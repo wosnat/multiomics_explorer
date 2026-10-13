@@ -38,7 +38,7 @@ total_matching, returned, offset, truncated, not_found, warnings, results
 
 - This returns ALL Gene node properties via g{.*} — for the common case, use gene_overview which returns curated fields with routing signals.
 
-- What this adds over gene_overview: the amino-acid `sequence`, genome coordinates (`contig`, `start`, `end`, `strand`, `protein_id`), the free-text `gene_summary` / `function_description` / `alternate_functional_descriptions`, sparse `catalytic_activities` (present on a minority of genes), `contributing_sources`, `seed_ortholog` + `seed_ortholog_evalue`, `all_identifiers`, `subcellular_localization`, and the full set of precomputed per-kind DM counts.
+- What this adds over gene_overview: the amino-acid `sequence`, genome coordinates (`contig`, `start`, `end`, `strand`, `protein_id`) with their provenance `coordinate_source` / `sequence_source` (`ncbi` / `cyanorak`; `protein_id` is null on genes only Cyanorak called), the free-text `gene_summary` / `function_description` / `alternate_functional_descriptions`, sparse `catalytic_activities` (present on a minority of genes), `contributing_sources`, `seed_ortholog` + `seed_ortholog_evalue`, `all_identifiers`, `subcellular_localization`, and the full set of precomputed per-kind DM counts.
 
 ## Chaining patterns
 

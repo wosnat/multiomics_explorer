@@ -176,14 +176,25 @@ examples:
         ]
       }
 
-  - title: not_found vs not_matched (missing gene vs gene with no coordinates)
+  - title: not_found vs a placed anchor (A9601_09441 is a Cyanorak-only gene — coordinates from Cyanorak, so it now has a neighborhood; not_matched stays empty)
     call: gene_neighbors(locus_tags=["ACZ81_08860", "A9601_09441", "NOTAREAL"])
     response: |
       {
-        "total_matching": 10,
-        "returned": 10,
+        "total_matching": 20,
+        "returned": 20,
         "truncated": false,
         "anchors": [
+          {
+            "locus_tag": "A9601_09441",
+            "organism_name": "Prochlorococcus AS9601",
+            "contig": "NC_008816.1",
+            "start": 813207,
+            "end": 813338,
+            "strand": "+",
+            "product": "conserved hypothetical protein",
+            "neighbors_returned": 10,
+            "dropped_null_strand": 0
+          },
           {
             "locus_tag": "ACZ81_08860",
             "organism_name": "Alteromonas macleodii HOT1A3",
@@ -196,43 +207,46 @@ examples:
             "dropped_null_strand": 0
           }
         ],
-        "by_organism": [{"organism_name": "Alteromonas macleodii HOT1A3", "count": 10}],
+        "by_organism": [
+          {"organism_name": "Prochlorococcus AS9601", "count": 10},
+          {"organism_name": "Alteromonas macleodii HOT1A3", "count": 10}
+        ],
         "not_found": ["NOTAREAL"],
-        "not_matched": ["A9601_09441"],
+        "not_matched": [],
         "warnings": [],
         "results": [
           {
-            "anchor_locus_tag": "ACZ81_08860",
-            "neighbor_locus_tag": "ACZ81_08835",
+            "anchor_locus_tag": "A9601_09441",
+            "neighbor_locus_tag": "A9601_09391",
             "rank_offset": -5,
-            "bp_gap": 5614,
+            "bp_gap": 4849,
             "strand": "-",
             "same_strand": false,
-            "product": "DUF2252 family protein",
+            "product": "S-adenosyl-L-methionine-dependent methyltransferase",
             "gene_name": null,
-            "gene_category": "Unknown"
+            "gene_category": "Stress response and adaptation"
           },
           {
-            "anchor_locus_tag": "ACZ81_08860",
-            "neighbor_locus_tag": "ACZ81_08840",
+            "anchor_locus_tag": "A9601_09441",
+            "neighbor_locus_tag": "A9601_09401",
             "rank_offset": -4,
-            "bp_gap": 4757,
-            "strand": "+",
-            "same_strand": true,
-            "product": "alkyl hydroperoxide reductase subunit C",
-            "gene_name": "ahpC",
-            "gene_category": "Cellular processes"
+            "bp_gap": 3326,
+            "strand": "-",
+            "same_strand": false,
+            "product": "glutamine synthetase, type I",
+            "gene_name": "glnA",
+            "gene_category": "Amino acid metabolism"
           },
           {
-            "anchor_locus_tag": "ACZ81_08860",
-            "neighbor_locus_tag": "ACZ81_08845",
+            "anchor_locus_tag": "A9601_09441",
+            "neighbor_locus_tag": "A9601_09411",
             "rank_offset": -3,
-            "bp_gap": 2986,
+            "bp_gap": 1928,
             "strand": "+",
             "same_strand": true,
-            "product": "alkyl hydroperoxide reductase subunit F",
-            "gene_name": "ahpF",
-            "gene_category": "Post-translational modification"
+            "product": "alanine--glyoxylate aminotransferase",
+            "gene_name": "spt",
+            "gene_category": "Amino acid metabolism"
           },
           ...
         ]

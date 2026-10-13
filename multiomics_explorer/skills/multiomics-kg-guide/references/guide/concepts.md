@@ -97,8 +97,10 @@ and `vesicle` simultaneously — distinct rows. Filter via
   `discussed_in_publication_count`, `compartments_observed`,
   `annotation_quality` (0..3 — see `docs://guide/conventions`). Each
   Gene also carries an amino-acid `sequence` and genomic coordinates
-  (`contig`, `start`, `end`, `strand`) — all co-populated; null only on
-  the ~3% of expression-only genes with no genome match. Exposed by
+  (`contig`, `start`, `end`, `strand`) — all co-populated. Most come from
+  NCBI; genes only Cyanorak called (no RefSeq protein, so `protein_id` is
+  null) take Cyanorak's coordinates and translation, flagged by
+  `coordinate_source` / `sequence_source` (`ncbi` / `cyanorak`). Exposed by
   `gene_aa_sequence` (sequences) and `gene_neighbors` (coordinates →
   positional neighborhood).
 - **`Protein`** / **`Polypeptide`** — each Gene has at most one
@@ -356,7 +358,7 @@ discriminator on each row (or in filters / rollups), and the
 
 Exact counts are intentionally **not** listed on this page — they change
 with every KG rebuild and a table reads as ground truth. The few orders
-of magnitude above (~127k genes, ~3% coordinate-less) are there only to
+of magnitude above (~127k genes) are there only to
 set scale. To get current cardinalities, call the tools that compute
 them live:
 

@@ -66,6 +66,7 @@ gene_aa_sequence(locus_tags=["ACZ81_08860", "ACZ81_08855"])
   "sequence_length_stats": {"count": 2, "min": 178, "q1": 178.0, "median": 178.0, "q3": 487.0, "max": 487, "mean": 332.5},
   "not_found": [],
   "not_matched": [],
+  "warnings": [],
   "fasta": "",
   "results": [
     {
@@ -105,6 +106,7 @@ gene_aa_sequence(locus_tags=["ACZ81_08860", "ACZ81_08855"], fasta=True)
   "sequence_length_stats": {"count": 2, "min": 178, "q1": 178.0, "median": 178.0, "q3": 487.0, "max": 487, "mean": 332.5},
   "not_found": [],
   "not_matched": [],
+  "warnings": [],
   "fasta": ">ACZ81_08855 Alteromonas macleodii HOT1A3|WP_049586664.1|hypothetical protein\nMLSVAAGGLTLAALGVIYKSWRAQASTYLYLGLVVWLVA...",
   "results": [
     {
@@ -129,7 +131,7 @@ gene_aa_sequence(locus_tags=["ACZ81_08860", "ACZ81_08855"], fasta=True)
 }
 ```
 
-### Example 3: not_found vs not_matched (missing gene vs gene with no sequence)
+### Example 3: not_found, plus a Cyanorak-only gene (A9601_09441 — sequence from Cyanorak, protein_id null)
 
 ```example-call
 gene_aa_sequence(locus_tags=["ACZ81_08860", "A9601_09441", "NOTAREAL"])
@@ -137,13 +139,17 @@ gene_aa_sequence(locus_tags=["ACZ81_08860", "A9601_09441", "NOTAREAL"])
 
 ```example-response
 {
-  "total_matching": 1,
-  "returned": 1,
+  "total_matching": 2,
+  "returned": 2,
   "truncated": false,
-  "by_organism": [{"organism_name": "Alteromonas macleodii HOT1A3", "count": 1}],
-  "sequence_length_stats": {"count": 1, "min": 487, "q1": 487.0, "median": 487.0, "q3": 487.0, "max": 487, "mean": 487.0},
+  "by_organism": [
+    {"organism_name": "Alteromonas macleodii HOT1A3", "count": 1},
+    {"organism_name": "Prochlorococcus AS9601", "count": 1}
+  ],
+  "sequence_length_stats": {"count": 2, "min": 43, "q1": 43.0, "median": 43.0, "q3": 487.0, "max": 487, "mean": 265.0},
   "not_found": ["NOTAREAL"],
-  "not_matched": ["A9601_09441"],
+  "not_matched": [],
+  "warnings": [],
   "fasta": "",
   "results": [
     {
@@ -154,6 +160,15 @@ gene_aa_sequence(locus_tags=["ACZ81_08860", "A9601_09441", "NOTAREAL"])
       "protein_id": "WP_061485747.1",
       "sequence_length": 487,
       "sequence": "MDKITKQNALNAHTWVGVFLSVLLFLVCLSGTVAVFHLEFERWEQPHIEEMKNVSPDVVEKAMDTFLAQNTQESHHLYVVFPTSDIPRLVVENDHAAYFADSEGNLLEQESVSFTEM..."
+    },
+    {
+      "locus_tag": "A9601_09441",
+      "organism_name": "Prochlorococcus AS9601",
+      "gene_name": null,
+      "product": "conserved hypothetical protein",
+      "protein_id": null,
+      "sequence_length": 43,
+      "sequence": "MGRPKIIAIVTGFISIAICIAYLLLITIFDFRTYLNDQLSNFT"
     }
   ]
 }
@@ -191,7 +206,9 @@ gene_overview → gene_aa_sequence (confirm identity, then pull the sequence)
 
 - sequence_length_stats and by_organism cover the full match, not just the returned page — they are stable across limit / offset. Page with `offset` to walk a large batch.
 
-- not_matched (gene exists but `sequence` is null, ~3% of genes — expression-only, no genome match) is distinct from not_found (locus_tag absent from the KG). See docs://guide/conventions.
+- not_matched (gene exists but `sequence` is null — every current Gene carries one, so expect it empty) is distinct from not_found (locus_tag absent from the KG). See docs://guide/conventions.
+
+- `protein_id` is null for genes only Cyanorak called (no RefSeq protein): their `sequence` is Cyanorak's translation (stop glyph stripped, start residue normalised to M). `gene_details` shows `sequence_source` (`ncbi` / `cyanorak`); cite the Cyanorak ORF id from `all_identifiers`, and treat the 5′ end as one caller's start call.
 
 - `limit` defaults to every input gene (min 25) rather than a small page — pass an explicit number to page.
 

@@ -49,14 +49,3 @@ class TestFixtureGuards:
         )
         assert rows[0]["gene_exists"] is False
 
-    def test_gene_no_coordinates_has_null_position(self, conn):
-        # Degenerate property: gene exists but strand/start/contig are null.
-        rows = conn.execute_query(
-            "MATCH (g:Gene {locus_tag:$lt}) "
-            "RETURN g.strand AS strand, g.start AS start, g.contig AS contig",
-            lt=fx.GENE_NO_COORDINATES,
-        )
-        assert rows, f"{fx.GENE_NO_COORDINATES} no longer in KG"
-        assert rows[0]["strand"] is None
-        assert rows[0]["start"] is None
-        assert rows[0]["contig"] is None

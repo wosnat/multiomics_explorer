@@ -2,7 +2,7 @@
 
 ## Guides
 
-- `docs://guide/concepts` — ~6238 tok — The knowledge graph integrates Prochlorococcus and Alteromonas multi-omics data: genomes, transcriptomes…
+- `docs://guide/concepts` — ~6269 tok — The knowledge graph integrates Prochlorococcus and Alteromonas multi-omics data: genomes, transcriptomes…
 - `docs://guide/conventions` — ~7047 tok — Patterns that hold across most or all 42 tools — things you'd otherwise re-learn tool by tool.
 - `docs://guide/python_api` — ~4115 tok — The `multiomics_explorer` package exposes the same 42 tools available via MCP, plus a handful of analysis…
 - `docs://guide/start_here` — ~4019 tok — This MCP server exposes 42 tools over a Prochlorococcus/Alteromonas multi-omics KG, in ten families below.
@@ -17,7 +17,7 @@
 - `docs://tools/gene_aa_sequence` — ~604 tok
 - `docs://tools/gene_clusters_by_gene` — ~954 tok
 - `docs://tools/gene_derived_metrics` — ~1188 tok
-- `docs://tools/gene_details` — ~679 tok
+- `docs://tools/gene_details` — ~713 tok
 - `docs://tools/gene_homologs` — ~692 tok
 - `docs://tools/gene_neighbors` — ~790 tok
 - `docs://tools/gene_ontology_terms` — ~1514 tok
@@ -61,12 +61,12 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/differential_expression_by_gene/full` — ~6702 tok
 - `docs://tools/differential_expression_by_ortholog/full` — ~2923 tok
 - `docs://tools/discussed_by_publication/full` — ~3476 tok
-- `docs://tools/gene_aa_sequence/full` — ~2212 tok
+- `docs://tools/gene_aa_sequence/full` — ~2404 tok
 - `docs://tools/gene_clusters_by_gene/full` — ~2330 tok
 - `docs://tools/gene_derived_metrics/full` — ~2983 tok
-- `docs://tools/gene_details/full` — ~2307 tok
+- `docs://tools/gene_details/full` — ~2341 tok
 - `docs://tools/gene_homologs/full` — ~2045 tok
-- `docs://tools/gene_neighbors/full` — ~3329 tok
+- `docs://tools/gene_neighbors/full` — ~3449 tok
 - `docs://tools/gene_ontology_terms/full` — ~10331 tok
 - `docs://tools/gene_overview/full` — ~8824 tok
 - `docs://tools/gene_response_profile/full` — ~5472 tok

@@ -38,12 +38,11 @@ MIXED_LOCUS_BATCH = ["PMM0001", "PMM_DOES_NOT_EXIST"]
 
 # --- Null-property fixtures (axis 4) --------------------------------------
 
-# A valid gene with NULL genomic coordinates (strand / start / contig all
-# null) — 3872 such genes exist. Positional tools (gene_neighbors) cannot
-# place it, so it must land in not_matched, never crash. Organism: NATL1A.
-# MATCH (g:Gene) WHERE g.strand IS NULL AND g.start IS NULL AND g.contig IS NULL
-#   RETURN g.locus_tag LIMIT 1
-GENE_NO_COORDINATES = "NATL1_09771"
+# (No null-coordinate gene fixture: since the 2026-10-13 KG rebuild, which
+# placed the 3,837 Cyanorak-only genes, every Gene carries contig / start /
+# strand — `MATCH (g:Gene) WHERE g.start IS NULL RETURN count(g)` = 0. The
+# gene_neighbors not_matched path stays covered by unit tests with mocked
+# null-coordinate anchors.)
 
 # --- Other unknown IDs (for not_found buckets) ----------------------------
 
