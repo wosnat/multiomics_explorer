@@ -10979,6 +10979,18 @@ class TestMetabolitesByGene:
         assert _mbg_sort_key(a, idx) < _mbg_sort_key(inh, idx)
         assert _mbg_sort_key(self._METAB_ROW, idx) < _mbg_sort_key(b, idx)
 
+    def test_sort_key_unique_on_secondary_id(self):
+        """Rows sharing (gene, metabolite) differ by reaction / TCDB family;
+        the key must separate them so paging is deterministic (backlog 2c.1)."""
+        from multiomics_explorer.api.functions import _mbg_sort_key
+        idx = {lt: i for i, lt in enumerate(self._LOCUS)}
+        r1 = {**self._METAB_ROW, "reaction_id": "kegg.reaction:R00001"}
+        r2 = {**self._METAB_ROW, "reaction_id": "kegg.reaction:R00002"}
+        assert _mbg_sort_key(r1, idx) < _mbg_sort_key(r2, idx)
+        t1 = {**self._TRANS_ROW_MS, "tcdb_family_id": "tcdb:3.A.1.1"}
+        t2 = {**self._TRANS_ROW_MS, "tcdb_family_id": "tcdb:3.A.1.2"}
+        assert _mbg_sort_key(t1, idx) < _mbg_sort_key(t2, idx)
+
     def test_by_gene_carries_resolution_and_score_max(self):
         """by_gene[] entries gain transport_substrate_resolution +
         tcdb_evidence_score_max (pass-through from the summary builder;
@@ -13713,6 +13725,27 @@ class TestGeneNeighbors:
         result = api.gene_neighbors(locus_tags=["ACZ81_08860"], conn=mock_conn)
         assert isinstance(result, dict)
         assert set(result.keys()) == self._ENVELOPE_KEYS
+
+    def test_window_above_cap_raises_before_query(self, mock_conn):
+        """window=10000 exhausted the Neo4j memory pool (backlog 2c.2)."""
+        with pytest.raises(ValueError, match="window"):
+            api.gene_neighbors(locus_tags=["ACZ81_08860"], window=101, conn=mock_conn)
+        mock_conn.execute_query.assert_not_called()
+
+    def test_row_budget_exceeded_raises_before_query(self, mock_conn):
+        """anchors × 2·window above the row budget → clear error, not an OOM."""
+        tags = [f"PMM{i:04d}" for i in range(1001)]
+        with pytest.raises(ValueError, match="batches"):
+            api.gene_neighbors(locus_tags=tags, window=50, conn=mock_conn)
+        mock_conn.execute_query.assert_not_called()
+
+    def test_row_budget_skipped_in_summary_mode(self, mock_conn):
+        """summary=True never runs the detail query, so the budget doesn't apply."""
+        tags = [f"PMM{i:04d}" for i in range(1001)]
+        mock_conn.execute_query.side_effect = [self._exist(tags), []]
+        result = api.gene_neighbors(locus_tags=tags, window=50, summary=True,
+                                    conn=mock_conn)
+        assert result["results"] == []
 
     def test_total_matching_from_detail_set(self, mock_conn):
         """total_matching derived from the (bounded) detail set, not the summary query."""

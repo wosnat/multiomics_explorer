@@ -8849,7 +8849,10 @@ def _mbg_sort_key(row: dict, locus_index: dict[str, int]) -> tuple:
       2. tcdb_evidence_score desc (None → 0; metabolism rows all tie)
       3. input gene order via `apoc.coll.indexOf` equivalent
       4. locus_tag (deterministic tiebreaker)
-      5. metabolite_id (final tiebreaker)
+      5. metabolite_id
+      6. reaction_id (metabolism) / tcdb_family_id (transport) — makes the
+         key unique per row so paging never overlaps (mirrors the builders'
+         ORDER BY).
     """
     if row.get("evidence_source") == "metabolism":
         precision_tier = 0
@@ -8865,6 +8868,7 @@ def _mbg_sort_key(row: dict, locus_index: dict[str, int]) -> tuple:
         input_pos,
         locus,
         row.get("metabolite_id") or "",
+        row.get("reaction_id") or row.get("tcdb_family_id") or "",
     )
 
 
@@ -10532,6 +10536,13 @@ def gene_aa_sequence(
 # ---------------------------------------------------------------------------
 
 
+# gene_neighbors guards (backlog 2c.2): the detail query materializes every
+# anchor × neighbor row before `limit` applies, so window=10000 over a whole
+# genome (~3.7M rows) exhausted the Neo4j transaction memory pool.
+GENE_NEIGHBORS_MAX_WINDOW = 100
+GENE_NEIGHBORS_MAX_ROWS = 100_000
+
+
 def gene_neighbors(
     locus_tags: list[str],
     window: int = 5,
@@ -10577,12 +10588,27 @@ def gene_neighbors(
     strand is null — then all its neighbors are kept and a warning is added.
     summary=True returns the envelope with results=[] (sugar for limit=0).
 
-    Raises ValueError if locus_tags is empty.
+    Raises ValueError if locus_tags is empty, if window > 100, or (detail
+    mode) if len(locus_tags) × 2 × window exceeds 100,000 rows — split
+    locus_tags into batches.
     """
     if not locus_tags:
         raise ValueError("locus_tags must not be empty.")
+    if window > GENE_NEIGHBORS_MAX_WINDOW:
+        raise ValueError(
+            f"window must be <= {GENE_NEIGHBORS_MAX_WINDOW} (got {window}). "
+            "gene_neighbors is for local operon / synteny context; for "
+            "genome-wide coordinates use gene_details (contig, start, end, "
+            "strand) over the organism's locus tags."
+        )
     if summary:
         limit = 0
+    elif len(set(locus_tags)) * 2 * window > GENE_NEIGHBORS_MAX_ROWS:
+        raise ValueError(
+            f"{len(set(locus_tags))} anchors × 2 × window={window} could return "
+            f"more than {GENE_NEIGHBORS_MAX_ROWS:,} neighbor rows. Split "
+            "locus_tags into batches, lower window, or pass summary=True."
+        )
 
     conn = _default_conn(conn)
 

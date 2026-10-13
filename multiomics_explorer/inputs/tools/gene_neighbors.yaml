@@ -262,6 +262,8 @@ mistakes:
   - "Neighbors are scoped to the same contig and organism. Genomes are often fragmented (e.g. the Alteromonas MarRef v6 assembly has 573 contigs; HOT1A3 by contrast is closed — chromosome + plasmid), so an anchor near a contig end returns fewer neighbors on that side — and a gene alone on its contig returns none (still reported in `anchors`)."
   - "rank_offset gives direction (signed); bp_gap is always unsigned (use rank_offset's sign for upstream/downstream)."
   - "not_matched (gene exists but lacks contig/start coordinates) is distinct from not_found (locus_tag absent from the KG). See docs://guide/conventions."
+  - wrong: "Sweeping a whole genome's coordinates with one huge call, e.g. gene_neighbors(locus_tags=<every gene>, window=10000)."
+    right: "window is capped at 100 and len(locus_tags) × 2 × window at 100,000 rows (the detail query builds every row before `limit` applies; the uncapped call exhausted Neo4j memory). For genome-wide contig/start/end/strand use gene_details over the organism's locus tags; batch larger anchor sets."
 
 # python_returns: dict
   - "`limit` defaults to every anchor × (2×window+1) neighbors (min 25) rather than a small page — pass an explicit number to page."

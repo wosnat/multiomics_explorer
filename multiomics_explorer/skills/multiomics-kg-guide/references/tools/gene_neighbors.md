@@ -14,7 +14,7 @@ docs://tools/gene_neighbors; summary=True first.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | locus_tags | list[string] | — | Anchor gene locus tags. Cross-organism OK. E.g. ['ACZ81_08860']. |
-| window | int | 5 | Number of genes upstream AND downstream on the same contig (±N by start order). |
+| window | int | 5 | Number of genes upstream AND downstream on the same contig (±N by start order). Max 100; len(locus_tags) × 2 × window must stay ≤ 100,000 rows (batch larger anchor sets). |
 | max_bp_distance | int \| None | None | Optional cap: drop neighbors whose intergenic gap to the anchor exceeds this many bp. |
 | same_strand | bool \| None | None | None=all neighbors; True=co-oriented only; False=opposite-strand only. Null-strand neighbors dropped when set. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |

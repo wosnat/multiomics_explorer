@@ -19,7 +19,7 @@
 - `docs://tools/gene_derived_metrics` — ~1188 tok
 - `docs://tools/gene_details` — ~679 tok
 - `docs://tools/gene_homologs` — ~692 tok
-- `docs://tools/gene_neighbors` — ~766 tok
+- `docs://tools/gene_neighbors` — ~790 tok
 - `docs://tools/gene_ontology_terms` — ~1514 tok
 - `docs://tools/gene_overview` — ~1240 tok
 - `docs://tools/gene_response_profile` — ~1099 tok
@@ -66,7 +66,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/gene_derived_metrics/full` — ~2983 tok
 - `docs://tools/gene_details/full` — ~2307 tok
 - `docs://tools/gene_homologs/full` — ~2045 tok
-- `docs://tools/gene_neighbors/full` — ~3194 tok
+- `docs://tools/gene_neighbors/full` — ~3329 tok
 - `docs://tools/gene_ontology_terms/full` — ~10331 tok
 - `docs://tools/gene_overview/full` — ~8824 tok
 - `docs://tools/gene_response_profile/full` — ~5472 tok

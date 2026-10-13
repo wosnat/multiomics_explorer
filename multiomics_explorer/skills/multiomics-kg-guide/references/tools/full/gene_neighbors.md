@@ -14,7 +14,7 @@ docs://tools/gene_neighbors; summary=True first.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | locus_tags | list[string] | — | Anchor gene locus tags. Cross-organism OK. E.g. ['ACZ81_08860']. |
-| window | int | 5 | Number of genes upstream AND downstream on the same contig (±N by start order). |
+| window | int | 5 | Number of genes upstream AND downstream on the same contig (±N by start order). Max 100; len(locus_tags) × 2 × window must stay ≤ 100,000 rows (batch larger anchor sets). |
 | max_bp_distance | int \| None | None | Optional cap: drop neighbors whose intergenic gap to the anchor exceeds this many bp. |
 | same_strand | bool \| None | None | None=all neighbors; True=co-oriented only; False=opposite-strand only. Null-strand neighbors dropped when set. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
@@ -346,6 +346,14 @@ It reports positional adjacency only — genes next to the anchor on the same co
 - rank_offset gives direction (signed); bp_gap is always unsigned (use rank_offset's sign for upstream/downstream).
 
 - not_matched (gene exists but lacks contig/start coordinates) is distinct from not_found (locus_tag absent from the KG). See docs://guide/conventions.
+
+```mistake
+Sweeping a whole genome's coordinates with one huge call, e.g. gene_neighbors(locus_tags=<every gene>, window=10000).
+```
+
+```correction
+window is capped at 100 and len(locus_tags) × 2 × window at 100,000 rows (the detail query builds every row before `limit` applies; the uncapped call exhausted Neo4j memory). For genome-wide contig/start/end/strand use gene_details over the organism's locus tags; batch larger anchor sets.
+```
 
 - `limit` defaults to every anchor × (2×window+1) neighbors (min 25) rather than a small page — pass an explicit number to page.
 

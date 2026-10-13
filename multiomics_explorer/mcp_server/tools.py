@@ -9923,7 +9923,7 @@ def register_tools(mcp: FastMCP):
         locus_tags: Annotated[list[str], Field(
             description="Anchor gene locus tags. Cross-organism OK. E.g. ['ACZ81_08860'].")],
         window: Annotated[int, Field(
-            description="Number of genes upstream AND downstream on the same contig (±N by start order).", ge=1)] = 5,
+            description="Number of genes upstream AND downstream on the same contig (±N by start order). Max 100; len(locus_tags) × 2 × window must stay ≤ 100,000 rows (batch larger anchor sets).", ge=1, le=100)] = 5,
         max_bp_distance: Annotated[int | None, Field(
             description="Optional cap: drop neighbors whose intergenic gap to the anchor exceeds this many bp.")] = None,
         same_strand: Annotated[bool | None, Field(

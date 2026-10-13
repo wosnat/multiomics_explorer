@@ -166,7 +166,7 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
       "evidence_kind": "quantifies",
       "n_replicates": 1,
       "metric_type": "extracellular_concentration",
-      "condition_label": "P_limited_light_50",
+      "condition_label": "replete_light_10",
       "organism_name": "Prochlorococcus MIT9301",
       "compartment": "extracellular",
       "experiment_id": "10.1128/msystems.01261-22_kujawinski_metabolomics_9301_extracellular",

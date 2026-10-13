@@ -29,6 +29,19 @@ Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · *
 |---|---|---|---|
 | 2b.6 | **Consolidation** (release boundary + KG `mcp_min_version`). Kept post-cut 2026-08-30 — tool merges too risky before alpha.5; means alpha.6 is a second breaking release. Merge `metabolites_by_quantifies_assay` + `metabolites_by_flags_assay` → `metabolites_by_assay`; merge or front the three `genes_by_*_metric`; `SKILL.md` for the skill tree and collapse CLAUDE.md's tool table; delete the research repo's duplicate python guide + fix its dangling `docs://analysis/to_dataframe` link. | L | queued |
 
+## 2c. Pro N-import coculture analysis 2026-10-06 (`multiomics_analysis/analyses/2026-10-06-pro_n_import_coculture/gaps_and_friction.md`)
+
+Explorer-side items only; KG asks from the same log are §4 D. Template / methodology entries in that log stay in the analysis repo.
+
+| # | Item | Size | Notes |
+|---|---|---|---|
+| 2c.2 | Genome-coordinate listing: all genes of an organism with contig / start / end / strand, pageable, flagging the coordinate-less ones. The analysis needed it and swept `gene_neighbors` (8 × window=250) + `gene_details` instead. The OOM half shipped 2026-10-13 (window ≤ 100, row budget). Could be a `gene_details` organism mode instead of a new tool. | M | |
+| 2c.3 | `genes_by_ontology` default `min_gene_set_size=5` / `max_gene_set_size=500` silently drop terms in enumeration calls (BRITE transporters MED4: 57 genes with defaults vs 86 with `1/None`; most role Pfams have 1–2 genes). Report the dropped-by-size term and gene counts in the envelope, and warn when a `term_ids` / `tree` call loses terms. | S | |
+| 2c.4 | The `metabolite_elements` filter (`metabolites_by_gene`, and check `list_metabolites.elements`) silently drops formula-less metabolites: MED4 transport has 249 metabolites / 4,105 rows, including N-bearing classes (amino acid, dipeptide, polyamine, siderophore). Report a `dropped_no_formula` count or warning. | S | |
+| 2c.5 | `list_metabolites(evidence_sources=['transport'])`: `top_organisms` sits at 508–510 for every organism because of the ABC-superfamily rollup, and there's no warning. Port the "inherited rows dominate" warning from `genes_by_metabolite`. | S | |
+| 2c.6 | `coculture_partner` is set only when coculture is the *treatment*. The 8 Weissberg 2025 N-starvation experiments (and García-Fernández glucose proteomics) have `background_factors: ['coculture']` and partner null, so the filter misses them and the agent reported "no Pro proteomics in coculture". Fix the param docs / `list_experiments` yaml mistakes section to say "treatment-only, also filter `background_factors=['coculture']`"; or, once KG D5 lands, match either field. | S | KG D5 |
+| 2c.7 | TCDB transport rows on superfamily-only genes (e.g. `salY`, `inherited`) give the gene's own attachment (`tcdb:3.A.1`) as the family, not the TCDB node the substrate came from. Check the row shape, and consider a `substrate_source_family` field. | S | investigate first |
+
 ## 3. Older backlog — verified 2026-08-28
 
 Shipped since the last refresh (removed from the open set): 3.9 metabolomics-DM slice (KG owner decided 2026-08-29: not planned, no driver dataset — reopenable); 3.10 KG-MET-002 (comment landed in rebuild #3); 3.6 static resources (verified 2026-08-29: every `docs://` URI is a static `FunctionResource`, no templates); `_freq_rollup` helper extraction;
@@ -64,6 +77,16 @@ Filed in chat 2026-08-28; the non-release set (B1–B3, new B5 rebuild-#3 ping, 
 - ~~B3~~ done in rebuild #3 (`min_size: int` sparse on the vocab node — was dropped by BioCypher for lack of a schema slot; hash-neutral, no re-pin).
 - ~~B5~~ rebuild #3 verified 2026-08-29 (07:22Z): `kg_release_info` ok, hash unchanged, 17/17 asserts; `min_size = 1` on the 7 promised vocab nodes; 4 goldens moved (3 Biller 2022 DM + `cluster_type` text), 2,904 `-m kg` passed after 4 stale pin fixes.
 - ~~B4~~ closed 2026-08-28 (HO-002: synonyms + `taxonomy_note`, name kept). Was: two `OrganismTaxon` nodes share `preferred_name = 'Meiothermus ruber'` (genome strain + 0-gene treatment taxon) — disambiguate the treatment taxon's name or add a uniqueness validity test.
+
+**D — from the Pro N-import coculture analysis 2026-10-06 (not yet filed KG-side)**
+- D1. Metabolite equivalence across namespaces: nitrate `chebi:14654` (transport arm) and `kegg.compound:C00244` (metabolism arm) share no ChEBI / MNX / InChIKey xref (they are a conjugate pair). Generic "Cysteine" C00736 (TCDB) is not linked to "L-Cysteine" C00097 (reactions), which makes 20 of 49 zero-enzyme cells an ID artefact. Ask for an `equivalent_ids` field or an equivalence edge (charge-state + D/L-generic normalisation). Without it, joins between the transport and metabolism arms silently miss matches.
+- D2. Chemical classes for Metabolite nodes (ChEBI is-a / role hierarchy or ClassyFire). Currently none; KEGG pathway or carrier-family proxies were ~50% wrong.
+- D3. TCDB substrate granularity: subfamily lists are inherited by every member gene (`sul1`/`sul3` list amino acids + nitrate; `ktrA`/`nhaS` list ammonium; MIT9313 `putP` lists urea/nitrate/polyamines). Add a per-attachment substrate-breadth field or a "substrate plausible given genome" flag. Also: PepT depth looks inverted on `dpp` (generic peptide only `inherited`); missing / truncated names (`tcdb:4.C.1.1`, bare `1.A.1.x` / `2.A.88.x` show the ID; `3.A.1.4.4` = "The high-affinity ("); `urtE` has a stray score-0 `tcdb:1.B.42`.
+- D4. Gene coordinates missing on 91 MED4 genes (~5%; e.g. `cyabrB2` PMM0573, `hli` PMM0815, `petL` PMM1718) and ~18% of MIT9313. Docs quote "~3%" overall (kg_claims, 3.17).
+- D5. Populate `coculture_partner` whenever the culture is a coculture, not only when coculture is the treatment (pairs with 2c.6).
+- D6. Experiments derived from one fitted model need a shared model / sample-set id, plus per-arm sampling day and growth state. The Weissberg anchor contrasts are algebraically linked (identity to 1e-15). The axenic arm is labelled d14 in one experiment and sits inside "d18" in another, and is labelled `nutrient_limited` although it is in full decline.
+- D7. Culture-level measurement node type (cell counts, medium NH₄⁺/NO₃⁻, N biomass, DON): organism, condition, bottle id, time, growth phase, value, unit, measured/derived, extraction method. Medium nutrients can already go in as `spent_medium` metabolite assays. Researcher wants cell counts; it's not urgent.
+- D8 (note): no KEGG reactions on di-/tripeptides; KO coverage gaps on transporters (`amt1`, `focA`). These are annotation limits, no ask yet.
 
 **C — notes, no action**: `expression_bin` declared but unused (drift test checks in-use ⊆ declared); `direct_gene_count` absent on PfamClan / BriteCategory (documented); 4 publications without `discusses` edges (pre-existing extraction gaps).
 

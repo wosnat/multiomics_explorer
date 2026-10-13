@@ -2980,7 +2980,7 @@ def build_list_experiments(
             f"{where_block}"
             f"RETURN {return_cols},\n"
             f"       score{verbose_cols}\n"
-            f"ORDER BY score DESC, e.organism_name, e.name\n"
+            f"ORDER BY score DESC, e.organism_name, e.name, e.id\n"
             f"{skip_clause}{limit_clause}"
         )
     else:
@@ -2988,7 +2988,7 @@ def build_list_experiments(
             "MATCH (p:Publication)-[:Has_experiment]->(e:Experiment)\n"
             f"{where_block}"
             f"RETURN {return_cols}{verbose_cols}\n"
-            f"ORDER BY p.publication_year DESC, e.organism_name, e.name\n"
+            f"ORDER BY p.publication_year DESC, e.organism_name, e.name, e.id\n"
             f"{skip_clause}{limit_clause}"
         )
 
@@ -9528,7 +9528,7 @@ def build_metabolites_by_gene_metabolism(
         f"{verbose_cols}\n"
         "ORDER BY 0,"
         " apoc.coll.indexOf($locus_tags, locus_tag),"
-        " locus_tag, metabolite_id"
+        " locus_tag, metabolite_id, reaction_id"
         f"{skip_clause}{limit_clause}"
     )
     return cypher, params
@@ -9638,7 +9638,7 @@ def build_metabolites_by_gene_transport(
         " CASE WHEN r.substrate_depth = 'most_specific' THEN 0 ELSE 1 END,"
         " tcdb_evidence_score DESC,"
         " apoc.coll.indexOf($locus_tags, locus_tag),"
-        " locus_tag, metabolite_id"
+        " locus_tag, metabolite_id, tcdb_family_id"
         f"{skip_clause}{limit_clause}"
     )
     return cypher, params
@@ -10655,7 +10655,7 @@ def build_metabolites_by_quantifies_assay(
         "       a.organism_name AS organism_name,\n"
         "       a.compartment AS compartment"
         f"{verbose_cols}\n"
-        "ORDER BY r.rank_by_metric ASC, m.id ASC, a.id ASC, r.time_point_order ASC"
+        "ORDER BY r.rank_by_metric ASC, m.id ASC, a.id ASC, r.time_point_order ASC, r.id ASC"
         f"{pagination}"
     )
     return cypher, params
@@ -10881,7 +10881,7 @@ def build_metabolites_by_flags_assay(
         "       a.organism_name AS organism_name,\n"
         "       a.compartment AS compartment"
         f"{verbose_cols}\n"
-        "ORDER BY flag_value DESC, m.id ASC, a.id ASC"
+        "ORDER BY flag_value DESC, m.id ASC, a.id ASC, r.id ASC"
         f"{pagination}"
     )
     return cypher, params
@@ -11109,7 +11109,7 @@ def build_assays_by_metabolite(
         "  RETURN\n"
         "    m.id AS metabolite_id, m.name AS metabolite_name,\n"
         "    a.id AS assay_id, a.name AS assay_name,\n"
-        "    'quantifies' AS evidence_kind,\n"
+        "    'quantifies' AS evidence_kind, rq.id AS edge_id,\n"
         "    rq.value AS value, rq.value_sd AS value_sd,\n"
         "    null AS flag_value, null AS n_positive,\n"
         "    rq.n_replicates AS n_replicates, rq.metric_type AS metric_type,\n"
@@ -11133,7 +11133,7 @@ def build_assays_by_metabolite(
         "  RETURN\n"
         "    m.id AS metabolite_id, m.name AS metabolite_name,\n"
         "    a.id AS assay_id, a.name AS assay_name,\n"
-        "    'flags' AS evidence_kind,\n"
+        "    'flags' AS evidence_kind, rf.id AS edge_id,\n"
         "    null AS value, null AS value_sd,\n"
         "    (rf.flag_value = 'detected') AS flag_value,\n"
         "    rf.n_positive AS n_positive,\n"
@@ -11193,7 +11193,7 @@ def build_assays_by_metabolite(
            if verbose else "")
         + "\n"
         "ORDER BY metabolite_id ASC, evidence_kind DESC, assay_id ASC,\n"
-        "         coalesce(timepoint_order, 999999) ASC"
+        "         coalesce(timepoint_order, 999999) ASC, edge_id ASC"
         f"{pagination}"
     )
     return cypher, params

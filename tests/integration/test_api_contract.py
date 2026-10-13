@@ -1832,3 +1832,37 @@ class TestSearchOntologyBrowseContract:
             assert set(entry) == {
                 "ontology", "total_entries", "total_matching", "score_max",
                 "returned", "truncated"}
+
+
+# ---------------------------------------------------------------------------
+# Paging stability (backlog 2c.1): concatenated pages == one big call.
+# PMM0331 has many reactions / TCDB families per (gene, metabolite);
+# list_experiments has (organism, name) collisions (axenic vs coculture arms).
+# ---------------------------------------------------------------------------
+def _collect_pages(fn, page, **kw):
+    rows, offset = [], 0
+    while True:
+        out = fn(limit=page, offset=offset, **kw)
+        rows += out["results"]
+        offset += page
+        if offset >= out["total_matching"]:
+            return rows
+
+
+def _row_keys(rows):
+    import json
+    return sorted(json.dumps(r, sort_keys=True, default=str) for r in rows)
+
+
+@pytest.mark.kg
+class TestPagingStability:
+    @pytest.mark.parametrize("fn_name, page, kwargs", [
+        ("metabolites_by_gene", 10,
+         dict(locus_tags=["PMM0331"], organism="Prochlorococcus MED4")),
+        ("list_experiments", 13, {}),
+    ])
+    def test_pages_match_single_call(self, conn, fn_name, page, kwargs):
+        fn = getattr(api, fn_name)
+        single = fn(limit=100000, conn=conn, **kwargs)["results"]
+        paged = _collect_pages(fn, page, conn=conn, **kwargs)
+        assert _row_keys(paged) == _row_keys(single)

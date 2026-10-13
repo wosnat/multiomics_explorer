@@ -13282,3 +13282,45 @@ class TestBuildResolveMetaboliteAliases:
         """Unresolved inputs must still produce a row (empty canonical)."""
         cypher, _ = self._build(["bogus"])
         assert "OPTIONAL MATCH" in cypher
+
+
+# ---------------------------------------------------------------------------
+# Paged builders: ORDER BY must end in a key unique for the row grain, or
+# SKIP/LIMIT pages overlap (duplicates + silently dropped rows) — backlog 2c.1.
+# ---------------------------------------------------------------------------
+
+
+def _order_by_clause(cypher: str) -> str:
+    """Return the final ORDER BY clause text (up to SKIP/LIMIT/end)."""
+    tail = cypher.rsplit("ORDER BY", 1)[1]
+    tail = re.split(r"\bSKIP\b|\bLIMIT\b", tail, maxsplit=1)[0]
+    return " ".join(tail.split())
+
+
+class TestPagedOrderByUniqueKey:
+    _MBG = dict(locus_tags=["PMM0331"], organism="Prochlorococcus MED4",
+                limit=10, offset=10)
+
+    @pytest.mark.parametrize(
+        "builder, kwargs, unique_tail",
+        [
+            ("build_metabolites_by_gene_metabolism", _MBG,
+             "locus_tag, metabolite_id, reaction_id"),
+            ("build_metabolites_by_gene_transport", _MBG,
+             "locus_tag, metabolite_id, tcdb_family_id"),
+            ("build_metabolites_by_quantifies_assay",
+             dict(assay_ids=["a1"], limit=10, offset=10), "r.id ASC"),
+            ("build_metabolites_by_flags_assay",
+             dict(assay_ids=["a1"], limit=10, offset=10), "r.id ASC"),
+            ("build_assays_by_metabolite",
+             dict(metabolite_ids=["kegg.compound:C00074"], limit=10, offset=10),
+             "edge_id ASC"),
+            ("build_list_experiments", dict(limit=10, offset=10), "e.id"),
+            ("build_list_experiments",
+             dict(search_text="coculture", limit=10, offset=10), "e.id"),
+        ],
+    )
+    def test_order_by_ends_in_unique_key(self, builder, kwargs, unique_tail):
+        import multiomics_explorer.kg.queries_lib as ql
+        cypher, _ = getattr(ql, builder)(**kwargs)
+        assert _order_by_clause(cypher).endswith(unique_tail), _order_by_clause(cypher)

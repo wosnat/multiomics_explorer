@@ -1006,6 +1006,73 @@ rows:
   - Qinglu Zeng
   - Sallie W. Chisholm
   background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 32
+  experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark
+  experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) (RNASEQ)
+  gene_count: 49
+  growth_phases:
+  - acute_stress
+  is_time_course: time_course
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1371/journal.pone.0165375
+  significant_down_count: 36
+  significant_up_count: 13
+  table_scope: significant_only
+  table_scope_detail: ''
+  time_point_count: 4
+  time_point_growth_phases:
+  - acute_stress
+  - acute_stress
+  - acute_stress
+  - acute_stress
+  time_point_hours:
+  - '1.5'
+  - '2.5'
+  - '4.5'
+  - '8.5'
+  time_point_labels:
+  - 1.5h post-inoculation
+  - 2.5h post-inoculation
+  - 4.5h post-inoculation
+  - 8.5h post-inoculation
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  time_point_significant_down:
+  - '0'
+  - '1'
+  - '26'
+  - '9'
+  time_point_significant_up:
+  - '1'
+  - '2'
+  - '5'
+  - '5'
+  time_point_totals:
+  - '1'
+  - '14'
+  - '3'
+  - '31'
+  treatment_type:
+  - light
+- authors:
+  - Luke R. Thompson
+  - Qinglu Zeng
+  - Sallie W. Chisholm
+  background_factors:
   - viral
   cluster_types: []
   clustering_analysis_count: 0
@@ -1073,73 +1140,6 @@ rows:
   - '29'
   - '3'
   - '8'
-  treatment_type:
-  - light
-- authors:
-  - Luke R. Thompson
-  - Qinglu Zeng
-  - Sallie W. Chisholm
-  background_factors:
-  - axenic
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: null
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 32
-  experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark
-  experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) (RNASEQ)
-  gene_count: 49
-  growth_phases:
-  - acute_stress
-  is_time_course: time_course
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: RNASEQ
-  organism_name: Prochlorococcus MED4
-  publication_doi: 10.1371/journal.pone.0165375
-  significant_down_count: 36
-  significant_up_count: 13
-  table_scope: significant_only
-  table_scope_detail: ''
-  time_point_count: 4
-  time_point_growth_phases:
-  - acute_stress
-  - acute_stress
-  - acute_stress
-  - acute_stress
-  time_point_hours:
-  - '1.5'
-  - '2.5'
-  - '4.5'
-  - '8.5'
-  time_point_labels:
-  - 1.5h post-inoculation
-  - 2.5h post-inoculation
-  - 4.5h post-inoculation
-  - 8.5h post-inoculation
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  time_point_significant_down:
-  - '0'
-  - '1'
-  - '26'
-  - '9'
-  time_point_significant_up:
-  - '1'
-  - '2'
-  - '5'
-  - '5'
-  time_point_totals:
-  - '1'
-  - '14'
-  - '3'
-  - '31'
   treatment_type:
   - light
 - authors:
@@ -2262,89 +2262,6 @@ rows:
   - Qinglu Zeng
   - Xingqin Lin
   background_factors:
-  - axenic
-  - diel
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: null
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 34
-  experiment_id: 10.1111/1462-2920.13104_phosphorus_plimited_natl2a_rnaseq_uninfected
-  experiment_name: NATL2A P-limited vs P-replete control (RNASEQ)
-  gene_count: 204
-  growth_phases:
-  - nutrient_limited
-  - recovery
-  is_time_course: time_course
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: RNASEQ
-  organism_name: Prochlorococcus NATL2A
-  publication_doi: 10.1111/1462-2920.13104
-  significant_down_count: 4
-  significant_up_count: 41
-  table_scope: significant_only
-  table_scope_detail: ''
-  time_point_count: 6
-  time_point_growth_phases:
-  - nutrient_limited
-  - nutrient_limited
-  - nutrient_limited
-  - nutrient_limited
-  - recovery
-  - recovery
-  time_point_hours:
-  - '24.0'
-  - '4.0'
-  - '46.0'
-  - '50.0'
-  - '59.0'
-  - '59.0'
-  time_point_labels:
-  - 24h
-  - 46h
-  - 4h
-  - 50h (P added)
-  - 59h
-  - 59h (P added)
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  - '6'
-  time_point_significant_down:
-  - '0'
-  - '0'
-  - '0'
-  - '0'
-  - '1'
-  - '3'
-  time_point_significant_up:
-  - '10'
-  - '15'
-  - '2'
-  - '4'
-  - '4'
-  - '6'
-  time_point_totals:
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  treatment_type:
-  - phosphorus
-- authors:
-  - Huiming Ding
-  - Qinglu Zeng
-  - Xingqin Lin
-  background_factors:
   - diel
   - viral
   cluster_types: []
@@ -2429,6 +2346,89 @@ rows:
   time_point_totals:
   - '34'
   - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  treatment_type:
+  - phosphorus
+- authors:
+  - Huiming Ding
+  - Qinglu Zeng
+  - Xingqin Lin
+  background_factors:
+  - axenic
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 34
+  experiment_id: 10.1111/1462-2920.13104_phosphorus_plimited_natl2a_rnaseq_uninfected
+  experiment_name: NATL2A P-limited vs P-replete control (RNASEQ)
+  gene_count: 204
+  growth_phases:
+  - nutrient_limited
+  - recovery
+  is_time_course: time_course
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus NATL2A
+  publication_doi: 10.1111/1462-2920.13104
+  significant_down_count: 4
+  significant_up_count: 41
+  table_scope: significant_only
+  table_scope_detail: ''
+  time_point_count: 6
+  time_point_growth_phases:
+  - nutrient_limited
+  - nutrient_limited
+  - nutrient_limited
+  - nutrient_limited
+  - recovery
+  - recovery
+  time_point_hours:
+  - '24.0'
+  - '4.0'
+  - '46.0'
+  - '50.0'
+  - '59.0'
+  - '59.0'
+  time_point_labels:
+  - 24h
+  - 46h
+  - 4h
+  - 50h (P added)
+  - 59h
+  - 59h (P added)
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  time_point_significant_down:
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '1'
+  - '3'
+  time_point_significant_up:
+  - '10'
+  - '15'
+  - '2'
+  - '4'
+  - '4'
+  - '6'
+  time_point_totals:
   - '34'
   - '34'
   - '34'

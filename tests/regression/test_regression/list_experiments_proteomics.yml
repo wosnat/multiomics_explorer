@@ -1024,6 +1024,61 @@ rows:
   - Dikla Aharonovich
   - Osnat Weissberg
   background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 2225
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
+  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
+    growth (PROTEOMICS)
+  gene_count: 4450
+  growth_phases:
+  - nutrient_limited
+  is_time_course: time_course
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_down_count: 578
+  significant_up_count: 433
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 2
+  time_point_growth_phases:
+  - nutrient_limited
+  - nutrient_limited
+  time_point_hours:
+  - '432.0'
+  - '744.0'
+  time_point_labels:
+  - day 18
+  - day 31
+  time_point_orders:
+  - '1'
+  - '2'
+  time_point_significant_down:
+  - '0'
+  - '578'
+  time_point_significant_up:
+  - '0'
+  - '433'
+  time_point_totals:
+  - '2225'
+  - '2225'
+  treatment_type:
+  - nitrogen
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -1091,61 +1146,6 @@ rows:
   - '2225'
   - '2225'
   - '2225'
-  - '2225'
-  - '2225'
-  treatment_type:
-  - nitrogen
-- authors:
-  - Daniel Sher
-  - Dikla Aharonovich
-  - Osnat Weissberg
-  background_factors:
-  - axenic
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: null
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 2225
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
-  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
-    growth (PROTEOMICS)
-  gene_count: 4450
-  growth_phases:
-  - nutrient_limited
-  is_time_course: time_course
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas macleodii HOT1A3
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 578
-  significant_up_count: 433
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 2
-  time_point_growth_phases:
-  - nutrient_limited
-  - nutrient_limited
-  time_point_hours:
-  - '432.0'
-  - '744.0'
-  time_point_labels:
-  - day 18
-  - day 31
-  time_point_orders:
-  - '1'
-  - '2'
-  time_point_significant_down:
-  - '0'
-  - '578'
-  time_point_significant_up:
-  - '0'
-  - '433'
-  time_point_totals:
   - '2225'
   - '2225'
   treatment_type:
@@ -2154,6 +2154,69 @@ rows:
   - Dikla Aharonovich
   - Osnat Weissberg
   background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: null
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 1424
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
+  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
+    (PROTEOMICS)
+  gene_count: 4272
+  growth_phases:
+  - death
+  - nutrient_limited
+  is_time_course: time_course
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: PROTEOMICS
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_down_count: 556
+  significant_up_count: 599
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 3
+  time_point_growth_phases:
+  - death
+  - death
+  - nutrient_limited
+  time_point_hours:
+  - '2136.0'
+  - '336.0'
+  - '744.0'
+  time_point_labels:
+  - day 14
+  - day 31
+  - day 89
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  time_point_significant_down:
+  - '204'
+  - '257'
+  - '95'
+  time_point_significant_up:
+  - '264'
+  - '295'
+  - '40'
+  time_point_totals:
+  - '1424'
+  - '1424'
+  - '1424'
+  treatment_type:
+  - nitrogen
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -2220,69 +2283,6 @@ rows:
   time_point_totals:
   - '1424'
   - '1424'
-  - '1424'
-  - '1424'
-  - '1424'
-  treatment_type:
-  - nitrogen
-- authors:
-  - Daniel Sher
-  - Dikla Aharonovich
-  - Osnat Weissberg
-  background_factors:
-  - axenic
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: null
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 1424
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
-  gene_count: 4272
-  growth_phases:
-  - death
-  - nutrient_limited
-  is_time_course: time_course
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Prochlorococcus MED4
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 556
-  significant_up_count: 599
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 3
-  time_point_growth_phases:
-  - death
-  - death
-  - nutrient_limited
-  time_point_hours:
-  - '2136.0'
-  - '336.0'
-  - '744.0'
-  time_point_labels:
-  - day 14
-  - day 31
-  - day 89
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  time_point_significant_down:
-  - '204'
-  - '257'
-  - '95'
-  time_point_significant_up:
-  - '264'
-  - '295'
-  - '40'
-  time_point_totals:
   - '1424'
   - '1424'
   - '1424'
