@@ -288,7 +288,7 @@ chaining:
   - "genes_by_ontology → differential_expression_by_gene"
   - "gene_overview → differential_expression_by_gene (check expression_edge_count first)"
   - "list_experiments → differential_expression_by_gene (filter by table_scope there, pass experiment_ids)"
-  - "differential_expression_by_gene → list_experiments(experiment_ids=[...]) to get the partner organism of a coculture experiment — `coculture_partner` is verbose-only in the compact experiments[] envelope"
+  - "differential_expression_by_gene → list_experiments(experiment_ids=[...], verbose=True) for the partner roles of a coculture experiment — `coculture_partner` (verbose-only here) is a flat list of every organism sharing the culture, treatment and background partners alike; `coculture_partners[].role` on list_experiments tells them apart"
 
 mistakes:
   - wrong: "Interpreting absence of a row as 'no change' when truncated=true"

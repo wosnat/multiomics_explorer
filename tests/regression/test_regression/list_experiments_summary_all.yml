@@ -14,6 +14,9 @@ rows:
   - '{''count'': 2, ''item'': ''condition_comparison''}'
   - '{''count'': 2, ''item'': ''diel''}'
   - '{''count'': 9, ''item'': ''time_course''}'
+  by_coculture_role:
+  - '{''count'': 44, ''item'': ''treatment''}'
+  - '{''count'': 78, ''item'': ''background''}'
   by_compartment:
   - '{''count'': 10, ''item'': ''exoproteome''}'
   - '{''count'': 13, ''item'': ''vesicle''}'

@@ -1768,12 +1768,14 @@ def register_tools(mcp: FastMCP):
                     "merops_family_class", "best_hit_kind", "pfam_support",
                     "attachment_depth", "trust_axes", "link_kinds",
                     "cluster_type", "treatment_type", "background_factors",
-                    "table_scope", "detection_status", "expression_status"],
+                    "table_scope", "detection_status", "expression_status",
+                    "partner_role"],
             Field(description=(
                 "Which filter to enumerate — gene/expression (incl. "
                 "cluster_type, expression_status), DerivedMetric (incl. "
                 "table_scope), chemistry (incl. detection_status), "
-                "experiment (treatment_type, background_factors), or a "
+                "experiment (treatment_type, background_factors, "
+                "partner_role), or a "
                 "trust vocabulary."
             )),
         ] = "gene_category",
@@ -3764,6 +3766,12 @@ def register_tools(mcp: FastMCP):
         gene_count: int = Field(description="Total genes with expression data at this time point.")
         genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status at this time point.")
 
+    class CoculturePartner(BaseModel):
+        name: str = Field(description="Partner OrganismTaxon preferred_name (matches an entry of coculture_partner).")
+        role: str = Field(description="Tests_coculture_with.partner_role: 'treatment' (presence is the contrast) or 'background' (culture context).")
+        organism_id: str = Field(description="OrganismTaxon id (e.g. 'insdc.gcf:GCF_001578515.1', 'ncbitaxon:10239').")
+        organism_type: str = Field(description="'genome_strain' (has genes in the KG — gene tools work on it), 'reference_proteome_match', or 'treatment'.")
+
     class ExperimentResult(SparseRow):
         # compact fields (always returned)
         experiment_id: str = Field(description="Experiment identifier (e.g. '10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq').")
@@ -3807,6 +3815,7 @@ def register_tools(mcp: FastMCP):
         derived_metric_gene_count: int | None = Field(default=None, description="Number of distinct genes with DerivedMetric annotations in this experiment (verbose-only).")
         derived_metric_types: list[str] | None = Field(default=None, description="Distinct DerivedMetric metric_type values for this experiment (verbose-only).")
         reports_derived_metric_types: list[str] | None = Field(default=None, description="DerivedMetric types reported by (not just associated with) this experiment (verbose-only).")
+        coculture_partners: list[CoculturePartner] = Field(default_factory=list, description="Verbose only. One entry per coculture partner with its role (name, role, organism_id, organism_type), sorted by name; [] when axenic. Omitted from compact rows.")
 
     class OrganismBreakdown(BaseModel):
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
@@ -3848,6 +3857,10 @@ def register_tools(mcp: FastMCP):
         metric_type: str = Field(description="DerivedMetric type name (e.g. 'damping_ratio', 'diel_amplitude_protein_log2').")
         count: int = Field(description="Number of experiments associated with DMs of this type.")
 
+    class CocultureRoleBreakdown(BaseModel):
+        coculture_role: str = Field(description="Coculture partner role ('treatment' or 'background').")
+        count: int = Field(description="Number of matching experiments with a partner of this role.")
+
     class ExpCompartmentBreakdown(BaseModel):
         compartment: str = Field(description="Wet-lab fraction (e.g. 'whole_cell', 'vesicle', 'exoproteome').")
         count: int = Field(description="Number of experiments in this compartment.")
@@ -3874,6 +3887,7 @@ def register_tools(mcp: FastMCP):
         by_metric_type: list[ExpMetricTypeBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric metric_type across matching experiments.")
         by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         by_compartment: list[ExpCompartmentBreakdown] = Field(default_factory=list, description="Experiment counts per wet-lab compartment.")
+        by_coculture_role: list[CocultureRoleBreakdown] = Field(default_factory=list, description="Matching experiments per coculture partner role, sorted desc. An experiment counts once per distinct role among its partners; axenic experiments count in none, so the sum need not equal total_matching.")
         time_course_count: int = Field(description="Number of time-course experiments in matching set.")
         score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used.")
         score_median: float | None = Field(default=None, description="Median Lucene relevance score, present only when search_text is used.")
@@ -3899,6 +3913,11 @@ def register_tools(mcp: FastMCP):
             "Matches treatment AND background partners — do not combine with "
             "treatment_type=['coculture'] unless you want coculture-vs-axenic "
             "comparisons only. E.g. 'Alteromonas', 'HOT1A3'.",
+        )] = None,
+        coculture_role: Annotated[Literal["treatment", "background"] | None, Field(
+            description="Keep experiments with a partner of this role: 'treatment' (the "
+            "partner's presence is the contrast: coculture vs axenic, or phage) or 'background' "
+            "(contrast is something else). With coculture_partner=, both hold for one partner.",
         )] = None,
         search_text: Annotated[str | None, Field(
             description="Free-text search on experiment name, treatment, control, "
@@ -3931,7 +3950,7 @@ def register_tools(mcp: FastMCP):
         """Differential-expression and characterization experiments with per-timepoint, DM and metabolomics rollups.
 
         Use to pick experiment_ids and read each one's table_scope before interpreting missing DE rows; for study-level metadata use `list_publications`.
-        Filters: organism, coculture_partner, table_scope, experiment_ids, search_text, time_course_only, plus the publication / condition filters.
+        Filters: organism, coculture_partner, coculture_role, table_scope, experiment_ids, search_text, time_course_only, plus the publication / condition filters.
         Returns: by_organism, by_treatment_type, by_table_scope, by_omics_type, by_growth_phase, not_found; one row = one experiment.
         docs://tools/list_experiments; summary=True first.
         """
@@ -3944,7 +3963,8 @@ def register_tools(mcp: FastMCP):
                 background_factors=background_factors,
                 growth_phases=growth_phases,
                 omics_type=omics_type, publication_dois=publication_dois,
-                coculture_partner=coculture_partner, search_text=search_text,
+                coculture_partner=coculture_partner,
+                coculture_role=coculture_role, search_text=search_text,
                 time_course_only=time_course_only, table_scope=table_scope,
                 experiment_ids=experiment_ids, compartment=compartment,
                 summary=summary,
@@ -3963,6 +3983,7 @@ def register_tools(mcp: FastMCP):
             by_value_kind = [ExpValueKindBreakdown(**b) for b in result.get("by_value_kind", [])]
             by_metric_type = [ExpMetricTypeBreakdown(**b) for b in result.get("by_metric_type", [])]
             by_compartment = [ExpCompartmentBreakdown(**b) for b in result.get("by_compartment", [])]
+            by_coculture_role = [CocultureRoleBreakdown(**b) for b in result.get("by_coculture_role", [])]
 
             # Build result models (empty list when summary=True)
             experiments = []
@@ -4002,6 +4023,7 @@ def register_tools(mcp: FastMCP):
                 by_metric_type=by_metric_type,
                 by_metric_type_truncated=result.get("by_metric_type_truncated"),
                 by_compartment=by_compartment,
+                by_coculture_role=by_coculture_role,
                 time_course_count=result["time_course_count"],
                 score_max=result.get("score_max"),
                 score_median=result.get("score_median"),

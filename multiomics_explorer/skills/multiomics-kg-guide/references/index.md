@@ -3,7 +3,7 @@
 ## Guides
 
 - `docs://guide/concepts` — ~6313 tok — The knowledge graph integrates Prochlorococcus and Alteromonas multi-omics data: genomes, transcriptomes…
-- `docs://guide/conventions` — ~7050 tok — Patterns that hold across most or all 42 tools — things you'd otherwise re-learn tool by tool.
+- `docs://guide/conventions` — ~7046 tok — Patterns that hold across most or all 42 tools — things you'd otherwise re-learn tool by tool.
 - `docs://guide/python_api` — ~4115 tok — The `multiomics_explorer` package exposes the same 42 tools available via MCP, plus a handful of analysis…
 - `docs://guide/start_here` — ~4019 tok — This MCP server exposes 42 tools over a Prochlorococcus/Alteromonas multi-omics KG, in ten families below.
 
@@ -11,8 +11,8 @@
 
 - `docs://tools/assays_by_metabolite` — ~1091 tok
 - `docs://tools/cluster_enrichment` — ~1941 tok
-- `docs://tools/differential_expression_by_gene` — ~1163 tok
-- `docs://tools/differential_expression_by_ortholog` — ~1053 tok
+- `docs://tools/differential_expression_by_gene` — ~1197 tok
+- `docs://tools/differential_expression_by_ortholog` — ~1124 tok
 - `docs://tools/discussed_by_publication` — ~785 tok
 - `docs://tools/gene_aa_sequence` — ~604 tok
 - `docs://tools/gene_clusters_by_gene` — ~954 tok
@@ -35,8 +35,8 @@
 - `docs://tools/kg_schema` — ~576 tok
 - `docs://tools/list_clustering_analyses` — ~977 tok
 - `docs://tools/list_derived_metrics` — ~1553 tok
-- `docs://tools/list_experiments` — ~1455 tok
-- `docs://tools/list_filter_values` — ~1296 tok
+- `docs://tools/list_experiments` — ~1621 tok
+- `docs://tools/list_filter_values` — ~1346 tok
 - `docs://tools/list_metabolite_assays` — ~1283 tok
 - `docs://tools/list_metabolites` — ~1774 tok
 - `docs://tools/list_organisms` — ~937 tok
@@ -58,8 +58,8 @@ Append /full for the complete page — all worked examples + full response forma
 
 - `docs://tools/assays_by_metabolite/full` — ~4917 tok
 - `docs://tools/cluster_enrichment/full` — ~4284 tok
-- `docs://tools/differential_expression_by_gene/full` — ~6640 tok
-- `docs://tools/differential_expression_by_ortholog/full` — ~2934 tok
+- `docs://tools/differential_expression_by_gene/full` — ~6673 tok
+- `docs://tools/differential_expression_by_ortholog/full` — ~3004 tok
 - `docs://tools/discussed_by_publication/full` — ~3476 tok
 - `docs://tools/gene_aa_sequence/full` — ~2404 tok
 - `docs://tools/gene_clusters_by_gene/full` — ~2330 tok
@@ -82,8 +82,8 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/kg_schema/full` — ~1755 tok
 - `docs://tools/list_clustering_analyses/full` — ~2571 tok
 - `docs://tools/list_derived_metrics/full` — ~3493 tok
-- `docs://tools/list_experiments/full` — ~8509 tok
-- `docs://tools/list_filter_values/full` — ~5603 tok
+- `docs://tools/list_experiments/full` — ~9255 tok
+- `docs://tools/list_filter_values/full` — ~5720 tok
 - `docs://tools/list_metabolite_assays/full` — ~3913 tok
 - `docs://tools/list_metabolites/full` — ~5901 tok
 - `docs://tools/list_organisms/full` — ~12675 tok

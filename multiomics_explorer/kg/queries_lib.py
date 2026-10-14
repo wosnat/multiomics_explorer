@@ -2831,6 +2831,7 @@ def _list_experiments_where(
     omics_type: list[str] | None = None,
     publication_doi: list[str] | None = None,
     coculture_partner: str | None = None,
+    coculture_role: str | None = None,
     search_text: str | None = None,
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
@@ -2887,10 +2888,26 @@ def _list_experiments_where(
         conditions.append("toLower(p.doi) IN $dois")
         params["dois"] = [d.lower() for d in publication_doi]
 
-    if coculture_partner:
+    if coculture_role:
+        # Role and name are tested on the SAME partner (one edge).
+        params["coculture_role"] = coculture_role
+        if coculture_partner:
+            conditions.append(
+                "EXISTS { (e)-[r:Tests_coculture_with]->(o:OrganismTaxon)"
+                " WHERE r.partner_role = $coculture_role"
+                " AND toLower(o.preferred_name) CONTAINS toLower($partner) }"
+            )
+            params["partner"] = coculture_partner
+        else:
+            conditions.append(
+                "EXISTS { (e)-[r:Tests_coculture_with]->(:OrganismTaxon)"
+                " WHERE r.partner_role = $coculture_role }"
+            )
+    elif coculture_partner:
+        # `cp`, not `p` — `p` is the Publication variable in the MATCH.
         conditions.append(
-            "ANY(p IN e.coculture_partner"
-            " WHERE toLower(p) CONTAINS toLower($partner))"
+            "ANY(cp IN e.coculture_partner"
+            " WHERE toLower(cp) CONTAINS toLower($partner))"
         )
         params["partner"] = coculture_partner
 
@@ -2920,6 +2937,7 @@ def build_list_experiments(
     omics_type: list[str] | None = None,
     publication_doi: list[str] | None = None,
     coculture_partner: str | None = None,
+    coculture_role: str | None = None,
     search_text: str | None = None,
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
@@ -2947,8 +2965,13 @@ def build_list_experiments(
     control, light_condition, light_intensity, medium, temperature,
     statistical_test, experimental_context, cluster_count,
     derived_metric_gene_count, derived_metric_types,
-    reports_derived_metric_types.
+    reports_derived_metric_types, coculture_partners
+    (list of {name, role, organism_id, organism_type} from
+    Tests_coculture_with edges, sorted by name; [] when axenic).
     RETURN keys (search_text): adds score.
+    coculture_role: 'treatment' | 'background' — keep experiments with a
+    Tests_coculture_with partner of that partner_role; with
+    coculture_partner, role and name must hold for the same partner.
     compartment: when provided, restricts to experiments in that wet-lab
     compartment (scalar equality: e.compartment = $compartment).
 
@@ -2963,7 +2986,8 @@ def build_list_experiments(
     where_block, params = _list_experiments_where(
         organism=organism, treatment_type=treatment_type,
         omics_type=omics_type, publication_doi=publication_doi,
-        coculture_partner=coculture_partner, search_text=search_text,
+        coculture_partner=coculture_partner, coculture_role=coculture_role,
+        search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
         background_factors=background_factors, growth_phases=growth_phases,
         experiment_ids=experiment_ids, compartment=compartment,
@@ -2982,7 +3006,11 @@ def build_list_experiments(
         "\n       coalesce(e.cluster_count, 0) AS cluster_count,"
         "\n       coalesce(e.derived_metric_gene_count, 0) AS derived_metric_gene_count,"
         "\n       coalesce(e.reports_derived_metric_types, []) AS derived_metric_types,"
-        "\n       coalesce(e.reports_derived_metric_types, []) AS reports_derived_metric_types"
+        "\n       coalesce(e.reports_derived_metric_types, []) AS reports_derived_metric_types,"
+        "\n       COLLECT { MATCH (e)-[r:Tests_coculture_with]->(o:OrganismTaxon)"
+        "\n                 RETURN {name: o.preferred_name, role: r.partner_role,"
+        "\n                         organism_id: o.id, organism_type: o.organism_type}"
+        "\n                 ORDER BY o.preferred_name } AS coculture_partners"
         if verbose else ""
     )
 
@@ -3063,6 +3091,7 @@ def build_list_experiments_summary(
     omics_type: list[str] | None = None,
     publication_doi: list[str] | None = None,
     coculture_partner: str | None = None,
+    coculture_role: str | None = None,
     search_text: str | None = None,
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
@@ -3080,8 +3109,11 @@ def build_list_experiments_summary(
     RETURN keys: total_matching, time_course_count, by_organism,
     by_treatment_type, by_background_factors, by_omics_type, by_publication,
     by_table_scope, by_cluster_type, by_growth_phase,
-    by_value_kind, by_metric_type, by_compartment.
+    by_value_kind, by_metric_type, by_compartment, by_coculture_role
+    (frequencies of distinct Tests_coculture_with.partner_role per
+    experiment; axenic experiments count in none).
     RETURN keys (search_text): adds score_max, score_median.
+    coculture_role: same semantics as build_list_experiments.
 
     Note: e.compartment is a scalar string, so we use collect(e.compartment)
     directly (no apoc.coll.flatten) for the by_compartment rollup.
@@ -3089,7 +3121,8 @@ def build_list_experiments_summary(
     where_block, params = _list_experiments_where(
         organism=organism, treatment_type=treatment_type,
         omics_type=omics_type, publication_doi=publication_doi,
-        coculture_partner=coculture_partner, search_text=search_text,
+        coculture_partner=coculture_partner, coculture_role=coculture_role,
+        search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
         background_factors=background_factors, growth_phases=growth_phases,
         experiment_ids=experiment_ids, compartment=compartment,
@@ -3110,6 +3143,8 @@ def build_list_experiments_summary(
         ",\n     apoc.coll.flatten(\n"
         "       collect(coalesce(e.reports_derived_metric_types, []))) AS mtypes"
         ",\n     collect(e.compartment) AS comps"
+        ",\n     apoc.coll.flatten(collect(COLLECT { MATCH (e)-[r:Tests_coculture_with]->(:OrganismTaxon)\n"
+        "                                         RETURN DISTINCT r.partner_role })) AS roles"
     )
 
     return_cols = (
@@ -3126,6 +3161,7 @@ def build_list_experiments_summary(
         ",\n       apoc.coll.frequencies(vks) AS by_value_kind"
         ",\n       apoc.coll.frequencies(mtypes) AS by_metric_type"
         ",\n       apoc.coll.frequencies(comps) AS by_compartment"
+        ",\n       apoc.coll.frequencies(roles) AS by_coculture_role"
     )
 
     if search_text:

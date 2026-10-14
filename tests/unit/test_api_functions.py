@@ -19707,3 +19707,228 @@ class TestListMetabolitesNoFormula:
         assert len(sentinel_calls) == 1
         assert out["no_formula_excluded"] == 4
         assert out["returned"] == 1
+
+
+class TestListExperimentsCocultureRole:
+    """Backlog 2c.6 — list_experiments coculture_role filter, verbose
+    coculture_partners pass-through, by_coculture_role envelope rollup.
+    Spec: docs/tool-specs/list_experiments-coculture-role.md."""
+
+    def _summary_result(self, **extra):
+        row = {
+            "total_matching": 53, "time_course_count": 0,
+            "by_organism": [{"item": "Prochlorococcus MED4", "count": 53}],
+            "by_treatment_type": [{"item": "coculture", "count": 5}],
+            "by_background_factors": [],
+            "by_omics_type": [{"item": "RNASEQ", "count": 53}],
+            "by_publication": [],
+            "by_table_scope": [],
+            "by_cluster_type": [],
+            "by_growth_phase": [],
+            "by_coculture_role": [
+                {"item": "background", "count": 48},
+                {"item": "treatment", "count": 5},
+            ],
+        }
+        row.update(extra)
+        return [row]
+
+    def _detail_row(self, **overrides):
+        row = {
+            "experiment_id": "exp_a", "experiment_name": "A",
+            "publication_doi": "10.1234/a",
+            "organism_name": "Prochlorococcus MED4",
+            "treatment_type": ["coculture"],
+            "coculture_partner": ["Alteromonas macleodii HOT1A3"],
+            "omics_type": "RNASEQ",
+            "is_time_course": "single_time_point",
+            "table_scope": "all_detected_genes",
+            "table_scope_detail": None,
+            "gene_count": 10, "distinct_gene_count": 10,
+            "significant_up_count": 1, "significant_down_count": 1,
+            "time_point_count": 1, "time_point_labels": ["20h"],
+            "time_point_orders": [1], "time_point_hours": [20.0],
+            "time_point_totals": [10], "time_point_significant_up": [1],
+            "time_point_significant_down": [1],
+            "clustering_analysis_count": 0, "cluster_types": [],
+        }
+        row.update(overrides)
+        return row
+
+    @staticmethod
+    def _spy_builders(monkeypatch):
+        calls = {"detail": [], "summary": []}
+        real_detail = api.build_list_experiments
+        real_summary = api.build_list_experiments_summary
+
+        def spy_detail(**kw):
+            calls["detail"].append(kw)
+            return real_detail(**kw)
+
+        def spy_summary(**kw):
+            calls["summary"].append(kw)
+            return real_summary(**kw)
+
+        monkeypatch.setattr(api, "build_list_experiments", spy_detail)
+        monkeypatch.setattr(api, "build_list_experiments_summary", spy_summary)
+        monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        return calls
+
+    def test_forwards_coculture_role_to_both_builders(self, mock_conn, monkeypatch):
+        calls = self._spy_builders(monkeypatch)
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(), self._summary_result(), [self._detail_row()],
+        ]
+        api.list_experiments(
+            coculture_partner="Alteromonas", coculture_role="treatment",
+            conn=mock_conn,
+        )
+        # first summary call is the filtered one (second = unfiltered total)
+        assert calls["summary"][0]["coculture_role"] == "treatment"
+        assert calls["summary"][0]["coculture_partner"] == "Alteromonas"
+        assert calls["detail"][0]["coculture_role"] == "treatment"
+        # params reach Cypher execution
+        summary_call = mock_conn.execute_query.call_args_list[0]
+        assert summary_call[1]["coculture_role"] == "treatment"
+        detail_call = mock_conn.execute_query.call_args_list[2]
+        assert detail_call[1]["coculture_role"] == "treatment"
+
+    def test_forwards_role_on_summary_only_call(self, mock_conn, monkeypatch):
+        calls = self._spy_builders(monkeypatch)
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(), self._summary_result(),
+        ]
+        api.list_experiments(coculture_role="background", summary=True,
+                             conn=mock_conn)
+        assert calls["summary"][0]["coculture_role"] == "background"
+
+    def test_role_default_none(self, mock_conn, monkeypatch):
+        calls = self._spy_builders(monkeypatch)
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(), self._summary_result(), [self._detail_row()],
+        ]
+        api.list_experiments(conn=mock_conn)
+        assert calls["summary"][0].get("coculture_role") is None
+        assert calls["detail"][0].get("coculture_role") is None
+        assert "coculture_role" not in mock_conn.execute_query.call_args_list[0][1]
+
+    @pytest.mark.parametrize("bad", ["Treatment", "partner", "both"])
+    def test_invalid_role_raises_naming_valid_values(self, mock_conn, bad):
+        with pytest.raises(ValueError) as exc_info:
+            api.list_experiments(coculture_role=bad, conn=mock_conn)
+        msg = str(exc_info.value)
+        assert "treatment" in msg
+        assert "background" in msg
+        mock_conn.execute_query.assert_not_called()
+
+    def test_by_coculture_role_renamed(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(), self._summary_result(), [self._detail_row()],
+        ]
+        result = api.list_experiments(coculture_partner="Alteromonas",
+                                      conn=mock_conn)
+        assert result["by_coculture_role"] == [
+            {"coculture_role": "background", "count": 48},
+            {"coculture_role": "treatment", "count": 5},
+        ]
+
+    def test_by_coculture_role_on_summary(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(), self._summary_result(),
+        ]
+        result = api.list_experiments(summary=True, conn=mock_conn)
+        roles = {d["coculture_role"]: d["count"] for d in result["by_coculture_role"]}
+        assert roles == {"background": 48, "treatment": 5}
+
+    def test_by_coculture_role_empty_list(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(by_coculture_role=[]),
+            self._summary_result(),
+            [self._detail_row(coculture_partner=[])],
+        ]
+        result = api.list_experiments(conn=mock_conn)
+        assert result["by_coculture_role"] == []
+
+    def test_by_coculture_role_absent_from_raw_defaults_empty(self, mock_conn):
+        raw = self._summary_result()
+        del raw[0]["by_coculture_role"]
+        mock_conn.execute_query.side_effect = [raw, raw, [self._detail_row()]]
+        result = api.list_experiments(conn=mock_conn)
+        assert result["by_coculture_role"] == []
+
+    def test_verbose_rows_pass_coculture_partners_through(self, mock_conn):
+        partners = [
+            {"name": "Alteromonas (MarRef v6)", "role": "background",
+             "organism_id": "insdc.gcf:GCF_000000000.1",
+             "organism_type": "reference_proteome_match"},
+            {"name": "Synechococcus sp. BL107", "role": "background",
+             "organism_id": "insdc.gcf:GCF_000153805.1",
+             "organism_type": "genome_strain"},
+        ]
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(), self._summary_result(),
+            [self._detail_row(
+                coculture_partner=["Alteromonas (MarRef v6)",
+                                   "Synechococcus sp. BL107"],
+                coculture_partners=partners,
+            ),
+             self._detail_row(experiment_id="exp_axenic",
+                              coculture_partner=[], coculture_partners=[])],
+        ]
+        result = api.list_experiments(verbose=True, conn=mock_conn)
+        assert result["results"][0]["coculture_partners"] == partners
+        assert result["results"][1]["coculture_partners"] == []
+        # compact list column unchanged
+        assert result["results"][0]["coculture_partner"] == [
+            "Alteromonas (MarRef v6)", "Synechococcus sp. BL107"]
+
+
+class TestListFilterValuesPartnerRole:
+    """Backlog 2c.6 — list_filter_values('partner_role') reads the
+    Tests_coculture_with.partner_role edge vocabulary (same path as
+    detection_status)."""
+
+    def test_partner_role_registered_as_edge_vocab(self):
+        assert api._MULTI_LABEL_VOCABS["partner_role"] == (
+            "partner_role", ("Tests_coculture_with",), "edge",
+        )
+
+    def test_partner_role_reads_edge_cv(self, monkeypatch):
+        calls = []
+
+        def fake_read(conn, applies_to, prop, kind, *, cache=True):
+            calls.append((applies_to, prop, kind))
+            return {"values": ["background", "treatment"],
+                    "value_descriptions": {
+                        "treatment": "partner presence is the contrast",
+                        "background": "culture context, not the contrast"},
+                    "description": "Role of a coculture partner",
+                    "source": "vocabulary", "warning": None}
+        monkeypatch.setattr(api, "_read_vocab_values", fake_read)
+        out = api.list_filter_values(filter_type="partner_role", conn=MagicMock())
+        assert calls == [("Tests_coculture_with", "partner_role", "edge")]
+        by_value = {r["value"]: r for r in out["results"]}
+        assert set(by_value) == {"treatment", "background"}
+        for row in out["results"]:
+            assert row["applies_to"] == ["Tests_coculture_with"]
+            assert row["source"] == "vocabulary"
+            assert "description" in row
+        assert out["warnings"] == []
+
+    def test_partner_role_pivot_fallback_warns(self, monkeypatch):
+        def fake_read(conn, applies_to, prop, kind, *, cache=True):
+            return {"values": ["background", "treatment"],
+                    "value_descriptions": {}, "description": None,
+                    "source": "pivot",
+                    "warning": "No ControlledVocabulary entry for "
+                               "Tests_coculture_with.partner_role"}
+        monkeypatch.setattr(api, "_read_vocab_values", fake_read)
+        out = api.list_filter_values(filter_type="partner_role", conn=MagicMock())
+        assert {r["source"] for r in out["results"]} == {"pivot"}
+        assert any("partner_role" in w for w in out["warnings"])
+
+    def test_unknown_filter_type_error_lists_partner_role(self, mock_conn):
+        with pytest.raises(ValueError) as exc_info:
+            api.list_filter_values(filter_type="bogus", conn=mock_conn)
+        assert "partner_role" in str(exc_info.value)

@@ -3060,8 +3060,8 @@ class TestBuildListExperiments:
         )
         assert "toLower(e.organism_name) CONTAINS word" in cypher
         assert (
-            "ANY(p IN e.coculture_partner"
-            " WHERE toLower(p) CONTAINS toLower($partner))"
+            "ANY(cp IN e.coculture_partner"
+            " WHERE toLower(cp) CONTAINS toLower($partner))"
         ) in cypher
         # Two clauses joined by AND, not OR.
         assert " AND " in cypher
@@ -3098,8 +3098,8 @@ class TestBuildListExperiments:
         """Coculture partner filter uses toLower CONTAINS."""
         cypher, params = build_list_experiments(coculture_partner="Alteromonas")
         assert (
-            "ANY(p IN e.coculture_partner"
-            " WHERE toLower(p) CONTAINS toLower($partner))"
+            "ANY(cp IN e.coculture_partner"
+            " WHERE toLower(cp) CONTAINS toLower($partner))"
         ) in cypher
         assert params["partner"] == "Alteromonas"
 
@@ -13552,3 +13552,153 @@ class TestBuildListMetabolitesNoFormulaCount:
         cypher, _ = self._build(elements=["N"])
         assert re.search(r"count\((DISTINCT )?m\)", cypher), cypher
         assert "LIMIT" not in cypher
+
+
+class TestBuildListExperimentsCocultureRole:
+    """Backlog 2c.6 — coculture_role filter (Tests_coculture_with.partner_role),
+    verbose coculture_partners column, summary by_coculture_role rollup.
+    Spec: docs/tool-specs/list_experiments-coculture-role.md."""
+
+    ROLE_AND_NAME = (
+        "EXISTS { (e)-[r:Tests_coculture_with]->(o:OrganismTaxon)"
+        " WHERE r.partner_role = $coculture_role"
+        " AND toLower(o.preferred_name) CONTAINS toLower($partner) }"
+    )
+    ROLE_ONLY = (
+        "EXISTS { (e)-[r:Tests_coculture_with]->(:OrganismTaxon)"
+        " WHERE r.partner_role = $coculture_role }"
+    )
+    PARTNER_ONLY = (
+        "ANY(cp IN e.coculture_partner"
+        " WHERE toLower(cp) CONTAINS toLower($partner))"
+    )
+
+    # --- _list_experiments_where branches ---
+    def test_where_role_and_partner_same_partner_exists(self):
+        from multiomics_explorer.kg.queries_lib import _list_experiments_where
+        where, params = _list_experiments_where(
+            coculture_partner="Alteromonas", coculture_role="background",
+        )
+        assert self.ROLE_AND_NAME in where
+        # role + partner must not ALSO emit the list predicate
+        assert "ANY(cp IN e.coculture_partner" not in where
+        assert params["coculture_role"] == "background"
+        assert params["partner"] == "Alteromonas"
+
+    def test_where_role_only_exists_without_name(self):
+        from multiomics_explorer.kg.queries_lib import _list_experiments_where
+        where, params = _list_experiments_where(coculture_role="treatment")
+        assert self.ROLE_ONLY in where
+        assert "preferred_name" not in where
+        assert "ANY(cp IN e.coculture_partner" not in where
+        assert params["coculture_role"] == "treatment"
+        assert "partner" not in params
+
+    def test_where_partner_only_uses_cp_list_predicate(self):
+        from multiomics_explorer.kg.queries_lib import _list_experiments_where
+        where, params = _list_experiments_where(coculture_partner="Alteromonas")
+        assert self.PARTNER_ONLY in where
+        assert "Tests_coculture_with" not in where
+        # p is the Publication variable — must not be shadowed
+        assert "ANY(p IN" not in where
+        assert params["partner"] == "Alteromonas"
+        assert "coculture_role" not in params
+
+    def test_where_no_role_no_param(self):
+        from multiomics_explorer.kg.queries_lib import _list_experiments_where
+        where, params = _list_experiments_where(organism="MED4")
+        assert "coculture_role" not in params
+        assert "$coculture_role" not in where
+        assert "Tests_coculture_with" not in where
+
+    def test_where_role_none_explicit_no_param(self):
+        from multiomics_explorer.kg.queries_lib import _list_experiments_where
+        where, params = _list_experiments_where(
+            coculture_partner="Alteromonas", coculture_role=None,
+        )
+        assert "coculture_role" not in params
+        assert self.PARTNER_ONLY in where
+
+    # --- build_list_experiments ---
+    def test_detail_role_and_partner(self):
+        cypher, params = build_list_experiments(
+            coculture_partner="Alteromonas", coculture_role="treatment",
+        )
+        assert self.ROLE_AND_NAME in cypher
+        assert params["coculture_role"] == "treatment"
+        assert params["partner"] == "Alteromonas"
+
+    def test_detail_role_only(self):
+        cypher, params = build_list_experiments(coculture_role="background")
+        assert self.ROLE_ONLY in cypher
+        assert params["coculture_role"] == "background"
+
+    def test_detail_role_with_search_text(self):
+        cypher, params = build_list_experiments(
+            coculture_role="treatment", search_text="coculture",
+        )
+        assert self.ROLE_ONLY in cypher
+        assert params["coculture_role"] == "treatment"
+
+    def test_detail_no_role_no_param(self):
+        cypher, params = build_list_experiments(coculture_partner="Alteromonas")
+        assert "coculture_role" not in params
+        assert "$coculture_role" not in cypher
+
+    def test_verbose_adds_coculture_partners_column(self):
+        cypher, _ = build_list_experiments(verbose=True)
+        assert (
+            "COLLECT { MATCH (e)-[r:Tests_coculture_with]->(o:OrganismTaxon)"
+        ) in cypher
+        assert "AS coculture_partners" in cypher
+        for frag in (
+            "name: o.preferred_name",
+            "role: r.partner_role",
+            "organism_id: o.id",
+            "organism_type: o.organism_type",
+            "ORDER BY o.preferred_name",
+        ):
+            assert frag in cypher, frag
+
+    def test_verbose_search_branch_has_coculture_partners(self):
+        cypher, _ = build_list_experiments(verbose=True, search_text="phage")
+        assert "AS coculture_partners" in cypher
+
+    def test_compact_has_no_coculture_partners_column(self):
+        cypher, _ = build_list_experiments(verbose=False)
+        assert "coculture_partners" not in cypher
+        assert "Tests_coculture_with" not in cypher
+        # compact list column unchanged
+        assert "e.coculture_partner AS coculture_partner" in cypher
+
+    # --- build_list_experiments_summary ---
+    def test_summary_role_and_partner(self):
+        cypher, params = build_list_experiments_summary(
+            coculture_partner="Alteromonas", coculture_role="background",
+        )
+        assert self.ROLE_AND_NAME in cypher
+        assert params["coculture_role"] == "background"
+        assert params["partner"] == "Alteromonas"
+
+    def test_summary_role_only(self):
+        cypher, params = build_list_experiments_summary(coculture_role="treatment")
+        assert self.ROLE_ONLY in cypher
+        assert params["coculture_role"] == "treatment"
+
+    def test_summary_no_role_no_param(self):
+        _, params = build_list_experiments_summary()
+        assert "coculture_role" not in params
+
+    def test_summary_returns_by_coculture_role(self):
+        cypher, _ = build_list_experiments_summary()
+        assert (
+            "COLLECT { MATCH (e)-[r:Tests_coculture_with]->(:OrganismTaxon)"
+        ) in cypher
+        assert "RETURN DISTINCT r.partner_role" in cypher
+        assert "AS roles" in cypher
+        assert "apoc.coll.frequencies(roles) AS by_coculture_role" in cypher
+
+    def test_summary_search_branch_returns_by_coculture_role(self):
+        cypher, _ = build_list_experiments_summary(search_text="coculture")
+        assert "apoc.coll.frequencies(roles) AS by_coculture_role" in cypher
+        assert "score_max" in cypher

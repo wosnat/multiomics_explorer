@@ -365,10 +365,13 @@ examples:
         ]
       }
 
+  - title: Coculture partner roles (edge vocabulary for list_experiments(coculture_role=...))
+    call: list_filter_values(filter_type="partner_role")
+
 response_notes:
   - title: "Filter-type families"
     body: |
-      `filter_type` values fall into four families. Gene / expression:
+      `filter_type` values fall into five families. Gene / expression:
       `gene_category` (Gene.category, counts summed across organisms),
       `brite_tree` (BRITE tree names + `tree_code`; count = terms, not
       genes), `growth_phase` (timepoint-level culture state), `omics_type`
@@ -380,6 +383,8 @@ response_notes:
       fraction), `table_scope` (Experiment.table_scope). Chemistry:
       `evidence_source` (Metabolite.evidence_sources values),
       `detection_status` (the `Assay_quantifies_metabolite` edge).
+      Coculture: `partner_role` (`Tests_coculture_with` edge; feeds
+      `list_experiments(coculture_role=...)`).
       Annotation-trust: `evidence`, `sources`, `call_class`,
       `interpro_type`, `ncbifam_family_type`, `merops_catalytic_type`,
       `merops_family_class`, `best_hit_kind`, `pfam_support`,
@@ -404,6 +409,7 @@ chaining:
   - "list_filter_values(filter_type='call_class') → genes_by_ontology(ontology='merops', call_class=[...])."
   - "list_filter_values(filter_type='treatment_type') → list_experiments(treatment_type=[...]) / list_derived_metrics(treatment_type=[...]) / list_metabolite_assays(treatment_type=[...]) / list_clustering_analyses(treatment_type=[...]); same routing for filter_type='background_factors'."
   - "list_filter_values(filter_type='growth_phase') → list_experiments(growth_phases=[...]) / list_derived_metrics(growth_phases=[...]) / differential_expression_by_gene(growth_phases=[...])"
+  - "list_filter_values(filter_type='partner_role') → list_experiments(coculture_role=...) to separate coculture-vs-axenic (treatment) partners from background partners"
   - "list_filter_values(filter_type='table_scope') → list_experiments(table_scope=[...]) to keep only experiments whose DE table reports every detected gene"
   - "list_filter_values(filter_type='value_kind') → list_derived_metrics(value_kind=...) / list_metabolite_assays(value_kind=...) → the matching genes_by_{kind}_metric or metabolites_by_{quantifies,flags}_assay drill-down"
 

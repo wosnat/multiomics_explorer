@@ -4682,3 +4682,130 @@ class TestCharacterizationExperimentsLive:
             ctx, locus_tags=[_SLICE4_DECAY_GENE], organism=_SLICE4_MED4,
             analysis_ids=[_SLICE4_DECAY_ANALYSIS])
         assert gcg.results and gcg.results[0].treatment_type == ["rna_decay"]
+
+
+@pytest.mark.kg
+class TestListExperimentsCocultureRole:
+    """Backlog 2c.6 live smoke — coculture_role filter, verbose
+    coculture_partners, by_coculture_role, list_filter_values('partner_role').
+    Relational assertions; live counts at spec freeze (2026-10-13T13:51Z build):
+    Alteromonas 53 = 5 treatment + 48 background; role-only 44 treatment /
+    78 background."""
+
+    def test_alteromonas_treatment_rows_are_coculture_contrasts(self, conn):
+        result = api.list_experiments(
+            coculture_partner="Alteromonas", coculture_role="treatment",
+            verbose=True, conn=conn,
+        )
+        rows = result["results"]
+        assert rows
+        assert result["total_matching"] == len(rows)
+        for r in rows:
+            assert "coculture" in r["treatment_type"], r["experiment_id"]
+            alt = [p for p in r["coculture_partners"]
+                   if "alteromonas" in p["name"].lower()]
+            assert alt, r["experiment_id"]
+            assert all(p["role"] == "treatment" for p in alt)
+
+    def test_alteromonas_background_rows_have_background_partner(self, conn):
+        result = api.list_experiments(
+            coculture_partner="Alteromonas", coculture_role="background",
+            verbose=True, conn=conn,
+        )
+        rows = result["results"]
+        assert rows
+        for r in rows:
+            assert any(
+                "alteromonas" in p["name"].lower() and p["role"] == "background"
+                for p in r["coculture_partners"]
+            ), r["experiment_id"]
+
+    def test_role_split_sums_to_partner_only_count(self, conn):
+        def n(**kw):
+            return api.list_experiments(
+                coculture_partner="Alteromonas", summary=True, conn=conn, **kw,
+            )["total_matching"]
+        total = n()
+        treat = n(coculture_role="treatment")
+        back = n(coculture_role="background")
+        assert treat > 0 and back > 0
+        # KG invariant: no experiment mixes roles -> split is a partition.
+        assert treat + back == total
+
+    def test_summary_by_coculture_role_matches_split(self, conn):
+        summ = api.list_experiments(
+            coculture_partner="Alteromonas", summary=True, conn=conn,
+        )
+        assert "by_coculture_role" in summ
+        roles = {b["coculture_role"]: b["count"] for b in summ["by_coculture_role"]}
+        assert set(roles) == {"treatment", "background"}
+        assert roles["treatment"] == api.list_experiments(
+            coculture_partner="Alteromonas", coculture_role="treatment",
+            summary=True, conn=conn)["total_matching"]
+        assert roles["background"] == api.list_experiments(
+            coculture_partner="Alteromonas", coculture_role="background",
+            summary=True, conn=conn)["total_matching"]
+        assert sum(roles.values()) == summ["total_matching"]
+
+    def test_by_coculture_role_present_on_detail(self, conn):
+        result = api.list_experiments(limit=1, conn=conn)
+        assert "by_coculture_role" in result
+        assert {b["coculture_role"] for b in result["by_coculture_role"]} <= {
+            "treatment", "background"}
+
+    def test_role_only_treatment_includes_phage(self, conn):
+        result = api.list_experiments(
+            coculture_role="treatment", verbose=True, conn=conn,
+        )
+        rows = result["results"]
+        assert any("viral" in r["treatment_type"] for r in rows)
+        assert any("coculture" in r["treatment_type"] for r in rows)
+        for r in rows:
+            assert any(p["role"] == "treatment" for p in r["coculture_partners"])
+
+    def test_role_only_partitions_partnered_experiments(self, conn):
+        treat = api.list_experiments(coculture_role="treatment", summary=True,
+                                     conn=conn)["total_matching"]
+        back = api.list_experiments(coculture_role="background", summary=True,
+                                    conn=conn)["total_matching"]
+        all_rows = api.list_experiments(conn=conn)["results"]
+        partnered = sum(1 for r in all_rows if r["coculture_partner"])
+        assert treat + back == partnered
+
+    def test_verbose_coculture_partners_names_equal_list(self, conn):
+        result = api.list_experiments(verbose=True, conn=conn)
+        rows = result["results"]
+        assert len(rows) == result["total_matching"]
+        for r in rows:
+            cps = r["coculture_partners"]
+            assert [p["name"] for p in cps] == r["coculture_partner"], \
+                r["experiment_id"]
+            for p in cps:
+                assert p["role"] in {"treatment", "background"}
+                assert p["organism_id"]
+                assert p["organism_type"]
+
+    def test_compact_rows_have_no_coculture_partners(self, conn):
+        result = api.list_experiments(coculture_partner="Alteromonas", limit=5,
+                                      conn=conn)
+        for r in result["results"]:
+            assert "coculture_partners" not in r
+
+    def test_mcp_wrapper_verbose_coculture_partners(self, tool_fns, conn):
+        result = asyncio.run(tool_fns["list_experiments"](
+            _ctx_with_conn(conn), coculture_partner="Alteromonas",
+            coculture_role="treatment", verbose=True, limit=10,
+        ))
+        assert result.results
+        for r in result.results:
+            assert all(cp.role == "treatment" for cp in r.coculture_partners
+                       if "alteromonas" in cp.name.lower())
+        assert {b.coculture_role for b in result.by_coculture_role} == {"treatment"}
+
+    def test_list_filter_values_partner_role(self, conn):
+        result = api.list_filter_values(filter_type="partner_role", conn=conn)
+        values = {r["value"] for r in result["results"]}
+        assert values == {"treatment", "background"}
+        for r in result["results"]:
+            assert r["applies_to"] == ["Tests_coculture_with"]
+            assert r["source"] == "vocabulary"

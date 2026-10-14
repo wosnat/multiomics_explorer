@@ -97,6 +97,7 @@ examples:
           {"compartment": "exoproteome", "count": 10},
           {"compartment": "extracellular", "count": 3}
         ],
+        "by_coculture_role": [{"coculture_role": "background", "count": 78}, {"coculture_role": "treatment", "count": 44}],
         "time_course_count": 41,
         "score_max": null,
         "score_median": null,
@@ -108,8 +109,13 @@ examples:
   - title: Summary for MED4 only
     call: list_experiments(summary=True, organism="MED4")
 
-  - title: Browse coculture experiments with Alteromonas
-    call: list_experiments(treatment_type=["coculture"], coculture_partner="Alteromonas")
+  - title: Browse every experiment cultured with Alteromonas
+    call: list_experiments(coculture_partner="Alteromonas")
+    note: "Matches any entry of the coculture_partner list — treatment partners (coculture-vs-axenic) and background partners (the culture was a coculture, the contrast is something else). Read by_coculture_role for the split."
+
+  - title: Pro experiments cultured with Alteromonas but studying something else
+    call: list_experiments(organism="Prochlorococcus", coculture_partner="Alteromonas", coculture_role="background")
+    note: "With coculture_partner=, the role and the name are tested on the same partner. coculture_role='treatment' instead keeps the coculture-vs-axenic contrasts with that partner."
 
   - title: Time-course nitrogen experiments in MED4
     call: list_experiments(organism="MED4", treatment_type=["nitrogen"], time_course_only=True)
@@ -202,6 +208,7 @@ examples:
         ],
         "by_metric_type_truncated": null,
         "by_compartment": [{"compartment": "vesicle", "count": 13}],
+        "by_coculture_role": [],
         "time_course_count": 0,
         "score_max": null,
         "score_median": null,
@@ -310,6 +317,7 @@ examples:
         "by_metric_type": [],
         "by_metric_type_truncated": null,
         "by_compartment": [{"compartment": "whole_cell", "count": 2}],
+        "by_coculture_role": [],
         "time_course_count": 0,
         "score_max": null,
         "score_median": null,
@@ -412,6 +420,7 @@ verbose_fields:
   - statistical_test
   - experimental_context
   - cluster_count
+  - coculture_partners
 
 chaining:
   - "list_organisms → list_experiments"
@@ -425,6 +434,8 @@ chaining:
   - "list_experiments (per-row `metabolite_count > 0`) → list_metabolite_assays(experiment_ids=[...]) to inspect the experiment's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup)."
   - "list_experiments → list_derived_metrics(experiment_ids=[...]) for the experiment's non-DE, column-level evidence (rhythmicity flags, amplitudes, trait classes)"
   - "list_experiments → pathway_enrichment(experiment_ids=[...], organism=...) for ORA over that experiment's DE gene sets"
+  - "differential_expression_by_gene / differential_expression_by_ortholog row (flat `coculture_partner` list) → list_experiments(experiment_ids=[...], verbose=True) → `coculture_partners[].role` tells treatment from background partners"
+  - "list_filter_values(filter_type='partner_role') → list_experiments(coculture_role=...)"
 
 mistakes:
   - "If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this experiment."
@@ -438,6 +449,9 @@ mistakes:
   - "For time-course experiments, top-level `gene_count` is the cumulative row count across timepoints (= `sum(time_point_totals)`). A 6-TP experiment with 1697 genes/TP has `gene_count=10182`. Use `distinct_gene_count` for detection-power or pathway-background reasoning — that's the unique-genes count regardless of timepoint. Per-TP detail lives in `timepoints[].gene_count`."
   - "`authors` is on every result row — no need to join with list_publications when you only need author attribution. list_publications is still the right call for richer publication metadata (abstract, journal, year)."
   - "`organism=` filters the profiled organism only (word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works). It does NOT match coculture partners — for partner-side filtering use `coculture_partner=`. The two filters AND-compose. A genus word alone ('Prochlorococcus') matches every strain of the genus — fine here, but the single-organism expression tools raise on it."
+  - "`coculture_partner` lists every organism sharing the culture: treatment partners (their presence is the contrast) AND background partners (the culture was a coculture, the contrast is something else). `treatment_type=['coculture']` keeps only the coculture-vs-axenic contrasts and drops the background cocultures. Use `coculture_role='treatment'` / `'background'` to choose explicitly (values: `list_filter_values(filter_type='partner_role')`); verbose `coculture_partners[].role` shows the role per partner."
+  - "`background_factors` containing both `axenic` and `coculture` marks a pooled design (axenic and coculture arms analyzed together) — a background partner on such an experiment was present in some arms, not all (the partner_role vocabulary description says 'every arm'; pooled designs are the exception)."
+  - "Phage infection is a treatment partner: role `treatment` with `treatment_type=['viral']`, not `['coculture']`. `coculture_role='treatment'` therefore returns phage experiments too unless you also pass `coculture_partner=` or `treatment_type=`."
   - "metabolite_count > 0 indicates a metabolomics-paired experiment. Drill into MetaboliteAssay nodes via list_metabolite_assays(experiment_ids=[...])."
   - wrong: "list_experiments(omics_type='RNASEQ')  # bare string"
     right: "list_experiments(omics_type=['RNASEQ'])  # treatment_type / background_factors / omics_type / table_scope / publication_dois / experiment_ids are lists; a bare string is iterated character by character and silently matches 0 rows"

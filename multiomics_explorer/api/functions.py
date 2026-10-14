@@ -1999,6 +1999,7 @@ _MULTI_LABEL_VOCABS: dict[str, tuple[str, tuple[str, ...], str]] = {
                          ("Assay_quantifies_metabolite",), "edge"),
     "expression_status": ("expression_status",
                          ("Changes_expression_of",), "edge"),
+    "partner_role": ("partner_role", ("Tests_coculture_with",), "edge"),
 }
 
 
@@ -2048,6 +2049,9 @@ def list_filter_values(
         edge (``applies_to`` names the relationship type).
       - ``expression_status``: values on the ``Changes_expression_of`` edge
         (``applies_to`` names the relationship type).
+      - ``partner_role``: coculture partner roles (``treatment`` /
+        ``background``) on the ``Tests_coculture_with`` edge; the values
+        accepted by ``list_experiments(coculture_role=...)``.
 
     ``ontology`` scopes any of the annotation-trust types to one ontology.
     Values come from the graph's ControlledVocabulary nodes; when a node is
@@ -2640,6 +2644,7 @@ def list_experiments(
     omics_type: list[str] | None = None,
     publication_dois: list[str] | None = None,
     coculture_partner: str | None = None,
+    coculture_role: str | None = None,
     search_text: str | None = None,
     time_course_only: bool = False,
     table_scope: list[str] | None = None,
@@ -2659,8 +2664,14 @@ def list_experiments(
     Always returns: total_entries, total_matching, by_organism,
     by_treatment_type, by_background_factors, by_omics_type,
     by_publication, by_table_scope, by_cluster_type, by_growth_phase,
-    by_value_kind, by_metric_type, by_compartment,
+    by_value_kind, by_metric_type, by_compartment, by_coculture_role,
     time_course_count, returned, truncated, not_found, warnings, results.
+
+    by_coculture_role: list of {coculture_role, count} — matching
+    experiments per partner role ('treatment' / 'background'), count desc.
+    An experiment counts once per distinct role across its partners;
+    axenic experiments count in none, so the counts need not sum to
+    total_matching. [] when no matching experiment has a partner.
 
     warnings: a closed-vocabulary filter value (treatment_type /
     background_factors / omics_type / table_scope / growth_phases /
@@ -2684,7 +2695,12 @@ def list_experiments(
     control, light_condition, light_intensity, medium, temperature,
     statistical_test, experimental_context,
     derived_metric_gene_count, derived_metric_types,
-    reports_derived_metric_types.
+    reports_derived_metric_types, coculture_partners.
+    coculture_partners: list of {name, role, organism_id, organism_type},
+    one per culture partner, sorted by name ([] when axenic). name matches
+    the compact coculture_partner list; role is 'treatment' or
+    'background'; organism_type 'genome_strain' means the partner has
+    genes in the KG, so gene tools can follow it.
     Both derived_metric_types and reports_derived_metric_types source
     from the same KG property (e.reports_derived_metric_types) and are
     identical in current data. Both are emitted for forward-compat
@@ -2701,6 +2717,13 @@ def list_experiments(
         culture (treatment and background partners, phage; [] when
         axenic). Per-row coculture_partner is that list.
 
+    coculture_role: 'treatment' (the partner's presence is the contrast —
+        coculture vs axenic, or phage infection) or 'background' (the
+        culture was a coculture; the contrast is something else). Keeps
+        experiments with a partner of that role. With coculture_partner=,
+        the role and the name must hold for the same partner. Valid values:
+        list_filter_values(filter_type='partner_role').
+
     compartment: if provided, restricts to experiments in that wet-lab
     compartment (scalar equality match on e.compartment, e.g. 'vesicle',
     'whole_cell', 'exoproteome'). Use list_filter_values(filter_type=
@@ -2713,6 +2736,8 @@ def list_experiments(
     any of the listed values (exact match). Mirrors the filter shape on
     sibling tools (pathway_enrichment, ontology_landscape, etc.).
     `not_found` in the envelope lists any provided IDs that did not match.
+
+    Raises ValueError if coculture_role is not 'treatment' or 'background'.
 
     gene_count vs distinct_gene_count
     ---------------------------------
@@ -2728,6 +2753,13 @@ def list_experiments(
         old=publication_doi, new=publication_dois,
         old_name="publication_doi", new_name="publication_dois",
     )
+    if coculture_role is not None and coculture_role not in (
+        "treatment", "background",
+    ):
+        raise ValueError(
+            f"Invalid coculture_role: {coculture_role!r}. "
+            "Valid values: 'treatment', 'background' (or None for any)."
+        )
     if summary:
         limit = 0
 
@@ -2743,7 +2775,8 @@ def list_experiments(
         organism=organism, treatment_type=treatment_type,
         background_factors=background_factors,
         omics_type=omics_type, publication_doi=publication_dois,
-        coculture_partner=coculture_partner, search_text=search_text,
+        coculture_partner=coculture_partner, coculture_role=coculture_role,
+        search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
         growth_phases=growth_phases, experiment_ids=experiment_ids,
         compartment=compartment,
@@ -2800,6 +2833,8 @@ def list_experiments(
             raw_summary.get("by_metric_type", []), "metric_type"),
         "by_compartment": _rename_freq(
             raw_summary.get("by_compartment", []), "compartment"),
+        "by_coculture_role": _rename_freq(
+            raw_summary.get("by_coculture_role", []), "coculture_role"),
         "time_course_count": raw_summary["time_course_count"],
     }
 

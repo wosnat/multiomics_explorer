@@ -674,6 +674,20 @@ def list_experiments_scenarios():
         Scenario(
             "offset_past_end",
             dict(offset=fx.OFFSET_PAST_END)),
+        # Backlog 2c.6: coculture_role filter-empty combos (live 2026-10-13
+        # 13:51Z build, both -> 0 rows, by_coculture_role []). Marinobacter
+        # is only ever a background partner; treatment_type=['coculture']
+        # experiments only carry treatment-role partners.
+        Scenario(
+            "role_partner_never_in_role",
+            dict(coculture_partner="Marinobacter", coculture_role="treatment")),
+        Scenario(
+            "role_partner_never_in_role_summary",
+            dict(coculture_partner="Marinobacter", coculture_role="treatment",
+                 summary=True)),
+        Scenario(
+            "coculture_treatment_type_background_role",
+            dict(treatment_type=["coculture"], coculture_role="background")),
     ]
 
 

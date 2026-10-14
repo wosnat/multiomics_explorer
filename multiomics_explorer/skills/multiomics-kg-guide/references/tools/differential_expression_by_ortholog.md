@@ -57,6 +57,7 @@ Result row: `group_id, consensus_gene_name, consensus_product, experiment_id, tr
 - search_homolog_groups → differential_expression_by_ortholog
 - gene_homologs → differential_expression_by_ortholog
 - genes_by_homolog_group (triage) → differential_expression_by_ortholog
+- differential_expression_by_ortholog → list_experiments(experiment_ids=[...], verbose=True) for partner roles — the row's `coculture_partner` is a flat list of every organism sharing the culture (treatment and background partners); `coculture_partners[].role` tells them apart
 - differential_expression_by_ortholog → genes_by_homolog_group(organisms=[...]) → differential_expression_by_gene per organism (per-gene detail behind a group × experiment row; loop it in Python per docs://guide/python_api)
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/differential_expression_by_ortholog/full`

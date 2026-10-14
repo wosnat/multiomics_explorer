@@ -5,7 +5,7 @@
 Differential-expression and characterization experiments with per-timepoint, DM and metabolomics rollups.
 
 Use to pick experiment_ids and read each one's table_scope before interpreting missing DE rows; for study-level metadata use `list_publications`.
-Filters: organism, coculture_partner, table_scope, experiment_ids, search_text, time_course_only, plus the publication / condition filters.
+Filters: organism, coculture_partner, coculture_role, table_scope, experiment_ids, search_text, time_course_only, plus the publication / condition filters.
 Returns: by_organism, by_treatment_type, by_table_scope, by_omics_type, by_growth_phase, not_found; one row = one experiment.
 docs://tools/list_experiments; summary=True first.
 
@@ -20,6 +20,7 @@ docs://tools/list_experiments; summary=True first.
 | omics_type | list[string] \| None | None | Keep experiments whose omics_type is in this list. Values: list_filter_values('omics_type'). |
 | publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | coculture_partner | string \| None | None | Filter by coculture partner organism (case-insensitive substring match against any entry of the coculture_partner list). Matches treatment AND background partners — do not combine with treatment_type=['coculture'] unless you want coculture-vs-axenic comparisons only. E.g. 'Alteromonas', 'HOT1A3'. |
+| coculture_role | string ('treatment', 'background') \| None | None | Keep experiments with a partner of this role: 'treatment' (the partner's presence is the contrast: coculture vs axenic, or phage) or 'background' (contrast is something else). With coculture_partner=, both hold for one partner. |
 | search_text | string \| None | None | Free-text search on experiment name, treatment, control, experimental context, and light condition (Lucene fulltext, case-insensitive). E.g. 'continuous light', 'diel'. |
 | time_course_only | bool | False | If true, return only time-course experiments (multiple time points). |
 | table_scope | list[string] \| None | None | Filter by table scope — what genes the source DE table contains. Values: 'all_detected_genes', 'significant_any_timepoint', 'significant_only', 'top_n', 'filtered_subset'. E.g. ['all_detected_genes'] for fair cross-experiment comparison. |
@@ -43,7 +44,7 @@ list_experiments(summary=True)
 ## Response sketch
 
 ```expected-keys
-total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, time_course_count, score_max, score_median, not_found, warnings, results
+total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, by_coculture_role, time_course_count, score_max, score_median, not_found, warnings, results
 ```
 
 Result row: `experiment_id, experiment_name, publication_doi, authors, organism_name, treatment_type, background_factors, coculture_partner, omics_type, is_time_course, table_scope, table_scope_detail, …`
@@ -69,5 +70,7 @@ Result row: `experiment_id, experiment_name, publication_doi, authors, organism_
 - list_experiments (per-row `metabolite_count > 0`) → list_metabolite_assays(experiment_ids=[...]) to inspect the experiment's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup).
 - list_experiments → list_derived_metrics(experiment_ids=[...]) for the experiment's non-DE, column-level evidence (rhythmicity flags, amplitudes, trait classes)
 - list_experiments → pathway_enrichment(experiment_ids=[...], organism=...) for ORA over that experiment's DE gene sets
+- differential_expression_by_gene / differential_expression_by_ortholog row (flat `coculture_partner` list) → list_experiments(experiment_ids=[...], verbose=True) → `coculture_partners[].role` tells treatment from background partners
+- list_filter_values(filter_type='partner_role') → list_experiments(coculture_role=...)
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/list_experiments/full`

@@ -5,7 +5,7 @@
 Differential-expression and characterization experiments with per-timepoint, DM and metabolomics rollups.
 
 Use to pick experiment_ids and read each one's table_scope before interpreting missing DE rows; for study-level metadata use `list_publications`.
-Filters: organism, coculture_partner, table_scope, experiment_ids, search_text, time_course_only, plus the publication / condition filters.
+Filters: organism, coculture_partner, coculture_role, table_scope, experiment_ids, search_text, time_course_only, plus the publication / condition filters.
 Returns: by_organism, by_treatment_type, by_table_scope, by_omics_type, by_growth_phase, not_found; one row = one experiment.
 docs://tools/list_experiments; summary=True first.
 
@@ -20,6 +20,7 @@ docs://tools/list_experiments; summary=True first.
 | omics_type | list[string] \| None | None | Keep experiments whose omics_type is in this list. Values: list_filter_values('omics_type'). |
 | publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | coculture_partner | string \| None | None | Filter by coculture partner organism (case-insensitive substring match against any entry of the coculture_partner list). Matches treatment AND background partners — do not combine with treatment_type=['coculture'] unless you want coculture-vs-axenic comparisons only. E.g. 'Alteromonas', 'HOT1A3'. |
+| coculture_role | string ('treatment', 'background') \| None | None | Keep experiments with a partner of this role: 'treatment' (the partner's presence is the contrast: coculture vs axenic, or phage) or 'background' (contrast is something else). With coculture_partner=, both hold for one partner. |
 | search_text | string \| None | None | Free-text search on experiment name, treatment, control, experimental context, and light condition (Lucene fulltext, case-insensitive). E.g. 'continuous light', 'diel'. |
 | time_course_only | bool | False | If true, return only time-course experiments (multiple time points). |
 | table_scope | list[string] \| None | None | Filter by table scope — what genes the source DE table contains. Values: 'all_detected_genes', 'significant_any_timepoint', 'significant_only', 'top_n', 'filtered_subset'. E.g. ['all_detected_genes'] for fair cross-experiment comparison. |
@@ -37,7 +38,7 @@ docs://tools/list_experiments; summary=True first.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, time_course_count, score_max, score_median, not_found, warnings, results
+total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, by_coculture_role, time_course_count, score_max, score_median, not_found, warnings, results
 ```
 
 - **total_entries** (int): Total experiments in the KG (unfiltered).
@@ -61,6 +62,7 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 - **by_metric_type** (list[ExpMetricTypeBreakdown]): Experiment counts by DerivedMetric metric_type across matching experiments.
 - **by_metric_type_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_compartment** (list[ExpCompartmentBreakdown]): Experiment counts per wet-lab compartment.
+- **by_coculture_role** (list[CocultureRoleBreakdown]): Matching experiments per coculture partner role, sorted desc. An experiment counts once per distinct role among its partners; axenic experiments count in none, so the sum need not equal total_matching.
 - **time_course_count** (int): Number of time-course experiments in matching set.
 - **score_max** (float | None): Max Lucene relevance score, present only when search_text is used.
 - **score_median** (float | None): Median Lucene relevance score, present only when search_text is used.
@@ -115,6 +117,7 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | statistical_test | string \| None (optional) | Statistical method (verbose-only). |
 | experimental_context | string \| None (optional) | Context summary (verbose-only). |
 | cluster_count | int \| None (optional) | Total gene clusters across analyses (verbose-only). |
+| coculture_partners | list[CoculturePartner] (optional) | Verbose only. One entry per coculture partner with its role (name, role, organism_id, organism_type), sorted by name; [] when axenic. Omitted from compact rows. |
 
 ## Few-shot examples
 
@@ -216,6 +219,7 @@ list_experiments(summary=True)
     {"compartment": "exoproteome", "count": 10},
     {"compartment": "extracellular", "count": 3}
   ],
+  "by_coculture_role": [{"coculture_role": "background", "count": 78}, {"coculture_role": "treatment", "count": 44}],
   "time_course_count": 41,
   "score_max": null,
   "score_median": null,
@@ -231,13 +235,23 @@ list_experiments(summary=True)
 list_experiments(summary=True, organism="MED4")
 ```
 
-### Example 3: Browse coculture experiments with Alteromonas
+### Example 3: Browse every experiment cultured with Alteromonas
 
 ```example-call
-list_experiments(treatment_type=["coculture"], coculture_partner="Alteromonas")
+list_experiments(coculture_partner="Alteromonas")
 ```
 
-### Example 4: Time-course nitrogen experiments in MED4
+*Matches any entry of the coculture_partner list — treatment partners (coculture-vs-axenic) and background partners (the culture was a coculture, the contrast is something else). Read by_coculture_role for the split.*
+
+### Example 4: Pro experiments cultured with Alteromonas but studying something else
+
+```example-call
+list_experiments(organism="Prochlorococcus", coculture_partner="Alteromonas", coculture_role="background")
+```
+
+*With coculture_partner=, the role and the name are tested on the same partner. coculture_role='treatment' instead keeps the coculture-vs-axenic contrasts with that partner.*
+
+### Example 5: Time-course nitrogen experiments in MED4
 
 ```example-call
 list_experiments(organism="MED4", treatment_type=["nitrogen"], time_course_only=True)
@@ -245,7 +259,7 @@ list_experiments(organism="MED4", treatment_type=["nitrogen"], time_course_only=
 
 *treatment_type values are short nouns from a live vocabulary ('nitrogen', not 'nitrogen_stress') — an unknown value returns 0 rows, not an error.*
 
-### Example 5: From publication to expression data
+### Example 6: From publication to expression data
 
 ```
 Step 1: list_publications(search_text="Biller")
@@ -258,7 +272,7 @@ Step 3: differential_expression_by_gene(organism="MED4", experiment_ids=["..."])
         → get gene-level results
 ```
 
-### Example 6: Orient then drill down
+### Example 7: Orient then drill down
 
 ```
 Step 1: list_experiments(summary=True)
@@ -273,7 +287,7 @@ Step 3: differential_expression_by_gene(organism="MED4", experiment_ids=["..."])
         → get gene-level results
 ```
 
-### Example 7: Fetch metadata for a known experiment_id list
+### Example 8: Fetch metadata for a known experiment_id list
 
 ```example-call
 list_experiments(experiment_ids=["10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq", "10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq"], verbose=True)
@@ -281,7 +295,7 @@ list_experiments(experiment_ids=["10.1101/2025.11.24.690089_coculture_prochloroc
 
 *experiment_ids are the KG's Experiment.id strings (DOI-prefixed); copy them from an earlier list_experiments result — unknown ids land in not_found.*
 
-### Example 8: Find vesicle-fraction experiments
+### Example 9: Find vesicle-fraction experiments
 
 ```example-call
 list_experiments(compartment="vesicle", limit=2)
@@ -344,6 +358,7 @@ list_experiments(compartment="vesicle", limit=2)
   ],
   "by_metric_type_truncated": null,
   "by_compartment": [{"compartment": "vesicle", "count": 13}],
+  "by_coculture_role": [],
   "time_course_count": 0,
   "score_max": null,
   "score_median": null,
@@ -422,7 +437,7 @@ list_experiments(compartment="vesicle", limit=2)
 }
 ```
 
-### Example 9: Inspect metabolomics-bearing experiments (per-row metabolite rollups)
+### Example 10: Inspect metabolomics-bearing experiments (per-row metabolite rollups)
 
 ```example-call
 list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell", "10.1073/pnas.2213271120_chitosan_addition_mit9313_metabolomics"])
@@ -457,6 +472,7 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
   "by_metric_type": [],
   "by_metric_type_truncated": null,
   "by_compartment": [{"compartment": "whole_cell", "count": 2}],
+  "by_coculture_role": [],
   "time_course_count": 0,
   "score_max": null,
   "score_median": null,
@@ -535,7 +551,7 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
 }
 ```
 
-### Example 10: gene_count vs distinct_gene_count for time-course experiments
+### Example 11: gene_count vs distinct_gene_count for time-course experiments
 
 ```
 Each result row carries both `gene_count` (cumulative row count
@@ -565,6 +581,8 @@ list_filter_values(filter_type='metric_type') → list_experiments(search_text='
 list_experiments (per-row `metabolite_count > 0`) → list_metabolite_assays(experiment_ids=[...]) to inspect the experiment's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup).
 list_experiments → list_derived_metrics(experiment_ids=[...]) for the experiment's non-DE, column-level evidence (rhythmicity flags, amplitudes, trait classes)
 list_experiments → pathway_enrichment(experiment_ids=[...], organism=...) for ORA over that experiment's DE gene sets
+differential_expression_by_gene / differential_expression_by_ortholog row (flat `coculture_partner` list) → list_experiments(experiment_ids=[...], verbose=True) → `coculture_partners[].role` tells treatment from background partners
+list_filter_values(filter_type='partner_role') → list_experiments(coculture_role=...)
 ```
 
 ## Common mistakes
@@ -590,6 +608,12 @@ list_experiments → pathway_enrichment(experiment_ids=[...], organism=...) for 
 - `authors` is on every result row — no need to join with list_publications when you only need author attribution. list_publications is still the right call for richer publication metadata (abstract, journal, year).
 
 - `organism=` filters the profiled organism only (word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works). It does NOT match coculture partners — for partner-side filtering use `coculture_partner=`. The two filters AND-compose. A genus word alone ('Prochlorococcus') matches every strain of the genus — fine here, but the single-organism expression tools raise on it.
+
+- `coculture_partner` lists every organism sharing the culture: treatment partners (their presence is the contrast) AND background partners (the culture was a coculture, the contrast is something else). `treatment_type=['coculture']` keeps only the coculture-vs-axenic contrasts and drops the background cocultures. Use `coculture_role='treatment'` / `'background'` to choose explicitly (values: `list_filter_values(filter_type='partner_role')`); verbose `coculture_partners[].role` shows the role per partner.
+
+- `background_factors` containing both `axenic` and `coculture` marks a pooled design (axenic and coculture arms analyzed together) — a background partner on such an experiment was present in some arms, not all (the partner_role vocabulary description says 'every arm'; pooled designs are the exception).
+
+- Phage infection is a treatment partner: role `treatment` with `treatment_type=['viral']`, not `['coculture']`. `coculture_role='treatment'` therefore returns phage experiments too unless you also pass `coculture_partner=` or `treatment_type=`.
 
 - metabolite_count > 0 indicates a metabolomics-paired experiment. Drill into MetaboliteAssay nodes via list_metabolite_assays(experiment_ids=[...]).
 
@@ -627,7 +651,7 @@ result['results'][0]['time_point_growth_phases']
 from multiomics_explorer import list_experiments
 
 result = list_experiments()
-# returns dict with keys: total_entries, total_matching, returned, offset, truncated, by_organism, by_organism_truncated, by_treatment_type, by_treatment_type_truncated, by_background_factors, by_background_factors_truncated, by_omics_type, by_publication, by_publication_truncated, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_metric_type_truncated, by_compartment, time_course_count, score_max, score_median, not_found, warnings, results
+# returns dict with keys: total_entries, total_matching, returned, offset, truncated, by_organism, by_organism_truncated, by_treatment_type, by_treatment_type_truncated, by_background_factors, by_background_factors_truncated, by_omics_type, by_publication, by_publication_truncated, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_metric_type_truncated, by_compartment, by_coculture_role, time_course_count, score_max, score_median, not_found, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

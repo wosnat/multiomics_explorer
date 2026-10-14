@@ -13,6 +13,9 @@ rows:
   - '{''count'': 1, ''item'': ''decay_pattern''}'
   - '{''count'': 1, ''item'': ''diel''}'
   - '{''count'': 5, ''item'': ''time_course''}'
+  by_coculture_role:
+  - '{''count'': 5, ''item'': ''treatment''}'
+  - '{''count'': 6, ''item'': ''background''}'
   by_compartment:
   - '{''count'': 2, ''item'': ''vesicle''}'
   - '{''count'': 43, ''item'': ''whole_cell''}'

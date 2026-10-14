@@ -3290,6 +3290,23 @@
     ]
    }
   },
+  "coculture_role": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "enum": [
+       "treatment",
+       "background"
+      ],
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
   "compartment": {
    "required": false,
    "type_sig": {
@@ -3486,7 +3503,8 @@
      "background_factors",
      "table_scope",
      "detection_status",
-     "expression_status"
+     "expression_status",
+     "partner_role"
     ],
     "type": "string"
    }

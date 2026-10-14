@@ -12380,3 +12380,262 @@ class TestListMetabolitesNoFormulaWrapper:
         f = ListMetabolitesResponse.model_fields["no_formula_excluded"]
         assert f.default is None
         assert f.description
+
+
+class TestListExperimentsCocultureRoleWrapper:
+    """Backlog 2c.6 — list_experiments `coculture_role` param, verbose
+    `coculture_partners` (CoculturePartner rows), `by_coculture_role`
+    envelope. Spec: docs/tool-specs/list_experiments-coculture-role.md."""
+
+    _SUMMARY = {
+        "total_entries": 209, "total_matching": 53,
+        "by_organism": [], "by_treatment_type": [], "by_background_factors": [],
+        "by_omics_type": [], "by_publication": [], "by_table_scope": [],
+        "by_coculture_role": [
+            {"coculture_role": "background", "count": 48},
+            {"coculture_role": "treatment", "count": 5},
+        ],
+        "time_course_count": 0, "score_max": None, "score_median": None,
+        "returned": 0, "truncated": True, "results": [],
+    }
+
+    _EXP = {
+        "experiment_id": "exp_marinobacter",
+        "experiment_name": "Marinobacter side",
+        "publication_doi": "10.1234/x",
+        "authors": [],
+        "organism_name": "Marinobacter adhaerens HP15",
+        "treatment_type": ["nitrogen"],
+        "background_factors": ["coculture"],
+        "coculture_partner": ["Alteromonas (MarRef v6)", "Synechococcus sp. BL107"],
+        "omics_type": "RNASEQ",
+        "is_time_course": False,
+        "table_scope": "all_detected_genes",
+        "table_scope_detail": None,
+        "gene_count": 10, "distinct_gene_count": 10,
+        "genes_by_status": {"significant_up": 1, "significant_down": 1,
+                            "not_significant": 8},
+    }
+
+    _PARTNERS = [
+        {"name": "Alteromonas (MarRef v6)", "role": "background",
+         "organism_id": "insdc.gcf:GCF_000000000.1",
+         "organism_type": "reference_proteome_match"},
+        {"name": "Synechococcus sp. BL107", "role": "background",
+         "organism_id": "insdc.gcf:GCF_000153805.1",
+         "organism_type": "genome_strain"},
+    ]
+
+    def _detail(self, **row_overrides):
+        import copy
+        row = copy.deepcopy(self._EXP)
+        row.update(copy.deepcopy(row_overrides))
+        return {**self._SUMMARY, "returned": 1, "truncated": True,
+                "results": [row]}
+
+    # --- param surface ---
+    def test_coculture_role_param_in_schema_as_enum(self):
+        props = _all_tool_input_schemas()["list_experiments"]["properties"]
+        assert "coculture_role" in props
+        sig = json.dumps(props["coculture_role"])
+        assert '"treatment"' in sig and '"background"' in sig
+        branches = props["coculture_role"].get("anyOf", [])
+        enums = [b.get("enum") for b in branches if "enum" in b]
+        assert enums and set(enums[0]) == {"treatment", "background"}
+        assert any(b.get("type") == "null" for b in branches)
+        assert props["coculture_role"].get("default") is None
+        assert props["coculture_role"].get("description")
+
+    def test_coculture_role_type_hint_literal(self, tool_fns):
+        import typing
+        hints = typing.get_type_hints(tool_fns["list_experiments"],
+                                      include_extras=True)
+        hint = str(hints.get("coculture_role"))
+        assert "Literal" in hint
+        assert "'treatment'" in hint and "'background'" in hint
+        assert "None" in hint
+
+    def test_coculture_role_placed_after_coculture_partner(self, tool_fns):
+        import inspect
+        names = list(inspect.signature(tool_fns["list_experiments"]).parameters)
+        assert names.index("coculture_role") == names.index("coculture_partner") + 1
+
+    @pytest.mark.asyncio
+    async def test_coculture_role_forwarded_to_api(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SUMMARY,
+        ) as mock_api:
+            await tool_fns["list_experiments"](
+                mock_ctx, coculture_partner="Alteromonas",
+                coculture_role="background", summary=True,
+            )
+        kw = mock_api.call_args[1]
+        assert kw["coculture_role"] == "background"
+        assert kw["coculture_partner"] == "Alteromonas"
+
+    @pytest.mark.asyncio
+    async def test_coculture_role_default_none_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SUMMARY,
+        ) as mock_api:
+            await tool_fns["list_experiments"](mock_ctx, summary=True)
+        assert mock_api.call_args[1]["coculture_role"] is None
+
+    @pytest.mark.asyncio
+    async def test_api_value_error_becomes_tool_error(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            side_effect=ValueError(
+                "coculture_role must be one of 'treatment', 'background'"),
+        ):
+            with pytest.raises(ToolError, match="treatment"):
+                await tool_fns["list_experiments"](mock_ctx, coculture_role="x")
+
+    # --- envelope ---
+    @pytest.mark.asyncio
+    async def test_by_coculture_role_on_response(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SUMMARY,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, summary=True)
+        roles = {b.coculture_role: b.count for b in result.by_coculture_role}
+        assert roles == {"background": 48, "treatment": 5}
+
+    @pytest.mark.asyncio
+    async def test_by_coculture_role_on_detail_response(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._detail(),
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+        assert len(result.by_coculture_role) == 2
+
+    @pytest.mark.asyncio
+    async def test_by_coculture_role_defaults_empty(self, tool_fns, mock_ctx):
+        api_ret = {k: v for k, v in self._SUMMARY.items()
+                   if k != "by_coculture_role"}
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=api_ret,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, summary=True)
+        assert result.by_coculture_role == []
+
+    def test_by_coculture_role_in_response_model_dump(self, tool_fns):
+        import asyncio
+        ctx = MagicMock()
+        ctx.request_context.lifespan_context.conn = MagicMock()
+        ctx.info = AsyncMock()
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SUMMARY,
+        ):
+            result = asyncio.run(tool_fns["list_experiments"](ctx, summary=True))
+        dumped = result.model_dump()
+        assert dumped["by_coculture_role"][0] == {
+            "coculture_role": "background", "count": 48}
+
+    # --- verbose rows ---
+    @pytest.mark.asyncio
+    async def test_verbose_coculture_partners_validate(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._detail(coculture_partners=self._PARTNERS),
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, verbose=True)
+        cps = result.results[0].coculture_partners
+        assert [c.name for c in cps] == result.results[0].coculture_partner
+        assert cps[0].role == "background"
+        assert cps[0].organism_id == "insdc.gcf:GCF_000000000.1"
+        assert cps[0].organism_type == "reference_proteome_match"
+        assert cps[1].organism_type == "genome_strain"
+
+    @pytest.mark.asyncio
+    async def test_verbose_coculture_partners_serialize(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._detail(coculture_partners=self._PARTNERS),
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, verbose=True)
+        row = result.results[0].model_dump()
+        assert row["coculture_partners"] == self._PARTNERS
+
+    @pytest.mark.asyncio
+    async def test_phage_partner_validates(self, tool_fns, mock_ctx):
+        phage = [{"name": "Phage", "role": "treatment",
+                  "organism_id": "ncbitaxon:10239", "organism_type": "treatment"}]
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._detail(coculture_partner=["Phage"],
+                                      treatment_type=["viral"],
+                                      coculture_partners=phage),
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, verbose=True)
+        cp = result.results[0].coculture_partners[0]
+        assert (cp.name, cp.role, cp.organism_id, cp.organism_type) == (
+            "Phage", "treatment", "ncbitaxon:10239", "treatment")
+
+    @pytest.mark.asyncio
+    async def test_coculture_partners_default_empty(self, tool_fns, mock_ctx):
+        """Compact rows (no key from api) -> default []."""
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._detail(),
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+        assert result.results[0].coculture_partners == []
+
+    @pytest.mark.asyncio
+    async def test_coculture_partner_missing_field_rejected(self, tool_fns, mock_ctx):
+        """CoculturePartner requires name/role/organism_id/organism_type."""
+        bad = [{"name": "Phage", "role": "treatment"}]
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._detail(coculture_partners=bad),
+        ):
+            with pytest.raises(Exception):
+                await tool_fns["list_experiments"](mock_ctx, verbose=True)
+
+
+class TestListFilterValuesPartnerRoleWrapper:
+    """Backlog 2c.6 — list_filter_values filter_type='partner_role'."""
+
+    def test_filter_type_literal_includes_partner_role(self, tool_fns):
+        import typing
+        hints = typing.get_type_hints(tool_fns["list_filter_values"],
+                                      include_extras=True)
+        assert "partner_role" in str(hints.get("filter_type"))
+
+    def test_filter_type_schema_enum_includes_partner_role(self):
+        props = _all_tool_input_schemas()["list_filter_values"]["properties"]
+        assert "partner_role" in props["filter_type"]["enum"]
+        assert "partner_role" in props["filter_type"].get("description", "")
+
+    @pytest.mark.asyncio
+    async def test_partner_role_branch_is_edge_scoped(self, tool_fns, mock_ctx):
+        api_return = {
+            "filter_type": "partner_role",
+            "description": "Role of a coculture partner",
+            "total_entries": 2, "returned": 2, "truncated": False,
+            "warnings": [],
+            "results": [
+                {"value": "background", "applies_to": ["Tests_coculture_with"],
+                 "source": "vocabulary", "description": "culture context"},
+                {"value": "treatment", "applies_to": ["Tests_coculture_with"],
+                 "source": "vocabulary", "description": "the contrast"},
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value=api_return,
+        ) as mock_api:
+            result = await tool_fns["list_filter_values"](
+                mock_ctx, filter_type="partner_role",
+            )
+        assert mock_api.call_args[1]["filter_type"] == "partner_role"
+        assert result.filter_type == "partner_role"
+        assert {r.value for r in result.results} == {"treatment", "background"}
+        assert all(r.applies_to == ["Tests_coculture_with"] for r in result.results)

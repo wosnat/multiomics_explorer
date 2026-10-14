@@ -523,12 +523,12 @@ Enumerate with `list_organisms()` (47 `OrganismTaxon` nodes, 47 distinct
 names, 43 with genes). In `run_cypher`, join genes to organisms via
 `Gene_belongs_to_organism`.
 
-`organism=` filters the **profiled organism only** on tools where it
-applies (`list_experiments`, `differential_expression_by_gene`). For
-coculture-partner-side filtering use `coculture_partner=` on
-`list_experiments`: it matches any entry of the `coculture_partner`
-list (treatment **and** background partners). Adding
-`treatment_type=['coculture']` drops the background cocultures.
+`organism=` filters the **profiled organism only** (`list_experiments`,
+`differential_expression_by_gene`). For the partner side use
+`list_experiments(coculture_partner=)`: it matches any entry of the
+`coculture_partner` list (treatment **and** background partners);
+`coculture_role='treatment'` / `'background'` keeps one role, tested on
+the same partner as the name.
 
 ---
 
