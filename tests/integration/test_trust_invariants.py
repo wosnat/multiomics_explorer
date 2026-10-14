@@ -352,8 +352,8 @@ class TestOrganismAnnotationRollups:
         assert rows == [], rows
 
     def test_rollups_are_dense_on_every_organism(self, conn):
-        """Spec §7.1: dense on 48/48 (a missing prop coalesces to 0 in the
-        builder, but the KG stamps every node)."""
+        """Spec §7.1: dense on every node (a missing prop coalesces to 0 in
+        the builder, but the KG stamps every node)."""
         row = conn.execute_query(
             "MATCH (o:OrganismTaxon)\n"
             "RETURN count(o) AS n,\n"
@@ -363,21 +363,20 @@ class TestOrganismAnnotationRollups:
             "       count(o.ncbifam_gene_count) AS ncbi,\n"
             "       sum(o.peptidase_gene_count) AS pep_sum,\n"
             "       max(o.peptidase_gene_count) AS pep_max")[0]
-        assert row["n"] == 48
-        assert row["pep"] == row["nonpep"] == row["ipr"] == row["ncbi"] == 48
+        assert row["pep"] == row["nonpep"] == row["ipr"] == row["ncbi"] == row["n"]
         assert row["pep_sum"] == 3439
         assert row["pep_max"] == 148
 
-    def test_meiothermus_ruber_name_collision_is_real(self, conn):
-        """Guards the 'join by edge' rule: the strain and the treatment
-        taxon share a preferred_name but only one has genes."""
+    def test_organism_preferred_names_are_unique(self, conn):
+        """The 2026-10-13 build retired the gene-less 'Meiothermus ruber'
+        treatment taxon (ncbitaxon:277), the last duplicate name. The
+        Experiment.coculture_partner list is built from partner
+        preferred_names, so a name collision would make it ambiguous."""
         rows = conn.execute_query(
-            "MATCH (o:OrganismTaxon {preferred_name: 'Meiothermus ruber'})\n"
-            "RETURN o.organism_type AS t, coalesce(o.gene_count, 0) AS g,\n"
-            "       coalesce(o.peptidase_gene_count, 0) AS p ORDER BY g")
-        assert len(rows) == 2
-        assert rows[0]["g"] == 0 and rows[0]["p"] == 0
-        assert rows[1]["g"] > 0 and rows[1]["p"] > 0
+            "MATCH (o:OrganismTaxon)\n"
+            "WITH o.preferred_name AS name, count(*) AS n WHERE n > 1\n"
+            "RETURN name, n")
+        assert rows == [], rows
 
     def test_list_organisms_row_equals_node_property(self, conn):
         """The api surfaces the node value verbatim (no re-count)."""

@@ -2,8 +2,8 @@
 
 ## Guides
 
-- `docs://guide/concepts` — ~6269 tok — The knowledge graph integrates Prochlorococcus and Alteromonas multi-omics data: genomes, transcriptomes…
-- `docs://guide/conventions` — ~7047 tok — Patterns that hold across most or all 42 tools — things you'd otherwise re-learn tool by tool.
+- `docs://guide/concepts` — ~6313 tok — The knowledge graph integrates Prochlorococcus and Alteromonas multi-omics data: genomes, transcriptomes…
+- `docs://guide/conventions` — ~7050 tok — Patterns that hold across most or all 42 tools — things you'd otherwise re-learn tool by tool.
 - `docs://guide/python_api` — ~4115 tok — The `multiomics_explorer` package exposes the same 42 tools available via MCP, plus a handful of analysis…
 - `docs://guide/start_here` — ~4019 tok — This MCP server exposes 42 tools over a Prochlorococcus/Alteromonas multi-omics KG, in ten families below.
 
@@ -35,12 +35,12 @@
 - `docs://tools/kg_schema` — ~576 tok
 - `docs://tools/list_clustering_analyses` — ~977 tok
 - `docs://tools/list_derived_metrics` — ~1553 tok
-- `docs://tools/list_experiments` — ~1414 tok
+- `docs://tools/list_experiments` — ~1455 tok
 - `docs://tools/list_filter_values` — ~1296 tok
 - `docs://tools/list_metabolite_assays` — ~1283 tok
 - `docs://tools/list_metabolites` — ~1774 tok
-- `docs://tools/list_organisms` — ~982 tok
-- `docs://tools/list_publications` — ~1288 tok
+- `docs://tools/list_organisms` — ~937 tok
+- `docs://tools/list_publications` — ~1249 tok
 - `docs://tools/metabolites_by_flags_assay` — ~1319 tok
 - `docs://tools/metabolites_by_gene` — ~1509 tok
 - `docs://tools/metabolites_by_quantifies_assay` — ~1717 tok
@@ -58,8 +58,8 @@ Append /full for the complete page — all worked examples + full response forma
 
 - `docs://tools/assays_by_metabolite/full` — ~4917 tok
 - `docs://tools/cluster_enrichment/full` — ~4284 tok
-- `docs://tools/differential_expression_by_gene/full` — ~6702 tok
-- `docs://tools/differential_expression_by_ortholog/full` — ~2923 tok
+- `docs://tools/differential_expression_by_gene/full` — ~6640 tok
+- `docs://tools/differential_expression_by_ortholog/full` — ~2934 tok
 - `docs://tools/discussed_by_publication/full` — ~3476 tok
 - `docs://tools/gene_aa_sequence/full` — ~2404 tok
 - `docs://tools/gene_clusters_by_gene/full` — ~2330 tok
@@ -72,30 +72,30 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/gene_response_profile/full` — ~5472 tok
 - `docs://tools/genes_by_boolean_metric/full` — ~5980 tok
 - `docs://tools/genes_by_categorical_metric/full` — ~6068 tok
-- `docs://tools/genes_by_function/full` — ~2732 tok
+- `docs://tools/genes_by_function/full` — ~2692 tok
 - `docs://tools/genes_by_homolog_group/full` — ~2436 tok
 - `docs://tools/genes_by_metabolite/full` — ~9596 tok
 - `docs://tools/genes_by_numeric_metric/full` — ~6747 tok
 - `docs://tools/genes_by_ontology/full` — ~14792 tok
 - `docs://tools/genes_in_cluster/full` — ~1960 tok
 - `docs://tools/kg_release_info/full` — ~2211 tok
-- `docs://tools/kg_schema/full` — ~1743 tok
-- `docs://tools/list_clustering_analyses/full` — ~2597 tok
+- `docs://tools/kg_schema/full` — ~1755 tok
+- `docs://tools/list_clustering_analyses/full` — ~2571 tok
 - `docs://tools/list_derived_metrics/full` — ~3493 tok
-- `docs://tools/list_experiments/full` — ~8390 tok
+- `docs://tools/list_experiments/full` — ~8509 tok
 - `docs://tools/list_filter_values/full` — ~5603 tok
 - `docs://tools/list_metabolite_assays/full` — ~3913 tok
 - `docs://tools/list_metabolites/full` — ~5901 tok
-- `docs://tools/list_organisms/full` — ~12769 tok
-- `docs://tools/list_publications/full` — ~8816 tok
+- `docs://tools/list_organisms/full` — ~12675 tok
+- `docs://tools/list_publications/full` — ~8795 tok
 - `docs://tools/metabolites_by_flags_assay/full` — ~3941 tok
 - `docs://tools/metabolites_by_gene/full` — ~8077 tok
 - `docs://tools/metabolites_by_quantifies_assay/full` — ~5420 tok
 - `docs://tools/ontology_landscape/full` — ~10789 tok
 - `docs://tools/ontology_term_details/full` — ~9137 tok
 - `docs://tools/pathway_enrichment/full` — ~13268 tok
-- `docs://tools/resolve_gene/full` — ~1602 tok
-- `docs://tools/run_cypher/full` — ~984 tok
+- `docs://tools/resolve_gene/full` — ~1520 tok
+- `docs://tools/run_cypher/full` — ~972 tok
 - `docs://tools/search_homolog_groups/full` — ~2275 tok
 - `docs://tools/search_ontology/full` — ~10250 tok
 

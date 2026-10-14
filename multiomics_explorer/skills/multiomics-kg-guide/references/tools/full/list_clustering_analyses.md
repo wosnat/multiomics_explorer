@@ -151,7 +151,7 @@ response['total_matching']  # use total, not len — results may be truncated
 
 - treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows and reports in the envelope `warnings` — check `warnings` before trusting an empty result. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. On analyses the same short nouns apply (darkness, viral, iron, nitrogen, diel, temperature, light, oxygen, rna_decay, genomic_analysis).
 
-- `organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works. 'Meiothermus ruber' names two OrganismTaxon nodes; the clustering analyses attach to the genome strain.
+- `organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works.
 
 - DataFrame conversion: `to_dataframe(result)` auto-dispatches and returns one row per analysis × cluster (compact: cluster_id / cluster_name / cluster_member_count; verbose=True adds cluster descriptions). See `docs://guide/python_api`.
 

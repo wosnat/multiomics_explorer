@@ -59,13 +59,15 @@ VALID_OMICS_TYPES: set[str] = {
 # Meiothermus HO-002 + TigrRole hierarchy / NCBIfam→TigrRole bridge + docs-review
 # asks DOC-001/004: Gene_has_pfam.evidence gains family_inferred, compartment
 # loses spent_medium / lysate, KG contract v2; + Cyanorak coordinate fallback:
-# new closed vocabs Gene.coordinate_source / Gene.sequence_source {ncbi, cyanorak},
-# built 2026-10-13T06:28Z). The recipe lives KG-side (docs/kg-changes/
+# new closed vocabs Gene.coordinate_source / Gene.sequence_source {ncbi, cyanorak};
+# + coculture partner list: new edge vocab Tests_coculture_with.partner_role
+# {treatment, background}, revised `coculture` value descriptions,
+# built 2026-10-13T13:51Z). The recipe lives KG-side (docs/kg-changes/
 # vocabulary-contract.md). A mismatch means baked docs / parameter descriptions
 # may list stale values — filters still validate live. Must equal the live
 # KG's value at release cut.
 EXPECTED_CONTROLLED_VOCABULARIES_HASH: str = (
-    "sha256:3833eeb47193f11c683c12ee679df3e65e3a7c6209e4b9b61db8fa0430d0abd6"
+    "sha256:6f01dce46215421c006c1e7af41d79953e034783d82521a7b55b0d392f2939df"
 )
 
 EXPECTED_KG_SHAPE: dict[str, tuple[str, ...] | str] = {

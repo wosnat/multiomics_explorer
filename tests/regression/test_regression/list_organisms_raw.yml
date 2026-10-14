@@ -1,5 +1,5 @@
 case_id: list_organisms_raw
-row_count: 48
+row_count: 47
 rows:
 - clade: null
   experiment_count: 0
@@ -25,7 +25,6 @@ rows:
   strain: Alt_MarRef
   treatment_types:
   - carbon
-  - coculture
 - clade: null
   experiment_count: 6
   gene_count: 3929
@@ -178,7 +177,6 @@ rows:
   strain: HP15
   treatment_types:
   - carbon
-  - coculture
 - clade: null
   experiment_count: 1
   gene_count: 2884
@@ -190,20 +188,6 @@ rows:
   publication_count: 1
   species: null
   strain: MruberA
-  treatment_types:
-  - light
-  - oxygen
-- clade: null
-  experiment_count: 1
-  gene_count: 0
-  genus: Meiothermus
-  ncbi_taxon_id: 277
-  omics_types:
-  - RNASEQ
-  organism_name: Meiothermus ruber
-  publication_count: 1
-  species: null
-  strain: null
   treatment_types:
   - light
   - oxygen
@@ -501,7 +485,6 @@ rows:
   strain: SS120
   treatment_types:
   - carbon
-  - coculture
   - nitrogen
   - phosphorus
 - clade: null
@@ -663,7 +646,6 @@ rows:
   strain: BL107
   treatment_types:
   - carbon
-  - coculture
 - clade: null
   experiment_count: 1
   gene_count: 2449

@@ -2633,7 +2633,7 @@ class TestListExperiments:
             "publication_doi": "10.1234/test",
             "organism_name": "Prochlorococcus MED4",
             "treatment_type": "coculture",
-            "coculture_partner": "Alteromonas macleodii HOT1A3",
+            "coculture_partner": ["Alteromonas macleodii HOT1A3"],
             "omics_type": "RNASEQ",
             "is_time_course": "single_time_point",
             "table_scope": "gene_level",
@@ -3246,7 +3246,7 @@ class TestDifferentialExpressionByGene:
                     "experiment_name": "Test experiment",
                     "treatment_type": "nitrogen_stress",
                     "omics_type": "RNASEQ",
-                    "coculture_partner": None,
+                    "coculture_partner": [],
                     "is_time_course": "time_course",
                     "table_scope": "all_detected_genes",
                     "table_scope_detail": None,
@@ -3425,7 +3425,7 @@ class TestDifferentialExpressionByGene:
                     "experiment_name": "Low",
                     "treatment_type": "x",
                     "omics_type": "RNASEQ",
-                    "coculture_partner": None,
+                    "coculture_partner": [],
                     "is_time_course": "single_time_point",
                     "table_scope": "all_detected_genes",
                     "table_scope_detail": None,
@@ -3440,7 +3440,7 @@ class TestDifferentialExpressionByGene:
                     "experiment_name": "High",
                     "treatment_type": "y",
                     "omics_type": "RNASEQ",
-                    "coculture_partner": None,
+                    "coculture_partner": [],
                     "is_time_course": "single_time_point",
                     "table_scope": "significant_only",
                     "table_scope_detail": None,
@@ -3479,7 +3479,7 @@ class TestDifferentialExpressionByGene:
                     "experiment_name": "Single",
                     "treatment_type": "x",
                     "omics_type": "RNASEQ",
-                    "coculture_partner": None,
+                    "coculture_partner": [],
                     "is_time_course": "single_time_point",
                     "table_scope": "all_detected_genes",
                     "table_scope_detail": None,
@@ -3643,7 +3643,7 @@ class TestDifferentialExpressionByGene:
                 "treatment_type": "nitrogen_stress",
                 "background_factors": ["axenic"],
                 "omics_type": "RNASEQ",
-                "coculture_partner": None,
+                "coculture_partner": [],
                 "is_time_course": "time_course",
                 "table_scope": "all_detected_genes",
                 "table_scope_detail": None,
@@ -3722,7 +3722,7 @@ class TestDifferentialExpressionByGene:
             assert len(exp["timepoints"]) == 2
             assert exp["background_factors"] == ["axenic"]
             assert exp["omics_type"] == "RNASEQ"
-            assert exp["coculture_partner"] is None
+            assert exp["coculture_partner"] == []
             assert exp["table_scope_detail"] is None
 
 
@@ -11870,7 +11870,7 @@ class TestListExperimentsPhase1Plumbing:
             "experiment_id": "exp_a", "experiment_name": "A",
             "publication_doi": "10.1234/a",
             "organism_name": "MED4", "treatment_type": ["control"],
-            "coculture_partner": None, "omics_type": "METABOLOMICS",
+            "coculture_partner": [], "omics_type": "METABOLOMICS",
             "is_time_course": "single_time_point",
             "table_scope": "all_detected_genes",
             "table_scope_detail": None,

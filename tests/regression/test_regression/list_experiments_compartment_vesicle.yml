@@ -14,7 +14,7 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 3
   derived_metric_value_kinds:
@@ -59,7 +59,7 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 3
   derived_metric_value_kinds:
@@ -104,7 +104,7 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 3
   derived_metric_value_kinds:
@@ -149,7 +149,7 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 3
   derived_metric_value_kinds:
@@ -194,7 +194,7 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 3
   derived_metric_value_kinds:
@@ -239,7 +239,7 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 3
   derived_metric_value_kinds:
@@ -283,7 +283,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 3
   derived_metric_value_kinds:
@@ -330,7 +330,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 1
   derived_metric_value_kinds:
@@ -379,7 +379,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -427,7 +427,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 3
   derived_metric_value_kinds:
@@ -475,7 +475,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -523,7 +523,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 3
   derived_metric_value_kinds:
@@ -566,7 +566,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 3
   derived_metric_value_kinds:

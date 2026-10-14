@@ -519,16 +519,16 @@ additionally accepts an exact `preferred_name` for gene-less taxa;
 `list_metabolites(organism_names=[...])` is exact, case-insensitive on
 `preferred_name` only.
 
-Enumerate with `list_organisms()` (48 `OrganismTaxon` nodes, 47 distinct
-names, 43 with genes). One name — `Meiothermus ruber` — is carried by two
-nodes (sequenced strain + gene-less treatment taxon); the resolver picks
-the strain, but joins over `run_cypher` should go through
-`Gene_belongs_to_organism`, never by name.
+Enumerate with `list_organisms()` (47 `OrganismTaxon` nodes, 47 distinct
+names, 43 with genes). In `run_cypher`, join genes to organisms via
+`Gene_belongs_to_organism`.
 
 `organism=` filters the **profiled organism only** on tools where it
 applies (`list_experiments`, `differential_expression_by_gene`). For
 coculture-partner-side filtering use `coculture_partner=` on
-`list_experiments`.
+`list_experiments`: it matches any entry of the `coculture_partner`
+list (treatment **and** background partners). Adding
+`treatment_type=['coculture']` drops the background cocultures.
 
 ---
 

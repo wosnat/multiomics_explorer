@@ -50,7 +50,7 @@ Result row: `doi, title, authors, year, journal, study_type, organisms, experime
 
 - treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or a summary=True call's by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. On this tool the rollups come from an unfiltered list_publications() call.
 
-- `organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works. Two OrganismTaxon nodes share the name 'Meiothermus ruber' (genome strain + treatment taxon), so organism='Meiothermus ruber' counts papers tied to either.
+- `organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works.
 
 ## Chaining patterns
 

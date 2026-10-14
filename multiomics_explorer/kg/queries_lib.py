@@ -2889,7 +2889,8 @@ def _list_experiments_where(
 
     if coculture_partner:
         conditions.append(
-            "toLower(e.coculture_partner) CONTAINS toLower($partner)"
+            "ANY(p IN e.coculture_partner"
+            " WHERE toLower(p) CONTAINS toLower($partner))"
         )
         params["partner"] = coculture_partner
 

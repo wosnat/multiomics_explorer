@@ -1,983 +1,6 @@
 case_id: list_experiments_treatment_types
-row_count: 76
+row_count: 36
 rows:
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 11
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_bl107_proteomics
-  experiment_name: 'Alteromonas in BL107 coculture: darkness +100 nM glucose vs darkness
-    (control)'
-  gene_count: 11
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 3
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '3'
-  time_point_totals:
-  - '11'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 11
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_bl107_proteomics
-  experiment_name: 'Alteromonas in BL107 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 11
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 5
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '5'
-  time_point_totals:
-  - '11'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 11
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_bl107_proteomics
-  experiment_name: 'Alteromonas in BL107 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 11
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 1
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '1'
-  time_point_totals:
-  - '11'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 11
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_bl107_proteomics
-  experiment_name: 'Alteromonas in BL107 coculture: light +5 mM glucose vs light (control)'
-  gene_count: 11
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 6
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '6'
-  time_point_totals:
-  - '11'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 16
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_med4_proteomics
-  experiment_name: 'Alteromonas in MED4 coculture: darkness +100 nM glucose vs darkness
-    (control)'
-  gene_count: 16
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '0'
-  time_point_totals:
-  - '16'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 16
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_med4_proteomics
-  experiment_name: 'Alteromonas in MED4 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 16
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 5
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '5'
-  time_point_totals:
-  - '16'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 16
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_med4_proteomics
-  experiment_name: 'Alteromonas in MED4 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 16
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '0'
-  time_point_totals:
-  - '16'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 16
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_med4_proteomics
-  experiment_name: 'Alteromonas in MED4 coculture: light +5 mM glucose vs light (control)'
-  gene_count: 16
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 5
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '5'
-  time_point_totals:
-  - '16'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 54
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_ss120_proteomics
-  experiment_name: 'Alteromonas in SS120 coculture: darkness +100 nM glucose vs darkness
-    (control)'
-  gene_count: 54
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 2
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '2'
-  time_point_totals:
-  - '54'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 54
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_ss120_proteomics
-  experiment_name: 'Alteromonas in SS120 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 54
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 20
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '20'
-  time_point_totals:
-  - '54'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 54
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_ss120_proteomics
-  experiment_name: 'Alteromonas in SS120 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 54
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 2
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '2'
-  time_point_significant_up:
-  - '0'
-  time_point_totals:
-  - '54'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 54
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_ss120_proteomics
-  experiment_name: 'Alteromonas in SS120 coculture: light +5 mM glucose vs light (control)'
-  gene_count: 54
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 1
-  significant_up_count: 16
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '1'
-  time_point_significant_up:
-  - '16'
-  time_point_totals:
-  - '54'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 4
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_wh7803_proteomics
-  experiment_name: 'Alteromonas in WH7803 coculture: darkness +100 nM glucose vs darkness
-    (control)'
-  gene_count: 4
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '0'
-  time_point_totals:
-  - '4'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 4
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_wh7803_proteomics
-  experiment_name: 'Alteromonas in WH7803 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 4
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '0'
-  time_point_totals:
-  - '4'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 4
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_wh7803_proteomics
-  experiment_name: 'Alteromonas in WH7803 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 4
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '0'
-  time_point_totals:
-  - '4'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 4
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_wh7803_proteomics
-  experiment_name: 'Alteromonas in WH7803 coculture: light +5 mM glucose vs light
-    (control)'
-  gene_count: 4
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '0'
-  time_point_totals:
-  - '4'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 78
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_wh8102_proteomics
-  experiment_name: 'Alteromonas in WH8102 coculture: darkness +100 nM glucose vs darkness
-    (control)'
-  gene_count: 78
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 2
-  significant_up_count: 1
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '2'
-  time_point_significant_up:
-  - '1'
-  time_point_totals:
-  - '78'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 78
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_wh8102_proteomics
-  experiment_name: 'Alteromonas in WH8102 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 78
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 26
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '26'
-  time_point_totals:
-  - '78'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 78
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_wh8102_proteomics
-  experiment_name: 'Alteromonas in WH8102 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 78
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 2
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '2'
-  time_point_totals:
-  - '78'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 78
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_wh8102_proteomics
-  experiment_name: 'Alteromonas in WH8102 coculture: light +5 mM glucose vs light
-    (control)'
-  gene_count: 78
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Alteromonas (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 27
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '27'
-  time_point_totals:
-  - '78'
-  treatment_type:
-  - carbon
-  - coculture
 - authors:
   - J. Jeffrey Morris
   - Marcelo Malisano Barreto Filho
@@ -987,7 +10,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MIT9312
+  coculture_partner:
+  - Prochlorococcus MIT9312
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1035,7 +59,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MIT9312
+  coculture_partner:
+  - Prochlorococcus MIT9312
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1083,7 +108,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus CC9311
+  coculture_partner:
+  - Synechococcus CC9311
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1131,7 +157,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus CC9311
+  coculture_partner:
+  - Synechococcus CC9311
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1179,7 +206,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
+  coculture_partner:
+  - Synechococcus WH8102
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1227,7 +255,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
+  coculture_partner:
+  - Synechococcus WH8102
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1274,7 +303,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
+  coculture_partner:
+  - Prochlorococcus MED4
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1334,7 +364,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MIT9313
+  coculture_partner:
+  - Prochlorococcus MIT9313
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1380,7 +411,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MIT9313
+  coculture_partner:
+  - Prochlorococcus MIT9313
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1420,1005 +452,6 @@ rows:
   treatment_type:
   - coculture
 - authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 82
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_bl107_proteomics
-  experiment_name: 'Marinobacter in BL107 coculture: darkness +100 nM glucose vs darkness
-    (control)'
-  gene_count: 82
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 8
-  significant_up_count: 3
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '8'
-  time_point_significant_up:
-  - '3'
-  time_point_totals:
-  - '82'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 82
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_bl107_proteomics
-  experiment_name: 'Marinobacter in BL107 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 82
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 10
-  significant_up_count: 1
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '10'
-  time_point_significant_up:
-  - '1'
-  time_point_totals:
-  - '82'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 82
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_bl107_proteomics
-  experiment_name: 'Marinobacter in BL107 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 82
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 10
-  significant_up_count: 2
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '10'
-  time_point_significant_up:
-  - '2'
-  time_point_totals:
-  - '82'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 82
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_bl107_proteomics
-  experiment_name: 'Marinobacter in BL107 coculture: light +5 mM glucose vs light
-    (control)'
-  gene_count: 82
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 7
-  significant_up_count: 1
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '7'
-  time_point_significant_up:
-  - '1'
-  time_point_totals:
-  - '82'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 342
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_med4_proteomics
-  experiment_name: 'Marinobacter in MED4 coculture: darkness +100 nM glucose vs darkness
-    (control)'
-  gene_count: 342
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '0'
-  time_point_totals:
-  - '342'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 342
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_med4_proteomics
-  experiment_name: 'Marinobacter in MED4 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 342
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 17
-  significant_up_count: 43
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '17'
-  time_point_significant_up:
-  - '43'
-  time_point_totals:
-  - '342'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 342
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_med4_proteomics
-  experiment_name: 'Marinobacter in MED4 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 342
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 6
-  significant_up_count: 3
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '6'
-  time_point_significant_up:
-  - '3'
-  time_point_totals:
-  - '342'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 342
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_med4_proteomics
-  experiment_name: 'Marinobacter in MED4 coculture: light +5 mM glucose vs light (control)'
-  gene_count: 342
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 7
-  significant_up_count: 34
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '7'
-  time_point_significant_up:
-  - '34'
-  time_point_totals:
-  - '342'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 195
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_ss120_proteomics
-  experiment_name: 'Marinobacter in SS120 coculture: darkness +100 nM glucose vs darkness
-    (control)'
-  gene_count: 195
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 2
-  significant_up_count: 1
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '2'
-  time_point_significant_up:
-  - '1'
-  time_point_totals:
-  - '195'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 195
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_ss120_proteomics
-  experiment_name: 'Marinobacter in SS120 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 195
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 12
-  significant_up_count: 74
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '12'
-  time_point_significant_up:
-  - '74'
-  time_point_totals:
-  - '195'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 195
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_ss120_proteomics
-  experiment_name: 'Marinobacter in SS120 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 195
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 6
-  significant_up_count: 2
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '6'
-  time_point_significant_up:
-  - '2'
-  time_point_totals:
-  - '195'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 195
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_ss120_proteomics
-  experiment_name: 'Marinobacter in SS120 coculture: light +5 mM glucose vs light
-    (control)'
-  gene_count: 195
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 19
-  significant_up_count: 44
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '19'
-  time_point_significant_up:
-  - '44'
-  time_point_totals:
-  - '195'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 146
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_wh7803_proteomics
-  experiment_name: 'Marinobacter in WH7803 coculture: darkness +100 nM glucose vs
-    darkness (control)'
-  gene_count: 146
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 2
-  significant_up_count: 1
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '2'
-  time_point_significant_up:
-  - '1'
-  time_point_totals:
-  - '146'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 145
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_wh7803_proteomics
-  experiment_name: 'Marinobacter in WH7803 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 145
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 2
-  significant_up_count: 16
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '2'
-  time_point_significant_up:
-  - '16'
-  time_point_totals:
-  - '145'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 145
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_wh7803_proteomics
-  experiment_name: 'Marinobacter in WH7803 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 145
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '0'
-  time_point_significant_up:
-  - '0'
-  time_point_totals:
-  - '145'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 146
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_wh7803_proteomics
-  experiment_name: 'Marinobacter in WH7803 coculture: light +5 mM glucose vs light
-    (control)'
-  gene_count: 146
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 3
-  significant_up_count: 9
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '3'
-  time_point_significant_up:
-  - '9'
-  time_point_totals:
-  - '146'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 483
-  experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_wh8102_proteomics
-  experiment_name: 'Marinobacter in WH8102 coculture: darkness +100 nM glucose vs
-    darkness (control)'
-  gene_count: 483
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 24
-  significant_up_count: 5
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '24'
-  time_point_significant_up:
-  - '5'
-  time_point_totals:
-  - '483'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - darkness
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 484
-  experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_wh8102_proteomics
-  experiment_name: 'Marinobacter in WH8102 coculture: darkness +5 mM glucose vs darkness
-    (control)'
-  gene_count: 484
-  growth_phases:
-  - darkness
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 3
-  significant_up_count: 24
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - darkness
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - darkness
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '3'
-  time_point_significant_up:
-  - '24'
-  time_point_totals:
-  - '484'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 484
-  experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_wh8102_proteomics
-  experiment_name: 'Marinobacter in WH8102 coculture: light +100 nM glucose vs light
-    (control)'
-  gene_count: 484
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 7
-  significant_up_count: 6
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '7'
-  time_point_significant_up:
-  - '6'
-  time_point_totals:
-  - '484'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 484
-  experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_wh8102_proteomics
-  experiment_name: 'Marinobacter in WH8102 coculture: light +5 mM glucose vs light
-    (control)'
-  gene_count: 484
-  growth_phases:
-  - stationary
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: PROTEOMICS
-  organism_name: Marinobacter (MarRef v6)
-  publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 32
-  significant_up_count: 54
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - stationary
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - stationary
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '32'
-  time_point_significant_up:
-  - '54'
-  time_point_totals:
-  - '484'
-  treatment_type:
-  - carbon
-  - coculture
-- authors:
   - Daniel Sher
   - Dikla Aharonovich
   - Osnat Weissberg
@@ -2426,7 +459,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Alteromonas macleodii HOT1A3
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2479,7 +513,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Alteromonas macleodii HOT1A3
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2525,7 +560,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Alteromonas macleodii HOT1A3
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2571,7 +607,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Alteromonas macleodii HOT1A3
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2618,7 +655,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Alteromonas macleodii MIT1002
+  coculture_partner:
+  - Alteromonas macleodii MIT1002
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2712,7 +750,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus elongatus PCC 7942
+  coculture_partner:
+  - Synechococcus elongatus PCC 7942
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2764,7 +803,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus elongatus PCC 7942
+  coculture_partner:
+  - Synechococcus elongatus PCC 7942
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2813,7 +853,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
+  coculture_partner:
+  - Synechococcus WH7803
   compartment: exoproteome
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2905,7 +946,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
+  coculture_partner:
+  - Synechococcus WH7803
   compartment: exoproteome
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2997,7 +1039,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
+  coculture_partner:
+  - Synechococcus WH7803
   compartment: exoproteome
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3045,7 +1088,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
+  coculture_partner:
+  - Synechococcus WH7803
   compartment: exoproteome
   derived_metric_count: 2
   derived_metric_value_kinds:
@@ -3087,7 +1131,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
+  coculture_partner:
+  - Synechococcus WH8102
   compartment: exoproteome
   derived_metric_count: 2
   derived_metric_value_kinds:
@@ -3141,7 +1186,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus PCC 7002
+  coculture_partner:
+  - Synechococcus PCC 7002
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3199,7 +1245,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus PCC 7002
+  coculture_partner:
+  - Synechococcus PCC 7002
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3257,7 +1304,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus PCC 7002
+  coculture_partner:
+  - Synechococcus PCC 7002
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3317,7 +1365,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Shewanella sp. W3-18-1
+  coculture_partner:
+  - Shewanella sp. W3-18-1
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3375,7 +1424,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Shewanella sp. W3-18-1
+  coculture_partner:
+  - Shewanella sp. W3-18-1
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3433,7 +1483,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Shewanella sp. W3-18-1
+  coculture_partner:
+  - Shewanella sp. W3-18-1
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3483,7 +1534,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Ruegeria pomeroyi DSS-3
+  coculture_partner:
+  - Ruegeria pomeroyi DSS-3
   compartment: exoproteome
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3575,7 +1627,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Ruegeria pomeroyi DSS-3
+  coculture_partner:
+  - Ruegeria pomeroyi DSS-3
   compartment: exoproteome
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3667,7 +1720,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Ruegeria pomeroyi DSS-3
+  coculture_partner:
+  - Ruegeria pomeroyi DSS-3
   compartment: exoproteome
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3717,7 +1771,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Ruegeria pomeroyi DSS-3
+  coculture_partner:
+  - Ruegeria pomeroyi DSS-3
   compartment: exoproteome
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3767,7 +1822,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Vibrio parahaemolyticus
+  coculture_partner:
+  - Vibrio parahaemolyticus
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3825,7 +1881,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Pseudomonas putida KT2440
+  coculture_partner:
+  - Pseudomonas putida KT2440
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3877,7 +1934,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Pseudomonas putida KT2440
+  coculture_partner:
+  - Pseudomonas putida KT2440
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3927,7 +1985,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Escherichia coli
+  coculture_partner:
+  - Escherichia coli
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3985,7 +2044,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Escherichia coli
+  coculture_partner:
+  - Escherichia coli
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []

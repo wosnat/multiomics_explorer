@@ -220,7 +220,7 @@ schema:
         cluster_count: int
         cluster_types: list
         clustering_analysis_count: int
-        coculture_partner: string
+        coculture_partner: list
         compartment: string
         control: string
         derived_metric_count: int
@@ -394,7 +394,7 @@ schema:
         cluster_count: int
         cluster_types: list
         clustering_analysis_count: int
-        coculture_partner: string
+        coculture_partner: list
         compartment: string
         control: string
         derived_metric_count: int
@@ -1899,6 +1899,7 @@ schema:
       - OrganismTaxon
       properties:
         id: string
+        partner_role: string
         licence: string
         source: string
         version: string

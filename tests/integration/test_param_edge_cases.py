@@ -503,7 +503,7 @@ class TestListExperimentsEdgeCases:
         assert result["total_matching"] >= 1
         for row in result["results"]:
             assert "MED4" in row["organism_name"] or (
-                row.get("coculture_partner") and "MED4" in row.get("coculture_partner", "")
+                any("MED4" in p for p in row["coculture_partner"])
             )
             assert "coculture" in row["treatment_type"]
 

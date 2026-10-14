@@ -151,8 +151,6 @@ resolve_gene → gene_ontology_terms
 
 - The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works, as does 'Prochlorococcus MED4'. A genus word alone ('Prochlorococcus') matches every strain of that genus — here that just widens the result set (this tool never raises on ambiguity; the single-organism expression tools do).
 
-- Two OrganismTaxon nodes share the name 'Meiothermus ruber' (a genome strain and a gene-less treatment taxon). organism='Meiothermus ruber' only ever returns genes of the genome strain — the treatment taxon has none — so the duplicate is harmless here, but do not use the name as a join key across list_organisms rows.
-
 - not_found is not reported — an identifier with no match simply yields total_matching=0 and results=[]. See docs://guide/conventions for the not_found / not_matched shapes on batch tools.
 
 ```mistake

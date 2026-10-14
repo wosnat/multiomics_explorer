@@ -100,13 +100,13 @@
     WITH o, count(g) AS n
     RETURN count(o) AS nodes, count(DISTINCT o.preferred_name) AS distinct_names,
            sum(CASE WHEN n > 0 THEN 1 ELSE 0 END) AS with_genes
-  expect: {nodes: 48, distinct_names: 47, with_genes: 43}
+  expect: {nodes: 47, distinct_names: 47, with_genes: 43}
   used_in:
     - CLAUDE.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/concepts.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
     - multiomics_explorer/inputs/tools/list_organisms.yaml
-  note: "48 OrganismTaxon rows / 47 distinct preferred_name (Meiothermus ruber duplicate) / 43 carry genes"
+  note: "47 OrganismTaxon rows / 47 distinct preferred_name (Meiothermus ruber duplicate retired 2026-10-13) / 43 carry genes"
 
 - id: ontology_count
   source: ontology_config

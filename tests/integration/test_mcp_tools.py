@@ -519,8 +519,27 @@ class TestListExperiments:
         assert result["total_matching"] >= 20
         for r in result["results"]:
             assert "MED4" in r["organism_name"] or (
-                r.get("coculture_partner") and "MED4" in r.get("coculture_partner", "")
+                any("MED4" in p for p in r["coculture_partner"])
             )
+
+    def test_detail_coculture_partner_filter_matches_list(self, conn):
+        """coculture_partner= matches any list entry, background partners included.
+
+        The 2026-10-06 N-import analysis missed Weissberg 2025 proteomics
+        because the partner was recorded only when coculture was the treatment.
+        """
+        result = api.list_experiments(coculture_partner="Alteromonas", conn=conn)
+        rows = result["results"]
+        assert rows
+        for r in rows:
+            assert isinstance(r["coculture_partner"], list)
+            assert any("alteromonas" in p.lower() for p in r["coculture_partner"])
+        assert any(
+            r["omics_type"] == "PROTEOMICS"
+            and "coculture" not in r["treatment_type"]
+            and "coculture" in r["background_factors"]
+            for r in rows
+        )
 
     def test_detail_treatment_type_filter(self, conn):
         """Treatment type list filter works."""

@@ -140,8 +140,10 @@ and `vesicle` simultaneously — distinct rows. Filter via
   `compartment`, `is_time_course`, `table_scope` (which gene universe
   the DE table reports — `all_detected_genes`, `significant_only`,
   `significant_any_timepoint`, `filtered_subset`, `top_n`; absent on
-  experiments with no DE table), and `coculture_partner` when
-  applicable.
+  experiments with no DE table), and `coculture_partner` (list[str] of
+  every organism sharing the culture — treatment and background
+  partners, phage; `[]` when axenic; each partner's role is
+  `partner_role` on the `Tests_coculture_with` edge).
 - **`ClusteringAnalysis`** — a published co-expression clustering.
   Owns `GeneCluster` children (`ClusteringAnalysisHasGeneCluster`);
   `cluster_type` is a closed vocabulary (`list_filter_values('cluster_type')`).

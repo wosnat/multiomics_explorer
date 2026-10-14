@@ -1,5 +1,5 @@
 case_id: list_publications_treatment_type
-row_count: 12
+row_count: 11
 rows:
 - authors:
   - Daniel Sher
@@ -79,49 +79,6 @@ rows:
   treatment_types:
   - coculture
   year: 2024
-- authors:
-  - Guadalupe Gómez-Baena
-  - Jesús Díez
-  - José Manuel García-Fernández
-  - José Ángel Moreno-Cabezuelo
-  background_factors:
-  - coculture
-  - darkness
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  compartments:
-  - whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  discussed_gene_count: 40
-  discussed_pathway_count: 8
-  doi: 10.1128/spectrum.03275-22
-  experiment_count: 60
-  growth_phases:
-  - darkness
-  - stationary
-  journal: Microbiology Spectrum
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_types:
-  - PROTEOMICS
-  organisms:
-  - Alteromonas (MarRef v6)
-  - Marinobacter (MarRef v6)
-  - Prochlorococcus MED4
-  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  - Synechococcus WH7803
-  - Synechococcus WH8102
-  - Synechococcus sp. BL107
-  study_type: Proteomics|Metabolomics
-  title: Integrated Proteomic and Metabolomic Analyses Show Differential Effects of
-    Glucose Availability in Marine Synechococcus and Prochlorococcus
-  treatment_types:
-  - carbon
-  - coculture
-  year: 2023
 - authors:
   - J. Jeffrey Morris
   - Marcelo Malisano Barreto Filho

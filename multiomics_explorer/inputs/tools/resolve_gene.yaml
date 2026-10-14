@@ -85,7 +85,6 @@ mistakes:
   - "Sibling tools: resolve_gene answers 'which node is this identifier?' (locus_tag / gene_name / alias → gene rows, no annotation payload). For 'what do I know about this gene' use gene_overview(locus_tags=[...]); for 'which genes do X' use genes_by_function(search_text=...)."
   - "Case-insensitive matching: 'pmm0001', 'PMM0001', and 'Pmm0001' all work"
   - "The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works, as does 'Prochlorococcus MED4'. A genus word alone ('Prochlorococcus') matches every strain of that genus — here that just widens the result set (this tool never raises on ambiguity; the single-organism expression tools do)."
-  - "Two OrganismTaxon nodes share the name 'Meiothermus ruber' (a genome strain and a gene-less treatment taxon). organism='Meiothermus ruber' only ever returns genes of the genome strain — the treatment taxon has none — so the duplicate is harmless here, but do not use the name as a join key across list_organisms rows."
   - "not_found is not reported — an identifier with no match simply yields total_matching=0 and results=[]. See docs://guide/conventions for the not_found / not_matched shapes on batch tools."
   - wrong: "genes_by_function(search_text='PMM0001')  # wrong tool for ID lookup"
     right: "resolve_gene(identifier='PMM0001')  # exact identity resolution"

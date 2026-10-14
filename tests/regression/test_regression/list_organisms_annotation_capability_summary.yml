@@ -91,7 +91,6 @@ results:
   transported_metabolite_count: 1265
   treatment_types:
   - carbon
-  - coculture
 - background_factors:
   - axenic
   - darkness
@@ -228,7 +227,7 @@ top_metabolic_capability:
   organism_name: Prochlorococcus MED4
   reaction_count: 943
   transported_metabolite_count: 1069
-total_entries: 48
+total_entries: 47
 total_matching: 3
 truncated: false
 warnings: []

@@ -19,7 +19,7 @@ docs://tools/list_experiments; summary=True first.
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | omics_type | list[string] \| None | None | Keep experiments whose omics_type is in this list. Values: list_filter_values('omics_type'). |
 | publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
-| coculture_partner | string \| None | None | Filter by coculture partner organism (word-based, case-insensitive match). Narrows coculture experiments. E.g. 'Alteromonas', 'HOT1A3'. |
+| coculture_partner | string \| None | None | Filter by coculture partner organism (case-insensitive substring match against any entry of the coculture_partner list). Matches treatment AND background partners — do not combine with treatment_type=['coculture'] unless you want coculture-vs-axenic comparisons only. E.g. 'Alteromonas', 'HOT1A3'. |
 | search_text | string \| None | None | Free-text search on experiment name, treatment, control, experimental context, and light condition (Lucene fulltext, case-insensitive). E.g. 'continuous light', 'diel'. |
 | time_course_only | bool | False | If true, return only time-course experiments (multiple time points). |
 | table_scope | list[string] \| None | None | Filter by table scope — what genes the source DE table contains. Values: 'all_detected_genes', 'significant_any_timepoint', 'significant_only', 'top_n', 'filtered_subset'. E.g. ['all_detected_genes'] for fair cross-experiment comparison. |
@@ -78,7 +78,7 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | organism_name | string | Profiled organism (e.g. 'Prochlorococcus MED4'). |
 | treatment_type | list[string] | Treatment categories (e.g. ['coculture'], ['nitrogen', 'coculture']). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
 | background_factors | list[string] (optional) | Background experimental factors (e.g. ['axenic', 'light']). Empty list when none specified. Live vocabulary: list_experiments(summary=True). |
-| coculture_partner | string \| None (optional) | Interacting organism — coculture partner or phage. Null when no interacting organism. |
+| coculture_partner | list[string] (optional) | Every organism sharing the culture, sorted preferred_names: treatment partners (coculture-vs-axenic, phage infection) AND background partners (the culture was a coculture; the experiment tests something else). [] when axenic. Role per partner is on the Tests_coculture_with edge (partner_role); 'coculture' IN treatment_type does not tell you the role. |
 | omics_type | string | Omics platform (e.g. 'RNASEQ', 'MICROARRAY', 'PROTEOMICS'). |
 | is_time_course | bool | Whether experiment has multiple time points. |
 | table_scope | string \| None (optional) | What genes the source DE table contains. Values: all_detected_genes (tested-absent rows kept — `not_significant` represents real biology), significant_any_timepoint, significant_only (tested-absent rows collapsed), top_n, filtered_subset. Critical for interpreting missing genes — see docs://guide/conventions. |
@@ -142,7 +142,7 @@ list_experiments(summary=True)
   "by_organism_truncated": null,
   "by_treatment_type": [
     {"treatment_type": "carbon", "count": 78},
-    {"treatment_type": "coculture", "count": 76},
+    {"treatment_type": "coculture", "count": 36},
     {"treatment_type": "compartment", "count": 17},
     {"treatment_type": "nitrogen", "count": 16},
     {"treatment_type": "light", "count": 13},
@@ -152,7 +152,7 @@ list_experiments(summary=True)
   "by_background_factors": [
     {"background_factor": "light", "count": 127},
     {"background_factor": "axenic", "count": 90},
-    {"background_factor": "coculture", "count": 58},
+    {"background_factor": "coculture", "count": 78},
     {"background_factor": "darkness", "count": 37},
     {"background_factor": "diel", "count": 19},
     ...
@@ -220,6 +220,7 @@ list_experiments(summary=True)
   "score_max": null,
   "score_median": null,
   "not_found": [],
+  "warnings": [],
   "results": []
 }
 ```
@@ -347,6 +348,7 @@ list_experiments(compartment="vesicle", limit=2)
   "score_max": null,
   "score_median": null,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "experiment_id": "10.1093/femsml/uqac025_vesicle_proteomics_ad45",
@@ -363,7 +365,7 @@ list_experiments(compartment="vesicle", limit=2)
       "organism_name": "Alteromonas macleodii AD45",
       "treatment_type": ["compartment"],
       "background_factors": ["axenic", "darkness"],
-      "coculture_partner": null,
+      "coculture_partner": [],
       "omics_type": "VESICLE_PROTEOMICS",
       "is_time_course": false,
       "table_scope": "top_n",
@@ -397,7 +399,7 @@ list_experiments(compartment="vesicle", limit=2)
       "organism_name": "Alteromonas macleodii ATCC27126",
       "treatment_type": ["compartment"],
       "background_factors": ["axenic", "darkness"],
-      "coculture_partner": null,
+      "coculture_partner": [],
       "omics_type": "VESICLE_PROTEOMICS",
       "is_time_course": false,
       "table_scope": "top_n",
@@ -459,6 +461,7 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
   "score_max": null,
   "score_median": null,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "experiment_id": "10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell",
@@ -475,7 +478,7 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
       "organism_name": "Prochlorococcus MIT9301",
       "treatment_type": ["phosphorus"],
       "background_factors": ["axenic"],
-      "coculture_partner": null,
+      "coculture_partner": [],
       "omics_type": "METABOLOMICS",
       "is_time_course": false,
       "table_scope": null,
@@ -509,7 +512,7 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
       "organism_name": "Prochlorococcus MIT9313",
       "treatment_type": ["carbon"],
       "background_factors": ["axenic", "light"],
-      "coculture_partner": null,
+      "coculture_partner": [],
       "omics_type": "METABOLOMICS",
       "is_time_course": false,
       "table_scope": null,

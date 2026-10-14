@@ -19,7 +19,7 @@ docs://tools/list_experiments; summary=True first.
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | omics_type | list[string] \| None | None | Keep experiments whose omics_type is in this list. Values: list_filter_values('omics_type'). |
 | publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
-| coculture_partner | string \| None | None | Filter by coculture partner organism (word-based, case-insensitive match). Narrows coculture experiments. E.g. 'Alteromonas', 'HOT1A3'. |
+| coculture_partner | string \| None | None | Filter by coculture partner organism (case-insensitive substring match against any entry of the coculture_partner list). Matches treatment AND background partners — do not combine with treatment_type=['coculture'] unless you want coculture-vs-axenic comparisons only. E.g. 'Alteromonas', 'HOT1A3'. |
 | search_text | string \| None | None | Free-text search on experiment name, treatment, control, experimental context, and light condition (Lucene fulltext, case-insensitive). E.g. 'continuous light', 'diel'. |
 | time_course_only | bool | False | If true, return only time-course experiments (multiple time points). |
 | table_scope | list[string] \| None | None | Filter by table scope — what genes the source DE table contains. Values: 'all_detected_genes', 'significant_any_timepoint', 'significant_only', 'top_n', 'filtered_subset'. E.g. ['all_detected_genes'] for fair cross-experiment comparison. |

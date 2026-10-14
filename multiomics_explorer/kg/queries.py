@@ -94,7 +94,7 @@ ORDER BY abs(r.log2_fold_change) DESC
 GENES_UPREGULATED_BY_COCULTURE = """
 MATCH (e:Experiment)-[r:Changes_expression_of {expression_direction: 'up'}]->(g:Gene)
 WHERE 'coculture' IN e.treatment_type
-  AND e.coculture_partner CONTAINS $coculture_genus
+  AND ANY(p IN e.coculture_partner WHERE p CONTAINS $coculture_genus)
   AND e.organism_name CONTAINS $target_strain
 RETURN g.locus_tag AS locus_tag, g.product AS product,
        r.log2_fold_change AS log2fc, r.adjusted_p_value AS padj,
@@ -163,7 +163,7 @@ FEW_SHOT_EXAMPLES = [
             "MATCH (e:Experiment)\n"
             "      -[r:Changes_expression_of {expression_direction: 'up'}]->(g:Gene)\n"
             "WHERE 'coculture' IN e.treatment_type\n"
-            "  AND e.coculture_partner CONTAINS 'Alteromonas'\n"
+            "  AND ANY(p IN e.coculture_partner WHERE p CONTAINS 'Alteromonas')\n"
             "  AND e.organism_name CONTAINS 'MED4'\n"
             "RETURN g.locus_tag, g.product, r.log2_fold_change, e.name\n"
             "ORDER BY r.log2_fold_change DESC\n"
@@ -171,8 +171,11 @@ FEW_SHOT_EXAMPLES = [
         ),
         "explanation": (
             "Expression uses Changes_expression_of (Experiment → Gene). "
-            "Coculture experiments have 'coculture' in their treatment_type array "
-            "and coculture_partner containing the partner organism name. "
+            "Coculture-vs-axenic experiments have 'coculture' in their treatment_type "
+            "array. coculture_partner is a list of every organism sharing the culture "
+            "(treatment and background partners, and phage); test it with ANY(...). "
+            "The role of each partner is on the Tests_coculture_with edge "
+            "(partner_role). "
             "e.organism_name is the target organism whose genes are affected."
         ),
     },
@@ -201,7 +204,7 @@ FEW_SHOT_EXAMPLES = [
             "MATCH (e:Experiment)\n"
             "      -[r:Changes_expression_of {expression_direction: 'up'}]->(g:Gene)\n"
             "WHERE 'coculture' IN e.treatment_type\n"
-            "  AND e.coculture_partner CONTAINS 'Alteromonas'\n"
+            "  AND ANY(p IN e.coculture_partner WHERE p CONTAINS 'Alteromonas')\n"
             "MATCH (g)-[:Gene_involved_in_biological_process]->(bp:BiologicalProcess)\n"
             "RETURN bp.name AS process, collect(DISTINCT g.locus_tag) AS genes, "
             "count(DISTINCT g) AS gene_count\n"

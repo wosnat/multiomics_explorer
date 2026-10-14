@@ -2696,6 +2696,11 @@ def list_experiments(
         (e.organism_name only). For partner-side filtering, use
         coculture_partner=; the two filters AND-compose.
 
+    coculture_partner: case-insensitive substring match against any entry
+        of e.coculture_partner — a list of every organism sharing the
+        culture (treatment and background partners, phage; [] when
+        axenic). Per-row coculture_partner is that list.
+
     compartment: if provided, restricts to experiments in that wet-lab
     compartment (scalar equality match on e.compartment, e.g. 'vesicle',
     'whole_cell', 'exoproteome'). Use list_filter_values(filter_type=

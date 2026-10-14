@@ -1926,10 +1926,7 @@ def register_tools(mcp: FastMCP):
                 "organism param ('MED4', 'Prochlorococcus MED4'; the synonym "
                 "'Meiothermus taiwanensis' resolves to 'Meiothermus ruber'); a "
                 "genus word like 'Alteromonas' matches every strain. Unknown "
-                "names are reported in not_found rather than raising. Note: two "
-                "OrganismTaxon nodes share preferred_name 'Meiothermus ruber' "
-                "(the genome strain + a gene-less treatment taxon) — join counts "
-                "by Gene_belongs_to_organism, never by name."
+                "names are reported in not_found rather than raising."
             ),
         )] = None,
         compartment: CompartmentParam = None,
@@ -3776,7 +3773,7 @@ def register_tools(mcp: FastMCP):
         organism_name: str = Field(description="Profiled organism (e.g. 'Prochlorococcus MED4').")
         treatment_type: list[str] = Field(description="Treatment categories (e.g. ['coculture'], ['nitrogen', 'coculture']). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True).")
         background_factors: list[str] = Field(default_factory=list, description="Background experimental factors (e.g. ['axenic', 'light']). Empty list when none specified. Live vocabulary: list_experiments(summary=True).")
-        coculture_partner: str | None = Field(default=None, description="Interacting organism — coculture partner or phage. Null when no interacting organism.")
+        coculture_partner: list[str] = Field(default_factory=list, description="Every organism sharing the culture, sorted preferred_names: treatment partners (coculture-vs-axenic, phage infection) AND background partners (the culture was a coculture; the experiment tests something else). [] when axenic. Role per partner is on the Tests_coculture_with edge (partner_role); 'coculture' IN treatment_type does not tell you the role.")
         omics_type: str = Field(description="Omics platform (e.g. 'RNASEQ', 'MICROARRAY', 'PROTEOMICS').")
         is_time_course: bool = Field(description="Whether experiment has multiple time points.")
         table_scope: str | None = Field(default=None, description="What genes the source DE table contains. Values: all_detected_genes (tested-absent rows kept — `not_significant` represents real biology), significant_any_timepoint, significant_only (tested-absent rows collapsed), top_n, filtered_subset. Critical for interpreting missing genes — see docs://guide/conventions.")
@@ -3897,9 +3894,11 @@ def register_tools(mcp: FastMCP):
         omics_type: OmicsTypeParam = None,
         publication_dois: PublicationDoisParam = None,
         coculture_partner: Annotated[str | None, Field(
-            description="Filter by coculture partner organism (word-based, "
-            "case-insensitive match). Narrows coculture experiments. "
-            "E.g. 'Alteromonas', 'HOT1A3'.",
+            description="Filter by coculture partner organism (case-insensitive "
+            "substring match against any entry of the coculture_partner list). "
+            "Matches treatment AND background partners — do not combine with "
+            "treatment_type=['coculture'] unless you want coculture-vs-axenic "
+            "comparisons only. E.g. 'Alteromonas', 'HOT1A3'.",
         )] = None,
         search_text: Annotated[str | None, Field(
             description="Free-text search on experiment name, treatment, control, "
@@ -4084,10 +4083,10 @@ def register_tools(mcp: FastMCP):
             " Always present — cheap to keep, and needed to distinguish"
             " RNASEQ vs PROTEOMICS entries in a compact call.",
         )
-        coculture_partner: str | None = Field(
-            default=None,
-            description="Coculture partner organism, if applicable."
-            " Verbose only.",
+        coculture_partner: list[str] = Field(
+            default_factory=list,
+            description="Organisms sharing the culture (treatment and"
+            " background partners, phage); [] when axenic. Verbose only.",
         )
         is_time_course: str = Field(
             description="KG two-state literal: 'time_course' or 'single_time_point'.",
@@ -4218,9 +4217,10 @@ def register_tools(mcp: FastMCP):
             default=None,
             description="Omics type (e.g. 'RNASEQ')",
         )
-        coculture_partner: str | None = Field(
-            default=None,
-            description="Coculture partner organism, if applicable",
+        coculture_partner: list[str] = Field(
+            default_factory=list,
+            description="Organisms sharing the culture (treatment and"
+            " background partners, phage); [] when axenic",
         )
         table_scope: str | None = Field(
             default=None,
@@ -4817,9 +4817,10 @@ def register_tools(mcp: FastMCP):
         organism_name: str = Field(
             description="Organism (e.g. 'Prochlorococcus MED4')",
         )
-        coculture_partner: str | None = Field(
-            default=None,
-            description="Coculture partner organism, if applicable",
+        coculture_partner: list[str] = Field(
+            default_factory=list,
+            description="Organisms sharing the culture (treatment and"
+            " background partners, phage); [] when axenic",
         )
         timepoint: str | None = Field(
             description="Timepoint label (e.g. '24h')."

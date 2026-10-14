@@ -124,7 +124,6 @@ rows:
     Glucose Availability in Marine Synechococcus and Prochlorococcus
   treatment_types:
   - carbon
-  - coculture
   year: 2023
 - authors:
   - Huan Liu

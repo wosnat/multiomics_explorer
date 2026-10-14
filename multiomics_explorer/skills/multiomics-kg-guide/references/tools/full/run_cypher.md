@@ -99,7 +99,7 @@ run_cypher(query="MATCH (g:Gene) WHERE g.locus_tag = 'PMM0001' RETURN g")
 
 - Reserved characters were replaced at KG build time, so string literals must match the stored form: an apostrophe is stored as a caret (`^`) and a pipe as a comma. `WHERE g.product CONTAINS "5'-nucleotidase"` matches nothing — write `CONTAINS '5^-nucleotidase'`. The same applies to search_text on the fulltext tools — search on the surrounding words instead (see docs://guide/conventions).
 
-- Organism names in Cypher must be the exact `preferred_name` / `Gene.organism_name` string ('Prochlorococcus MED4', not 'MED4') — the word-based matching that the MCP tools do on `organism=` is not applied to raw queries. Note that 'Meiothermus ruber' names two OrganismTaxon nodes; join organisms through Gene_belongs_to_organism, never by name.
+- Organism names in Cypher must be the exact `preferred_name` / `Gene.organism_name` string ('Prochlorococcus MED4', not 'MED4') — the word-based matching that the MCP tools do on `organism=` is not applied to raw queries. Join genes to organisms through Gene_belongs_to_organism rather than by name.
 
 ## Package import equivalent
 

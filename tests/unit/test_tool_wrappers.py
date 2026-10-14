@@ -2667,7 +2667,7 @@ class TestListExperimentsWrapper:
         "organism_name": "Prochlorococcus MED4",
         "treatment_type": ["coculture"],
         "background_factors": [],
-        "coculture_partner": "Alteromonas macleodii HOT1A3",
+        "coculture_partner": ["Alteromonas macleodii HOT1A3"],
         "omics_type": "RNASEQ",
         "is_time_course": False,
         "table_scope": "all_detected_genes",
@@ -3188,7 +3188,7 @@ class TestDifferentialExpressionByGeneWrapper:
                 "treatment_type": ["nitrogen_stress"],
                 "background_factors": [],
                 "omics_type": "RNASEQ",
-                "coculture_partner": None,
+                "coculture_partner": [],
                 "is_time_course": "time_course",
                 "table_scope": "all_detected_genes",
                 "table_scope_detail": None,
@@ -3478,7 +3478,7 @@ class TestDifferentialExpressionByGeneWrapper:
         assert exp.timepoints is None
         assert exp.experiment_name is None
         assert exp.background_factors is None
-        assert exp.coculture_partner is None
+        assert exp.coculture_partner == []
         assert exp.table_scope_detail is None
 
 
@@ -3851,7 +3851,7 @@ class TestDifferentialExpressionByOrthologWrapper:
              "consensus_product": "CP47", "experiment_id": "EXP001",
              "treatment_type": ["nitrogen_limitation"],
              "background_factors": [],
-             "organism_name": "MED4", "coculture_partner": None,
+             "organism_name": "MED4", "coculture_partner": [],
              "timepoint": "24h", "timepoint_hours": 24.0,
              "timepoint_order": 3, "genes_with_expression": 3,
              "total_genes": 5, "significant_up": 2,
@@ -8412,7 +8412,7 @@ class TestListExperimentsPhase1PlumbingWrapper:
         "publication_doi": "10.1234/m", "authors": [],
         "organism_name": "MIT9301",
         "treatment_type": ["control"], "background_factors": [],
-        "coculture_partner": None, "omics_type": "METABOLOMICS",
+        "coculture_partner": [], "omics_type": "METABOLOMICS",
         "is_time_course": False, "table_scope": "all_detected_genes",
         "table_scope_detail": None, "gene_count": 0,
         "distinct_gene_count": 0,

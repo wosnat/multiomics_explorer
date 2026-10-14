@@ -226,7 +226,7 @@ genes_by_function(search_text='ABC transporter permease', organism='HOT1A3', gen
 
 - Use min_quality=2 to skip hypothetical proteins and get better-annotated results.
 
-- The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works. A genus word alone ('Prochlorococcus') matches every strain of that genus. 'Meiothermus ruber' names two OrganismTaxon nodes (genome strain + gene-less treatment taxon) — only the genome strain has genes, so gene hits are unaffected.
+- The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works. A genus word alone ('Prochlorococcus') matches every strain of that genus.
 
 - `search_text` is Lucene: fuzzy `~`, wildcards `*`, quoted phrases and AND / OR are supported — see docs://guide/conventions for syntax and scoring.
 

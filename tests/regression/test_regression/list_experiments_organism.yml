@@ -18,7 +18,7 @@ rows:
   - diel
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -80,7 +80,7 @@ rows:
   - diel
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -133,7 +133,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Alteromonas macleodii HOT1A3
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -188,7 +189,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -251,7 +252,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -327,7 +329,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -382,7 +384,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -459,7 +462,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -507,7 +512,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -555,7 +562,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -603,7 +612,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -652,7 +663,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -704,7 +715,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -764,7 +775,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Alteromonas macleodii HOT1A3
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -811,7 +823,7 @@ rows:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -878,7 +890,7 @@ rows:
   - viral
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -952,7 +964,8 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1013,7 +1026,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1088,7 +1102,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1135,7 +1149,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1183,7 +1197,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 3
   derived_metric_value_kinds:
@@ -1233,7 +1247,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 2
   derived_metric_value_kinds:
@@ -1288,7 +1302,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 2
   derived_metric_value_kinds:
@@ -1332,7 +1346,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 5
   derived_metric_value_kinds:
@@ -1379,7 +1393,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 3
   derived_metric_value_kinds:
@@ -1426,7 +1440,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: vesicle
   derived_metric_count: 1
   derived_metric_value_kinds:
@@ -1467,7 +1481,7 @@ rows:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 6
   derived_metric_value_kinds:
@@ -1509,7 +1523,7 @@ rows:
   cluster_types:
   - time_course
   clustering_analysis_count: 1
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1565,7 +1579,7 @@ rows:
   cluster_types:
   - time_course
   clustering_analysis_count: 1
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1614,7 +1628,7 @@ rows:
   cluster_types:
   - time_course
   clustering_analysis_count: 1
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1666,7 +1680,7 @@ rows:
   cluster_types:
   - decay_pattern
   clustering_analysis_count: 1
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 4
   derived_metric_value_kinds:
@@ -1719,7 +1733,7 @@ rows:
   cluster_types:
   - diel
   clustering_analysis_count: 1
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1767,7 +1781,8 @@ rows:
   cluster_types:
   - time_course
   clustering_analysis_count: 1
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1863,7 +1878,7 @@ rows:
   - diel
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1912,7 +1927,7 @@ rows:
   - diel
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1961,7 +1976,7 @@ rows:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2011,7 +2026,7 @@ rows:
   - chemical
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2061,7 +2076,7 @@ rows:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2115,7 +2130,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2168,7 +2183,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2217,7 +2232,7 @@ rows:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2272,7 +2287,7 @@ rows:
   cluster_types:
   - time_course
   clustering_analysis_count: 1
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2355,7 +2370,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2433,7 +2448,7 @@ rows:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2482,7 +2497,7 @@ rows:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []

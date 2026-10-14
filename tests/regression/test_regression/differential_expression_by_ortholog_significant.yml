@@ -4,7 +4,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1016/j.micres.2015.04.006_salt_saltacclimated_5_salt_as9601_rnaseq
@@ -23,7 +23,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_0004_co2_med4_microarray
@@ -42,7 +42,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_and_no_med4_microarray
@@ -61,7 +61,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
@@ -80,7 +80,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
@@ -99,7 +99,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
@@ -117,7 +117,8 @@ rows:
   - nitrogen
 - background_factors:
   - light
-  coculture_partner: Alteromonas macleodii HOT1A3
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
@@ -136,7 +137,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
@@ -155,7 +156,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
@@ -174,7 +175,8 @@ rows:
 - background_factors:
   - coculture
   - light
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
@@ -193,7 +195,8 @@ rows:
 - background_factors:
   - coculture
   - light
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
@@ -212,7 +215,8 @@ rows:
 - background_factors:
   - coculture
   - light
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
@@ -231,7 +235,8 @@ rows:
 - background_factors:
   - coculture
   - light
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
@@ -250,7 +255,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
@@ -269,7 +274,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
@@ -288,7 +293,8 @@ rows:
 - background_factors:
   - coculture
   - light
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
@@ -307,7 +313,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/s42003-019-0410-x_plastic_hdpe_plastic_leachate_50_mit9312_rnaseq
@@ -326,7 +332,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/s42003-019-0410-x_plastic_pvc_plastic_leachate_2_mit9312_rnaseq
@@ -345,7 +351,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_mit9313_mit9313_microarray
@@ -364,7 +370,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_mit9313_mit9313_microarray
@@ -383,7 +389,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/s42003-019-0410-x_plastic_hdpe_plastic_leachate_50_natl2a_rnaseq
@@ -402,7 +408,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/s42003-019-0410-x_plastic_pvc_plastic_leachate_2_natl2a_rnaseq
@@ -421,7 +427,8 @@ rows:
 - background_factors:
   - coculture
   - diel
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas macleodii MIT1002
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
@@ -440,7 +447,8 @@ rows:
 - background_factors:
   - coculture
   - diel
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas macleodii MIT1002
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
@@ -459,7 +467,8 @@ rows:
 - background_factors:
   - coculture
   - diel
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas macleodii MIT1002
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
@@ -478,7 +487,8 @@ rows:
 - background_factors:
   - coculture
   - diel
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas macleodii MIT1002
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
@@ -497,7 +507,8 @@ rows:
 - background_factors:
   - coculture
   - diel
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas macleodii MIT1002
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
@@ -516,7 +527,7 @@ rows:
 - background_factors:
   - axenic
   - diel
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
@@ -535,7 +546,7 @@ rows:
 - background_factors:
   - axenic
   - diel
-  coculture_partner: null
+  coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
@@ -554,7 +565,8 @@ rows:
 - background_factors:
   - coculture
   - diel
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas macleodii MIT1002
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
@@ -573,7 +585,9 @@ rows:
 - background_factors:
   - coculture
   - light
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_ss120_proteomics
@@ -591,7 +605,8 @@ rows:
   - carbon
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh7803
@@ -609,7 +624,8 @@ rows:
   - viral
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh7803
@@ -627,7 +643,8 @@ rows:
   - viral
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh7803
@@ -645,7 +662,8 @@ rows:
   - viral
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh7803
@@ -663,7 +681,8 @@ rows:
   - viral
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh7803
@@ -681,7 +700,8 @@ rows:
   - viral
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh7803
@@ -699,7 +719,8 @@ rows:
   - viral
 - background_factors:
   - light
-  coculture_partner: Ruegeria pomeroyi DSS-3
+  coculture_partner:
+  - Ruegeria pomeroyi DSS-3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/nmicrobiol.2017.100_early_coculture_syn_wh7803_proteomics
@@ -717,7 +738,8 @@ rows:
   - coculture
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8102
@@ -735,7 +757,8 @@ rows:
   - viral
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8102
@@ -753,7 +776,8 @@ rows:
   - viral
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8102
@@ -771,7 +795,8 @@ rows:
   - viral
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8102
@@ -789,7 +814,8 @@ rows:
   - viral
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8102
@@ -807,7 +833,8 @@ rows:
   - viral
 - background_factors:
   - light
-  coculture_partner: Vibrio parahaemolyticus
+  coculture_partner:
+  - Vibrio parahaemolyticus
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1111/j.1462-2920.2009.01997.x_vibrio_coculture_wh8102_microarray
@@ -825,7 +852,8 @@ rows:
   - coculture
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8109
@@ -843,7 +871,8 @@ rows:
   - viral
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8109
@@ -861,7 +890,8 @@ rows:
   - viral
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8109
@@ -879,7 +909,8 @@ rows:
   - viral
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8109
@@ -897,7 +928,8 @@ rows:
   - viral
 - background_factors:
   - diel
-  coculture_partner: Phage
+  coculture_partner:
+  - Phage
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8109

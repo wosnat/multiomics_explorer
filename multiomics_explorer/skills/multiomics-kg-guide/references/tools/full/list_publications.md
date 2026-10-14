@@ -115,7 +115,7 @@ list_publications()
   ],
   "by_organism_truncated": true,
   "by_treatment_type": [
-    {"treatment_type": "coculture", "count": 12},
+    {"treatment_type": "coculture", "count": 11},
     {"treatment_type": "carbon", "count": 6},
     {"treatment_type": "light", "count": 6},
     {"treatment_type": "viral", "count": 5},
@@ -170,6 +170,7 @@ list_publications()
   "offset": 0,
   "truncated": true,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "doi": "10.64898/2026.04.15.718746",
@@ -324,6 +325,7 @@ list_publications(compartment="vesicle")
   "offset": 0,
   "truncated": false,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "doi": "10.1093/femsml/uqac025",
@@ -470,6 +472,7 @@ list_publications(publication_dois=["10.1128/msystems.01261-22", "10.1073/pnas.2
   "offset": 0,
   "truncated": false,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "doi": "10.1073/pnas.2213271120",
@@ -581,7 +584,7 @@ list_publications()
   ],
   "by_organism_truncated": true,
   "by_treatment_type": [
-    {"treatment_type": "coculture", "count": 12},
+    {"treatment_type": "coculture", "count": 11},
     {"treatment_type": "carbon", "count": 6},
     {"treatment_type": "light", "count": 6},
     {"treatment_type": "viral", "count": 5},
@@ -636,6 +639,7 @@ list_publications()
   "offset": 0,
   "truncated": true,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "doi": "10.64898/2026.04.15.718746",
@@ -734,7 +738,7 @@ list_publications → list_derived_metrics(publication_dois=[doi]) for the paper
 
 - treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or a summary=True call's by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. On this tool the rollups come from an unfiltered list_publications() call.
 
-- `organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works. Two OrganismTaxon nodes share the name 'Meiothermus ruber' (genome strain + treatment taxon), so organism='Meiothermus ruber' counts papers tied to either.
+- `organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works.
 
 - Use the dedicated author param for author filtering (e.g. author='Biller'), not search_text — search_text searches title, abstract, and description only.
 

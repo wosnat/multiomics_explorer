@@ -3059,7 +3059,10 @@ class TestBuildListExperiments:
             organism="MED4", coculture_partner="Alteromonas",
         )
         assert "toLower(e.organism_name) CONTAINS word" in cypher
-        assert "toLower(e.coculture_partner) CONTAINS toLower($partner)" in cypher
+        assert (
+            "ANY(p IN e.coculture_partner"
+            " WHERE toLower(p) CONTAINS toLower($partner))"
+        ) in cypher
         # Two clauses joined by AND, not OR.
         assert " AND " in cypher
         # No OR anywhere — the organism predicate must not be re-OR'd, and the
@@ -3094,7 +3097,10 @@ class TestBuildListExperiments:
     def test_coculture_partner_filter(self):
         """Coculture partner filter uses toLower CONTAINS."""
         cypher, params = build_list_experiments(coculture_partner="Alteromonas")
-        assert "toLower(e.coculture_partner) CONTAINS toLower($partner)" in cypher
+        assert (
+            "ANY(p IN e.coculture_partner"
+            " WHERE toLower(p) CONTAINS toLower($partner))"
+        ) in cypher
         assert params["partner"] == "Alteromonas"
 
     def test_search_text_fulltext(self):

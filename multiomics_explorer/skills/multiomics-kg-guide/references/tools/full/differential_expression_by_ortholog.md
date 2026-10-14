@@ -73,7 +73,7 @@ total_matching, matching_genes, matching_groups, experiment_count, median_abs_lo
 | treatment_type | list[string] | Treatment categories (e.g. ['nitrogen']) |
 | background_factors | list[string] (optional) | Background experimental factors |
 | organism_name | string | Organism (e.g. 'Prochlorococcus MED4') |
-| coculture_partner | string \| None (optional) | Coculture partner organism, if applicable |
+| coculture_partner | list[string] (optional) | Organisms sharing the culture (treatment and background partners, phage); [] when axenic |
 | timepoint | string \| None | Timepoint label (e.g. '24h'). Null when edge has no label. |
 | timepoint_hours | float \| None | Numeric hours (e.g. 24.0). Null for non-numeric labels. |
 | timepoint_order | int | Sort key for time course order (e.g. 3) |

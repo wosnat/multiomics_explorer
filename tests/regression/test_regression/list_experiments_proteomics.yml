@@ -7,10 +7,13 @@ rows:
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Synechococcus sp. BL107
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -49,17 +52,19 @@ rows:
   - '11'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Synechococcus sp. BL107
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -98,17 +103,19 @@ rows:
   - '11'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Synechococcus sp. BL107
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -147,17 +154,19 @@ rows:
   - '11'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Synechococcus sp. BL107
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -195,17 +204,19 @@ rows:
   - '11'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Prochlorococcus MED4
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -244,17 +255,19 @@ rows:
   - '16'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Prochlorococcus MED4
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -293,17 +306,19 @@ rows:
   - '16'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Prochlorococcus MED4
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -342,17 +357,19 @@ rows:
   - '16'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Prochlorococcus MED4
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -390,17 +407,19 @@ rows:
   - '16'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -439,17 +458,19 @@ rows:
   - '54'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -488,17 +509,19 @@ rows:
   - '54'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -537,17 +560,19 @@ rows:
   - '54'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -585,17 +610,19 @@ rows:
   - '54'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Synechococcus WH7803
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -634,17 +661,19 @@ rows:
   - '4'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Synechococcus WH7803
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -683,17 +712,19 @@ rows:
   - '4'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Synechococcus WH7803
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -732,17 +763,19 @@ rows:
   - '4'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Synechococcus WH7803
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -781,17 +814,19 @@ rows:
   - '4'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Synechococcus WH8102
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -830,17 +865,19 @@ rows:
   - '78'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Synechococcus WH8102
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -879,17 +916,19 @@ rows:
   - '78'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Synechococcus WH8102
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -928,17 +967,19 @@ rows:
   - '78'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
   - José Manuel García-Fernández
   - José Ángel Moreno-Cabezuelo
   background_factors:
+  - coculture
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
+  coculture_partner:
+  - Marinobacter (MarRef v6)
+  - Synechococcus WH8102
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -977,7 +1018,6 @@ rows:
   - '78'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - J. Jeffrey Morris
   - James Kizziah
@@ -988,7 +1028,7 @@ rows:
   - axenic
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 3
   derived_metric_value_kinds:
@@ -1028,7 +1068,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1083,7 +1123,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Prochlorococcus MED4
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1160,7 +1201,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Synechococcus sp. BL107
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1199,7 +1242,6 @@ rows:
   - '82'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1210,7 +1252,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Synechococcus sp. BL107
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1249,7 +1293,6 @@ rows:
   - '82'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1260,7 +1303,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Synechococcus sp. BL107
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1299,7 +1344,6 @@ rows:
   - '82'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1310,7 +1354,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus sp. BL107
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Synechococcus sp. BL107
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1349,7 +1395,6 @@ rows:
   - '82'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1360,7 +1405,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Prochlorococcus MED4
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1399,7 +1446,6 @@ rows:
   - '342'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1410,7 +1456,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Prochlorococcus MED4
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1449,7 +1497,6 @@ rows:
   - '342'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1460,7 +1507,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Prochlorococcus MED4
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1499,7 +1548,6 @@ rows:
   - '342'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1510,7 +1558,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus MED4
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Prochlorococcus MED4
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1548,7 +1598,6 @@ rows:
   - '342'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1559,7 +1608,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1598,7 +1649,6 @@ rows:
   - '195'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1609,7 +1659,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1648,7 +1700,6 @@ rows:
   - '195'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1659,7 +1710,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1698,7 +1751,6 @@ rows:
   - '195'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1709,7 +1761,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1748,7 +1802,6 @@ rows:
   - '195'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1759,7 +1812,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Synechococcus WH7803
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1798,7 +1853,6 @@ rows:
   - '146'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1809,7 +1863,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Synechococcus WH7803
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1848,7 +1904,6 @@ rows:
   - '145'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1859,7 +1914,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Synechococcus WH7803
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1898,7 +1955,6 @@ rows:
   - '145'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1909,7 +1965,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH7803
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Synechococcus WH7803
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1948,7 +2006,6 @@ rows:
   - '146'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -1959,7 +2016,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Synechococcus WH8102
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1998,7 +2057,6 @@ rows:
   - '483'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -2009,7 +2067,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Synechococcus WH8102
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2048,7 +2108,6 @@ rows:
   - '484'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -2059,7 +2118,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Synechococcus WH8102
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2098,7 +2159,6 @@ rows:
   - '484'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -2109,7 +2169,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus WH8102
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Synechococcus WH8102
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2148,7 +2210,6 @@ rows:
   - '484'
   treatment_type:
   - carbon
-  - coculture
 - authors:
   - Daniel Sher
   - Dikla Aharonovich
@@ -2158,7 +2219,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2221,7 +2282,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas macleodii HOT1A3
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2298,7 +2360,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2346,7 +2410,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2394,7 +2460,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2442,7 +2510,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2489,7 +2559,7 @@ rows:
   - diel
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2538,7 +2608,7 @@ rows:
   - diel
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2586,7 +2656,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2634,7 +2704,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2683,7 +2753,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2731,7 +2803,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2779,7 +2853,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2827,7 +2903,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2877,7 +2955,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2924,7 +3002,7 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -2976,7 +3054,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Synechococcus elongatus PCC 7942
+  coculture_partner:
+  - Synechococcus elongatus PCC 7942
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3025,7 +3104,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3073,7 +3154,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3121,7 +3204,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3169,7 +3254,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3217,7 +3304,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3265,7 +3354,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3313,7 +3404,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3361,7 +3454,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3412,7 +3507,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Pseudomonas putida KT2440
+  coculture_partner:
+  - Pseudomonas putida KT2440
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3462,7 +3558,8 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: Escherichia coli
+  coculture_partner:
+  - Escherichia coli
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3512,7 +3609,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3560,7 +3659,9 @@ rows:
   - darkness
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3608,7 +3709,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -3656,7 +3759,9 @@ rows:
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner: null
+  coculture_partner:
+  - Alteromonas (MarRef v6)
+  - Marinobacter (MarRef v6)
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []

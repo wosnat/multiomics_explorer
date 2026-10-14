@@ -13,7 +13,7 @@ docs://tools/list_organisms; summary=True first.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism_names | list[string] \| None | None | Filter by organism: case-insensitive word match on preferred_name and name_synonyms, like every other tool's organism param ('MED4', 'Prochlorococcus MED4'; the synonym 'Meiothermus taiwanensis' resolves to 'Meiothermus ruber'); a genus word like 'Alteromonas' matches every strain. Unknown names are reported in not_found rather than raising. Note: two OrganismTaxon nodes share preferred_name 'Meiothermus ruber' (the genome strain + a gene-less treatment taxon) — join counts by Gene_belongs_to_organism, never by name. |
+| organism_names | list[string] \| None | None | Filter by organism: case-insensitive word match on preferred_name and name_synonyms, like every other tool's organism param ('MED4', 'Prochlorococcus MED4'; the synonym 'Meiothermus taiwanensis' resolves to 'Meiothermus ruber'); a genus word like 'Alteromonas' matches every strain. Unknown names are reported in not_found rather than raising. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
@@ -106,8 +106,8 @@ list_organisms()
 
 ```example-response
 {
-  "total_entries": 48,
-  "total_matching": 48,
+  "total_entries": 47,
+  "total_matching": 47,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 11},
     {"cluster_type": "time_course", "count": 3},
@@ -117,7 +117,7 @@ list_organisms()
   ],
   "by_organism_type": [
     {"organism_type": "genome_strain", "count": 41},
-    {"organism_type": "treatment", "count": 5},
+    {"organism_type": "treatment", "count": 4},
     {"organism_type": "reference_proteome_match", "count": 2}
   ],
   "by_value_kind": [
@@ -217,11 +217,12 @@ list_organisms()
     ...
   ],
   "top_annotation_capability_truncated": true,
-  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 43},
+  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 42},
   "returned": 5,
   "offset": 0,
   "truncated": true,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "organism_name": "Alteromonas",
@@ -263,7 +264,7 @@ list_organisms()
       "gene_count": 4305,
       "publication_count": 1,
       "experiment_count": 60,
-      "treatment_types": ["carbon", "coculture"],
+      "treatment_types": ["carbon"],
       "background_factors": ["coculture", "darkness", "light"],
       "omics_types": ["PROTEOMICS"],
       "clustering_analysis_count": 0,
@@ -325,8 +326,8 @@ list_organisms(summary=True)
 
 ```example-response
 {
-  "total_entries": 48,
-  "total_matching": 48,
+  "total_entries": 47,
+  "total_matching": 47,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 11},
     {"cluster_type": "time_course", "count": 3},
@@ -336,7 +337,7 @@ list_organisms(summary=True)
   ],
   "by_organism_type": [
     {"organism_type": "genome_strain", "count": 41},
-    {"organism_type": "treatment", "count": 5},
+    {"organism_type": "treatment", "count": 4},
     {"organism_type": "reference_proteome_match", "count": 2}
   ],
   "by_value_kind": [
@@ -436,11 +437,12 @@ list_organisms(summary=True)
     ...
   ],
   "top_annotation_capability_truncated": null,
-  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 43},
+  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 42},
   "returned": 0,
   "offset": 0,
   "truncated": true,
   "not_found": [],
+  "warnings": [],
   "results": []
 }
 ```
@@ -453,7 +455,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
 
 ```example-response
 {
-  "total_entries": 48,
+  "total_entries": 47,
   "total_matching": 2,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 1},
@@ -516,6 +518,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
   "offset": 0,
   "truncated": false,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "organism_name": "Alteromonas macleodii MIT1002",
@@ -593,7 +596,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
 
 ```example-response
 {
-  "total_entries": 48,
+  "total_entries": 47,
   "total_matching": 2,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 2},
@@ -657,6 +660,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
   "offset": 0,
   "truncated": false,
   "not_found": ["Bogus organism"],
+  "warnings": [],
   "results": [
     {
       "organism_name": "Prochlorococcus MED4",
@@ -741,7 +745,7 @@ list_organisms(compartment="vesicle")
 
 ```example-response
 {
-  "total_entries": 48,
+  "total_entries": 47,
   "total_matching": 9,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 3},
@@ -848,6 +852,7 @@ list_organisms(compartment="vesicle")
   "offset": 0,
   "truncated": true,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "organism_name": "Alteromonas macleodii AD45",
@@ -949,8 +954,8 @@ list_organisms(summary=True)
 
 ```example-response
 {
-  "total_entries": 48,
-  "total_matching": 48,
+  "total_entries": 47,
+  "total_matching": 47,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 11},
     {"cluster_type": "time_course", "count": 3},
@@ -960,7 +965,7 @@ list_organisms(summary=True)
   ],
   "by_organism_type": [
     {"organism_type": "genome_strain", "count": 41},
-    {"organism_type": "treatment", "count": 5},
+    {"organism_type": "treatment", "count": 4},
     {"organism_type": "reference_proteome_match", "count": 2}
   ],
   "by_value_kind": [
@@ -1060,11 +1065,12 @@ list_organisms(summary=True)
     ...
   ],
   "top_annotation_capability_truncated": null,
-  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 43},
+  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 42},
   "returned": 0,
   "offset": 0,
   "truncated": true,
   "not_found": [],
+  "warnings": [],
   "results": []
 }
 ```
@@ -1077,8 +1083,8 @@ list_organisms(summary=True)
 
 ```example-response
 {
-  "total_entries": 48,
-  "total_matching": 48,
+  "total_entries": 47,
+  "total_matching": 47,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 11},
     {"cluster_type": "time_course", "count": 3},
@@ -1088,7 +1094,7 @@ list_organisms(summary=True)
   ],
   "by_organism_type": [
     {"organism_type": "genome_strain", "count": 41},
-    {"organism_type": "treatment", "count": 5},
+    {"organism_type": "treatment", "count": 4},
     {"organism_type": "reference_proteome_match", "count": 2}
   ],
   "by_value_kind": [
@@ -1188,11 +1194,12 @@ list_organisms(summary=True)
     ...
   ],
   "top_annotation_capability_truncated": null,
-  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 43},
+  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 42},
   "returned": 0,
   "offset": 0,
   "truncated": true,
   "not_found": [],
+  "warnings": [],
   "results": []
 }
 ```
@@ -1234,8 +1241,6 @@ list_organisms → list_experiments(organism=...) to scope experiments to the ch
 - The four annotation-coverage counts (`peptidase_gene_count`, `nonpeptidase_homolog_gene_count`, `interpro_gene_count`, `ncbifam_gene_count`) are distinct-gene counts per organism, zero-filled (never null). A gene carrying both a `peptidase` and a `nonpeptidase_homolog` MEROPS call counts once in each. They measure coverage, not annotation quality, and scale with genome size — rank Prochlorococcus strains against each other, not against a 4,000-gene heterotroph.
 
 - `top_annotation_capability` ranks the matched set by `peptidase_gene_count` descending, then `preferred_name`; the other three counts are carried as columns, not sort keys. All-zero rows are excluded from the ranking but still appear in `results`. Detail calls cap the ranking to the first 10 (`top_annotation_capability_truncated=true` when capped); `summary=True` returns the full ranking uncapped. There is no min-count filter — read the ranking, then drill in with genes_by_ontology(ontology='merops', call_class=['peptidase'], organism=...).
-
-- Two OrganismTaxon nodes can share a `preferred_name` (the Meiothermus ruber genome strain and the gene-less Meiothermus ruber treatment taxon). Their rows differ in `organism_type` and `gene_count`; the treatment taxon reads 0 on every coverage count. When you need a strain, pick the `genome_strain` row.
 
 - `organism_names=` uses the same word-based, case-insensitive match on preferred_name + name_synonyms as every other tool's organism param ('MED4' works); unknown names land in `not_found`.
 

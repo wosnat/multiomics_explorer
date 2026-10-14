@@ -23,7 +23,7 @@ examples:
         "by_organism_truncated": null,
         "by_treatment_type": [
           {"treatment_type": "carbon", "count": 78},
-          {"treatment_type": "coculture", "count": 76},
+          {"treatment_type": "coculture", "count": 36},
           {"treatment_type": "compartment", "count": 17},
           {"treatment_type": "nitrogen", "count": 16},
           {"treatment_type": "light", "count": 13},
@@ -33,7 +33,7 @@ examples:
         "by_background_factors": [
           {"background_factor": "light", "count": 127},
           {"background_factor": "axenic", "count": 90},
-          {"background_factor": "coculture", "count": 58},
+          {"background_factor": "coculture", "count": 78},
           {"background_factor": "darkness", "count": 37},
           {"background_factor": "diel", "count": 19},
           ...
@@ -101,6 +101,7 @@ examples:
         "score_max": null,
         "score_median": null,
         "not_found": [],
+        "warnings": [],
         "results": []
       }
 
@@ -205,6 +206,7 @@ examples:
         "score_max": null,
         "score_median": null,
         "not_found": [],
+        "warnings": [],
         "results": [
           {
             "experiment_id": "10.1093/femsml/uqac025_vesicle_proteomics_ad45",
@@ -221,7 +223,7 @@ examples:
             "organism_name": "Alteromonas macleodii AD45",
             "treatment_type": ["compartment"],
             "background_factors": ["axenic", "darkness"],
-            "coculture_partner": null,
+            "coculture_partner": [],
             "omics_type": "VESICLE_PROTEOMICS",
             "is_time_course": false,
             "table_scope": "top_n",
@@ -255,7 +257,7 @@ examples:
             "organism_name": "Alteromonas macleodii ATCC27126",
             "treatment_type": ["compartment"],
             "background_factors": ["axenic", "darkness"],
-            "coculture_partner": null,
+            "coculture_partner": [],
             "omics_type": "VESICLE_PROTEOMICS",
             "is_time_course": false,
             "table_scope": "top_n",
@@ -312,6 +314,7 @@ examples:
         "score_max": null,
         "score_median": null,
         "not_found": [],
+        "warnings": [],
         "results": [
           {
             "experiment_id": "10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell",
@@ -328,7 +331,7 @@ examples:
             "organism_name": "Prochlorococcus MIT9301",
             "treatment_type": ["phosphorus"],
             "background_factors": ["axenic"],
-            "coculture_partner": null,
+            "coculture_partner": [],
             "omics_type": "METABOLOMICS",
             "is_time_course": false,
             "table_scope": null,
@@ -362,7 +365,7 @@ examples:
             "organism_name": "Prochlorococcus MIT9313",
             "treatment_type": ["carbon"],
             "background_factors": ["axenic", "light"],
-            "coculture_partner": null,
+            "coculture_partner": [],
             "omics_type": "METABOLOMICS",
             "is_time_course": false,
             "table_scope": null,

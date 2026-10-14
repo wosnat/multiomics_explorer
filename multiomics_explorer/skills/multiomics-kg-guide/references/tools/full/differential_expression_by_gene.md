@@ -88,7 +88,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 | treatment | string \| None (optional) | Treatment details (e.g. 'PRO99-lowN nutrient starvation') |
 | gene_category | string \| None (optional) | Gene functional category (e.g. 'Inorganic ion transport') |
 | omics_type | string \| None (optional) | Omics type (e.g. 'RNASEQ') |
-| coculture_partner | string \| None (optional) | Coculture partner organism, if applicable |
+| coculture_partner | list[string] (optional) | Organisms sharing the culture (treatment and background partners, phage); [] when axenic |
 | table_scope | string \| None (optional) | What genes the source DE table contains (e.g. 'all_detected_genes'). Verbose only. |
 | table_scope_detail | string \| None (optional) | Free-text clarification of table_scope. Verbose only. |
 | background_factors | list[string] (optional) | Background experimental factors. Verbose only. |
@@ -440,8 +440,6 @@ differential_expression_by_gene(organism='Prochlorococcus', summary=True)  # gen
 ```correction
 differential_expression_by_gene(organism='MED4', summary=True)  # organism= is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works; a bare genus word matches every strain and raises 'matches multiple organisms — be more specific'
 ```
-
-- 'Meiothermus ruber' names two OrganismTaxon nodes (a genome strain and a gene-less treatment taxon). organism='Meiothermus ruber' resolves to the genome strain only (resolution gates on gene_count > 0), so it does not raise — but never join organism rows from list_organisms by that name.
 
 - `direction` and `significant_only` interplay: when direction is 'up' / 'down' / 'both' it filters expression_status directly and `significant_only` is ignored (direction='up', significant_only=False still returns only significant_up rows). `significant_only=True` only matters with direction=None, where it drops not_significant rows — i.e. it equals direction='both'. Pick whichever spelling is clearer at the call site; default direction=None, significant_only=False returns everything.
 
