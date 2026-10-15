@@ -13,9 +13,9 @@ docs://tools/genes_by_metabolite; summary=True first.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| metabolite_ids | list[string] | — | Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites). |
+| metabolite_ids | list[string] | — | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolites. |
 | organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
-| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; bare/xref forms coerced (see resolved_aliases); exclude wins on overlap. |
+| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
 | ec_numbers | list[string] \| None | None | Narrow metabolism rows to those whose Reaction carries any of these EC numbers. **Metabolism arm only — does not affect transport rows**, which are returned unchanged. To restrict to metabolism rows alone, combine with `evidence_sources=['metabolism']`. E.g. ['6.3.1.2'] for glutamine synthetase. |
 | metabolite_pathway_ids | list[string] \| None | None | Filter to rows where the **metabolite** is in any of these KEGG pathways (`KeggTerm.id`, e.g. ['kegg.pathway:ko00910'] for nitrogen metabolism). Anchored on `Metabolite.pathway_ids` (transport-extended), so applies uniformly to both arms. **Not gene-anchored** — for filtering by genes' KEGG-pathway annotations, route through `genes_by_ontology(ontology="kegg", term_ids=[pathway_id], organism=...)` first to obtain locus_tags. `not_found.metabolite_pathway_ids` lists IDs that don't exist as a KeggTerm. |
 | mass_balance | string ('balanced', 'unbalanced') \| None | None | Narrow metabolism rows to those whose Reaction has this mass balance status. **Metabolism arm only — does not affect transport rows**. Combine with `evidence_sources=['metabolism']` to restrict to metabolism rows alone. |
@@ -42,7 +42,7 @@ total_matching, returned, offset, truncated, warnings, resolved_aliases, not_fou
 - **offset** (int): Echo of the requested offset.
 - **truncated** (bool): True when `offset + limit < total_matching`.
 - **warnings** (list[string]): Diagnostic strings. Currently emitted: inherited-dominance auto-warning when `substrate_depth='inherited'` rows are the transport-arm majority and `substrate_depth` was not set explicitly; bare-ID collision notes (one input → several metabolites, expanded to all); a `gene_categories` value not found in the live vocabulary.
-- **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
+- **resolved_aliases** (object): Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.
 - **not_found** (GbmNotFound): Inputs that did not resolve to a KG node — see model.
 - **not_matched** (list[string]): Input metabolite_ids that exist as Metabolite nodes but produced zero rows in this organism slice (under the active filters). Distinct from `not_found.metabolite_ids` (those don't exist at all).
 - **by_metabolite** (list[GbmByMetabolite]): Per-metabolite rollup. One entry per input metabolite_id that produced ≥1 row.
@@ -70,7 +70,7 @@ total_matching, returned, offset, truncated, warnings, resolved_aliases, not_fou
 | evidence_source | string ('metabolism', 'transport') | Path through which this row reaches the metabolite. 'metabolism' = `Gene → Reaction → Metabolite`. 'transport' = `Gene → TcdbFamily → Metabolite` via the gene's deepest TCDB attachments only. Metabolomics evidence has no gene anchor here. |
 | substrate_depth | string ('most_specific', 'inherited') \| None (optional) | Transport rows only (None on metabolism rows). 'most_specific' = this family is the most specific surviving transporter node for this substrate, relative to the gene-pruned hierarchy — not a curation level. 'inherited' = rolled up from a descendant. |
 | tcdb_evidence_score | float \| None (optional) | Transport rows only (None on metabolism rows). KG 5-signal composite for the gene×family call, in [0,1]. Rank with it, don't filter: 0 = uncorroborated DIAMOND hit, not absent. Rows within a depth tier sort by it desc. |
-| transport_substrate_resolution | string ('resolved', 'family_inferred') \| None (optional) | Transport rows only (None on metabolism rows). The gene's KG-authoritative TCDB substrate resolution, repeated on each of its transport rows — not a per-substrate fact ('family_inferred' = reachability, not capability). Row fact: substrate_depth. |
+| transport_substrate_resolution | string ('resolved', 'family_inferred') \| None (optional) | Transport rows only. The gene's TCDB substrate resolution, repeated per row (not a per-substrate fact): 'resolved' = a deepest attachment is not lumping (TcdbFamily.substrate_breadth = 'lumping'); 'family_inferred' = reachability, not capability. |
 | reaction_id | string \| None (optional) | Full prefixed Reaction ID (e.g. 'kegg.reaction:R00253'). Metabolism rows only — see class-level note on undirected, non-reversible interpretation. |
 | reaction_name | string \| None (optional) | Reaction systematic name + KEGG equation (raw KEGG value, can be lengthy; a small fraction of reactions have empty `''`). Metabolism rows only — see class-level note on undirected, non-reversible interpretation. |
 | ec_numbers | list[string] \| None (optional) | EC classification(s) for this reaction. Empty list on reactions without an EC annotation. None on transport rows. |
@@ -623,16 +623,18 @@ genes_by_metabolite(metabolite_ids=['C00064'])  # then treating `C00064` in `not
 ```
 
 ```correction
-Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
-the node's cross-references before the query runs: `C00064` →
-`kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
-`HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
-(`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
-inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
-CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
-ALL matching metabolites and appends a `warnings` entry; pass the canonical
-id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
-in the form you passed. Exclude-wins-on-overlap is computed on the canonical IDs, so `metabolite_ids=['C00064'], exclude_metabolite_ids=['kegg.compound:C00064']` excludes.
+Metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are normalised and
+looked up in every identifier the metabolite carries before the query runs:
+`C00064` / `kegg.compound:c00064` → `kegg.compound:C00064`, `CHEBI:17234` /
+`17234` → `chebi:17234`; `HMDB0000122`, `MNXM732398` and bare InChIKeys resolve
+the same way. Retired ids of merged or re-keyed nodes resolve to the surviving
+node (`chebi:14654` → nitrate `kegg.compound:C00244`). Every input that isn't
+already canonical is listed in envelope `resolved_aliases`
+(`{input: [canonical, ...]}`). A removed compound whose measurements moved to
+another compound, and a chemical-role id (`chebi:10004`, 'vitamin (role)'),
+stay verbatim in `not_found` with a `warnings` entry naming the replacement or
+the role. Other unresolved inputs stay verbatim in `not_found` in the form you
+passed. Exclude-wins-on-overlap is computed on the canonical IDs, so `metabolite_ids=['C00064'], exclude_metabolite_ids=['kegg.compound:C00064']` excludes.
 
 ```
 

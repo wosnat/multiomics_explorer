@@ -22,36 +22,126 @@ The `metabolism` and `transport` rows share tools — the `evidence_source` fiel
 The `Metabolite.evidence_sources` list field on each Metabolite node already indicates which of the three pipelines contribute (e.g., `['metabolism', 'transport', 'metabolomics']`); read this to route quickly.
 
 **Metabolite ID forms.** Canonical `Metabolite.id` carries a namespace prefix: `kegg.compound:C00064`
-(KEGG-keyed, the large majority) or `chebi:17234` (ChEBI-only, mostly TCDB substrates).
-Ids of merged, re-keyed or removed nodes are retired — the KG's
-`metabolite_id_remap.tsv` lists every one. Every `metabolite_ids` / `exclude_metabolite_ids`
-parameter on the seven chemistry / metabolomics tools (`list_metabolites`,
-`genes_by_metabolite`, `metabolites_by_gene`, `list_metabolite_assays`,
-`metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`,
-`assays_by_metabolite`) also accepts the un-prefixed / xref aliases and
-resolves them to canonical IDs before the query runs: bare KEGG `C00064`,
-`CHEBI:17234` or bare numeric `17234`, `HMDB0000122`, `MNXM1095050`.
-Canonical forms pass through untouched; any other prefixed form is passed
-through verbatim and lands in `not_found`. The examples below use bare
-KEGG IDs deliberately.
+(KEGG-keyed, the large majority) or `chebi:17234` (ChEBI-only, mostly TCDB substrates). Each
+node also lists every identifier it answers to in `all_identifiers` — lower-case-prefixed
+CURIEs for KEGG, ChEBI (primary and secondary), MetaNetX, HMDB and InChIKey
+(`kegg.compound:C00244`, `chebi:14654`, `mnx:MNXM732398`, `hmdb:HMDB0000122`,
+`inchikey:GRYLNZFGIOXLOG-UHFFFAOYSA-N`). Every entry sits on exactly one node.
 
-- **Collision policy.** KEGG xrefs are unique; CHEBI / HMDB / MNXM are not
-  (two KEGG nodes can share one `chebi_id`). An ambiguous alias expands to
-  **all** matching metabolites and appends a `warnings` entry
-  (`'<input>' resolved to N metabolites: [...] — pass the canonical id to
-  narrow`). Nothing is silently picked. The same rule applies to
-  `exclude_metabolite_ids` — an ambiguous exclude removes every match.
-- **Envelope.** Coerced inputs are reported in `resolved_aliases`
-  (`{input: [canonical, ...]}`, empty when none). Unresolved inputs stay
-  verbatim and appear in `not_found` in the form you passed. Exclude-wins-on-
-  overlap is evaluated on the canonical IDs, so mixed forms across
-  `metabolite_ids` and `exclude_metabolite_ids` still overlap correctly.
-- **Not coercion:** `list_metabolites`' exact-xref filters
-  (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`) match the xref
-  property directly, never rewrite the input, and report nothing in
-  `resolved_aliases`.
+Every `metabolite_ids` / `exclude_metabolite_ids` parameter on the seven chemistry /
+metabolomics tools (`list_metabolites`, `genes_by_metabolite`, `metabolites_by_gene`,
+`list_metabolite_assays`, `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`,
+`assays_by_metabolite`) resolves its inputs before the query runs:
+
+1. **Normalise the form.** `C00064` / `kegg.compound:c00064` → `kegg.compound:C00064`;
+   `CHEBI:17234` / bare `17234` → `chebi:17234`; `MNXM732398` → `mnx:MNXM732398`;
+   `HMDB02878` → `hmdb:HMDB0002878` (digits padded to 7); a bare InChIKey →
+   `inchikey:<KEY>`.
+2. **Look it up** as a node id first, then in every node's `all_identifiers`. This is how
+   **retired ids** resolve: ids of nodes an earlier KG build merged or re-keyed now sit in
+   the surviving node's `all_identifiers` (`chebi:14654` → nitrate `kegg.compound:C00244`;
+   `kegg.compound:C01327`, hydrogen chloride, → chloride `kegg.compound:C00698`).
+3. **Report.** Every input that isn't already the canonical id is listed in
+   `resolved_aliases` (`{input: [canonical, ...]}`, empty when none), so a case fix, a
+   prefix fix and a retired-id hop are all visible. Exclude-wins-on-overlap is evaluated on
+   the canonical ids, so mixed forms across `metabolite_ids` and `exclude_metabolite_ids`
+   still overlap correctly.
+
+Three inputs stay verbatim and land in `not_found`:
+
+- **A removed compound** whose paper measurements were moved to a different compound — e.g.
+  `kegg.compound:C00525` (D-tryptophan), whose rows now sit on L-tryptophan
+  `kegg.compound:C00078`. A `warnings` entry names the new id. It is not resolved, because the
+  two are different compounds; pass the new id yourself if the paper's stereo call is not the
+  point.
+- **A chemical-role id** — `chebi:10004` or `chebi.role:33229` ('vitamin (role)'). Roles
+  (vitamin, siderophore, antibiotic, …) are `ChemicalRole` nodes, not metabolites; a
+  `warnings` entry names the role. See "Chemical roles" under Track A f for the route to the
+  TCDB families that transport them.
+- **Anything else unknown** — a name such as `glutamate` (resolve names with
+  `list_metabolites(search_text=...)` first), or an id the KG never carried.
+
+`list_metabolites`' xref filters (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`)
+normalise each value the same way and match it against `all_identifiers`, so secondary and
+retired ids match too. They are filters, not resolution: they report nothing in
+`resolved_aliases`.
+
+**Molecule vs class (`structure_kind`).** `list_metabolites` rows carry `structure_kind`:
+`defined` (one molecule), `generic` (a class such as 'Amino acid' or 'Acyl-CoA') or `polymer`
+(DNA, glycogen). Generic and polymer nodes have no `mass` and carry generic formulas with a
+placeholder (`C2H4NO2*` for 'Amino acid'), whose element set still feeds the `elements`
+filter. Filter `structure_kind=['defined']` when a question is about specific molecules.
 
 **Row schema is unified across both annotation arms.** `genes_by_metabolite` and `metabolites_by_gene` rows carry the full cross-arm key set — every row has `evidence_source`, `substrate_depth`, `tcdb_evidence_score`, `reaction_id`, `reaction_name`, `ec_numbers`, `mass_balance`, `tcdb_family_id`, `tcdb_family_name`, with explicit `None` on the fields belonging to the other arm. Code against `evidence_source` to discriminate (or `substrate_depth is not None` for transport-only); the cross-arm `None`s mean every row has identical keys, no `KeyError` branching.
+
+## KEGG compound categories: what they are and aren't
+
+`list_metabolites` carries two KEGG classification fields — `kegg_functional_categories` and
+`kegg_brite_classes` — as row fields, filters and envelope rollups
+(`by_kegg_functional_category`, `by_kegg_brite_class`). Both are useful for describing a result
+list and both are **partial**. Read this before using either to include, exclude or count.
+
+1. **Source and method.** `kegg_functional_categories` holds the 9 top-level groups of KEGG BRITE
+   hierarchy **br08001 "Compounds with biological roles"** (values:
+   `list_filter_values('kegg_functional_category')`). br08001 is a hand-curated KEGG list:
+   curators place selected **representative** compounds under functional headings. It is not an
+   exhaustive or rule-based chemical classification. A compound is in a category only if KEGG
+   listed it there; the KG copies KEGG's assignments and never infers a category.
+2. **Coverage is low.** Only 334 of 3,214 metabolites (~10%) carry a category. Common central
+   metabolites the KG catalyses are often unclassified: 1,974 metabolites with catalyst genes
+   have no category — fumarate, ethanol, L-carnitine and D-ribulose 5-phosphate among them.
+3. **Absence means "KEGG didn't list it", not "not in this category".** Fumarate is an organic
+   acid and carries no category. The envelope's trailing `"not classified"` entry counts these
+   metabolites so the gap stays visible. Never read a missing category as a negative.
+   `"not classified"` is an envelope label only — the filter does not accept it.
+4. **Functional, not structural headings.** Amino acids *and* amines (putrescine, dopamine) sit
+   under Peptides; myo-inositol under Carbohydrates; retinol under Vitamins and cofactors. A
+   compound can sit in more than one category (dopamine is also under Hormones and transmitters).
+5. **Consequences for analysis.**
+   - Use categories to *describe or group* a result list, not to *exclude* compounds.
+   - For enrichment or "over-represented category" claims, the background is the classified
+     metabolites only (those with at least one value in the field you test), never all
+     metabolites — an unclassified compound is not a non-member.
+   - For composition questions (N-containing, P-containing), use the `elements` filter instead.
+6. **The second field, `kegg_brite_classes`**, holds KEGG's 7 other compound BRITE trees, as
+   `"Tree: Class"` strings (values: `list_filter_values('kegg_brite_class')`):
+   - Lipids br08002 (LIPID MAPS-style classes);
+   - Phytochemical compounds br08003;
+   - Glycosides br08021;
+   - Pesticides br08007;
+   - Natural toxins br08009;
+   - Endocrine disrupting compounds br08006;
+   - Bioactive peptides br08005.
+
+   These are the same kind of hand-curated, representative-compound lists. Some are chemical
+   (lipid and phytochemical classes, glycosides); others group compounds by use or effect
+   (pesticides, toxins, endocrine disruptors). The tree prefix keeps same-named classes apart
+   (`Pesticides: Pesticides` vs `Endocrine disrupting compounds: Pesticides and herbicides`).
+   Coverage:
+   - 652 of 3,214 metabolites (~20%) have a class;
+   - with both fields, 883 (~27%) have something;
+   - 687 of the 2,221 metabolites with catalyst genes have something.
+
+   Only the top level of each tree is on the row. Deeper classes (e.g. the lipid subclass
+   'Fatty Acids and Conjugates') are `run_cypher`-only, through the `MetaboliteClass` hierarchy
+   (`tree_code`, `level` 0 = top class):
+
+   ```cypher
+   MATCH (cls:MetaboliteClass {tree_code: 'br08002'})
+   WHERE cls.name CONTAINS 'Fatty Acids and Conjugates'
+   MATCH (sub:MetaboliteClass)-[:Metabolite_class_is_a_metabolite_class*0..]->(cls)
+   MATCH (m:Metabolite)-[:Metabolite_in_metabolite_class]->(sub)
+   RETURN cls.id AS class_id, m.id AS metabolite_id, m.name AS name,
+          collect(DISTINCT sub.name) AS via_classes
+   ORDER BY name
+   LIMIT 50
+   ```
+
+   Points 3 and 5 apply unchanged.
+7. **Two fields, two questions.** `kegg_functional_categories` answers "what is it for, in
+   KEGG's functional grouping"; `kegg_brite_classes` answers "what kind of compound is it, or
+   what is it used as". They overlap: butanoic acid is Lipids + Organic acids functionally, and
+   `Lipids: Fatty acyls` + `Phytochemical compounds: Fatty acids related compounds` in BRITE.
 
 ## When to surface caveats inline
 
@@ -186,6 +276,17 @@ Both depths are annotations, not ground truth — transporter specificity in nat
 2. **`transport_substrate_resolution`** (gene) — *is the gene's substrate breadth meaningful?* `family_inferred` = every deepest attachment is a lumping family (reachability, not capability); `resolved` = at least one deepest attachment is non-lumping — not all of them. A gene attached at both a specific family and the ABC superfamily is `resolved` and still carries the superfamily rollup in its `transported_metabolite_count`; only the row level separates them. The gene's value is repeated on each of its transport rows (`None` on metabolism rows) so a batch scan can drop `family_inferred` rows without joining back to `by_gene[]` / `top_genes[]`; it never varies across one gene's rows.
 3. **`substrate_depth`** (row) — *where does this substrate sit for this family?* `most_specific` = the most specific **surviving** transporter node in the gene-pruned hierarchy (can be a family node, e.g. nitrite via `tcdb:2.A.16` in MED4; not a curation level); `inherited` = came down from an ancestor's substrate set (usually the ABC superfamily `tcdb:3.A.1`).
 
+**What "lumping" means.** A TCDB family is *lumping* when the KG marks it
+`TcdbFamily.substrate_breadth = 'lumping'`: a pinned set of broad superfamilies and families
+(the ABC superfamily `tcdb:3.A.1`, MFS `tcdb:2.A.1`, APC `tcdb:2.A.3`, …) whose substrate list
+pools what their many subfamilies carry, so a substrate count there is reachability, not
+capability. The other values are `specific` (level 2 or deeper and not lumping) and
+`not_assessed` (TCDB class / subclass nodes, whose substrate counts grow with level by
+construction). The set is curated, not a cutoff — a `level` / `metabolite_count` threshold does
+not reproduce it, so read the property instead (`ontology_term_details(term_ids=[...],
+verbose=True)` shows it under `properties`). `transport_substrate_resolution` and the
+`substrate_depth` warnings are built on this property.
+
 **Rows are deepest-attachment projections.** A gene attached to a family *and* to one of its descendants contributes rows only through the descendant; the ancestor's substrate rollup is intentionally absent. So distinct metabolites across a gene's transport rows equal `gene_overview.transported_metabolite_count` (PMM0392: 13, not the ABC-superfamily plateau of 554), and distinct genes across a metabolite's transport rows, summed over organisms, equal `list_metabolites.transporter_gene_count`. Full family membership, ancestors included, is visible via `gene_ontology_terms(ontology=['tcdb'], mode='leaf', include_superseded=True)` — without `include_superseded=True` leaf mode also shows deepest attachments only.
 
 **Choose the depth filter by question shape, not by reflex toward "high confidence":**
@@ -299,6 +400,28 @@ de = differential_expression_by_gene(
 
 **TCDB family-anchored context:** to see what a family *is* before trusting its substrate set — its level (class / subclass / family / subfamily), parents and children, `member_count` vs `gene_count`, and the Pfam domains / GO terms it is built from (`links_out`, composition) — use `ontology_term_details(term_ids=['tcdb:3.A.1'])`. Browse families by size with `search_ontology(ontology=['tcdb'], level=2)`. The full TCDB reference (identifier form, `attachment_depth` — visible only with `gene_ontology_terms(mode='leaf', include_superseded=True, verbose=True)` — evidence, pitfalls) is `docs://ontologies/tcdb`; the other ontologies are indexed at `docs://ontologies/index`.
 
+**Chemical roles (siderophores, vitamins, antibiotics):** role terms are `ChemicalRole` nodes
+(`chebi.role:<n>`), not metabolites, so no metabolite tool returns them and a role id passed as
+`metabolite_ids` lands in `not_found` with a warning naming the role. TCDB curates some
+substrates only as a role ("siderophore"), reachable through `run_cypher`:
+
+```cypher
+CALL db.index.fulltext.queryNodes('chemicalRoleFullText', 'siderophore')
+YIELD node AS role, score
+WITH role ORDER BY score DESC LIMIT 1
+MATCH (sub:ChemicalRole)-[:Chemical_role_is_a_chemical_role*0..]->(role)
+MATCH (f:TcdbFamily)-[:Tcdb_family_transports_chemical_role]->(sub)
+WHERE f.substrate_breadth <> 'not_assessed'
+RETURN role.id AS role_id, f.id AS tcdb_family_id, f.name AS tcdb_family_name,
+       f.substrate_breadth AS substrate_breadth,
+       collect(DISTINCT sub.name) AS via_roles
+ORDER BY tcdb_family_id
+```
+
+`*0..` includes the role itself plus its narrower roles. Discount `lumping` families (see
+"What lumping means" under g), then take the family ids to
+`genes_by_ontology(ontology='tcdb', term_ids=[...], organism=...)` for the genes.
+
 **KEGG pathway-anchored — pick the right surface:**
 - **metabolite_pathways** (compound-anchored): which metabolites are in pathway X → `list_metabolites(pathway_ids=[...])`. Edge: `Metabolite_in_pathway`.
 - **ko_pathways** (gene-KO-anchored): which genes are annotated to KOs in pathway X → `genes_by_ontology(ontology='kegg', ...)`. Edges: `Gene_has_kegg_ko` + `Kegg_term_is_a_kegg_term`.
@@ -372,6 +495,14 @@ Four native tools cover the measurement layer (no `run_cypher` needed):
 - **`Assay_quantifies` vs `Assay_flags`.** Quantifies = concentration/intensity (with `value`, `value_sd`, `n_replicates`, `metric_percentile`, `rank_by_metric`); Flags = qualitative detection (with `flag_value`, `n_positive`, `n_replicates`). Their downstream interpretation differs — split per DM convention into two drill-down tools.
 - **Compartment matters.** `whole_cell` measures pool; `extracellular` measures excretion / uptake / spent media; `vesicle` measures cargo packaged into extracellular vesicles. Filter via the `compartment=` kwarg on every Track-B tool.
 - **Targeted panel ≠ full metabolome.** Absence in measurement ≠ absence in cell. The current KG covers ~135 distinct metabolites across 14 assays in 3 papers — out of ~3.2k metabolites total, so ~96% have no measurement coverage.
+- **Stereo form may be the KG's call, not the paper's.** Every measurement row carries
+  `stereo_assignment`: `as_reported` (the paper named the form, or the compound has no stereo
+  variant) or `dominant_form_assumed` (the paper gave no form — e.g. 'Alanine' — and the KG
+  placed the row on one form of the stereo family, usually the one with the most catalysing
+  genes, here L-alanine `kegg.compound:C00041`). The drill-downs add `by_stereo_assignment` to the envelope and a
+  `warnings` entry when assumed rows are present; pass `stereo_assignment=['as_reported']` to
+  keep only the paper's own calls. Say "measured as alanine (L-form assumed)" when quoting an
+  assumed row.
 - **Replicate / normalisation conventions vary by paper.** Read `value_sd` and `n_replicates` on the edge, plus `field_description` on the parent assay (canonical provenance read — `verbose=True` surfaces it). The `value` itself is processed per the paper's pipeline.
 - **Tested-absent vs unmeasured.** See "Tested-absent vs unmeasured" above — the top-level invariant. Tested-absent rows (`value=0` / `detection_status='not_detected'` / `flag_value=false`) are biology, not noise; default-filtering them strips the majority of the layer.
 
@@ -497,6 +628,8 @@ User asks about a metabolite or chemistry
 ├─ "Which metabolites does gene X act on?" → metabolites_by_gene
 ├─ "Find metabolite by name → metabolite_id" → list_metabolites(search_text="...")  ← name-search hook; precedes any compound-anchored chain
 ├─ "Find metabolites by element / pathway / mass" → list_metabolites
+├─ "Which metabolites are lipids / sugars / vitamins?" → list_metabolites(kegg_functional_categories=… / kegg_brite_classes=…) — partial, see KEGG compound categories
+├─ "Which transporters carry siderophores / vitamins (a chemical role)?" → run_cypher ChemicalRole route (Track A f)
 ├─ "Cross-feeding between organisms" → Track A d — Cross-feeding bridge
 ├─ "N-source / chemistry-filtered DE" → Track A e — N-source / nutrient-class workflow
 ├─ "Genes that transport substrate X" → Track A2 b2 (metabolite-anchored; see also Track A f — Ontology bridges)

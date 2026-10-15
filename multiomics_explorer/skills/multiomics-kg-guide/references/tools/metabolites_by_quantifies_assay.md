@@ -15,8 +15,8 @@ docs://tools/metabolites_by_quantifies_assay; summary=True first.
 |---|---|---|---|
 | assay_ids | list[string] | — | MetaboliteAssay IDs to drill into (full prefixed). Discover via `list_metabolite_assays(value_kind='numeric')`. E.g. ['metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration']. `not_found.assay_ids` lists IDs absent from the KG. |
 | organism | string \| None | None | Organism: case-insensitive substring match on the organism name ('MED4'); a genus word matches every strain. See list_organisms. |
-| metabolite_ids | list[string] \| None | None | Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites). |
-| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; bare/xref forms coerced (see resolved_aliases); exclude wins on overlap. |
+| metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolites. |
+| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
 | experiment_ids | list[string] \| None | None | Filter to assays from these experiments. |
 | publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
@@ -31,6 +31,7 @@ docs://tools/metabolites_by_quantifies_assay; summary=True first.
 | min_percentile | float \| None | None | Lower bound on `metric_percentile` (0-100). **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `metric_percentile` is nulled for display. |
 | max_percentile | float \| None | None | Upper bound on `metric_percentile`. **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `metric_percentile` is nulled for display. |
 | max_rank | int \| None | None | Cap on `rank_by_metric` (1 = highest). Top-N drill-down. **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `rank_by_metric` is nulled for display. |
+| stereo_assignment | list[string] \| None | None | Stereo-form provenance (OR): 'as_reported' = the paper named the form; 'dominant_form_assumed' = it named none and the KG placed it on the dominant form (e.g. 'Alanine' on L-Alanine). ['as_reported'] drops assumed rows. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | limit | int | 5 | Max rows returned (paging). |
@@ -49,7 +50,7 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:met
 ## Response sketch
 
 ```expected-keys
-total_matching, by_detection_status, by_metric_bucket, by_assay, by_compartment, by_organism, by_metric, excluded_assays, warnings, resolved_aliases, not_found, returned, truncated, offset, results
+total_matching, by_detection_status, by_stereo_assignment, by_metric_bucket, by_assay, by_compartment, by_organism, by_metric, excluded_assays, warnings, resolved_aliases, not_found, returned, truncated, offset, results
 ```
 
 Result row: `metabolite_id, name, kegg_compound_id, value, value_sd, n_replicates, n_non_zero, metric_type, metric_bucket, metric_percentile, rank_by_metric, detection_status, …`
@@ -57,6 +58,23 @@ Result row: `metabolite_id, name, kegg_compound_id, value, value_sd, n_replicate
 ## Common mistakes
 
 - Numeric arm only (`Assay_quantifies_metabolite`). Siblings: `metabolites_by_flags_assay` is the boolean-arm twin (presence flags, no values); `assays_by_metabolite` is the metabolite-anchored reverse lookup over both arms.
+
+```mistake
+metabolites_by_quantifies_assay(assay_ids=[...])  # then citing an L-amino-acid row as 'the paper measured L-alanine'
+```
+
+```correction
+`stereo_assignment` on every row says who chose the stereo form:
+`as_reported` = the paper named it (or the compound has no stereo
+variant); `dominant_form_assumed` = the paper gave no form and the KG
+placed the row on one form of the stereo family (usually the one with
+the most catalysing genes — 'Alanine' lands on L-alanine
+`kegg.compound:C00041`). The envelope's `by_stereo_assignment` counts
+both over the matched set and a `warnings` entry fires when any row is
+assumed. Pass `stereo_assignment=['as_reported']` when the stereo form
+matters to the claim, or quote assumed rows as "L-form assumed".
+
+```
 
 ```mistake
 A requested assay_id silently disappears from the results and not_found.assay_ids stays empty.
@@ -67,16 +85,6 @@ A boolean assay_id is genuinely found (it exists as `value_kind='boolean'`)
 but this tool only drills numeric edges — it's excluded from
 `not_found.assay_ids` and reported via a `warnings` entry naming
 `metabolites_by_flags_assay` as the tool to use instead.
-
-```
-
-```mistake
-Filter out value=0 / flag_value=false rows assuming they are noise.
-```
-
-```correction
-These rows are tested-absent — the metabolite was assayed and not found.
-They are biology. Keep them unless explicitly investigating presence-only.
 
 ```
 

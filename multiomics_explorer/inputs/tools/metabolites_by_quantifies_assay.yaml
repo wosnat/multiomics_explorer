@@ -152,6 +152,14 @@ examples:
     # carries one row per assay. Useful for comparing intracellular pool
     # vs spent-media excretion in the same paper.
 
+  - title: Paper-stated stereo forms only — drop rows whose form the KG assumed
+    call: metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9313:relative_peak_area_biovolume_normalized"], stereo_assignment=["as_reported"], summary=True)
+    response: |
+      {
+        "total_matching": 49,
+        "by_stereo_assignment": [{"stereo_assignment": "as_reported", "count": 49}]
+      }
+
 verbose_fields:
   - assay_name
   - field_description
@@ -167,6 +175,17 @@ chaining:
 
 mistakes:
   - "Numeric arm only (`Assay_quantifies_metabolite`). Siblings: `metabolites_by_flags_assay` is the boolean-arm twin (presence flags, no values); `assays_by_metabolite` is the metabolite-anchored reverse lookup over both arms."
+  - wrong: "metabolites_by_quantifies_assay(assay_ids=[...])  # then citing an L-amino-acid row as 'the paper measured L-alanine'"
+    right: |
+      `stereo_assignment` on every row says who chose the stereo form:
+      `as_reported` = the paper named it (or the compound has no stereo
+      variant); `dominant_form_assumed` = the paper gave no form and the KG
+      placed the row on one form of the stereo family (usually the one with
+      the most catalysing genes — 'Alanine' lands on L-alanine
+      `kegg.compound:C00041`). The envelope's `by_stereo_assignment` counts
+      both over the matched set and a `warnings` entry fires when any row is
+      assumed. Pass `stereo_assignment=['as_reported']` when the stereo form
+      matters to the claim, or quote assumed rows as "L-form assumed".
   - wrong: "A requested assay_id silently disappears from the results and not_found.assay_ids stays empty."
     right: |
       A boolean assay_id is genuinely found (it exists as `value_kind='boolean'`)
@@ -190,8 +209,8 @@ mistakes:
       Tool soft-excludes non-rankable assays from mixed input (surfaces in
       envelope `excluded_assays` + `warnings`) and raises ValueError if every
       selected assay is non-rankable. `warnings` also carries metabolite-ID
-      collision notes when an ambiguous CHEBI / HMDB / MNXM input expanded to
-      several metabolites (see `resolved_aliases`).
+      notes (a removed compound or a chemical-role id in `metabolite_ids`) and
+      the assumed-stereo-form count (see `stereo_assignment`).
 
   - wrong: "Expect not_found to be a flat list[str]."
     right: |
@@ -237,16 +256,18 @@ mistakes:
 
   - wrong: "metabolites_by_quantifies_assay(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'"
     right: |
-      Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
-      the node's cross-references before the query runs: `C00064` →
-      `kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
-      `HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
-      (`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
-      inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
-      CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
-      ALL matching metabolites and appends a `warnings` entry; pass the canonical
-      id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
-      in the form you passed.
+      Metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are normalised and
+      looked up in every identifier the metabolite carries before the query runs:
+      `C00064` / `kegg.compound:c00064` → `kegg.compound:C00064`, `CHEBI:17234` /
+      `17234` → `chebi:17234`; `HMDB0000122`, `MNXM732398` and bare InChIKeys resolve
+      the same way. Retired ids of merged or re-keyed nodes resolve to the surviving
+      node (`chebi:14654` → nitrate `kegg.compound:C00244`). Every input that isn't
+      already canonical is listed in envelope `resolved_aliases`
+      (`{input: [canonical, ...]}`). A removed compound whose measurements moved to
+      another compound, and a chemical-role id (`chebi:10004`, 'vitamin (role)'),
+      stay verbatim in `not_found` with a `warnings` entry naming the replacement or
+      the role. Other unresolved inputs stay verbatim in `not_found` in the form you
+      passed.
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (about 70% of numeric edges are not_detected, kept by default)."
   - "`organism` here matches by case-insensitive CONTAINS, not the word-based match the gene tools use; cross-organism is the default."
   - "A `metabolite_ids` entry absent from the KG lands in `not_found.metabolite_ids`; one that exists but is unmeasured by the selected assays simply contributes zero rows."

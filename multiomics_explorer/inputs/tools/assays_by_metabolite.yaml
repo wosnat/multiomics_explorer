@@ -181,6 +181,14 @@ examples:
     # Useful for asking "what shows up in spent media?" without merging
     # the intracellular pool view.
 
+  - title: Assumed stereo form — every alanine measurement was placed on L-alanine by the KG
+    call: assays_by_metabolite(metabolite_ids=["kegg.compound:C00041"], summary=True)
+    response: |
+      {
+        "total_matching": 6,
+        "by_stereo_assignment": [{"stereo_assignment": "dominant_form_assumed", "count": 6}]
+      }
+
 verbose_fields:
   - assay_field_description
   - replicate_values
@@ -194,6 +202,17 @@ chaining:
 
 mistakes:
   - "Metabolite-anchored reverse lookup over BOTH arms. Siblings: `metabolites_by_quantifies_assay` (assay-anchored, numeric arm, rankable filters) and `metabolites_by_flags_assay` (assay-anchored, boolean arm) — drill back to them with the `assay_id`s found here."
+  - wrong: "assays_by_metabolite(metabolite_ids=['kegg.compound:C00041'])  # then reporting 'L-alanine was measured in 6 assays'"
+    right: |
+      `stereo_assignment` on every row (both arms) says who chose the stereo form:
+      `as_reported` = the paper named it (or the compound has no stereo
+      variant); `dominant_form_assumed` = the paper gave no form and the KG
+      placed the row on one form of the stereo family (usually the one with
+      the most catalysing genes — 'Alanine' lands on L-alanine
+      `kegg.compound:C00041`). The envelope's `by_stereo_assignment` counts
+      both over the matched set and a `warnings` entry fires when any row is
+      assumed. Pass `stereo_assignment=['as_reported']` when the stereo form
+      matters to the claim, or quote assumed rows as "L-form assumed".
   - wrong: "Filter out value=0 / flag_value=false rows assuming they are noise."
     right: |
       These rows are tested-absent — the metabolite was assayed and not found.
@@ -257,15 +276,17 @@ mistakes:
 
   - wrong: "assays_by_metabolite(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'"
     right: |
-      Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
-      the node's cross-references before the query runs: `C00064` →
-      `kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
-      `HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
-      (`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
-      inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
-      CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
-      ALL matching metabolites and appends a `warnings` entry; pass the canonical
-      id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
-      in the form you passed.
+      Metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are normalised and
+      looked up in every identifier the metabolite carries before the query runs:
+      `C00064` / `kegg.compound:c00064` → `kegg.compound:C00064`, `CHEBI:17234` /
+      `17234` → `chebi:17234`; `HMDB0000122`, `MNXM732398` and bare InChIKeys resolve
+      the same way. Retired ids of merged or re-keyed nodes resolve to the surviving
+      node (`chebi:14654` → nitrate `kegg.compound:C00244`). Every input that isn't
+      already canonical is listed in envelope `resolved_aliases`
+      (`{input: [canonical, ...]}`). A removed compound whose measurements moved to
+      another compound, and a chemical-role id (`chebi:10004`, 'vitamin (role)'),
+      stay verbatim in `not_found` with a `warnings` entry naming the replacement or
+      the role. Other unresolved inputs stay verbatim in `not_found` in the form you
+      passed.
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for the not_found vs not_matched convention across batch tools."
   - "`organism` here matches by case-insensitive CONTAINS, not the word-based match the gene tools use; cross-organism is the default."

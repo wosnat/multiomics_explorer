@@ -3504,7 +3504,11 @@
      "table_scope",
      "detection_status",
      "expression_status",
-     "partner_role"
+     "partner_role",
+     "structure_kind",
+     "kegg_functional_category",
+     "kegg_brite_class",
+     "stereo_assignment"
     ],
     "type": "string"
    }

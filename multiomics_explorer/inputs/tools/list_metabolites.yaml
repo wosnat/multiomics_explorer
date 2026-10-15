@@ -15,6 +15,35 @@ examples:
   - title: Lucene search by name
     call: list_metabolites(search_text="glucose", limit=3)
 
+  - title: Retired id — resolves to the surviving node and shows in resolved_aliases
+    call: list_metabolites(metabolite_ids=["chebi:14654"])
+    response: |
+      {
+        "total_matching": 1,
+        "resolved_aliases": {"chebi:14654": ["kegg.compound:C00244"]}
+      }
+
+  - title: Generic classes and polymers — what is not a single molecule
+    call: list_metabolites(structure_kind=["generic"], summary=True)
+    response: |
+      {
+        "total_matching": 624
+      }
+
+  - title: KEGG functional category — describe, don't exclude (read the "not classified" tail)
+    call: list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
+    response: |
+      {
+        "total_matching": 60
+      }
+
+  - title: KEGG BRITE class — top-level class of one of the 7 other compound trees
+    call: 'list_metabolites(kegg_brite_classes=["Lipids: Fatty acyls"], limit=3)'
+    response: |
+      {
+        "total_matching": 254
+      }
+
   - title: Transport-only metabolites (TCDB substrates without local catalysis)
     call: list_metabolites(evidence_sources=["transport"], summary=True)
 
@@ -176,6 +205,7 @@ chaining:
   - "list_metabolites (per-row `transporter_gene_count > 0`) → genes_by_metabolite(metabolite_ids=[...], organism=..., evidence_sources=['transport']) — distinct genes in the transport rows, summed over organisms, equal transporter_gene_count"
   - "list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)"
   - "differential_expression_by_gene → metabolites_by_gene(metabolite_elements=['N']) → list_metabolites for chemistry context"
+  - "list_metabolites (per-row `kegg_brite_classes`, top level only) → run_cypher over `MetaboliteClass` for the deeper KEGG compound classes (docs://analysis/metabolites)"
   - "list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(metabolite_ids=[...]) — reverse lookup of all measurement evidence (numeric + boolean) for the measured compounds (cross-organism by default)."
 
 mistakes:
@@ -196,6 +226,18 @@ mistakes:
       `Fe`) for the ~12 elements this KG's chemistry layer carries. An
       unrecognized element (not a known symbol or full name) is dropped from
       the filter, reported in `not_found.elements`, and adds a `warnings` entry.
+  - wrong: "list_metabolites(kegg_functional_categories=['Organic acids'])  # read as 'all organic acids'; anything missing is not one"
+    right: |
+      `kegg_functional_categories` (KEGG br08001) and `kegg_brite_classes` (KEGG's 7 other
+      compound trees) are hand-curated lists of representative compounds, not a full
+      classification: ~10% of metabolites carry a functional category and ~20% a BRITE
+      class. A missing value means "KEGG did not list it", not "not in it" — fumarate is an
+      organic acid with no category. The headings are functional (amines sit under
+      Peptides). Use them to describe or group results, never to exclude; for enrichment
+      use the classified metabolites as background; for composition use `elements`. The
+      envelope's trailing `"not classified"` entry counts the unlisted metabolites; it is
+      not a filter value. Details: docs://analysis/metabolites.
+  - "`structure_kind` separates single molecules (`defined`) from classes and polymers (`generic` / `polymer`, e.g. 'Amino acid', 'Acyl-CoA', glycogen). Generic and polymer nodes have no `mass` and carry generic formulas with a placeholder ('Amino acid' is `C2H4NO2*`), whose atoms still feed the `elements` filter — add `structure_kind=['defined']` when a question is about specific molecules."
   - "evidence_sources='metabolomics' selects metabolites measured by a MetaboliteAssay. Drill in via list_metabolite_assays(metabolite_ids=[...]) or assays_by_metabolite to inspect the measurement evidence."
   - "Same metabolite measured in both whole_cell and extracellular returns one row with `measured_compartments=['extracellular','whole_cell']` (sorted), not two rows — Metabolite is compartment-agnostic."
   - "When a roster is dominated by ATP / ADP / NADH / NADPH / H2O (currency cofactors that every organism reaches), pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip them — the same list works on the gene-anchored `metabolites_by_gene`, whose `top_metabolites` rollup is where the noise usually shows first. KG namespace is `kegg.compound:` (not `chebi:`)."
@@ -205,14 +247,16 @@ mistakes:
     right: "list_metabolites(organism_names=['Prochlorococcus MED4'])  # full preferred_name"
   - wrong: "list_metabolites(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'"
     right: |
-      Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
-      the node's cross-references before the query runs: `C00064` →
-      `kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
-      `HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
-      (`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
-      inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
-      CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
-      ALL matching metabolites and appends a `warnings` entry; pass the canonical
-      id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
-      in the form you passed. The dedicated exact-xref filters (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`) are a separate, uncoerced mechanism — they match the xref property directly.
+      Metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are normalised and
+      looked up in every identifier the metabolite carries before the query runs:
+      `C00064` / `kegg.compound:c00064` → `kegg.compound:C00064`, `CHEBI:17234` /
+      `17234` → `chebi:17234`; `HMDB0000122`, `MNXM732398` and bare InChIKeys resolve
+      the same way. Retired ids of merged or re-keyed nodes resolve to the surviving
+      node (`chebi:14654` → nitrate `kegg.compound:C00244`). Every input that isn't
+      already canonical is listed in envelope `resolved_aliases`
+      (`{input: [canonical, ...]}`). A removed compound whose measurements moved to
+      another compound, and a chemical-role id (`chebi:10004`, 'vitamin (role)'),
+      stay verbatim in `not_found` with a `warnings` entry naming the replacement or
+      the role. Other unresolved inputs stay verbatim in `not_found` in the form you
+      passed. The xref filters (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`) normalise each value the same way and match any of the metabolite's identifiers, including secondary and retired ones; they are filters, so they add nothing to `resolved_aliases`.
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/concepts` for the chemistry layer overview."

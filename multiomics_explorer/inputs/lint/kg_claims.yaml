@@ -297,3 +297,57 @@
   used_in:
     - multiomics_explorer/inputs/tools/gene_neighbors.yaml
   note: "gene_neighbors fragmentation exemplars (docs-review 2026-09-15): MarRef v6 has 573 contigs; HOT1A3 is closed (chromosome + plasmid)"
+
+- id: metabolite_kegg_functional_category_coverage
+  cypher: >
+    MATCH (m:Metabolite)
+    RETURN count(m) AS metabolites,
+           sum(CASE WHEN size(coalesce(m.kegg_functional_categories, [])) > 0 THEN 1 ELSE 0 END)
+             AS with_functional_category
+  expect: {metabolites: 3214, with_functional_category: 334}
+  tolerance: {rel: 0.05}
+  used_in:
+    - multiomics_explorer/mcp_server/tools.py
+    - multiomics_explorer/api/functions.py
+    - multiomics_explorer/inputs/tools/list_metabolites.yaml
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
+  note: >
+    KEGG br08001 functional categories are partial: 334 of 3,214 metabolites carry one
+    (docs: '~10% listed' / 'absent for ~90%'). Fails ⇒ rewrite the coverage figure in the
+    kegg_functional_categories descriptions and the KEGG-categories subsection.
+
+- id: metabolite_kegg_brite_class_coverage
+  cypher: >
+    MATCH (m:Metabolite)
+    RETURN count(m) AS metabolites,
+           sum(CASE WHEN size(coalesce(m.kegg_brite_classes, [])) > 0 THEN 1 ELSE 0 END)
+             AS with_brite_class,
+           sum(CASE WHEN size(coalesce(m.kegg_functional_categories, []))
+                       + size(coalesce(m.kegg_brite_classes, [])) > 0 THEN 1 ELSE 0 END)
+             AS with_either
+  expect: {metabolites: 3214, with_brite_class: 652, with_either: 883}
+  tolerance: {rel: 0.05}
+  used_in:
+    - multiomics_explorer/mcp_server/tools.py
+    - multiomics_explorer/api/functions.py
+    - multiomics_explorer/inputs/tools/list_metabolites.yaml
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
+  note: >
+    KEGG compound BRITE classes (7 trees other than br08001): 652 of 3,214 metabolites
+    (docs: '~20%' / 'absent for ~80%'); 883 (~27%) carry either field.
+
+- id: metabolite_kegg_classification_catalysed
+  cypher: >
+    MATCH (m:Metabolite) WHERE coalesce(m.catalyst_gene_count, 0) > 0
+    WITH size(coalesce(m.kegg_functional_categories, [])) > 0 AS f,
+         size(coalesce(m.kegg_brite_classes, [])) > 0 AS b
+    RETURN count(*) AS catalysed,
+           sum(CASE WHEN NOT f THEN 1 ELSE 0 END) AS catalysed_without_category,
+           sum(CASE WHEN f OR b THEN 1 ELSE 0 END) AS catalysed_with_either
+  expect: {catalysed: 2221, catalysed_without_category: 1974, catalysed_with_either: 687}
+  tolerance: {rel: 0.05}
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
+  note: >
+    Of metabolites with catalyst genes, 1,974 have no functional category and 687 have
+    either KEGG classification field (KEGG-categories subsection of analysis/metabolites.md).

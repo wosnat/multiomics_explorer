@@ -355,15 +355,15 @@ exclusions in `excluded_assays`).
 
 ## Chemistry conventions
 
-The chemistry / metabolomics surface (`list_metabolites`,
-`genes_by_metabolite`, `metabolites_by_gene`, and the four metabolomics
-tools) has three cross-cutting conventions: a three-level transport trust
+Chemistry / metabolomics tools share three conventions: a transport trust
 ladder (`tcdb_evidence_score` → `transport_substrate_resolution` →
-`substrate_depth`) for TCDB-derived substrate calls, permanent
-direction-agnosticism on KEGG reaction joins, and a bare/xref coercion
-scheme for `metabolite_ids` (bare KEGG, `CHEBI:`, `HMDB`, `MNXM` all
-resolve to the canonical `kegg.compound:` / `chebi:` / `mnx:` form). Full
-detail: `docs://analysis/metabolites`.
+`substrate_depth`), undirected KEGG reaction joins, and id resolution on
+`metabolite_ids`: inputs are normalised, then looked up in
+`Metabolite.all_identifiers`, so retired ids resolve (listed in
+`resolved_aliases`); removed compounds and role ids warn.
+`Metabolite.all_identifiers` holds CURIEs (`chebi:14654`);
+`Gene.all_identifiers` holds bare ids (`Q7V3R7`). Detail:
+`docs://analysis/metabolites`.
 
 ## Ontology term / ortholog-group ID forms
 

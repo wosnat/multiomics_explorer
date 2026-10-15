@@ -126,14 +126,14 @@ PublicationDoisParam = Annotated[list[str] | None, Field(description=_PUBLICATIO
 
 PublicationDoisRequiredParam = Annotated[list[str], Field(description=_PUBLICATION_DOIS_DESC)]
 
-_METABOLITE_IDS_DESC = "Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites)."
+_METABOLITE_IDS_DESC = "Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolites."
 
 MetaboliteIdsParam = Annotated[list[str] | None, Field(description=_METABOLITE_IDS_DESC)]
 
 MetaboliteIdsRequiredParam = Annotated[list[str], Field(description=_METABOLITE_IDS_DESC)]
 
 ExcludeMetaboliteIdsParam = Annotated[list[str] | None, Field(
-    description="Drop these metabolites; bare/xref forms coerced (see resolved_aliases); exclude wins on overlap.",
+    description="Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap.",
 )]
 
 InformativeOnlyParam = Annotated[bool, Field(

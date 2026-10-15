@@ -24,8 +24,8 @@ docs://tools/list_metabolite_assays; summary=True first.
 | publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | experiment_ids | list[string] \| None | None | Experiment node id(s). |
 | assay_ids | list[string] \| None | None | MetaboliteAssay id(s). `not_found.assay_ids` lists unknowns. |
-| metabolite_ids | list[string] \| None | None | Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites). |
-| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; bare/xref forms coerced (see resolved_aliases); exclude wins on overlap. |
+| metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolites. |
+| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
 | rankable | bool \| None | None | True → assays supporting rank/percentile/bucket on metabolites_by_quantifies_assay's rankable-gated filters. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
@@ -59,7 +59,7 @@ total_entries, total_matching, metabolite_count_total, by_organism, by_value_kin
 - **offset** (int): Pagination offset used
 - **truncated** (bool): True when total_matching > returned
 - **not_found** (LmaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_doi — bucket key is singular `publication_doi` regardless of the `publication_dois` input filter name).
-- **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
+- **resolved_aliases** (object): Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.
 - **warnings** (list[string]): Diagnostic strings, e.g. a bare metabolite ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow), a closed-vocabulary filter value (compartment / treatment_type / background_factors / growth_phases) not found in the live vocabulary, or an organism that matches no OrganismTaxon.
 
 ### Per-result fields
@@ -239,16 +239,18 @@ list_metabolite_assays(metabolite_ids=['C00064'])  # then treating `C00064` in `
 ```
 
 ```correction
-Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
-the node's cross-references before the query runs: `C00064` →
-`kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
-`HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
-(`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
-inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
-CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
-ALL matching metabolites and appends a `warnings` entry; pass the canonical
-id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
-in the form you passed.
+Metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are normalised and
+looked up in every identifier the metabolite carries before the query runs:
+`C00064` / `kegg.compound:c00064` → `kegg.compound:C00064`, `CHEBI:17234` /
+`17234` → `chebi:17234`; `HMDB0000122`, `MNXM732398` and bare InChIKeys resolve
+the same way. Retired ids of merged or re-keyed nodes resolve to the surviving
+node (`chebi:14654` → nitrate `kegg.compound:C00244`). Every input that isn't
+already canonical is listed in envelope `resolved_aliases`
+(`{input: [canonical, ...]}`). A removed compound whose measurements moved to
+another compound, and a chemical-role id (`chebi:10004`, 'vitamin (role)'),
+stay verbatim in `not_found` with a `warnings` entry naming the replacement or
+the role. Other unresolved inputs stay verbatim in `not_found` in the form you
+passed.
 
 ```
 

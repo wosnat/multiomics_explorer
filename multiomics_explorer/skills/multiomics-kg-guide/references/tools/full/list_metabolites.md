@@ -14,18 +14,21 @@ docs://tools/list_metabolites; summary=True first.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string \| None | None | Free-text search on metabolite name (Lucene syntax). Index covers Metabolite.name only — element/formula composition is filtered through `elements` (presence list), not search. E.g. 'glucose', 'phosphate AND amino'. |
-| metabolite_ids | list[string] \| None | None | Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites). |
-| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; bare/xref forms coerced (see resolved_aliases); exclude wins on overlap. |
-| kegg_compound_ids | list[string] \| None | None | Filter by raw KEGG C-numbers (e.g. ['C00031']). Convenience over `metabolite_ids` when working with KEGG-anchored data; the prefixed equivalent is `kegg.compound:C*`. |
-| chebi_ids | list[string] \| None | None | Filter by raw ChEBI numeric IDs (e.g. ['4167', '15422']). 90% of Metabolite nodes carry a `chebi_id`. |
-| hmdb_ids | list[string] \| None | None | Filter by raw HMDB IDs (e.g. ['HMDB0000122']). 47% coverage. |
-| mnxm_ids | list[string] \| None | None | Filter by raw MetaNetX IDs (e.g. ['MNXM1364061']). 100% coverage — every Metabolite has a `mnxm_id`. |
+| metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolites. |
+| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
+| kegg_compound_ids | list[string] \| None | None | KEGG compound ids, bare or prefixed (e.g. ['C00031']). Matches any of the metabolite's identifiers, including secondary and retired ones, so a merged compound's old KEGG id still finds it. |
+| chebi_ids | list[string] \| None | None | ChEBI ids, bare digits or 'CHEBI:' form (e.g. ['4167', 'CHEBI:15422']). Matches any of the metabolite's identifiers, including secondary and retired ones. |
+| hmdb_ids | list[string] \| None | None | HMDB ids (e.g. ['HMDB0000122']; short 'HMDB02878' is padded). Matches any of the metabolite's identifiers, including secondary and retired ones. |
+| mnxm_ids | list[string] \| None | None | MetaNetX ids (e.g. ['MNXM1364061']). Matches any of the metabolite's identifiers, including secondary and retired ones. |
 | elements | list[string] \| None | None | Element-presence filter (Hill-notation symbols, e.g. 'Fe', 'N'). AND of presence — ['N', 'P'] matches metabolites containing BOTH. A case-insensitive symbol ('n', 'fe') or a full element name ('Nitrogen') for one of the ~12 elements this KG's chemistry layer carries (C, H, N, O, P, S, Fe, Mg, Mn, Zn, Cu, Co, Mo, Ni, Se) is normalized silently; anything else is dropped from the filter and reported in `not_found.elements` with a warning. Use this rather than substring-matching on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Empty/null formula metabolites never match. |
 | min_mass | float \| None | None | Minimum monoisotopic mass (Da). Excludes metabolites with null `mass` (~22%). E.g. 60.0. |
 | max_mass | float \| None | None | Maximum monoisotopic mass (Da). E.g. 1000.0. |
 | organism_names | list[string] \| None | None | Restrict to metabolites reachable by these organisms (case-insensitive on `preferred_name`). UNION semantics — a metabolite reached by ANY listed organism qualifies. Joined via `Organism_has_metabolite` (catalysis OR transport). E.g. ['Prochlorococcus MED4']. `not_found.organism_names` lists any unknown names. |
 | pathway_ids | list[string] \| None | None | Filter by KEGG pathway membership (`KeggTerm.id`). E.g. ['kegg.pathway:ko00910'] for nitrogen metabolism. Joined via `Metabolite_in_pathway`. `not_found.pathway_ids` lists unknown IDs. |
 | evidence_sources | list[string ('metabolism', 'transport', 'metabolomics')] \| None | None | Filter by evidence path. Set-membership ANY semantics — ['transport'] returns transport-only AND dual. Valid values: 'metabolism' (catalysis-reachable), 'transport' (TCDB-curated substrate), 'metabolomics' (measured by a MetaboliteAssay). Other values raise at the MCP boundary. |
+| structure_kind | list[string] \| None | None | Structure kind(s) (OR): 'defined' (one molecule), 'generic' (a compound class) or 'polymer'. E.g. ['defined'] drops generic substrates like 'amino acid'. Values: list_filter_values('structure_kind'). |
+| kegg_functional_categories | list[string] \| None | None | KEGG br08001 categories (OR). Hand-curated and partial: only ~10% of metabolites are listed, so a missing category means 'KEGG did not list it', not 'not in it' (fumarate is unclassified). Values: list_filter_values('kegg_functional_category'). |
+| kegg_brite_classes | list[string] \| None | None | Classes from 7 other KEGG compound BRITE trees, as 'Tree: Class' (OR), e.g. 'Lipids: Fatty acyls'. Curated and partial (~20% of metabolites): unlisted = 'KEGG did not list it', not 'not in it'. Values: list_filter_values('kegg_brite_class'). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | limit | int | 5 | Max rows returned (paging). |
@@ -36,7 +39,7 @@ docs://tools/list_metabolites; summary=True first.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, returned, offset, truncated, not_found, resolved_aliases, warnings, results
+total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, by_structure_kind, by_kegg_functional_category, by_kegg_brite_class, score_max, score_median, returned, offset, truncated, not_found, resolved_aliases, warnings, results
 ```
 
 - **total_entries** (int): Total Metabolite nodes in KG (unfiltered).
@@ -47,14 +50,17 @@ total_entries, total_matching, top_organisms, top_metabolite_pathways, by_eviden
 - **xref_coverage** (MetXrefCoverage): Cross-ref ID coverage within matched set.
 - **mass_stats** (MetMassStats): Mass distribution within matched set.
 - **by_measurement_coverage** (MetMeasurementCoverage): Metabolomics measurement coverage rollup across matched metabolites. Two sub-rollups: by_paper_count (frequency by measured_paper_count value) + by_compartment (frequency by measured_compartments value).
+- **by_structure_kind** (list[MetStructureKindBucket]): Matched metabolites per structure_kind ('defined' / 'generic' / 'polymer'), sorted desc.
+- **by_kegg_functional_category** (list[MetKeggFunctionalCategoryBucket]): Matched metabolites per KEGG br08001 category, sorted desc, always ending with 'not classified' (KEGG did not list them; not a filter value). Unlisted is not 'in none of these'.
+- **by_kegg_brite_class** (list[MetKeggBriteClassBucket]): Matched metabolites per 'Tree: Class' from 7 KEGG compound BRITE trees, sorted desc, always ending with 'not classified' (KEGG did not list them; not a filter value).
 - **score_max** (float | None): Max Lucene score (only with `search_text`).
 - **score_median** (float | None): Median Lucene score (only with `search_text`).
 - **returned** (int): Metabolites in this response.
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.
 - **not_found** (MetNotFound): Per-filter buckets for unknown input IDs.
-- **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
-- **warnings** (list[string]): Diagnostic strings, e.g. a bare ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow), a `metabolite_ids` / `exclude_metabolite_ids` entry matching no recognized id pattern at all (likely a NAME — resolve it with `search_text` instead), or an `elements` entry that isn't a recognized symbol or name (see `not_found.elements`).
+- **resolved_aliases** (object): Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.
+- **warnings** (list[string]): Diagnostics: a removed compound (names the id now holding its measurements), a chemical role rather than a metabolite, an id-shaped NAME (use `search_text`), an unknown vocabulary value, or an unrecognized `elements` entry.
 - **no_formula_excluded** (int | None): Metabolites passing every other filter but dropped by `elements` because they have no formula (generic classes like 'amino acid' never match an element filter). Null when no `elements` filter.
 
 ### Per-result fields
@@ -79,6 +85,9 @@ total_entries, total_matching, top_organisms, top_metabolite_pathways, by_eviden
 | measured_organisms | list[string] (optional) | Organism preferred_names with at least one MetaboliteAssay anchored to this metabolite. Populated when measured_assay_count > 0; [] otherwise. |
 | measured_compartments | list[string] (optional) | Wet-lab compartments observed for this metabolite (subset of {'whole_cell', 'extracellular', 'vesicle'}). Empty on unmeasured metabolites — use len(measured_compartments) >= 1 to filter for measurement-anchored rows. |
 | score | float \| None (optional) | Lucene relevance score (only with `search_text`). |
+| structure_kind | string \| None (optional) | 'defined' (one molecule), 'generic' (a compound class, e.g. 'amino acid') or 'polymer'. Generic and polymer entries have no formula-level chemistry. Values: list_filter_values('structure_kind'). |
+| kegg_functional_categories | list[string] \| None (optional) | KEGG br08001 categories this metabolite is listed under. Absent = KEGG did not list it (~90% of metabolites), not 'none apply'. Curated, functional headings (amines sit under Peptides). |
+| kegg_brite_classes | list[string] \| None (optional) | 'Tree: Class' from 7 KEGG compound BRITE trees (lipids, phytochemicals, glycosides, pesticides, toxins, endocrine disruptors, bioactive peptides). Absent = KEGG did not list it (~80% of metabolites). |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -116,13 +125,62 @@ list_metabolites(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii 
 list_metabolites(search_text="glucose", limit=3)
 ```
 
-### Example 5: Transport-only metabolites (TCDB substrates without local catalysis)
+### Example 5: Retired id — resolves to the surviving node and shows in resolved_aliases
+
+```example-call
+list_metabolites(metabolite_ids=["chebi:14654"])
+```
+
+```example-response
+{
+  "total_matching": 1,
+  "resolved_aliases": {"chebi:14654": ["kegg.compound:C00244"]}
+}
+```
+
+### Example 6: Generic classes and polymers — what is not a single molecule
+
+```example-call
+list_metabolites(structure_kind=["generic"], summary=True)
+```
+
+```example-response
+{
+  "total_matching": 624
+}
+```
+
+### Example 7: KEGG functional category — describe, don't exclude (read the "not classified" tail)
+
+```example-call
+list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
+```
+
+```example-response
+{
+  "total_matching": 60
+}
+```
+
+### Example 8: KEGG BRITE class — top-level class of one of the 7 other compound trees
+
+```example-call
+list_metabolites(kegg_brite_classes=["Lipids: Fatty acyls"], limit=3)
+```
+
+```example-response
+{
+  "total_matching": 254
+}
+```
+
+### Example 9: Transport-only metabolites (TCDB substrates without local catalysis)
 
 ```example-call
 list_metabolites(evidence_sources=["transport"], summary=True)
 ```
 
-### Example 6: Transport-only metabolite by ID — reading the two gene counts together
+### Example 10: Transport-only metabolite by ID — reading the two gene counts together
 
 ```example-call
 list_metabolites(metabolite_ids=["chebi:17234"])
@@ -178,7 +236,7 @@ list_metabolites(metabolite_ids=["chebi:17234"])
 }
 ```
 
-### Example 7: Measured metabolites — measurement coverage envelope
+### Example 11: Measured metabolites — measurement coverage envelope
 
 ```example-call
 list_metabolites(evidence_sources=["metabolomics"], summary=True)
@@ -252,7 +310,7 @@ list_metabolites(evidence_sources=["metabolomics"], summary=True)
 }
 ```
 
-### Example 8: Multi-step — find N-metabolites then drill into catalysts
+### Example 12: Multi-step — find N-metabolites then drill into catalysts
 
 ```
 Step 1: list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"], limit=10)
@@ -262,7 +320,7 @@ Step 2: genes_by_metabolite(metabolite_ids=[chosen_ids], organism="Prochlorococc
         → catalysing genes per metabolite
 ```
 
-### Example 9: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O when top_metabolites is dominated by them
+### Example 13: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O when top_metabolites is dominated by them
 
 ```example-call
 list_metabolites(
@@ -287,6 +345,7 @@ list_metabolites → genes_by_metabolite(metabolite_ids=[...], organism=...)
 list_metabolites (per-row `transporter_gene_count > 0`) → genes_by_metabolite(metabolite_ids=[...], organism=..., evidence_sources=['transport']) — distinct genes in the transport rows, summed over organisms, equal transporter_gene_count
 list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)
 differential_expression_by_gene → metabolites_by_gene(metabolite_elements=['N']) → list_metabolites for chemistry context
+list_metabolites (per-row `kegg_brite_classes`, top level only) → run_cypher over `MetaboliteClass` for the deeper KEGG compound classes (docs://analysis/metabolites)
 list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(metabolite_ids=[...]) — reverse lookup of all measurement evidence (numeric + boolean) for the measured compounds (cross-organism by default).
 ```
 
@@ -326,6 +385,25 @@ the filter, reported in `not_found.elements`, and adds a `warnings` entry.
 
 ```
 
+```mistake
+list_metabolites(kegg_functional_categories=['Organic acids'])  # read as 'all organic acids'; anything missing is not one
+```
+
+```correction
+`kegg_functional_categories` (KEGG br08001) and `kegg_brite_classes` (KEGG's 7 other
+compound trees) are hand-curated lists of representative compounds, not a full
+classification: ~10% of metabolites carry a functional category and ~20% a BRITE
+class. A missing value means "KEGG did not list it", not "not in it" — fumarate is an
+organic acid with no category. The headings are functional (amines sit under
+Peptides). Use them to describe or group results, never to exclude; for enrichment
+use the classified metabolites as background; for composition use `elements`. The
+envelope's trailing `"not classified"` entry counts the unlisted metabolites; it is
+not a filter value. Details: docs://analysis/metabolites.
+
+```
+
+- `structure_kind` separates single molecules (`defined`) from classes and polymers (`generic` / `polymer`, e.g. 'Amino acid', 'Acyl-CoA', glycogen). Generic and polymer nodes have no `mass` and carry generic formulas with a placeholder ('Amino acid' is `C2H4NO2*`), whose atoms still feed the `elements` filter — add `structure_kind=['defined']` when a question is about specific molecules.
+
 - evidence_sources='metabolomics' selects metabolites measured by a MetaboliteAssay. Drill in via list_metabolite_assays(metabolite_ids=[...]) or assays_by_metabolite to inspect the measurement evidence.
 
 - Same metabolite measured in both whole_cell and extracellular returns one row with `measured_compartments=['extracellular','whole_cell']` (sorted), not two rows — Metabolite is compartment-agnostic.
@@ -353,16 +431,18 @@ list_metabolites(metabolite_ids=['C00064'])  # then treating `C00064` in `not_fo
 ```
 
 ```correction
-Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
-the node's cross-references before the query runs: `C00064` →
-`kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
-`HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
-(`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
-inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
-CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
-ALL matching metabolites and appends a `warnings` entry; pass the canonical
-id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
-in the form you passed. The dedicated exact-xref filters (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`) are a separate, uncoerced mechanism — they match the xref property directly.
+Metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are normalised and
+looked up in every identifier the metabolite carries before the query runs:
+`C00064` / `kegg.compound:c00064` → `kegg.compound:C00064`, `CHEBI:17234` /
+`17234` → `chebi:17234`; `HMDB0000122`, `MNXM732398` and bare InChIKeys resolve
+the same way. Retired ids of merged or re-keyed nodes resolve to the surviving
+node (`chebi:14654` → nitrate `kegg.compound:C00244`). Every input that isn't
+already canonical is listed in envelope `resolved_aliases`
+(`{input: [canonical, ...]}`). A removed compound whose measurements moved to
+another compound, and a chemical-role id (`chebi:10004`, 'vitamin (role)'),
+stay verbatim in `not_found` with a `warnings` entry naming the replacement or
+the role. Other unresolved inputs stay verbatim in `not_found` in the form you
+passed. The xref filters (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`) normalise each value the same way and match any of the metabolite's identifiers, including secondary and retired ones; they are filters, so they add nothing to `resolved_aliases`.
 
 ```
 
@@ -374,7 +454,7 @@ in the form you passed. The dedicated exact-xref filters (`kegg_compound_ids`, `
 from multiomics_explorer import list_metabolites
 
 result = list_metabolites()
-# returns dict with keys: total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, score_max, score_median, returned, offset, truncated, not_found, resolved_aliases, warnings, no_formula_excluded, results
+# returns dict with keys: total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, by_structure_kind, by_kegg_functional_category, by_kegg_brite_class, score_max, score_median, returned, offset, truncated, not_found, resolved_aliases, warnings, no_formula_excluded, results
 ```
 
 Use package import for bulk data extraction in scripts.

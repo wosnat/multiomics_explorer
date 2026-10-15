@@ -13,7 +13,7 @@ docs://tools/list_filter_values.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment', 'omics_type', 'evidence_source', 'evidence', 'sources', 'call_class', 'interpro_type', 'ncbifam_family_type', 'merops_catalytic_type', 'merops_family_class', 'best_hit_kind', 'pfam_support', 'attachment_depth', 'trust_axes', 'link_kinds', 'cluster_type', 'treatment_type', 'background_factors', 'table_scope', 'detection_status', 'expression_status', 'partner_role') | gene_category | Which filter to enumerate — gene/expression (incl. cluster_type, expression_status), DerivedMetric (incl. table_scope), chemistry (incl. detection_status), experiment (treatment_type, background_factors, partner_role), or a trust vocabulary. |
+| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment', 'omics_type', 'evidence_source', 'evidence', 'sources', 'call_class', 'interpro_type', 'ncbifam_family_type', 'merops_catalytic_type', 'merops_family_class', 'best_hit_kind', 'pfam_support', 'attachment_depth', 'trust_axes', 'link_kinds', 'cluster_type', 'treatment_type', 'background_factors', 'table_scope', 'detection_status', 'expression_status', 'partner_role', 'structure_kind', 'kegg_functional_category', 'kegg_brite_class', 'stereo_assignment') | gene_category | Which filter to enumerate: gene/expression (incl. cluster_type), DerivedMetric, chemistry (detection_status, structure_kind, kegg_functional_category, kegg_brite_class, stereo_assignment), experiment (incl. partner_role) or a trust vocabulary. |
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') \| None | None | Scope a trust filter_type (e.g. 'trust_axes') to one ontology key. Ignored on non-trust filter types. |
 
 ## Response format
@@ -55,7 +55,11 @@ edge). DerivedMetric: `metric_type`, `value_kind`
 (`numeric` / `boolean` / `categorical`), `compartment` (wet-lab
 fraction), `table_scope` (Experiment.table_scope). Chemistry:
 `evidence_source` (Metabolite.evidence_sources values),
-`detection_status` (the `Assay_quantifies_metabolite` edge).
+`structure_kind`, `kegg_functional_category` (KEGG br08001) and
+`kegg_brite_class` (the 7 other KEGG compound trees; no per-value
+descriptions, tree codes in the envelope `description`) on Metabolite,
+`detection_status` (the `Assay_quantifies_metabolite` edge) and
+`stereo_assignment` (both metabolomics assay edges).
 Coculture: `partner_role` (`Tests_coculture_with` edge; feeds
 `list_experiments(coculture_role=...)`).
 Annotation-trust: `evidence`, `sources`, `call_class`,
@@ -277,7 +281,59 @@ list_filter_values(filter_type="evidence_source")
 }
 ```
 
-### Example 11: Enumerate the trust ladder (annotation-trust `evidence` axis)
+### Example 11: Metabolite structure kinds (molecule vs class vs polymer, for list_metabolites(structure_kind=...))
+
+```example-call
+list_filter_values(filter_type="structure_kind")
+```
+
+```example-response
+{
+  "filter_type": "structure_kind",
+  "total_entries": 3
+}
+```
+
+### Example 12: KEGG functional categories (br08001, partial — for list_metabolites(kegg_functional_categories=...))
+
+```example-call
+list_filter_values(filter_type="kegg_functional_category")
+```
+
+```example-response
+{
+  "filter_type": "kegg_functional_category",
+  "total_entries": 9
+}
+```
+
+### Example 13: KEGG compound BRITE classes ('Tree: Class', tree codes in the envelope description)
+
+```example-call
+list_filter_values(filter_type="kegg_brite_class")
+```
+
+```example-response
+{
+  "filter_type": "kegg_brite_class",
+  "total_entries": 28
+}
+```
+
+### Example 14: Stereo assignment on metabolomics edges (for the assay drill-downs' stereo_assignment filter)
+
+```example-call
+list_filter_values(filter_type="stereo_assignment")
+```
+
+```example-response
+{
+  "filter_type": "stereo_assignment",
+  "total_entries": 2
+}
+```
+
+### Example 15: Enumerate the trust ladder (annotation-trust `evidence` axis)
 
 ```example-call
 list_filter_values(filter_type="evidence")
@@ -334,7 +390,7 @@ list_filter_values(filter_type="evidence")
 }
 ```
 
-### Example 12: Discover which trust axes an ontology supports
+### Example 16: Discover which trust axes an ontology supports
 
 ```example-call
 list_filter_values(filter_type="trust_axes", ontology="tcdb")
@@ -372,7 +428,7 @@ list_filter_values(filter_type="trust_axes", ontology="tcdb")
 }
 ```
 
-### Example 13: Enumerate MEROPS call_class values
+### Example 17: Enumerate MEROPS call_class values
 
 ```example-call
 list_filter_values(filter_type="call_class")
@@ -409,7 +465,7 @@ list_filter_values(filter_type="call_class")
 }
 ```
 
-### Example 14: Enumerate InterPro types (for the interpro_type facet/filter)
+### Example 18: Enumerate InterPro types (for the interpro_type facet/filter)
 
 ```example-call
 list_filter_values(filter_type="interpro_type")
@@ -432,7 +488,7 @@ list_filter_values(filter_type="interpro_type")
 }
 ```
 
-### Example 15: Enumerate MEROPS / NCBIfam term-side categoricals
+### Example 19: Enumerate MEROPS / NCBIfam term-side categoricals
 
 ```example-call
 list_filter_values(filter_type="merops_catalytic_type")
@@ -455,7 +511,7 @@ list_filter_values(filter_type="merops_catalytic_type")
 }
 ```
 
-### Example 16: Enumerate clustering-analysis types (for the cluster_type filter)
+### Example 20: Enumerate clustering-analysis types (for the cluster_type filter)
 
 ```example-call
 list_filter_values(filter_type="cluster_type")
@@ -478,7 +534,7 @@ list_filter_values(filter_type="cluster_type")
 }
 ```
 
-### Example 17: Enumerate treatment types (spans Experiment, DerivedMetric, MetaboliteAssay, ClusteringAnalysis)
+### Example 21: Enumerate treatment types (spans Experiment, DerivedMetric, MetaboliteAssay, ClusteringAnalysis)
 
 ```example-call
 list_filter_values(filter_type="treatment_type")
@@ -513,7 +569,7 @@ list_filter_values(filter_type="treatment_type")
 }
 ```
 
-### Example 18: Coculture partner roles (edge vocabulary for list_experiments(coculture_role=...))
+### Example 22: Coculture partner roles (edge vocabulary for list_experiments(coculture_role=...))
 
 ```example-call
 list_filter_values(filter_type="partner_role")
@@ -528,6 +584,8 @@ list_filter_values('brite_tree') → ontology_landscape(tree=...) → pathway_en
 list_filter_values(filter_type='metric_type') → list_derived_metrics(metric_types=[...]) → genes_by_{kind}_metric
 list_filter_values(filter_type='compartment') → list_experiments(compartment=...) / list_organisms(compartment=...) / list_publications(compartment=...)
 list_filter_values(filter_type='evidence_source') → list_metabolites(evidence_sources=[...]) for slicing by evidence type.
+list_filter_values(filter_type='structure_kind' / 'kegg_functional_category' / 'kegg_brite_class') → list_metabolites(structure_kind=[...] / kegg_functional_categories=[...] / kegg_brite_classes=[...]) — the KEGG values are partial, curated lists (docs://analysis/metabolites)
+list_filter_values(filter_type='stereo_assignment') → metabolites_by_quantifies_assay / metabolites_by_flags_assay / assays_by_metabolite(stereo_assignment=[...])
 list_filter_values(filter_type='omics_type') → list_experiments(omics_type=...) for filtering by experiment type.
 list_filter_values(filter_type='trust_axes', ontology=...) → genes_by_ontology / gene_ontology_terms / pathway_enrichment / cluster_enrichment(sources=..., evidence=..., max_tier=..., min_evidence_score=..., call_class=...) — see docs://analysis/annotation_evidence for the full per-ontology profile.
 list_filter_values(filter_type='interpro_type') → genes_by_ontology(ontology='interpro', ...) / search_ontology(ontology='interpro', interpro_type=...) / pathway_enrichment(ontology='interpro', interpro_type=...).
@@ -566,6 +624,8 @@ list_filter_values(filter_type='gene_category')  # then pass value to genes_by_f
 - `cluster_type` follows the same vocabulary-or-pivot rule (ControlledVocabulary for ClusteringAnalysis.cluster_type; six values). The value lists quoted in the `cluster_type` parameter descriptions of list_clustering_analyses / gene_clusters_by_gene are documentation only — this call is the live source, and a `warn` from kg_release_info on the vocabulary hash is the cue to prefer it over any quoted list.
 
 - Two `description` fields, two scopes: the envelope `description` is the property's vocabulary text (what `evidence` / `call_class` / `cluster_type` means as a whole), emitted once; a row's `description` is the meaning of that one value. Rows without per-value text simply omit the key — read the envelope, don't treat the absence as a missing vocabulary.
+
+- `kegg_functional_category` and `kegg_brite_class` list KEGG's curated classes, which cover only a minority of metabolites — a metabolite outside every value is unlisted, not classified as 'none'. The `"not classified"` entry in list_metabolites' `by_kegg_*` rollups is an envelope label, not a value here, and the filters reject it. `kegg_brite_class` rows carry no per-value `description` (the values contain ': '); the envelope `description` names each tree's code.
 
 - `trust_axes` and `link_kinds` are config-derived (not KG-vocabulary reads) — they answer 'which filter params work on this ontology', not 'what values exist'. Pass `ontology=...` to scope either to one ontology; omit it to see all.
 

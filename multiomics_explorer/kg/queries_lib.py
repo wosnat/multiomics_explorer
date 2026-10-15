@@ -2049,6 +2049,9 @@ def _list_metabolites_where(
     organism_names_lc: list[str] | None = None,
     pathway_ids: list[str] | None = None,
     evidence_sources: list[str] | None = None,
+    structure_kind: list[str] | None = None,
+    kegg_functional_categories: list[str] | None = None,
+    kegg_brite_classes: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build WHERE clause and params for metabolite queries.
 
@@ -2058,6 +2061,12 @@ def _list_metabolites_where(
     stays unchanged (it's the second arg to
     `db.index.fulltext.queryNodes('metaboliteFullText', $search)`); only
     the Python kwarg renamed.
+
+    The xref filters (`kegg_compound_ids` / `chebi_ids` / `hmdb_ids` /
+    `mnxm_ids`) take CURIE lists already normalised by the api layer
+    (`kegg.compound:C00085`, `chebi:14654`, `hmdb:HMDB0000122`,
+    `mnx:MNXM732398`) and match any entry of `m.all_identifiers`
+    (primary, secondary and merged-member ids).
     """
     conditions: list[str] = []
     params: dict = {}
@@ -2073,21 +2082,18 @@ def _list_metabolites_where(
         conditions.append("(NOT (m.id IN $exclude_metabolite_ids))")
         params["exclude_metabolite_ids"] = exclude_metabolite_ids
 
-    if kegg_compound_ids:
-        conditions.append("m.kegg_compound_id IN $kegg_compound_ids")
-        params["kegg_compound_ids"] = kegg_compound_ids
-
-    if chebi_ids:
-        conditions.append("m.chebi_id IN $chebi_ids")
-        params["chebi_ids"] = chebi_ids
-
-    if hmdb_ids:
-        conditions.append("m.hmdb_id IN $hmdb_ids")
-        params["hmdb_ids"] = hmdb_ids
-
-    if mnxm_ids:
-        conditions.append("m.mnxm_id IN $mnxm_ids")
-        params["mnxm_ids"] = mnxm_ids
+    for xref_param, xref_curies in (
+        ("kegg_compound_ids", kegg_compound_ids),
+        ("chebi_ids", chebi_ids),
+        ("hmdb_ids", hmdb_ids),
+        ("mnxm_ids", mnxm_ids),
+    ):
+        if xref_curies:
+            conditions.append(
+                f"ANY(x IN ${xref_param} "
+                "WHERE x IN coalesce(m.all_identifiers, []))"
+            )
+            params[xref_param] = xref_curies
 
     if elements:
         conditions.append(
@@ -2123,45 +2129,80 @@ def _list_metabolites_where(
         )
         params["evidence_sources"] = evidence_sources
 
+    if structure_kind:
+        conditions.append("m.structure_kind IN $structure_kind")
+        params["structure_kind"] = structure_kind
+
+    if kegg_functional_categories:
+        conditions.append(
+            "ANY(c IN coalesce(m.kegg_functional_categories, []) "
+            "WHERE c IN $kegg_functional_categories)"
+        )
+        params["kegg_functional_categories"] = kegg_functional_categories
+
+    if kegg_brite_classes:
+        conditions.append(
+            "ANY(x IN coalesce(m.kegg_brite_classes, []) "
+            "WHERE x IN $kegg_brite_classes)"
+        )
+        params["kegg_brite_classes"] = kegg_brite_classes
+
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
     return where_block, params
 
 
-def build_resolve_metabolite_aliases(raw_ids: list[str]) -> tuple[str, dict]:
-    """Map bare / xref metabolite identifiers to canonical ``Metabolite.id``.
+def build_resolve_metabolite_curies(curies: list[str]) -> tuple[str, dict]:
+    """Resolve normalised metabolite CURIEs to canonical ``Metabolite.id``.
 
-    One ``UNWIND $raw`` round-trip (spec
-    ``docs/tool-specs/bare-metabolite-id-coercion.md``). Each input string is
-    matched against exactly one xref property by shape: ``C\\d{5}`` →
-    ``kegg_compound_id``; ``CHEBI:\\d+`` (prefix stripped case-insensitively)
-    or ``\\d+`` → ``chebi_id``; ``HMDB\\d+`` → ``hmdb_id``; ``MNXM\\d+`` →
-    ``mnxm_id``. Already-canonical / prefixed inputs are filtered out by the
-    api layer before the call — this builder does not pass them through.
+    One ``UNWIND $curies`` round-trip (spec
+    ``docs/tool-specs/metabolite-identity-surface.md`` §A). The api layer
+    normalises each raw input to a CURIE first (``kegg.compound:C00244``,
+    ``chebi:14654``, ``hmdb:HMDB0000122``, ``mnx:MNXM732398``,
+    ``inchikey:...``, ``chebi.role:33229``). Lookup order per CURIE:
 
-    Returns one row per input (``OPTIONAL MATCH``) with ``raw`` and
-    ``canonical`` (``collect(m.id)`` — empty when unresolved, >1 on CHEBI /
-    HMDB / MNXM collisions; the api layer expands all and warns, never picks
-    one). Row order follows ``$raw``.
+    1. index path — ``(m:Metabolite {id: c})``;
+    2. on a miss only, ``c IN m.all_identifiers`` (secondary / merged ids;
+       every entry lives on exactly one node);
+    3. on no canonical hit, diagnostics: ``recurated_from_ids`` (a dropped
+       node whose paper rows now live on another, *different* compound —
+       never an identity) and ``ChemicalRole`` (own id or its ``chebi:``
+       identifiers).
+
+    Returns one row per input (``OPTIONAL MATCH``; misses yield empty lists),
+    columns ``curie``, ``canonical`` (list of ids), ``recurated_to`` and
+    ``roles`` (lists of ``{id, name}``). One row per *distinct* CURIE
+    (duplicates collapse in the aggregation); row order is not guaranteed —
+    key by ``curie``.
 
     Args:
-        raw_ids: Bare / xref identifiers to resolve (``["C00064", "CHEBI:17234"]``).
+        curies: Normalised CURIEs to resolve.
 
     Returns:
-        ``(cypher, {"raw": raw_ids})``.
+        ``(cypher, {"curies": curies})``.
     """
     cypher = (
-        "UNWIND $raw AS raw\n"
-        "WITH raw,\n"
-        "     CASE WHEN toUpper(raw) STARTS WITH 'CHEBI:' "
-        "THEN substring(raw, 6) ELSE raw END AS key\n"
-        "OPTIONAL MATCH (m:Metabolite)\n"
-        "WHERE (raw =~ 'C[0-9]{5}'  AND m.kegg_compound_id = raw)\n"
-        "   OR (key =~ '[0-9]+'     AND m.chebi_id = key)\n"
-        "   OR (raw =~ 'HMDB[0-9]+' AND m.hmdb_id = raw)\n"
-        "   OR (raw =~ 'MNXM[0-9]+' AND m.mnxm_id = raw)\n"
-        "RETURN raw, collect(m.id) AS canonical"
+        "UNWIND $curies AS c\n"
+        "OPTIONAL MATCH (m:Metabolite {id: c})\n"
+        "WITH c, collect(DISTINCT m.id) AS direct\n"
+        "CALL {\n"
+        "  WITH c, direct\n"
+        "  OPTIONAL MATCH (m:Metabolite)\n"
+        "  WHERE size(direct) = 0 AND c IN m.all_identifiers\n"
+        "  RETURN collect(m.id) AS via_alias\n"
+        "}\n"
+        "WITH c, direct + via_alias AS canonical\n"
+        "OPTIONAL MATCH (t:Metabolite)\n"
+        "WHERE size(canonical) = 0 AND c IN coalesce(t.recurated_from_ids, [])\n"
+        "WITH c, canonical,\n"
+        "     [x IN collect({id: t.id, name: t.name}) WHERE x.id IS NOT NULL]"
+        " AS recurated_to\n"
+        "OPTIONAL MATCH (r:ChemicalRole)\n"
+        "WHERE size(canonical) = 0 AND (r.id = c OR c IN r.all_identifiers)\n"
+        "RETURN c AS curie, canonical, recurated_to,\n"
+        "       [x IN collect({id: r.id, name: r.name}) WHERE x.id IS NOT NULL]"
+        " AS roles"
     )
-    return cypher, {"raw": raw_ids}
+    return cypher, {"curies": curies}
 
 
 def build_list_metabolites(
@@ -2179,6 +2220,9 @@ def build_list_metabolites(
     organism_names_lc: list[str] | None = None,
     pathway_ids: list[str] | None = None,
     evidence_sources: list[str] | None = None,
+    structure_kind: list[str] | None = None,
+    kegg_functional_categories: list[str] | None = None,
+    kegg_brite_classes: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -2191,7 +2235,9 @@ def build_list_metabolites(
     catalyst_gene_count=0 + transporter_gene_count>0 = transport-only),
     evidence_sources, chebi_id, pathway_ids, pathway_count,
     measured_assay_count, measured_paper_count, measured_organisms,
-    measured_compartments.
+    measured_compartments, structure_kind, kegg_functional_categories,
+    kegg_brite_classes (the two KEGG lists are null when KEGG doesn't list
+    the metabolite — sparse; the api layer drops them).
     When search_text is provided, also: score.
     RETURN keys (verbose): adds inchikey, smiles, mnxm_id, hmdb_id,
     pathway_names. All verbose columns are direct property reads on m;
@@ -2211,6 +2257,9 @@ def build_list_metabolites(
         organism_names_lc=organism_names_lc,
         pathway_ids=pathway_ids,
         evidence_sources=evidence_sources,
+        structure_kind=structure_kind,
+        kegg_functional_categories=kegg_functional_categories,
+        kegg_brite_classes=kegg_brite_classes,
     )
 
     verbose_cols = (
@@ -2253,6 +2302,9 @@ def build_list_metabolites(
             "       coalesce(m.measured_paper_count, 0) AS measured_paper_count,\n"
             "       coalesce(m.measured_organisms, []) AS measured_organisms,\n"
             "       coalesce(m.measured_compartments, []) AS measured_compartments,\n"
+            "       m.structure_kind AS structure_kind,\n"
+            "       m.kegg_functional_categories AS kegg_functional_categories,\n"
+            "       m.kegg_brite_classes AS kegg_brite_classes,\n"
             f"       score{verbose_cols}\n"
             "ORDER BY score DESC, m.organism_count DESC, m.id\n"
             f"{limit_clause}"
@@ -2277,7 +2329,10 @@ def build_list_metabolites(
             "       coalesce(m.measured_assay_count, 0) AS measured_assay_count,\n"
             "       coalesce(m.measured_paper_count, 0) AS measured_paper_count,\n"
             "       coalesce(m.measured_organisms, []) AS measured_organisms,\n"
-            f"       coalesce(m.measured_compartments, []) AS measured_compartments{verbose_cols}\n"
+            "       coalesce(m.measured_compartments, []) AS measured_compartments,\n"
+            "       m.structure_kind AS structure_kind,\n"
+            "       m.kegg_functional_categories AS kegg_functional_categories,\n"
+            f"       m.kegg_brite_classes AS kegg_brite_classes{verbose_cols}\n"
             "ORDER BY m.organism_count DESC, m.catalyst_gene_count DESC, m.id\n"
             f"{limit_clause}"
         )
@@ -2300,12 +2355,19 @@ def build_list_metabolites_summary(
     organism_names_lc: list[str] | None = None,
     pathway_ids: list[str] | None = None,
     evidence_sources: list[str] | None = None,
+    structure_kind: list[str] | None = None,
+    kegg_functional_categories: list[str] | None = None,
+    kegg_brite_classes: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary aggregation Cypher for list_metabolites.
 
     RETURN keys: total_entries, total_matching, top_organisms,
     top_metabolite_pathways, by_evidence_source, with_chebi, with_hmdb,
-    with_mnxm, mass_min, mass_median, mass_max.
+    with_mnxm, mass_min, mass_median, mass_max, by_measurement_coverage,
+    by_structure_kind, by_kegg_functional_category ([{item, count}]
+    frequency rows), kegg_functional_unclassified (int: matched metabolites
+    with no br08001 category), by_kegg_brite_class ([{item, count}]),
+    kegg_brite_unclassified (int).
     When search_text is provided, also: score_max, score_median.
 
     Critical: never `collect(m) AS matched`. Instead flatten denormalized
@@ -2325,6 +2387,9 @@ def build_list_metabolites_summary(
         organism_names_lc=organism_names_lc,
         pathway_ids=pathway_ids,
         evidence_sources=evidence_sources,
+        structure_kind=structure_kind,
+        kegg_functional_categories=kegg_functional_categories,
+        kegg_brite_classes=kegg_brite_classes,
     )
 
     top_organisms_block = (
@@ -2374,11 +2439,23 @@ def build_list_metabolites_summary(
             "     collect(score) AS scores,\n"
             "     collect(coalesce(m.measured_paper_count, 0)) AS paper_counts,\n"
             "     apoc.coll.flatten(\n"
-            "       collect(coalesce(m.measured_compartments, []))) AS m_comps\n"
+            "       collect(coalesce(m.measured_compartments, []))) AS m_comps,\n"
+            "     collect(m.structure_kind) AS sks,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(m.kegg_functional_categories, []))) AS kfcs,\n"
+            "     sum(CASE WHEN m IS NOT NULL\n"
+            "              AND size(coalesce(m.kegg_functional_categories, [])) = 0 "
+            "THEN 1 ELSE 0 END) AS kegg_functional_unclassified,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(m.kegg_brite_classes, []))) AS kbcs,\n"
+            "     sum(CASE WHEN m IS NOT NULL\n"
+            "              AND size(coalesce(m.kegg_brite_classes, [])) = 0 "
+            "THEN 1 ELSE 0 END) AS kegg_brite_unclassified\n"
             "MATCH (m2:Metabolite)\n"
             "WITH count(m2) AS total_entries, total_matching, es, all_orgs, "
             "all_pwys, with_chebi, with_hmdb, with_mnxm, masses, scores, "
-            "paper_counts, m_comps\n"
+            "paper_counts, m_comps, sks, kfcs, kegg_functional_unclassified, "
+            "kbcs, kegg_brite_unclassified\n"
             f"{top_organisms_block}"
             f"{top_pathways_block}"
             "RETURN total_entries, total_matching,\n"
@@ -2393,7 +2470,12 @@ def build_list_metabolites_summary(
             "       {\n"
             "         by_paper_count: apoc.coll.frequencies(paper_counts),\n"
             "         by_compartment: apoc.coll.frequencies(m_comps)\n"
-            "       } AS by_measurement_coverage"
+            "       } AS by_measurement_coverage,\n"
+            "       apoc.coll.frequencies(sks) AS by_structure_kind,\n"
+            "       apoc.coll.frequencies(kfcs) AS by_kegg_functional_category,\n"
+            "       kegg_functional_unclassified,\n"
+            "       apoc.coll.frequencies(kbcs) AS by_kegg_brite_class,\n"
+            "       kegg_brite_unclassified"
         )
     else:
         # OPTIONAL MATCH preserves the total_entries row when the filtered
@@ -2418,7 +2500,18 @@ def build_list_metabolites_summary(
             "     collect(m.mass) AS masses,\n"
             "     collect(coalesce(m.measured_paper_count, 0)) AS paper_counts,\n"
             "     apoc.coll.flatten(\n"
-            "       collect(coalesce(m.measured_compartments, []))) AS m_comps\n"
+            "       collect(coalesce(m.measured_compartments, []))) AS m_comps,\n"
+            "     collect(m.structure_kind) AS sks,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(m.kegg_functional_categories, []))) AS kfcs,\n"
+            "     sum(CASE WHEN m IS NOT NULL\n"
+            "              AND size(coalesce(m.kegg_functional_categories, [])) = 0 "
+            "THEN 1 ELSE 0 END) AS kegg_functional_unclassified,\n"
+            "     apoc.coll.flatten(\n"
+            "       collect(coalesce(m.kegg_brite_classes, []))) AS kbcs,\n"
+            "     sum(CASE WHEN m IS NOT NULL\n"
+            "              AND size(coalesce(m.kegg_brite_classes, [])) = 0 "
+            "THEN 1 ELSE 0 END) AS kegg_brite_unclassified\n"
             f"{top_organisms_block}"
             f"{top_pathways_block}"
             "RETURN total_entries, total_matching,\n"
@@ -2431,7 +2524,12 @@ def build_list_metabolites_summary(
             "       {\n"
             "         by_paper_count: apoc.coll.frequencies(paper_counts),\n"
             "         by_compartment: apoc.coll.frequencies(m_comps)\n"
-            "       } AS by_measurement_coverage"
+            "       } AS by_measurement_coverage,\n"
+            "       apoc.coll.frequencies(sks) AS by_structure_kind,\n"
+            "       apoc.coll.frequencies(kfcs) AS by_kegg_functional_category,\n"
+            "       kegg_functional_unclassified,\n"
+            "       apoc.coll.frequencies(kbcs) AS by_kegg_brite_class,\n"
+            "       kegg_brite_unclassified"
         )
 
     return cypher, params
@@ -2452,6 +2550,9 @@ def build_list_metabolites_no_formula_count(
     organism_names_lc: list[str] | None = None,
     pathway_ids: list[str] | None = None,
     evidence_sources: list[str] | None = None,
+    structure_kind: list[str] | None = None,
+    kegg_functional_categories: list[str] | None = None,
+    kegg_brite_classes: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Count metabolites the `elements` filter drops because they have no
     formula (empty `m.elements`) but pass every other filter.
@@ -2478,6 +2579,9 @@ def build_list_metabolites_no_formula_count(
         organism_names_lc=organism_names_lc,
         pathway_ids=pathway_ids,
         evidence_sources=evidence_sources,
+        structure_kind=structure_kind,
+        kegg_functional_categories=kegg_functional_categories,
+        kegg_brite_classes=kegg_brite_classes,
     )
     empty_cond = _EMPTY_METABOLITE_ELEMENTS_CONDITION
     if where_block:
@@ -10472,6 +10576,7 @@ def _metabolites_by_quantifies_assay_where(
     metric_percentile_min: float | None = None,
     metric_percentile_max: float | None = None,
     rank_by_metric_max: int | None = None,
+    stereo_assignment: list[str] | None = None,
 ) -> tuple[list[str], dict]:
     """Shared WHERE-conditions builder for metabolites_by_quantifies_assay.
 
@@ -10549,6 +10654,9 @@ def _metabolites_by_quantifies_assay_where(
     if rank_by_metric_max is not None:
         conditions.append("r.rank_by_metric <= $rank_by_metric_max")
         params["rank_by_metric_max"] = rank_by_metric_max
+    if stereo_assignment:
+        conditions.append("r.stereo_assignment IN $stereo_assignment")
+        params["stereo_assignment"] = stereo_assignment
     # Rank filters and display agree: a tested-absent row's rank fields are
     # nulled at the api layer regardless of what the KG stored (many raw
     # zeros tie into a high percentile/bucket), so a rank-gated filter must
@@ -10678,12 +10786,14 @@ def build_metabolites_by_quantifies_assay_summary(
     metric_percentile_min: float | None = None,
     metric_percentile_max: float | None = None,
     rank_by_metric_max: int | None = None,
+    stereo_assignment: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for metabolites_by_quantifies_assay (parent §12.2).
 
     RETURN keys: total_matching, by_detection_status (audit §4.3.3 primary
     headline), by_metric_bucket, by_assay, by_compartment, by_organism,
-    filtered_value_min, filtered_value_max.
+    filtered_value_min, filtered_value_max, by_stereo_assignment
+    ([{item, count}] over `r.stereo_assignment`).
 
     `by_metric` envelope (per-assay precomputed-vs-filtered) is computed in
     api/ layer by enriching with diagnostics result.
@@ -10706,6 +10816,7 @@ def build_metabolites_by_quantifies_assay_summary(
         metric_percentile_min=metric_percentile_min,
         metric_percentile_max=metric_percentile_max,
         rank_by_metric_max=rank_by_metric_max,
+        stereo_assignment=stereo_assignment,
     )
     params["assay_ids"] = assay_ids
     all_conditions = ["a.id IN $assay_ids"] + conditions
@@ -10720,6 +10831,7 @@ def build_metabolites_by_quantifies_assay_summary(
         "     collect(a.compartment) AS comps,\n"
         "     collect(a.organism_name) AS orgs,\n"
         "     [v IN collect(r.value) WHERE v IS NOT NULL] AS vals,\n"
+        "     [x IN collect(r.stereo_assignment) WHERE x IS NOT NULL] AS stereos,\n"
         "     count(*) AS total_matching\n"
         "RETURN total_matching,\n"
         "       apoc.coll.frequencies(dets) AS by_detection_status,\n"
@@ -10728,7 +10840,8 @@ def build_metabolites_by_quantifies_assay_summary(
         "       apoc.coll.frequencies(comps) AS by_compartment,\n"
         "       apoc.coll.frequencies(orgs) AS by_organism,\n"
         "       apoc.coll.min(vals) AS filtered_value_min,\n"
-        "       apoc.coll.max(vals) AS filtered_value_max"
+        "       apoc.coll.max(vals) AS filtered_value_max,\n"
+        "       apoc.coll.frequencies(stereos) AS by_stereo_assignment"
     )
     return cypher, params
 
@@ -10753,6 +10866,7 @@ def build_metabolites_by_quantifies_assay(
     metric_percentile_min: float | None = None,
     metric_percentile_max: float | None = None,
     rank_by_metric_max: int | None = None,
+    stereo_assignment: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -10764,7 +10878,7 @@ def build_metabolites_by_quantifies_assay(
       n_non_zero, metric_type, metric_bucket, metric_percentile,
       rank_by_metric, detection_status, timepoint, timepoint_hours,
       timepoint_order, growth_phase (KG-MET-017 null today), condition_label,
-      assay_id, organism_name, compartment.
+      stereo_assignment, assay_id, organism_name, compartment.
 
     Verbose adds: assay_name, field_description, experimental_context,
     light_condition, replicate_values.
@@ -10795,6 +10909,7 @@ def build_metabolites_by_quantifies_assay(
         metric_percentile_min=metric_percentile_min,
         metric_percentile_max=metric_percentile_max,
         rank_by_metric_max=rank_by_metric_max,
+        stereo_assignment=stereo_assignment,
     )
     params["assay_ids"] = assay_ids
     all_conditions = ["a.id IN $assay_ids"] + conditions
@@ -10840,6 +10955,7 @@ def build_metabolites_by_quantifies_assay(
         "            THEN e.time_point_growth_phases[r.time_point_order - 1]\n"
         "            ELSE null END AS growth_phase,\n"
         "       r.condition_label AS condition_label,\n"
+        "       r.stereo_assignment AS stereo_assignment,\n"
         "       a.id AS assay_id,\n"
         "       a.organism_name AS organism_name,\n"
         "       a.compartment AS compartment"
@@ -10866,6 +10982,7 @@ def _metabolites_by_flags_assay_where(
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
     flag_value: str | None = None,
+    stereo_assignment: list[str] | None = None,
 ) -> tuple[list[str], dict]:
     """WHERE-conditions builder for metabolites_by_flags_assay.
 
@@ -10916,6 +11033,9 @@ def _metabolites_by_flags_assay_where(
         # D4: API coerces bool → 'detected'/'not_detected' string before this layer.
         conditions.append("r.flag_value = $flag_value")
         params["flag_value"] = flag_value
+    if stereo_assignment:
+        conditions.append("r.stereo_assignment IN $stereo_assignment")
+        params["stereo_assignment"] = stereo_assignment
 
     return conditions, params
 
@@ -10955,11 +11075,12 @@ def build_metabolites_by_flags_assay_summary(
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
     flag_value: str | None = None,
+    stereo_assignment: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for metabolites_by_flags_assay (parent §12.3).
 
     RETURN keys: total_matching, by_value (apoc on flag_value),
-    by_assay, by_compartment, by_organism.
+    by_assay, by_compartment, by_organism, by_stereo_assignment.
 
     No `by_detection_status` — boolean arm has no `detection_status` field.
     """
@@ -10974,6 +11095,7 @@ def build_metabolites_by_flags_assay_summary(
         background_factors=background_factors,
         growth_phases=growth_phases,
         flag_value=flag_value,
+        stereo_assignment=stereo_assignment,
     )
     params["assay_ids"] = assay_ids
     all_conditions = ["a.id IN $assay_ids"] + conditions
@@ -10986,12 +11108,14 @@ def build_metabolites_by_flags_assay_summary(
         "     collect(a.id) AS assay_ids_collected,\n"
         "     collect(a.compartment) AS comps,\n"
         "     collect(a.organism_name) AS orgs,\n"
+        "     [x IN collect(r.stereo_assignment) WHERE x IS NOT NULL] AS stereos,\n"
         "     count(*) AS total_matching\n"
         "RETURN total_matching,\n"
         "       apoc.coll.frequencies(flags) AS by_value,\n"
         "       apoc.coll.frequencies(assay_ids_collected) AS by_assay,\n"
         "       apoc.coll.frequencies(comps) AS by_compartment,\n"
-        "       apoc.coll.frequencies(orgs) AS by_organism"
+        "       apoc.coll.frequencies(orgs) AS by_organism,\n"
+        "       apoc.coll.frequencies(stereos) AS by_stereo_assignment"
     )
     return cypher, params
 
@@ -11009,6 +11133,7 @@ def build_metabolites_by_flags_assay(
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
     flag_value: str | None = None,
+    stereo_assignment: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -11017,8 +11142,8 @@ def build_metabolites_by_flags_assay(
 
     Per-row schema (compact):
       metabolite_id, name, kegg_compound_id, flag_value (bool, D4 coerced),
-      n_positive, n_replicates, metric_type, condition_label, assay_id,
-      organism_name, compartment.
+      n_positive, n_replicates, metric_type, condition_label,
+      stereo_assignment, assay_id, organism_name, compartment.
 
     Verbose adds: assay_name, field_description.
 
@@ -11037,6 +11162,7 @@ def build_metabolites_by_flags_assay(
         background_factors=background_factors,
         growth_phases=growth_phases,
         flag_value=flag_value,
+        stereo_assignment=stereo_assignment,
     )
     params["assay_ids"] = assay_ids
     all_conditions = ["a.id IN $assay_ids"] + conditions
@@ -11066,6 +11192,7 @@ def build_metabolites_by_flags_assay(
         "       r.n_replicates AS n_replicates,\n"
         "       r.metric_type AS metric_type,\n"
         "       r.condition_label AS condition_label,\n"
+        "       r.stereo_assignment AS stereo_assignment,\n"
         "       a.id AS assay_id,\n"
         "       a.organism_name AS organism_name,\n"
         "       a.compartment AS compartment"
@@ -11088,8 +11215,13 @@ def _assays_by_metabolite_branch_conditions(
     exclude_metabolite_ids: list[str] | None = None,
     metric_types: list[str] | None = None,
     compartment: str | None = None,
+    stereo_assignment: list[str] | None = None,
 ) -> tuple[list[str], dict]:
     """Per-branch WHERE-conditions for build_assays_by_metabolite[_summary].
+
+    `rel_alias` names the arm's edge variable (`rq` / `rf`); edge-level
+    filters (`stereo_assignment`, shared by both arms) are written against it,
+    so callers build one condition list per arm.
 
     Each UNION ALL branch is scoped independently. Required input
     `metabolite_ids` is added by the caller (since both branches share the
@@ -11110,6 +11242,9 @@ def _assays_by_metabolite_branch_conditions(
     if compartment is not None:
         conditions.append("a.compartment = $compartment")
         params["compartment"] = compartment
+    if stereo_assignment:
+        conditions.append(f"{rel_alias}.stereo_assignment IN $stereo_assignment")
+        params["stereo_assignment"] = stereo_assignment
     return conditions, params
 
 
@@ -11121,6 +11256,7 @@ def build_assays_by_metabolite_summary(
     exclude_metabolite_ids: list[str] | None = None,
     metric_types: list[str] | None = None,
     compartment: str | None = None,
+    stereo_assignment: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for assays_by_metabolite (parent §12.4 UNION ALL).
 
@@ -11135,7 +11271,8 @@ def build_assays_by_metabolite_summary(
 
     RETURN keys: total_matching, by_evidence_kind, by_organism,
     by_compartment, by_assay, by_detection_status (numeric subset),
-    by_flag_value (boolean subset), metabolites_matched,
+    by_flag_value (boolean subset), by_stereo_assignment (both arms
+    combined, [{item, count}]), metabolites_matched,
     matched_metabolite_ids (distinct metabolite IDs with at least one
     edge in the unpaged filtered slice — the authoritative source for
     api/'s not_matched / metabolites_with_evidence partition; `results`
@@ -11147,38 +11284,45 @@ def build_assays_by_metabolite_summary(
     `[f IN collect(flag) WHERE f IS NOT NULL]` to preserve
     union-shape NULL boundaries.
     """
-    branch_conds, params = _assays_by_metabolite_branch_conditions(
-        rel_alias="rq",
-        organism=organism,
-        exclude_metabolite_ids=exclude_metabolite_ids,
-        metric_types=metric_types,
-        compartment=compartment,
-    )
+    arm_where: dict[str, str] = {}
+    params: dict = {}
+    for rel_alias in ("rq", "rf"):
+        branch_conds, arm_params = _assays_by_metabolite_branch_conditions(
+            rel_alias=rel_alias,
+            organism=organism,
+            exclude_metabolite_ids=exclude_metabolite_ids,
+            metric_types=metric_types,
+            compartment=compartment,
+            stereo_assignment=stereo_assignment,
+        )
+        params.update(arm_params)
+        base_where = ["m.id IN $metabolite_ids"] + branch_conds
+        arm_where[rel_alias] = "WHERE " + " AND ".join(base_where) + "\n"
     params["metabolite_ids"] = metabolite_ids
-
-    base_where = ["m.id IN $metabolite_ids"] + branch_conds
-    where_block = "WHERE " + " AND ".join(base_where) + "\n"
+    where_q, where_f = arm_where["rq"], arm_where["rf"]
 
     branches = []
     if evidence_kind in (None, "quantifies"):
         branches.append(
             "  MATCH (a:MetaboliteAssay)-[rq:Assay_quantifies_metabolite]->(m:Metabolite)\n"
-            f"  {where_block}"
+            f"  {where_q}"
             "  RETURN m.id AS metabolite_id, a.id AS assay_id,\n"
             "         a.organism_name AS organism_name,\n"
             "         a.compartment AS compartment,\n"
             "         'quantifies' AS evidence_kind,\n"
-            "         rq.detection_status AS det, null AS flag"
+            "         rq.detection_status AS det, null AS flag,\n"
+            "         rq.stereo_assignment AS stereo"
         )
     if evidence_kind in (None, "flags"):
         branches.append(
             "  MATCH (a:MetaboliteAssay)-[rf:Assay_flags_metabolite]->(m:Metabolite)\n"
-            f"  {where_block}"
+            f"  {where_f}"
             "  RETURN m.id AS metabolite_id, a.id AS assay_id,\n"
             "         a.organism_name AS organism_name,\n"
             "         a.compartment AS compartment,\n"
             "         'flags' AS evidence_kind,\n"
-            "         null AS det, (rf.flag_value = 'detected') AS flag"
+            "         null AS det, (rf.flag_value = 'detected') AS flag,\n"
+            "         rf.stereo_assignment AS stereo"
         )
 
     # Always emit both rel-aliases in cypher text so anti-pattern guards
@@ -11195,7 +11339,8 @@ def build_assays_by_metabolite_summary(
             "         a.organism_name AS organism_name,\n"
             "         a.compartment AS compartment,\n"
             "         'flags' AS evidence_kind,\n"
-            "         null AS det, (rf.flag_value = 'detected') AS flag"
+            "         null AS det, (rf.flag_value = 'detected') AS flag,\n"
+            "         rf.stereo_assignment AS stereo"
         )
     elif evidence_kind == "flags":
         union_body = (
@@ -11205,7 +11350,8 @@ def build_assays_by_metabolite_summary(
             "         a.organism_name AS organism_name,\n"
             "         a.compartment AS compartment,\n"
             "         'quantifies' AS evidence_kind,\n"
-            "         rq.detection_status AS det, null AS flag\n"
+            "         rq.detection_status AS det, null AS flag,\n"
+            "         rq.stereo_assignment AS stereo\n"
             "  UNION ALL\n"
         ) + union_body
 
@@ -11220,6 +11366,7 @@ def build_assays_by_metabolite_summary(
         "     collect(evidence_kind) AS evks,\n"
         "     [d IN collect(det) WHERE d IS NOT NULL] AS dets,\n"
         "     [f IN collect(flag) WHERE f IS NOT NULL] AS flags,\n"
+        "     [x IN collect(stereo) WHERE x IS NOT NULL] AS stereos,\n"
         "     count(*) AS total_matching\n"
         "RETURN total_matching,\n"
         "       apoc.coll.frequencies(evks) AS by_evidence_kind,\n"
@@ -11228,6 +11375,7 @@ def build_assays_by_metabolite_summary(
         "       apoc.coll.frequencies(assay_ids_collected) AS by_assay,\n"
         "       apoc.coll.frequencies(dets) AS by_detection_status,\n"
         "       apoc.coll.frequencies(flags) AS by_flag_value,\n"
+        "       apoc.coll.frequencies(stereos) AS by_stereo_assignment,\n"
         "       size(apoc.coll.toSet(m_ids)) AS metabolites_matched,\n"
         "       apoc.coll.toSet(m_ids) AS matched_metabolite_ids"
     )
@@ -11242,6 +11390,7 @@ def build_assays_by_metabolite(
     exclude_metabolite_ids: list[str] | None = None,
     metric_types: list[str] | None = None,
     compartment: str | None = None,
+    stereo_assignment: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -11253,6 +11402,7 @@ def build_assays_by_metabolite(
       value, value_sd, flag_value, n_positive, n_replicates, metric_type,
       metric_bucket, metric_percentile, detection_status, timepoint,
       timepoint_hours, timepoint_order, growth_phase, condition_label,
+      stereo_assignment (shared by both arms, never null-padded),
       organism_name, compartment, experiment_id, publication_doi.
 
     Cross-arm fields padded with explicit nulls (UNION ALL constraint —
@@ -11263,17 +11413,22 @@ def build_assays_by_metabolite(
     Sort key (slice spec §6.4): metabolite_id ASC, evidence_kind DESC,
     assay_id ASC, coalesce(timepoint_order, 999999) ASC.
     """
-    branch_conds, params = _assays_by_metabolite_branch_conditions(
-        rel_alias="rq",
-        organism=organism,
-        exclude_metabolite_ids=exclude_metabolite_ids,
-        metric_types=metric_types,
-        compartment=compartment,
-    )
+    arm_where: dict[str, str] = {}
+    params: dict = {}
+    for rel_alias in ("rq", "rf"):
+        branch_conds, arm_params = _assays_by_metabolite_branch_conditions(
+            rel_alias=rel_alias,
+            organism=organism,
+            exclude_metabolite_ids=exclude_metabolite_ids,
+            metric_types=metric_types,
+            compartment=compartment,
+            stereo_assignment=stereo_assignment,
+        )
+        params.update(arm_params)
+        base_where = ["m.id IN $metabolite_ids"] + branch_conds
+        arm_where[rel_alias] = "WHERE " + " AND ".join(base_where) + "\n"
     params["metabolite_ids"] = metabolite_ids
-
-    base_where = ["m.id IN $metabolite_ids"] + branch_conds
-    where_block = "WHERE " + " AND ".join(base_where) + "\n"
+    where_q, where_f = arm_where["rq"], arm_where["rf"]
 
     verbose_q = ""
     verbose_f = ""
@@ -11293,7 +11448,7 @@ def build_assays_by_metabolite(
 
     quantifies_branch = (
         "  MATCH (a:MetaboliteAssay)-[rq:Assay_quantifies_metabolite]->(m:Metabolite)\n"
-        f"  {where_block}"
+        f"  {where_q}"
         "  OPTIONAL MATCH (a)<-[:ExperimentHasMetaboliteAssay]-(e:Experiment)\n"
         "  RETURN\n"
         "    m.id AS metabolite_id, m.name AS metabolite_name,\n"
@@ -11312,13 +11467,14 @@ def build_assays_by_metabolite(
         "         THEN e.time_point_growth_phases[rq.time_point_order - 1]\n"
         "         ELSE null END AS growth_phase,\n"
         "    rq.condition_label AS condition_label,\n"
+        "    rq.stereo_assignment AS stereo_assignment,\n"
         "    a.organism_name AS organism_name, a.compartment AS compartment,\n"
         "    a.experiment_id AS experiment_id, a.publication_doi AS publication_doi"
         f"{verbose_q}"
     )
     flags_branch = (
         "  MATCH (a:MetaboliteAssay)-[rf:Assay_flags_metabolite]->(m:Metabolite)\n"
-        f"  {where_block}"
+        f"  {where_f}"
         "  RETURN\n"
         "    m.id AS metabolite_id, m.name AS metabolite_name,\n"
         "    a.id AS assay_id, a.name AS assay_name,\n"
@@ -11331,6 +11487,7 @@ def build_assays_by_metabolite(
         "    null AS timepoint, null AS timepoint_hours, null AS timepoint_order,\n"
         "    null AS growth_phase,\n"
         "    rf.condition_label AS condition_label,\n"
+        "    rf.stereo_assignment AS stereo_assignment,\n"
         "    a.organism_name AS organism_name, a.compartment AS compartment,\n"
         "    a.experiment_id AS experiment_id, a.publication_doi AS publication_doi"
         f"{verbose_f}"
@@ -11342,7 +11499,7 @@ def build_assays_by_metabolite(
         # Active quantifies branch + zero-row flags branch (identical column shape).
         flags_zero = flags_branch.replace(
             "  MATCH (a:MetaboliteAssay)-[rf:Assay_flags_metabolite]->(m:Metabolite)\n"
-            f"  {where_block}",
+            f"  {where_f}",
             "  MATCH (a:MetaboliteAssay)-[rf:Assay_flags_metabolite]->(m:Metabolite)\n"
             "  WHERE false AND m.id IN $metabolite_ids\n",
             1,
@@ -11351,7 +11508,7 @@ def build_assays_by_metabolite(
     elif evidence_kind == "flags":
         quant_zero = quantifies_branch.replace(
             "  MATCH (a:MetaboliteAssay)-[rq:Assay_quantifies_metabolite]->(m:Metabolite)\n"
-            f"  {where_block}"
+            f"  {where_q}"
             "  OPTIONAL MATCH (a)<-[:ExperimentHasMetaboliteAssay]-(e:Experiment)\n",
             "  MATCH (a:MetaboliteAssay)-[rq:Assay_quantifies_metabolite]->(m:Metabolite)\n"
             "  WHERE false AND m.id IN $metabolite_ids\n"
@@ -11376,8 +11533,8 @@ def build_assays_by_metabolite(
         "       value, value_sd, flag_value, n_positive,\n"
         "       n_replicates, metric_type, metric_bucket, metric_percentile,\n"
         "       detection_status, timepoint, timepoint_hours, timepoint_order,\n"
-        "       growth_phase, condition_label, organism_name, compartment,\n"
-        "       experiment_id, publication_doi"
+        "       growth_phase, condition_label, stereo_assignment,\n"
+        "       organism_name, compartment, experiment_id, publication_doi"
         + (",\n       assay_field_description, replicate_values, experimental_context"
            if verbose else "")
         + "\n"

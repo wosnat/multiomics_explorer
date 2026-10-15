@@ -13532,23 +13532,25 @@ class TestBuildListMetabolitesNoFormulaCount:
             elements=["N"],
             metabolite_ids=["kegg.compound:C00086"],
             exclude_metabolite_ids=["kegg.compound:C00002"],
-            kegg_compound_ids=["C00086"],
-            chebi_ids=["16199"],
-            hmdb_ids=["HMDB0000294"],
-            mnxm_ids=["MNXM731"],
+            kegg_compound_ids=["kegg.compound:C00086"],
+            chebi_ids=["chebi:16199"],
+            hmdb_ids=["hmdb:HMDB0000294"],
+            mnxm_ids=["mnx:MNXM731"],
             mass_min=10.0,
             mass_max=500.0,
             organism_names_lc=["prochlorococcus med4"],
             pathway_ids=["kegg.pathway:ko00910"],
             evidence_sources=["transport"],
         )
+        # xref filters take CURIE lists and match any identifier
+        # (metabolite-identity-surface spec B).
         for frag in (
             "m.id IN $metabolite_ids",
             "(NOT (m.id IN $exclude_metabolite_ids))",
-            "m.kegg_compound_id IN $kegg_compound_ids",
-            "m.chebi_id IN $chebi_ids",
-            "m.hmdb_id IN $hmdb_ids",
-            "m.mnxm_id IN $mnxm_ids",
+            "ANY(x IN $kegg_compound_ids WHERE x IN coalesce(m.all_identifiers, []))",
+            "ANY(x IN $chebi_ids WHERE x IN coalesce(m.all_identifiers, []))",
+            "ANY(x IN $hmdb_ids WHERE x IN coalesce(m.all_identifiers, []))",
+            "ANY(x IN $mnxm_ids WHERE x IN coalesce(m.all_identifiers, []))",
             "m.mass >= $mass_min",
             "m.mass <= $mass_max",
             "WHERE toLower(o) IN $organism_names_lc)",
@@ -13558,10 +13560,10 @@ class TestBuildListMetabolitesNoFormulaCount:
             assert frag in cypher, f"missing filter fragment: {frag}"
         assert params["metabolite_ids"] == ["kegg.compound:C00086"]
         assert params["exclude_metabolite_ids"] == ["kegg.compound:C00002"]
-        assert params["kegg_compound_ids"] == ["C00086"]
-        assert params["chebi_ids"] == ["16199"]
-        assert params["hmdb_ids"] == ["HMDB0000294"]
-        assert params["mnxm_ids"] == ["MNXM731"]
+        assert params["kegg_compound_ids"] == ["kegg.compound:C00086"]
+        assert params["chebi_ids"] == ["chebi:16199"]
+        assert params["hmdb_ids"] == ["hmdb:HMDB0000294"]
+        assert params["mnxm_ids"] == ["mnx:MNXM731"]
         assert params["mass_min"] == 10.0
         assert params["mass_max"] == 500.0
         assert params["organism_names_lc"] == ["prochlorococcus med4"]

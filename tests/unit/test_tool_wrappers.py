@@ -12823,13 +12823,16 @@ _MIS_ASSAY_TOOL_RETURNS = {
         TestMetabolitesByQuantifiesAssayWrapper._SAMPLE_API_RETURN,
         dict(assay_ids=["a1"]),
         {"metabolite_id": "kegg.compound:C00041", "name": "L-Alanine",
-         "assay_id": "a1", "stereo_assignment": "dominant_form_assumed"},
+         "assay_id": "a1", "metric_type": "cellular_concentration",
+         "organism_name": "Prochlorococcus MIT9313", "compartment": "whole_cell",
+         "stereo_assignment": "dominant_form_assumed"},
     ),
     "metabolites_by_flags_assay": (
         TestMetabolitesByFlagsAssayWrapper._SAMPLE_API_RETURN,
         dict(assay_ids=["a1"]),
         {"metabolite_id": "kegg.compound:C00041", "name": "L-Alanine",
-         "assay_id": "a1", "flag_value": True,
+         "assay_id": "a1", "flag_value": True, "metric_type": "presence_flag",
+         "organism_name": "Prochlorococcus MIT9313", "compartment": "whole_cell",
          "stereo_assignment": "dominant_form_assumed"},
     ),
     "assays_by_metabolite": (
@@ -12838,7 +12841,8 @@ _MIS_ASSAY_TOOL_RETURNS = {
         {"metabolite_id": "kegg.compound:C00041", "metabolite_name": "L-Alanine",
          "assay_id": "a1", "assay_name": "Assay a1",
          "evidence_kind": "flags", "metric_type": "presence_flag",
-         "flag_value": True, "stereo_assignment": "dominant_form_assumed"},
+         "flag_value": True, "organism_name": "Prochlorococcus MIT9313",
+         "compartment": "whole_cell", "stereo_assignment": "dominant_form_assumed"},
     ),
 }
 

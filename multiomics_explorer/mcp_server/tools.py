@@ -550,6 +550,10 @@ class MetaboliteResult(SparseRow):
     measured_organisms: list[str] = Field(default_factory=list, description="Organism preferred_names with at least one MetaboliteAssay anchored to this metabolite. Populated when measured_assay_count > 0; [] otherwise.")
     measured_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments observed for this metabolite (subset of {'whole_cell', 'extracellular', 'vesicle'}). Empty on unmeasured metabolites — use len(measured_compartments) >= 1 to filter for measurement-anchored rows.")
     score: float | None = Field(default=None, description="Lucene relevance score (only with `search_text`).")
+    # Identity / KEGG classification (spec metabolite-identity-surface §C/§C2)
+    structure_kind: str | None = Field(default=None, description="'defined' (one molecule), 'generic' (a compound class, e.g. 'amino acid') or 'polymer'. Generic and polymer entries have no formula-level chemistry. Values: list_filter_values('structure_kind').")
+    kegg_functional_categories: list[str] | None = Field(default=None, description="KEGG br08001 categories this metabolite is listed under. Absent = KEGG did not list it (~90% of metabolites), not 'none apply'. Curated, functional headings (amines sit under Peptides).")
+    kegg_brite_classes: list[str] | None = Field(default=None, description="'Tree: Class' from 7 KEGG compound BRITE trees (lipids, phytochemicals, glycosides, pesticides, toxins, endocrine disruptors, bioactive peptides). Absent = KEGG did not list it (~80% of metabolites).")
 
     # verbose
     inchikey: str | None = Field(default=None, description="InChIKey structural fingerprint (e.g. 'WQZGKKKJIJFFOK-GASJEMHNSA-N'). Verbose only.")
@@ -609,6 +613,21 @@ class MetMeasurementCoverage(BaseModel):
     by_compartment: list[MetCompartmentBucket] = Field(default_factory=list, description="Frequency distribution of measured_compartments values across the matched set. Sums to >= count of measured metabolites because the same metabolite can be measured in multiple compartments.")
 
 
+class MetStructureKindBucket(BaseModel):
+    structure_kind: str = Field(description="Structure kind ('defined', 'generic' or 'polymer').")
+    count: int = Field(description="Matched metabolites with this structure kind.")
+
+
+class MetKeggFunctionalCategoryBucket(BaseModel):
+    kegg_functional_category: str = Field(description="KEGG br08001 category (e.g. 'Peptides'), or the trailing 'not classified' label: matched metabolites KEGG did not list. That label is not a filter value.")
+    count: int = Field(description="Matched metabolites in this category. A metabolite in two categories counts in both.")
+
+
+class MetKeggBriteClassBucket(BaseModel):
+    kegg_brite_class: str = Field(description="'Tree: Class' (e.g. 'Lipids: Fatty acyls'), or the trailing 'not classified' label: matched metabolites KEGG did not list. That label is not a filter value.")
+    count: int = Field(description="Matched metabolites in this class. A metabolite in two classes counts in both.")
+
+
 class ListMetabolitesResponse(BaseModel):
     total_entries: int = Field(description="Total Metabolite nodes in KG (unfiltered).")
     total_matching: int = Field(description="Metabolites matching filters.")
@@ -618,14 +637,17 @@ class ListMetabolitesResponse(BaseModel):
     xref_coverage: MetXrefCoverage = Field(description="Cross-ref ID coverage within matched set.")
     mass_stats: MetMassStats = Field(description="Mass distribution within matched set.")
     by_measurement_coverage: MetMeasurementCoverage = Field(default_factory=MetMeasurementCoverage, description="Metabolomics measurement coverage rollup across matched metabolites. Two sub-rollups: by_paper_count (frequency by measured_paper_count value) + by_compartment (frequency by measured_compartments value).")
+    by_structure_kind: list[MetStructureKindBucket] = Field(default_factory=list, description="Matched metabolites per structure_kind ('defined' / 'generic' / 'polymer'), sorted desc.")
+    by_kegg_functional_category: list[MetKeggFunctionalCategoryBucket] = Field(default_factory=list, description="Matched metabolites per KEGG br08001 category, sorted desc, always ending with 'not classified' (KEGG did not list them; not a filter value). Unlisted is not 'in none of these'.")
+    by_kegg_brite_class: list[MetKeggBriteClassBucket] = Field(default_factory=list, description="Matched metabolites per 'Tree: Class' from 7 KEGG compound BRITE trees, sorted desc, always ending with 'not classified' (KEGG did not list them; not a filter value).")
     score_max: float | None = Field(default=None, description="Max Lucene score (only with `search_text`).")
     score_median: float | None = Field(default=None, description="Median Lucene score (only with `search_text`).")
     returned: int = Field(description="Metabolites in this response.")
     offset: int = Field(default=0, description="Offset into full result set.")
     truncated: bool = Field(description="True if total_matching > returned.")
     not_found: MetNotFound = Field(default_factory=MetNotFound, description="Per-filter buckets for unknown input IDs.")
-    resolved_aliases: dict[str, list[str]] = Field(default_factory=dict, description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
-    warnings: list[str] = Field(default_factory=list, description="Diagnostic strings, e.g. a bare ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow), a `metabolite_ids` / `exclude_metabolite_ids` entry matching no recognized id pattern at all (likely a NAME — resolve it with `search_text` instead), or an `elements` entry that isn't a recognized symbol or name (see `not_found.elements`).")
+    resolved_aliases: dict[str, list[str]] = Field(default_factory=dict, description="Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.")
+    warnings: list[str] = Field(default_factory=list, description="Diagnostics: a removed compound (names the id now holding its measurements), a chemical role rather than a metabolite, an id-shaped NAME (use `search_text`), an unknown vocabulary value, or an unrecognized `elements` entry.")
     no_formula_excluded: int | None = Field(default=None, description="Metabolites passing every other filter but dropped by `elements` because they have no formula (generic classes like 'amino acid' never match an element filter). Null when no `elements` filter.")
     results: list[MetaboliteResult] = Field(default_factory=list)
 
@@ -688,10 +710,10 @@ class GeneReactionMetaboliteTriplet(SparseRow):
         "absent. Rows within a depth tier sort by it desc.")
     transport_substrate_resolution: Literal["resolved", "family_inferred"] | None = Field(
         default=None,
-        description="Transport rows only (None on metabolism rows). The gene's "
-        "KG-authoritative TCDB substrate resolution, repeated on each of its "
-        "transport rows — not a per-substrate fact ('family_inferred' = "
-        "reachability, not capability). Row fact: substrate_depth.")
+        description="Transport rows only. The gene's TCDB substrate "
+        "resolution, repeated per row (not a per-substrate fact): 'resolved' "
+        "= a deepest attachment is not lumping (TcdbFamily.substrate_breadth "
+        "= 'lumping'); 'family_inferred' = reachability, not capability.")
 
     # metabolism-arm fields (None on transport rows)
     reaction_id: str | None = Field(
@@ -928,9 +950,10 @@ class GbmTopGene(BaseModel):
     transport_substrate_resolution: str | None = Field(
         default=None,
         description="Gene-level `Gene.transport_substrate_resolution`: "
-        "'resolved' = at least one non-lumping deepest attachment (not "
-        "all); 'family_inferred' = substrate breadth is reachability, not "
-        "capability. None = no TCDB call.")
+        "'resolved' = at least one deepest attachment is not lumping "
+        "(`TcdbFamily.substrate_breadth = 'lumping'`); 'family_inferred' = "
+        "substrate breadth is reachability, not capability. None = no TCDB "
+        "call.")
     tcdb_evidence_score_max: float | None = Field(
         default=None,
         description="Gene-level max of the KG 5-signal composite "
@@ -982,7 +1005,7 @@ class GenesByMetaboliteResponse(BaseModel):
         "found in the live vocabulary.")
     resolved_aliases: dict[str, list[str]] = Field(
         default_factory=dict,
-        description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
+        description="Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.")
     not_found: GbmNotFound = Field(
         default_factory=GbmNotFound,
         description="Inputs that did not resolve to a KG node — see model.")
@@ -1088,9 +1111,10 @@ class MbgByGene(BaseModel):
     transport_substrate_resolution: str | None = Field(
         default=None,
         description="Gene-level `Gene.transport_substrate_resolution`: "
-        "'resolved' = at least one non-lumping deepest attachment (not "
-        "all); 'family_inferred' = substrate breadth is reachability, not "
-        "capability. None = no TCDB call.")
+        "'resolved' = at least one deepest attachment is not lumping "
+        "(`TcdbFamily.substrate_breadth = 'lumping'`); 'family_inferred' = "
+        "substrate breadth is reachability, not capability. None = no TCDB "
+        "call.")
     tcdb_evidence_score_max: float | None = Field(
         default=None,
         description="Gene-level max of the KG 5-signal composite "
@@ -1362,7 +1386,7 @@ class MetabolitesByGeneResponse(BaseModel):
         "one (locus_tags are never case-normalised).")
     resolved_aliases: dict[str, list[str]] = Field(
         default_factory=dict,
-        description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
+        description="Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.")
     not_found: MbgNotFound = Field(
         default_factory=MbgNotFound,
         description="Inputs that did not resolve to a KG node — see model.")
@@ -1769,13 +1793,14 @@ def register_tools(mcp: FastMCP):
                     "attachment_depth", "trust_axes", "link_kinds",
                     "cluster_type", "treatment_type", "background_factors",
                     "table_scope", "detection_status", "expression_status",
-                    "partner_role"],
+                    "partner_role", "structure_kind",
+                    "kegg_functional_category", "kegg_brite_class",
+                    "stereo_assignment"],
             Field(description=(
-                "Which filter to enumerate — gene/expression (incl. "
-                "cluster_type, expression_status), DerivedMetric (incl. "
-                "table_scope), chemistry (incl. detection_status), "
-                "experiment (treatment_type, background_factors, "
-                "partner_role), or a "
+                "Which filter to enumerate: gene/expression (incl. "
+                "cluster_type), DerivedMetric, chemistry (detection_status, structure_kind, "
+                "kegg_functional_category, kegg_brite_class, "
+                "stereo_assignment), experiment (incl. partner_role) or a "
                 "trust vocabulary."
             )),
         ] = "gene_category",
@@ -2230,7 +2255,7 @@ def register_tools(mcp: FastMCP):
         )
         transport_substrate_resolution: str | None = Field(
             default=None,
-            description="'resolved' = at least one non-lumping deepest TCDB attachment (not all); 'family_inferred' = transported_metabolite_count is reachability, not capability. None = no TCDB call. Read the score; if resolved, drill into substrates.",
+            description="'resolved' = at least one deepest TCDB attachment is not lumping (TcdbFamily.substrate_breadth = 'lumping'); 'family_inferred' = transported_metabolite_count is reachability, not capability. None = no TCDB call.",
         )
         evidence_sources: list[str] = Field(
             default_factory=list,
@@ -7976,21 +8001,25 @@ def register_tools(mcp: FastMCP):
         metabolite_ids: MetaboliteIdsParam = None,
         exclude_metabolite_ids: ExcludeMetaboliteIdsParam = None,
         kegg_compound_ids: Annotated[list[str] | None, Field(
-            description="Filter by raw KEGG C-numbers (e.g. ['C00031']). "
-            "Convenience over `metabolite_ids` when working with KEGG-anchored "
-            "data; the prefixed equivalent is `kegg.compound:C*`.",
+            description="KEGG compound ids, bare or prefixed (e.g. ['C00031']). "
+            "Matches any of the metabolite's identifiers, including "
+            "secondary and retired ones, so a merged compound's old KEGG id "
+            "still finds it.",
         )] = None,
         chebi_ids: Annotated[list[str] | None, Field(
-            description="Filter by raw ChEBI numeric IDs (e.g. ['4167', '15422']). "
-            "90% of Metabolite nodes carry a `chebi_id`.",
+            description="ChEBI ids, bare digits or 'CHEBI:' form (e.g. "
+            "['4167', 'CHEBI:15422']). Matches any of the metabolite's "
+            "identifiers, including secondary and retired ones.",
         )] = None,
         hmdb_ids: Annotated[list[str] | None, Field(
-            description="Filter by raw HMDB IDs (e.g. ['HMDB0000122']). "
-            "47% coverage.",
+            description="HMDB ids (e.g. ['HMDB0000122']; short 'HMDB02878' "
+            "is padded). Matches any of the metabolite's identifiers, "
+            "including secondary and retired ones.",
         )] = None,
         mnxm_ids: Annotated[list[str] | None, Field(
-            description="Filter by raw MetaNetX IDs (e.g. ['MNXM1364061']). "
-            "100% coverage — every Metabolite has a `mnxm_id`.",
+            description="MetaNetX ids (e.g. ['MNXM1364061']). Matches any of "
+            "the metabolite's identifiers, including secondary and retired "
+            "ones.",
         )] = None,
         elements: Annotated[list[str] | None, Field(
             description="Element-presence filter (Hill-notation symbols, "
@@ -8035,6 +8064,26 @@ def register_tools(mcp: FastMCP):
                 "MetaboliteAssay). Other values raise at the MCP boundary.",
             ),
         ] = None,
+        structure_kind: Annotated[list[str] | None, Field(
+            description="Structure kind(s) (OR): 'defined' (one molecule), "
+            "'generic' (a compound class) or 'polymer'. E.g. ['defined'] "
+            "drops generic substrates like 'amino acid'. Values: "
+            "list_filter_values('structure_kind').",
+        )] = None,
+        kegg_functional_categories: Annotated[list[str] | None, Field(
+            description="KEGG br08001 categories (OR). Hand-curated and "
+            "partial: only ~10% of metabolites are listed, so a missing "
+            "category means 'KEGG did not list it', not 'not in it' "
+            "(fumarate is unclassified). Values: "
+            "list_filter_values('kegg_functional_category').",
+        )] = None,
+        kegg_brite_classes: Annotated[list[str] | None, Field(
+            description="Classes from 7 other KEGG compound BRITE trees, as "
+            "'Tree: Class' (OR), e.g. 'Lipids: Fatty acyls'. Curated and "
+            "partial (~20% of metabolites): unlisted = 'KEGG did not list "
+            "it', not 'not in it'. Values: "
+            "list_filter_values('kegg_brite_class').",
+        )] = None,
         summary: SummaryParam = False,
         verbose: VerboseParam = False,
         limit: LimitParam = 5,
@@ -8053,6 +8102,9 @@ def register_tools(mcp: FastMCP):
             f"exclude_metabolite_ids={exclude_metabolite_ids} "
             f"elements={elements} organism_names={organism_names} "
             f"pathway_ids={pathway_ids} evidence_sources={evidence_sources} "
+            f"structure_kind={structure_kind} "
+            f"kegg_functional_categories={kegg_functional_categories} "
+            f"kegg_brite_classes={kegg_brite_classes} "
             f"summary={summary} verbose={verbose} limit={limit} offset={offset}"
         )
         try:
@@ -8071,6 +8123,9 @@ def register_tools(mcp: FastMCP):
                 organism_names=organism_names,
                 pathway_ids=pathway_ids,
                 evidence_sources=evidence_sources,
+                structure_kind=structure_kind,
+                kegg_functional_categories=kegg_functional_categories,
+                kegg_brite_classes=kegg_brite_classes,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
@@ -8109,6 +8164,18 @@ def register_tools(mcp: FastMCP):
                 xref_coverage=xref_coverage,
                 mass_stats=mass_stats,
                 by_measurement_coverage=by_measurement_coverage,
+                by_structure_kind=[
+                    MetStructureKindBucket(**b)
+                    for b in result.get("by_structure_kind", [])
+                ],
+                by_kegg_functional_category=[
+                    MetKeggFunctionalCategoryBucket(**b)
+                    for b in result.get("by_kegg_functional_category", [])
+                ],
+                by_kegg_brite_class=[
+                    MetKeggBriteClassBucket(**b)
+                    for b in result.get("by_kegg_brite_class", [])
+                ],
                 score_max=result.get("score_max"),
                 score_median=result.get("score_median"),
                 returned=result["returned"],
@@ -8729,7 +8796,7 @@ def register_tools(mcp: FastMCP):
             "`publication_dois` input filter name).")
         resolved_aliases: dict[str, list[str]] = Field(
             default_factory=dict,
-            description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
+            description="Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.")
         warnings: list[str] = Field(
             default_factory=list,
             description="Diagnostic strings, e.g. a bare metabolite ID "
@@ -8979,6 +9046,11 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Input publication DOIs absent from the KG.")
 
+    class MqaByStereoAssignment(BaseModel):
+        stereo_assignment: str = Field(
+            description="'as_reported' or 'dominant_form_assumed'.")
+        count: int = Field(description="Row count with this stereo assignment.")
+
     class MetabolitesByQuantifiesAssayResult(SparseRow):
         # Identity / chemistry
         metabolite_id: str = Field(
@@ -9032,6 +9104,11 @@ def register_tools(mcp: FastMCP):
             description="One of 'detected', 'sporadic', 'not_detected'. "
             "'not_detected' = tested-absent (real biology, kept by "
             "default). Numeric edge only.")
+        stereo_assignment: str | None = Field(
+            default=None,
+            description="'as_reported' (the paper named this stereo form) or "
+            "'dominant_form_assumed' (it named none; the KG placed the "
+            "measurement on the dominant form, e.g. 'Alanine' on L-Alanine).")
         # Timepoint / phase (sentinel-coerced)
         timepoint: str | None = Field(
             default=None,
@@ -9089,6 +9166,11 @@ def register_tools(mcp: FastMCP):
             description="Counts per detection_status — primary qualitative "
             "headline. 'not_detected' rows are tested-absent (real "
             "biology, kept by default — about 70% of numeric edges).")
+        by_stereo_assignment: list[MqaByStereoAssignment] = Field(
+            default_factory=list,
+            description="Rows per stereo_assignment over the matched set. "
+            "'dominant_form_assumed' rows had no form named by the paper; "
+            "filter stereo_assignment=['as_reported'] to drop them.")
         by_metric_bucket: list[MqaByMetricBucket] = Field(
             default_factory=list,
             description="Counts per rank-bucket on rankable rows.")
@@ -9115,14 +9197,14 @@ def register_tools(mcp: FastMCP):
         warnings: list[str] = Field(
             default_factory=list,
             description="Human-readable rankable-gating diagnostics, "
-            "bare-ID collision notes (one input → several metabolites, "
-            "expanded to all), and a sibling-tool notice when a requested "
+            "metabolite-id notes (removed compound, chemical role), a count "
+            "of dominant-form-assumed rows, and a sibling-tool notice when a requested "
             "assay_id exists as value_kind='boolean' (genuinely found, "
             "excluded from `not_found.assay_ids` — use "
             "`metabolites_by_flags_assay` instead).")
         resolved_aliases: dict[str, list[str]] = Field(
             default_factory=dict,
-            description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
+            description="Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.")
         not_found: MqaNotFound = Field(
             default_factory=MqaNotFound,
             description="Per-batch-input unknown IDs (4 buckets: "
@@ -9213,6 +9295,13 @@ def register_tools(mcp: FastMCP):
                         "their `rank_by_metric` is nulled for display.",
             ge=1,
         )] = None,
+        stereo_assignment: Annotated[list[str] | None, Field(
+            description="Stereo-form provenance (OR): 'as_reported' = the "
+                        "paper named the form; 'dominant_form_assumed' = it "
+                        "named none and the KG placed it on the dominant form "
+                        "(e.g. 'Alanine' on L-Alanine). ['as_reported'] drops "
+                        "assumed rows.",
+        )] = None,
         summary: SummaryParam = False,
         verbose: VerboseParam = False,
         limit: LimitParam = 5,
@@ -9251,6 +9340,7 @@ def register_tools(mcp: FastMCP):
                 min_percentile=min_percentile,
                 max_percentile=max_percentile,
                 max_rank=max_rank,
+                stereo_assignment=stereo_assignment,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
@@ -9291,6 +9381,10 @@ def register_tools(mcp: FastMCP):
             results=results,
             total_matching=data["total_matching"],
             by_detection_status=by_detection_status,
+            by_stereo_assignment=[
+                MqaByStereoAssignment(**b)
+                for b in data.get("by_stereo_assignment", [])
+            ],
             by_metric_bucket=by_metric_bucket,
             by_assay=by_assay,
             by_compartment=by_compartment,
@@ -9349,6 +9443,11 @@ def register_tools(mcp: FastMCP):
         experiment_ids: list[str] = Field(default_factory=list)
         publication_doi: list[str] = Field(default_factory=list)
 
+    class MfaByStereoAssignment(BaseModel):
+        stereo_assignment: str = Field(
+            description="'as_reported' or 'dominant_form_assumed'.")
+        count: int = Field(description="Row count with this stereo assignment.")
+
     class MetabolitesByFlagsAssayResult(SparseRow):
         # Identity / chemistry
         metabolite_id: str = Field(
@@ -9364,6 +9463,11 @@ def register_tools(mcp: FastMCP):
         n_positive: int | None = Field(
             default=None,
             description="Number of replicates flagged positive.")
+        stereo_assignment: str | None = Field(
+            default=None,
+            description="'as_reported' (the paper named this stereo form) or "
+            "'dominant_form_assumed' (it named none; the KG placed the "
+            "measurement on the dominant form, e.g. 'Alanine' on L-Alanine).")
         n_replicates: int | None = Field(
             default=None, description="Number of replicates.")
         metric_type: str = Field(
@@ -9399,6 +9503,11 @@ def register_tools(mcp: FastMCP):
             "are tested-absent (real biology, kept by default). Boolean "
             "arm has no `by_detection_status` — `flag_value` IS the "
             "qualitative-detection signal here.")
+        by_stereo_assignment: list[MfaByStereoAssignment] = Field(
+            default_factory=list,
+            description="Rows per stereo_assignment over the matched set. "
+            "'dominant_form_assumed' rows had no form named by the paper; "
+            "filter stereo_assignment=['as_reported'] to drop them.")
         by_assay: list[MfaByAssay] = Field(
             default_factory=list,
             description="Counts per assay_id.")
@@ -9417,14 +9526,14 @@ def register_tools(mcp: FastMCP):
         warnings: list[str] = Field(
             default_factory=list,
             description="No gate diagnostics here (no gates apply); "
-            "bare-ID collision notes (one input → several metabolites, "
-            "expanded to all), and a sibling-tool notice when a requested "
+            "metabolite-id notes (removed compound, chemical role), a count "
+            "of dominant-form-assumed rows, and a sibling-tool notice when a requested "
             "assay_id exists as value_kind='numeric' (genuinely found, "
             "excluded from `not_found.assay_ids` — use "
             "`metabolites_by_quantifies_assay` instead). Otherwise `[]`.")
         resolved_aliases: dict[str, list[str]] = Field(
             default_factory=dict,
-            description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
+            description="Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.")
         not_found: MfaNotFound = Field(
             default_factory=MfaNotFound,
             description="Per-batch-input unknown IDs (4 buckets: "
@@ -9471,6 +9580,13 @@ def register_tools(mcp: FastMCP):
                         "boolean DMs store `not_flagged`), so `flag_value=False` "
                         "returns real rows (about 69% of boolean rows).",
         )] = None,
+        stereo_assignment: Annotated[list[str] | None, Field(
+            description="Stereo-form provenance (OR): 'as_reported' = the "
+                        "paper named the form; 'dominant_form_assumed' = it "
+                        "named none and the KG placed it on the dominant form "
+                        "(e.g. 'Alanine' on L-Alanine). ['as_reported'] drops "
+                        "assumed rows.",
+        )] = None,
         summary: SummaryParam = False,
         verbose: VerboseParam = False,
         limit: LimitParam = 5,
@@ -9502,6 +9618,7 @@ def register_tools(mcp: FastMCP):
                 background_factors=background_factors,
                 growth_phases=growth_phases,
                 flag_value=flag_value,
+                stereo_assignment=stereo_assignment,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
@@ -9530,6 +9647,10 @@ def register_tools(mcp: FastMCP):
             results=results,
             total_matching=data["total_matching"],
             by_value=by_value,
+            by_stereo_assignment=[
+                MfaByStereoAssignment(**b)
+                for b in data.get("by_stereo_assignment", [])
+            ],
             by_assay=by_assay,
             by_compartment=by_compartment,
             by_organism=by_organism,
@@ -9573,6 +9694,11 @@ def register_tools(mcp: FastMCP):
             description="Sample compartment ('whole_cell' or 'extracellular').")
         count: int = Field(description="Row count in this compartment.")
 
+    class AbmByStereoAssignment(BaseModel):
+        stereo_assignment: str = Field(
+            description="'as_reported' or 'dominant_form_assumed'.")
+        count: int = Field(description="Row count with this stereo assignment.")
+
     class AbmByAssay(BaseModel):
         assay_id: str = Field(description="Assay id.")
         count: int = Field(description="Row count from this assay.")
@@ -9606,6 +9732,12 @@ def register_tools(mcp: FastMCP):
             default=None, description="Parent experiment id.")
         publication_doi: str | None = Field(
             default=None, description="Parent publication DOI.")
+        stereo_assignment: str | None = Field(
+            default=None,
+            description="'as_reported' (the paper named this stereo form) or "
+            "'dominant_form_assumed' (it named none; the KG placed the "
+            "measurement on the dominant form, e.g. 'Alanine' on "
+            "L-Alanine). Both arms.")
         # Numeric-only (sparse on flags rows)
         value: float | None = Field(
             default=None,
@@ -9690,6 +9822,11 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Boolean-row subset rollup; empty when "
             "`evidence_kind='quantifies'`.")
+        by_stereo_assignment: list[AbmByStereoAssignment] = Field(
+            default_factory=list,
+            description="Rows per stereo_assignment over the matched set. "
+            "'dominant_form_assumed' rows had no form named by the paper; "
+            "filter stereo_assignment=['as_reported'] to drop them.")
         metabolites_with_evidence: list[str] = Field(
             default_factory=list,
             description="Input `metabolite_ids` with at least one row in "
@@ -9717,12 +9854,12 @@ def register_tools(mcp: FastMCP):
             "`summary=True` or a batch larger than `limit`.")
         resolved_aliases: dict[str, list[str]] = Field(
             default_factory=dict,
-            description="Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).")
+            description="Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.")
         warnings: list[str] = Field(
             default_factory=list,
-            description="Diagnostic strings, e.g. a bare metabolite ID "
-            "that resolved to more than one metabolite (expanded to all — "
-            "pass the canonical id to narrow).")
+            description="Diagnostic strings, e.g. a removed compound (names "
+            "the id now holding its measurements), a chemical role rather "
+            "than a metabolite, or a count of dominant-form-assumed rows.")
         returned: int = Field(description="Length of `results`.")
         truncated: bool = Field(
             description="True when total_matching > offset + returned.")
@@ -9753,6 +9890,13 @@ def register_tools(mcp: FastMCP):
                         "'presence_flag_extracellular'].",
         )] = None,
         compartment: CompartmentParam = None,
+        stereo_assignment: Annotated[list[str] | None, Field(
+            description="Stereo-form provenance (OR): 'as_reported' = the "
+                        "paper named the form; 'dominant_form_assumed' = it "
+                        "named none and the KG placed it on the dominant form "
+                        "(e.g. 'Alanine' on L-Alanine). ['as_reported'] drops "
+                        "assumed rows.",
+        )] = None,
         summary: SummaryParam = False,
         verbose: VerboseParam = False,
         limit: LimitParam = 5,
@@ -9779,6 +9923,7 @@ def register_tools(mcp: FastMCP):
                 exclude_metabolite_ids=exclude_metabolite_ids,
                 metric_types=metric_types,
                 compartment=compartment,
+                stereo_assignment=stereo_assignment,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
@@ -9816,6 +9961,10 @@ def register_tools(mcp: FastMCP):
             by_assay=by_assay,
             by_detection_status=by_detection_status,
             by_flag_value=by_flag_value,
+            by_stereo_assignment=[
+                AbmByStereoAssignment(**b)
+                for b in data.get("by_stereo_assignment", [])
+            ],
             metabolites_with_evidence=data["metabolites_with_evidence"],
             metabolites_without_evidence=data["metabolites_without_evidence"],
             metabolites_matched=data["metabolites_matched"],

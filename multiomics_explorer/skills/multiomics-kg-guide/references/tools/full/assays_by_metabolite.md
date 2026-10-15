@@ -13,12 +13,13 @@ docs://tools/assays_by_metabolite; summary=True first for 50+ IDs.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| metabolite_ids | list[string] | — | Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites). |
+| metabolite_ids | list[string] | — | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolites. |
 | organism | string \| None | None | Organism: case-insensitive substring match on the organism name ('MED4'); a genus word matches every strain. See list_organisms. |
 | evidence_kind | string ('quantifies', 'flags') \| None | None | Filter by edge type. `'quantifies'` = numeric arm only (rows carry value, detection_status, timepoint*). `'flags'` = boolean arm only (rows carry flag_value, n_positive). Default `None` = both arms merged (polymorphic rows; cross-arm fields explicit `None`). |
-| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; bare/xref forms coerced (see resolved_aliases); exclude wins on overlap. |
+| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
 | metric_types | list[string] \| None | None | Filter by metric_type tag(s) on the parent assay. E.g. ['cellular_concentration', 'extracellular_concentration', 'presence_flag_intracellular', 'presence_flag_extracellular']. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
+| stereo_assignment | list[string] \| None | None | Stereo-form provenance (OR): 'as_reported' = the paper named the form; 'dominant_form_assumed' = it named none and the KG placed it on the dominant form (e.g. 'Alanine' on L-Alanine). ['as_reported'] drops assumed rows. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | limit | int | 5 | Max rows returned (paging). |
@@ -31,7 +32,7 @@ docs://tools/assays_by_metabolite; summary=True first for 50+ IDs.
 ### Envelope
 
 ```expected-keys
-total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_detection_status, by_flag_value, metabolites_with_evidence, metabolites_without_evidence, metabolites_matched, not_found, not_matched, resolved_aliases, warnings, returned, truncated, offset, results
+total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_detection_status, by_flag_value, by_stereo_assignment, metabolites_with_evidence, metabolites_without_evidence, metabolites_matched, not_found, not_matched, resolved_aliases, warnings, returned, truncated, offset, results
 ```
 
 - **total_matching** (int): Row count merged across arms (one row per metabolite × assay-edge). Use `metabolites_matched` for distinct-metabolite count.
@@ -41,13 +42,14 @@ total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_dete
 - **by_assay** (list[AbmByAssay]): Counts per assay_id.
 - **by_detection_status** (list[AbmByDetectionStatus]): Numeric-row subset rollup; empty when `evidence_kind='flags'`.
 - **by_flag_value** (list[AbmByFlagValue]): Boolean-row subset rollup; empty when `evidence_kind='quantifies'`.
+- **by_stereo_assignment** (list[AbmByStereoAssignment]): Rows per stereo_assignment over the matched set. 'dominant_form_assumed' rows had no form named by the paper; filter stereo_assignment=['as_reported'] to drop them.
 - **metabolites_with_evidence** (list[string]): Input `metabolite_ids` with at least one row in the filtered slice (parallel to `gene_derived_metrics`'s `genes_with_metrics`). Computed from the full filtered match set, not from the (paginated, possibly empty) `results` page — populated the same way whether or not `summary=True`.
 - **metabolites_without_evidence** (list[string]): Input `metabolite_ids` with no row in the filtered slice (includes both `not_found` and `not_matched` IDs).
 - **metabolites_matched** (int): Distinct-metabolite count — use this for unique tallies (NOT `total_matching`, which is row-count).
 - **not_found** (list[string]): Flat `list[str]` — single-batch reverse-lookup. Input metabolite IDs absent from the KG.
 - **not_matched** (list[string]): Flat `list[str]` — IDs in KG with no edge after filters (unmeasured for this scope). Distinct from `not_found`. Computed from the full filtered match set (see `metabolites_with_evidence`) — correct even with `summary=True` or a batch larger than `limit`.
-- **resolved_aliases** (object): Bare / xref metabolite inputs coerced to canonical IDs, `{input: [canonical, ...]}` — only coerced entries, across both `metabolite_ids` and `exclude_metabolite_ids`. A list longer than 1 is a collision (expanded to all; see `warnings`).
-- **warnings** (list[string]): Diagnostic strings, e.g. a bare metabolite ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow).
+- **resolved_aliases** (object): Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.
+- **warnings** (list[string]): Diagnostic strings, e.g. a removed compound (names the id now holding its measurements), a chemical role rather than a metabolite, or a count of dominant-form-assumed rows.
 - **returned** (int): Length of `results`.
 - **truncated** (bool): True when total_matching > offset + returned.
 - **offset** (int): Pagination offset used.
@@ -68,6 +70,7 @@ total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_dete
 | compartment | string | 'whole_cell' or 'extracellular'. |
 | experiment_id | string \| None (optional) | Parent experiment id. |
 | publication_doi | string \| None (optional) | Parent publication DOI. |
+| stereo_assignment | string \| None (optional) | 'as_reported' (the paper named this stereo form) or 'dominant_form_assumed' (it named none; the KG placed the measurement on the dominant form, e.g. 'Alanine' on L-Alanine). Both arms. |
 | value | float \| None (optional) | Raw concentration / intensity. Numeric arm only. |
 | value_sd | float \| None (optional) | Standard deviation across replicates. Numeric arm only. |
 | metric_bucket | string \| None (optional) | Bucket label. Numeric, rankable subset only; null on tested-absent (`detection_status='not_detected'`) rows even then — a stored bucket from raw-zero coincidence is not a ranking signal. |
@@ -270,6 +273,19 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074", "kegg.compound:C999
 assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"], compartment="extracellular")
 ```
 
+### Example 7: Assumed stereo form — every alanine measurement was placed on L-alanine by the KG
+
+```example-call
+assays_by_metabolite(metabolite_ids=["kegg.compound:C00041"], summary=True)
+```
+
+```example-response
+{
+  "total_matching": 6,
+  "by_stereo_assignment": [{"stereo_assignment": "dominant_form_assumed", "count": 6}]
+}
+```
+
 ## Chaining patterns
 
 ```
@@ -282,6 +298,23 @@ assays_by_metabolite → metabolites_by_flags_assay(assay_ids=[...], metabolite_
 ## Common mistakes
 
 - Metabolite-anchored reverse lookup over BOTH arms. Siblings: `metabolites_by_quantifies_assay` (assay-anchored, numeric arm, rankable filters) and `metabolites_by_flags_assay` (assay-anchored, boolean arm) — drill back to them with the `assay_id`s found here.
+
+```mistake
+assays_by_metabolite(metabolite_ids=['kegg.compound:C00041'])  # then reporting 'L-alanine was measured in 6 assays'
+```
+
+```correction
+`stereo_assignment` on every row (both arms) says who chose the stereo form:
+`as_reported` = the paper named it (or the compound has no stereo
+variant); `dominant_form_assumed` = the paper gave no form and the KG
+placed the row on one form of the stereo family (usually the one with
+the most catalysing genes — 'Alanine' lands on L-alanine
+`kegg.compound:C00041`). The envelope's `by_stereo_assignment` counts
+both over the matched set and a `warnings` entry fires when any row is
+assumed. Pass `stereo_assignment=['as_reported']` when the stereo form
+matters to the claim, or quote assumed rows as "L-form assumed".
+
+```
 
 ```mistake
 Filter out value=0 / flag_value=false rows assuming they are noise.
@@ -389,16 +422,18 @@ assays_by_metabolite(metabolite_ids=['C00064'])  # then treating `C00064` in `no
 ```
 
 ```correction
-Bare / xref metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are resolved via
-the node's cross-references before the query runs: `C00064` →
-`kegg.compound:C00064`, `CHEBI:17234` / `17234` → the `chebi_id` match,
-`HMDB0000122` → `hmdb_id`, `MNXM1095050` → `mnxm_id`. Canonical forms
-(`kegg.compound:` / `chebi:` / `mnx:`) pass through untouched. Coerced
-inputs are listed in envelope `resolved_aliases` (`{input: [canonical, ...]}`).
-CHEBI / HMDB / MNXM xrefs are not unique — an ambiguous input expands to
-ALL matching metabolites and appends a `warnings` entry; pass the canonical
-id to narrow. Unresolved inputs stay verbatim and surface in `not_found`
-in the form you passed.
+Metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are normalised and
+looked up in every identifier the metabolite carries before the query runs:
+`C00064` / `kegg.compound:c00064` → `kegg.compound:C00064`, `CHEBI:17234` /
+`17234` → `chebi:17234`; `HMDB0000122`, `MNXM732398` and bare InChIKeys resolve
+the same way. Retired ids of merged or re-keyed nodes resolve to the surviving
+node (`chebi:14654` → nitrate `kegg.compound:C00244`). Every input that isn't
+already canonical is listed in envelope `resolved_aliases`
+(`{input: [canonical, ...]}`). A removed compound whose measurements moved to
+another compound, and a chemical-role id (`chebi:10004`, 'vitamin (role)'),
+stay verbatim in `not_found` with a `warnings` entry naming the replacement or
+the role. Other unresolved inputs stay verbatim in `not_found` in the form you
+passed.
 
 ```
 
@@ -412,7 +447,7 @@ in the form you passed.
 from multiomics_explorer import assays_by_metabolite
 
 result = assays_by_metabolite(metabolite_ids=...)
-# returns dict with keys: total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_detection_status, by_flag_value, metabolites_with_evidence, metabolites_without_evidence, metabolites_matched, not_found, not_matched, resolved_aliases, warnings, returned, truncated, offset, results
+# returns dict with keys: total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_detection_status, by_flag_value, by_stereo_assignment, metabolites_with_evidence, metabolites_without_evidence, metabolites_matched, not_found, not_matched, resolved_aliases, warnings, returned, truncated, offset, results
 ```
 
 Use package import for bulk data extraction in scripts.

@@ -13,12 +13,13 @@ docs://tools/assays_by_metabolite; summary=True first for 50+ IDs.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| metabolite_ids | list[string] | — | Metabolite IDs; bare or xref forms coerced (see resolved_aliases, docs://analysis/metabolites). |
+| metabolite_ids | list[string] | — | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolites. |
 | organism | string \| None | None | Organism: case-insensitive substring match on the organism name ('MED4'); a genus word matches every strain. See list_organisms. |
 | evidence_kind | string ('quantifies', 'flags') \| None | None | Filter by edge type. `'quantifies'` = numeric arm only (rows carry value, detection_status, timepoint*). `'flags'` = boolean arm only (rows carry flag_value, n_positive). Default `None` = both arms merged (polymorphic rows; cross-arm fields explicit `None`). |
-| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; bare/xref forms coerced (see resolved_aliases); exclude wins on overlap. |
+| exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
 | metric_types | list[string] \| None | None | Filter by metric_type tag(s) on the parent assay. E.g. ['cellular_concentration', 'extracellular_concentration', 'presence_flag_intracellular', 'presence_flag_extracellular']. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
+| stereo_assignment | list[string] \| None | None | Stereo-form provenance (OR): 'as_reported' = the paper named the form; 'dominant_form_assumed' = it named none and the KG placed it on the dominant form (e.g. 'Alanine' on L-Alanine). ['as_reported'] drops assumed rows. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | limit | int | 5 | Max rows returned (paging). |
@@ -37,7 +38,7 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
 ## Response sketch
 
 ```expected-keys
-total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_detection_status, by_flag_value, metabolites_with_evidence, metabolites_without_evidence, metabolites_matched, not_found, not_matched, resolved_aliases, warnings, returned, truncated, offset, results
+total_matching, by_evidence_kind, by_organism, by_compartment, by_assay, by_detection_status, by_flag_value, by_stereo_assignment, metabolites_with_evidence, metabolites_without_evidence, metabolites_matched, not_found, not_matched, resolved_aliases, warnings, returned, truncated, offset, results
 ```
 
 Result row: `metabolite_id, metabolite_name, assay_id, assay_name, evidence_kind, n_replicates, metric_type, condition_label, organism_name, compartment, experiment_id, publication_doi, …`
@@ -47,23 +48,29 @@ Result row: `metabolite_id, metabolite_name, assay_id, assay_name, evidence_kind
 - Metabolite-anchored reverse lookup over BOTH arms. Siblings: `metabolites_by_quantifies_assay` (assay-anchored, numeric arm, rankable filters) and `metabolites_by_flags_assay` (assay-anchored, boolean arm) — drill back to them with the `assay_id`s found here.
 
 ```mistake
+assays_by_metabolite(metabolite_ids=['kegg.compound:C00041'])  # then reporting 'L-alanine was measured in 6 assays'
+```
+
+```correction
+`stereo_assignment` on every row (both arms) says who chose the stereo form:
+`as_reported` = the paper named it (or the compound has no stereo
+variant); `dominant_form_assumed` = the paper gave no form and the KG
+placed the row on one form of the stereo family (usually the one with
+the most catalysing genes — 'Alanine' lands on L-alanine
+`kegg.compound:C00041`). The envelope's `by_stereo_assignment` counts
+both over the matched set and a `warnings` entry fires when any row is
+assumed. Pass `stereo_assignment=['as_reported']` when the stereo form
+matters to the claim, or quote assumed rows as "L-form assumed".
+
+```
+
+```mistake
 Filter out value=0 / flag_value=false rows assuming they are noise.
 ```
 
 ```correction
 These rows are tested-absent — the metabolite was assayed and not found.
 They are biology. Keep them unless explicitly investigating presence-only.
-
-```
-
-```mistake
-A metabolite missing from results means it was not detected.
-```
-
-```correction
-Missing means unmeasured (out of scope for this assay). For 'tested and
-not found,' look for a value=0 / flag_value=false / detection_status='not_detected'
-row.
 
 ```
 

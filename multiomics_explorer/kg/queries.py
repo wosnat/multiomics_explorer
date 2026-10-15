@@ -266,4 +266,51 @@ FEW_SHOT_EXAMPLES = [
             "like 'axenic', 'diel_cycle', 'continuous_light'. Use coalesce for null safety."
         ),
     },
+    {
+        "question": "Which TCDB families transport siderophores?",
+        "cypher": (
+            "CALL db.index.fulltext.queryNodes('chemicalRoleFullText', 'siderophore')\n"
+            "YIELD node AS role, score\n"
+            "WITH role ORDER BY score DESC LIMIT 1\n"
+            "MATCH (sub:ChemicalRole)-[:Chemical_role_is_a_chemical_role*0..]->(role)\n"
+            "MATCH (f:TcdbFamily)-[:Tcdb_family_transports_chemical_role]->(sub)\n"
+            "WHERE f.substrate_breadth <> 'not_assessed'\n"
+            "RETURN role.id AS role_id, f.id AS tcdb_family_id, f.name AS tcdb_family_name,\n"
+            "       f.substrate_breadth AS substrate_breadth,\n"
+            "       collect(DISTINCT sub.name) AS via_roles\n"
+            "ORDER BY tcdb_family_id"
+        ),
+        "explanation": (
+            "Siderophore, vitamin, antibiotic and similar terms are ChemicalRole nodes "
+            "(id chebi.role:<n>), not Metabolite nodes, so the metabolite tools never return "
+            "them. Find the role by name with the chemicalRoleFullText index, expand to its "
+            "narrower roles with Chemical_role_is_a_chemical_role*0.. (child → parent), then "
+            "follow Tcdb_family_transports_chemical_role (TcdbFamily → ChemicalRole). "
+            "substrate_breadth = 'lumping' marks broad superfamilies whose substrate list is "
+            "reachability, not capability; 'not_assessed' marks TCDB class / subclass nodes. "
+            "Feed tcdb_family_id to genes_by_ontology(ontology='tcdb', term_ids=[...])."
+        ),
+    },
+    {
+        "question": "Which metabolites are in the KEGG lipid class 'Fatty Acids and Conjugates', including its subclasses?",
+        "cypher": (
+            "MATCH (cls:MetaboliteClass {tree_code: 'br08002'})\n"
+            "WHERE cls.name CONTAINS 'Fatty Acids and Conjugates'\n"
+            "MATCH (sub:MetaboliteClass)-[:Metabolite_class_is_a_metabolite_class*0..]->(cls)\n"
+            "MATCH (m:Metabolite)-[:Metabolite_in_metabolite_class]->(sub)\n"
+            "RETURN cls.id AS class_id, m.id AS metabolite_id, m.name AS name,\n"
+            "       collect(DISTINCT sub.name) AS via_classes\n"
+            "ORDER BY name\n"
+            "LIMIT 50"
+        ),
+        "explanation": (
+            "MetaboliteClass nodes hold the KEGG compound BRITE trees (tree_code, e.g. br08002 "
+            "Lipids; level 0 = top class). list_metabolites exposes only the top level, as "
+            "'Tree: Class' strings in kegg_brite_classes; deeper classes need this hierarchy "
+            "walk: Metabolite_class_is_a_metabolite_class*0.. (child → parent) collects the "
+            "subclasses, Metabolite_in_metabolite_class (Metabolite → MetaboliteClass) the "
+            "members. KEGG lists representative compounds only, so a metabolite missing from a "
+            "class is unlisted, not excluded."
+        ),
+    },
 ]
