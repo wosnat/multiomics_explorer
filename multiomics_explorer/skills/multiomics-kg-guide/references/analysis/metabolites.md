@@ -371,7 +371,7 @@ Four native tools cover the measurement layer (no `run_cypher` needed):
 - **No gene anchor.** A metabolite measurement says nothing about which gene produced/consumed it.
 - **`Assay_quantifies` vs `Assay_flags`.** Quantifies = concentration/intensity (with `value`, `value_sd`, `n_replicates`, `metric_percentile`, `rank_by_metric`); Flags = qualitative detection (with `flag_value`, `n_positive`, `n_replicates`). Their downstream interpretation differs — split per DM convention into two drill-down tools.
 - **Compartment matters.** `whole_cell` measures pool; `extracellular` measures excretion / uptake / spent media; `vesicle` measures cargo packaged into extracellular vesicles. Filter via the `compartment=` kwarg on every Track-B tool.
-- **Targeted panel ≠ full metabolome.** Absence in measurement ≠ absence in cell. The current KG covers ~134 distinct metabolites across 14 assays in 3 papers — out of ~3.2k metabolites total, so ~96% have no measurement coverage.
+- **Targeted panel ≠ full metabolome.** Absence in measurement ≠ absence in cell. The current KG covers ~135 distinct metabolites across 14 assays in 3 papers — out of ~3.2k metabolites total, so ~96% have no measurement coverage.
 - **Replicate / normalisation conventions vary by paper.** Read `value_sd` and `n_replicates` on the edge, plus `field_description` on the parent assay (canonical provenance read — `verbose=True` surfaces it). The `value` itself is processed per the paper's pipeline.
 - **Tested-absent vs unmeasured.** See "Tested-absent vs unmeasured" above — the top-level invariant. Tested-absent rows (`value=0` / `detection_status='not_detected'` / `flag_value=false`) are biology, not noise; default-filtering them strips the majority of the layer.
 

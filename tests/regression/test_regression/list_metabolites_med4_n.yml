@@ -14,7 +14,7 @@ by_measurement_coverage:
   - compartment: whole_cell
     count: 89
   by_paper_count:
-  - count: 913
+  - count: 914
     paper_count: 0
   - count: 56
     paper_count: 1
@@ -25,7 +25,7 @@ by_measurement_coverage:
 case_id: list_metabolites_med4_n
 mass_stats:
   mass_max: 5227.103
-  mass_median: 336.197
+  mass_median: 336.173
   mass_min: 18.039
 no_formula_excluded: 171
 not_found:
@@ -283,13 +283,13 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 513
+- count: 511
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 213
+- count: 212
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
-- count: 160
+- count: 159
   metabolite_pathway_id: kegg.pathway:ko01240
   metabolite_pathway_name: Biosynthesis of cofactors
 - count: 81
@@ -314,34 +314,34 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko00970
   metabolite_pathway_name: Aminoacyl-tRNA biosynthesis
 top_organisms:
-- count: 1002
+- count: 1003
   organism_name: Prochlorococcus MED4
-- count: 985
+- count: 986
   organism_name: Prochlorococcus MIT9515
-- count: 980
+- count: 981
   organism_name: Prochlorococcus AS9601
-- count: 977
+- count: 978
   organism_name: Prochlorococcus MIT9215
-- count: 976
+- count: 977
   organism_name: Prochlorococcus MIT1327
-- count: 976
+- count: 977
   organism_name: Prochlorococcus MIT9312
-- count: 976
+- count: 977
   organism_name: Prochlorococcus MIT9303
-- count: 975
+- count: 976
   organism_name: Prochlorococcus RSP50
-- count: 975
+- count: 976
   organism_name: Prochlorococcus SB
-- count: 974
+- count: 975
   organism_name: Prochlorococcus MIT0604
-total_entries: 3203
-total_matching: 1002
+total_entries: 3214
+total_matching: 1003
 truncated: true
 warnings:
 - 171 metabolites have no formula and can never match an element filter (often generic
   classes such as 'amino acid' or 'dipeptide'). Re-run without elements to inspect
   them.
 xref_coverage:
-  with_chebi: 970
-  with_hmdb: 587
-  with_mnxm: 1002
+  with_chebi: 971
+  with_hmdb: 586
+  with_mnxm: 1001

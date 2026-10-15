@@ -130,7 +130,7 @@ list_metabolites(metabolite_ids=["chebi:17234"])
 
 ```example-response
 {
-  "total_entries": 3203,
+  "total_entries": 3214,
   "total_matching": 1,
   "top_organisms": [
     {"organism_name": "Alteromonas macleodii AD45", "count": 1},
@@ -186,14 +186,14 @@ list_metabolites(evidence_sources=["metabolomics"], summary=True)
 
 ```example-response
 {
-  "total_entries": 3203,
-  "total_matching": 134,
+  "total_entries": 3214,
+  "total_matching": 135,
   "top_organisms": [
-    {"organism_name": "Prochlorococcus MIT9313", "count": 133},
+    {"organism_name": "Prochlorococcus MIT9313", "count": 134},
     {"organism_name": "Prochlorococcus MIT9301", "count": 127},
     {"organism_name": "Prochlorococcus MIT0801", "count": 126},
-    {"organism_name": "Synechococcus elongatus UTEX 2973", "count": 121},
-    {"organism_name": "Pseudomonas putida KT2440", "count": 121},
+    {"organism_name": "Synechococcus elongatus PCC 7942", "count": 121},
+    {"organism_name": "Alteromonas mediterranea AltDE1", "count": 121},
     ...
   ],
   "top_metabolite_pathways": [
@@ -225,18 +225,18 @@ list_metabolites(evidence_sources=["metabolomics"], summary=True)
     ...
   ],
   "by_evidence_source": [
-    {"evidence_source": "metabolomics", "count": 134},
+    {"evidence_source": "metabolomics", "count": 135},
     {"evidence_source": "metabolism", "count": 119},
     {"evidence_source": "transport", "count": 104}
   ],
-  "xref_coverage": {"with_chebi": 134, "with_hmdb": 126, "with_mnxm": 134},
+  "xref_coverage": {"with_chebi": 135, "with_hmdb": 125, "with_mnxm": 133},
   "mass_stats": {"mass_min": 89.094, "mass_median": 179.172, "mass_max": 1353.372},
   "by_measurement_coverage": {
-    "by_paper_count": [{"paper_count": 1, "count": 91}, {"paper_count": 2, "count": 38}, {"paper_count": 3, "count": 5}],
+    "by_paper_count": [{"paper_count": 1, "count": 93}, {"paper_count": 2, "count": 37}, {"paper_count": 3, "count": 5}],
     "by_compartment": [
       {"compartment": "extracellular", "count": 92},
       {"compartment": "vesicle", "count": 70},
-      {"compartment": "whole_cell", "count": 134}
+      {"compartment": "whole_cell", "count": 135}
     ]
   },
   "score_max": null,

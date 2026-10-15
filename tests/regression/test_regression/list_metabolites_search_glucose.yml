@@ -52,7 +52,7 @@ results:
   organism_count: 43
   pathway_count: 0
   pathway_ids: []
-  score: 3.0688
+  score: 3.0709
   transporter_count: 18
   transporter_gene_count: 3091
 - catalyst_gene_count: 303
@@ -99,7 +99,7 @@ results:
   - kegg.pathway:ko01240
   - kegg.pathway:ko01250
   - kegg.pathway:ko04082
-  score: 2.5825
+  score: 2.5841
   transporter_count: 3
   transporter_gene_count: 1708
 - catalyst_gene_count: 284
@@ -157,7 +157,7 @@ results:
   - kegg.pathway:ko05111
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
-  score: 2.5825
+  score: 2.5841
   transporter_count: 10
   transporter_gene_count: 1436
 - catalyst_gene_count: 198
@@ -191,7 +191,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 2.5825
+  score: 2.5841
   transporter_count: 1
   transporter_gene_count: 249
 - catalyst_gene_count: 89
@@ -220,7 +220,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 2.5825
+  score: 2.5841
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 18
@@ -249,7 +249,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 2.5825
+  score: 2.5841
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 192
@@ -277,7 +277,7 @@ results:
   - kegg.pathway:ko01110
   - kegg.pathway:ko01120
   - kegg.pathway:ko01200
-  score: 2.2292
+  score: 2.2306
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 183
@@ -309,7 +309,7 @@ results:
   - kegg.pathway:ko01200
   - kegg.pathway:ko01250
   - kegg.pathway:ko04964
-  score: 2.2292
+  score: 2.2306
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 196
@@ -359,7 +359,7 @@ results:
   - kegg.pathway:ko05111
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
-  score: 1.9609
+  score: 1.9621
   transporter_count: 2
   transporter_gene_count: 866
 - catalyst_gene_count: 287
@@ -404,7 +404,7 @@ results:
   - kegg.pathway:ko01240
   - kegg.pathway:ko01250
   - kegg.pathway:ko04922
-  score: 1.9609
+  score: 1.9621
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 0
@@ -426,7 +426,7 @@ results:
   organism_count: 43
   pathway_count: 0
   pathway_ids: []
-  score: 1.9609
+  score: 1.9621
   transporter_count: 2
   transporter_gene_count: 606
 - catalyst_gene_count: 0
@@ -448,7 +448,7 @@ results:
   organism_count: 43
   pathway_count: 0
   pathway_ids: []
-  score: 1.7503
+  score: 1.7514
   transporter_count: 1
   transporter_gene_count: 586
 - catalyst_gene_count: 175
@@ -484,7 +484,7 @@ results:
   - kegg.pathway:ko01250
   - kegg.pathway:ko04152
   - kegg.pathway:ko04922
-  score: 1.7503
+  score: 1.7514
   transporter_count: 1
   transporter_gene_count: 0
 - catalyst_gene_count: 188
@@ -516,7 +516,7 @@ results:
   - kegg.pathway:ko01200
   - kegg.pathway:ko04152
   - kegg.pathway:ko04922
-  score: 1.7503
+  score: 1.7514
   transporter_count: 2
   transporter_gene_count: 583
 - catalyst_gene_count: 20
@@ -540,7 +540,7 @@ results:
   pathway_count: 1
   pathway_ids:
   - kegg.pathway:ko00500
-  score: 1.7503
+  score: 1.7514
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 1
@@ -567,7 +567,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.7503
+  score: 1.7514
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 137
@@ -599,7 +599,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.4408
+  score: 1.4416
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 32
@@ -626,7 +626,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.4408
+  score: 1.4416
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 24
@@ -653,7 +653,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.4408
+  score: 1.4416
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 1
@@ -683,7 +683,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.4408
+  score: 1.4416
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 2
@@ -708,7 +708,7 @@ results:
   pathway_ids:
   - kegg.pathway:ko00500
   - kegg.pathway:ko02060
-  score: 1.3237
+  score: 1.3245
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 1
@@ -738,7 +738,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.2243
+  score: 1.225
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 33
@@ -762,13 +762,13 @@ results:
   pathway_ids:
   - kegg.pathway:ko00052
   - kegg.pathway:ko01100
-  score: 1.1387
+  score: 1.1394
   transporter_count: 0
   transporter_gene_count: 0
 returned: 23
 row_count: 23
-score_max: 3.068840980529785
-score_median: 1.7503104209899902
+score_max: 3.070871353149414
+score_median: 1.751352310180664
 top_metabolite_pathways:
 - count: 18
   metabolite_pathway_id: kegg.pathway:ko01100
@@ -821,7 +821,7 @@ top_organisms:
   organism_name: Prochlorococcus MIT1327
 - count: 18
   organism_name: Meiothermus ruber
-total_entries: 3203
+total_entries: 3214
 total_matching: 23
 truncated: false
 warnings: []

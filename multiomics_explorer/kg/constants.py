@@ -66,13 +66,15 @@ VALID_OMICS_TYPES: set[str] = {
 # Metabolite.structure_kind / .identity_basis / .kegg_compound_categories,
 # MetaboliteClass.level_kind / .tree, ChemicalRole.level_kind,
 # TcdbFamily.substrate_breadth, assay-edge stereo_assignment, sources/evidence
-# on the 3 new curated edges, Tcdb_family_transports_chemical_role.substrate_depth,
-# built 2026-10-15T16:26Z). The recipe lives KG-side (docs/kg-changes/
+# on the 3 new curated edges, Tcdb_family_transports_chemical_role.substrate_depth;
+# + MNX stereo guard rebuild: Metabolite.kegg_compound_categories renamed
+# kegg_functional_categories, new closed vocab Metabolite.kegg_brite_classes,
+# built 2026-10-15T19:17Z). The recipe lives KG-side (docs/kg-changes/
 # vocabulary-contract.md). A mismatch means baked docs / parameter descriptions
 # may list stale values — filters still validate live. Must equal the live
 # KG's value at release cut.
 EXPECTED_CONTROLLED_VOCABULARIES_HASH: str = (
-    "sha256:f09cfcaa44d9628d1ac78d73e0aa486ac8b5aa64f35f07a0a6d680d32a9ad03c"
+    "sha256:03d763464616a4f69cf189c36c3795f2b4a1bcf420d626ebaef03bc1f295b1bc"
 )
 
 EXPECTED_KG_SHAPE: dict[str, tuple[str, ...] | str] = {

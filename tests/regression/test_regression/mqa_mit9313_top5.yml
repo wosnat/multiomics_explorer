@@ -6,14 +6,14 @@ rows:
   condition_label: control
   detection_status: detected
   growth_phase: null
-  kegg_compound_id: C05345
-  metabolite_id: kegg.compound:C05345
+  kegg_compound_id: C00085
+  metabolite_id: kegg.compound:C00085
   metric_bucket: top_decile
   metric_percentile: 100.0
   metric_type: cellular_concentration
   n_non_zero: 2
   n_replicates: 2
-  name: beta-D-Fructose 6-phosphate
+  name: D-Fructose 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 1
   timepoint: 6 days
@@ -26,14 +26,14 @@ rows:
   condition_label: control
   detection_status: sporadic
   growth_phase: null
-  kegg_compound_id: C05345
-  metabolite_id: kegg.compound:C05345
+  kegg_compound_id: C00085
+  metabolite_id: kegg.compound:C00085
   metric_bucket: top_decile
   metric_percentile: 98.4127
   metric_type: cellular_concentration
   n_non_zero: 2
   n_replicates: 3
-  name: beta-D-Fructose 6-phosphate
+  name: D-Fructose 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 2
   timepoint: 4 days
@@ -46,14 +46,14 @@ rows:
   condition_label: chitosan
   detection_status: detected
   growth_phase: null
-  kegg_compound_id: C05345
-  metabolite_id: kegg.compound:C05345
+  kegg_compound_id: C00085
+  metabolite_id: kegg.compound:C00085
   metric_bucket: top_decile
   metric_percentile: 96.8254
   metric_type: cellular_concentration
   n_non_zero: 2
   n_replicates: 2
-  name: beta-D-Fructose 6-phosphate
+  name: D-Fructose 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 3
   timepoint: 6 days
@@ -146,14 +146,14 @@ rows:
   condition_label: chitosan
   detection_status: sporadic
   growth_phase: null
-  kegg_compound_id: C05345
-  metabolite_id: kegg.compound:C05345
+  kegg_compound_id: C00085
+  metabolite_id: kegg.compound:C00085
   metric_bucket: top_quartile
   metric_percentile: 88.8889
   metric_type: cellular_concentration
   n_non_zero: 1
   n_replicates: 3
-  name: beta-D-Fructose 6-phosphate
+  name: D-Fructose 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 8
   timepoint: 4 days

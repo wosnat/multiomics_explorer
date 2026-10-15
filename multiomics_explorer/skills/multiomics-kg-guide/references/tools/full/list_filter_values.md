@@ -270,9 +270,9 @@ list_filter_values(filter_type="evidence_source")
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "metabolism", "count": 2214},
+    {"value": "metabolism", "count": 2221},
     {"value": "transport", "count": 1382},
-    {"value": "metabolomics", "count": 134}
+    {"value": "metabolomics", "count": 135}
   ]
 }
 ```

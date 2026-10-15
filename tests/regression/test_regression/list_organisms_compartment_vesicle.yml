@@ -4,7 +4,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
-  catalyzed_metabolite_count: 1321
+  catalyzed_metabolite_count: 1326
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -39,7 +39,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
-  catalyzed_metabolite_count: 1302
+  catalyzed_metabolite_count: 1307
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -74,7 +74,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
-  catalyzed_metabolite_count: 1334
+  catalyzed_metabolite_count: 1339
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -109,7 +109,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
-  catalyzed_metabolite_count: 1275
+  catalyzed_metabolite_count: 1280
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -146,7 +146,7 @@ rows:
   - coculture
   - darkness
   - light
-  catalyzed_metabolite_count: 1329
+  catalyzed_metabolite_count: 1334
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -191,7 +191,7 @@ rows:
   - darkness
   - diel
   - light
-  catalyzed_metabolite_count: 1347
+  catalyzed_metabolite_count: 1352
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -240,7 +240,7 @@ rows:
   - diel
   - light
   - viral
-  catalyzed_metabolite_count: 1034
+  catalyzed_metabolite_count: 1039
   clade: HLI
   cluster_types:
   - decay_pattern
@@ -312,7 +312,7 @@ rows:
   - coculture
   - diel
   - light
-  catalyzed_metabolite_count: 1042
+  catalyzed_metabolite_count: 1047
   clade: HLII
   cluster_types:
   - genomic_island
@@ -359,7 +359,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  catalyzed_metabolite_count: 1076
+  catalyzed_metabolite_count: 1081
   clade: LLIV
   cluster_types:
   - genomic_island
@@ -382,7 +382,7 @@ rows:
   - nutrient_limited
   - recovery
   interpro_gene_count: 1888
-  measured_metabolite_count: 133
+  measured_metabolite_count: 134
   ncbi_taxon_id: 74547
   ncbifam_gene_count: 905
   nonpeptidase_homolog_gene_count: 11

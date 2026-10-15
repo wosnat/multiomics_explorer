@@ -85,12 +85,12 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/list_experiments/full` — ~9255 tok
 - `docs://tools/list_filter_values/full` — ~5720 tok
 - `docs://tools/list_metabolite_assays/full` — ~3913 tok
-- `docs://tools/list_metabolites/full` — ~5952 tok
+- `docs://tools/list_metabolites/full` — ~5954 tok
 - `docs://tools/list_organisms/full` — ~12675 tok
 - `docs://tools/list_publications/full` — ~8795 tok
 - `docs://tools/metabolites_by_flags_assay/full` — ~3946 tok
 - `docs://tools/metabolites_by_gene/full` — ~8077 tok
-- `docs://tools/metabolites_by_quantifies_assay/full` — ~5424 tok
+- `docs://tools/metabolites_by_quantifies_assay/full` — ~5420 tok
 - `docs://tools/ontology_landscape/full` — ~10789 tok
 - `docs://tools/ontology_term_details/full` — ~9180 tok
 - `docs://tools/pathway_enrichment/full` — ~13268 tok
@@ -105,28 +105,28 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://analysis/derived_metrics` — ~2743 tok — The DerivedMetric (DM) node family: what DMs are, how to discover them, and how to drill into gene-level…
 - `docs://analysis/enrichment` — ~7252 tok — How to run over-representation analysis (ORA) with the `multiomics_explorer` package: the building blocks…
 - `docs://analysis/expression` — ~2315 tok — The differential-expression (DE) tool family and the two analysis utilities that reshape its output into…
-- `docs://analysis/metabolites` — ~10075 tok — LLM-facing decision-tree guide for metabolite questions.
+- `docs://analysis/metabolites` — ~10070 tok — LLM-facing decision-tree guide for metabolite questions.
 
 ## Ontologies
 
-- `docs://ontologies/brite` — ~1852 tok
-- `docs://ontologies/cazy` — ~1760 tok
-- `docs://ontologies/cog_category` — ~1397 tok
-- `docs://ontologies/cyanorak_role` — ~1725 tok
-- `docs://ontologies/ec` — ~1983 tok
-- `docs://ontologies/go_bp` — ~2049 tok
-- `docs://ontologies/go_cc` — ~1697 tok
-- `docs://ontologies/go_mf` — ~1836 tok
+- `docs://ontologies/brite` — ~1968 tok
+- `docs://ontologies/cazy` — ~1830 tok
+- `docs://ontologies/cog_category` — ~1450 tok
+- `docs://ontologies/cyanorak_role` — ~1775 tok
+- `docs://ontologies/ec` — ~2038 tok
+- `docs://ontologies/go_bp` — ~2140 tok
+- `docs://ontologies/go_cc` — ~1788 tok
+- `docs://ontologies/go_mf` — ~1925 tok
 - `docs://ontologies/index` — ~1239 tok — One page per supported ontology — what it is, how genes get annotated, identifier form, hierarchy, the…
-- `docs://ontologies/interpro` — ~2237 tok
-- `docs://ontologies/kegg` — ~2285 tok
-- `docs://ontologies/merops` — ~2516 tok
-- `docs://ontologies/ncbifam` — ~2197 tok
-- `docs://ontologies/pfam` — ~1926 tok
+- `docs://ontologies/interpro` — ~2419 tok
+- `docs://ontologies/kegg` — ~2349 tok
+- `docs://ontologies/merops` — ~2734 tok
+- `docs://ontologies/ncbifam` — ~2316 tok
+- `docs://ontologies/pfam` — ~1978 tok
 - `docs://ontologies/signal_peptide_type` — ~1488 tok
 - `docs://ontologies/subcellular_localization` — ~1510 tok
-- `docs://ontologies/tcdb` — ~2673 tok
-- `docs://ontologies/tigr_role` — ~2532 tok
+- `docs://ontologies/tcdb` — ~2836 tok
+- `docs://ontologies/tigr_role` — ~2602 tok
 
 ## Examples
 

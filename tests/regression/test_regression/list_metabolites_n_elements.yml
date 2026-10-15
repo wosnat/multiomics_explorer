@@ -1,5 +1,5 @@
 by_evidence_source:
-- count: 1228
+- count: 1231
   evidence_source: metabolism
 - count: 672
   evidence_source: transport
@@ -14,7 +14,7 @@ by_measurement_coverage:
   - compartment: whole_cell
     count: 101
   by_paper_count:
-  - count: 1587
+  - count: 1591
     paper_count: 0
   - count: 68
     paper_count: 1
@@ -25,7 +25,7 @@ by_measurement_coverage:
 case_id: list_metabolites_n_elements
 mass_stats:
   mass_max: 5227.103
-  mass_median: 324.399
+  mass_median: 324.262
   mass_min: 18.039
 no_formula_excluded: 237
 not_found:
@@ -314,34 +314,34 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko00330
   metabolite_pathway_name: Arginine and proline metabolism
 top_organisms:
-- count: 1336
+- count: 1338
   organism_name: Pseudomonas putida KT2440
-- count: 1325
+- count: 1328
   organism_name: Ruegeria pomeroyi DSS-3
-- count: 1275
-  organism_name: Alteromonas (MarRef v6)
-- count: 1273
+- count: 1276
   organism_name: Alteromonas mediterranea AltDE1
-- count: 1264
+- count: 1276
+  organism_name: Alteromonas (MarRef v6)
+- count: 1266
   organism_name: Alteromonas macleodii EZ55
-- count: 1264
+- count: 1266
   organism_name: Alteromonas macleodii MIT1002
-- count: 1260
+- count: 1262
   organism_name: Alteromonas mediterranea AltDE
-- count: 1260
+- count: 1262
   organism_name: Alteromonas macleodii BGP6
-- count: 1259
+- count: 1261
   organism_name: Alteromonas macleodii ATCC27126
-- count: 1257
+- count: 1259
   organism_name: Alteromonas macleodii HOT1A3
-total_entries: 3203
-total_matching: 1688
+total_entries: 3214
+total_matching: 1692
 truncated: true
 warnings:
 - 237 metabolites have no formula and can never match an element filter (often generic
   classes such as 'amino acid' or 'dipeptide'). Re-run without elements to inspect
   them.
 xref_coverage:
-  with_chebi: 1620
+  with_chebi: 1624
   with_hmdb: 891
   with_mnxm: 1688

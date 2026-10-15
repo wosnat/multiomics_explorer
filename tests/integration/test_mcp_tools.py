@@ -2619,14 +2619,16 @@ class TestListMetabolites:
 
     def test_elements_n_filter(self, conn):
         """N-bearing metabolites total (1693 → 1688 at the 2026-10-15
-        metabolite-identity rebuild: merges + role removal)."""
+        metabolite-identity rebuild: merges + role removal; → 1692 at the
+        2026-10-15T19:17Z stereo-guard rebuild: 9 stereo splits + 2
+        keep_separate)."""
         result = api.list_metabolites(elements=["N"], conn=conn)
-        assert result["total_matching"] == 1688
+        assert result["total_matching"] == 1692
 
     def test_elements_n_and_p_filter(self, conn):
         """Multi-element AND filter (must contain both N and P)."""
         result = api.list_metabolites(elements=["N", "P"], conn=conn)
-        assert result["total_matching"] == 574  # 583 → 574 (2026-10-15 identity rebuild)
+        assert result["total_matching"] == 576  # 583 → 574 (2026-10-15 identity rebuild) → 576 (stereo-guard splits)
 
     def test_organism_plus_elements_filter(self, conn):
         """MED4 + N elements (the canonical N-source primitive): 992.
@@ -2637,13 +2639,14 @@ class TestListMetabolites:
         (by_evidence_source now: metabolism 659, transport 510,
         metabolomics 90). 992 → 1002 at the 2026-10-15 metabolite-identity
         rebuild (re-keyed chebi: → KEGG nodes gain catalysis reach; 33
-        class nodes gain ChEBI generic formulas + elements)."""
+        class nodes gain ChEBI generic formulas + elements); → 1003 at the
+        stereo-guard rebuild (split stereo forms)."""
         result = api.list_metabolites(
             organism_names=["Prochlorococcus MED4"],
             elements=["N"],
             conn=conn,
         )
-        assert result["total_matching"] == 1002
+        assert result["total_matching"] == 1003
 
     def test_pathway_id_filter(self, conn):
         """Nitrogen metabolism pathway (ko00910) has 18 metabolites."""

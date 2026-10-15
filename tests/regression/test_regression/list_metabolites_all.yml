@@ -1,9 +1,9 @@
 by_evidence_source:
-- count: 2214
+- count: 2221
   evidence_source: metabolism
 - count: 1382
   evidence_source: transport
-- count: 134
+- count: 135
   evidence_source: metabolomics
 by_measurement_coverage:
   by_compartment:
@@ -12,13 +12,13 @@ by_measurement_coverage:
   - compartment: vesicle
     count: 70
   - compartment: whole_cell
-    count: 134
+    count: 135
   by_paper_count:
-  - count: 3069
+  - count: 3079
     paper_count: 0
-  - count: 91
+  - count: 93
     paper_count: 1
-  - count: 38
+  - count: 37
     paper_count: 2
   - count: 5
     paper_count: 3
@@ -270,31 +270,31 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko00860
   metabolite_pathway_name: Porphyrin metabolism
 top_organisms:
-- count: 2413
+- count: 2419
   organism_name: Pseudomonas putida KT2440
-- count: 2360
+- count: 2367
   organism_name: Alteromonas macleodii EZ55
-- count: 2355
+- count: 2363
   organism_name: Ruegeria pomeroyi DSS-3
-- count: 2304
+- count: 2309
   organism_name: Alteromonas (MarRef v6)
-- count: 2300
+- count: 2306
   organism_name: Alteromonas macleodii MIT1002
-- count: 2287
+- count: 2293
   organism_name: Alteromonas macleodii BGP6
-- count: 2285
+- count: 2291
   organism_name: Alteromonas macleodii HOT1A3
-- count: 2276
+- count: 2282
   organism_name: Alteromonas macleodii AD45
-- count: 2273
+- count: 2279
   organism_name: Marinobacter (MarRef v6)
-- count: 2264
+- count: 2271
   organism_name: Alteromonas mediterranea AltDE1
-total_entries: 3203
-total_matching: 3203
+total_entries: 3214
+total_matching: 3214
 truncated: true
 warnings: []
 xref_coverage:
-  with_chebi: 3075
+  with_chebi: 3089
   with_hmdb: 1495
   with_mnxm: 3203
