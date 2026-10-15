@@ -97,3 +97,48 @@ Absorb only:
 
 No explorer code change is needed. The resolver work (backlog 2c.8) will resolve `C00085` either way
 through `all_identifiers`.
+
+---
+
+## Ask 6 (separate from the merge issue): precompute the other 7 KEGG compound trees, and rename the property
+
+**Context.** The explorer is surfacing KEGG compound classification on `list_metabolites` (spec
+`docs/tool-specs/metabolite-identity-surface.md`, sections C / C2) as two fields:
+- `kegg_functional_categories`: br08001 "Compounds with biological roles", read from today's
+  `Metabolite.kegg_compound_categories`;
+- `kegg_brite_classes`: top-level classes of the 7 other trees (br08002 Lipids, br08003
+  Phytochemical compounds, br08021 Glycosides, br08007 Pesticides, br08009 Natural toxins,
+  br08006 Endocrine disrupting compounds, br08005 Bioactive peptides). Values are
+  `"<Tree title>: <class>"`, e.g. `Lipids: Fatty acyls`.
+
+The second field exists in the KG only as `MetaboliteClass` nodes, so the explorer **derives it per
+query** today. The query walks `Metabolite_in_metabolite_class` → `Metabolite_class_is_a_metabolite_class*0..`
+to level 0, then builds the label. It's fast (≈ 60 ms whole-KG), but:
+- no `ControlledVocabulary` node covers the values, so filter validation and
+  `list_filter_values(filter_type='kegg_brite_class')` use a derived list;
+- the label format (tree title, LIPID MAPS code stripped) lives in explorer Cypher instead of the KG.
+
+**Asks:**
+
+a. **New property `Metabolite.kegg_brite_classes`** (`str[]`, sparse, post-import): the distinct
+   level-0 classes of every tree except br08001, formatted `"<Tree title>: <class name>"`:
+   - Tree title = `MetaboliteClass.tree` with `_` → space and the first letter capitalised.
+   - Class name = KEGG's name with the 2-letter LIPID MAPS code removed (`FA  Fatty acyls` →
+     `Fatty acyls`).
+   - Expected today: 651 metabolites, 28 distinct values, e.g. `Lipids: Fatty acyls` 253,
+     `Lipids: Prenol lipids` 137, `Phytochemical compounds: Terpenoids` 57.
+b. **A `ControlledVocabulary` node** for `(Metabolite, kegg_brite_classes)`, closed, with
+   `value_descriptions` naming the source tree code (e.g. `Lipids: Fatty acyls` → "br08002, top level").
+c. **Rename `Metabolite.kegg_compound_categories` → `kegg_functional_categories`**, with its
+   `ControlledVocabulary` entry. "Compound categories" doesn't say which KEGG tree it is, and it
+   reads as the umbrella for both fields. The explorer will use the new name in its output
+   regardless; until the KG renames, it aliases the old property.
+d. **A KG test** that `kegg_brite_classes` equals the derivation above for every metabolite.
+
+**Explorer impact when landed:**
+- the builders read the property instead of the subquery (rows and envelope unchanged);
+- `list_filter_values` switches from the derived list to the vocabulary read;
+- the hash re-pins;
+- (c) is a one-line builder change plus a vocab mapping update.
+
+Not blocking: the explorer ships the derived version first.
