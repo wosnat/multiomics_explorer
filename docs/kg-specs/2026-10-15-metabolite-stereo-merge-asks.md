@@ -142,3 +142,139 @@ d. **A KG test** that `kegg_brite_classes` equals the derivation above for every
 - (c) is a one-line builder change plus a vocab mapping update.
 
 Not blocking: the explorer ships the derived version first.
+
+---
+
+## KG follow-up (2026-10-15, for discussion, nothing changed yet)
+
+Plan file on the KG side: `plans/metabolite_mnx_stereo_guard.md`.
+
+### Root cause (asks 1–4)
+
+The table is correct, and the cause is narrower than the asks assume.
+- All 21 multi-KEGG nodes come from `mnx_same_entity` links.
+- That basis (and `manual`) **deliberately skips** the KEGG↔KEGG guard in `canonical.canonicalise`. §1 says "two KEGG ids merge only on MNX evidence or a curated merge", so MNX was trusted outright.
+- MNX treats a stereo-unspecified compound, or a generic sugar and its β-anomer, as one entity. Nothing downstream re-checks that.
+
+**The canonical-id choice is not a second bug.** `_choose` already picks the KEGG id with the most references from **gene-reachable** reactions, which is your ask 3a. The β forms really are ahead on that measure:
+
+| Pair | Kept reactions (pre-merge) | All KEGG reactions |
+|---|---|---|
+| `C05345` β-F6P vs `C00085` F6P | **10** vs 9 | 18 vs **29** |
+| `C05378` β-F1,6BP vs `C00354` F1,6BP | **5** vs 4 | 6 vs **11** |
+
+So the rule chose correctly. Once the merges stop, it no longer has to choose between these ids.
+
+### Proposed fix
+
+**1. Stereo guard on MNX links.** Refuse an MNX link between two groups with different KEGG ids when some KEGG pair across them is *stereo-distinct*. Two KEGG ids are stereo-distinct when:
+- one has a non-class ChEBI term whose InChIKey shares the other's connectivity block;
+- that InChIKey's stereo layer appears on none of the other's terms in that block;
+- the two term names are **not** a cis/trans or E/Z pair. These are exempt, as §3.6 already treats them; this keeps caffeate merged.
+
+The guard uses ChEBI's per-KEGG-id terms, not the node's `inchikey`. That InChIKey comes from MNX, so every member of an MNX group shares it.
+
+Tested against today's 21 groups:
+- it refuses exactly your 9 stereo/anomer pairs;
+- it allows all 10 pairs you called fine;
+- `manual` overrides stay exempt.
+
+**2. Curated `keep_separate` for the two pairs no structural test can see:**
+- `C00193` Aromatic aldehyde / `C00261` Benzaldehyde;
+- `C03688` Apo-[ACP] / `C16240` [Lipoyl-carrier protein]-L-lysine.
+
+The KG override key is `keep_separate:`, not `no_merge:`.
+
+ChEBI makes `C00193` hard to catch: it cross-references `C00193` to benzaldehyde itself as well as to the class "arenecarbaldehyde". A class → member rule based on ChEBI would also split phenol (`C15584` carries the class "phenols"), so this one stays curated.
+
+**3. Tests.**
+- Unit tests for the guard.
+- A step-6 stage-P check: the build fails if any written node's `kegg_compound_ids` holds a stereo-distinct pair.
+- A KG test that your 11 pairs sit on 11 × 2 different nodes.
+
+That covers ask 4. The class → member half of ask 4 can only be tested as "the curated pairs stay apart", because no general test exists for it (see point 2).
+
+### Stereo links after the split
+
+The existing ChEBI `is_a` walk re-creates `Metabolite_is_stereo_form_of` for 8 of the 9 pairs:
+- `C00197→C00597`, `C01102→C05702`, `C03227→C02794`, `C04272→C04039`, `C06010→C00900`, `C16241→C00725`;
+- `C05345→C00085`, `C05378→C00354` (the two anomer pairs).
+
+`C17345` / `C04644` gets no edge, because ChEBI has no `is_a` between them. They become two plain nodes.
+
+**Correction on "nothing for anomer-only pairs, per §21":** §21 says the opposite, "Anomer stereo edges are still emitted". What §21 forbids is moving a *measurement* onto an anomer. Unless you want to reopen that, the two fructose anomer edges come back.
+
+### Open question for you: MNX fields on a split pair
+
+After the split, both nodes still carry the same `mnxm_id`, and through it the same `inchikey`, `smiles`, `hmdb_id` and MNX ChEBI aliases. Stage H refuses to build when an identifier sits on two nodes. Proposal:
+- The MNX fields stay on the node whose ChEBI InChIKey equals MNX's InChIKey (protonation ignored). β-F6P keeps `MNXM1107898` and `HMDB0003971`, because MNX describes the β-anomer.
+- The other node (`C00085`) drops `mnxm_id`, `smiles` and `hmdb_id`. It takes `inchikey` from its own primary ChEBI term and keeps `formula` and `mass`, which are the same across stereoisomers.
+- Where neither node matches (the two carrier proteins have no InChIKey), the node `_choose` would have kept keeps the MNX fields.
+
+Effect for you: the generic forms (`C00085`, `C00354`, `C00597`, …) come back **without** an `mnx:` / `hmdb:` entry in `all_identifiers`. An MNX or HMDB id the resolver receives lands on the specific form. That is the same situation as ask 5, and it is what MNX asserts. Is that acceptable, or do you want the generic node to keep the MNX id (which means removing it from the specific node)?
+
+### Ask 3b (ion over acid): proposed curated pin, not a rule
+
+A general "prefer the charged form" rule fails. ChEBI cross-references `C00094` "Sulfite" to *sulfurous acid*, so the rule would move the sulfite node onto hydrogensulfite `C11481`. We propose instead a short `canonical:` pin list in `metabolite_identity_overrides.yaml`: `C00698` chloride, `C01324` bromide, `C00742` fluoride. Pinning changes those three nodes' ids (`C01327` → `C00698`, and so on). Do you want that in the same rebuild, or later?
+
+### Ask 5 (HMDB0000122 on β-D-glucose): curated, follow-up
+
+This is not a merge or pick bug, and the HMDB id comes from MNX:
+- MNX's `MNXM1364060` (β-D-glucose) carries `HMDB0000122`;
+- HMDB's own "D-Glucose" record has the β-D-glucopyranose structure;
+- `CHEBI:17634` D-glucose has no KEGG xref and no InChIKey, so no node ever picks it up.
+
+Fixing it means a curated xref move: `HMDB0000122` and `CHEBI:17634` → `C00031`. We'd rather not write an algorithm that second-guesses MNX and HMDB here. We will report the count you asked for (HMDB / ChEBI xrefs on anomer-only nodes whose generic sibling exists) with the rebuild. The move itself would come as a follow-up, using the same override file. Agreed?
+
+### Ask 6 (BRITE classes + rename): accepted as proposed
+
+Your expected numbers reproduce exactly from the committed class caches: **651 metabolites, 28 values**, `Lipids: Fatty acyls` 253, `Lipids: Prenol lipids` 137, `Phytochemical compounds: Terpenoids` 57.
+- **a, b, d:** yes. `kegg_brite_classes` is computed post-import from the `MetaboliteClass` trees, with a closed `ControlledVocabulary` whose `value_descriptions` name the tree code. The KG test re-derives the property.
+- **c:** yes, renamed to `kegg_functional_categories`, with a `### Breaking` CHANGELOG entry. There is no alias period on the KG side, since you already alias.
+
+Proposal: ship asks 1–4 and 6 in one rebuild, so you re-pin the vocabulary hash once. 3b and 5 go in that rebuild only if you agree to the curated pins / moves above.
+
+**Please answer:**
+1. Who keeps the MNX fields on a split pair?
+2. Do the anomer edges stay, as §21 says?
+3. 3b: now or later?
+4. 5: is a curated follow-up acceptable?
+
+## Explorer reply (2026-10-15)
+
+The root cause and the fix plan are agreed. The guard you describe (ChEBI per-KEGG-id terms,
+connectivity block plus stereo layer, a cis/trans and E/Z exemption, `manual` exempt) is better than
+what we asked for, and it's verified against all 21 groups. So is `keep_separate:` for the two class
+and carrier-protein pairs. Thanks also for the canonical-choice numbers: ask 3a withdrawn, since the
+rule chose correctly. One rebuild for asks 1–4 + 6 is good.
+
+**Answers:**
+
+1. **MNX fields on a split pair: go with your proposal.** The structure-matching node keeps the MNX
+   fields: β-F6P keeps `MNXM1107898` / `HMDB0003971`, and the generic `C00085` drops `mnxm_id` /
+   `smiles` / `hmdb_id` and takes `inchikey` from its own primary ChEBI term. That is what MNX and
+   HMDB assert, and the explorer shouldn't second-guess them either. One condition:
+   - **the generic node must keep its own ChEBI ids** (primary + secondary, as `chebi:` CURIEs) in
+     `all_identifiers`, so a ChEBI id for the generic form resolves to the generic node.
+
+   An MNX or HMDB id landing on the specific form is fine on our side. The stereo-form link
+   connects the two, and the explorer's planned "other stereo form" hint will point from one to the
+   other.
+2. **Anomer edges stay.** You're right: §21 keeps anomer stereo edges and only forbids moving a
+   *measurement* onto an anomer. Our "nothing for anomer-only pairs" misquoted it. Please re-create
+   the `C05345→C00085` and `C05378→C00354` edges. `C17345` / `C04644` ending up as two unlinked
+   nodes is fine.
+3. **3b: now, in the same rebuild.** One absorb is better than two. Pin `C00698` chloride, `C01324`
+   bromide, `C00742` fluoride. The old ids (`C01327` …) stay in `all_identifiers` as merged
+   members, so the explorer resolver maps them, and they belong in `metabolite_id_remap.tsv`.
+4. **5: a curated follow-up is acceptable.** Moving `HMDB0000122` and `CHEBI:17634` → `C00031` through the
+   override file is the right mechanism. Please include the count (HMDB / ChEBI xrefs on
+   anomer-only nodes whose generic sibling exists) with this rebuild, so we can judge whether the
+   follow-up is one move or a list. If the override is trivial to add now, put it in this rebuild.
+
+**Ask 6, explorer side:**
+- the explorer ships `kegg_brite_classes` **derived** first, and switches to the property at absorb;
+- for the rename it reads `coalesce(m.kegg_functional_categories, m.kegg_compound_categories)`, so
+  the build works on either side of the rebuild;
+- the KG's `### Breaking` CHANGELOG entry for (c) is fine. Please also list it in `breaking_changes`
+  when the release is stamped.
