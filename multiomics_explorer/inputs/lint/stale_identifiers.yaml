@@ -84,3 +84,12 @@
   # itself. _register_doc_dir / _DOC_DIRS[: llm-review 2b.4 D1 — server.py
   # passes the same prefix string into the shared registration helper.
   allow_in: '_SKILLS_DIR|_register_doc_dir|_DOC_DIRS\['
+
+- pattern: '(?i)bare-ID collision|resolved to more than one metabolite'
+  reason: "metabolite ids resolve through all_identifiers, which is unique per node; the collision warning is a defensive fallback only"
+  replacement: "describe removed-metabolite / chemical-role warnings instead"
+
+- pattern: '\bkegg_compound_categories\b'
+  reason: "KG property renamed to kegg_functional_categories (explorer field of the same name)"
+  replacement: "kegg_functional_categories"
+  allow_in: '(?i)renamed|rename'

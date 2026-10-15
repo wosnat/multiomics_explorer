@@ -158,6 +158,51 @@ vocabularies:
       closed: true
       values:
       - curated
+  kegg_brite_classes:
+    Metabolite:
+      closed: true
+      values:
+      - 'Bioactive peptides: Cardiovascular peptides'
+      - 'Bioactive peptides: Neuropeptides'
+      - 'Endocrine disrupting compounds: Pesticides and herbicides'
+      - 'Endocrine disrupting compounds: Plasticizers and plastics'
+      - 'Glycosides: N-glycosides'
+      - 'Glycosides: O-glycosides'
+      - 'Glycosides: S-glycosides'
+      - 'Lipids: Fatty acyls'
+      - 'Lipids: Glycerolipids'
+      - 'Lipids: Glycerophospholipids'
+      - 'Lipids: Polyketides'
+      - 'Lipids: Prenol lipids'
+      - 'Lipids: Saccharolipids'
+      - 'Lipids: Sphingolipids'
+      - 'Lipids: Sterol lipids'
+      - 'Natural toxins: Fungal toxins'
+      - 'Natural toxins: Marine biotoxins'
+      - 'Natural toxins: Phytotoxins'
+      - 'Pesticides: Obsolete pesticides'
+      - 'Pesticides: Pesticides'
+      - 'Phytochemical compounds: Alkaloids'
+      - 'Phytochemical compounds: Amino acid related compounds'
+      - 'Phytochemical compounds: Fatty acids related compounds'
+      - 'Phytochemical compounds: Flavonoids'
+      - 'Phytochemical compounds: Others'
+      - 'Phytochemical compounds: Phenylpropanoids'
+      - 'Phytochemical compounds: Shikimate / acetate-malonate pathway derived compounds'
+      - 'Phytochemical compounds: Terpenoids'
+  kegg_functional_categories:
+    Metabolite:
+      closed: true
+      values:
+      - Antibiotics
+      - Carbohydrates
+      - Hormones and transmitters
+      - Lipids
+      - Nucleic acids
+      - Organic acids
+      - Peptides
+      - Steroids
+      - Vitamins and cofactors
   omics_type:
     Experiment:
       closed: true
@@ -261,6 +306,24 @@ vocabularies:
       closed: true
       values:
       - chebi
+  stereo_assignment:
+    Assay_flags_metabolite:
+      closed: true
+      values:
+      - as_reported
+      - dominant_form_assumed
+    Assay_quantifies_metabolite:
+      closed: true
+      values:
+      - as_reported
+      - dominant_form_assumed
+  structure_kind:
+    Metabolite:
+      closed: true
+      values:
+      - defined
+      - generic
+      - polymer
   substrate_depth:
     Tcdb_family_transports_chemical_role:
       closed: true

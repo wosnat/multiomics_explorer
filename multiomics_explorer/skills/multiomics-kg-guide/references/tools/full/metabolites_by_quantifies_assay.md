@@ -5,8 +5,8 @@
 Numeric MetaboliteAssay edges — one row per metabolite × assay edge with its value; cross-organism.
 
 Use for values, detection status and rankable cutoffs; pre-flight `list_metabolite_assays`; flags `metabolites_by_flags_assay`, both arms `assays_by_metabolite`.
-Filters: assay_ids, organism, metabolite_ids, min/max_value, detection_status, timepoint, metric_bucket, min/max_percentile, max_rank.
-Returns: by_detection_status, by_metric_bucket, by_assay, by_metric, excluded_assays; one row = one edge. Tested-absent rows kept.
+Filters: assay_ids, organism, metabolite_ids, value, detection_status, stereo_assignment, timepoint, rankable cutoffs.
+Returns: by_detection_status, by_stereo_assignment, by_metric_bucket, by_assay, by_metric, excluded_assays; one row = one edge. Tested-absent rows kept.
 docs://tools/metabolites_by_quantifies_assay; summary=True first.
 
 ## Parameters
@@ -123,6 +123,7 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:met
       "metric_percentile": 100.0,
       "rank_by_metric": 1,
       "detection_status": "detected",
+      "stereo_assignment": "as_reported",
       "timepoint": "6 days",
       "timepoint_hours": 144.0,
       "timepoint_order": 2,
@@ -145,6 +146,7 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:met
       "metric_percentile": 98.41269841269842,
       "rank_by_metric": 2,
       "detection_status": "sporadic",
+      "stereo_assignment": "as_reported",
       "timepoint": "4 days",
       "timepoint_hours": 96.0,
       "timepoint_order": 1,
@@ -167,6 +169,7 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:met
       "metric_percentile": 96.82539682539682,
       "rank_by_metric": 3,
       "detection_status": "detected",
+      "stereo_assignment": "as_reported",
       "timepoint": "6 days",
       "timepoint_hours": 144.0,
       "timepoint_order": 2,
@@ -183,6 +186,10 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:met
     {"detection_status": "sporadic", "count": 30},
     {"detection_status": "detected", "count": 27},
     {"detection_status": "not_detected", "count": 7}
+  ],
+  "by_stereo_assignment": [
+    {"stereo_assignment": "as_reported", "count": 60},
+    {"stereo_assignment": "dominant_form_assumed", "count": 4}
   ],
   "by_metric_bucket": [
     {"bucket": "mid", "count": 32},
@@ -215,7 +222,9 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:met
     }
   ],
   "excluded_assays": [],
-  "warnings": [],
+  "warnings": [
+    "4 of 64 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on L-Alanine); filter s..."
+  ],
   "resolved_aliases": {},
   "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
   "returned": 5,
@@ -262,8 +271,51 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:1462-2920.15834:s7_
 
 ```example-response
 {
+  "results": [],
   "total_matching": 49,
-  "by_stereo_assignment": [{"stereo_assignment": "as_reported", "count": 49}]
+  "by_detection_status": [
+    {"detection_status": "detected", "count": 33},
+    {"detection_status": "sporadic", "count": 11},
+    {"detection_status": "not_detected", "count": 5}
+  ],
+  "by_stereo_assignment": [{"stereo_assignment": "as_reported", "count": 49}],
+  "by_metric_bucket": [
+    {"bucket": "mid", "count": 25},
+    {"bucket": "low", "count": 16},
+    {"bucket": "top_decile", "count": 4},
+    {"bucket": "top_quartile", "count": 4}
+  ],
+  "by_assay": [
+    {
+      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9313:relative_peak_area_biovolume_normalized",
+      "count": 49
+    }
+  ],
+  "by_compartment": [{"compartment": "whole_cell", "count": 49}],
+  "by_organism": [{"organism_name": "Prochlorococcus MIT9313", "count": 49}],
+  "by_metric": [
+    {
+      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9313:relative_peak_area_biovolume_normalized",
+      "name": "MIT9313 whole-cell targeted metabolite relative peak area (biovolume-normalized)",
+      "metric_type": "",
+      "count": 49,
+      "filtered_value_min": 0.0,
+      "filtered_value_max": 32.0,
+      "assay_value_min": 0.0,
+      "assay_value_q1": 0.00065,
+      "assay_value_median": 0.0043,
+      "assay_value_q3": 0.022,
+      "assay_value_max": 32.0,
+      "rankable": true
+    }
+  ],
+  "excluded_assays": [],
+  "warnings": [],
+  "resolved_aliases": {},
+  "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
+  "returned": 0,
+  "truncated": true,
+  "offset": 0
 }
 ```
 

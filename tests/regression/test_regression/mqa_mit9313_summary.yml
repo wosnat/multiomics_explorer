@@ -16,6 +16,9 @@ rows:
   - '{''count'': 9, ''item'': ''top_quartile''}'
   by_organism:
   - '{''count'': 64, ''item'': ''Prochlorococcus MIT9313''}'
+  by_stereo_assignment:
+  - '{''count'': 4, ''item'': ''dominant_form_assumed''}'
+  - '{''count'': 60, ''item'': ''as_reported''}'
   filtered_value_max: 0.4465
   filtered_value_min: 0.0
   total_matching: 64

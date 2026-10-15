@@ -5,8 +5,8 @@
 Metabolite IDs to every measurement edge, numeric and boolean arms merged into one polymorphic row set; cross-organism.
 
 Use for the metabolite-anchored reverse view; drill back to one arm with `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay`.
-Filters: metabolite_ids (+exclude), organism, evidence_kind, metric_types, compartment.
-Returns: by_evidence_kind, by_detection_status, by_flag_value, by_assay, metabolites_matched (distinct; total_matching counts rows), not_found, not_matched; one row = one edge.
+Filters: metabolite_ids (+exclude), organism, evidence_kind, metric_types, compartment, stereo_assignment.
+Returns: by_evidence_kind, by_detection_status, by_flag_value, by_stereo_assignment, by_assay, metabolites_matched (distinct), not_found; one row = one edge.
 docs://tools/assays_by_metabolite; summary=True first for 50+ IDs.
 
 ## Parameters

@@ -2,11 +2,11 @@
 
 ## What it does
 
-Boolean MetaboliteAssay edges — one row per metabolite × flag edge; cross-organism. flag_value=False rows are tested-absent: both states are stored.
+Boolean MetaboliteAssay edges — one row per metabolite × flag edge; cross-organism. flag_value=False rows are tested-absent (both states stored).
 
 Use for presence / absence calls; pre-flight `list_metabolite_assays`; values `metabolites_by_quantifies_assay`, both arms `assays_by_metabolite`.
-Filters: assay_ids, organism, metabolite_ids, flag_value, plus publication / experiment / condition.
-Returns: by_value, by_assay, by_metric, not_found, excluded_assays (empty here, for parity with the numeric twin); one row = one flag.
+Filters: assay_ids, organism, metabolite_ids, flag_value, stereo_assignment, plus publication / experiment filters.
+Returns: by_value, by_stereo_assignment, by_assay, by_metric, not_found, excluded_assays (always empty); one row = one flag.
 docs://tools/metabolites_by_flags_assay; summary=True first.
 
 ## Parameters

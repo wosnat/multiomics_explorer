@@ -5,6 +5,64 @@ by_evidence_source:
   evidence_source: transport
 - count: 89
   evidence_source: metabolomics
+by_kegg_brite_class:
+- count: 28
+  kegg_brite_class: 'Lipids: Fatty acyls'
+- count: 20
+  kegg_brite_class: 'Phytochemical compounds: Alkaloids'
+- count: 19
+  kegg_brite_class: 'Glycosides: N-glycosides'
+- count: 18
+  kegg_brite_class: 'Pesticides: Pesticides'
+- count: 15
+  kegg_brite_class: 'Lipids: Polyketides'
+- count: 6
+  kegg_brite_class: 'Lipids: Prenol lipids'
+- count: 6
+  kegg_brite_class: 'Lipids: Saccharolipids'
+- count: 4
+  kegg_brite_class: 'Lipids: Glycerophospholipids'
+- count: 4
+  kegg_brite_class: 'Lipids: Sphingolipids'
+- count: 4
+  kegg_brite_class: 'Natural toxins: Phytotoxins'
+- count: 2
+  kegg_brite_class: 'Endocrine disrupting compounds: Pesticides and herbicides'
+- count: 2
+  kegg_brite_class: 'Glycosides: S-glycosides'
+- count: 2
+  kegg_brite_class: 'Lipids: Sterol lipids'
+- count: 2
+  kegg_brite_class: 'Natural toxins: Fungal toxins'
+- count: 1
+  kegg_brite_class: 'Bioactive peptides: Cardiovascular peptides'
+- count: 1
+  kegg_brite_class: 'Pesticides: Obsolete pesticides'
+- count: 1
+  kegg_brite_class: 'Phytochemical compounds: Amino acid related compounds'
+- count: 1
+  kegg_brite_class: 'Phytochemical compounds: Terpenoids'
+- count: 877
+  kegg_brite_class: not classified
+by_kegg_functional_category:
+- count: 44
+  kegg_functional_category: Peptides
+- count: 43
+  kegg_functional_category: Nucleic acids
+- count: 28
+  kegg_functional_category: Vitamins and cofactors
+- count: 23
+  kegg_functional_category: Antibiotics
+- count: 12
+  kegg_functional_category: Hormones and transmitters
+- count: 5
+  kegg_functional_category: Lipids
+- count: 3
+  kegg_functional_category: Carbohydrates
+- count: 1
+  kegg_functional_category: Steroids
+- count: 855
+  kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment:
   - compartment: extracellular
@@ -22,6 +80,13 @@ by_measurement_coverage:
     paper_count: 2
   - count: 1
     paper_count: 3
+by_structure_kind:
+- count: 844
+  structure_kind: defined
+- count: 156
+  structure_kind: generic
+- count: 3
+  structure_kind: polymer
 case_id: list_metabolites_med4_n
 mass_stats:
   mass_max: 5227.103
@@ -48,6 +113,11 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
+  kegg_brite_classes:
+  - 'Glycosides: N-glycosides'
+  kegg_functional_categories:
+  - Nucleic acids
+  - Vitamins and cofactors
   mass: 503.15
   measured_assay_count: 0
   measured_compartments: []
@@ -91,6 +161,7 @@ results:
   - kegg.pathway:ko05133
   - kegg.pathway:ko05410
   - kegg.pathway:ko05415
+  structure_kind: defined
   transporter_count: 15
   transporter_gene_count: 2195
 - catalyst_gene_count: 3564
@@ -106,6 +177,10 @@ results:
   - metabolomics
   - transport
   formula: C10H12N5O10P2
+  kegg_brite_classes:
+  - 'Glycosides: N-glycosides'
+  kegg_functional_categories:
+  - Nucleic acids
   mass: 424.179
   measured_assay_count: 4
   measured_compartments:
@@ -140,6 +215,7 @@ results:
   - kegg.pathway:ko05012
   - kegg.pathway:ko05014
   - kegg.pathway:ko05022
+  structure_kind: defined
   transporter_count: 5
   transporter_gene_count: 862
 - catalyst_gene_count: 3302
@@ -155,6 +231,8 @@ results:
   - metabolomics
   - transport
   formula: C21H26N7O14P2
+  kegg_functional_categories:
+  - Vitamins and cofactors
   mass: 662.422
   measured_assay_count: 6
   measured_compartments:
@@ -184,6 +262,7 @@ results:
   - kegg.pathway:ko04936
   - kegg.pathway:ko04977
   - kegg.pathway:ko05208
+  structure_kind: defined
   transporter_count: 4
   transporter_gene_count: 625
 - catalyst_gene_count: 3017
@@ -219,6 +298,7 @@ results:
   - kegg.pathway:ko04020
   - kegg.pathway:ko04714
   - kegg.pathway:ko04925
+  structure_kind: defined
   transporter_count: 2
   transporter_gene_count: 129
 - catalyst_gene_count: 2464
@@ -234,6 +314,10 @@ results:
   - metabolomics
   - transport
   formula: C10H12N5O7P
+  kegg_brite_classes:
+  - 'Glycosides: N-glycosides'
+  kegg_functional_categories:
+  - Nucleic acids
   mass: 345.208
   measured_assay_count: 12
   measured_compartments:
@@ -276,6 +360,7 @@ results:
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
   - kegg.pathway:ko05032
+  structure_kind: defined
   transporter_count: 2
   transporter_gene_count: 0
 returned: 5

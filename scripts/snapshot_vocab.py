@@ -39,6 +39,10 @@ SNAPSHOT_PROPERTIES = [
     "substrate_depth",
     "attachment_depth",
     "cluster_type",
+    "structure_kind",
+    "kegg_functional_categories",
+    "kegg_brite_classes",
+    "stereo_assignment",
 ]
 
 _VOCAB_CYPHER = (

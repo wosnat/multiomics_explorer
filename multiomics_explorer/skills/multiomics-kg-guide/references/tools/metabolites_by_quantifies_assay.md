@@ -5,8 +5,8 @@
 Numeric MetaboliteAssay edges — one row per metabolite × assay edge with its value; cross-organism.
 
 Use for values, detection status and rankable cutoffs; pre-flight `list_metabolite_assays`; flags `metabolites_by_flags_assay`, both arms `assays_by_metabolite`.
-Filters: assay_ids, organism, metabolite_ids, min/max_value, detection_status, timepoint, metric_bucket, min/max_percentile, max_rank.
-Returns: by_detection_status, by_metric_bucket, by_assay, by_metric, excluded_assays; one row = one edge. Tested-absent rows kept.
+Filters: assay_ids, organism, metabolite_ids, value, detection_status, stereo_assignment, timepoint, rankable cutoffs.
+Returns: by_detection_status, by_stereo_assignment, by_metric_bucket, by_assay, by_metric, excluded_assays; one row = one edge. Tested-absent rows kept.
 docs://tools/metabolites_by_quantifies_assay; summary=True first.
 
 ## Parameters

@@ -3,11 +3,22 @@ by_evidence_source:
   evidence_source: metabolism
 - count: 1
   evidence_source: transport
+by_kegg_brite_class:
+- count: 1
+  kegg_brite_class: not classified
+by_kegg_functional_category:
+- count: 1
+  kegg_functional_category: Carbohydrates
+- count: 0
+  kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment: []
   by_paper_count:
   - count: 1
     paper_count: 0
+by_structure_kind:
+- count: 1
+  structure_kind: defined
 case_id: list_metabolites_id_batch_with_unknown
 mass_stats:
   mass_max: 180.156
@@ -32,6 +43,8 @@ results:
   - metabolism
   - transport
   formula: C6H12O6
+  kegg_functional_categories:
+  - Carbohydrates
   mass: 180.156
   measured_assay_count: 0
   measured_compartments: []
@@ -77,6 +90,7 @@ results:
   - kegg.pathway:ko05111
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
+  structure_kind: defined
   transporter_count: 10
   transporter_gene_count: 1436
 returned: 1

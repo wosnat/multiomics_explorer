@@ -16,6 +16,7 @@ rows:
   name: D-Fructose 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 1
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -36,6 +37,7 @@ rows:
   name: D-Fructose 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 2
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -56,6 +58,7 @@ rows:
   name: D-Fructose 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 3
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -76,6 +79,7 @@ rows:
   name: Citrate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 4
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -96,6 +100,7 @@ rows:
   name: Citrate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 5
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -116,6 +121,7 @@ rows:
   name: Citrate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 6
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -136,6 +142,7 @@ rows:
   name: Citrate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 7
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -156,6 +163,7 @@ rows:
   name: D-Fructose 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 8
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -176,6 +184,7 @@ rows:
   name: D-Glucose 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 9
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -196,6 +205,7 @@ rows:
   name: D-Glucose 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 10
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -216,6 +226,7 @@ rows:
   name: D-Glucose 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 11
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -236,6 +247,7 @@ rows:
   name: 6-Phospho-D-gluconate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 12
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -256,6 +268,7 @@ rows:
   name: D-Ribulose 1,5-bisphosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 13
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -276,6 +289,7 @@ rows:
   name: 3-Phospho-D-glycerate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 14
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -296,6 +310,7 @@ rows:
   name: Chitobiose
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 15
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -316,6 +331,7 @@ rows:
   name: Chitobiose
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 16
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -336,6 +352,7 @@ rows:
   name: D-Glucose 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 17
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -356,6 +373,7 @@ rows:
   name: Phosphoenolpyruvate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 18
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -376,6 +394,7 @@ rows:
   name: Acetyl-CoA
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 19
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -396,6 +415,7 @@ rows:
   name: 3-Phospho-D-glycerate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 20
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -416,6 +436,7 @@ rows:
   name: D-Ribulose 1,5-bisphosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 21
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -436,6 +457,7 @@ rows:
   name: Acetyl-CoA
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 22
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -456,6 +478,7 @@ rows:
   name: Phosphoenolpyruvate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 23
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -476,6 +499,7 @@ rows:
   name: 6-Phospho-D-gluconate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 24
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -496,6 +520,7 @@ rows:
   name: 3-Phospho-D-glycerate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 25
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -516,6 +541,7 @@ rows:
   name: 6-Phospho-D-gluconate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 26
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -536,6 +562,7 @@ rows:
   name: N-Acetyl-D-glucosamine 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 27
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -556,6 +583,7 @@ rows:
   name: Chitobiose
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 28
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -576,6 +604,7 @@ rows:
   name: D-Ribose 5-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 29
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -596,6 +625,7 @@ rows:
   name: D-Glucosamine 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 30
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -616,6 +646,7 @@ rows:
   name: Fumarate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 31
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -636,6 +667,7 @@ rows:
   name: D-Ribose 5-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 32
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -656,6 +688,7 @@ rows:
   name: N-Acetyl-D-glucosamine 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 33
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -676,6 +709,7 @@ rows:
   name: Chitobiose
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 34
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -696,6 +730,7 @@ rows:
   name: Phosphoenolpyruvate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 35
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -716,6 +751,7 @@ rows:
   name: N-Acetyl-D-glucosamine 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 36
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -736,6 +772,7 @@ rows:
   name: N-Acetyl-D-glucosamine 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 37
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -756,6 +793,7 @@ rows:
   name: D-Glucosamine 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 38
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -776,6 +814,7 @@ rows:
   name: D-Ribose 5-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 39
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -796,6 +835,7 @@ rows:
   name: Phosphoenolpyruvate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 40
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -816,6 +856,7 @@ rows:
   name: D-Ribulose 1,5-bisphosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 41
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -836,6 +877,7 @@ rows:
   name: (S)-Malate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 42
+  stereo_assignment: dominant_form_assumed
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -856,6 +898,7 @@ rows:
   name: D-Ribulose 1,5-bisphosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 43
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -876,6 +919,7 @@ rows:
   name: Fumarate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 44
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -896,6 +940,7 @@ rows:
   name: Fumarate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 45
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -916,6 +961,7 @@ rows:
   name: D-Ribose 5-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 46
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -936,6 +982,7 @@ rows:
   name: 3-Phospho-D-glycerate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 47
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -956,6 +1003,7 @@ rows:
   name: Fumarate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 48
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -976,6 +1024,7 @@ rows:
   name: D-Glucosamine 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 49
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -996,6 +1045,7 @@ rows:
   name: 2-Oxoglutarate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 50
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -1016,6 +1066,7 @@ rows:
   name: (S)-Malate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 51
+  stereo_assignment: dominant_form_assumed
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -1036,6 +1087,7 @@ rows:
   name: D-Glucosamine
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 52
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -1056,6 +1108,7 @@ rows:
   name: 2-Oxoglutarate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 53
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -1076,6 +1129,7 @@ rows:
   name: D-Glucosamine
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 54
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -1096,6 +1150,7 @@ rows:
   name: D-Glucosamine
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 55
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -1116,6 +1171,7 @@ rows:
   name: 2-Oxoglutarate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 56
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -1136,6 +1192,7 @@ rows:
   name: D-Glucosamine
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 57
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -1156,6 +1213,7 @@ rows:
   name: Acetyl-CoA
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 58
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -1176,6 +1234,7 @@ rows:
   name: Acetyl-CoA
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 59
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -1196,6 +1255,7 @@ rows:
   name: 2-Oxoglutarate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 60
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -1216,6 +1276,7 @@ rows:
   name: (S)-Malate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 61
+  stereo_assignment: dominant_form_assumed
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -1236,6 +1297,7 @@ rows:
   name: (S)-Malate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 62
+  stereo_assignment: dominant_form_assumed
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -1256,6 +1318,7 @@ rows:
   name: 6-Phospho-D-gluconate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 63
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -1276,6 +1339,7 @@ rows:
   name: D-Glucosamine 6-phosphate
   organism_name: Prochlorococcus MIT9313
   rank_by_metric: 64
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1

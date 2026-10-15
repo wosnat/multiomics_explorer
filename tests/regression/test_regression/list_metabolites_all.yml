@@ -5,6 +5,87 @@ by_evidence_source:
   evidence_source: transport
 - count: 135
   evidence_source: metabolomics
+by_kegg_brite_class:
+- count: 254
+  kegg_brite_class: 'Lipids: Fatty acyls'
+- count: 137
+  kegg_brite_class: 'Lipids: Prenol lipids'
+- count: 57
+  kegg_brite_class: 'Phytochemical compounds: Terpenoids'
+- count: 38
+  kegg_brite_class: 'Lipids: Sterol lipids'
+- count: 37
+  kegg_brite_class: 'Phytochemical compounds: Alkaloids'
+- count: 34
+  kegg_brite_class: 'Lipids: Polyketides'
+- count: 30
+  kegg_brite_class: 'Pesticides: Pesticides'
+- count: 27
+  kegg_brite_class: 'Lipids: Glycerophospholipids'
+- count: 22
+  kegg_brite_class: 'Glycosides: N-glycosides'
+- count: 21
+  kegg_brite_class: 'Phytochemical compounds: Phenylpropanoids'
+- count: 18
+  kegg_brite_class: 'Lipids: Saccharolipids'
+- count: 15
+  kegg_brite_class: 'Glycosides: O-glycosides'
+- count: 11
+  kegg_brite_class: 'Natural toxins: Phytotoxins'
+- count: 11
+  kegg_brite_class: 'Phytochemical compounds: Flavonoids'
+- count: 9
+  kegg_brite_class: 'Lipids: Glycerolipids'
+- count: 9
+  kegg_brite_class: 'Phytochemical compounds: Fatty acids related compounds'
+- count: 8
+  kegg_brite_class: 'Lipids: Sphingolipids'
+- count: 8
+  kegg_brite_class: 'Phytochemical compounds: Amino acid related compounds'
+- count: 6
+  kegg_brite_class: 'Endocrine disrupting compounds: Pesticides and herbicides'
+- count: 5
+  kegg_brite_class: 'Pesticides: Obsolete pesticides'
+- count: 3
+  kegg_brite_class: 'Glycosides: S-glycosides'
+- count: 3
+  kegg_brite_class: 'Natural toxins: Fungal toxins'
+- count: 2
+  kegg_brite_class: 'Endocrine disrupting compounds: Plasticizers and plastics'
+- count: 2
+  kegg_brite_class: 'Phytochemical compounds: Others'
+- count: 1
+  kegg_brite_class: 'Bioactive peptides: Cardiovascular peptides'
+- count: 1
+  kegg_brite_class: 'Bioactive peptides: Neuropeptides'
+- count: 1
+  kegg_brite_class: 'Natural toxins: Marine biotoxins'
+- count: 1
+  kegg_brite_class: 'Phytochemical compounds: Shikimate / acetate-malonate pathway
+    derived compounds'
+- count: 2562
+  kegg_brite_class: not classified
+by_kegg_functional_category:
+- count: 65
+  kegg_functional_category: Carbohydrates
+- count: 60
+  kegg_functional_category: Peptides
+- count: 47
+  kegg_functional_category: Nucleic acids
+- count: 41
+  kegg_functional_category: Vitamins and cofactors
+- count: 40
+  kegg_functional_category: Lipids
+- count: 35
+  kegg_functional_category: Organic acids
+- count: 28
+  kegg_functional_category: Antibiotics
+- count: 24
+  kegg_functional_category: Hormones and transmitters
+- count: 15
+  kegg_functional_category: Steroids
+- count: 2880
+  kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment:
   - compartment: extracellular
@@ -22,6 +103,13 @@ by_measurement_coverage:
     paper_count: 2
   - count: 5
     paper_count: 3
+by_structure_kind:
+- count: 2564
+  structure_kind: defined
+- count: 624
+  structure_kind: generic
+- count: 26
+  structure_kind: polymer
 case_id: list_metabolites_all
 mass_stats:
   mass_max: 5227.103
@@ -71,6 +159,7 @@ results:
   - kegg.pathway:ko05022
   - kegg.pathway:ko05208
   - kegg.pathway:ko05415
+  structure_kind: defined
   transporter_count: 15
   transporter_gene_count: 1900
 - catalyst_gene_count: 6041
@@ -85,6 +174,11 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
+  kegg_brite_classes:
+  - 'Glycosides: N-glycosides'
+  kegg_functional_categories:
+  - Nucleic acids
+  - Vitamins and cofactors
   mass: 503.15
   measured_assay_count: 0
   measured_compartments: []
@@ -128,6 +222,7 @@ results:
   - kegg.pathway:ko05133
   - kegg.pathway:ko05410
   - kegg.pathway:ko05415
+  structure_kind: defined
   transporter_count: 15
   transporter_gene_count: 2195
 - catalyst_gene_count: 5776
@@ -175,6 +270,7 @@ results:
   - kegg.pathway:ko05120
   - kegg.pathway:ko05164
   - kegg.pathway:ko05323
+  structure_kind: defined
   transporter_count: 123
   transporter_gene_count: 8017
 - catalyst_gene_count: 4325
@@ -200,6 +296,7 @@ results:
   - kegg.pathway:ko00190
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
+  structure_kind: defined
   transporter_count: 3
   transporter_gene_count: 99
 - catalyst_gene_count: 4069
@@ -232,6 +329,7 @@ results:
   - kegg.pathway:ko04978
   - kegg.pathway:ko05012
   - kegg.pathway:ko05022
+  structure_kind: defined
   transporter_count: 15
   transporter_gene_count: 2867
 returned: 5

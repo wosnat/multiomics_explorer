@@ -551,7 +551,7 @@ class MetaboliteResult(SparseRow):
     measured_compartments: list[str] = Field(default_factory=list, description="Wet-lab compartments observed for this metabolite (subset of {'whole_cell', 'extracellular', 'vesicle'}). Empty on unmeasured metabolites — use len(measured_compartments) >= 1 to filter for measurement-anchored rows.")
     score: float | None = Field(default=None, description="Lucene relevance score (only with `search_text`).")
     # Identity / KEGG classification (spec metabolite-identity-surface §C/§C2)
-    structure_kind: str | None = Field(default=None, description="'defined' (one molecule), 'generic' (a compound class, e.g. 'amino acid') or 'polymer'. Generic and polymer entries have no formula-level chemistry. Values: list_filter_values('structure_kind').")
+    structure_kind: str | None = Field(default=None, description="'defined' (one molecule), 'generic' (a compound class, e.g. 'amino acid') or 'polymer'. Generic / polymer entries carry a generic formula (R or * groups) and no mass. Values: list_filter_values('structure_kind').")
     kegg_functional_categories: list[str] | None = Field(default=None, description="KEGG br08001 categories this metabolite is listed under. Absent = KEGG did not list it (~90% of metabolites), not 'none apply'. Curated, functional headings (amines sit under Peptides).")
     kegg_brite_classes: list[str] | None = Field(default=None, description="'Tree: Class' from 7 KEGG compound BRITE trees (lipids, phytochemicals, glycosides, pesticides, toxins, endocrine disruptors, bioactive peptides). Absent = KEGG did not list it (~80% of metabolites).")
 
@@ -712,8 +712,8 @@ class GeneReactionMetaboliteTriplet(SparseRow):
         default=None,
         description="Transport rows only. The gene's TCDB substrate "
         "resolution, repeated per row (not a per-substrate fact): 'resolved' "
-        "= a deepest attachment is not lumping (TcdbFamily.substrate_breadth "
-        "= 'lumping'); 'family_inferred' = reachability, not capability.")
+        "= a deepest attachment is non-lumping (TcdbFamily.substrate_breadth); "
+        "'family_inferred' = reachability, not capability.")
 
     # metabolism-arm fields (None on transport rows)
     reaction_id: str | None = Field(
@@ -950,8 +950,8 @@ class GbmTopGene(BaseModel):
     transport_substrate_resolution: str | None = Field(
         default=None,
         description="Gene-level `Gene.transport_substrate_resolution`: "
-        "'resolved' = at least one deepest attachment is not lumping "
-        "(`TcdbFamily.substrate_breadth = 'lumping'`); 'family_inferred' = "
+        "'resolved' = a deepest attachment is non-lumping "
+        "(`TcdbFamily.substrate_breadth`); 'family_inferred' = "
         "substrate breadth is reachability, not capability. None = no TCDB "
         "call.")
     tcdb_evidence_score_max: float | None = Field(
@@ -1000,9 +1000,9 @@ class GenesByMetaboliteResponse(BaseModel):
         description="Diagnostic strings. Currently emitted: inherited-"
         "dominance auto-warning when `substrate_depth='inherited'` rows "
         "are the transport-arm majority and `substrate_depth` was not set "
-        "explicitly; bare-ID collision notes (one input → several "
-        "metabolites, expanded to all); a `gene_categories` value not "
-        "found in the live vocabulary.")
+        "explicitly; a removed-metabolite or chemical-role id (kept in "
+        "not_found, with where to look instead); a `gene_categories` "
+        "value not found in the live vocabulary.")
     resolved_aliases: dict[str, list[str]] = Field(
         default_factory=dict,
         description="Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.")
@@ -1111,8 +1111,8 @@ class MbgByGene(BaseModel):
     transport_substrate_resolution: str | None = Field(
         default=None,
         description="Gene-level `Gene.transport_substrate_resolution`: "
-        "'resolved' = at least one deepest attachment is not lumping "
-        "(`TcdbFamily.substrate_breadth = 'lumping'`); 'family_inferred' = "
+        "'resolved' = a deepest attachment is non-lumping "
+        "(`TcdbFamily.substrate_breadth`); 'family_inferred' = "
         "substrate breadth is reachability, not capability. None = no TCDB "
         "call.")
     tcdb_evidence_score_max: float | None = Field(
@@ -1379,9 +1379,9 @@ class MetabolitesByGeneResponse(BaseModel):
         description="Diagnostic strings. Currently emitted: gene-anchored "
         "auto-warning naming input genes whose "
         "`transport_substrate_resolution='family_inferred'` — their "
-        "substrate breadth is reachability, not capability; bare-ID "
-        "collision notes (one input → several metabolites, expanded to "
-        "all); a `gene_categories` value not found in the live vocabulary; "
+        "substrate breadth is reachability, not capability; a "
+        "removed-metabolite or chemical-role id (kept in not_found); a "
+        "`gene_categories` value not found in the live vocabulary; "
         "a `not_found.locus_tags` entry differing only by case from a real "
         "one (locus_tags are never case-normalised).")
     resolved_aliases: dict[str, list[str]] = Field(
@@ -2255,7 +2255,7 @@ def register_tools(mcp: FastMCP):
         )
         transport_substrate_resolution: str | None = Field(
             default=None,
-            description="'resolved' = at least one deepest TCDB attachment is not lumping (TcdbFamily.substrate_breadth = 'lumping'); 'family_inferred' = transported_metabolite_count is reachability, not capability. None = no TCDB call.",
+            description="'resolved' = at least one deepest TCDB attachment is a non-lumping family (lumping = TcdbFamily.substrate_breadth='lumping'); 'family_inferred' = transported_metabolite_count is reachability, not capability. None = no TCDB call.",
         )
         evidence_sources: list[str] = Field(
             default_factory=list,
@@ -8091,9 +8091,9 @@ def register_tools(mcp: FastMCP):
     ) -> ListMetabolitesResponse:
         """Browse the chemistry layer — KEGG-curated metabolism, TCDB-curated transport substrates, and compounds measured by a MetaboliteAssay.
 
-        Use as the compound-side entry point; for a metabolite's genes use `genes_by_metabolite`, for measurement evidence `assays_by_metabolite`.
-        Filters: search_text, metabolite_ids (+exclude), xref ID lists, elements, min/max_mass, organism_names, pathway_ids, evidence_sources.
-        Returns: top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, by_measurement_coverage; one row = one metabolite.
+        Use as the compound-side entry point; genes via `genes_by_metabolite`, measurements via `assays_by_metabolite`.
+        Filters: search_text, metabolite_ids (+exclude), xref IDs, elements, mass, organism_names, pathway_ids, evidence_sources, structure_kind, kegg_functional_categories, kegg_brite_classes.
+        Returns: top_organisms, top pathways, by_evidence_source, by_structure_kind, by_kegg_*; one row = one metabolite.
         docs://tools/list_metabolites; summary=True first.
         """
         await ctx.info(
@@ -8799,9 +8799,9 @@ def register_tools(mcp: FastMCP):
             description="Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.")
         warnings: list[str] = Field(
             default_factory=list,
-            description="Diagnostic strings, e.g. a bare metabolite ID "
-            "that resolved to more than one metabolite (expanded to all — "
-            "pass the canonical id to narrow), a closed-vocabulary filter "
+            description="Diagnostic strings, e.g. a removed-metabolite or "
+            "chemical-role id (kept in not_found, with where to look "
+            "instead), a closed-vocabulary filter "
             "value (compartment / treatment_type / background_factors / "
             "growth_phases) not found in the live vocabulary, or an "
             "organism that matches no OrganismTaxon.")
@@ -9310,8 +9310,8 @@ def register_tools(mcp: FastMCP):
         """Numeric MetaboliteAssay edges — one row per metabolite × assay edge with its value; cross-organism.
 
         Use for values, detection status and rankable cutoffs; pre-flight `list_metabolite_assays`; flags `metabolites_by_flags_assay`, both arms `assays_by_metabolite`.
-        Filters: assay_ids, organism, metabolite_ids, min/max_value, detection_status, timepoint, metric_bucket, min/max_percentile, max_rank.
-        Returns: by_detection_status, by_metric_bucket, by_assay, by_metric, excluded_assays; one row = one edge. Tested-absent rows kept.
+        Filters: assay_ids, organism, metabolite_ids, value, detection_status, stereo_assignment, timepoint, rankable cutoffs.
+        Returns: by_detection_status, by_stereo_assignment, by_metric_bucket, by_assay, by_metric, excluded_assays; one row = one edge. Tested-absent rows kept.
         docs://tools/metabolites_by_quantifies_assay; summary=True first.
         """
         await ctx.info(
@@ -9592,11 +9592,11 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> MetabolitesByFlagsAssayResponse:
-        """Boolean MetaboliteAssay edges — one row per metabolite × flag edge; cross-organism. flag_value=False rows are tested-absent: both states are stored.
+        """Boolean MetaboliteAssay edges — one row per metabolite × flag edge; cross-organism. flag_value=False rows are tested-absent (both states stored).
 
         Use for presence / absence calls; pre-flight `list_metabolite_assays`; values `metabolites_by_quantifies_assay`, both arms `assays_by_metabolite`.
-        Filters: assay_ids, organism, metabolite_ids, flag_value, plus publication / experiment / condition.
-        Returns: by_value, by_assay, by_metric, not_found, excluded_assays (empty here, for parity with the numeric twin); one row = one flag.
+        Filters: assay_ids, organism, metabolite_ids, flag_value, stereo_assignment, plus publication / experiment filters.
+        Returns: by_value, by_stereo_assignment, by_assay, by_metric, not_found, excluded_assays (always empty); one row = one flag.
         docs://tools/metabolites_by_flags_assay; summary=True first.
         """
         await ctx.info(
@@ -9905,8 +9905,8 @@ def register_tools(mcp: FastMCP):
         """Metabolite IDs to every measurement edge, numeric and boolean arms merged into one polymorphic row set; cross-organism.
 
         Use for the metabolite-anchored reverse view; drill back to one arm with `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay`.
-        Filters: metabolite_ids (+exclude), organism, evidence_kind, metric_types, compartment.
-        Returns: by_evidence_kind, by_detection_status, by_flag_value, by_assay, metabolites_matched (distinct; total_matching counts rows), not_found, not_matched; one row = one edge.
+        Filters: metabolite_ids (+exclude), organism, evidence_kind, metric_types, compartment, stereo_assignment.
+        Returns: by_evidence_kind, by_detection_status, by_flag_value, by_stereo_assignment, by_assay, metabolites_matched (distinct), not_found; one row = one edge.
         docs://tools/assays_by_metabolite; summary=True first for 50+ IDs.
         """
         await ctx.info(

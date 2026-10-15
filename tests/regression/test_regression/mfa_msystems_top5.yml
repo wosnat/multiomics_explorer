@@ -12,6 +12,7 @@ rows:
   n_replicates: 1
   name: NAD+
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -23,6 +24,7 @@ rows:
   n_replicates: 1
   name: S-Adenosyl-L-methionine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -34,6 +36,7 @@ rows:
   n_replicates: 1
   name: AMP
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -45,6 +48,7 @@ rows:
   n_replicates: 1
   name: S-Adenosyl-L-homocysteine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -56,6 +60,7 @@ rows:
   n_replicates: 1
   name: L-Glutamate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -67,6 +72,7 @@ rows:
   n_replicates: 1
   name: 2-Oxoglutarate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -78,6 +84,7 @@ rows:
   n_replicates: 1
   name: L-Aspartate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -89,6 +96,7 @@ rows:
   n_replicates: 1
   name: Glutathione
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -100,6 +108,7 @@ rows:
   n_replicates: 1
   name: L-Arginine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -111,6 +120,7 @@ rows:
   n_replicates: 1
   name: L-Glutamine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -122,6 +132,7 @@ rows:
   n_replicates: 1
   name: L-Methionine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -133,6 +144,7 @@ rows:
   n_replicates: 1
   name: L-Tryptophan
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -144,6 +156,7 @@ rows:
   n_replicates: 1
   name: L-Phenylalanine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -155,6 +168,7 @@ rows:
   n_replicates: 1
   name: L-Tyrosine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -166,6 +180,7 @@ rows:
   n_replicates: 1
   name: D-Glucose 6-phosphate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -177,6 +192,7 @@ rows:
   n_replicates: 1
   name: UMP
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -188,6 +204,7 @@ rows:
   n_replicates: 1
   name: Uracil
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -199,6 +216,7 @@ rows:
   n_replicates: 1
   name: Glycerone phosphate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -210,6 +228,7 @@ rows:
   n_replicates: 1
   name: L-Leucine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -221,6 +240,7 @@ rows:
   n_replicates: 1
   name: IMP
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -232,6 +252,7 @@ rows:
   n_replicates: 1
   name: L-Proline
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -243,6 +264,7 @@ rows:
   n_replicates: 1
   name: 5^-Methylthioadenosine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -254,6 +276,7 @@ rows:
   n_replicates: 1
   name: L-Valine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -265,6 +288,7 @@ rows:
   n_replicates: 1
   name: 4-Methyl-2-oxopentanoate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -276,6 +300,7 @@ rows:
   n_replicates: 1
   name: Spermidine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -287,6 +312,7 @@ rows:
   n_replicates: 1
   name: L-Citrulline
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -298,6 +324,7 @@ rows:
   n_replicates: 1
   name: Guanosine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -309,6 +336,7 @@ rows:
   n_replicates: 1
   name: L-Isoleucine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -320,6 +348,7 @@ rows:
   n_replicates: 1
   name: 4-Aminobenzoate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -331,6 +360,7 @@ rows:
   n_replicates: 1
   name: N-Acetyl-L-glutamate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -342,6 +372,7 @@ rows:
   n_replicates: 1
   name: (S)-3-Methyl-2-oxopentanoic acid
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -353,6 +384,7 @@ rows:
   n_replicates: 1
   name: Betaine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -364,6 +396,7 @@ rows:
   n_replicates: 1
   name: Pantothenate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -375,6 +408,7 @@ rows:
   n_replicates: 1
   name: Chitobiose
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -386,6 +420,7 @@ rows:
   n_replicates: 1
   name: Hemine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -397,6 +432,7 @@ rows:
   n_replicates: 1
   name: N,N^,N^^-triacetylchitotriose
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -408,6 +444,7 @@ rows:
   n_replicates: 1
   name: acetyltaurine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -419,6 +456,7 @@ rows:
   n_replicates: 1
   name: L-Alanine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -430,6 +468,7 @@ rows:
   n_replicates: 1
   name: Succinate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -441,6 +480,7 @@ rows:
   n_replicates: 1
   name: L-Serine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -452,6 +492,7 @@ rows:
   n_replicates: 1
   name: Phosphoenolpyruvate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -463,6 +504,7 @@ rows:
   n_replicates: 1
   name: L-Ornithine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -474,6 +516,7 @@ rows:
   n_replicates: 1
   name: sn-Glycerol 3-phosphate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -485,6 +528,7 @@ rows:
   n_replicates: 1
   name: L-Cysteine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -496,6 +540,7 @@ rows:
   n_replicates: 1
   name: Choline
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -507,6 +552,7 @@ rows:
   n_replicates: 1
   name: Biotin
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -518,6 +564,7 @@ rows:
   n_replicates: 1
   name: Fumarate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -529,6 +576,7 @@ rows:
   n_replicates: 1
   name: Glutathione disulfide
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -540,6 +588,7 @@ rows:
   n_replicates: 1
   name: Putrescine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -551,6 +600,7 @@ rows:
   n_replicates: 1
   name: N-Acetyl-D-glucosamine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -562,6 +612,7 @@ rows:
   n_replicates: 1
   name: 3-Methyl-2-oxobutanoic acid
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -573,6 +624,7 @@ rows:
   n_replicates: 1
   name: Adenine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -584,6 +636,7 @@ rows:
   n_replicates: 1
   name: (S)-Malate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -595,6 +648,7 @@ rows:
   n_replicates: 1
   name: 4-Hydroxybenzoate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -606,6 +660,7 @@ rows:
   n_replicates: 1
   name: Citrate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -617,6 +672,7 @@ rows:
   n_replicates: 1
   name: L-Threonine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -628,6 +684,7 @@ rows:
   n_replicates: 1
   name: 2,3-Dihydroxybenzoate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -639,6 +696,7 @@ rows:
   n_replicates: 1
   name: Adenosine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -650,6 +708,7 @@ rows:
   n_replicates: 1
   name: Thymidine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -661,6 +720,7 @@ rows:
   n_replicates: 1
   name: Guanine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -672,6 +732,7 @@ rows:
   n_replicates: 1
   name: Taurine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -683,6 +744,7 @@ rows:
   n_replicates: 1
   name: Riboflavin
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -694,6 +756,7 @@ rows:
   n_replicates: 1
   name: Inosine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -705,6 +768,7 @@ rows:
   n_replicates: 1
   name: Orotate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -716,6 +780,7 @@ rows:
   n_replicates: 1
   name: Pyridoxine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -727,6 +792,7 @@ rows:
   n_replicates: 1
   name: L-Kynurenine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -738,6 +804,7 @@ rows:
   n_replicates: 1
   name: 4-Aminobutanoate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -749,6 +816,7 @@ rows:
   n_replicates: 1
   name: D-Glucosamine 6-phosphate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -760,6 +828,7 @@ rows:
   n_replicates: 1
   name: Thiamine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -771,6 +840,7 @@ rows:
   n_replicates: 1
   name: Cytosine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -782,6 +852,7 @@ rows:
   n_replicates: 1
   name: Xanthine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -793,6 +864,7 @@ rows:
   n_replicates: 1
   name: Tryptamine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -804,6 +876,7 @@ rows:
   n_replicates: 1
   name: Folate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -815,6 +888,7 @@ rows:
   n_replicates: 1
   name: Indole-3-acetate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -826,6 +900,7 @@ rows:
   n_replicates: 1
   name: Thiamin monophosphate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -837,6 +912,7 @@ rows:
   n_replicates: 1
   name: 4-Amino-5-hydroxymethyl-2-methylpyrimidine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -848,6 +924,7 @@ rows:
   n_replicates: 1
   name: Glyphosate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -859,6 +936,7 @@ rows:
   n_replicates: 1
   name: Xanthosine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -870,6 +948,7 @@ rows:
   n_replicates: 1
   name: Dethiobiotin
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -881,6 +960,7 @@ rows:
   n_replicates: 1
   name: N-Acetylmuramate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -892,6 +972,7 @@ rows:
   n_replicates: 1
   name: Cyanocobalamin
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -903,6 +984,7 @@ rows:
   n_replicates: 1
   name: 2-Aminoethylphosphonate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -914,6 +996,7 @@ rows:
   n_replicates: 1
   name: S,S-Dimethyl-beta-propiothetin
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -925,6 +1008,7 @@ rows:
   n_replicates: 1
   name: Taurocholate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -936,6 +1020,7 @@ rows:
   n_replicates: 1
   name: (3Z)-Phycocyanobilin
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -947,6 +1032,7 @@ rows:
   n_replicates: 1
   name: Ectoine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -958,6 +1044,7 @@ rows:
   n_replicates: 1
   name: Fosfomycin
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -969,6 +1056,7 @@ rows:
   n_replicates: 1
   name: Muramic acid
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -980,6 +1068,7 @@ rows:
   n_replicates: 1
   name: Caffeine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -991,6 +1080,7 @@ rows:
   n_replicates: 1
   name: Syringic acid
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -1002,6 +1092,7 @@ rows:
   n_replicates: 1
   name: (R)-2,3-Dihydroxypropane-1-sulfonate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -1013,6 +1104,7 @@ rows:
   n_replicates: 1
   name: 4-Amino-5-aminomethyl-2-methylpyrimidine
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -1024,3 +1116,4 @@ rows:
   n_replicates: 1
   name: 3-Sulfanylpropanoate
   organism_name: Prochlorococcus MIT9301
+  stereo_assignment: as_reported

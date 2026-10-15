@@ -12375,9 +12375,8 @@ class TestGenesByMetabolitePhase2:
     def _mock_conn(self):
         """Provide a wide buffer of empty results to satisfy probes."""
         conn = MagicMock()
-        conn.execute_query.side_effect = [
-            [self._SUMMARY_ROW],
-        ] + [[]] * 10
+        conn.execute_query.side_effect = _resolver_aware(
+            [[self._SUMMARY_ROW]] + [[]] * 10)
         return conn
 
     def test_exclude_metabolite_ids_passed(self):
@@ -12399,7 +12398,7 @@ class TestGenesByMetabolitePhase2:
             metabolite_ids=self._METS, organism=self._ORG,
             summary=True, conn=conn,
         )
-        summary_call = conn.execute_query.call_args_list[0]
+        summary_call = _non_resolver_calls(conn)[0]
         kw = summary_call.kwargs
         assert "exclude_metabolite_ids" not in kw
 
@@ -12445,9 +12444,8 @@ class TestMetabolitesByGenePhase2:
 
     def _mock_conn(self):
         conn = MagicMock()
-        conn.execute_query.side_effect = [
-            [self._SUMMARY_ROW],
-        ] + [[]] * 10
+        conn.execute_query.side_effect = _resolver_aware(
+            [[self._SUMMARY_ROW]] + [[]] * 10)
         return conn
 
     def test_envelope_top_metabolite_pathways_propagated(self):
@@ -12485,7 +12483,7 @@ class TestMetabolitesByGenePhase2:
         metabolites_by_gene(
             self._LOCUS, self._ORG, summary=True, conn=conn,
         )
-        summary_call = conn.execute_query.call_args_list[0]
+        summary_call = _non_resolver_calls(conn)[0]
         kw = summary_call.kwargs
         assert "exclude_metabolite_ids" not in kw
 
@@ -20600,3 +20598,35 @@ class TestListFilterValuesIdentitySurface:
         for name in ("structure_kind", "kegg_functional_category",
                      "kegg_brite_class", "stereo_assignment"):
             assert name in msg
+
+
+# ---------------------------------------------------------------------------
+# Code-review follow-ups (metabolite-identity-surface)
+# ---------------------------------------------------------------------------
+
+class TestIdentitySurfaceReviewFollowups:
+    def test_chebi_role_prefix_case_and_zeros_normalised(self):
+        from multiomics_explorer.api.functions import _normalize_metabolite_curie
+        assert _normalize_metabolite_curie("CHEBI.ROLE:033229") == "chebi.role:33229"
+        assert _normalize_metabolite_curie("chebi.role:33229") == "chebi.role:33229"
+
+    def test_dominant_form_warning_skipped_when_assumed_rows_requested(self):
+        from multiomics_explorer.api.functions import _stereo_assignment_envelope
+        freq = [{"item": "dominant_form_assumed", "count": 138}]
+        _, warnings = _stereo_assignment_envelope(
+            freq, 138, ["dominant_form_assumed"])
+        assert warnings == []
+
+    def test_dominant_form_warning_kept_when_filter_includes_as_reported(self):
+        from multiomics_explorer.api.functions import _stereo_assignment_envelope
+        freq = [{"item": "as_reported", "count": 10},
+                {"item": "dominant_form_assumed", "count": 4}]
+        _, warnings = _stereo_assignment_envelope(
+            freq, 14, ["as_reported", "dominant_form_assumed"])
+        assert len(warnings) == 1 and warnings[0].startswith("4 of 14 rows")
+
+    def test_dominant_form_warning_kept_without_filter(self):
+        from multiomics_explorer.api.functions import _stereo_assignment_envelope
+        freq = [{"item": "dominant_form_assumed", "count": 4}]
+        _, warnings = _stereo_assignment_envelope(freq, 64)
+        assert warnings and warnings[0].startswith("4 of 64 rows")

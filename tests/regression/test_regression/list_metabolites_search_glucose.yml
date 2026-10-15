@@ -5,6 +5,16 @@ by_evidence_source:
   evidence_source: transport
 - count: 3
   evidence_source: metabolomics
+by_kegg_brite_class:
+- count: 23
+  kegg_brite_class: not classified
+by_kegg_functional_category:
+- count: 2
+  kegg_functional_category: Carbohydrates
+- count: 1
+  kegg_functional_category: Vitamins and cofactors
+- count: 20
+  kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment:
   - compartment: extracellular
@@ -20,6 +30,9 @@ by_measurement_coverage:
     paper_count: 1
   - count: 1
     paper_count: 3
+by_structure_kind:
+- count: 23
+  structure_kind: defined
 case_id: list_metabolites_search_glucose
 mass_stats:
   mass_max: 587.328
@@ -53,6 +66,7 @@ results:
   pathway_count: 0
   pathway_ids: []
   score: 3.0709
+  structure_kind: defined
   transporter_count: 18
   transporter_gene_count: 3091
 - catalyst_gene_count: 303
@@ -68,6 +82,8 @@ results:
   - metabolomics
   - transport
   formula: C15H22N2O17P2
+  kegg_functional_categories:
+  - Vitamins and cofactors
   mass: 564.286
   measured_assay_count: 4
   measured_compartments:
@@ -100,6 +116,7 @@ results:
   - kegg.pathway:ko01250
   - kegg.pathway:ko04082
   score: 2.5841
+  structure_kind: defined
   transporter_count: 3
   transporter_gene_count: 1708
 - catalyst_gene_count: 284
@@ -112,6 +129,8 @@ results:
   - metabolism
   - transport
   formula: C6H12O6
+  kegg_functional_categories:
+  - Carbohydrates
   mass: 180.156
   measured_assay_count: 0
   measured_compartments: []
@@ -158,6 +177,7 @@ results:
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
   score: 2.5841
+  structure_kind: defined
   transporter_count: 10
   transporter_gene_count: 1436
 - catalyst_gene_count: 198
@@ -192,6 +212,7 @@ results:
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
   score: 2.5841
+  structure_kind: defined
   transporter_count: 1
   transporter_gene_count: 249
 - catalyst_gene_count: 89
@@ -221,6 +242,7 @@ results:
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
   score: 2.5841
+  structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 18
@@ -250,6 +272,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
   score: 2.5841
+  structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 192
@@ -278,6 +301,7 @@ results:
   - kegg.pathway:ko01120
   - kegg.pathway:ko01200
   score: 2.2306
+  structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 183
@@ -310,6 +334,7 @@ results:
   - kegg.pathway:ko01250
   - kegg.pathway:ko04964
   score: 2.2306
+  structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 196
@@ -360,6 +385,7 @@ results:
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
   score: 1.9621
+  structure_kind: defined
   transporter_count: 2
   transporter_gene_count: 866
 - catalyst_gene_count: 287
@@ -405,6 +431,7 @@ results:
   - kegg.pathway:ko01250
   - kegg.pathway:ko04922
   score: 1.9621
+  structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 0
@@ -416,6 +443,8 @@ results:
   evidence_sources:
   - transport
   formula: C6H12O5
+  kegg_functional_categories:
+  - Carbohydrates
   mass: 164.157
   measured_assay_count: 0
   measured_compartments: []
@@ -427,6 +456,7 @@ results:
   pathway_count: 0
   pathway_ids: []
   score: 1.9621
+  structure_kind: defined
   transporter_count: 2
   transporter_gene_count: 606
 - catalyst_gene_count: 0
@@ -449,6 +479,7 @@ results:
   pathway_count: 0
   pathway_ids: []
   score: 1.7514
+  structure_kind: defined
   transporter_count: 1
   transporter_gene_count: 586
 - catalyst_gene_count: 175
@@ -485,6 +516,7 @@ results:
   - kegg.pathway:ko04152
   - kegg.pathway:ko04922
   score: 1.7514
+  structure_kind: defined
   transporter_count: 1
   transporter_gene_count: 0
 - catalyst_gene_count: 188
@@ -517,6 +549,7 @@ results:
   - kegg.pathway:ko04152
   - kegg.pathway:ko04922
   score: 1.7514
+  structure_kind: defined
   transporter_count: 2
   transporter_gene_count: 583
 - catalyst_gene_count: 20
@@ -541,6 +574,7 @@ results:
   pathway_ids:
   - kegg.pathway:ko00500
   score: 1.7514
+  structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 1
@@ -568,6 +602,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
   score: 1.7514
+  structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 137
@@ -600,6 +635,7 @@ results:
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
   score: 1.4416
+  structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 32
@@ -627,6 +663,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
   score: 1.4416
+  structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 24
@@ -654,6 +691,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
   score: 1.4416
+  structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 1
@@ -684,6 +722,7 @@ results:
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
   score: 1.4416
+  structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 2
@@ -709,6 +748,7 @@ results:
   - kegg.pathway:ko00500
   - kegg.pathway:ko02060
   score: 1.3245
+  structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 1
@@ -739,6 +779,7 @@ results:
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
   score: 1.225
+  structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 33
@@ -763,6 +804,7 @@ results:
   - kegg.pathway:ko00052
   - kegg.pathway:ko01100
   score: 1.1394
+  structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 returned: 23

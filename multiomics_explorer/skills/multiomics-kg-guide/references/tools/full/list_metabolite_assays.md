@@ -60,7 +60,7 @@ total_entries, total_matching, metabolite_count_total, by_organism, by_value_kin
 - **truncated** (bool): True when total_matching > returned
 - **not_found** (LmaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_doi — bucket key is singular `publication_doi` regardless of the `publication_dois` input filter name).
 - **resolved_aliases** (object): Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.
-- **warnings** (list[string]): Diagnostic strings, e.g. a bare metabolite ID that resolved to more than one metabolite (expanded to all — pass the canonical id to narrow), a closed-vocabulary filter value (compartment / treatment_type / background_factors / growth_phases) not found in the live vocabulary, or an organism that matches no OrganismTaxon.
+- **warnings** (list[string]): Diagnostic strings, e.g. a removed-metabolite or chemical-role id (kept in not_found, with where to look instead), a closed-vocabulary filter value (compartment / treatment_type / background_factors / growth_phases) not found in the live vocabulary, or an organism that matches no OrganismTaxon.
 
 ### Per-result fields
 

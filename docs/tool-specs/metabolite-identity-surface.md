@@ -204,7 +204,8 @@ Both register in `_CLOSED_VOCAB_PARAMS`:
 
 An unknown value warns (it never raises) and matches nothing, as for other closed vocabularies.
 
-**Envelope** (always present, also on `summary=True`; `[]` on an empty match). Shape follows the
+**Envelope** (always present, also on `summary=True`; on an empty match `by_structure_kind` is `[]`
+and the KEGG lists hold only their `"not classified": 0` entry). Shape follows the
 other `by_*` lists:
 - `by_structure_kind: [{structure_kind, count}]`.
 - `by_kegg_functional_category: [{kegg_functional_category, count}]`: metabolites per category,

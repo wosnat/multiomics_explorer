@@ -168,8 +168,9 @@ and `vesicle` simultaneously — distinct rows. Filter via
   `metabolomics`} indicating which pipelines reach this compound. The
   first-class chemistry node: query directly with `list_metabolites`,
   drill in via `genes_by_metabolite` / `metabolites_by_gene`. Every
-  `metabolite_ids` parameter also accepts bare / xref forms (`C00064`,
-  `CHEBI:17234`, `HMDB…`, `MNXM…`) — see `docs://guide/conventions`
+  `metabolite_ids` parameter accepts any id form, bare or prefixed
+  (`C00064`, `CHEBI:17234`, `HMDB…`, `MNXM…`, an InChIKey), and retired
+  ids resolve to the current node — see `docs://analysis/metabolites`
   "Metabolite ID forms".
 
   KEGG `Reaction` nodes sit *between* Gene and Metabolite on the

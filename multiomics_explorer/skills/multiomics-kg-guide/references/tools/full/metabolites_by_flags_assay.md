@@ -2,11 +2,11 @@
 
 ## What it does
 
-Boolean MetaboliteAssay edges — one row per metabolite × flag edge; cross-organism. flag_value=False rows are tested-absent: both states are stored.
+Boolean MetaboliteAssay edges — one row per metabolite × flag edge; cross-organism. flag_value=False rows are tested-absent (both states stored).
 
 Use for presence / absence calls; pre-flight `list_metabolite_assays`; values `metabolites_by_quantifies_assay`, both arms `assays_by_metabolite`.
-Filters: assay_ids, organism, metabolite_ids, flag_value, plus publication / experiment / condition.
-Returns: by_value, by_assay, by_metric, not_found, excluded_assays (empty here, for parity with the numeric twin); one row = one flag.
+Filters: assay_ids, organism, metabolite_ids, flag_value, stereo_assignment, plus publication / experiment filters.
+Returns: by_value, by_stereo_assignment, by_assay, by_metric, not_found, excluded_assays (always empty); one row = one flag.
 docs://tools/metabolites_by_flags_assay; summary=True first.
 
 ## Parameters
@@ -96,6 +96,7 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
       "kegg_compound_id": "C00003",
       "flag_value": true,
       "n_positive": 1,
+      "stereo_assignment": "as_reported",
       "n_replicates": 1,
       "metric_type": "presence_flag_intracellular",
       "condition_label": "",
@@ -109,6 +110,7 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
       "kegg_compound_id": "C00019",
       "flag_value": true,
       "n_positive": 1,
+      "stereo_assignment": "as_reported",
       "n_replicates": 1,
       "metric_type": "presence_flag_intracellular",
       "condition_label": "",
@@ -122,6 +124,7 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
       "kegg_compound_id": "C00020",
       "flag_value": true,
       "n_positive": 1,
+      "stereo_assignment": "as_reported",
       "n_replicates": 1,
       "metric_type": "presence_flag_intracellular",
       "condition_label": "",
@@ -133,6 +136,10 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
   ],
   "total_matching": 93,
   "by_value": [{"flag_value": false, "count": 58}, {"flag_value": true, "count": 35}],
+  "by_stereo_assignment": [
+    {"stereo_assignment": "as_reported", "count": 72},
+    {"stereo_assignment": "dominant_form_assumed", "count": 21}
+  ],
   "by_assay": [
     {
       "assay_id": "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular",
@@ -148,7 +155,9 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
     }
   ],
   "excluded_assays": [],
-  "warnings": [],
+  "warnings": [
+    "21 of 93 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on L-Alanine); filter ..."
+  ],
   "resolved_aliases": {},
   "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
   "returned": 5,
@@ -195,8 +204,31 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
 
 ```example-response
 {
+  "results": [],
   "total_matching": 72,
-  "by_stereo_assignment": [{"stereo_assignment": "as_reported", "count": 72}]
+  "by_value": [{"flag_value": false, "count": 50}, {"flag_value": true, "count": 22}],
+  "by_stereo_assignment": [{"stereo_assignment": "as_reported", "count": 72}],
+  "by_assay": [
+    {
+      "assay_id": "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular",
+      "count": 72
+    }
+  ],
+  "by_compartment": [{"compartment": "whole_cell", "count": 72}],
+  "by_organism": [{"organism_name": "Prochlorococcus MIT9301", "count": 72}],
+  "by_metric": [
+    {
+      "assay_id": "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular",
+      "count": 72
+    }
+  ],
+  "excluded_assays": [],
+  "warnings": [],
+  "resolved_aliases": {},
+  "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
+  "returned": 0,
+  "truncated": true,
+  "offset": 0
 }
 ```
 

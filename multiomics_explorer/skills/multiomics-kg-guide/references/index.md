@@ -41,9 +41,9 @@
 - `docs://tools/list_metabolites` — ~1875 tok
 - `docs://tools/list_organisms` — ~937 tok
 - `docs://tools/list_publications` — ~1249 tok
-- `docs://tools/metabolites_by_flags_assay` — ~1552 tok
+- `docs://tools/metabolites_by_flags_assay` — ~1553 tok
 - `docs://tools/metabolites_by_gene` — ~1541 tok
-- `docs://tools/metabolites_by_quantifies_assay` — ~1950 tok
+- `docs://tools/metabolites_by_quantifies_assay` — ~1951 tok
 - `docs://tools/ontology_landscape` — ~1265 tok
 - `docs://tools/ontology_term_details` — ~1111 tok
 - `docs://tools/pathway_enrichment` — ~1909 tok
@@ -56,7 +56,7 @@
 
 Append /full for the complete page — all worked examples + full response format.
 
-- `docs://tools/assays_by_metabolite/full` — ~5460 tok
+- `docs://tools/assays_by_metabolite/full` — ~5960 tok
 - `docs://tools/cluster_enrichment/full` — ~4284 tok
 - `docs://tools/differential_expression_by_gene/full` — ~6673 tok
 - `docs://tools/differential_expression_by_ortholog/full` — ~3004 tok
@@ -68,7 +68,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/gene_homologs/full` — ~2045 tok
 - `docs://tools/gene_neighbors/full` — ~3449 tok
 - `docs://tools/gene_ontology_terms/full` — ~10331 tok
-- `docs://tools/gene_overview/full` — ~8847 tok
+- `docs://tools/gene_overview/full` — ~8851 tok
 - `docs://tools/gene_response_profile/full` — ~5472 tok
 - `docs://tools/genes_by_boolean_metric/full` — ~5980 tok
 - `docs://tools/genes_by_categorical_metric/full` — ~6068 tok
@@ -83,14 +83,14 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/list_clustering_analyses/full` — ~2571 tok
 - `docs://tools/list_derived_metrics/full` — ~3493 tok
 - `docs://tools/list_experiments/full` — ~9255 tok
-- `docs://tools/list_filter_values/full` — ~6311 tok
-- `docs://tools/list_metabolite_assays/full` — ~3977 tok
-- `docs://tools/list_metabolites/full` — ~7241 tok
+- `docs://tools/list_filter_values/full` — ~6947 tok
+- `docs://tools/list_metabolite_assays/full` — ~3970 tok
+- `docs://tools/list_metabolites/full` — ~11683 tok
 - `docs://tools/list_organisms/full` — ~12675 tok
 - `docs://tools/list_publications/full` — ~8795 tok
-- `docs://tools/metabolites_by_flags_assay/full` — ~4499 tok
-- `docs://tools/metabolites_by_gene/full` — ~8140 tok
-- `docs://tools/metabolites_by_quantifies_assay/full` — ~5982 tok
+- `docs://tools/metabolites_by_flags_assay/full` — ~4799 tok
+- `docs://tools/metabolites_by_gene/full` — ~8133 tok
+- `docs://tools/metabolites_by_quantifies_assay/full` — ~6456 tok
 - `docs://tools/ontology_landscape/full` — ~10789 tok
 - `docs://tools/ontology_term_details/full` — ~9180 tok
 - `docs://tools/pathway_enrichment/full` — ~13268 tok
@@ -109,24 +109,24 @@ Append /full for the complete page — all worked examples + full response forma
 
 ## Ontologies
 
-- `docs://ontologies/brite` — ~1852 tok
-- `docs://ontologies/cazy` — ~1760 tok
-- `docs://ontologies/cog_category` — ~1397 tok
-- `docs://ontologies/cyanorak_role` — ~1725 tok
-- `docs://ontologies/ec` — ~1983 tok
-- `docs://ontologies/go_bp` — ~2049 tok
-- `docs://ontologies/go_cc` — ~1697 tok
-- `docs://ontologies/go_mf` — ~1836 tok
+- `docs://ontologies/brite` — ~1968 tok
+- `docs://ontologies/cazy` — ~1830 tok
+- `docs://ontologies/cog_category` — ~1450 tok
+- `docs://ontologies/cyanorak_role` — ~1775 tok
+- `docs://ontologies/ec` — ~2038 tok
+- `docs://ontologies/go_bp` — ~2140 tok
+- `docs://ontologies/go_cc` — ~1788 tok
+- `docs://ontologies/go_mf` — ~1925 tok
 - `docs://ontologies/index` — ~1239 tok — One page per supported ontology — what it is, how genes get annotated, identifier form, hierarchy, the…
-- `docs://ontologies/interpro` — ~2237 tok
-- `docs://ontologies/kegg` — ~2285 tok
-- `docs://ontologies/merops` — ~2516 tok
-- `docs://ontologies/ncbifam` — ~2197 tok
-- `docs://ontologies/pfam` — ~1926 tok
+- `docs://ontologies/interpro` — ~2419 tok
+- `docs://ontologies/kegg` — ~2349 tok
+- `docs://ontologies/merops` — ~2734 tok
+- `docs://ontologies/ncbifam` — ~2316 tok
+- `docs://ontologies/pfam` — ~1978 tok
 - `docs://ontologies/signal_peptide_type` — ~1488 tok
 - `docs://ontologies/subcellular_localization` — ~1510 tok
-- `docs://ontologies/tcdb` — ~2673 tok
-- `docs://ontologies/tigr_role` — ~2532 tok
+- `docs://ontologies/tcdb` — ~2836 tok
+- `docs://ontologies/tigr_role` — ~2602 tok
 
 ## Examples
 

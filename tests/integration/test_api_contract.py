@@ -1536,7 +1536,7 @@ class TestMetabolitesByQuantifiesAssayContract:
 
     EXPECTED_ENVELOPE_KEYS = {
         "results", "total_matching",
-        "by_detection_status", "by_metric_bucket", "by_assay",
+        "by_detection_status", "by_metric_bucket", "by_assay", "by_stereo_assignment",
         "by_compartment", "by_organism", "by_metric",
         "excluded_assays", "warnings", "not_found",
         "returned", "offset", "truncated", "resolved_aliases",
@@ -1578,7 +1578,7 @@ class TestMetabolitesByFlagsAssayContract:
 
     EXPECTED_ENVELOPE_KEYS = {
         "results", "total_matching",
-        "by_value", "by_assay", "by_compartment", "by_organism", "by_metric",
+        "by_value", "by_assay", "by_stereo_assignment", "by_compartment", "by_organism", "by_metric",
         "excluded_assays", "warnings", "not_found",
         "returned", "offset", "truncated", "resolved_aliases",
     }  # 14 keys — note: NO `by_detection_status` (boolean arm has no
@@ -1613,9 +1613,12 @@ class TestMetabolitesByFlagsAssayContract:
         bv = {b.flag_value: b.count for b in validated.by_value}
         assert bv[True] == 35
         assert bv[False] == 58
-        # excluded_assays / warnings always [] on boolean arm (§5.3).
+        # excluded_assays always [] on boolean arm (§5.3).
         assert validated.excluded_assays == []
-        assert validated.warnings == []
+        # warnings carries only the dominant-form stereo warning (metabolite-
+        # identity-surface spec D): 21 of the 93 msystems presence-flag rows.
+        assert len(validated.warnings) == 1
+        assert validated.warnings[0].startswith("21 of 93 rows assume the dominant stereo form")
         # Detail rows surface flag_value as Python bool.
         for r in validated.results:
             assert isinstance(r.flag_value, bool)
@@ -1628,7 +1631,7 @@ class TestAssaysByMetaboliteContract:
 
     EXPECTED_ENVELOPE_KEYS = {
         "results", "total_matching",
-        "by_evidence_kind", "by_organism", "by_compartment", "by_assay",
+        "by_evidence_kind", "by_organism", "by_compartment", "by_assay", "by_stereo_assignment",
         "by_detection_status", "by_flag_value",
         "metabolites_matched",
         "metabolites_with_evidence", "metabolites_without_evidence",

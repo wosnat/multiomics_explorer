@@ -1,0 +1,110 @@
+by_evidence_source:
+- count: 332
+  evidence_source: metabolism
+- count: 330
+  evidence_source: transport
+by_kegg_brite_class:
+- count: 34
+  kegg_brite_class: 'Lipids: Fatty acyls'
+- count: 26
+  kegg_brite_class: 'Lipids: Glycerophospholipids'
+- count: 9
+  kegg_brite_class: 'Lipids: Glycerolipids'
+- count: 3
+  kegg_brite_class: 'Lipids: Sphingolipids'
+- count: 1
+  kegg_brite_class: 'Lipids: Sterol lipids'
+- count: 551
+  kegg_brite_class: not classified
+by_kegg_functional_category:
+- count: 19
+  kegg_functional_category: Lipids
+- count: 2
+  kegg_functional_category: Antibiotics
+- count: 603
+  kegg_functional_category: not classified
+by_measurement_coverage:
+  by_compartment: []
+  by_paper_count:
+  - count: 624
+    paper_count: 0
+by_structure_kind:
+- count: 624
+  structure_kind: generic
+case_id: list_metabolites_structure_kind_generic
+mass_stats:
+  mass_max: null
+  mass_median: null
+  mass_min: null
+not_found:
+  elements: []
+  metabolite_ids: []
+  organism_names: []
+  pathway_ids: []
+offset: 0
+resolved_aliases: {}
+results: []
+returned: 0
+row_count: 0
+score_max: null
+score_median: null
+top_metabolite_pathways:
+- count: 147
+  metabolite_pathway_id: kegg.pathway:ko01100
+  metabolite_pathway_name: Metabolic pathways
+- count: 42
+  metabolite_pathway_id: kegg.pathway:ko00061
+  metabolite_pathway_name: Fatty acid biosynthesis
+- count: 35
+  metabolite_pathway_id: kegg.pathway:ko01212
+  metabolite_pathway_name: Fatty acid metabolism
+- count: 34
+  metabolite_pathway_id: kegg.pathway:ko01110
+  metabolite_pathway_name: Biosynthesis of secondary metabolites
+- count: 25
+  metabolite_pathway_id: kegg.pathway:ko00970
+  metabolite_pathway_name: Aminoacyl-tRNA biosynthesis
+- count: 22
+  metabolite_pathway_id: kegg.pathway:ko01240
+  metabolite_pathway_name: Biosynthesis of cofactors
+- count: 21
+  metabolite_pathway_id: kegg.pathway:ko00564
+  metabolite_pathway_name: Glycerophospholipid metabolism
+- count: 13
+  metabolite_pathway_id: kegg.pathway:ko00780
+  metabolite_pathway_name: Biotin metabolism
+- count: 12
+  metabolite_pathway_id: kegg.pathway:ko00561
+  metabolite_pathway_name: Glycerolipid metabolism
+- count: 12
+  metabolite_pathway_id: kegg.pathway:ko00785
+  metabolite_pathway_name: Lipoic acid metabolism
+top_organisms:
+- count: 522
+  organism_name: Alteromonas macleodii MIT1002
+- count: 521
+  organism_name: Alteromonas macleodii HOT1A3
+- count: 520
+  organism_name: Alteromonas macleodii BGP6
+- count: 520
+  organism_name: Alteromonas mediterranea AltDE1
+- count: 518
+  organism_name: Alteromonas macleodii EZ55
+- count: 518
+  organism_name: Alteromonas mediterranea AltDE
+- count: 516
+  organism_name: Alteromonas macleodii ATCC27126
+- count: 513
+  organism_name: Alteromonas macleodii AD45
+- count: 511
+  organism_name: Alteromonas macleodii BS11
+- count: 509
+  organism_name: Alteromonas (MarRef v6)
+total_entries: 3214
+total_matching: 624
+truncated: true
+warnings: []
+xref_coverage:
+  with_chebi: 541
+  with_hmdb: 2
+  with_mnxm: 622

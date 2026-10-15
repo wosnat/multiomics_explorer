@@ -5,8 +5,8 @@
 Metabolite IDs to every measurement edge, numeric and boolean arms merged into one polymorphic row set; cross-organism.
 
 Use for the metabolite-anchored reverse view; drill back to one arm with `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay`.
-Filters: metabolite_ids (+exclude), organism, evidence_kind, metric_types, compartment.
-Returns: by_evidence_kind, by_detection_status, by_flag_value, by_assay, metabolites_matched (distinct; total_matching counts rows), not_found, not_matched; one row = one edge.
+Filters: metabolite_ids (+exclude), organism, evidence_kind, metric_types, compartment, stereo_assignment.
+Returns: by_evidence_kind, by_detection_status, by_flag_value, by_stereo_assignment, by_assay, metabolites_matched (distinct), not_found; one row = one edge.
 docs://tools/assays_by_metabolite; summary=True first for 50+ IDs.
 
 ## Parameters
@@ -116,6 +116,7 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
       "compartment": "extracellular",
       "experiment_id": "10.1128/msystems.01261-22_kujawinski_metabolomics_0801_extracellular",
       "publication_doi": "10.1128/msystems.01261-22",
+      "stereo_assignment": "as_reported",
       "value": 0.0,
       "value_sd": 0.0,
       "metric_bucket": null,
@@ -145,6 +146,7 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
       "compartment": "whole_cell",
       "experiment_id": "10.1128/msystems.01261-22_kujawinski_metabolomics_0801_whole_cell",
       "publication_doi": "10.1128/msystems.01261-22",
+      "stereo_assignment": "as_reported",
       "value": 0.0,
       "value_sd": 0.0,
       "metric_bucket": null,
@@ -174,6 +176,7 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
       "compartment": "extracellular",
       "experiment_id": "10.1128/msystems.01261-22_kujawinski_metabolomics_9301_extracellular",
       "publication_doi": "10.1128/msystems.01261-22",
+      "stereo_assignment": "as_reported",
       "value": 0.0,
       "value_sd": 0.0,
       "metric_bucket": null,
@@ -230,6 +233,7 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
     {"detection_status": "sporadic", "count": 3}
   ],
   "by_flag_value": [{"flag_value": false, "count": 2}],
+  "by_stereo_assignment": [{"stereo_assignment": "as_reported", "count": 20}],
   "metabolites_with_evidence": ["kegg.compound:C00074"],
   "metabolites_without_evidence": [],
   "metabolites_matched": 1,
@@ -281,8 +285,53 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00041"], summary=True)
 
 ```example-response
 {
+  "results": [],
   "total_matching": 6,
-  "by_stereo_assignment": [{"stereo_assignment": "dominant_form_assumed", "count": 6}]
+  "by_evidence_kind": [{"evidence_kind": "quantifies", "count": 4}, {"evidence_kind": "flags", "count": 2}],
+  "by_organism": [
+    {"organism_name": "Prochlorococcus MIT9313", "count": 2},
+    {"organism_name": "Prochlorococcus MIT9312", "count": 2},
+    {"organism_name": "Prochlorococcus MIT9301", "count": 2}
+  ],
+  "by_compartment": [{"compartment": "whole_cell", "count": 4}, {"compartment": "vesicle", "count": 2}],
+  "by_assay": [
+    {
+      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_vesicles_mit9313:relative_peak_area_biovolume_normalized",
+      "count": 1
+    },
+    {
+      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_vesicles_mit9312:relative_peak_area_biovolume_normalized",
+      "count": 1
+    },
+    {
+      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9313:relative_peak_area_biovolume_normalized",
+      "count": 1
+    },
+    {
+      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9312:relative_peak_area_biovolume_normalized",
+      "count": 1
+    },
+    {
+      "assay_id": "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular",
+      "count": 1
+    },
+    ...
+  ],
+  "by_detection_status": [{"detection_status": "not_detected", "count": 2}, {"detection_status": "detected", "count": 2}],
+  "by_flag_value": [{"flag_value": false, "count": 2}],
+  "by_stereo_assignment": [{"stereo_assignment": "dominant_form_assumed", "count": 6}],
+  "metabolites_with_evidence": ["kegg.compound:C00041"],
+  "metabolites_without_evidence": [],
+  "metabolites_matched": 1,
+  "not_found": [],
+  "not_matched": [],
+  "resolved_aliases": {},
+  "warnings": [
+    "6 of 6 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on L-Alanine); filter st..."
+  ],
+  "returned": 0,
+  "truncated": true,
+  "offset": 0
 }
 ```
 

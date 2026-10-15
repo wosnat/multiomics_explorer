@@ -290,7 +290,31 @@ list_filter_values(filter_type="structure_kind")
 ```example-response
 {
   "filter_type": "structure_kind",
-  "total_entries": 3
+  "description": "What kind of chemical structure this metabolite is.",
+  "total_entries": 3,
+  "returned": 3,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {
+      "value": "defined",
+      "source": "vocabulary",
+      "applies_to": ["Metabolite"],
+      "description": "one concrete structure"
+    },
+    {
+      "value": "generic",
+      "source": "vocabulary",
+      "applies_to": ["Metabolite"],
+      "description": "a class or a structure with R groups; no single formula mass"
+    },
+    {
+      "value": "polymer",
+      "source": "vocabulary",
+      "applies_to": ["Metabolite"],
+      "description": "a repeat-unit polymer; formula is the repeat unit"
+    }
+  ]
 }
 ```
 
@@ -303,7 +327,17 @@ list_filter_values(filter_type="kegg_functional_category")
 ```example-response
 {
   "filter_type": "kegg_functional_category",
-  "total_entries": 9
+  "description": "Level-0 categories of KEGG compound BRITE br08001 (compounds with biological roles) that contain this metabolite. Spa...",
+  "total_entries": 9,
+  "returned": 9,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {"value": "Antibiotics", "source": "vocabulary", "applies_to": ["Metabolite"]},
+    {"value": "Carbohydrates", "source": "vocabulary", "applies_to": ["Metabolite"]},
+    {"value": "Hormones and transmitters", "source": "vocabulary", "applies_to": ["Metabolite"]},
+    ...
+  ]
 }
 ```
 
@@ -316,7 +350,25 @@ list_filter_values(filter_type="kegg_brite_class")
 ```example-response
 {
   "filter_type": "kegg_brite_class",
-  "total_entries": 28
+  "description": "Top-level classes of the seven KEGG compound BRITE trees other than br08001 that contain this metabolite, as \"<Tree>:...",
+  "total_entries": 28,
+  "returned": 28,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {
+      "value": "Bioactive peptides: Cardiovascular peptides",
+      "source": "vocabulary",
+      "applies_to": ["Metabolite"]
+    },
+    {"value": "Bioactive peptides: Neuropeptides", "source": "vocabulary", "applies_to": ["Metabolite"]},
+    {
+      "value": "Endocrine disrupting compounds: Pesticides and herbicides",
+      "source": "vocabulary",
+      "applies_to": ["Metabolite"]
+    },
+    ...
+  ]
 }
 ```
 
@@ -329,7 +381,25 @@ list_filter_values(filter_type="stereo_assignment")
 ```example-response
 {
   "filter_type": "stereo_assignment",
-  "total_entries": 2
+  "description": "Whether the stereo form of the measured metabolite was stated by the paper or chosen by the KG.",
+  "total_entries": 2,
+  "returned": 2,
+  "truncated": false,
+  "warnings": [],
+  "results": [
+    {
+      "value": "as_reported",
+      "source": "vocabulary",
+      "applies_to": ["Assay_flags_metabolite", "Assay_quantifies_metabolite"],
+      "description": "the paper named the form, or the metabolite has no stereo variant other than anomers"
+    },
+    {
+      "value": "dominant_form_assumed",
+      "source": "vocabulary",
+      "applies_to": ["Assay_flags_metabolite", "Assay_quantifies_metabolite"],
+      "description": "the paper gave no stereo; the row was placed on one form of a stereo family (usually the one with the most catalysing..."
+    }
+  ]
 }
 ```
 

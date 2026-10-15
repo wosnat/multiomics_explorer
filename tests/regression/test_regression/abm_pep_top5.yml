@@ -19,6 +19,7 @@ rows:
   n_replicates: 1
   organism_name: Prochlorococcus MIT0801
   publication_doi: 10.1128/msystems.01261-22
+  stereo_assignment: as_reported
   timepoint: null
   timepoint_hours: null
   timepoint_order: null
@@ -42,6 +43,7 @@ rows:
   n_replicates: 1
   organism_name: Prochlorococcus MIT0801
   publication_doi: 10.1128/msystems.01261-22
+  stereo_assignment: as_reported
   timepoint: null
   timepoint_hours: null
   timepoint_order: null
@@ -65,6 +67,7 @@ rows:
   n_replicates: 1
   organism_name: Prochlorococcus MIT9301
   publication_doi: 10.1128/msystems.01261-22
+  stereo_assignment: as_reported
   timepoint: null
   timepoint_hours: null
   timepoint_order: null
@@ -88,6 +91,7 @@ rows:
   n_replicates: 1
   organism_name: Prochlorococcus MIT9301
   publication_doi: 10.1128/msystems.01261-22
+  stereo_assignment: as_reported
   timepoint: null
   timepoint_hours: null
   timepoint_order: null
@@ -111,6 +115,7 @@ rows:
   n_replicates: 1
   organism_name: Prochlorococcus MIT9301
   publication_doi: 10.1128/msystems.01261-22
+  stereo_assignment: as_reported
   timepoint: null
   timepoint_hours: null
   timepoint_order: null
@@ -134,6 +139,7 @@ rows:
   n_replicates: 1
   organism_name: Prochlorococcus MIT9301
   publication_doi: 10.1128/msystems.01261-22
+  stereo_assignment: as_reported
   timepoint: null
   timepoint_hours: null
   timepoint_order: null
@@ -157,6 +163,7 @@ rows:
   n_replicates: 1
   organism_name: Prochlorococcus MIT9301
   publication_doi: 10.1128/msystems.01261-22
+  stereo_assignment: as_reported
   timepoint: null
   timepoint_hours: null
   timepoint_order: null
@@ -180,6 +187,7 @@ rows:
   n_replicates: 1
   organism_name: Prochlorococcus MIT9301
   publication_doi: 10.1128/msystems.01261-22
+  stereo_assignment: as_reported
   timepoint: null
   timepoint_hours: null
   timepoint_order: null
@@ -203,6 +211,7 @@ rows:
   n_replicates: 1
   organism_name: Prochlorococcus MIT9301
   publication_doi: 10.1128/msystems.01261-22
+  stereo_assignment: as_reported
   timepoint: null
   timepoint_hours: null
   timepoint_order: null
@@ -226,6 +235,7 @@ rows:
   n_replicates: 1
   organism_name: Prochlorococcus MIT9301
   publication_doi: 10.1128/msystems.01261-22
+  stereo_assignment: as_reported
   timepoint: null
   timepoint_hours: null
   timepoint_order: null
@@ -249,6 +259,7 @@ rows:
   n_replicates: 3
   organism_name: Prochlorococcus MIT9303
   publication_doi: 10.1073/pnas.2213271120
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -272,6 +283,7 @@ rows:
   n_replicates: 3
   organism_name: Prochlorococcus MIT9303
   publication_doi: 10.1073/pnas.2213271120
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -295,6 +307,7 @@ rows:
   n_replicates: 1
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1128/msystems.01261-22
+  stereo_assignment: as_reported
   timepoint: null
   timepoint_hours: null
   timepoint_order: null
@@ -318,6 +331,7 @@ rows:
   n_replicates: 1
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1128/msystems.01261-22
+  stereo_assignment: as_reported
   timepoint: null
   timepoint_hours: null
   timepoint_order: null
@@ -341,6 +355,7 @@ rows:
   n_replicates: 1
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1128/msystems.01261-22
+  stereo_assignment: as_reported
   timepoint: null
   timepoint_hours: null
   timepoint_order: null
@@ -364,6 +379,7 @@ rows:
   n_replicates: 1
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1128/msystems.01261-22
+  stereo_assignment: as_reported
   timepoint: null
   timepoint_hours: null
   timepoint_order: null
@@ -387,6 +403,7 @@ rows:
   n_replicates: 3
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1073/pnas.2213271120
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -410,6 +427,7 @@ rows:
   n_replicates: 3
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1073/pnas.2213271120
+  stereo_assignment: as_reported
   timepoint: 4 days
   timepoint_hours: 96.0
   timepoint_order: 1
@@ -433,6 +451,7 @@ rows:
   n_replicates: 2
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1073/pnas.2213271120
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2
@@ -456,6 +475,7 @@ rows:
   n_replicates: 2
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1073/pnas.2213271120
+  stereo_assignment: as_reported
   timepoint: 6 days
   timepoint_hours: 144.0
   timepoint_order: 2

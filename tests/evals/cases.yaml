@@ -1666,6 +1666,27 @@
     min_rows: 1
     columns: [metabolite_id, name, score]
 
+- id: list_metabolites_retired_ids
+  tool: list_metabolites
+  desc: |
+    Metabolite identity resolver — canonical, retired, removed, role and
+    unknown ids in one batch: chebi:14654 resolves to nitrate
+    (resolved_aliases); kegg.compound:C00525 (removed D-Trp) and chebi:10004
+    (chemical role) stay in not_found with warnings; C99999 unknown.
+  params:
+    metabolite_ids:
+      [kegg.compound:C00244, chebi:14654, kegg.compound:C00525, chebi:10004, kegg.compound:C99999]
+  expect:
+    min_rows: 1
+    columns: [metabolite_id, name, structure_kind]
+
+- id: list_metabolites_structure_kind_generic
+  tool: list_metabolites
+  desc: structure_kind=['generic'] envelope (summary) — by_structure_kind and the KEGG breakdowns with their 'not classified' entries
+  params: {structure_kind: [generic], summary: true}
+  expect:
+    min_rows: 0
+
 - id: list_metabolites_id_batch_with_unknown
   tool: list_metabolites
   desc: Batch IDs with unknown — populates not_found.metabolite_ids
@@ -1740,12 +1761,13 @@
 - id: genes_by_metabolite_mixed_unknown_ids
   tool: genes_by_metabolite
   desc: |
-    Mixed input [urea, chebi:9314, kegg.compound:C99999] × MED4 —
-    not_found.metabolite_ids = ['chebi:9314', 'kegg.compound:C99999'];
-    urea returns 23 rows.
+    Mixed input [urea, chebi:999999999, kegg.compound:C99999] × MED4 —
+    not_found.metabolite_ids = ['chebi:999999999', 'kegg.compound:C99999'].
+    (chebi:9314 used to sit here; it is sucrose's ChEBI id and now resolves
+    through all_identifiers, so it no longer exercises "unknown".)
   params:
     metabolite_ids:
-      [kegg.compound:C00086, chebi:9314, kegg.compound:C99999]
+      [kegg.compound:C00086, chebi:999999999, kegg.compound:C99999]
     organism: Prochlorococcus MED4
     limit: 5
   expect:
@@ -1943,6 +1965,19 @@
     row0_check: "total_matching == 64"
 
 # ── metabolites_by_flags_assay ──
+- id: mfa_msystems_as_reported_only
+  tool: metabolites_by_flags_assay
+  desc: |
+    msystems intracellular presence flags restricted to paper-stated stereo
+    forms (stereo_assignment=['as_reported']); by_stereo_assignment has one bucket.
+  params:
+    assay_ids: ["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular"]
+    stereo_assignment: [as_reported]
+    limit: 5
+  expect:
+    min_rows: 1
+    columns: [metabolite_id, name, flag_value, stereo_assignment]
+
 - id: mfa_msystems_top5
   tool: metabolites_by_flags_assay
   desc: |

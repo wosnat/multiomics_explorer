@@ -1,0 +1,123 @@
+by_evidence_source:
+- count: 1
+  evidence_source: metabolism
+- count: 1
+  evidence_source: transport
+by_kegg_brite_class:
+- count: 1
+  kegg_brite_class: not classified
+by_kegg_functional_category:
+- count: 1
+  kegg_functional_category: not classified
+by_measurement_coverage:
+  by_compartment: []
+  by_paper_count:
+  - count: 1
+    paper_count: 0
+by_structure_kind:
+- count: 1
+  structure_kind: defined
+case_id: list_metabolites_retired_ids
+mass_stats:
+  mass_max: 63.012
+  mass_median: 63.012
+  mass_min: 63.012
+not_found:
+  elements: []
+  metabolite_ids:
+  - kegg.compound:C00525
+  - chebi:10004
+  - kegg.compound:C99999
+  organism_names: []
+  pathway_ids: []
+offset: 0
+resolved_aliases:
+  chebi:14654:
+  - kegg.compound:C00244
+results:
+- catalyst_gene_count: 33
+  chebi_id: '48107'
+  elements:
+  - H
+  - N
+  - O
+  evidence_sources:
+  - metabolism
+  - transport
+  formula: HNO3
+  mass: 63.012
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
+  metabolite_id: kegg.compound:C00244
+  name: Nitrate
+  organism_count: 43
+  pathway_count: 6
+  pathway_ids:
+  - kegg.pathway:ko00910
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01120
+  - kegg.pathway:ko01310
+  - kegg.pathway:ko02010
+  - kegg.pathway:ko02020
+  structure_kind: defined
+  transporter_count: 15
+  transporter_gene_count: 3549
+returned: 1
+row_count: 1
+score_max: null
+score_median: null
+top_metabolite_pathways:
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko00910
+  metabolite_pathway_name: Nitrogen metabolism
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko01100
+  metabolite_pathway_name: Metabolic pathways
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko01120
+  metabolite_pathway_name: Microbial metabolism in diverse environments
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko01310
+  metabolite_pathway_name: Nitrogen cycle
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko02010
+  metabolite_pathway_name: ABC transporters
+- count: 1
+  metabolite_pathway_id: kegg.pathway:ko02020
+  metabolite_pathway_name: Two-component system
+top_organisms:
+- count: 1
+  organism_name: Alteromonas macleodii AD45
+- count: 1
+  organism_name: Alteromonas macleodii ATCC27126
+- count: 1
+  organism_name: Alteromonas macleodii BGP6
+- count: 1
+  organism_name: Alteromonas macleodii BS11
+- count: 1
+  organism_name: Alteromonas macleodii EZ55
+- count: 1
+  organism_name: Alteromonas macleodii HOT1A3
+- count: 1
+  organism_name: Alteromonas macleodii MIT1002
+- count: 1
+  organism_name: Alteromonas mediterranea AltDE
+- count: 1
+  organism_name: Alteromonas mediterranea AltDE1
+- count: 1
+  organism_name: Alteromonas (MarRef v6)
+total_entries: 3214
+total_matching: 1
+truncated: false
+warnings:
+- '''kegg.compound:C00525'' was removed; its paper measurements now live on kegg.compound:C00078
+  (L-Tryptophan) — pass that id to see them.'
+- '''chebi:10004'' is the chemical role ''vitamin (role)'' (chebi.role:33229), not
+  a metabolite — TCDB families that transport it are reachable through run_cypher
+  (see docs://analysis/metabolites).'
+xref_coverage:
+  with_chebi: 1
+  with_hmdb: 0
+  with_mnxm: 1

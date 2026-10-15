@@ -801,10 +801,13 @@ def _closed_edge_vocab_warnings(
 
 def _stereo_assignment_envelope(
     raw_freq: list[dict] | None, total_matching: int,
+    stereo_filter: list[str] | None = None,
 ) -> tuple[list[dict], list[str]]:
     """`by_stereo_assignment` rows (renamed from apoc frequency rows, count
     desc) and the dominant-form warning when any matched row carries
-    `stereo_assignment='dominant_form_assumed'`."""
+    `stereo_assignment='dominant_form_assumed'`. The warning is skipped
+    when `stereo_filter` already excludes 'as_reported' — the caller asked
+    for the assumed rows on purpose."""
     by_stereo = sorted(
         _rename_freq(raw_freq or [], "stereo_assignment"),
         key=lambda r: (-(r.get("count") or 0), str(r.get("stereo_assignment"))),
@@ -814,7 +817,8 @@ def _stereo_assignment_envelope(
         if r.get("stereo_assignment") == "dominant_form_assumed"
     )
     warnings: list[str] = []
-    if n_assumed:
+    asked_for_assumed = bool(stereo_filter) and "as_reported" not in stereo_filter
+    if n_assumed and not asked_for_assumed:
         warnings.append(
             f"{n_assumed} of {total_matching} rows assume the dominant stereo "
             "form — the paper named no form (e.g. 'Alanine' placed on "
@@ -7920,7 +7924,8 @@ def _normalize_metabolite_curie(raw: str) -> str:
     digits → `chebi:` + digits without leading zeros; `mnx:<x>` / bare
     `MNXM\\d+` → `mnx:` + upper; `hmdb:<x>` / bare `HMDB\\d+` →
     `hmdb:HMDB` + 7-digit zero-padded number; `inchikey:<key>` / bare
-    InChIKey → `inchikey:` + upper; `chebi.role:<n>` and anything else
+    InChIKey → `inchikey:` + upper; `chebi.role:<n>` → lower-case prefix,
+    digits without leading zeros; anything else
     (unknown prefix, a metabolite name) are returned unchanged.
     """
     if not isinstance(raw, str):
@@ -7941,6 +7946,8 @@ def _normalize_metabolite_curie(raw: str) -> str:
             return _hmdb_curie(m.group(1)) if m else f"hmdb:{local.upper()}"
         if p == "inchikey":
             return f"inchikey:{local.upper()}"
+        if p == "chebi.role" and _DIGITS_RE.match(local):
+            return f"chebi.role:{int(local)}"
         return raw
     if _KEGG_COMPOUND_BARE_RE.match(raw):
         return f"kegg.compound:{raw.upper()}"
@@ -8027,7 +8034,7 @@ def _canonicalize_metabolite_ids(
     curies = list(dict.fromkeys(curie_of.values()))
     cypher, params = build_resolve_metabolite_curies(curies)
     rows = conn.execute_query(cypher, **params) or []
-    lookup = {r.get("curie"): r for r in rows if isinstance(r, dict)}
+    lookup = {r["curie"]: r for r in rows}
 
     canonical: list[str] = []
     seen: set[str] = set()
@@ -10412,7 +10419,7 @@ def metabolites_by_quantifies_assay(
 
     total_matching = sum_row.get("total_matching", 0) or 0
     by_stereo_assignment, stereo_warnings = _stereo_assignment_envelope(
-        sum_row.get("by_stereo_assignment"), total_matching)
+        sum_row.get("by_stereo_assignment"), total_matching, stereo_assignment)
     warnings.extend(stereo_warnings)
 
     # ---- Q3: detail (skipped when summary=True) -------------------------
@@ -10625,7 +10632,7 @@ def metabolites_by_flags_assay(
 
     total_matching = sum_row.get("total_matching", 0) or 0
     by_stereo_assignment, stereo_warnings = _stereo_assignment_envelope(
-        sum_row.get("by_stereo_assignment"), total_matching)
+        sum_row.get("by_stereo_assignment"), total_matching, stereo_assignment)
     warnings.extend(stereo_warnings)
 
     # `by_metric` per spec §5.3: per-assay scalar rollup. Boolean has
@@ -10821,7 +10828,7 @@ def assays_by_metabolite(
         sum_row.get("by_flag_value", []) or [], "flag_value")
     metabolites_matched = sum_row.get("metabolites_matched", 0) or 0
     by_stereo_assignment, stereo_warnings = _stereo_assignment_envelope(
-        sum_row.get("by_stereo_assignment"), total_matching)
+        sum_row.get("by_stereo_assignment"), total_matching, stereo_assignment)
     warnings += stereo_warnings
 
     # ---- Q3: detail (skipped when summary=True) -------------------------

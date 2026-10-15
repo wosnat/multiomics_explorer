@@ -24,7 +24,7 @@ gene_count_total: 29
 metabolite_count_total: 1
 not_found:
   metabolite_ids:
-  - chebi:9314
+  - chebi:999999999
   - kegg.compound:C99999
   metabolite_pathway_ids: []
   organism: null

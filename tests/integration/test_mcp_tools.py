@@ -3414,7 +3414,9 @@ class TestMetabolitesByQuantifiesAssayKG:
         assert result["results"] == []
         # No rankable-gating exclusion (assay is rankable)
         assert result["excluded_assays"] == []
-        assert result["warnings"] == []
+        # Only the dominant-form stereo warning (metabolite-identity-surface spec D).
+        assert len(result["warnings"]) == 1
+        assert result["warnings"][0].startswith("4 of 64 rows assume the dominant stereo form")
 
     def test_mit9313_top5_rows(self, conn):
         """§7: top-5 ranks 1-5; F6P top_decile rank 1-3, Citrate rank 4-5."""
@@ -3534,7 +3536,9 @@ class TestMetabolitesByFlagsAssayKG:
         assert result["results"] == []
         # Always-empty envelope-shape (no rankable gates on boolean arm).
         assert result["excluded_assays"] == []
-        assert result["warnings"] == []
+        # Only the dominant-form stereo warning (metabolite-identity-surface spec D).
+        assert len(result["warnings"]) == 1
+        assert result["warnings"][0].startswith("21 of 93 rows assume the dominant stereo form")
 
     def test_msystems_top5_alphabetical_true(self, conn):
         """§7: top-5 detail rows are flag_value=true; expected names
