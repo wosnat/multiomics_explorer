@@ -34,7 +34,7 @@ rows:
   - coculture
   - darkness
   - light
-  catalyzed_metabolite_count: 1359
+  catalyzed_metabolite_count: 1352
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -63,13 +63,13 @@ rows:
   reference_proteome: UP000262181
   species: null
   strain: Alt_MarRef
-  transported_metabolite_count: 1265
+  transported_metabolite_count: 1200
   treatment_types:
   - carbon
 - background_factors:
   - axenic
   - darkness
-  catalyzed_metabolite_count: 1328
+  catalyzed_metabolite_count: 1321
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -98,13 +98,13 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: AD45
-  transported_metabolite_count: 1266
+  transported_metabolite_count: 1202
   treatment_types:
   - compartment
 - background_factors:
   - axenic
   - darkness
-  catalyzed_metabolite_count: 1309
+  catalyzed_metabolite_count: 1302
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -133,13 +133,13 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: ATCC27126
-  transported_metabolite_count: 1267
+  transported_metabolite_count: 1202
   treatment_types:
   - compartment
 - background_factors:
   - axenic
   - darkness
-  catalyzed_metabolite_count: 1341
+  catalyzed_metabolite_count: 1334
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -168,13 +168,13 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: BGP6
-  transported_metabolite_count: 1269
+  transported_metabolite_count: 1204
   treatment_types:
   - compartment
 - background_factors:
   - axenic
   - darkness
-  catalyzed_metabolite_count: 1282
+  catalyzed_metabolite_count: 1275
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -203,7 +203,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: BS11
-  transported_metabolite_count: 1265
+  transported_metabolite_count: 1200
   treatment_types:
   - compartment
 - background_factors:
@@ -211,7 +211,7 @@ rows:
   - coculture
   - diel
   - light
-  catalyzed_metabolite_count: 1428
+  catalyzed_metabolite_count: 1421
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -245,7 +245,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: EZ55
-  transported_metabolite_count: 1266
+  transported_metabolite_count: 1201
   treatment_types:
   - carbon
   - coculture
@@ -255,7 +255,7 @@ rows:
   - coculture
   - darkness
   - light
-  catalyzed_metabolite_count: 1336
+  catalyzed_metabolite_count: 1329
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -289,7 +289,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: HOT1A3
-  transported_metabolite_count: 1269
+  transported_metabolite_count: 1204
   treatment_types:
   - coculture
   - compartment
@@ -300,7 +300,7 @@ rows:
   - darkness
   - diel
   - light
-  catalyzed_metabolite_count: 1354
+  catalyzed_metabolite_count: 1347
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -335,14 +335,14 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: MIT1002
-  transported_metabolite_count: 1267
+  transported_metabolite_count: 1202
   treatment_types:
   - coculture
   - compartment
   - darkness
   - growth_phase
 - background_factors: []
-  catalyzed_metabolite_count: 1306
+  catalyzed_metabolite_count: 1299
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -368,10 +368,10 @@ rows:
   reference_proteome: null
   species: Alteromonas mediterranea
   strain: AltDE
-  transported_metabolite_count: 1254
+  transported_metabolite_count: 1190
   treatment_types: []
 - background_factors: []
-  catalyzed_metabolite_count: 1326
+  catalyzed_metabolite_count: 1318
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -397,7 +397,7 @@ rows:
   reference_proteome: null
   species: Alteromonas mediterranea
   strain: AltDE1
-  transported_metabolite_count: 1256
+  transported_metabolite_count: 1192
   treatment_types: []
 - background_factors:
   - light
@@ -437,7 +437,7 @@ rows:
   - coculture
   - darkness
   - light
-  catalyzed_metabolite_count: 1346
+  catalyzed_metabolite_count: 1340
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -466,12 +466,12 @@ rows:
   reference_proteome: GCF_000166295.1
   species: Marinobacter adhaerens
   strain: HP15
-  transported_metabolite_count: 1232
+  transported_metabolite_count: 1167
   treatment_types:
   - carbon
 - background_factors:
   - coculture
-  catalyzed_metabolite_count: 1215
+  catalyzed_metabolite_count: 1208
   clade: null
   cluster_types:
   - condition_comparison
@@ -499,7 +499,7 @@ rows:
   reference_proteome: null
   species: null
   strain: MruberA
-  transported_metabolite_count: 1201
+  transported_metabolite_count: 1136
   treatment_types:
   - light
   - oxygen
@@ -547,7 +547,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  catalyzed_metabolite_count: 1017
+  catalyzed_metabolite_count: 1012
   clade: HLII
   cluster_types:
   - genomic_island
@@ -576,7 +576,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: AS9601
-  transported_metabolite_count: 1060
+  transported_metabolite_count: 1004
   treatment_types:
   - salt
 - background_factors:
@@ -587,7 +587,7 @@ rows:
   - diel
   - light
   - viral
-  catalyzed_metabolite_count: 1039
+  catalyzed_metabolite_count: 1034
   clade: HLI
   cluster_types:
   - decay_pattern
@@ -638,7 +638,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MED4
-  transported_metabolite_count: 1069
+  transported_metabolite_count: 1011
   treatment_types:
   - carbon
   - coculture
@@ -656,7 +656,7 @@ rows:
   - viral
 - background_factors:
   - axenic
-  catalyzed_metabolite_count: 1022
+  catalyzed_metabolite_count: 1017
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
@@ -684,13 +684,13 @@ rows:
   reference_proteome: null
   species: null
   strain: MIT0604
-  transported_metabolite_count: 1057
+  transported_metabolite_count: 1002
   treatment_types:
   - chemical
   - light
 - background_factors:
   - axenic
-  catalyzed_metabolite_count: 1036
+  catalyzed_metabolite_count: 1031
   clade: LLI
   cluster_types: []
   clustering_analysis_count: 0
@@ -717,12 +717,12 @@ rows:
   reference_proteome: null
   species: null
   strain: MIT0801
-  transported_metabolite_count: 1073
+  transported_metabolite_count: 1018
   treatment_types:
   - growth_phase
   - phosphorus
 - background_factors: []
-  catalyzed_metabolite_count: 1027
+  catalyzed_metabolite_count: 1022
   clade: HLII
   cluster_types:
   - genomic_island
@@ -749,10 +749,10 @@ rows:
   reference_proteome: null
   species: null
   strain: MIT1314
-  transported_metabolite_count: 1057
+  transported_metabolite_count: 1002
   treatment_types: []
 - background_factors: []
-  catalyzed_metabolite_count: 1084
+  catalyzed_metabolite_count: 1079
   clade: LLIV
   cluster_types: []
   clustering_analysis_count: 0
@@ -778,10 +778,10 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT1327
-  transported_metabolite_count: 1099
+  transported_metabolite_count: 1041
   treatment_types: []
 - background_factors: []
-  catalyzed_metabolite_count: 1014
+  catalyzed_metabolite_count: 1009
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
@@ -807,10 +807,10 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9202
-  transported_metabolite_count: 1065
+  transported_metabolite_count: 1010
   treatment_types: []
 - background_factors: []
-  catalyzed_metabolite_count: 1048
+  catalyzed_metabolite_count: 1043
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
@@ -836,13 +836,13 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9215
-  transported_metabolite_count: 1066
+  transported_metabolite_count: 1011
   treatment_types: []
 - background_factors:
   - axenic
   - diel
   - light
-  catalyzed_metabolite_count: 1052
+  catalyzed_metabolite_count: 1047
   clade: HLII
   cluster_types:
   - condition_comparison
@@ -857,7 +857,7 @@ rows:
   growth_phases:
   - exponential
   interpro_gene_count: 1537
-  measured_metabolite_count: 99
+  measured_metabolite_count: 96
   ncbi_taxon_id: 167546
   ncbifam_gene_count: 774
   nonpeptidase_homolog_gene_count: 10
@@ -873,7 +873,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9301
-  transported_metabolite_count: 1061
+  transported_metabolite_count: 1005
   treatment_types:
   - growth_phase
   - phosphorus
@@ -881,7 +881,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  catalyzed_metabolite_count: 1135
+  catalyzed_metabolite_count: 1129
   clade: LLIV
   cluster_types:
   - genomic_island
@@ -911,7 +911,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9303
-  transported_metabolite_count: 1169
+  transported_metabolite_count: 1106
   treatment_types:
   - carbon
 - background_factors:
@@ -919,7 +919,7 @@ rows:
   - coculture
   - diel
   - light
-  catalyzed_metabolite_count: 1047
+  catalyzed_metabolite_count: 1042
   clade: HLII
   cluster_types:
   - genomic_island
@@ -938,7 +938,7 @@ rows:
   - exponential
   - stationary
   interpro_gene_count: 1557
-  measured_metabolite_count: 69
+  measured_metabolite_count: 70
   ncbi_taxon_id: 74546
   ncbifam_gene_count: 759
   nonpeptidase_homolog_gene_count: 9
@@ -956,7 +956,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9312
-  transported_metabolite_count: 1061
+  transported_metabolite_count: 1006
   treatment_types:
   - carbon
   - coculture
@@ -966,7 +966,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  catalyzed_metabolite_count: 1081
+  catalyzed_metabolite_count: 1076
   clade: LLIV
   cluster_types:
   - genomic_island
@@ -989,7 +989,7 @@ rows:
   - nutrient_limited
   - recovery
   interpro_gene_count: 1888
-  measured_metabolite_count: 145
+  measured_metabolite_count: 133
   ncbi_taxon_id: 74547
   ncbifam_gene_count: 905
   nonpeptidase_homolog_gene_count: 11
@@ -1008,7 +1008,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9313
-  transported_metabolite_count: 1154
+  transported_metabolite_count: 1096
   treatment_types:
   - carbon
   - coculture
@@ -1020,7 +1020,7 @@ rows:
   - tss_mapping
   - viral
 - background_factors: []
-  catalyzed_metabolite_count: 1018
+  catalyzed_metabolite_count: 1013
   clade: HLI
   cluster_types: []
   clustering_analysis_count: 0
@@ -1046,12 +1046,12 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9515
-  transported_metabolite_count: 1101
+  transported_metabolite_count: 1044
   treatment_types: []
 - background_factors:
   - axenic
   - light
-  catalyzed_metabolite_count: 1039
+  catalyzed_metabolite_count: 1034
   clade: LLI
   cluster_types:
   - genomic_island
@@ -1080,7 +1080,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: NATL1A
-  transported_metabolite_count: 1106
+  transported_metabolite_count: 1051
   treatment_types:
   - salt
 - background_factors:
@@ -1089,7 +1089,7 @@ rows:
   - diel
   - light
   - viral
-  catalyzed_metabolite_count: 1029
+  catalyzed_metabolite_count: 1024
   clade: LLI
   cluster_types:
   - diel
@@ -1129,7 +1129,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: NATL2A
-  transported_metabolite_count: 1074
+  transported_metabolite_count: 1019
   treatment_types:
   - coculture
   - darkness
@@ -1137,7 +1137,7 @@ rows:
   - phosphorus
   - plastic
 - background_factors: []
-  catalyzed_metabolite_count: 1076
+  catalyzed_metabolite_count: 1071
   clade: LLI
   cluster_types: []
   clustering_analysis_count: 0
@@ -1163,10 +1163,10 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: PAC1
-  transported_metabolite_count: 1103
+  transported_metabolite_count: 1048
   treatment_types: []
 - background_factors: []
-  catalyzed_metabolite_count: 1043
+  catalyzed_metabolite_count: 1038
   clade: HLI
   cluster_types:
   - genomic_island
@@ -1193,10 +1193,10 @@ rows:
   reference_proteome: null
   species: null
   strain: RSP50
-  transported_metabolite_count: 1083
+  transported_metabolite_count: 1027
   treatment_types: []
 - background_factors: []
-  catalyzed_metabolite_count: 1025
+  catalyzed_metabolite_count: 1020
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
@@ -1222,14 +1222,14 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: SB
-  transported_metabolite_count: 1059
+  transported_metabolite_count: 1003
   treatment_types: []
 - background_factors:
   - axenic
   - coculture
   - darkness
   - light
-  catalyzed_metabolite_count: 1046
+  catalyzed_metabolite_count: 1041
   clade: LLII
   cluster_types:
   - genomic_island
@@ -1261,14 +1261,14 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: SS120
-  transported_metabolite_count: 1081
+  transported_metabolite_count: 1023
   treatment_types:
   - carbon
   - nitrogen
   - phosphorus
 - background_factors:
   - light
-  catalyzed_metabolite_count: 1490
+  catalyzed_metabolite_count: 1483
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -1297,12 +1297,12 @@ rows:
   reference_proteome: null
   species: Pseudomonas putida
   strain: KT2440
-  transported_metabolite_count: 1260
+  transported_metabolite_count: 1193
   treatment_types:
   - coculture
 - background_factors:
   - light
-  catalyzed_metabolite_count: 1468
+  catalyzed_metabolite_count: 1460
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -1333,12 +1333,12 @@ rows:
   reference_proteome: null
   species: Ruegeria pomeroyi
   strain: DSS-3
-  transported_metabolite_count: 1213
+  transported_metabolite_count: 1146
   treatment_types:
   - coculture
 - background_factors:
   - light
-  catalyzed_metabolite_count: 1306
+  catalyzed_metabolite_count: 1299
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -1366,7 +1366,7 @@ rows:
   reference_proteome: null
   species: Shewanella sp.
   strain: W3-18-1
-  transported_metabolite_count: 1264
+  transported_metabolite_count: 1196
   treatment_types:
   - carbon
   - coculture
@@ -1374,7 +1374,7 @@ rows:
   - axenic
   - coculture
   - light
-  catalyzed_metabolite_count: 1129
+  catalyzed_metabolite_count: 1123
   clade: I
   cluster_types: []
   clustering_analysis_count: 0
@@ -1402,13 +1402,13 @@ rows:
   reference_proteome: null
   species: null
   strain: CC9311
-  transported_metabolite_count: 1178
+  transported_metabolite_count: 1117
   treatment_types:
   - carbon
   - coculture
 - background_factors:
   - light
-  catalyzed_metabolite_count: 1105
+  catalyzed_metabolite_count: 1099
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -1436,7 +1436,7 @@ rows:
   reference_proteome: null
   species: null
   strain: PCC7002
-  transported_metabolite_count: 1222
+  transported_metabolite_count: 1155
   treatment_types:
   - carbon
   - coculture
@@ -1445,7 +1445,7 @@ rows:
   - darkness
   - diel
   - light
-  catalyzed_metabolite_count: 1145
+  catalyzed_metabolite_count: 1140
   clade: V
   cluster_types:
   - time_course
@@ -1480,7 +1480,7 @@ rows:
   reference_proteome: null
   species: null
   strain: WH7803
-  transported_metabolite_count: 1132
+  transported_metabolite_count: 1075
   treatment_types:
   - carbon
   - coculture
@@ -1491,7 +1491,7 @@ rows:
   - darkness
   - diel
   - light
-  catalyzed_metabolite_count: 1120
+  catalyzed_metabolite_count: 1114
   clade: III
   cluster_types: []
   clustering_analysis_count: 0
@@ -1525,14 +1525,14 @@ rows:
   reference_proteome: null
   species: Parasynechococcus marenigrum
   strain: WH8102
-  transported_metabolite_count: 1172
+  transported_metabolite_count: 1113
   treatment_types:
   - carbon
   - coculture
   - viral
 - background_factors:
   - diel
-  catalyzed_metabolite_count: 1059
+  catalyzed_metabolite_count: 1052
   clade: II
   cluster_types: []
   clustering_analysis_count: 0
@@ -1560,12 +1560,12 @@ rows:
   reference_proteome: null
   species: null
   strain: WH8109
-  transported_metabolite_count: 1151
+  transported_metabolite_count: 1090
   treatment_types:
   - viral
 - background_factors:
   - light
-  catalyzed_metabolite_count: 1170
+  catalyzed_metabolite_count: 1164
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -1594,12 +1594,12 @@ rows:
   reference_proteome: null
   species: Synechococcus elongatus
   strain: PCC7942
-  transported_metabolite_count: 1205
+  transported_metabolite_count: 1138
   treatment_types:
   - coculture
 - background_factors:
   - light
-  catalyzed_metabolite_count: 1175
+  catalyzed_metabolite_count: 1169
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -1628,14 +1628,14 @@ rows:
   reference_proteome: null
   species: Synechococcus elongatus
   strain: UTEX2973
-  transported_metabolite_count: 1205
+  transported_metabolite_count: 1138
   treatment_types:
   - coculture
 - background_factors:
   - coculture
   - darkness
   - light
-  catalyzed_metabolite_count: 1068
+  catalyzed_metabolite_count: 1061
   clade: IV
   cluster_types: []
   clustering_analysis_count: 0
@@ -1664,12 +1664,12 @@ rows:
   reference_proteome: null
   species: Synechococcus sp.
   strain: BL107
-  transported_metabolite_count: 1143
+  transported_metabolite_count: 1083
   treatment_types:
   - carbon
 - background_factors:
   - coculture
-  catalyzed_metabolite_count: 1003
+  catalyzed_metabolite_count: 998
   clade: null
   cluster_types:
   - condition_comparison
@@ -1697,7 +1697,7 @@ rows:
   reference_proteome: null
   species: Thermosynechococcus vestitus
   strain: BP1
-  transported_metabolite_count: 1156
+  transported_metabolite_count: 1091
   treatment_types:
   - light
   - oxygen

@@ -39,7 +39,7 @@ results:
   gene_name: ureC
   locus_tag: PMM0963
   mass_balance: balanced
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
@@ -58,7 +58,7 @@ results:
   gene_name: ureB
   locus_tag: PMM0964
   mass_balance: balanced
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
@@ -77,7 +77,7 @@ results:
   gene_name: ureA
   locus_tag: PMM0965
   mass_balance: balanced
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
@@ -95,7 +95,7 @@ results:
   gene_name: urtB
   locus_tag: PMM0971
   mass_balance: null
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
@@ -115,7 +115,7 @@ results:
   gene_name: speB
   locus_tag: PMM1686
   mass_balance: balanced
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056

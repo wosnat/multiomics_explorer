@@ -12,27 +12,27 @@ by_element:
 - element: P
   metabolite_count: 2
 by_evidence_source:
-- count: 13
+- count: 12
   evidence_source: transport
 by_gene:
 - gene_name: cbiQ
   locus_tag: PMM0392
   metabolism_rows: 0
-  metabolite_count: 13
+  metabolite_count: 12
   product: transmembrane component of ECF transporter energizing module
   reaction_count: 0
-  rows: 13
+  rows: 12
   tcdb_evidence_score_max: 0.8
   transport_inherited_rows: 0
-  transport_most_specific_rows: 13
+  transport_most_specific_rows: 12
   transport_substrate_resolution: resolved
   transporter_count: 5
 by_substrate_depth:
-- count: 13
+- count: 12
   substrate_depth: most_specific
 case_id: metabolites_by_gene_pmm0392_med4_transport
 gene_count_total: 1
-metabolite_count_total: 13
+metabolite_count_total: 12
 not_found:
   locus_tags: []
   metabolite_elements: []
@@ -44,22 +44,6 @@ offset: 0
 reaction_count_total: 0
 resolved_aliases: {}
 results:
-- ec_numbers: null
-  evidence_source: transport
-  gene_name: cbiQ
-  locus_tag: PMM0392
-  mass_balance: null
-  metabolite_chebi_id: '10004'
-  metabolite_id: chebi:10004
-  metabolite_name: vitamin (role)
-  product: transmembrane component of ECF transporter energizing module
-  reaction_id: null
-  reaction_name: null
-  substrate_depth: most_specific
-  tcdb_evidence_score: 0.8
-  tcdb_family_id: tcdb:3.A.1.32
-  tcdb_family_name: The Cobalamin Precursor (B 12 -P) Family
-  transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
@@ -81,7 +65,7 @@ results:
   gene_name: cbiQ
   locus_tag: PMM0392
   mass_balance: null
-  metabolite_chebi_id: '13315'
+  metabolite_chebi_id: '16238'
   metabolite_formula: C27H33N9O15P2
   metabolite_id: kegg.compound:C00016
   metabolite_mass: 785.557
@@ -99,7 +83,7 @@ results:
   gene_name: cbiQ
   locus_tag: PMM0392
   mass_balance: null
-  metabolite_chebi_id: '13317'
+  metabolite_chebi_id: '17621'
   metabolite_formula: C17H21N4O9P
   metabolite_id: kegg.compound:C00061
   metabolite_mass: 456.348
@@ -117,7 +101,7 @@ results:
   gene_name: cbiQ
   locus_tag: PMM0392
   mass_balance: null
-  metabolite_chebi_id: '13905'
+  metabolite_chebi_id: '15956'
   metabolite_formula: C10H15N2O3S
   metabolite_id: kegg.compound:C00120
   metabolite_mass: 243.308
@@ -135,7 +119,7 @@ results:
   gene_name: cbiQ
   locus_tag: PMM0392
   mass_balance: null
-  metabolite_chebi_id: '12055'
+  metabolite_chebi_id: '17509'
   metabolite_formula: C11H15N5O3S
   metabolite_id: kegg.compound:C00170
   metabolite_mass: 297.34
@@ -153,7 +137,7 @@ results:
   gene_name: cbiQ
   locus_tag: PMM0392
   mass_balance: null
-  metabolite_chebi_id: '176615'
+  metabolite_chebi_id: '27638'
   metabolite_formula: Co
   metabolite_id: kegg.compound:C00175
   metabolite_mass: 58.933
@@ -171,7 +155,7 @@ results:
   gene_name: cbiQ
   locus_tag: PMM0392
   mass_balance: null
-  metabolite_chebi_id: '15044'
+  metabolite_chebi_id: '17015'
   metabolite_formula: C17H19N4O6
   metabolite_id: kegg.compound:C00255
   metabolite_mass: 375.361
@@ -189,7 +173,7 @@ results:
   gene_name: cbiQ
   locus_tag: PMM0392
   mass_balance: null
-  metabolite_chebi_id: '13379'
+  metabolite_chebi_id: '25107'
   metabolite_formula: Mg
   metabolite_id: kegg.compound:C00305
   metabolite_mass: 24.305
@@ -207,7 +191,7 @@ results:
   gene_name: cbiQ
   locus_tag: PMM0392
   mass_balance: null
-  metabolite_chebi_id: '15227'
+  metabolite_chebi_id: '18385'
   metabolite_formula: C12H17N4OS
   metabolite_id: kegg.compound:C00378
   metabolite_mass: 265.362
@@ -225,7 +209,7 @@ results:
   gene_name: cbiQ
   locus_tag: PMM0392
   mass_balance: null
-  metabolite_chebi_id: '136521'
+  metabolite_chebi_id: '72346'
   metabolite_formula: C18H22N5O6
   metabolite_id: kegg.compound:C21647
   metabolite_mass: 404.403
@@ -260,7 +244,7 @@ results:
   gene_name: cbiQ
   locus_tag: PMM0392
   mass_balance: null
-  metabolite_chebi_id: '24075'
+  metabolite_chebi_id: '27470'
   metabolite_formula: C19H17N7O6
   metabolite_id: kegg.compound:C00504
   metabolite_mass: 439.388
@@ -273,8 +257,8 @@ results:
   tcdb_family_id: tcdb:3.A.1.28
   tcdb_family_name: The Queuosine (Queuosine) Family
   transport_substrate_resolution: resolved
-returned: 13
-row_count: 13
+returned: 12
+row_count: 12
 top_gene_categories:
 - category: Transport
   gene_count: 1
@@ -312,7 +296,7 @@ top_metabolite_pathways:
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko00270
   metabolite_pathway_name: Cysteine and methionine metabolism
-  pathway_metabolite_count: 62
+  pathway_metabolite_count: 61
   pathway_reaction_count: 63
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko01240
@@ -322,23 +306,14 @@ top_metabolite_pathways:
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
-  pathway_metabolite_count: 614
+  pathway_metabolite_count: 618
   pathway_reaction_count: 536
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-  pathway_metabolite_count: 1621
+  pathway_metabolite_count: 1626
   pathway_reaction_count: 1718
 top_metabolites:
-- formula: null
-  gene_count: 1
-  metabolism_rows: 0
-  metabolite_id: chebi:10004
-  name: vitamin (role)
-  reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
-  transporter_count: 1
 - formula: null
   gene_count: 1
   metabolism_rows: 0
@@ -420,6 +395,15 @@ top_metabolites:
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
   transporter_count: 1
+- formula: C12H17N4OS
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: kegg.compound:C00378
+  name: Thiamine
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
 top_reactions: []
 top_tcdb_families:
 - gene_count: 1
@@ -442,7 +426,7 @@ top_tcdb_families:
   tcdb_family_name: The Thiamin Precursor (Thi-P) Family
 - gene_count: 1
   level_kind: tc_subfamily
-  metabolite_count: 2
+  metabolite_count: 1
   substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.32
   tcdb_family_name: The Cobalamin Precursor (B 12 -P) Family
@@ -452,7 +436,7 @@ top_tcdb_families:
   substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.33
   tcdb_family_name: The Methylthioadenosine (MTA) Family
-total_matching: 13
+total_matching: 12
 transporter_count_total: 5
 truncated: false
 warnings: []

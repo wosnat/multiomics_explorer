@@ -143,32 +143,32 @@ list_organisms()
     {
       "organism_name": "Pseudomonas putida KT2440",
       "reaction_count": 1449,
-      "catalyzed_metabolite_count": 1490,
-      "transported_metabolite_count": 1260
+      "catalyzed_metabolite_count": 1483,
+      "transported_metabolite_count": 1193
     },
     {
       "organism_name": "Ruegeria pomeroyi DSS-3",
       "reaction_count": 1377,
-      "catalyzed_metabolite_count": 1468,
-      "transported_metabolite_count": 1213
+      "catalyzed_metabolite_count": 1460,
+      "transported_metabolite_count": 1146
     },
     {
       "organism_name": "Alteromonas macleodii EZ55",
       "reaction_count": 1348,
-      "catalyzed_metabolite_count": 1428,
-      "transported_metabolite_count": 1266
+      "catalyzed_metabolite_count": 1421,
+      "transported_metabolite_count": 1201
     },
     {
       "organism_name": "Alteromonas (MarRef v6)",
       "reaction_count": 1263,
-      "catalyzed_metabolite_count": 1359,
-      "transported_metabolite_count": 1265
+      "catalyzed_metabolite_count": 1352,
+      "transported_metabolite_count": 1200
     },
     {
       "organism_name": "Alteromonas macleodii MIT1002",
       "reaction_count": 1288,
-      "catalyzed_metabolite_count": 1354,
-      "transported_metabolite_count": 1267
+      "catalyzed_metabolite_count": 1347,
+      "transported_metabolite_count": 1202
     },
     ...
   ],
@@ -274,8 +274,8 @@ list_organisms()
       "derived_metric_value_kinds": [],
       "compartments": [],
       "reaction_count": 1263,
-      "catalyzed_metabolite_count": 1359,
-      "transported_metabolite_count": 1265,
+      "catalyzed_metabolite_count": 1352,
+      "transported_metabolite_count": 1200,
       "measured_metabolite_count": 0,
       "peptidase_gene_count": 148,
       "nonpeptidase_homolog_gene_count": 31,
@@ -305,8 +305,8 @@ list_organisms()
       "derived_metric_value_kinds": ["numeric"],
       "compartments": ["vesicle"],
       "reaction_count": 1259,
-      "catalyzed_metabolite_count": 1328,
-      "transported_metabolite_count": 1266,
+      "catalyzed_metabolite_count": 1321,
+      "transported_metabolite_count": 1202,
       "measured_metabolite_count": 0,
       "peptidase_gene_count": 129,
       "nonpeptidase_homolog_gene_count": 32,
@@ -363,32 +363,32 @@ list_organisms(summary=True)
     {
       "organism_name": "Pseudomonas putida KT2440",
       "reaction_count": 1449,
-      "catalyzed_metabolite_count": 1490,
-      "transported_metabolite_count": 1260
+      "catalyzed_metabolite_count": 1483,
+      "transported_metabolite_count": 1193
     },
     {
       "organism_name": "Ruegeria pomeroyi DSS-3",
       "reaction_count": 1377,
-      "catalyzed_metabolite_count": 1468,
-      "transported_metabolite_count": 1213
+      "catalyzed_metabolite_count": 1460,
+      "transported_metabolite_count": 1146
     },
     {
       "organism_name": "Alteromonas macleodii EZ55",
       "reaction_count": 1348,
-      "catalyzed_metabolite_count": 1428,
-      "transported_metabolite_count": 1266
+      "catalyzed_metabolite_count": 1421,
+      "transported_metabolite_count": 1201
     },
     {
       "organism_name": "Alteromonas (MarRef v6)",
       "reaction_count": 1263,
-      "catalyzed_metabolite_count": 1359,
-      "transported_metabolite_count": 1265
+      "catalyzed_metabolite_count": 1352,
+      "transported_metabolite_count": 1200
     },
     {
       "organism_name": "Alteromonas macleodii MIT1002",
       "reaction_count": 1288,
-      "catalyzed_metabolite_count": 1354,
-      "transported_metabolite_count": 1267
+      "catalyzed_metabolite_count": 1347,
+      "transported_metabolite_count": 1202
     },
     ...
   ],
@@ -483,14 +483,14 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
     {
       "organism_name": "Alteromonas macleodii MIT1002",
       "reaction_count": 1288,
-      "catalyzed_metabolite_count": 1354,
-      "transported_metabolite_count": 1267
+      "catalyzed_metabolite_count": 1347,
+      "transported_metabolite_count": 1202
     },
     {
       "organism_name": "Prochlorococcus MED4",
       "reaction_count": 943,
-      "catalyzed_metabolite_count": 1039,
-      "transported_metabolite_count": 1069
+      "catalyzed_metabolite_count": 1034,
+      "transported_metabolite_count": 1011
     }
   ],
   "top_metabolic_capability_truncated": null,
@@ -541,8 +541,8 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
       "derived_metric_value_kinds": ["boolean", "numeric"],
       "compartments": ["vesicle", "whole_cell"],
       "reaction_count": 1288,
-      "catalyzed_metabolite_count": 1354,
-      "transported_metabolite_count": 1267,
+      "catalyzed_metabolite_count": 1347,
+      "transported_metabolite_count": 1202,
       "measured_metabolite_count": 0,
       "peptidase_gene_count": 120,
       "nonpeptidase_homolog_gene_count": 32,
@@ -570,8 +570,8 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
       "derived_metric_value_kinds": ["boolean", "categorical", "numeric"],
       "compartments": ["vesicle", "whole_cell"],
       "reaction_count": 943,
-      "catalyzed_metabolite_count": 1039,
-      "transported_metabolite_count": 1069,
+      "catalyzed_metabolite_count": 1034,
+      "transported_metabolite_count": 1011,
       "measured_metabolite_count": 0,
       "peptidase_gene_count": 50,
       "nonpeptidase_homolog_gene_count": 8,
@@ -625,14 +625,14 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
     {
       "organism_name": "Prochlorococcus MIT9301",
       "reaction_count": 945,
-      "catalyzed_metabolite_count": 1052,
-      "transported_metabolite_count": 1061
+      "catalyzed_metabolite_count": 1047,
+      "transported_metabolite_count": 1005
     },
     {
       "organism_name": "Prochlorococcus MED4",
       "reaction_count": 943,
-      "catalyzed_metabolite_count": 1039,
-      "transported_metabolite_count": 1069
+      "catalyzed_metabolite_count": 1034,
+      "transported_metabolite_count": 1011
     }
   ],
   "top_metabolic_capability_truncated": null,
@@ -683,8 +683,8 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
       "derived_metric_value_kinds": ["boolean", "categorical", "numeric"],
       "compartments": ["vesicle", "whole_cell"],
       "reaction_count": 943,
-      "catalyzed_metabolite_count": 1039,
-      "transported_metabolite_count": 1069,
+      "catalyzed_metabolite_count": 1034,
+      "transported_metabolite_count": 1011,
       "measured_metabolite_count": 0,
       "peptidase_gene_count": 50,
       "nonpeptidase_homolog_gene_count": 8,
@@ -712,9 +712,9 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
       "derived_metric_value_kinds": [],
       "compartments": [],
       "reaction_count": 945,
-      "catalyzed_metabolite_count": 1052,
-      "transported_metabolite_count": 1061,
-      "measured_metabolite_count": 99,
+      "catalyzed_metabolite_count": 1047,
+      "transported_metabolite_count": 1005,
+      "measured_metabolite_count": 96,
       "peptidase_gene_count": 49,
       "nonpeptidase_homolog_gene_count": 10,
       "interpro_gene_count": 1537,
@@ -773,32 +773,32 @@ list_organisms(compartment="vesicle")
     {
       "organism_name": "Alteromonas macleodii MIT1002",
       "reaction_count": 1288,
-      "catalyzed_metabolite_count": 1354,
-      "transported_metabolite_count": 1267
+      "catalyzed_metabolite_count": 1347,
+      "transported_metabolite_count": 1202
     },
     {
       "organism_name": "Alteromonas macleodii BGP6",
       "reaction_count": 1275,
-      "catalyzed_metabolite_count": 1341,
-      "transported_metabolite_count": 1269
+      "catalyzed_metabolite_count": 1334,
+      "transported_metabolite_count": 1204
     },
     {
       "organism_name": "Alteromonas macleodii HOT1A3",
       "reaction_count": 1266,
-      "catalyzed_metabolite_count": 1336,
-      "transported_metabolite_count": 1269
+      "catalyzed_metabolite_count": 1329,
+      "transported_metabolite_count": 1204
     },
     {
       "organism_name": "Alteromonas macleodii AD45",
       "reaction_count": 1259,
-      "catalyzed_metabolite_count": 1328,
-      "transported_metabolite_count": 1266
+      "catalyzed_metabolite_count": 1321,
+      "transported_metabolite_count": 1202
     },
     {
       "organism_name": "Alteromonas macleodii ATCC27126",
       "reaction_count": 1251,
-      "catalyzed_metabolite_count": 1309,
-      "transported_metabolite_count": 1267
+      "catalyzed_metabolite_count": 1302,
+      "transported_metabolite_count": 1202
     },
     ...
   ],
@@ -875,8 +875,8 @@ list_organisms(compartment="vesicle")
       "derived_metric_value_kinds": ["numeric"],
       "compartments": ["vesicle"],
       "reaction_count": 1259,
-      "catalyzed_metabolite_count": 1328,
-      "transported_metabolite_count": 1266,
+      "catalyzed_metabolite_count": 1321,
+      "transported_metabolite_count": 1202,
       "measured_metabolite_count": 0,
       "peptidase_gene_count": 129,
       "nonpeptidase_homolog_gene_count": 32,
@@ -904,8 +904,8 @@ list_organisms(compartment="vesicle")
       "derived_metric_value_kinds": ["numeric"],
       "compartments": ["vesicle"],
       "reaction_count": 1251,
-      "catalyzed_metabolite_count": 1309,
-      "transported_metabolite_count": 1267,
+      "catalyzed_metabolite_count": 1302,
+      "transported_metabolite_count": 1202,
       "measured_metabolite_count": 0,
       "peptidase_gene_count": 125,
       "nonpeptidase_homolog_gene_count": 37,
@@ -933,8 +933,8 @@ list_organisms(compartment="vesicle")
       "derived_metric_value_kinds": ["numeric"],
       "compartments": ["vesicle"],
       "reaction_count": 1275,
-      "catalyzed_metabolite_count": 1341,
-      "transported_metabolite_count": 1269,
+      "catalyzed_metabolite_count": 1334,
+      "transported_metabolite_count": 1204,
       "measured_metabolite_count": 0,
       "peptidase_gene_count": 127,
       "nonpeptidase_homolog_gene_count": 33,
@@ -991,32 +991,32 @@ list_organisms(summary=True)
     {
       "organism_name": "Pseudomonas putida KT2440",
       "reaction_count": 1449,
-      "catalyzed_metabolite_count": 1490,
-      "transported_metabolite_count": 1260
+      "catalyzed_metabolite_count": 1483,
+      "transported_metabolite_count": 1193
     },
     {
       "organism_name": "Ruegeria pomeroyi DSS-3",
       "reaction_count": 1377,
-      "catalyzed_metabolite_count": 1468,
-      "transported_metabolite_count": 1213
+      "catalyzed_metabolite_count": 1460,
+      "transported_metabolite_count": 1146
     },
     {
       "organism_name": "Alteromonas macleodii EZ55",
       "reaction_count": 1348,
-      "catalyzed_metabolite_count": 1428,
-      "transported_metabolite_count": 1266
+      "catalyzed_metabolite_count": 1421,
+      "transported_metabolite_count": 1201
     },
     {
       "organism_name": "Alteromonas (MarRef v6)",
       "reaction_count": 1263,
-      "catalyzed_metabolite_count": 1359,
-      "transported_metabolite_count": 1265
+      "catalyzed_metabolite_count": 1352,
+      "transported_metabolite_count": 1200
     },
     {
       "organism_name": "Alteromonas macleodii MIT1002",
       "reaction_count": 1288,
-      "catalyzed_metabolite_count": 1354,
-      "transported_metabolite_count": 1267
+      "catalyzed_metabolite_count": 1347,
+      "transported_metabolite_count": 1202
     },
     ...
   ],
@@ -1120,32 +1120,32 @@ list_organisms(summary=True)
     {
       "organism_name": "Pseudomonas putida KT2440",
       "reaction_count": 1449,
-      "catalyzed_metabolite_count": 1490,
-      "transported_metabolite_count": 1260
+      "catalyzed_metabolite_count": 1483,
+      "transported_metabolite_count": 1193
     },
     {
       "organism_name": "Ruegeria pomeroyi DSS-3",
       "reaction_count": 1377,
-      "catalyzed_metabolite_count": 1468,
-      "transported_metabolite_count": 1213
+      "catalyzed_metabolite_count": 1460,
+      "transported_metabolite_count": 1146
     },
     {
       "organism_name": "Alteromonas macleodii EZ55",
       "reaction_count": 1348,
-      "catalyzed_metabolite_count": 1428,
-      "transported_metabolite_count": 1266
+      "catalyzed_metabolite_count": 1421,
+      "transported_metabolite_count": 1201
     },
     {
       "organism_name": "Alteromonas (MarRef v6)",
       "reaction_count": 1263,
-      "catalyzed_metabolite_count": 1359,
-      "transported_metabolite_count": 1265
+      "catalyzed_metabolite_count": 1352,
+      "transported_metabolite_count": 1200
     },
     {
       "organism_name": "Alteromonas macleodii MIT1002",
       "reaction_count": 1288,
-      "catalyzed_metabolite_count": 1354,
-      "transported_metabolite_count": 1267
+      "catalyzed_metabolite_count": 1347,
+      "transported_metabolite_count": 1202
     },
     ...
   ],

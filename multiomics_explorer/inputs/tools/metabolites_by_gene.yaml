@@ -21,13 +21,13 @@ examples:
     # PMM0913 (salY) is one of the ABC-superfamily-only MED4 genes: its
     # deepest TCDB attachment IS the superfamily (tcdb:3.A.1), so
     # `by_gene[0]` reads transport_substrate_resolution='family_inferred'
-    # (score_max 0.8) and the auto-warning fires — 554 transport rows of
+    # (score_max 0.8) and the auto-warning fires — 518 transport rows of
     # reachability through a lumping family, not capability. Note the
-    # split: 312 rows are inherited, but 242 are most_specific AT the
+    # split: 301 rows are inherited, but 217 are most_specific AT the
     # superfamily — substrates no kept child of tcdb:3.A.1 carries. That
     # is a superfamily-level position, not a subfamily call, so
     # `substrate_depth=['most_specific']` does NOT remove this gene (it
-    # still returns 242 rows, no warning). The gene-level resolution is
+    # still returns 217 rows, no warning). The gene-level resolution is
     # the only guard against reading its substrates. `limit=5` caps the
     # row blowup.
 
@@ -136,11 +136,11 @@ examples:
   - title: Conservative-cast transporter slice (mute the rollup blowup)
     call: metabolites_by_gene(locus_tags=["PMM0434", "PMM0913"], organism="Prochlorococcus MED4", substrate_depth=["most_specific"], evidence_sources=["transport"], limit=5)
     # Both inputs are ABC-superfamily-only genes: the unfiltered transport
-    # call returns 1108 rows (554 each: 312 inherited + 242 most_specific
+    # call returns 1036 rows (518 each: 301 inherited + 217 most_specific
     # at tcdb:3.A.1) and trips the auto-warning because both read
     # transport_substrate_resolution='family_inferred'. Pairing
     # `substrate_depth=['most_specific']` AND `evidence_sources=['transport']`
-    # drops the inherited rows but still returns 484 rows (242 per gene)
+    # drops the inherited rows but still returns 434 rows (217 per gene)
     # with no warning — the filter mutes the rollup, it does not judge the
     # genes. most_specific at a lumping superfamily is a superfamily-level
     # position, not a subfamily call; read `by_gene[].transport_substrate_resolution`
@@ -219,7 +219,7 @@ mistakes:
     node in the gene-pruned hierarchy, which can be a family node;
     `inherited` = came down from an ancestor's substrate set). When the
     auto-warning fires, `substrate_depth=['most_specific']` does NOT remove
-    `family_inferred` genes (PMM0913 keeps 242 such rows) — only the
+    `family_inferred` genes (PMM0913 keeps 217 such rows) — only the
     gene-level resolution guards against reading their substrates. Full
     ladder and the depth-filter decision (conservative cast vs broad
     screen): `docs://analysis/metabolites`.
@@ -229,7 +229,7 @@ mistakes:
     only through the descendant; the ancestor's substrate rollup is
     intentionally absent. Consequently distinct metabolites across a gene's
     transport rows equal `gene_overview.transported_metabolite_count`
-    (PMM0392: 13, not the ABC-superfamily plateau), and metabolite-side
+    (PMM0392: 12, not the ABC-superfamily plateau), and metabolite-side
     distinct genes equal `list_metabolites.transporter_gene_count`. To see
     a gene's full family membership including superseded ancestors, use
     `gene_ontology_terms(ontology='tcdb')`.

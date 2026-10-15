@@ -270,9 +270,9 @@ list_filter_values(filter_type="evidence_source")
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "metabolism", "count": 2225},
-    {"value": "transport", "count": 1462},
-    {"value": "metabolomics", "count": 149}
+    {"value": "metabolism", "count": 2214},
+    {"value": "transport", "count": 1382},
+    {"value": "metabolomics", "count": 134}
   ]
 }
 ```
@@ -441,7 +441,7 @@ list_filter_values(filter_type="merops_catalytic_type")
 ```example-response
 {
   "filter_type": "merops_catalytic_type",
-  "description": "Catalytic mechanism of a peptidase family, MEROPS^s single-letter code spelled out (S = serine, C = cysteine, M = met...",
+  "description": "Catalytic mechanism of a peptidase family, the MEROPS single-letter code spelled out (S = serine, C = cysteine, M = m...",
   "total_entries": 9,
   "returned": 9,
   "truncated": false,

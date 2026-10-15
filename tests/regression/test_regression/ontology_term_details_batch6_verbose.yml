@@ -829,7 +829,7 @@ results:
     ''apoplast'', ''props'': {''id'': ''3.A.1-has_go-GO:0048046'', ''curated_tcids'':
     [''3.A.1.208.17'']}}'
   member_count: 55
-  metabolite_count: 554
+  metabolite_count: 518
   name: The ATP-binding Cassette (ABC) Superfamily
   ontology: tcdb
   organism_count: 43
@@ -842,10 +842,11 @@ results:
     level: 2
     level_kind: tc_family
     member_count: 55
-    metabolite_count: 554
+    metabolite_count: 518
     name: The ATP-binding Cassette (ABC) Superfamily
     organism_count: 43
     preferred_id: tcdb
+    substrate_breadth: lumping
     superfamily: ArsA ATPase (ArsA) Superfamily
     tc_class_id: tcdb:3
     tcdb_id: 3.A.1

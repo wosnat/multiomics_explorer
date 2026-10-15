@@ -59,7 +59,7 @@ results:
   - coculture
   - darkness
   - light
-  catalyzed_metabolite_count: 1359
+  catalyzed_metabolite_count: 1352
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -88,7 +88,7 @@ results:
   reference_proteome: UP000262181
   species: null
   strain: Alt_MarRef
-  transported_metabolite_count: 1265
+  transported_metabolite_count: 1200
   treatment_types:
   - carbon
 - background_factors:
@@ -138,7 +138,7 @@ results:
   - diel
   - light
   - viral
-  catalyzed_metabolite_count: 1039
+  catalyzed_metabolite_count: 1034
   clade: HLI
   cluster_types:
   - decay_pattern
@@ -187,7 +187,7 @@ results:
   reaction_count: 943
   species: Prochlorococcus marinus
   strain: MED4
-  transported_metabolite_count: 1069
+  transported_metabolite_count: 1011
   treatment_types:
   - carbon
   - coculture
@@ -219,14 +219,14 @@ top_annotation_capability:
   peptidase_gene_count: 50
   preferred_name: Prochlorococcus MED4
 top_metabolic_capability:
-- catalyzed_metabolite_count: 1359
+- catalyzed_metabolite_count: 1352
   organism_name: Alteromonas (MarRef v6)
   reaction_count: 1263
-  transported_metabolite_count: 1265
-- catalyzed_metabolite_count: 1039
+  transported_metabolite_count: 1200
+- catalyzed_metabolite_count: 1034
   organism_name: Prochlorococcus MED4
   reaction_count: 943
-  transported_metabolite_count: 1069
+  transported_metabolite_count: 1011
 total_entries: 47
 total_matching: 3
 truncated: false

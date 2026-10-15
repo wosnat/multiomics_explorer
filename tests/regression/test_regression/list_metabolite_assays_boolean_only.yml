@@ -19,7 +19,7 @@ rows:
   publication_doi: 10.1128/msystems.01261-22
   rankable: false
   timepoints: []
-  total_metabolite_count: 92
+  total_metabolite_count: 93
   treatment_type:
   - phosphorus
   unit: ''
@@ -48,7 +48,7 @@ rows:
   publication_doi: 10.1128/msystems.01261-22
   rankable: false
   timepoints: []
-  total_metabolite_count: 92
+  total_metabolite_count: 93
   treatment_type:
   - phosphorus
   unit: ''

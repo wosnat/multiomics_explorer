@@ -1,33 +1,33 @@
 by_evidence_source:
-- count: 659
+- count: 669
   evidence_source: metabolism
-- count: 510
+- count: 526
   evidence_source: transport
-- count: 90
+- count: 89
   evidence_source: metabolomics
 by_measurement_coverage:
   by_compartment:
   - compartment: extracellular
-    count: 65
+    count: 66
   - compartment: vesicle
-    count: 41
+    count: 51
   - compartment: whole_cell
-    count: 90
+    count: 89
   by_paper_count:
-  - count: 902
+  - count: 913
     paper_count: 0
-  - count: 69
+  - count: 56
     paper_count: 1
-  - count: 20
+  - count: 32
     paper_count: 2
   - count: 1
     paper_count: 3
 case_id: list_metabolites_med4_n
 mass_stats:
   mass_max: 5227.103
-  mass_median: 334.33
+  mass_median: 336.197
   mass_min: 18.039
-no_formula_excluded: 263
+no_formula_excluded: 171
 not_found:
   elements: []
   metabolite_ids: []
@@ -37,7 +37,7 @@ offset: 0
 resolved_aliases: {}
 results:
 - catalyst_gene_count: 6041
-  chebi_id: '10789'
+  chebi_id: '15422'
   elements:
   - C
   - H
@@ -94,7 +94,7 @@ results:
   transporter_count: 15
   transporter_gene_count: 2195
 - catalyst_gene_count: 3564
-  chebi_id: '13222'
+  chebi_id: '16761'
   elements:
   - C
   - H
@@ -143,7 +143,7 @@ results:
   transporter_count: 5
   transporter_gene_count: 862
 - catalyst_gene_count: 3302
-  chebi_id: '13393'
+  chebi_id: '15846'
   elements:
   - C
   - H
@@ -156,14 +156,15 @@ results:
   - transport
   formula: C21H26N7O14P2
   mass: 662.422
-  measured_assay_count: 4
+  measured_assay_count: 6
   measured_compartments:
   - vesicle
   - whole_cell
   measured_organisms:
+  - Prochlorococcus MIT9301
   - Prochlorococcus MIT9312
   - Prochlorococcus MIT9313
-  measured_paper_count: 1
+  measured_paper_count: 2
   metabolite_id: kegg.compound:C00003
   name: NAD+
   organism_count: 43
@@ -186,7 +187,7 @@ results:
   transporter_count: 4
   transporter_gene_count: 625
 - catalyst_gene_count: 3017
-  chebi_id: '13395'
+  chebi_id: '16908'
   elements:
   - C
   - H
@@ -199,7 +200,7 @@ results:
   - transport
   formula: C21H27N7O14P2
   mass: 663.43
-  measured_assay_count: 8
+  measured_assay_count: 6
   measured_compartments:
   - extracellular
   - whole_cell
@@ -221,7 +222,7 @@ results:
   transporter_count: 2
   transporter_gene_count: 129
 - catalyst_gene_count: 2464
-  chebi_id: '12056'
+  chebi_id: '16027'
   elements:
   - C
   - H
@@ -282,27 +283,27 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 503
+- count: 513
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 209
+- count: 213
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
-- count: 159
+- count: 160
   metabolite_pathway_id: kegg.pathway:ko01240
   metabolite_pathway_name: Biosynthesis of cofactors
 - count: 81
   metabolite_pathway_id: kegg.pathway:ko01120
   metabolite_pathway_name: Microbial metabolism in diverse environments
-- count: 77
+- count: 78
   metabolite_pathway_id: kegg.pathway:ko00860
   metabolite_pathway_name: Porphyrin metabolism
+- count: 68
+  metabolite_pathway_id: kegg.pathway:ko02010
+  metabolite_pathway_name: ABC transporters
 - count: 63
   metabolite_pathway_id: kegg.pathway:ko01230
   metabolite_pathway_name: Biosynthesis of amino acids
-- count: 63
-  metabolite_pathway_id: kegg.pathway:ko02010
-  metabolite_pathway_name: ABC transporters
 - count: 60
   metabolite_pathway_id: kegg.pathway:ko00230
   metabolite_pathway_name: Purine metabolism
@@ -313,34 +314,34 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko00970
   metabolite_pathway_name: Aminoacyl-tRNA biosynthesis
 top_organisms:
-- count: 992
+- count: 1002
   organism_name: Prochlorococcus MED4
-- count: 975
+- count: 985
   organism_name: Prochlorococcus MIT9515
-- count: 970
+- count: 980
   organism_name: Prochlorococcus AS9601
-- count: 966
+- count: 977
   organism_name: Prochlorococcus MIT9215
-- count: 966
+- count: 976
   organism_name: Prochlorococcus MIT1327
-- count: 966
-  organism_name: Prochlorococcus MIT9303
-- count: 965
-  organism_name: Prochlorococcus RSP50
-- count: 965
-  organism_name: Prochlorococcus SB
-- count: 965
+- count: 976
   organism_name: Prochlorococcus MIT9312
-- count: 964
+- count: 976
+  organism_name: Prochlorococcus MIT9303
+- count: 975
+  organism_name: Prochlorococcus RSP50
+- count: 975
+  organism_name: Prochlorococcus SB
+- count: 974
   organism_name: Prochlorococcus MIT0604
-total_entries: 3356
-total_matching: 992
+total_entries: 3203
+total_matching: 1002
 truncated: true
 warnings:
-- 263 metabolites have no formula and can never match an element filter (often generic
+- 171 metabolites have no formula and can never match an element filter (often generic
   classes such as 'amino acid' or 'dipeptide'). Re-run without elements to inspect
   them.
 xref_coverage:
-  with_chebi: 895
-  with_hmdb: 586
-  with_mnxm: 992
+  with_chebi: 970
+  with_hmdb: 587
+  with_mnxm: 1002

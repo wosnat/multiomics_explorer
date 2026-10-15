@@ -34,6 +34,7 @@ examples:
         "offset": 0,
         "truncated": false,
         "not_found": [],
+        "warnings": [],
         "results": [
           {
             "locus_tag": "PMM1428",
@@ -118,6 +119,7 @@ examples:
         "offset": 0,
         "truncated": false,
         "not_found": [],
+        "warnings": [],
         "results": [
           {
             "locus_tag": "MIT1002_01809",
@@ -192,6 +194,7 @@ examples:
         "offset": 0,
         "truncated": false,
         "not_found": [],
+        "warnings": [],
         "results": [
           {
             "locus_tag": "PMM0001",
@@ -247,7 +250,7 @@ examples:
             "reaction_count": 0,
             "catalyzed_metabolite_count": 0,
             "tcdb_evidence_score_max": 0.8,
-            "transported_metabolite_count": 13,
+            "transported_metabolite_count": 12,
             "transport_substrate_resolution": "resolved",
             "evidence_sources": ["transport", "metabolomics"],
             "merops_classes": [],
@@ -292,6 +295,7 @@ examples:
         "offset": 0,
         "truncated": false,
         "not_found": [],
+        "warnings": [],
         "results": [
           {
             "locus_tag": "HP15_1897",
@@ -360,6 +364,7 @@ examples:
         "offset": 0,
         "truncated": false,
         "not_found": [],
+        "warnings": [],
         "results": [
           {
             "locus_tag": "MIT1002_03660",
@@ -427,6 +432,7 @@ examples:
         "offset": 0,
         "truncated": false,
         "not_found": [],
+        "warnings": [],
         "results": [
           {
             "locus_tag": "PMT2118",

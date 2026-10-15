@@ -34,7 +34,7 @@ results:
   gene_name: cynA
   locus_tag: PMM0370
   mass_balance: null
-  metabolite_chebi_id: '14658'
+  metabolite_chebi_id: '25567'
   metabolite_formula: NO2
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005
@@ -52,7 +52,7 @@ results:
   gene_name: cynA
   locus_tag: PMM0370
   mass_balance: null
-  metabolite_chebi_id: '14658'
+  metabolite_chebi_id: '25567'
   metabolite_formula: NO2
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005
@@ -70,7 +70,7 @@ results:
   gene_name: cynB
   locus_tag: PMM0371
   mass_balance: null
-  metabolite_chebi_id: '14658'
+  metabolite_chebi_id: '25567'
   metabolite_formula: NO2
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005
@@ -88,7 +88,7 @@ results:
   gene_name: cynB
   locus_tag: PMM0371
   mass_balance: null
-  metabolite_chebi_id: '14658'
+  metabolite_chebi_id: '25567'
   metabolite_formula: NO2
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005
@@ -106,7 +106,7 @@ results:
   gene_name: cynD
   locus_tag: PMM0372
   mass_balance: null
-  metabolite_chebi_id: '14658'
+  metabolite_chebi_id: '25567'
   metabolite_formula: NO2
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005

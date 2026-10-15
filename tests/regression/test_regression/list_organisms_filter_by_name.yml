@@ -9,7 +9,7 @@ rows:
   - diel
   - light
   - viral
-  catalyzed_metabolite_count: 1039
+  catalyzed_metabolite_count: 1034
   clade: HLI
   cluster_types:
   - decay_pattern
@@ -60,7 +60,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MED4
-  transported_metabolite_count: 1069
+  transported_metabolite_count: 1011
   treatment_types:
   - carbon
   - coculture
@@ -80,7 +80,7 @@ rows:
   - axenic
   - diel
   - light
-  catalyzed_metabolite_count: 1052
+  catalyzed_metabolite_count: 1047
   clade: HLII
   cluster_types:
   - condition_comparison
@@ -95,7 +95,7 @@ rows:
   growth_phases:
   - exponential
   interpro_gene_count: 1537
-  measured_metabolite_count: 99
+  measured_metabolite_count: 96
   ncbi_taxon_id: 167546
   ncbifam_gene_count: 774
   nonpeptidase_homolog_gene_count: 10
@@ -111,7 +111,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9301
-  transported_metabolite_count: 1061
+  transported_metabolite_count: 1005
   treatment_types:
   - growth_phase
   - phosphorus

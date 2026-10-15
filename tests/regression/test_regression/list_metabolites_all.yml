@@ -1,31 +1,31 @@
 by_evidence_source:
-- count: 2225
+- count: 2214
   evidence_source: metabolism
-- count: 1462
+- count: 1382
   evidence_source: transport
-- count: 149
+- count: 134
   evidence_source: metabolomics
 by_measurement_coverage:
   by_compartment:
   - compartment: extracellular
     count: 92
   - compartment: vesicle
-    count: 69
+    count: 70
   - compartment: whole_cell
-    count: 149
+    count: 134
   by_paper_count:
-  - count: 3207
+  - count: 3069
     paper_count: 0
-  - count: 119
+  - count: 91
     paper_count: 1
-  - count: 25
+  - count: 38
     paper_count: 2
   - count: 5
     paper_count: 3
 case_id: list_metabolites_all
 mass_stats:
   mass_max: 5227.103
-  mass_median: 245.127
+  mass_median: 246.263
   mass_min: 1.00794
 not_found:
   elements: []
@@ -36,7 +36,7 @@ offset: 0
 resolved_aliases: {}
 results:
 - catalyst_gene_count: 10249
-  chebi_id: '10743'
+  chebi_id: '15377'
   elements:
   - H
   - O
@@ -71,10 +71,10 @@ results:
   - kegg.pathway:ko05022
   - kegg.pathway:ko05208
   - kegg.pathway:ko05415
-  transporter_count: 14
-  transporter_gene_count: 1844
+  transporter_count: 15
+  transporter_gene_count: 1900
 - catalyst_gene_count: 6041
-  chebi_id: '10789'
+  chebi_id: '15422'
   elements:
   - C
   - H
@@ -131,7 +131,7 @@ results:
   transporter_count: 15
   transporter_gene_count: 2195
 - catalyst_gene_count: 5776
-  chebi_id: '10744'
+  chebi_id: '15378'
   elements:
   - H
   evidence_sources:
@@ -178,7 +178,7 @@ results:
   transporter_count: 123
   transporter_gene_count: 8017
 - catalyst_gene_count: 4325
-  chebi_id: '13420'
+  chebi_id: '29888'
   elements:
   - H
   - O
@@ -203,7 +203,7 @@ results:
   transporter_count: 3
   transporter_gene_count: 99
 - catalyst_gene_count: 4069
-  chebi_id: '14791'
+  chebi_id: '26078'
   elements:
   - H
   - O
@@ -239,10 +239,10 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 1621
+- count: 1626
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 614
+- count: 618
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
 - count: 593
@@ -257,7 +257,7 @@ top_metabolite_pathways:
 - count: 125
   metabolite_pathway_id: kegg.pathway:ko01230
   metabolite_pathway_name: Biosynthesis of amino acids
-- count: 117
+- count: 122
   metabolite_pathway_id: kegg.pathway:ko02010
   metabolite_pathway_name: ABC transporters
 - count: 105
@@ -266,35 +266,35 @@ top_metabolite_pathways:
 - count: 104
   metabolite_pathway_id: kegg.pathway:ko01200
   metabolite_pathway_name: Carbon metabolism
-- count: 90
+- count: 91
   metabolite_pathway_id: kegg.pathway:ko00860
   metabolite_pathway_name: Porphyrin metabolism
 top_organisms:
-- count: 2514
+- count: 2413
   organism_name: Pseudomonas putida KT2440
-- count: 2464
+- count: 2360
   organism_name: Alteromonas macleodii EZ55
-- count: 2461
+- count: 2355
   organism_name: Ruegeria pomeroyi DSS-3
-- count: 2409
+- count: 2304
   organism_name: Alteromonas (MarRef v6)
-- count: 2401
+- count: 2300
   organism_name: Alteromonas macleodii MIT1002
-- count: 2391
+- count: 2287
   organism_name: Alteromonas macleodii BGP6
-- count: 2387
+- count: 2285
   organism_name: Alteromonas macleodii HOT1A3
-- count: 2378
+- count: 2276
   organism_name: Alteromonas macleodii AD45
-- count: 2374
+- count: 2273
   organism_name: Marinobacter (MarRef v6)
-- count: 2365
+- count: 2264
   organism_name: Alteromonas mediterranea AltDE1
-total_entries: 3356
-total_matching: 3356
+total_entries: 3203
+total_matching: 3203
 truncated: true
 warnings: []
 xref_coverage:
-  with_chebi: 3042
-  with_hmdb: 1502
-  with_mnxm: 3347
+  with_chebi: 3075
+  with_hmdb: 1495
+  with_mnxm: 3203

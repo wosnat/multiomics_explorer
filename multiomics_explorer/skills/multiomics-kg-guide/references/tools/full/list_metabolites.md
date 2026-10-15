@@ -125,12 +125,12 @@ list_metabolites(evidence_sources=["transport"], summary=True)
 ### Example 6: Transport-only metabolite by ID — reading the two gene counts together
 
 ```example-call
-list_metabolites(metabolite_ids=["chebi:14313"])
+list_metabolites(metabolite_ids=["chebi:17234"])
 ```
 
 ```example-response
 {
-  "total_entries": 3356,
+  "total_entries": 3203,
   "total_matching": 1,
   "top_organisms": [
     {"organism_name": "Alteromonas macleodii AD45", "count": 1},
@@ -150,12 +150,13 @@ list_metabolites(metabolite_ids=["chebi:14313"])
   "returned": 1,
   "offset": 0,
   "truncated": false,
-  "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": []},
+  "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": [], "elements": []},
   "resolved_aliases": {},
   "warnings": [],
+  "no_formula_excluded": null,
   "results": [
     {
-      "metabolite_id": "chebi:14313",
+      "metabolite_id": "chebi:17234",
       "name": "glucose",
       "formula": "C6H12O6",
       "elements": ["C", "H", "O"],
@@ -165,7 +166,7 @@ list_metabolites(metabolite_ids=["chebi:14313"])
       "transporter_count": 18,
       "transporter_gene_count": 3091,
       "evidence_sources": ["transport"],
-      "chebi_id": "14313",
+      "chebi_id": "17234",
       "pathway_ids": [],
       "pathway_count": 0,
       "measured_assay_count": 0,
@@ -185,57 +186,57 @@ list_metabolites(evidence_sources=["metabolomics"], summary=True)
 
 ```example-response
 {
-  "total_entries": 3356,
-  "total_matching": 149,
+  "total_entries": 3203,
+  "total_matching": 134,
   "top_organisms": [
-    {"organism_name": "Prochlorococcus MIT9313", "count": 146},
-    {"organism_name": "Prochlorococcus MIT9301", "count": 132},
-    {"organism_name": "Prochlorococcus MIT9312", "count": 132},
-    {"organism_name": "Prochlorococcus MIT0801", "count": 128},
-    {"organism_name": "Pseudomonas putida KT2440", "count": 123},
+    {"organism_name": "Prochlorococcus MIT9313", "count": 133},
+    {"organism_name": "Prochlorococcus MIT9301", "count": 127},
+    {"organism_name": "Prochlorococcus MIT0801", "count": 126},
+    {"organism_name": "Synechococcus elongatus UTEX 2973", "count": 121},
+    {"organism_name": "Pseudomonas putida KT2440", "count": 121},
     ...
   ],
   "top_metabolite_pathways": [
     {
       "metabolite_pathway_id": "kegg.pathway:ko01100",
       "metabolite_pathway_name": "Metabolic pathways",
-      "count": 119
+      "count": 122
     },
     {
       "metabolite_pathway_id": "kegg.pathway:ko01110",
       "metabolite_pathway_name": "Biosynthesis of secondary metabolites",
-      "count": 64
+      "count": 67
     },
     {
       "metabolite_pathway_id": "kegg.pathway:ko01240",
       "metabolite_pathway_name": "Biosynthesis of cofactors",
-      "count": 47
-    },
-    {
-      "metabolite_pathway_id": "kegg.pathway:ko01120",
-      "metabolite_pathway_name": "Microbial metabolism in diverse environments",
-      "count": 38
+      "count": 49
     },
     {
       "metabolite_pathway_id": "kegg.pathway:ko02010",
       "metabolite_pathway_name": "ABC transporters",
-      "count": 38
+      "count": 39
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko01120",
+      "metabolite_pathway_name": "Microbial metabolism in diverse environments",
+      "count": 39
     },
     ...
   ],
   "by_evidence_source": [
-    {"evidence_source": "metabolomics", "count": 149},
-    {"evidence_source": "metabolism", "count": 117},
-    {"evidence_source": "transport", "count": 103}
+    {"evidence_source": "metabolomics", "count": 134},
+    {"evidence_source": "metabolism", "count": 119},
+    {"evidence_source": "transport", "count": 104}
   ],
-  "xref_coverage": {"with_chebi": 143, "with_hmdb": 128, "with_mnxm": 140},
-  "mass_stats": {"mass_min": 89.094, "mass_median": 175.188, "mass_max": 1347.385},
+  "xref_coverage": {"with_chebi": 134, "with_hmdb": 126, "with_mnxm": 134},
+  "mass_stats": {"mass_min": 89.094, "mass_median": 179.172, "mass_max": 1353.372},
   "by_measurement_coverage": {
-    "by_paper_count": [{"paper_count": 1, "count": 119}, {"paper_count": 2, "count": 25}, {"paper_count": 3, "count": 5}],
+    "by_paper_count": [{"paper_count": 1, "count": 91}, {"paper_count": 2, "count": 38}, {"paper_count": 3, "count": 5}],
     "by_compartment": [
       {"compartment": "extracellular", "count": 92},
-      {"compartment": "vesicle", "count": 69},
-      {"compartment": "whole_cell", "count": 149}
+      {"compartment": "vesicle", "count": 70},
+      {"compartment": "whole_cell", "count": 134}
     ]
   },
   "score_max": null,
@@ -243,9 +244,10 @@ list_metabolites(evidence_sources=["metabolomics"], summary=True)
   "returned": 0,
   "offset": 0,
   "truncated": true,
-  "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": []},
+  "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": [], "elements": []},
   "resolved_aliases": {},
   "warnings": [],
+  "no_formula_excluded": null,
   "results": []
 }
 ```
@@ -298,7 +300,7 @@ list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(m
 
 - `elements` never matches a metabolite with no formula (empty `elements`) — mostly generic classes such as 'amino acid', 'dipeptide' or 'Polyamine'. When the filter is set, the envelope's `no_formula_excluded` counts metabolites that pass every other filter but have no formula, and a `warnings` entry fires when it is > 0. Re-run without `elements` to inspect them.
 
-- `search_text` is a Lucene search over the metabolite name only — NOT the formula. For element/composition queries, use `elements` (presence list).
+- `search_text` is a Lucene search over the metabolite name, formula and identifiers (KEGG / ChEBI / MNX / HMDB ids, InChIKey) — a formula hit is a token match, not a composition query. For element/composition questions use `elements` (presence list).
 
 ```mistake
 list_metabolites(metabolite_ids=['glutamate'])  # a name, not an id

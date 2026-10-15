@@ -2618,14 +2618,15 @@ class TestListMetabolites:
         assert result["total_matching"] == kg_count("MATCH (m:Metabolite) RETURN count(m)")
 
     def test_elements_n_filter(self, conn):
-        """N-bearing metabolites total."""
+        """N-bearing metabolites total (1693 → 1688 at the 2026-10-15
+        metabolite-identity rebuild: merges + role removal)."""
         result = api.list_metabolites(elements=["N"], conn=conn)
-        assert result["total_matching"] == 1693
+        assert result["total_matching"] == 1688
 
     def test_elements_n_and_p_filter(self, conn):
         """Multi-element AND filter (must contain both N and P)."""
         result = api.list_metabolites(elements=["N", "P"], conn=conn)
-        assert result["total_matching"] == 583
+        assert result["total_matching"] == 574  # 583 → 574 (2026-10-15 identity rebuild)
 
     def test_organism_plus_elements_filter(self, conn):
         """MED4 + N elements (the canonical N-source primitive): 992.
@@ -2634,13 +2635,15 @@ class TestListMetabolites:
         enrichment (new Gene→Reaction links) + the 2026-08 TCDB rebuild
         expanded MED4's chemistry-reachable metabolite set
         (by_evidence_source now: metabolism 659, transport 510,
-        metabolomics 90)."""
+        metabolomics 90). 992 → 1002 at the 2026-10-15 metabolite-identity
+        rebuild (re-keyed chebi: → KEGG nodes gain catalysis reach; 33
+        class nodes gain ChEBI generic formulas + elements)."""
         result = api.list_metabolites(
             organism_names=["Prochlorococcus MED4"],
             elements=["N"],
             conn=conn,
         )
-        assert result["total_matching"] == 992
+        assert result["total_matching"] == 1002
 
     def test_pathway_id_filter(self, conn):
         """Nitrogen metabolism pathway (ko00910) has 18 metabolites."""
@@ -2678,11 +2681,12 @@ class TestListMetabolites:
         assert "score" in result["results"][0]
 
     def test_evidence_sources_transport_filter(self, conn):
-        """transport-only evidence filter: 1,462 metabolites."""
+        """transport-only evidence filter: 1,382 metabolites (1,462 before the
+        2026-10-15 identity rebuild: −57 roles, merges)."""
         result = api.list_metabolites(
             evidence_sources=["transport"], conn=conn,
         )
-        assert result["total_matching"] == 1462
+        assert result["total_matching"] == 1382
 
     def test_summary_mode_empty_results_envelope_populated(self, conn, kg_count):
         """summary=True returns no result rows but envelope is populated."""
@@ -2899,11 +2903,12 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
 
     def test_gene_overview_pmm0392_resolved(self, conn):
         """PMM0392 (ABC transporter; deepest families 3.A.1.{25,28,29,30,31,
-        32,33}) → 0.8 / 13 / 'resolved'."""
+        32,33}) → 0.8 / 12 / 'resolved' (13 → 12 at the 2026-10-15 identity
+        rebuild: role term chebi:10004 left Metabolite)."""
         row = api.gene_overview(["PMM0392"], conn=conn)["results"][0]
         assert "transporter_count" not in row
         assert row["tcdb_evidence_score_max"] == 0.8
-        assert row["transported_metabolite_count"] == 13
+        assert row["transported_metabolite_count"] == 12
         assert row["transport_substrate_resolution"] == "resolved"
         assert "transport" in row["evidence_sources"]
 
@@ -2923,7 +2928,7 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
 
     def test_mbg_pmm0392_transport_metabolites_equal_gene_overview_count(self, conn):
         """(i) distinct metabolites in metabolites_by_gene(['PMM0392'])
-        transport rows == gene_overview.transported_metabolite_count == 13
+        transport rows == gene_overview.transported_metabolite_count == 12
         (all-edges semantics gave 554 — the superseded 3.A.1 rollup)."""
         mbg = api.metabolites_by_gene(
             ["PMM0392"], self._MED4, evidence_sources=["transport"],
@@ -2931,11 +2936,11 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
         )
         assert not mbg["truncated"]
         mets = {r["metabolite_id"] for r in mbg["results"]}
-        assert len(mets) == 13
+        assert len(mets) == 12
         ov = api.gene_overview(["PMM0392"], conn=conn)["results"][0]
-        assert len(mets) == ov["transported_metabolite_count"] == 13
+        assert len(mets) == ov["transported_metabolite_count"] == 12
         by_gene = next(g for g in mbg["by_gene"] if g["locus_tag"] == "PMM0392")
-        assert by_gene["metabolite_count"] == 13
+        assert by_gene["metabolite_count"] == 12
         assert by_gene["transport_substrate_resolution"] == "resolved"
         assert by_gene["tcdb_evidence_score_max"] == 0.8
         # decision 5 caveat: resolved genes do not trigger the gene-anchored
@@ -3246,7 +3251,7 @@ class TestListMetaboliteAssays:
         result = list_metabolite_assays(conn=conn)
         assert result["total_entries"] == 14
         assert result["total_matching"] == 14
-        assert result["metabolite_count_total"] == 1044  # cumulative-across-assays
+        assert result["metabolite_count_total"] == 1050  # cumulative-across-assays (1044 → 1050: 2026-10-15 GSH/GSSG split + repoints)
         assert len(result["results"]) == 14
 
     def test_value_kind_numeric(self, conn):
@@ -3530,9 +3535,11 @@ class TestMetabolitesByFlagsAssayKG:
 
     def test_msystems_top5_alphabetical_true(self, conn):
         """§7: top-5 detail rows are flag_value=true; expected names
-        S-adenosyl-L-methionine, tyrosine, NADH, AMP, S-Adenosyl-L-homocysteine
-        (sort key: flag_value DESC, m.id ASC). At least 4 of these surface
-        in the top-5."""
+        NAD+, S-Adenosyl-L-methionine, AMP, S-Adenosyl-L-homocysteine,
+        L-Glutamate (sort key: flag_value DESC, m.id ASC). At least 4 of these
+        surface in the top-5. Re-pinned at the 2026-10-15 identity rebuild:
+        tyrosine / SAM moved off measurement-only chebi: nodes onto C00082 /
+        C00019, and names are now KEGG names."""
         from multiomics_explorer.api import metabolites_by_flags_assay
         result = metabolites_by_flags_assay(
             assay_ids=[_MSYSTEMS_PRESENCE_FLAGS_ASSAY], limit=5, conn=conn)
@@ -3541,8 +3548,8 @@ class TestMetabolitesByFlagsAssayKG:
         assert all(r["flag_value"] is True for r in result["results"])
         names = [r["name"] for r in result["results"]]
         expected = {
-            "S-adenosyl-L-methionine", "tyrosine", "NADH",
-            "AMP", "S-Adenosyl-L-homocysteine",
+            "NAD+", "S-Adenosyl-L-methionine", "AMP",
+            "S-Adenosyl-L-homocysteine", "L-Glutamate",
         }
         match_count = sum(1 for n in names if n in expected)
         assert match_count >= 4, (

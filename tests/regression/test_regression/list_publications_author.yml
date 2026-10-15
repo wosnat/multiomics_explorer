@@ -161,7 +161,7 @@ rows:
   metabolite_compartments:
   - extracellular
   - whole_cell
-  metabolite_count: 99
+  metabolite_count: 96
   omics_types:
   - METABOLOMICS
   organisms:
@@ -258,7 +258,7 @@ rows:
   metabolite_compartments:
   - vesicle
   - whole_cell
-  metabolite_count: 69
+  metabolite_count: 70
   omics_types:
   - METABOLOMICS
   - VESICLE_PROTEOMICS

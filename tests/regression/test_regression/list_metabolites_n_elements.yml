@@ -1,33 +1,33 @@
 by_evidence_source:
-- count: 1230
+- count: 1228
   evidence_source: metabolism
-- count: 656
+- count: 672
   evidence_source: transport
-- count: 106
+- count: 101
   evidence_source: metabolomics
 by_measurement_coverage:
   by_compartment:
   - compartment: extracellular
-    count: 71
+    count: 73
   - compartment: vesicle
-    count: 48
+    count: 54
   - compartment: whole_cell
-    count: 106
+    count: 101
   by_paper_count:
   - count: 1587
     paper_count: 0
-  - count: 85
+  - count: 68
     paper_count: 1
-  - count: 20
+  - count: 32
     paper_count: 2
   - count: 1
     paper_count: 3
 case_id: list_metabolites_n_elements
 mass_stats:
   mass_max: 5227.103
-  mass_median: 323.132
+  mass_median: 324.399
   mass_min: 18.039
-no_formula_excluded: 374
+no_formula_excluded: 237
 not_found:
   elements: []
   metabolite_ids: []
@@ -37,7 +37,7 @@ offset: 0
 resolved_aliases: {}
 results:
 - catalyst_gene_count: 6041
-  chebi_id: '10789'
+  chebi_id: '15422'
   elements:
   - C
   - H
@@ -94,7 +94,7 @@ results:
   transporter_count: 15
   transporter_gene_count: 2195
 - catalyst_gene_count: 3564
-  chebi_id: '13222'
+  chebi_id: '16761'
   elements:
   - C
   - H
@@ -143,7 +143,7 @@ results:
   transporter_count: 5
   transporter_gene_count: 862
 - catalyst_gene_count: 3302
-  chebi_id: '13393'
+  chebi_id: '15846'
   elements:
   - C
   - H
@@ -156,14 +156,15 @@ results:
   - transport
   formula: C21H26N7O14P2
   mass: 662.422
-  measured_assay_count: 4
+  measured_assay_count: 6
   measured_compartments:
   - vesicle
   - whole_cell
   measured_organisms:
+  - Prochlorococcus MIT9301
   - Prochlorococcus MIT9312
   - Prochlorococcus MIT9313
-  measured_paper_count: 1
+  measured_paper_count: 2
   metabolite_id: kegg.compound:C00003
   name: NAD+
   organism_count: 43
@@ -186,7 +187,7 @@ results:
   transporter_count: 4
   transporter_gene_count: 625
 - catalyst_gene_count: 3017
-  chebi_id: '13395'
+  chebi_id: '16908'
   elements:
   - C
   - H
@@ -199,7 +200,7 @@ results:
   - transport
   formula: C21H27N7O14P2
   mass: 663.43
-  measured_assay_count: 8
+  measured_assay_count: 6
   measured_compartments:
   - extracellular
   - whole_cell
@@ -221,7 +222,7 @@ results:
   transporter_count: 2
   transporter_gene_count: 129
 - catalyst_gene_count: 2464
-  chebi_id: '12056'
+  chebi_id: '16027'
   elements:
   - C
   - H
@@ -282,10 +283,10 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 896
+- count: 899
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 325
+- count: 327
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
 - count: 204
@@ -294,7 +295,7 @@ top_metabolite_pathways:
 - count: 182
   metabolite_pathway_id: kegg.pathway:ko01240
   metabolite_pathway_name: Biosynthesis of cofactors
-- count: 85
+- count: 86
   metabolite_pathway_id: kegg.pathway:ko00860
   metabolite_pathway_name: Porphyrin metabolism
 - count: 79
@@ -306,41 +307,41 @@ top_metabolite_pathways:
 - count: 71
   metabolite_pathway_id: kegg.pathway:ko00230
   metabolite_pathway_name: Purine metabolism
-- count: 65
+- count: 70
   metabolite_pathway_id: kegg.pathway:ko02010
   metabolite_pathway_name: ABC transporters
 - count: 57
   metabolite_pathway_id: kegg.pathway:ko00330
   metabolite_pathway_name: Arginine and proline metabolism
 top_organisms:
-- count: 1334
+- count: 1336
   organism_name: Pseudomonas putida KT2440
-- count: 1329
+- count: 1325
   organism_name: Ruegeria pomeroyi DSS-3
-- count: 1274
+- count: 1275
   organism_name: Alteromonas (MarRef v6)
-- count: 1272
+- count: 1273
   organism_name: Alteromonas mediterranea AltDE1
-- count: 1262
+- count: 1264
   organism_name: Alteromonas macleodii EZ55
-- count: 1262
+- count: 1264
   organism_name: Alteromonas macleodii MIT1002
-- count: 1258
+- count: 1260
   organism_name: Alteromonas mediterranea AltDE
-- count: 1258
+- count: 1260
   organism_name: Alteromonas macleodii BGP6
-- count: 1257
+- count: 1259
   organism_name: Alteromonas macleodii ATCC27126
-- count: 1255
+- count: 1257
   organism_name: Alteromonas macleodii HOT1A3
-total_entries: 3356
-total_matching: 1693
+total_entries: 3203
+total_matching: 1688
 truncated: true
 warnings:
-- 374 metabolites have no formula and can never match an element filter (often generic
+- 237 metabolites have no formula and can never match an element filter (often generic
   classes such as 'amino acid' or 'dipeptide'). Re-run without elements to inspect
   them.
 xref_coverage:
-  with_chebi: 1508
-  with_hmdb: 893
-  with_mnxm: 1693
+  with_chebi: 1620
+  with_hmdb: 891
+  with_mnxm: 1688

@@ -9,13 +9,15 @@ by_measurement_coverage:
   by_compartment:
   - compartment: extracellular
     count: 2
+  - compartment: vesicle
+    count: 2
   - compartment: whole_cell
     count: 2
   by_paper_count:
   - count: 16
     paper_count: 0
   - count: 2
-    paper_count: 1
+    paper_count: 2
 case_id: list_metabolites_pathway
 mass_stats:
   mass_max: 146.146
@@ -30,7 +32,7 @@ offset: 0
 resolved_aliases: {}
 results:
 - catalyst_gene_count: 2386
-  chebi_id: '13282'
+  chebi_id: '16526'
   elements:
   - C
   - O
@@ -76,7 +78,7 @@ results:
   transporter_count: 8
   transporter_gene_count: 228
 - catalyst_gene_count: 2106
-  chebi_id: '13405'
+  chebi_id: '16134'
   elements:
   - H
   - N
@@ -116,7 +118,7 @@ results:
   transporter_count: 9
   transporter_gene_count: 442
 - catalyst_gene_count: 1905
-  chebi_id: '13107'
+  chebi_id: '16015'
   elements:
   - C
   - H
@@ -128,15 +130,17 @@ results:
   - transport
   formula: C5H8NO4
   mass: 146.122
-  measured_assay_count: 8
+  measured_assay_count: 12
   measured_compartments:
   - extracellular
+  - vesicle
   - whole_cell
   measured_organisms:
   - Prochlorococcus MIT0801
   - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9312
   - Prochlorococcus MIT9313
-  measured_paper_count: 1
+  measured_paper_count: 2
   metabolite_id: kegg.compound:C00025
   name: L-Glutamate
   organism_count: 43
@@ -197,7 +201,7 @@ results:
   transporter_count: 5
   transporter_gene_count: 786
 - catalyst_gene_count: 1374
-  chebi_id: '10745'
+  chebi_id: '15379'
   elements:
   - O
   evidence_sources:
@@ -230,7 +234,7 @@ results:
   transporter_count: 4
   transporter_gene_count: 2248
 - catalyst_gene_count: 1096
-  chebi_id: '13110'
+  chebi_id: '18050'
   elements:
   - C
   - H
@@ -242,15 +246,17 @@ results:
   - transport
   formula: C5H10N2O3
   mass: 146.146
-  measured_assay_count: 8
+  measured_assay_count: 12
   measured_compartments:
   - extracellular
+  - vesicle
   - whole_cell
   measured_organisms:
   - Prochlorococcus MIT0801
   - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9312
   - Prochlorococcus MIT9313
-  measured_paper_count: 1
+  measured_paper_count: 2
   metabolite_id: kegg.compound:C00064
   name: L-Glutamine
   organism_count: 43
@@ -283,7 +289,7 @@ results:
   transporter_count: 12
   transporter_gene_count: 2365
 - catalyst_gene_count: 463
-  chebi_id: '13351'
+  chebi_id: '17544'
   elements:
   - C
   - H
@@ -322,7 +328,7 @@ results:
   transporter_count: 13
   transporter_gene_count: 1989
 - catalyst_gene_count: 373
-  chebi_id: '14276'
+  chebi_id: '30751'
   elements:
   - C
   - H
@@ -355,7 +361,7 @@ results:
   transporter_count: 5
   transporter_gene_count: 667
 - catalyst_gene_count: 183
-  chebi_id: '13942'
+  chebi_id: '17672'
   elements:
   - C
   - H
@@ -390,7 +396,7 @@ results:
   transporter_count: 1
   transporter_gene_count: 0
 - catalyst_gene_count: 129
-  chebi_id: '13941'
+  chebi_id: '28616'
   elements:
   - C
   - H
@@ -415,7 +421,7 @@ results:
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 98
-  chebi_id: '14658'
+  chebi_id: '25567'
   elements:
   - N
   - O
@@ -444,7 +450,7 @@ results:
   transporter_count: 8
   transporter_gene_count: 2347
 - catalyst_gene_count: 33
-  chebi_id: '25545'
+  chebi_id: '48107'
   elements:
   - H
   - N
@@ -469,10 +475,10 @@ results:
   - kegg.pathway:ko01310
   - kegg.pathway:ko02010
   - kegg.pathway:ko02020
-  transporter_count: 8
-  transporter_gene_count: 1737
+  transporter_count: 15
+  transporter_gene_count: 3549
 - catalyst_gene_count: 26
-  chebi_id: '14037'
+  chebi_id: '28024'
   elements:
   - C
   - N
@@ -497,7 +503,7 @@ results:
   transporter_count: 3
   transporter_gene_count: 2169
 - catalyst_gene_count: 7
-  chebi_id: '14661'
+  chebi_id: '17045'
   elements:
   - N
   - O
@@ -522,6 +528,7 @@ results:
   transporter_count: 2
   transporter_gene_count: 192
 - catalyst_gene_count: 20
+  chebi_id: '18379'
   elements:
   - C
   - N
@@ -543,7 +550,7 @@ results:
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 18
-  chebi_id: '14275'
+  chebi_id: '16397'
   elements:
   - C
   - H
@@ -570,7 +577,7 @@ results:
   transporter_count: 2
   transporter_gene_count: 8
 - catalyst_gene_count: 7
-  chebi_id: '14657'
+  chebi_id: '16480'
   elements:
   - N
   - O
@@ -585,7 +592,7 @@ results:
   metabolite_id: kegg.compound:C00533
   name: Nitric oxide
   organism_count: 2
-  pathway_count: 38
+  pathway_count: 39
   pathway_ids:
   - kegg.pathway:ko00330
   - kegg.pathway:ko00910
@@ -623,12 +630,13 @@ results:
   - kegg.pathway:ko05171
   - kegg.pathway:ko05200
   - kegg.pathway:ko05225
+  - kegg.pathway:ko05332
   - kegg.pathway:ko05415
   - kegg.pathway:ko05418
   transporter_count: 0
   transporter_gene_count: 0
 - catalyst_gene_count: 3
-  chebi_id: '10793'
+  chebi_id: '15429'
   elements:
   - H
   - N
@@ -654,7 +662,7 @@ results:
   transporter_count: 1
   transporter_gene_count: 8
 - catalyst_gene_count: 1
-  chebi_id: '13388'
+  chebi_id: '17997'
   elements:
   - N
   evidence_sources:
@@ -734,11 +742,11 @@ top_organisms:
   organism_name: Alteromonas mediterranea AltDE1
 - count: 15
   organism_name: Alteromonas macleodii BGP6
-total_entries: 3356
+total_entries: 3203
 total_matching: 18
 truncated: false
 warnings: []
 xref_coverage:
-  with_chebi: 17
+  with_chebi: 18
   with_hmdb: 16
   with_mnxm: 18

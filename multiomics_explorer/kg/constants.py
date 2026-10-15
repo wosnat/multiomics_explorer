@@ -61,13 +61,18 @@ VALID_OMICS_TYPES: set[str] = {
 # loses spent_medium / lysate, KG contract v2; + Cyanorak coordinate fallback:
 # new closed vocabs Gene.coordinate_source / Gene.sequence_source {ncbi, cyanorak};
 # + coculture partner list: new edge vocab Tests_coculture_with.partner_role
-# {treatment, background}, revised `coculture` value descriptions,
-# built 2026-10-13T13:51Z). The recipe lives KG-side (docs/kg-changes/
+# {treatment, background}, revised `coculture` value descriptions;
+# + metabolite identity + classes + chemical roles: new vocabs
+# Metabolite.structure_kind / .identity_basis / .kegg_compound_categories,
+# MetaboliteClass.level_kind / .tree, ChemicalRole.level_kind,
+# TcdbFamily.substrate_breadth, assay-edge stereo_assignment, sources/evidence
+# on the 3 new curated edges, Tcdb_family_transports_chemical_role.substrate_depth,
+# built 2026-10-15T16:26Z). The recipe lives KG-side (docs/kg-changes/
 # vocabulary-contract.md). A mismatch means baked docs / parameter descriptions
 # may list stale values — filters still validate live. Must equal the live
 # KG's value at release cut.
 EXPECTED_CONTROLLED_VOCABULARIES_HASH: str = (
-    "sha256:6f01dce46215421c006c1e7af41d79953e034783d82521a7b55b0d392f2939df"
+    "sha256:f09cfcaa44d9628d1ac78d73e0aa486ac8b5aa64f35f07a0a6d680d32a9ad03c"
 )
 
 EXPECTED_KG_SHAPE: dict[str, tuple[str, ...] | str] = {

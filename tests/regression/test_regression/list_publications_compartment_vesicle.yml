@@ -76,7 +76,7 @@ rows:
   metabolite_compartments:
   - vesicle
   - whole_cell
-  metabolite_count: 69
+  metabolite_count: 70
   omics_types:
   - METABOLOMICS
   - VESICLE_PROTEOMICS

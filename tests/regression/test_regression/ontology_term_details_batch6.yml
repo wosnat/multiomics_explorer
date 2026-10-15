@@ -517,7 +517,7 @@ results:
     ''target_id'': ''go:0048046'', ''target_ontology'': ''go_cc'', ''target_name'':
     ''apoplast''}'
   member_count: 55
-  metabolite_count: 554
+  metabolite_count: 518
   name: The ATP-binding Cassette (ABC) Superfamily
   ontology: tcdb
   organism_count: 43

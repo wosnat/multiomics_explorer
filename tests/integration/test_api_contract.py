@@ -1438,7 +1438,7 @@ class TestPhase1PlumbingContract:
         assert row["reaction_count"] == 0
         assert "transporter_count" not in row
         assert row["tcdb_evidence_score_max"] == 0.8
-        assert row["transported_metabolite_count"] == 13
+        assert row["transported_metabolite_count"] == 12  # 13 → 12: role chebi:10004 left Metabolite (2026-10-15)
         assert row["transport_substrate_resolution"] == "resolved"
         assert "metabolism" not in row["evidence_sources"], (
             f"PMM0392 has reaction_count=0 but evidence_sources contains "

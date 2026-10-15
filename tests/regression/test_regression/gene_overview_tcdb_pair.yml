@@ -169,7 +169,7 @@ results:
   tcdb_evidence_score_max: 0.8
   tcdb_family_count: 7
   transport_substrate_resolution: resolved
-  transported_metabolite_count: 13
+  transported_metabolite_count: 12
 returned: 2
 row_count: 2
 top_discussing_publications:

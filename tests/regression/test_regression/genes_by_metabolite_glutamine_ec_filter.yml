@@ -36,7 +36,7 @@ results:
   gene_name: murJ
   locus_tag: PMM0261
   mass_balance: null
-  metabolite_chebi_id: '13110'
+  metabolite_chebi_id: '18050'
   metabolite_formula: C5H10N2O3
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
@@ -54,7 +54,7 @@ results:
   gene_name: ftsE
   locus_tag: PMM0434
   mass_balance: null
-  metabolite_chebi_id: '13110'
+  metabolite_chebi_id: '18050'
   metabolite_formula: C5H10N2O3
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
@@ -72,7 +72,7 @@ results:
   gene_name: ccmA
   locus_tag: PMM0449
   mass_balance: null
-  metabolite_chebi_id: '13110'
+  metabolite_chebi_id: '18050'
   metabolite_formula: C5H10N2O3
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
@@ -90,7 +90,7 @@ results:
   gene_name: ycf38
   locus_tag: PMM0450
   mass_balance: null
-  metabolite_chebi_id: '13110'
+  metabolite_chebi_id: '18050'
   metabolite_formula: C5H10N2O3
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
@@ -109,7 +109,7 @@ results:
   gene_name: glnA
   locus_tag: PMM0920
   mass_balance: balanced
-  metabolite_chebi_id: '13110'
+  metabolite_chebi_id: '18050'
   metabolite_formula: C5H10N2O3
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146

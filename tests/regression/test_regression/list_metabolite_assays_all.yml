@@ -79,7 +79,7 @@ rows:
   publication_doi: 10.1128/msystems.01261-22
   rankable: false
   timepoints: []
-  total_metabolite_count: 92
+  total_metabolite_count: 93
   treatment_type:
   - phosphorus
   unit: ''
@@ -108,7 +108,7 @@ rows:
   publication_doi: 10.1128/msystems.01261-22
   rankable: false
   timepoints: []
-  total_metabolite_count: 92
+  total_metabolite_count: 93
   treatment_type:
   - phosphorus
   unit: ''
@@ -236,7 +236,7 @@ rows:
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
   timepoints: []
-  total_metabolite_count: 69
+  total_metabolite_count: 70
   treatment_type:
   - compartment
   unit: relative peak area / biovolume
@@ -270,7 +270,7 @@ rows:
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
   timepoints: []
-  total_metabolite_count: 69
+  total_metabolite_count: 70
   treatment_type:
   - compartment
   unit: relative peak area / biovolume
@@ -303,7 +303,7 @@ rows:
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
   timepoints: []
-  total_metabolite_count: 69
+  total_metabolite_count: 70
   treatment_type:
   - compartment
   unit: relative peak area / biovolume
@@ -334,7 +334,7 @@ rows:
   publication_doi: 10.1111/1462-2920.15834
   rankable: true
   timepoints: []
-  total_metabolite_count: 69
+  total_metabolite_count: 70
   treatment_type:
   - compartment
   unit: relative peak area / biovolume

@@ -531,7 +531,7 @@ search_ontology(search_text="nitrate", limit=2)
 ```example-response
 {
   "mode": "search",
-  "total_entries": 49144,
+  "total_entries": 49149,
   "total_matching": 155,
   "score_max": 7.6005682945251465,
   "score_median": 3.41845965385437,
@@ -573,9 +573,9 @@ search_ontology(search_text="nitrate", limit=2)
     },
     {
       "ontology": "kegg",
-      "total_entries": 5143,
+      "total_entries": 5148,
       "total_matching": 20,
-      "score_max": 2.7984232902526855,
+      "score_max": 2.7983765602111816,
       "returned": 2,
       "truncated": true
     },
@@ -1034,19 +1034,19 @@ search_ontology(search_text="transport", ontology=["kegg"], informative_only=Tru
 ```example-response
 {
   "mode": "search",
-  "total_entries": 5143,
+  "total_entries": 5148,
   "total_matching": 329,
-  "score_max": 1.7505996227264404,
-  "score_median": 1.155104637145996,
+  "score_max": 1.7510488033294678,
+  "score_median": 1.1552175283432007,
   "returned": 5,
   "offset": 0,
   "truncated": true,
   "by_ontology": [
     {
       "ontology": "kegg",
-      "total_entries": 5143,
+      "total_entries": 5148,
       "total_matching": 329,
-      "score_max": 1.7505996227264404,
+      "score_max": 1.7510488033294678,
       "returned": 5,
       "truncated": true
     }
@@ -1061,7 +1061,7 @@ search_ontology(search_text="transport", ontology=["kegg"], informative_only=Tru
       "id": "kegg.subcategory:09131",
       "name": "Membrane transport",
       "ontology_type": "kegg",
-      "score": 1.7505996227264404,
+      "score": 1.7510488033294678,
       "level": 1,
       "is_informative": true,
       "discussed_by_n_publications": 0,
@@ -1072,7 +1072,7 @@ search_ontology(search_text="transport", ontology=["kegg"], informative_only=Tru
       "id": "kegg.subcategory:09141",
       "name": "Transport and catabolism",
       "ontology_type": "kegg",
-      "score": 1.6120857000350952,
+      "score": 1.612439751625061,
       "level": 1,
       "is_informative": true,
       "discussed_by_n_publications": 0,
@@ -1083,7 +1083,7 @@ search_ontology(search_text="transport", ontology=["kegg"], informative_only=Tru
       "id": "kegg.orthology:K06197",
       "name": "chaB; cation transport regulator",
       "ontology_type": "kegg",
-      "score": 1.4938839673995972,
+      "score": 1.4941649436950684,
       "level": 3,
       "is_informative": true,
       "discussed_by_n_publications": 0,
@@ -1104,19 +1104,19 @@ search_ontology(search_text="calvin", ontology=["kegg"])
 ```example-response
 {
   "mode": "search",
-  "total_entries": 5143,
+  "total_entries": 5148,
   "total_matching": 1,
-  "score_max": 4.122867107391357,
-  "score_median": 4.122867107391357,
+  "score_max": 4.122564792633057,
+  "score_median": 4.122564792633057,
   "returned": 1,
   "offset": 0,
   "truncated": false,
   "by_ontology": [
     {
       "ontology": "kegg",
-      "total_entries": 5143,
+      "total_entries": 5148,
       "total_matching": 1,
-      "score_max": 4.122867107391357,
+      "score_max": 4.122564792633057,
       "returned": 1,
       "truncated": false
     }
@@ -1131,7 +1131,7 @@ search_ontology(search_text="calvin", ontology=["kegg"])
       "id": "kegg.pathway:ko00710",
       "name": "Carbon fixation by Calvin cycle",
       "ontology_type": "kegg",
-      "score": 4.122867107391357,
+      "score": 4.122564792633057,
       "level": 2,
       "is_informative": true,
       "discussed_by_n_publications": 23,

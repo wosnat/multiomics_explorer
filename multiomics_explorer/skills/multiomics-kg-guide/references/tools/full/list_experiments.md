@@ -509,7 +509,7 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
       "derived_metric_count": 0,
       "derived_metric_value_kinds": [],
       "compartment": "whole_cell",
-      "metabolite_count": 99,
+      "metabolite_count": 96,
       "metabolite_assay_count": 3,
       "metabolite_compartments": ["whole_cell"]
     },

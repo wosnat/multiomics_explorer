@@ -88,9 +88,9 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
 {
   "results": [
     {
-      "metabolite_id": "chebi:142094",
-      "name": "S-adenosyl-L-methionine",
-      "kegg_compound_id": null,
+      "metabolite_id": "kegg.compound:C00003",
+      "name": "NAD+",
+      "kegg_compound_id": "C00003",
       "flag_value": true,
       "n_positive": 1,
       "n_replicates": 1,
@@ -101,9 +101,9 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
       "compartment": "whole_cell"
     },
     {
-      "metabolite_id": "chebi:173245",
-      "name": "Tyrosine",
-      "kegg_compound_id": null,
+      "metabolite_id": "kegg.compound:C00019",
+      "name": "S-Adenosyl-L-methionine",
+      "kegg_compound_id": "C00019",
       "flag_value": true,
       "n_positive": 1,
       "n_replicates": 1,
@@ -114,9 +114,9 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
       "compartment": "whole_cell"
     },
     {
-      "metabolite_id": "kegg.compound:C00004",
-      "name": "NADH",
-      "kegg_compound_id": "C00004",
+      "metabolite_id": "kegg.compound:C00020",
+      "name": "AMP",
+      "kegg_compound_id": "C00020",
       "flag_value": true,
       "n_positive": 1,
       "n_replicates": 1,

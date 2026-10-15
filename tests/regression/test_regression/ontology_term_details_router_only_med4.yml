@@ -123,7 +123,7 @@ results:
   level_kind: tc_family
   links_out: []
   member_count: 55
-  metabolite_count: 554
+  metabolite_count: 518
   name: The ATP-binding Cassette (ABC) Superfamily
   ontology: tcdb
   organism_count: 43

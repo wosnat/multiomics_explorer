@@ -32,7 +32,7 @@ results:
   gene_name: urtA
   locus_tag: PMM0970
   mass_balance: null
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
@@ -50,7 +50,7 @@ results:
   gene_name: urtA
   locus_tag: PMM0970
   mass_balance: null
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
@@ -68,7 +68,7 @@ results:
   gene_name: urtB
   locus_tag: PMM0971
   mass_balance: null
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
@@ -86,7 +86,7 @@ results:
   gene_name: urtB
   locus_tag: PMM0971
   mass_balance: null
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
@@ -104,7 +104,7 @@ results:
   gene_name: urtC
   locus_tag: PMM0972
   mass_balance: null
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
@@ -122,7 +122,7 @@ results:
   gene_name: urtC
   locus_tag: PMM0972
   mass_balance: null
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
@@ -140,7 +140,7 @@ results:
   gene_name: urtD
   locus_tag: PMM0973
   mass_balance: null
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
@@ -158,7 +158,7 @@ results:
   gene_name: urtD
   locus_tag: PMM0973
   mass_balance: null
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
@@ -176,7 +176,7 @@ results:
   gene_name: urtE
   locus_tag: PMM0974
   mass_balance: null
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
@@ -194,7 +194,7 @@ results:
   gene_name: urtE
   locus_tag: PMM0974
   mass_balance: null
-  metabolite_chebi_id: '134711'
+  metabolite_chebi_id: '16199'
   metabolite_formula: CH4N2O
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056

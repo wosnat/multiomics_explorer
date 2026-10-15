@@ -392,7 +392,7 @@ rows:
   metabolite_assay_count: 1
   metabolite_compartments:
   - vesicle
-  metabolite_count: 69
+  metabolite_count: 70
   omics_type: METABOLOMICS
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1111/1462-2920.15834
@@ -488,7 +488,7 @@ rows:
   metabolite_assay_count: 1
   metabolite_compartments:
   - vesicle
-  metabolite_count: 69
+  metabolite_count: 70
   omics_type: METABOLOMICS
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1111/1462-2920.15834

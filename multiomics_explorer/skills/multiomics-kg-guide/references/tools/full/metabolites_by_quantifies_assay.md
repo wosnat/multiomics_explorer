@@ -108,9 +108,9 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:met
 {
   "results": [
     {
-      "metabolite_id": "kegg.compound:C00085",
-      "name": "D-Fructose 6-phosphate",
-      "kegg_compound_id": "C00085",
+      "metabolite_id": "kegg.compound:C05345",
+      "name": "beta-D-Fructose 6-phosphate",
+      "kegg_compound_id": "C05345",
       "value": 0.4465,
       "value_sd": 0.0643467170879758,
       "n_replicates": 2,
@@ -130,9 +130,9 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:met
       "compartment": "whole_cell"
     },
     {
-      "metabolite_id": "kegg.compound:C00085",
-      "name": "D-Fructose 6-phosphate",
-      "kegg_compound_id": "C00085",
+      "metabolite_id": "kegg.compound:C05345",
+      "name": "beta-D-Fructose 6-phosphate",
+      "kegg_compound_id": "C05345",
       "value": 0.289,
       "value_sd": 0.26416093579482947,
       "n_replicates": 3,
@@ -152,9 +152,9 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:met
       "compartment": "whole_cell"
     },
     {
-      "metabolite_id": "kegg.compound:C00085",
-      "name": "D-Fructose 6-phosphate",
-      "kegg_compound_id": "C00085",
+      "metabolite_id": "kegg.compound:C05345",
+      "name": "beta-D-Fructose 6-phosphate",
+      "kegg_compound_id": "C05345",
       "value": 0.2385,
       "value_sd": 0.03747665940288703,
       "n_replicates": 2,

@@ -62,7 +62,7 @@ results:
   gene_name: carB
   locus_tag: PMM0825
   mass_balance: balanced
-  metabolite_chebi_id: '13110'
+  metabolite_chebi_id: '18050'
   metabolite_formula: C5H10N2O3
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
@@ -81,7 +81,7 @@ results:
   gene_name: glnA
   locus_tag: PMM0920
   mass_balance: balanced
-  metabolite_chebi_id: '13110'
+  metabolite_chebi_id: '18050'
   metabolite_formula: C5H10N2O3
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
@@ -115,7 +115,7 @@ results:
   gene_name: carA
   locus_tag: PMM0951
   mass_balance: balanced
-  metabolite_chebi_id: '13110'
+  metabolite_chebi_id: '18050'
   metabolite_formula: C5H10N2O3
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
@@ -134,7 +134,7 @@ results:
   gene_name: nadE
   locus_tag: PMM1446
   mass_balance: balanced
-  metabolite_chebi_id: '13110'
+  metabolite_chebi_id: '18050'
   metabolite_formula: C5H10N2O3
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
@@ -154,7 +154,7 @@ results:
   gene_name: glsF
   locus_tag: PMM1512
   mass_balance: balanced
-  metabolite_chebi_id: '13110'
+  metabolite_chebi_id: '18050'
   metabolite_formula: C5H10N2O3
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146

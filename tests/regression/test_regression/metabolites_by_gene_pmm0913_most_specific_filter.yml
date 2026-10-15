@@ -1,47 +1,47 @@
 by_element:
 - element: C
-  metabolite_count: 149
+  metabolite_count: 155
 - element: H
-  metabolite_count: 146
+  metabolite_count: 153
 - element: O
-  metabolite_count: 135
+  metabolite_count: 141
 - element: N
-  metabolite_count: 94
+  metabolite_count: 99
 - element: S
-  metabolite_count: 27
+  metabolite_count: 29
 - element: Cl
   metabolite_count: 21
 - element: P
   metabolite_count: 11
-- element: As
-  metabolite_count: 3
 - element: F
+  metabolite_count: 4
+- element: As
   metabolite_count: 3
 - element: Br
   metabolite_count: 2
 by_element_truncated: true
 by_evidence_source:
-- count: 242
+- count: 217
   evidence_source: transport
 by_gene:
 - gene_name: salY
   locus_tag: PMM0913
   metabolism_rows: 0
-  metabolite_count: 242
+  metabolite_count: 217
   product: putative ABC efflux system
   reaction_count: 0
-  rows: 242
+  rows: 217
   tcdb_evidence_score_max: 0.8
   transport_inherited_rows: 0
-  transport_most_specific_rows: 242
+  transport_most_specific_rows: 217
   transport_substrate_resolution: family_inferred
   transporter_count: 1
 by_substrate_depth:
-- count: 242
+- count: 217
   substrate_depth: most_specific
 case_id: metabolites_by_gene_pmm0913_most_specific_filter
 gene_count_total: 1
-metabolite_count_total: 242
+metabolite_count_total: 217
 not_found:
   locus_tags: []
   metabolite_elements: []
@@ -58,97 +58,11 @@ results:
   gene_name: salY
   locus_tag: PMM0913
   mass_balance: null
-  metabolite_chebi_id: '10074'
-  metabolite_id: chebi:10074
-  metabolite_name: xenobiotic
-  product: putative ABC efflux system
-  reaction_id: null
-  reaction_name: null
-  substrate_depth: most_specific
-  tcdb_evidence_score: 0.8
-  tcdb_family_id: tcdb:3.A.1
-  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-  transport_substrate_resolution: family_inferred
-- ec_numbers: null
-  evidence_source: transport
-  gene_name: salY
-  locus_tag: PMM0913
-  mass_balance: null
   metabolite_chebi_id: '104011'
   metabolite_formula: C9H9N2O3
   metabolite_id: chebi:104011
   metabolite_mass: 193.182
-  metabolite_name: 4-aminohippurate
-  product: putative ABC efflux system
-  reaction_id: null
-  reaction_name: null
-  substrate_depth: most_specific
-  tcdb_evidence_score: 0.8
-  tcdb_family_id: tcdb:3.A.1
-  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-  transport_substrate_resolution: family_inferred
-- ec_numbers: null
-  evidence_source: transport
-  gene_name: salY
-  locus_tag: PMM0913
-  mass_balance: null
-  metabolite_chebi_id: '11148'
-  metabolite_formula: C10H19NO8P*2
-  metabolite_id: chebi:11148
-  metabolite_name: 1,2-diacyl-sn-glycero-3-phosphocholine(1+)
-  product: putative ABC efflux system
-  reaction_id: null
-  reaction_name: null
-  substrate_depth: most_specific
-  tcdb_evidence_score: 0.8
-  tcdb_family_id: tcdb:3.A.1
-  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-  transport_substrate_resolution: family_inferred
-- ec_numbers: null
-  evidence_source: transport
-  gene_name: salY
-  locus_tag: PMM0913
-  mass_balance: null
-  metabolite_chebi_id: '11685'
-  metabolite_formula: C14H12O3
-  metabolite_id: chebi:11685
-  metabolite_mass: 228.247
-  metabolite_name: resveratrol
-  product: putative ABC efflux system
-  reaction_id: null
-  reaction_name: null
-  substrate_depth: most_specific
-  tcdb_evidence_score: 0.8
-  tcdb_family_id: tcdb:3.A.1
-  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-  transport_substrate_resolution: family_inferred
-- ec_numbers: null
-  evidence_source: transport
-  gene_name: salY
-  locus_tag: PMM0913
-  mass_balance: null
-  metabolite_chebi_id: '11978'
-  metabolite_formula: C9H7O3
-  metabolite_id: chebi:11978
-  metabolite_mass: 163.152
-  metabolite_name: 4-coumarate
-  product: putative ABC efflux system
-  reaction_id: null
-  reaction_name: null
-  substrate_depth: most_specific
-  tcdb_evidence_score: 0.8
-  tcdb_family_id: tcdb:3.A.1
-  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-  transport_substrate_resolution: family_inferred
-- ec_numbers: null
-  evidence_source: transport
-  gene_name: salY
-  locus_tag: PMM0913
-  mass_balance: null
-  metabolite_chebi_id: '12487'
-  metabolite_formula: C4H6NO2*3
-  metabolite_id: chebi:12487
-  metabolite_name: a ceramide
+  metabolite_name: p-aminohippuric acid
   product: putative ABC efflux system
   reaction_id: null
   reaction_name: null
@@ -182,7 +96,7 @@ results:
   metabolite_formula: C11H6N2O6S3
   metabolite_id: chebi:133462
   metabolite_mass: 358.378
-  metabolite_name: firefly D-sulfoluciferin
+  metabolite_name: firefly sulfoluciferin
   product: putative ABC efflux system
   reaction_id: null
   reaction_name: null
@@ -212,10 +126,89 @@ results:
   gene_name: salY
   locus_tag: PMM0913
   mass_balance: null
-  metabolite_chebi_id: '13688'
-  metabolite_formula: C19H31O*
-  metabolite_id: chebi:13688
-  metabolite_name: a sterol
+  metabolite_chebi_id: '22315'
+  metabolite_id: chebi:22315
+  metabolite_name: alkaloid
+  product: putative ABC efflux system
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1
+  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: salY
+  locus_tag: PMM0913
+  mass_balance: null
+  metabolite_chebi_id: '22563'
+  metabolite_id: chebi:22563
+  metabolite_name: anion
+  product: putative ABC efflux system
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1
+  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: salY
+  locus_tag: PMM0913
+  mass_balance: null
+  metabolite_chebi_id: '23219'
+  metabolite_id: chebi:23219
+  metabolite_name: bile acid taurine conjugate
+  product: putative ABC efflux system
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1
+  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: salY
+  locus_tag: PMM0913
+  mass_balance: null
+  metabolite_chebi_id: '23403'
+  metabolite_id: chebi:23403
+  metabolite_name: coumarins
+  product: putative ABC efflux system
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1
+  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: salY
+  locus_tag: PMM0913
+  mass_balance: null
+  metabolite_chebi_id: '23447'
+  metabolite_id: chebi:23447
+  metabolite_name: cyclic nucleotide
+  product: putative ABC efflux system
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1
+  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
+  transport_substrate_resolution: family_inferred
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: salY
+  locus_tag: PMM0913
+  mass_balance: null
+  metabolite_chebi_id: '23765'
+  metabolite_id: chebi:23765
+  metabolite_name: quinolone
   product: putative ABC efflux system
   reaction_id: null
   reaction_name: null
@@ -282,56 +275,11 @@ top_metabolite_pathways:
   pathway_reaction_count: 8
 top_metabolite_pathways_truncated: true
 top_metabolites:
-- formula: null
-  gene_count: 1
-  metabolism_rows: 0
-  metabolite_id: chebi:10074
-  name: xenobiotic
-  reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
-  transporter_count: 1
 - formula: C9H9N2O3
   gene_count: 1
   metabolism_rows: 0
   metabolite_id: chebi:104011
-  name: 4-aminohippurate
-  reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
-  transporter_count: 1
-- formula: C10H19NO8P*2
-  gene_count: 1
-  metabolism_rows: 0
-  metabolite_id: chebi:11148
-  name: 1,2-diacyl-sn-glycero-3-phosphocholine(1+)
-  reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
-  transporter_count: 1
-- formula: C14H12O3
-  gene_count: 1
-  metabolism_rows: 0
-  metabolite_id: chebi:11685
-  name: resveratrol
-  reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
-  transporter_count: 1
-- formula: C9H7O3
-  gene_count: 1
-  metabolism_rows: 0
-  metabolite_id: chebi:11978
-  name: 4-coumarate
-  reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
-  transporter_count: 1
-- formula: C4H6NO2*3
-  gene_count: 1
-  metabolism_rows: 0
-  metabolite_id: chebi:12487
-  name: a ceramide
+  name: p-aminohippuric acid
   reaction_count: 0
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
@@ -349,7 +297,7 @@ top_metabolites:
   gene_count: 1
   metabolism_rows: 0
   metabolite_id: chebi:133462
-  name: firefly D-sulfoluciferin
+  name: firefly sulfoluciferin
   reaction_count: 0
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
@@ -363,11 +311,56 @@ top_metabolites:
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
   transporter_count: 1
-- formula: C19H31O*
+- formula: null
   gene_count: 1
   metabolism_rows: 0
-  metabolite_id: chebi:13688
-  name: a sterol
+  metabolite_id: chebi:22315
+  name: alkaloid
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: null
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: chebi:22563
+  name: anion
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: null
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: chebi:23219
+  name: bile acid taurine conjugate
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: null
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: chebi:23403
+  name: coumarins
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: null
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: chebi:23447
+  name: cyclic nucleotide
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: null
+  gene_count: 1
+  metabolism_rows: 0
+  metabolite_id: chebi:23765
+  name: quinolone
   reaction_count: 0
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
@@ -376,11 +369,11 @@ top_reactions: []
 top_tcdb_families:
 - gene_count: 1
   level_kind: tc_family
-  metabolite_count: 242
+  metabolite_count: 217
   substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-total_matching: 242
+total_matching: 217
 transporter_count_total: 1
 truncated: true
 warnings: []

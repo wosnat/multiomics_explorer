@@ -113,7 +113,7 @@ list_metabolite_assays(summary=True)
 {
   "total_entries": 14,
   "total_matching": 14,
-  "metabolite_count_total": 1044,
+  "metabolite_count_total": 1050,
   "by_organism": [
     {"organism_name": "Prochlorococcus MIT9313", "count": 5},
     {"organism_name": "Prochlorococcus MIT9301", "count": 4},

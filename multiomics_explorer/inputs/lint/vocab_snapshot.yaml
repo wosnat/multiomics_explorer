@@ -2,7 +2,7 @@
 # Live ControlledVocabulary values for the properties the docs quote.
 # tests/unit/test_docs_lint.py reads this offline; the -m kg test in
 # tests/integration/test_docs_kg_claims.py asserts it matches the live KG.
-kg_built_at: '2026-10-13T13:51:35.522Z'
+kg_built_at: '2026-10-15T16:26:50.706Z'
 vocabularies:
   attachment_depth:
     Gene_has_tcdb_family:
@@ -146,6 +146,18 @@ vocabularies:
       - curated
       - domain_inferred
       - family_inferred
+    Metabolite_in_metabolite_class:
+      closed: true
+      values:
+      - curated
+    Metabolite_is_enantiomer_of:
+      closed: true
+      values:
+      - curated
+    Metabolite_is_stereo_form_of:
+      closed: true
+      values:
+      - curated
   omics_type:
     Experiment:
       closed: true
@@ -237,7 +249,24 @@ vocabularies:
       - interproscan
       - ncbi
       - uniprot
+    Metabolite_in_metabolite_class:
+      closed: true
+      values:
+      - kegg
+    Metabolite_is_enantiomer_of:
+      closed: true
+      values:
+      - chebi
+    Metabolite_is_stereo_form_of:
+      closed: true
+      values:
+      - chebi
   substrate_depth:
+    Tcdb_family_transports_chemical_role:
+      closed: true
+      values:
+      - inherited
+      - most_specific
     Tcdb_family_transports_metabolite:
       closed: true
       values:

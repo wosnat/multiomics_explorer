@@ -138,6 +138,7 @@ gene_overview(locus_tags=["PMM1428"])
   "offset": 0,
   "truncated": false,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "locus_tag": "PMM1428",
@@ -235,6 +236,7 @@ gene_overview(locus_tags=["MIT1002_01809"])
   "offset": 0,
   "truncated": false,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "locus_tag": "MIT1002_01809",
@@ -314,6 +316,7 @@ gene_overview(locus_tags=["PMM0392", "PMM0001"])
   "offset": 0,
   "truncated": false,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "locus_tag": "PMM0001",
@@ -369,7 +372,7 @@ gene_overview(locus_tags=["PMM0392", "PMM0001"])
       "reaction_count": 0,
       "catalyzed_metabolite_count": 0,
       "tcdb_evidence_score_max": 0.8,
-      "transported_metabolite_count": 13,
+      "transported_metabolite_count": 12,
       "transport_substrate_resolution": "resolved",
       "evidence_sources": ["transport", "metabolomics"],
       "merops_classes": [],
@@ -419,6 +422,7 @@ gene_overview(locus_tags=["HP15_1897"])
   "offset": 0,
   "truncated": false,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "locus_tag": "HP15_1897",
@@ -492,6 +496,7 @@ gene_overview(locus_tags=["MIT1002_03660"])
   "offset": 0,
   "truncated": false,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "locus_tag": "MIT1002_03660",
@@ -564,6 +569,7 @@ gene_overview(locus_tags=["PMT2118", "PMT_1030"])
   "offset": 0,
   "truncated": false,
   "not_found": [],
+  "warnings": [],
   "results": [
     {
       "locus_tag": "PMT2118",

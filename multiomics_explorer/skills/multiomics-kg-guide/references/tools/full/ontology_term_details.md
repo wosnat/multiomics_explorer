@@ -126,6 +126,7 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
     {"link_kind": "router", "count": 7},
     {"link_kind": "membership", "count": 1}
   ],
+  "resolved_aliases": {},
   "warnings": [],
   "results": [
     {
@@ -144,7 +145,7 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
       "tc_class_id": "tcdb:3",
       "member_count": 55,
       "superfamily": "ArsA ATPase (ArsA) Superfamily",
-      "metabolite_count": 554,
+      "metabolite_count": 518,
       "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters", "level": 1}],
       "children": [
         {"id": "tcdb:3.A.1.1", "name": "The Carbohydrate Uptake Transporter-1 (CUT1) Family", "level": 3},
@@ -315,6 +316,7 @@ ontology_term_details(term_ids=["tigr.role:energy_metabolism"])
   "by_ontology": [{"ontology": "tigr_role", "count": 1}],
   "links_out_total": 0,
   "by_link_kind": [],
+  "resolved_aliases": {},
   "warnings": [],
   "results": [
     {
@@ -371,6 +373,7 @@ ontology_term_details(term_ids=["tcdb:3.A.1"], link_kinds=["composition"])
   "by_ontology": [{"ontology": "tcdb", "count": 1}],
   "links_out_total": 129,
   "by_link_kind": [{"link_kind": "composition", "count": 129}],
+  "resolved_aliases": {},
   "warnings": [],
   "results": [
     {
@@ -389,7 +392,7 @@ ontology_term_details(term_ids=["tcdb:3.A.1"], link_kinds=["composition"])
       "tc_class_id": "tcdb:3",
       "member_count": 55,
       "superfamily": "ArsA ATPase (ArsA) Superfamily",
-      "metabolite_count": 554,
+      "metabolite_count": 518,
       "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters", "level": 1}],
       "children": [
         {"id": "tcdb:3.A.1.1", "name": "The Carbohydrate Uptake Transporter-1 (CUT1) Family", "level": 3},
@@ -460,6 +463,7 @@ ontology_term_details(term_ids=["interpro:IPR000362"], verbose=True)
   "by_ontology": [{"ontology": "interpro", "count": 1}],
   "links_out_total": 5,
   "by_link_kind": [{"link_kind": "router", "count": 5}],
+  "resolved_aliases": {},
   "warnings": [],
   "results": [
     {
@@ -572,6 +576,7 @@ ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", ve
   "by_ontology": [{"ontology": "go_bp", "count": 1}, {"ontology": "tcdb", "count": 1}],
   "links_out_total": 129,
   "by_link_kind": [{"link_kind": "composition", "count": 129}],
+  "resolved_aliases": {},
   "warnings": [],
   "results": [
     {
@@ -624,7 +629,7 @@ ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", ve
       "tc_class_id": "tcdb:3",
       "member_count": 55,
       "superfamily": "ArsA ATPase (ArsA) Superfamily",
-      "metabolite_count": 554,
+      "metabolite_count": 518,
       "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters", "level": 1}],
       "children": [
         {"id": "tcdb:3.A.1.1", "name": "The Carbohydrate Uptake Transporter-1 (CUT1) Family", "level": 3},
@@ -695,7 +700,8 @@ ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", ve
         "level": 2,
         "organism_count": 43,
         "name": "The ATP-binding Cassette (ABC) Superfamily",
-        "metabolite_count": 554
+        "metabolite_count": 518,
+        "substrate_breadth": "lumping"
       },
       "genes_by_organism": [{"organism": "Prochlorococcus MED4", "gene_count": 65}]
     }

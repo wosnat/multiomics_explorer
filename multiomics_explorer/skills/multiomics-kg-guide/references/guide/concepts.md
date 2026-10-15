@@ -160,8 +160,8 @@ and `vesicle` simultaneously — distinct rows. Filter via
 ### Chemistry layer
 
 - **`Metabolite`** — chemical compound, anchored by prefixed ID
-  (`kegg.compound:Cxxxxx` for KEGG-derived; `chebi:NNN` for TCDB-only
-  substrates; a few `mnx:MNXM…` MetaNetX-only compounds). Carries
+  (`kegg.compound:Cxxxxx` for KEGG-derived; `chebi:NNN` for ChEBI-only
+  compounds, mostly TCDB substrates). Carries
   cross-refs (`chebi_id`, `hmdb_id`, `mnxm_id`), `formula`, `elements`
   (presence list, never substring), `mass`, and a precomputed
   `evidence_sources` list — subset of {`metabolism`, `transport`,

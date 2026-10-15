@@ -264,7 +264,7 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochloro
       "metabolite_name": "Urea",
       "metabolite_formula": "CH4N2O",
       "metabolite_mass": 60.056,
-      "metabolite_chebi_id": "134711"
+      "metabolite_chebi_id": "16199"
     },
     {
       "locus_tag": "PMM0972",
@@ -284,7 +284,7 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochloro
       "metabolite_name": "Urea",
       "metabolite_formula": "CH4N2O",
       "metabolite_mass": 60.056,
-      "metabolite_chebi_id": "134711"
+      "metabolite_chebi_id": "16199"
     },
     {
       "locus_tag": "PMM0973",
@@ -304,7 +304,7 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochloro
       "metabolite_name": "Urea",
       "metabolite_formula": "CH4N2O",
       "metabolite_mass": 60.056,
-      "metabolite_chebi_id": "134711"
+      "metabolite_chebi_id": "16199"
     },
     ...
   ]
@@ -487,7 +487,7 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00088"], organism="Prochloro
       "metabolite_name": "Nitrite",
       "metabolite_formula": "NO2",
       "metabolite_mass": 46.005,
-      "metabolite_chebi_id": "14658"
+      "metabolite_chebi_id": "25567"
     },
     {
       "locus_tag": "PMM0372",
@@ -507,7 +507,7 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00088"], organism="Prochloro
       "metabolite_name": "Nitrite",
       "metabolite_formula": "NO2",
       "metabolite_mass": 46.005,
-      "metabolite_chebi_id": "14658"
+      "metabolite_chebi_id": "25567"
     },
     {
       "locus_tag": "PMM0371",
@@ -527,7 +527,7 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00088"], organism="Prochloro
       "metabolite_name": "Nitrite",
       "metabolite_formula": "NO2",
       "metabolite_mass": 46.005,
-      "metabolite_chebi_id": "14658"
+      "metabolite_chebi_id": "25567"
     },
     ...
   ]
