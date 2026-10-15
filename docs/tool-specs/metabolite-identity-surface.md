@@ -125,7 +125,7 @@ Live results (build 2026-10-15T19:17Z):
 | `chebi:14313` | `[chebi:17234]` | | |
 | `mnx:WATER` | `[kegg.compound:C00001]` | | |
 | `inchikey:GRYLNZFGIOXLOG-UHFFFAOYSA-N` | `[kegg.compound:C00244]` | | |
-| `hmdb:HMDB0000122` | `[kegg.compound:C00221]` | | |
+| `hmdb:HMDB0000122` | `[kegg.compound:C00031]` (D-Glucose; moved by KG ask 5 in build T19:58Z) | | |
 | `kegg.compound:C00525` | `[]` | `[C00078 L-Tryptophan]` | |
 | `mnx:MNXM1565340` | `[]` | `[C00062 L-Arginine]` | |
 | `chebi:10004` | `[]` | | `[chebi.role:33229 vitamin (role)]` |
@@ -170,7 +170,7 @@ ANY(x IN $kegg_compound_curies WHERE x IN coalesce(m.all_identifiers, []))
 ```
 
 Verified: `C00085` → `[kegg.compound:C00085]`; `C01327` → `[kegg.compound:C00698]`; `chebi:14654` and `chebi:17632` → `[kegg.compound:C00244]`;
-`hmdb:HMDB0000122` → `[kegg.compound:C00221]`; `mnx:MNXM732398` → `[kegg.compound:C00244]`.
+`hmdb:HMDB0000122` → `[kegg.compound:C00031]`; `mnx:MNXM732398` → `[kegg.compound:C00244]`.
 Params keep their names and types (`list[str] | None`). Docstrings: "matches any of the metabolite's
 identifiers, including secondary and retired ones".
 
@@ -492,11 +492,8 @@ classify. The only expected diff is the new keys.
   That's acceptable at tool batch sizes. Don't add an index; the KG has none for list membership.
 - **`assays_by_metabolite` polymorphic rows** stay `BaseModel`; `stereo_assignment` is common to both
   arms, so it's never `None`.
-- **Known KG follow-up (ask 5, curated, pending):** 17 anomer → generic pairs. Some HMDB ids for
-  generic sugars sit on the anomer, e.g. `HMDB0000122` (D-glucose) on β-D-glucose `C00221`. The
-  resolver follows the KG, so these inputs land on the anomer until the KG's `xref_move:`
-  overrides land. No explorer change is needed then. The MNX stereo-merge issue itself is fixed
-  in the 2026-10-15T19:17Z build.
+- **KG ask 5 delivered** (build 2026-10-15T19:58Z): generic sugar HMDB / ChEBI records sit on the
+  generic nodes (`HMDB0000122`, `CHEBI:17634` → D-Glucose `C00031`).
 - `stereo_assignment` validation is the first closed-vocab **edge** filter routed through
   `_CLOSED_VOCAB_PARAMS`. Keep the change local to that table / helper.
 
