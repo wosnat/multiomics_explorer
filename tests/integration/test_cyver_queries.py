@@ -23,6 +23,8 @@ from CyVer import PropertiesValidator, SchemaValidator, SyntaxValidator
 
 from multiomics_explorer.kg.queries_lib import (
     ONTOLOGY_CONFIG,
+    build_list_metabolites,
+    build_list_metabolites_summary,
     build_differential_expression_by_gene,
     build_gene_response_profile_envelope,
     build_gene_response_profile,
@@ -241,6 +243,15 @@ def _build_lm_no_formula_count(**kwargs):
     return _ql.build_list_metabolites_no_formula_count(**kwargs)
 
 
+
+# Lazy wrapper for the metabolite-identity-surface resolver builder
+# (docs/tool-specs/metabolite-identity-surface.md §A): resolved at call time
+# so collection does not depend on it existing yet (red until Stage 2).
+def _build_resolve_metabolite_curies(**kwargs):
+    from multiomics_explorer.kg import queries_lib as _ql
+    return _ql.build_resolve_metabolite_curies(**kwargs)
+
+
 # (test_id, builder_callable, kwargs)
 # Ontology-dependent builders are expanded below via ONTOLOGY_CONFIG.
 _BUILDERS: list[tuple[str, ...]] = [
@@ -310,6 +321,32 @@ _BUILDERS: list[tuple[str, ...]] = [
      {"metabolite_ids": ["kegg.compound:C00074"]}),
     ("assays_by_metabolite_verbose", build_assays_by_metabolite,
      {"metabolite_ids": ["kegg.compound:C00074"], "verbose": True}),
+    # --- metabolite identity surface (§A resolver, §B-§C2, §D stereo) ---
+    ("resolve_metabolite_curies", _build_resolve_metabolite_curies,
+     {"curies": ["chebi:14654", "kegg.compound:C00525", "chebi:10004"]}),
+    ("list_metabolites_identity_filters", build_list_metabolites,
+     {"kegg_compound_ids": ["kegg.compound:C00085"],
+      "structure_kind": ["generic"],
+      "kegg_functional_categories": ["Peptides"],
+      "kegg_brite_classes": ["Lipids: Fatty acyls"]}),
+    ("list_metabolites_summary_identity", build_list_metabolites_summary,
+     {"structure_kind": ["generic"]}),
+    ("metabolites_by_quantifies_assay_stereo", build_metabolites_by_quantifies_assay,
+     {"assay_ids": ["a1"], "stereo_assignment": ["as_reported"]}),
+    ("metabolites_by_quantifies_assay_summary_stereo",
+     build_metabolites_by_quantifies_assay_summary,
+     {"assay_ids": ["a1"], "stereo_assignment": ["as_reported"]}),
+    ("metabolites_by_flags_assay_stereo", build_metabolites_by_flags_assay,
+     {"assay_ids": ["a1"], "stereo_assignment": ["as_reported"]}),
+    ("metabolites_by_flags_assay_summary_stereo",
+     build_metabolites_by_flags_assay_summary,
+     {"assay_ids": ["a1"], "stereo_assignment": ["as_reported"]}),
+    ("assays_by_metabolite_stereo", build_assays_by_metabolite,
+     {"metabolite_ids": ["kegg.compound:C00041"],
+      "stereo_assignment": ["as_reported"]}),
+    ("assays_by_metabolite_summary_stereo", build_assays_by_metabolite_summary,
+     {"metabolite_ids": ["kegg.compound:C00041"],
+      "stereo_assignment": ["as_reported"]}),
     # --- homolog group search ---
     ("search_homolog_groups_summary", build_search_homolog_groups_summary, {"search_text": "photosystem"}),
     ("search_homolog_groups", build_search_homolog_groups, {"search_text": "photosystem"}),

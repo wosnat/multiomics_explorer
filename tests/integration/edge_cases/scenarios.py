@@ -762,6 +762,23 @@ def list_metabolites_scenarios():
         Scenario(
             "unrecognized_element",
             dict(elements=["Xx"])),
+        # metabolite-identity surface §A (build 2026-10-15T19:17Z): a retired
+        # id resolves via all_identifiers (chebi:14654 -> nitrate C00244); a
+        # role id and a recurated (dropped) id stay verbatim in not_found with
+        # a warning; a mixed batch exercises all branches in one round-trip.
+        Scenario(
+            "retired_metabolite_id",
+            dict(metabolite_ids=[_RETIRED_NITRATE_ID])),
+        Scenario(
+            "role_metabolite_id",
+            dict(metabolite_ids=[_ROLE_VITAMIN_ID])),
+        Scenario(
+            "recurated_metabolite_id",
+            dict(metabolite_ids=[_RECURATED_D_TRP_ID])),
+        Scenario(
+            "mixed_identity_batch",
+            dict(metabolite_ids=[_NITRATE_ID, _RETIRED_NITRATE_ID,
+                                 _UNKNOWN_KEGG_ID])),
     ]
 
 
@@ -970,6 +987,13 @@ _UNKNOWN_ASSAY_ID = "metabolite_assay:does_not_exist"
 _BARE_UREA_ID = "C00086"   # -> _UREA_ID
 _BARE_PEP_ID = "C00074"    # -> _PEP_ID
 _BARE_KEGG_ID = "C00064"   # L-glutamate, kegg.compound:C00064
+# metabolite-identity surface (live build 2026-10-15T19:17Z, spec §A table).
+_NITRATE_ID = "kegg.compound:C00244"
+_RETIRED_NITRATE_ID = "chebi:14654"         # retired -> kegg.compound:C00244
+_ROLE_VITAMIN_ID = "chebi:10004"            # ChemicalRole chebi.role:33229
+_RECURATED_D_TRP_ID = "kegg.compound:C00525"  # dropped; rows on L-Trp C00078
+_UNKNOWN_KEGG_ID = "kegg.compound:C99999"
+_L_ALA_ID = "kegg.compound:C00041"          # all assay edges dominant_form_assumed
 
 
 def genes_by_metabolite_scenarios():
@@ -1098,6 +1122,12 @@ def metabolites_by_quantifies_assay_scenarios():
         Scenario(
             "wrong_kind_assay",
             dict(assay_ids=[_BOOLEAN_ASSAY])),
+        # metabolite-identity surface §D: every L-Ala edge is
+        # dominant_form_assumed -> as_reported filter empties the slice.
+        Scenario(
+            "empty_stereo_assignment_intersection",
+            dict(assay_ids=[_NUMERIC_ASSAY], metabolite_ids=[_L_ALA_ID],
+                 stereo_assignment=["as_reported"])),
     ]
 
 
@@ -1128,6 +1158,12 @@ def metabolites_by_flags_assay_scenarios():
         Scenario(
             "wrong_kind_assay",
             dict(assay_ids=[_NUMERIC_ASSAY])),
+        # metabolite-identity surface §D: L-Ala flags edges are all
+        # dominant_form_assumed -> as_reported filter empties the slice.
+        Scenario(
+            "empty_stereo_assignment_intersection",
+            dict(assay_ids=[_BOOLEAN_ASSAY], metabolite_ids=[_L_ALA_ID],
+                 stereo_assignment=["as_reported"])),
     ]
 
 
@@ -1158,6 +1194,21 @@ def assays_by_metabolite_scenarios():
         Scenario(
             "genome_only_organism",
             dict(metabolite_ids=[_PEP_ID], organism=fx.GENOME_ONLY_ORGANISM)),
+        # metabolite-identity surface §D: L-Ala exists and is measured, but
+        # only with dominant_form_assumed edges -> not_matched (flat).
+        Scenario(
+            "empty_stereo_assignment_intersection",
+            dict(metabolite_ids=[_L_ALA_ID], stereo_assignment=["as_reported"]),
+            input_ids=[_L_ALA_ID]),
+        # §A: a role id is not a metabolite -> flat not_found + warning.
+        Scenario(
+            "role_metabolite_id",
+            dict(metabolite_ids=[_ROLE_VITAMIN_ID]),
+            input_ids=[_ROLE_VITAMIN_ID]),
+        # §A: mixed batch — canonical + retired (resolves) + unknown.
+        Scenario(
+            "mixed_identity_batch",
+            dict(metabolite_ids=[_PEP_ID, _RETIRED_NITRATE_ID, _UNKNOWN_KEGG_ID])),
     ]
 
 

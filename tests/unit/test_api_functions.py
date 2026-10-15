@@ -14,6 +14,62 @@ from multiomics_explorer.kg import constants as _kg_constants
 
 
 # ---------------------------------------------------------------------------
+# Resolver-aware mocks (metabolite-identity surface §A). The 7 metabolite-ID
+# tools now issue ONE `build_resolve_metabolite_curies` round-trip
+# (`UNWIND $curies`) whenever metabolite ids are passed — even canonical ones.
+# These helpers answer that query from an identity stub (each canonical-looking
+# CURIE resolves to itself) so a test's fixed-order response list only serves
+# the other queries. They work before the resolver exists (no such query →
+# the list lines up exactly as before) and after.
+# ---------------------------------------------------------------------------
+
+_RESOLVER_MARK = "UNWIND $curies"
+_RESOLVER_IDENTITY_PREFIXES = (
+    "kegg.compound", "chebi", "mnx", "hmdb", "inchikey",
+)
+
+
+def _identity_resolver_rows(curies):
+    def _canon(c):
+        if ":" in c and c.split(":", 1)[0] in _RESOLVER_IDENTITY_PREFIXES:
+            return [c]
+        return []
+    return [{"curie": c, "canonical": _canon(c), "recurated_to": [], "roles": []}
+            for c in curies]
+
+
+def _resolver_aware(responses):
+    """`side_effect` replacement: resolver queries → identity stub; every
+    other query consumes `responses` in order (same semantics as a
+    MagicMock side_effect list, including raising exception items and
+    StopIteration when exhausted)."""
+    queue = list(responses)
+
+    def _exec(cypher, *args, **params):
+        if _RESOLVER_MARK in cypher:
+            return _identity_resolver_rows(params.get("curies", []))
+        if not queue:
+            raise StopIteration
+        item = queue.pop(0)
+        if isinstance(item, BaseException) or (
+                isinstance(item, type) and issubclass(item, BaseException)):
+            raise item
+        return item
+
+    return _exec
+
+
+def _non_resolver_calls(conn):
+    """`conn.execute_query.call_args_list` minus resolver round-trips."""
+    out = []
+    for c in conn.execute_query.call_args_list:
+        cypher = c.args[0] if c.args else c.kwargs.get("cypher", "")
+        if _RESOLVER_MARK not in cypher:
+            out.append(c)
+    return out
+
+
+# ---------------------------------------------------------------------------
 # Top-level package re-exports
 # ---------------------------------------------------------------------------
 class TestTopLevelImports:
@@ -8581,7 +8637,7 @@ class TestListMetabolites:
         conn = MagicMock()
         side_effect = [[summary_row], detail_rows]
         side_effect.extend(extra)
-        conn.execute_query.side_effect = side_effect
+        conn.execute_query.side_effect = _resolver_aware(side_effect)
         return conn
 
     def test_returns_dict_envelope(self):
@@ -9035,9 +9091,10 @@ class TestGenesByMetabolite:
     # ---- Helpers ----
 
     def _mock_conn(self, *side_effect):
-        """Conn whose .execute_query yields the provided sequence."""
+        """Conn whose .execute_query yields the provided sequence (resolver
+        round-trips answered separately — see `_resolver_aware`)."""
         conn = MagicMock()
-        conn.execute_query.side_effect = list(side_effect)
+        conn.execute_query.side_effect = _resolver_aware(side_effect)
         return conn
 
     def _api(self):
@@ -9458,10 +9515,10 @@ class TestGenesByMetabolite:
         # Only summary should run — detail should not be invoked. We seed
         # only one return value; if detail dispatched, the next call would
         # raise StopIteration.
-        conn.execute_query.side_effect = [
+        conn.execute_query.side_effect = _resolver_aware([
             [self._SUMMARY_ROW_BOTH_ARMS],
             [{"found": ["kegg.compound:C00086"]}],
-        ]
+        ])
         out = gbm(self._METS, self._ORG, summary=True, conn=conn)
         assert out["results"] == []
         assert out["returned"] == 0
@@ -9539,12 +9596,12 @@ class TestGenesByMetabolite:
             "multiomics_explorer.api.functions.GraphConnection",
         ) as MockConn:
             mock_instance = MockConn.return_value
-            mock_instance.execute_query.side_effect = [
+            mock_instance.execute_query.side_effect = _resolver_aware([
                 [self._SUMMARY_ROW_BOTH_ARMS],
                 [self._METAB_ROW],
                 [self._TRANS_ROW_MS],
                 [{"found": ["kegg.compound:C00086"]}],
-            ]
+            ])
             out = gbm(self._METS, self._ORG)
         MockConn.assert_called_once()
         assert out["total_matching"] == 23
@@ -9746,7 +9803,7 @@ class TestGenesByMetabolite:
             [{"found": ["kegg.compound:C00086"]}],
         )
         gbm(self._METS, self._ORG, substrate_depth=["most_specific"], conn=conn)
-        calls = conn.execute_query.call_args_list
+        calls = _non_resolver_calls(conn)
         summary_kwargs = calls[0].kwargs
         assert summary_kwargs.get("substrate_depth") == ["most_specific"]
         metab_cypher, metab_kwargs = calls[1].args[0], calls[1].kwargs
@@ -10298,7 +10355,8 @@ class TestMetabolitesByGene:
         # top_pathways query (added in S1 fix to honor spec § 5 verified
         # 3-branch UNION). Tests that need to assert on top_pathways
         # content provide an explicit positional response in the slot.
-        conn.execute_query.side_effect = list(side_effect) + [[]] * 4
+        conn.execute_query.side_effect = _resolver_aware(
+            list(side_effect) + [[]] * 4)
         return conn
 
     def _api(self):
@@ -11210,7 +11268,7 @@ class TestChemistryInputProbesParity:
             raise ValueError(f"no organism matching '{organism}' found.")
         monkeypatch.setattr(api, "_validate_organism_inputs", boom)
         conn_sc = MagicMock()
-        conn_sc.execute_query.side_effect = [[found_metab], [found_paths]]
+        conn_sc.execute_query.side_effect = _resolver_aware([[found_metab], [found_paths]])
         out_sc = gbm(
             metabolite_ids, "Bogus organism",
             metabolite_pathway_ids=pathway_ids, conn=conn_sc,
@@ -11232,11 +11290,11 @@ class TestChemistryInputProbesParity:
             "top_gene_categories": [], "top_genes": [],
         }
         conn_main = MagicMock()
-        conn_main.execute_query.side_effect = [
+        conn_main.execute_query.side_effect = _resolver_aware([
             [empty_summary],  # summary builder
             [found_metab],    # not_found.metabolite_ids probe
             [found_paths],    # not_found.metabolite_pathway_ids probe
-        ]
+        ])
         out_main = gbm(
             metabolite_ids, "Prochlorococcus MED4",
             metabolite_pathway_ids=pathway_ids, conn=conn_main,
@@ -12104,7 +12162,7 @@ class TestListMetabolitesPhase1Plumbing:
         conn = MagicMock()
         side_effect = [[summary_row], detail_rows]
         side_effect.extend(extra)
-        conn.execute_query.side_effect = side_effect
+        conn.execute_query.side_effect = _resolver_aware(side_effect)
         return conn
 
     def test_per_row_measured_assay_count(self):
@@ -12238,7 +12296,8 @@ class TestListMetabolitesPhase2:
 
     def _mock_conn(self, summary_row, detail_rows):
         conn = MagicMock()
-        conn.execute_query.side_effect = [[summary_row], detail_rows]
+        conn.execute_query.side_effect = _resolver_aware(
+            [[summary_row], detail_rows])
         return conn
 
     def test_envelope_top_metabolite_pathways_propagated(self):
@@ -12265,7 +12324,7 @@ class TestListMetabolitesPhase2:
         )
         # Inspect the summary call (first call) — kwargs should carry
         # the exclude list through to the builder.
-        summary_call = conn.execute_query.call_args_list[0]
+        summary_call = _non_resolver_calls(conn)[0]
         kw = summary_call.kwargs
         # The builder param `exclude_metabolite_ids` is passed as a
         # Cypher param of the same name — so it appears in execute_query
@@ -12329,7 +12388,7 @@ class TestGenesByMetabolitePhase2:
             exclude_metabolite_ids=["kegg.compound:C00002"],
             summary=True, conn=conn,
         )
-        summary_call = conn.execute_query.call_args_list[0]
+        summary_call = _non_resolver_calls(conn)[0]
         kw = summary_call.kwargs
         assert kw.get("exclude_metabolite_ids") == ["kegg.compound:C00002"]
 
@@ -12416,7 +12475,7 @@ class TestMetabolitesByGenePhase2:
             exclude_metabolite_ids=["kegg.compound:C00002"],
             summary=True, conn=conn,
         )
-        summary_call = conn.execute_query.call_args_list[0]
+        summary_call = _non_resolver_calls(conn)[0]
         kw = summary_call.kwargs
         assert kw.get("exclude_metabolite_ids") == ["kegg.compound:C00002"]
 
@@ -13258,11 +13317,11 @@ class TestAssaysByMetabolite:
             "metabolites_matched": 0,
             "matched_metabolite_ids": [],
         }]
-        mock_conn.execute_query.side_effect = [
+        mock_conn.execute_query.side_effect = _resolver_aware([
             [],            # existence probe — input ID absent
             empty_summary, # summary
             [],            # detail
-        ]
+        ])
         data = assays_by_metabolite(
             metabolite_ids=["kegg.compound:C99999"], conn=mock_conn,
         )
@@ -13300,11 +13359,11 @@ class TestAssaysByMetabolite:
                 "value": 0.05,
             },
         ]
-        mock_conn.execute_query.side_effect = [
+        mock_conn.execute_query.side_effect = _resolver_aware([
             existence_rows,
             summary_rows,
             detail_rows,
-        ]
+        ])
         data = assays_by_metabolite(
             metabolite_ids=[present_id, absent_id], conn=mock_conn,
         )
@@ -13335,13 +13394,13 @@ class TestAssaysByMetabolite:
             "metabolites_matched": 1,
             "matched_metabolite_ids": [present_id],
         }]
-        mock_conn.execute_query.side_effect = [
+        mock_conn.execute_query.side_effect = _resolver_aware([
             existence_rows,
             summary_rows,
             # detail query must NOT run when summary=True; no third item
             # needed, but pytest-regressions-style side_effect lists tolerate
             # unused extras — omit it to also assert call_count below.
-        ]
+        ])
         data = assays_by_metabolite(
             metabolite_ids=[present_id], summary=True, conn=mock_conn,
         )
@@ -13349,7 +13408,8 @@ class TestAssaysByMetabolite:
         assert data["not_matched"] == []
         assert data["metabolites_without_evidence"] == []
         assert data["metabolites_with_evidence"] == [present_id]
-        assert mock_conn.execute_query.call_count == 2
+        # Count excludes the metabolite-ID resolver round-trip (§A).
+        assert len(_non_resolver_calls(mock_conn)) == 2
 
     def test_not_detected_rows_have_null_rank_fields(self):
         # Regression for the bug: a tested-absent row can still carry a
@@ -13384,9 +13444,9 @@ class TestAssaysByMetabolite:
                 "detection_status": "not_detected",
             },
         ]
-        mock_conn.execute_query.side_effect = [
+        mock_conn.execute_query.side_effect = _resolver_aware([
             existence_rows, summary_rows, detail_rows,
-        ]
+        ])
         data = assays_by_metabolite(metabolite_ids=[mid], conn=mock_conn)
         row = data["results"][0]
         assert row["metric_bucket"] is None
@@ -13412,14 +13472,14 @@ class TestAssaysByMetabolite:
             "metabolites_matched": 0,
             "matched_metabolite_ids": [],
         }]
-        mock_conn.execute_query.side_effect = [
+        mock_conn.execute_query.side_effect = _resolver_aware([
             [{"organisms": ["Prochlorococcus MED4"]}],   # organism resolve
             [{"has_assays": False}],                      # targeted existence
             [{"orgs": ["Prochlorococcus MED4"]}],          # full org list
             [{"metabolite_id": mid}],                      # existence probe
             empty_summary,
             [],
-        ]
+        ])
         data = assays_by_metabolite(
             metabolite_ids=[mid], organism="MIT9313", conn=mock_conn)
         assert any(
@@ -17612,19 +17672,27 @@ class TestTripletRowsCarryTransportSubstrateResolution:
 # Bare metabolite-ID coercion (backlog 3.2, Mode B) — api helper + 7 tools
 # ---------------------------------------------------------------------------
 
-_ALIAS_MARK = "UNWIND $raw"
+# metabolite-identity surface §A supersedes the backlog 3.2 bare-alias
+# contract: every non-empty batch is normalised to CURIEs in Python and sent
+# through ONE `build_resolve_metabolite_curies` round-trip (`UNWIND $curies`),
+# which returns `{curie, canonical, recurated_to, roles}` per CURIE.
+_ALIAS_MARK = "UNWIND $curies"
 
 
 class _AliasConn:
-    """Stub GraphConnection that answers the alias-resolver query from a
-    `{raw: [canonical, ...]}` map and every other query from a FIFO of canned
-    responses (last-exhausted → `[]`).
+    """Stub GraphConnection that answers the CURIE-resolver query from
+    `{curie: [canonical, ...]}` (+ optional `{curie: [{id, name}]}` maps for
+    the recurated / role branches) and every other query from a FIFO of
+    canned responses (last-exhausted → `[]`).
 
     Records every call so tests can inspect the params each builder received.
     """
 
-    def __init__(self, alias_map: dict | None = None, responses=None):
+    def __init__(self, alias_map: dict | None = None, responses=None,
+                 recurated: dict | None = None, roles: dict | None = None):
         self.alias_map = alias_map or {}
+        self.recurated = recurated or {}
+        self.roles = roles or {}
         self.responses = list(responses or [])
         self.calls: list[tuple[str, dict]] = []
 
@@ -17632,8 +17700,11 @@ class _AliasConn:
         self.calls.append((cypher, dict(params)))
         if _ALIAS_MARK in cypher:
             return [
-                {"raw": r, "canonical": list(self.alias_map.get(r, []))}
-                for r in params["raw"]
+                {"curie": c,
+                 "canonical": list(self.alias_map.get(c, [])),
+                 "recurated_to": list(self.recurated.get(c, [])),
+                 "roles": list(self.roles.get(c, []))}
+                for c in params["curies"]
             ]
         if "AS organisms" in cypher:
             # genes_by_metabolite / metabolites_by_gene call
@@ -17663,7 +17734,8 @@ class _AliasConn:
 
 class TestCanonicalizeMetaboliteIds:
     """`_canonicalize_metabolite_ids(conn, ids)` →
-    `(canonical_ids, resolved_aliases, warnings)`."""
+    `(canonical_ids, resolved_aliases, warnings)` under the CURIE-resolver
+    contract (metabolite-identity surface §A, helper contract)."""
 
     def _fn(self):
         from multiomics_explorer.api.functions import (
@@ -17688,97 +17760,157 @@ class TestCanonicalizeMetaboliteIds:
         assert warnings == []
         assert conn.calls == []
 
+    # -- one round-trip, always -------------------------------------------
     @pytest.mark.parametrize("canon", [
-        "kegg.compound:C00064", "chebi:17234", "mnx:MNXM1095050",
+        "kegg.compound:C00064", "chebi:17234", "kegg.compound:C00244",
     ])
-    def test_canonical_prefix_passthrough_no_query(self, canon):
-        conn = _AliasConn()
+    def test_canonical_input_one_round_trip_no_alias(self, canon):
+        """An input that already is the canonical id is looked up (retired
+        ids look canonical too) but never reported in resolved_aliases."""
+        conn = _AliasConn({canon: [canon]})
         ids, aliases, warnings = self._fn()(conn, [canon])
         assert ids == [canon]
         assert aliases == {}
         assert warnings == []
-        assert conn.calls == []
-
-    def test_all_canonical_batch_zero_queries(self):
-        conn = _AliasConn()
-        batch = ["kegg.compound:C00064", "chebi:17234", "mnx:MNXM1095050"]
-        ids, _, _ = self._fn()(conn, batch)
-        assert ids == batch
-        assert conn.calls == []
-
-    def test_unknown_prefix_passthrough_verbatim_no_query(self):
-        """Any other `prefix:` form (except CHEBI:) is not an alias —
-        forwarded untouched so it lands in `not_found` as today."""
-        conn = _AliasConn()
-        ids, aliases, _ = self._fn()(conn, ["pubchem:5793", "kegg.pathway:ko00010"])
-        assert ids == ["pubchem:5793", "kegg.pathway:ko00010"]
-        assert aliases == {}
-        assert conn.calls == []
-
-    def test_prefixed_ids_not_sent_to_resolver(self):
-        """Canonical inputs are filtered out in Python before the UNWIND."""
-        conn = _AliasConn({"C00064": ["kegg.compound:C00064"]})
-        self._fn()(conn, ["kegg.compound:C00001", "C00064", "pubchem:1"])
+        assert len(conn.calls) == 1
         assert len(conn.alias_calls) == 1
-        _, params = conn.alias_calls[0]
-        assert params["raw"] == ["C00064"]
 
-    # -- classification rules ---------------------------------------------
-    def test_bare_kegg(self):
-        conn = _AliasConn({"C00064": ["kegg.compound:C00064"]})
+    def test_all_prefixed_batch_is_exactly_one_round_trip(self):
+        batch = ["kegg.compound:C00064", "chebi:14654", "kegg.compound:C00525",
+                 "chebi:10004", "kegg.compound:C99999"]
+        conn = _AliasConn({"kegg.compound:C00064": ["kegg.compound:C00064"],
+                           "chebi:14654": ["kegg.compound:C00244"]})
+        self._fn()(conn, batch)
+        assert len(conn.calls) == 1
+        assert len(conn.alias_calls) == 1
+
+    def test_inputs_are_normalised_to_curies_before_the_query(self):
+        conn = _AliasConn()
+        self._fn()(conn, ["C00064", "CHEBI:0014654", "HMDB02878",
+                          "mnx:water", "kegg.compound:C00064"])
+        _, params = conn.alias_calls[0]
+        sent = params["curies"]
+        for curie in ("kegg.compound:C00064", "chebi:14654",
+                      "hmdb:HMDB0002878", "mnx:WATER"):
+            assert curie in sent
+        for raw in ("C00064", "CHEBI:0014654", "HMDB02878", "mnx:water"):
+            assert raw not in sent
+        assert len(sent) == len(set(sent)), "CURIEs must be deduped"
+
+    # -- resolved ----------------------------------------------------------
+    def test_retired_id_resolves_and_is_reported(self):
+        conn = _AliasConn({"chebi:14654": ["kegg.compound:C00244"]})
+        ids, aliases, warnings = self._fn()(conn, ["chebi:14654"])
+        assert ids == ["kegg.compound:C00244"]
+        assert aliases == {"chebi:14654": ["kegg.compound:C00244"]}
+        assert warnings == []
+
+    def test_bare_kegg_normalisation_is_reported(self):
+        conn = _AliasConn({"kegg.compound:C00064": ["kegg.compound:C00064"]})
         ids, aliases, warnings = self._fn()(conn, ["C00064"])
         assert ids == ["kegg.compound:C00064"]
         assert aliases == {"C00064": ["kegg.compound:C00064"]}
         assert warnings == []
 
-    def test_uppercase_chebi_prefix_is_alias(self):
-        conn = _AliasConn({"CHEBI:17234": ["kegg.compound:C00064"]})
+    def test_uppercase_chebi_resolves_keyed_by_raw_input(self):
+        conn = _AliasConn({"chebi:17234": ["kegg.compound:C00064"]})
         ids, aliases, _ = self._fn()(conn, ["CHEBI:17234"])
         assert ids == ["kegg.compound:C00064"]
         assert aliases == {"CHEBI:17234": ["kegg.compound:C00064"]}
-        _, params = conn.alias_calls[0]
-        assert params["raw"] == ["CHEBI:17234"]
-
-    def test_lowercase_chebi_prefix_is_canonical(self):
-        """`chebi:NNN` is a KG-canonical `Metabolite.id` — never resolved."""
-        conn = _AliasConn({"chebi:10004": ["SHOULD_NOT_BE_USED"]})
-        ids, aliases, _ = self._fn()(conn, ["chebi:10004"])
-        assert ids == ["chebi:10004"]
-        assert aliases == {}
-        assert conn.calls == []
 
     def test_bare_numeric_is_chebi(self):
-        conn = _AliasConn({"17234": ["kegg.compound:C00064"]})
+        conn = _AliasConn({"chebi:17234": ["kegg.compound:C00064"]})
         ids, aliases, _ = self._fn()(conn, ["17234"])
         assert ids == ["kegg.compound:C00064"]
         assert aliases == {"17234": ["kegg.compound:C00064"]}
 
-    def test_bare_hmdb(self):
-        conn = _AliasConn({"HMDB0000122": ["kegg.compound:C00221"]})
-        ids, aliases, _ = self._fn()(conn, ["HMDB0000122"])
-        assert ids == ["kegg.compound:C00221"]
-        assert aliases == {"HMDB0000122": ["kegg.compound:C00221"]}
+    def test_short_hmdb_is_padded_then_resolved(self):
+        conn = _AliasConn({"hmdb:HMDB0002878": ["kegg.compound:C00570"]})
+        ids, aliases, _ = self._fn()(conn, ["HMDB02878"])
+        assert ids == ["kegg.compound:C00570"]
+        assert aliases == {"HMDB02878": ["kegg.compound:C00570"]}
 
     def test_bare_mnxm(self):
-        conn = _AliasConn({"MNXM1095050": ["chebi:10004"]})
-        ids, aliases, _ = self._fn()(conn, ["MNXM1095050"])
+        conn = _AliasConn({"mnx:MNXM732398": ["kegg.compound:C00244"]})
+        ids, aliases, _ = self._fn()(conn, ["MNXM732398"])
+        assert ids == ["kegg.compound:C00244"]
+        assert aliases == {"MNXM732398": ["kegg.compound:C00244"]}
+
+    def test_merged_member_resolves(self):
+        """kegg.compound:C01327 (HCl) is a merged member of Cl- C00698."""
+        conn = _AliasConn({"kegg.compound:C01327": ["kegg.compound:C00698"]})
+        ids, aliases, _ = self._fn()(conn, ["kegg.compound:C01327"])
+        assert ids == ["kegg.compound:C00698"]
+        assert aliases == {"kegg.compound:C01327": ["kegg.compound:C00698"]}
+
+    # -- recurated / role / unresolved ------------------------------------
+    def test_recurated_kept_verbatim_with_warning(self):
+        conn = _AliasConn(recurated={"kegg.compound:C00525": [
+            {"id": "kegg.compound:C00078", "name": "L-Tryptophan"}]})
+        ids, aliases, warnings = self._fn()(conn, ["kegg.compound:C00525"])
+        assert ids == ["kegg.compound:C00525"]
+        assert aliases == {}
+        assert len(warnings) == 1
+        w = warnings[0]
+        assert "'kegg.compound:C00525'" in w
+        assert "removed" in w
+        assert "kegg.compound:C00078" in w
+        assert "L-Tryptophan" in w
+
+    def test_recurated_bare_input_kept_in_callers_form(self):
+        conn = _AliasConn(recurated={"kegg.compound:C00525": [
+            {"id": "kegg.compound:C00078", "name": "L-Tryptophan"}]})
+        ids, aliases, warnings = self._fn()(conn, ["C00525"])
+        assert ids == ["C00525"]
+        assert aliases == {}
+        assert any("kegg.compound:C00078" in w for w in warnings)
+
+    def test_role_kept_verbatim_with_warning(self):
+        conn = _AliasConn(roles={"chebi:10004": [
+            {"id": "chebi.role:33229", "name": "vitamin (role)"}]})
+        ids, aliases, warnings = self._fn()(conn, ["chebi:10004"])
         assert ids == ["chebi:10004"]
-        assert aliases == {"MNXM1095050": ["chebi:10004"]}
+        assert aliases == {}
+        assert len(warnings) == 1
+        w = warnings[0]
+        assert "'chebi:10004'" in w
+        assert "chebi.role:33229" in w
+        assert "vitamin (role)" in w
+        assert "not a metabolite" in w
+        assert "run_cypher" in w
 
-    def test_exactly_one_round_trip(self):
-        conn = _AliasConn({
-            "C00064": ["kegg.compound:C00064"],
-            "HMDB0000122": ["kegg.compound:C00221"],
-            "MNXM1095050": ["chebi:10004"],
-        })
-        self._fn()(conn, ["C00064", "HMDB0000122", "MNXM1095050", "chebi:1"])
-        assert len(conn.calls) == 1
-        assert len(conn.alias_calls) == 1
+    def test_role_id_itself_kept_verbatim_with_warning(self):
+        conn = _AliasConn(roles={"chebi.role:33229": [
+            {"id": "chebi.role:33229", "name": "vitamin (role)"}]})
+        ids, aliases, warnings = self._fn()(conn, ["chebi.role:33229"])
+        assert ids == ["chebi.role:33229"]
+        assert aliases == {}
+        assert any("vitamin (role)" in w for w in warnings)
 
-    # -- collisions / unresolved / ordering -------------------------------
+    def test_unresolved_stays_verbatim(self):
+        conn = _AliasConn({})
+        ids, aliases, warnings = self._fn()(conn, ["kegg.compound:C99999"])
+        assert ids == ["kegg.compound:C99999"]
+        assert aliases == {}
+        assert warnings == []
+
+    def test_unresolved_bare_stays_in_callers_form(self):
+        conn = _AliasConn({})
+        ids, aliases, warnings = self._fn()(conn, ["C99999"])
+        assert ids == ["C99999"]
+        assert aliases == {}
+        assert warnings == []
+
+    def test_name_shaped_input_verbatim(self):
+        conn = _AliasConn({})
+        ids, aliases, _ = self._fn()(conn, ["glutamate", "pubchem:5793"])
+        assert ids == ["glutamate", "pubchem:5793"]
+        assert aliases == {}
+
+    # -- defensive collision fallback / ordering --------------------------
     def test_collision_expands_to_all_and_warns(self):
         both = ["kegg.compound:C00354", "kegg.compound:C05378"]
-        conn = _AliasConn({"CHEBI:16905": both})
+        conn = _AliasConn({"chebi:16905": both})
         ids, aliases, warnings = self._fn()(conn, ["CHEBI:16905"])
         assert ids == both
         assert aliases == {"CHEBI:16905": both}
@@ -17789,53 +17921,42 @@ class TestCanonicalizeMetaboliteIds:
         assert "kegg.compound:C05378" in w
         assert "2 metabolites" in w
 
-    def test_unique_match_no_warning(self):
-        conn = _AliasConn({"C00064": ["kegg.compound:C00064"]})
-        _, _, warnings = self._fn()(conn, ["C00064"])
-        assert warnings == []
-
-    def test_unresolved_stays_verbatim(self):
-        """No node matched → keep the user's input form so the existing
-        `not_found` probes report it unchanged; no alias, no warning."""
-        conn = _AliasConn({})  # C99999 → []
-        ids, aliases, warnings = self._fn()(conn, ["C99999"])
-        assert ids == ["C99999"]
-        assert aliases == {}
-        assert warnings == []
-
-    def test_input_order_preserved(self):
-        conn = _AliasConn({
-            "C00064": ["kegg.compound:C00064"],
-            "HMDB0000122": ["kegg.compound:C00221"],
-        })
-        ids, _, _ = self._fn()(conn, [
-            "HMDB0000122", "chebi:10004", "C00064", "bogus99",
+    def test_mixed_batch_order_and_classification(self):
+        conn = _AliasConn(
+            {"kegg.compound:C00064": ["kegg.compound:C00064"],
+             "chebi:14654": ["kegg.compound:C00244"]},
+            recurated={"kegg.compound:C00525": [
+                {"id": "kegg.compound:C00078", "name": "L-Tryptophan"}]},
+            roles={"chebi:10004": [
+                {"id": "chebi.role:33229", "name": "vitamin (role)"}]},
+        )
+        ids, aliases, warnings = self._fn()(conn, [
+            "chebi:14654", "kegg.compound:C00064", "kegg.compound:C00525",
+            "chebi:10004", "kegg.compound:C99999",
         ])
         assert ids == [
-            "kegg.compound:C00221", "chebi:10004", "kegg.compound:C00064",
-            "bogus99",
+            "kegg.compound:C00244", "kegg.compound:C00064",
+            "kegg.compound:C00525", "chebi:10004", "kegg.compound:C99999",
         ]
+        assert aliases == {"chebi:14654": ["kegg.compound:C00244"]}
+        assert len(warnings) == 2
+        assert len(conn.calls) == 1
 
-    def test_dedup_after_expansion_first_seen_order(self):
+    def test_dedup_after_resolution_first_seen_order(self):
         conn = _AliasConn({
-            "C00064": ["kegg.compound:C00064"],
-            "CHEBI:17234": ["kegg.compound:C00064"],
+            "kegg.compound:C00064": ["kegg.compound:C00064"],
+            "chebi:17234": ["kegg.compound:C00064"],
+            "kegg.compound:C00001": ["kegg.compound:C00001"],
         })
         ids, aliases, _ = self._fn()(conn, [
-            "C00064", "kegg.compound:C00064", "CHEBI:17234", "kegg.compound:C00001",
+            "C00064", "kegg.compound:C00064", "CHEBI:17234",
+            "kegg.compound:C00001",
         ])
         assert ids == ["kegg.compound:C00064", "kegg.compound:C00001"]
         assert aliases == {
             "C00064": ["kegg.compound:C00064"],
             "CHEBI:17234": ["kegg.compound:C00064"],
         }
-
-    def test_resolved_aliases_only_holds_coerced_entries(self):
-        conn = _AliasConn({"C00064": ["kegg.compound:C00064"]})
-        _, aliases, _ = self._fn()(conn, [
-            "kegg.compound:C00001", "C00064", "C99999", "pubchem:1",
-        ])
-        assert set(aliases) == {"C00064"}
 
 
 # ---- per-tool plumbing ------------------------------------------------------
@@ -17844,7 +17965,9 @@ _BARE = "C00064"
 _CANON = "kegg.compound:C00064"
 _BARE_X = "C00002"
 _CANON_X = "kegg.compound:C00002"
-_ALIAS_MAP = {_BARE: [_CANON], _BARE_X: [_CANON_X]}
+# CURIE-keyed (the resolver receives normalised CURIEs); canonical ids map
+# to themselves, as the live resolver returns them.
+_ALIAS_MAP = {_CANON: [_CANON], _CANON_X: [_CANON_X]}
 _ORG = "Prochlorococcus MED4"
 
 _LM_SUMMARY = {
@@ -17982,8 +18105,10 @@ class TestMetaboliteIdCoercionPerTool:
         assert isinstance(out["resolved_aliases"], dict)
         assert out["resolved_aliases"] == {}
         assert isinstance(out["warnings"], list)
-        # No bare input → no resolver round-trip.
-        assert conn.alias_calls == []
+        # metabolite-identity surface §A: canonical inputs (genes_by_metabolite
+        # / assays_by_metabolite inject one) now take one resolver round-trip
+        # (retired ids look canonical) — but never land in resolved_aliases.
+        assert len(conn.alias_calls) <= 1
 
     @pytest.mark.parametrize("name", _TOOL_NAMES)
     def test_both_params_share_one_resolved_aliases_map(self, name):
@@ -17998,7 +18123,7 @@ class TestMetaboliteIdCoercionPerTool:
     def test_collision_warning_appended_to_envelope(self, name):
         both = ["kegg.compound:C00354", "kegg.compound:C05378"]
         call, responses = _tool(name)
-        conn = _AliasConn({"CHEBI:16905": both}, responses())
+        conn = _AliasConn({"chebi:16905": both}, responses())
         out = call(conn, ["CHEBI:16905"], None)
         params = conn.first_params_with("metabolite_ids")
         assert params["metabolite_ids"] == both
@@ -18029,7 +18154,7 @@ class TestCoercionWarningsAppendNotReplace:
             "metabolite_id": both[0], "name": "x",
             "transport_most_specific_rows": 1, "transport_inherited_rows": 3,
         }]
-        conn = _AliasConn({"CHEBI:16905": both}, [[summary]])
+        conn = _AliasConn({"chebi:16905": both}, [[summary]])
         out = f.genes_by_metabolite(
             metabolite_ids=["CHEBI:16905"], organism=_ORG,
             summary=True, conn=conn,
@@ -18464,7 +18589,8 @@ class TestGenesByMetaboliteBreakdownCap:
 
     def _mock_conn(self, top_genes):
         conn = MagicMock()
-        conn.execute_query.side_effect = [[self._summary_row(top_genes)]] + [[]] * 10
+        conn.execute_query.side_effect = _resolver_aware(
+            [[self._summary_row(top_genes)]] + [[]] * 10)
         return conn
 
     def test_top_genes_capped_and_sorted_desc_on_detail_call(self):
@@ -19932,3 +20058,545 @@ class TestListFilterValuesPartnerRole:
         with pytest.raises(ValueError) as exc_info:
             api.list_filter_values(filter_type="bogus", conn=mock_conn)
         assert "partner_role" in str(exc_info.value)
+
+
+# ---------------------------------------------------------------------------
+# Metabolite identity surface (spec docs/tool-specs/metabolite-identity-surface.md)
+# §A CURIE normaliser + shape helpers, §B/§C/§C2 list_metabolites, §D assay
+# stereo_assignment, §E list_filter_values filter types.
+# ---------------------------------------------------------------------------
+
+_MIS_INCHIKEY = "GRYLNZFGIOXLOG-UHFFFAOYSA-N"
+
+
+class TestNormalizeMetaboliteCurie:
+    """`_normalize_metabolite_curie(raw) -> str` — every row of §A's table."""
+
+    def _fn(self):
+        from multiomics_explorer.api.functions import _normalize_metabolite_curie
+        return _normalize_metabolite_curie
+
+    @pytest.mark.parametrize("raw, expected", [
+        # kegg.compound:<x> → upper(x); prefix case-insensitive
+        ("kegg.compound:C00085", "kegg.compound:C00085"),
+        ("kegg.compound:c00085", "kegg.compound:C00085"),
+        ("KEGG.COMPOUND:C00085", "kegg.compound:C00085"),
+        # C\d{5} → kegg.compound:
+        ("C00085", "kegg.compound:C00085"),
+        ("c00085", "kegg.compound:C00085"),
+        # chebi:<digits> / CHEBI:<digits> / bare digits → leading zeros stripped
+        ("chebi:14654", "chebi:14654"),
+        ("CHEBI:14654", "chebi:14654"),
+        ("CHEBI:0014654", "chebi:14654"),
+        ("chebi:0014654", "chebi:14654"),
+        ("14654", "chebi:14654"),
+        ("0014654", "chebi:14654"),
+        # mnx:<x> → upper(x), keeps the non-MNXM local part
+        ("mnx:MNXM732398", "mnx:MNXM732398"),
+        ("mnx:mnxm732398", "mnx:MNXM732398"),
+        ("MNX:MNXM732398", "mnx:MNXM732398"),
+        ("mnx:water", "mnx:WATER"),
+        ("mnx:WATER", "mnx:WATER"),
+        # MNXM\d+ → mnx:
+        ("MNXM732398", "mnx:MNXM732398"),
+        ("mnxm732398", "mnx:MNXM732398"),
+        # hmdb:<x> / HMDB\d+ → hmdb:HMDB + 7 digits
+        ("hmdb:HMDB0000122", "hmdb:HMDB0000122"),
+        ("hmdb:HMDB02878", "hmdb:HMDB0002878"),
+        ("HMDB:hmdb0000122", "hmdb:HMDB0000122"),
+        ("HMDB0000122", "hmdb:HMDB0000122"),
+        ("HMDB02878", "hmdb:HMDB0002878"),
+        ("hmdb02878", "hmdb:HMDB0002878"),
+        # inchikey:<key> / bare InChIKey → inchikey: + upper
+        (f"inchikey:{_MIS_INCHIKEY}", f"inchikey:{_MIS_INCHIKEY}"),
+        (f"inchikey:{_MIS_INCHIKEY.lower()}", f"inchikey:{_MIS_INCHIKEY}"),
+        (f"INCHIKEY:{_MIS_INCHIKEY}", f"inchikey:{_MIS_INCHIKEY}"),
+        (_MIS_INCHIKEY, f"inchikey:{_MIS_INCHIKEY}"),
+        (_MIS_INCHIKEY.lower(), f"inchikey:{_MIS_INCHIKEY}"),
+        # chebi.role:<digits> → unchanged
+        ("chebi.role:33229", "chebi.role:33229"),
+        # anything else → unchanged
+        ("glutamate", "glutamate"),
+        ("pubchem:5793", "pubchem:5793"),
+        ("kegg.pathway:ko00010", "kegg.pathway:ko00010"),
+    ])
+    def test_table(self, raw, expected):
+        assert self._fn()(raw) == expected
+
+
+class TestMetaboliteIdShapeHelpersIdentitySurface:
+    """§A: `_looks_like_metabolite_id` / `_metabolite_id_shape_warnings`
+    accept the new CURIE shapes; prefixes table grows."""
+
+    def test_canonical_prefixes(self):
+        assert api._CANONICAL_METABOLITE_PREFIXES == (
+            "kegg.compound", "chebi", "mnx", "hmdb", "inchikey", "chebi.role",
+        )
+
+    @pytest.mark.parametrize("raw", [
+        "hmdb:HMDB0000122", f"inchikey:{_MIS_INCHIKEY}", _MIS_INCHIKEY,
+        "chebi.role:33229", "mnx:WATER", "HMDB02878", "CHEBI:0014654",
+    ])
+    def test_new_shapes_do_not_warn(self, raw):
+        assert api._looks_like_metabolite_id(raw)
+        assert api._metabolite_id_shape_warnings([raw]) == []
+
+    def test_name_still_warns(self):
+        warnings = api._metabolite_id_shape_warnings(["glutamate"])
+        assert len(warnings) == 1
+        assert "'glutamate' is not a metabolite id" in warnings[0]
+
+
+class _MisConn:
+    """Routing stub for the identity-surface api tests — dispatches on the
+    Cypher text so extra queries (CURIE resolver, vocabulary reads, probes)
+    never shift a FIFO."""
+
+    def __init__(self, *, summary=None, detail=None, vocab=None,
+                 resolver=None, diag=None, kind=None):
+        self.summary = summary or {}
+        self.detail = detail or []
+        self.vocab = vocab or {}
+        self.resolver = resolver or {}
+        self.diag = diag or []
+        self.kind = kind or []
+        self.calls: list[tuple[str, dict]] = []
+
+    def execute_query(self, cypher, **params):
+        self.calls.append((cypher, dict(params)))
+        if "UNWIND $curies" in cypher:
+            return [{"curie": c, "canonical": list(self.resolver.get(c, [])),
+                     "recurated_to": [], "roles": []}
+                    for c in params["curies"]]
+        if "ControlledVocabulary" in cypher:
+            vals = self.vocab.get((params.get("applies_to"), params.get("prop")))
+            if not vals:
+                return []
+            return [{"values": list(vals), "value_descriptions": [],
+                     "description": "d"}]
+        if "RETURN DISTINCT" in cypher:
+            return []
+        if "AS rankable" in cypher:
+            return list(self.diag)
+        if "a.value_kind AS value_kind" in cypher:
+            return list(self.kind)
+        if "total_matching" in cypher or "total_entries" in cypher:
+            return [dict(self.summary)]
+        if "AS found" in cypher:
+            return [{"found": list(params.get("ids", []))}]
+        if "WHERE m.id IN $ids RETURN m.id AS metabolite_id" in cypher:
+            return [{"metabolite_id": x} for x in params["ids"]]
+        return [dict(r) for r in self.detail]
+
+    def summary_params(self):
+        for c, p in self.calls:
+            if ("total_matching" in c or "total_entries" in c) \
+                    and "UNWIND $curies" not in c:
+                return p
+        raise AssertionError("no summary query issued")
+
+
+@pytest.fixture()
+def _mis_fresh_vocab():
+    api._reset_vocab_cache()
+    yield
+    api._reset_vocab_cache()
+
+
+_MIS_LM_SUMMARY = {
+    **_LM_SUMMARY,
+    "total_matching": 9,
+    "by_structure_kind": [{"item": "generic", "count": 2},
+                          {"item": "defined", "count": 7}],
+    "by_kegg_functional_category": [{"item": "Lipids", "count": 1},
+                                    {"item": "Peptides", "count": 3}],
+    "kegg_functional_unclassified": 5,
+    "by_kegg_brite_class": [{"item": "Lipids: Fatty acyls", "count": 2},
+                            {"item": "Lipids: Prenol lipids", "count": 1}],
+    "kegg_brite_unclassified": 6,
+}
+
+
+@pytest.mark.usefixtures("_mis_fresh_vocab")
+class TestListMetabolitesIdentitySurface:
+    """§B/§C/§C2 at the api layer."""
+
+    def _call(self, conn, **kwargs):
+        return api.list_metabolites(conn=conn, **kwargs)
+
+    # -- §B xref normalisation ---------------------------------------------
+    def test_xref_values_normalised_to_curies_before_builder(self):
+        conn = _MisConn(summary=_MIS_LM_SUMMARY)
+        self._call(
+            conn, summary=True,
+            kegg_compound_ids=["C00085"],
+            chebi_ids=["CHEBI:0014654"],
+            hmdb_ids=["HMDB02878"],
+            mnxm_ids=["mnxm732398"],
+        )
+        values = list(conn.summary_params().values())
+        assert ["kegg.compound:C00085"] in values
+        assert ["chebi:14654"] in values
+        assert ["hmdb:HMDB0002878"] in values
+        assert ["mnx:MNXM732398"] in values
+        for raw in (["C00085"], ["CHEBI:0014654"], ["HMDB02878"], ["mnxm732398"]):
+            assert raw not in values
+
+    def test_legacy_bare_chebi_digits_still_work(self):
+        conn = _MisConn(summary=_MIS_LM_SUMMARY)
+        self._call(conn, summary=True, chebi_ids=["4167", "chebi:15422"])
+        assert ["chebi:4167", "chebi:15422"] in list(conn.summary_params().values())
+
+    # -- §C/§C2 filters --------------------------------------------------
+    def test_new_filters_reach_summary_and_detail_builders(self):
+        conn = _MisConn(summary=_MIS_LM_SUMMARY)
+        self._call(
+            conn, limit=5,
+            structure_kind=["generic", "polymer"],
+            kegg_functional_categories=["Peptides"],
+            kegg_brite_classes=["Lipids: Fatty acyls"],
+        )
+        builder_calls = [p for c, p in conn.calls if "MATCH (m:Metabolite)" in c
+                         and "structure_kind" in p]
+        assert len(builder_calls) >= 2, "summary + detail must both filter"
+        for p in builder_calls:
+            assert p["structure_kind"] == ["generic", "polymer"]
+            assert p["kegg_functional_categories"] == ["Peptides"]
+            assert p["kegg_brite_classes"] == ["Lipids: Fatty acyls"]
+
+    def test_closed_vocab_registry_entries(self):
+        reg = api._CLOSED_VOCAB_PARAMS
+        assert reg["structure_kind"] == (
+            "Metabolite", "structure_kind", "structure_kind")
+        assert reg["kegg_functional_categories"] == (
+            "Metabolite", "kegg_functional_categories", "kegg_functional_category")
+        assert reg["kegg_brite_classes"] == (
+            "Metabolite", "kegg_brite_classes", "kegg_brite_class")
+
+    def test_unknown_structure_kind_warns_never_raises(self):
+        conn = _MisConn(summary=_MIS_LM_SUMMARY, vocab={
+            ("Metabolite", "structure_kind"): ["defined", "generic", "polymer"]})
+        out = self._call(conn, summary=True, structure_kind=["bogus"])
+        assert any("'bogus'" in w
+                   and "list_filter_values(filter_type='structure_kind')" in w
+                   for w in out["warnings"]), out["warnings"]
+
+    def test_not_classified_is_not_a_filter_value(self):
+        conn = _MisConn(summary=_MIS_LM_SUMMARY, vocab={
+            ("Metabolite", "kegg_functional_categories"): [
+                "Carbohydrates", "Peptides", "Lipids"]})
+        out = self._call(conn, summary=True,
+                         kegg_functional_categories=["not classified"])
+        assert any(
+            "'not classified'" in w
+            and "list_filter_values(filter_type='kegg_functional_category')" in w
+            for w in out["warnings"]), out["warnings"]
+
+    def test_unknown_brite_class_warns(self):
+        conn = _MisConn(summary=_MIS_LM_SUMMARY, vocab={
+            ("Metabolite", "kegg_brite_classes"): ["Lipids: Fatty acyls"]})
+        out = self._call(conn, summary=True, kegg_brite_classes=["Fatty acyls"])
+        assert any(
+            "'Fatty acyls'" in w
+            and "list_filter_values(filter_type='kegg_brite_class')" in w
+            for w in out["warnings"]), out["warnings"]
+
+    # -- envelope ----------------------------------------------------------
+    def test_by_structure_kind_renamed_and_sorted(self):
+        out = self._call(_MisConn(summary=_MIS_LM_SUMMARY), summary=True)
+        assert out["by_structure_kind"] == [
+            {"structure_kind": "defined", "count": 7},
+            {"structure_kind": "generic", "count": 2},
+        ]
+
+    def test_by_kegg_functional_category_with_trailing_not_classified(self):
+        out = self._call(_MisConn(summary=_MIS_LM_SUMMARY), summary=True)
+        assert out["by_kegg_functional_category"] == [
+            {"kegg_functional_category": "Peptides", "count": 3},
+            {"kegg_functional_category": "Lipids", "count": 1},
+            {"kegg_functional_category": "not classified", "count": 5},
+        ]
+
+    def test_by_kegg_brite_class_with_trailing_not_classified(self):
+        out = self._call(_MisConn(summary=_MIS_LM_SUMMARY), summary=True)
+        assert out["by_kegg_brite_class"] == [
+            {"kegg_brite_class": "Lipids: Fatty acyls", "count": 2},
+            {"kegg_brite_class": "Lipids: Prenol lipids", "count": 1},
+            {"kegg_brite_class": "not classified", "count": 6},
+        ]
+
+    def test_not_classified_entry_present_when_zero(self):
+        summary = {**_MIS_LM_SUMMARY,
+                   "kegg_functional_unclassified": 0,
+                   "kegg_brite_unclassified": 0}
+        out = self._call(_MisConn(summary=summary), summary=True)
+        assert out["by_kegg_functional_category"][-1] == {
+            "kegg_functional_category": "not classified", "count": 0}
+        assert out["by_kegg_brite_class"][-1] == {
+            "kegg_brite_class": "not classified", "count": 0}
+
+    def test_not_classified_trails_even_when_largest(self):
+        summary = {**_MIS_LM_SUMMARY, "kegg_functional_unclassified": 2880}
+        out = self._call(_MisConn(summary=summary), summary=True)
+        assert out["by_kegg_functional_category"][-1] == {
+            "kegg_functional_category": "not classified", "count": 2880}
+        assert out["by_kegg_functional_category"][0]["kegg_functional_category"] \
+            == "Peptides"
+
+    def test_raw_unclassified_counts_not_exposed(self):
+        out = self._call(_MisConn(summary=_MIS_LM_SUMMARY), summary=True)
+        assert "kegg_functional_unclassified" not in out
+        assert "kegg_brite_unclassified" not in out
+
+    def test_envelope_keys_present_on_detail_call(self):
+        out = self._call(_MisConn(summary=_MIS_LM_SUMMARY), limit=5)
+        for key in ("by_structure_kind", "by_kegg_functional_category",
+                    "by_kegg_brite_class"):
+            assert isinstance(out[key], list)
+
+    # -- rows --------------------------------------------------------------
+    def test_sparse_kegg_class_fields_stripped_structure_kind_kept(self):
+        rows = [
+            {"metabolite_id": "kegg.compound:C00122", "name": "Fumarate",
+             "structure_kind": "defined",
+             "kegg_functional_categories": None, "kegg_brite_classes": None},
+            {"metabolite_id": "kegg.compound:C00064", "name": "L-Glutamine",
+             "structure_kind": "defined",
+             "kegg_functional_categories": ["Peptides"], "kegg_brite_classes": []},
+            {"metabolite_id": "kegg.compound:C01443", "name": "Ouabain",
+             "structure_kind": "defined",
+             "kegg_functional_categories": ["Steroids"],
+             "kegg_brite_classes": ["Glycosides: O-glycosides",
+                                    "Lipids: Sterol lipids"]},
+        ]
+        out = self._call(_MisConn(summary=_MIS_LM_SUMMARY, detail=rows), limit=5)
+        fum, gln, oua = out["results"]
+        assert fum["structure_kind"] == "defined"
+        assert "kegg_functional_categories" not in fum
+        assert "kegg_brite_classes" not in fum
+        assert gln["kegg_functional_categories"] == ["Peptides"]
+        assert "kegg_brite_classes" not in gln
+        assert oua["kegg_brite_classes"] == [
+            "Glycosides: O-glycosides", "Lipids: Sterol lipids"]
+
+
+# -- §D assay tools ---------------------------------------------------------
+
+_MIS_STEREO_FREQ = [{"item": "as_reported", "count": 49},
+                    {"item": "dominant_form_assumed", "count": 21}]
+_MIS_STEREO_VOCAB = {
+    ("Assay_quantifies_metabolite", "stereo_assignment"):
+        ["as_reported", "dominant_form_assumed"],
+    ("Assay_flags_metabolite", "stereo_assignment"):
+        ["as_reported", "dominant_form_assumed"],
+}
+
+
+def _mis_assay_calls():
+    """(name, call(conn, **kw), conn factory(summary_extra, detail))."""
+    def mqa(conn, **kw):
+        return api.metabolites_by_quantifies_assay(
+            assay_ids=["a1"], conn=conn, **kw)
+
+    def mfa(conn, **kw):
+        return api.metabolites_by_flags_assay(assay_ids=["a1"], conn=conn, **kw)
+
+    def abm(conn, **kw):
+        return api.assays_by_metabolite(
+            metabolite_ids=["kegg.compound:C00041"], conn=conn, **kw)
+
+    def mqa_conn(extra, detail=None):
+        return _MisConn(summary={**_MQA_SUMMARY, **extra}, diag=_MQA_DIAG,
+                        detail=detail, vocab=_MIS_STEREO_VOCAB)
+
+    def mfa_conn(extra, detail=None):
+        return _MisConn(summary={**_MFA_SUMMARY, **extra}, kind=_MFA_KIND,
+                        detail=detail, vocab=_MIS_STEREO_VOCAB)
+
+    def abm_conn(extra, detail=None):
+        return _MisConn(
+            summary={**_ABM_SUMMARY,
+                     "matched_metabolite_ids": ["kegg.compound:C00041"],
+                     **extra},
+            detail=detail, vocab=_MIS_STEREO_VOCAB,
+            resolver={"kegg.compound:C00041": ["kegg.compound:C00041"]})
+
+    return {
+        "metabolites_by_quantifies_assay": (mqa, mqa_conn),
+        "metabolites_by_flags_assay": (mfa, mfa_conn),
+        "assays_by_metabolite": (abm, abm_conn),
+    }
+
+
+_MIS_ASSAY_TOOLS = [
+    "metabolites_by_quantifies_assay", "metabolites_by_flags_assay",
+    "assays_by_metabolite",
+]
+
+
+@pytest.mark.usefixtures("_mis_fresh_vocab")
+class TestAssayStereoAssignmentApi:
+    """§D: stereo_assignment param, by_stereo_assignment envelope, warning."""
+
+    @pytest.mark.parametrize("name", _MIS_ASSAY_TOOLS)
+    def test_param_reaches_summary_builder(self, name):
+        call, make = _mis_assay_calls()[name]
+        conn = make({"total_matching": 49,
+                     "by_stereo_assignment": [{"item": "as_reported", "count": 49}]})
+        call(conn, stereo_assignment=["as_reported"], summary=True)
+        assert conn.summary_params()["stereo_assignment"] == ["as_reported"]
+
+    @pytest.mark.parametrize("name", _MIS_ASSAY_TOOLS)
+    def test_param_reaches_detail_builder(self, name):
+        call, make = _mis_assay_calls()[name]
+        conn = make({"total_matching": 49,
+                     "by_stereo_assignment": [{"item": "as_reported", "count": 49}]})
+        call(conn, stereo_assignment=["as_reported"])
+        detail_params = [
+            p for c, p in conn.calls
+            if "stereo_assignment" in p and "total_matching" not in c
+        ]
+        assert detail_params, "detail builder never received stereo_assignment"
+
+    @pytest.mark.parametrize("name", _MIS_ASSAY_TOOLS)
+    def test_by_stereo_assignment_envelope(self, name):
+        call, make = _mis_assay_calls()[name]
+        conn = make({"total_matching": 70, "by_stereo_assignment": _MIS_STEREO_FREQ})
+        out = call(conn, summary=True)
+        assert out["by_stereo_assignment"] == [
+            {"stereo_assignment": "as_reported", "count": 49},
+            {"stereo_assignment": "dominant_form_assumed", "count": 21},
+        ]
+
+    @pytest.mark.parametrize("name", _MIS_ASSAY_TOOLS)
+    def test_dominant_form_warning(self, name):
+        call, make = _mis_assay_calls()[name]
+        conn = make({"total_matching": 70, "by_stereo_assignment": _MIS_STEREO_FREQ})
+        out = call(conn, summary=True)
+        hits = [w for w in out["warnings"] if "dominant stereo form" in w]
+        assert len(hits) == 1, out["warnings"]
+        w = hits[0]
+        assert "21 of 70 rows" in w
+        assert "stereo_assignment=['as_reported']" in w
+
+    @pytest.mark.parametrize("name", _MIS_ASSAY_TOOLS)
+    def test_no_warning_when_all_as_reported(self, name):
+        call, make = _mis_assay_calls()[name]
+        conn = make({"total_matching": 49,
+                     "by_stereo_assignment": [{"item": "as_reported", "count": 49}]})
+        out = call(conn, summary=True)
+        assert not any("dominant stereo form" in w for w in out["warnings"])
+
+    @pytest.mark.parametrize("name", _MIS_ASSAY_TOOLS)
+    def test_detail_row_carries_stereo_assignment(self, name):
+        call, make = _mis_assay_calls()[name]
+        row = {"metabolite_id": "kegg.compound:C00041", "name": "L-Alanine",
+               "metabolite_name": "L-Alanine", "assay_id": "a1",
+               "evidence_kind": "quantifies",
+               "stereo_assignment": "dominant_form_assumed"}
+        conn = make({"total_matching": 1,
+                     "by_stereo_assignment": [
+                         {"item": "dominant_form_assumed", "count": 1}]},
+                    detail=[row])
+        out = call(conn)
+        assert out["results"][0]["stereo_assignment"] == "dominant_form_assumed"
+
+    @pytest.mark.parametrize("name", _MIS_ASSAY_TOOLS)
+    def test_unknown_stereo_value_warns_never_raises(self, name):
+        call, make = _mis_assay_calls()[name]
+        conn = make({"total_matching": 0, "by_stereo_assignment": []})
+        out = call(conn, stereo_assignment=["bogus_form"], summary=True)
+        assert any("bogus_form" in w and "stereo_assignment" in w
+                   for w in out["warnings"]), out["warnings"]
+
+    def test_quantifies_empty_path_carries_by_stereo_assignment(self):
+        """No surviving assay → early-return envelope still has the key."""
+        conn = _MisConn(summary=_MQA_SUMMARY, diag=[], vocab=_MIS_STEREO_VOCAB)
+        out = api.metabolites_by_quantifies_assay(
+            assay_ids=["nope"], summary=True, conn=conn)
+        assert out["by_stereo_assignment"] == []
+
+
+# -- §E list_filter_values ---------------------------------------------------
+
+
+class TestListFilterValuesIdentitySurface:
+    """§E: structure_kind, kegg_functional_category, kegg_brite_class (node),
+    stereo_assignment (edge, two rel types) — all vocabulary reads."""
+
+    @staticmethod
+    def _fake(calls, values, *, descs=None, description="d"):
+        def fake_read(conn, applies_to, prop, kind, *, cache=True):
+            calls.append((applies_to, prop, kind))
+            return {"values": list(values), "value_descriptions": dict(descs or {}),
+                    "description": description, "source": "vocabulary",
+                    "warning": None}
+        return fake_read
+
+    def test_structure_kind(self, monkeypatch):
+        calls = []
+        monkeypatch.setattr(api, "_read_vocab_values",
+                            self._fake(calls, ["defined", "generic", "polymer"]))
+        out = api.list_filter_values(filter_type="structure_kind", conn=MagicMock())
+        assert {r["value"] for r in out["results"]} == {
+            "defined", "generic", "polymer"}
+        assert calls == [("Metabolite", "structure_kind", "node")]
+        assert all(r["applies_to"] == ["Metabolite"] for r in out["results"])
+
+    def test_kegg_functional_category_carries_value_descriptions(self, monkeypatch):
+        calls = []
+        monkeypatch.setattr(api, "_read_vocab_values", self._fake(
+            calls, ["Peptides", "Lipids"],
+            descs={"Peptides": "amino acids, peptides and amines"}))
+        out = api.list_filter_values(
+            filter_type="kegg_functional_category", conn=MagicMock())
+        by_value = {r["value"]: r for r in out["results"]}
+        assert set(by_value) == {"Peptides", "Lipids"}
+        assert by_value["Peptides"]["description"] == (
+            "amino acids, peptides and amines")
+        assert calls == [("Metabolite", "kegg_functional_categories", "node")]
+
+    def test_kegg_brite_class_no_row_descriptions_envelope_description(
+            self, monkeypatch):
+        calls = []
+        tree_desc = "Trees: br08002 Lipids, br08003 Phytochemical compounds"
+        monkeypatch.setattr(api, "_read_vocab_values", self._fake(
+            calls, ["Lipids: Fatty acyls", "Pesticides: Pesticides"],
+            description=tree_desc))
+        out = api.list_filter_values(
+            filter_type="kegg_brite_class", conn=MagicMock())
+        assert {r["value"] for r in out["results"]} == {
+            "Lipids: Fatty acyls", "Pesticides: Pesticides"}
+        assert all(not r.get("description") for r in out["results"])
+        assert out["description"] == tree_desc
+        assert calls == [("Metabolite", "kegg_brite_classes", "node")]
+
+    def test_stereo_assignment_is_edge_scoped_on_both_assay_edges(self, monkeypatch):
+        calls = []
+        monkeypatch.setattr(api, "_read_vocab_values", self._fake(
+            calls, ["as_reported", "dominant_form_assumed"]))
+        out = api.list_filter_values(filter_type="stereo_assignment", conn=MagicMock())
+        by_value = {r["value"]: r for r in out["results"]}
+        assert set(by_value) == {"as_reported", "dominant_form_assumed"}
+        for row in out["results"]:
+            assert row["applies_to"] == [
+                "Assay_flags_metabolite", "Assay_quantifies_metabolite"]
+        assert sorted(calls) == [
+            ("Assay_flags_metabolite", "stereo_assignment", "edge"),
+            ("Assay_quantifies_metabolite", "stereo_assignment", "edge"),
+        ]
+
+    def test_stereo_assignment_in_multi_label_vocabs(self):
+        prop, labels, kind = api._MULTI_LABEL_VOCABS["stereo_assignment"]
+        assert prop == "stereo_assignment"
+        assert set(labels) == {"Assay_quantifies_metabolite",
+                               "Assay_flags_metabolite"}
+        assert kind == "edge"
+
+    def test_unknown_filter_type_error_lists_new_types(self, mock_conn):
+        with pytest.raises(ValueError) as exc_info:
+            api.list_filter_values(filter_type="bogus", conn=mock_conn)
+        msg = str(exc_info.value)
+        for name in ("structure_kind", "kegg_functional_category",
+                     "kegg_brite_class", "stereo_assignment"):
+            assert name in msg

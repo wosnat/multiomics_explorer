@@ -7333,6 +7333,11 @@ class TestBuildGenesByCategoricalMetric:
 # ---------------------------------------------------------------------------
 
 
+_ALL_IDENTIFIERS_ANY = re.compile(
+    r"ANY\(x IN \$(\w+) WHERE x IN coalesce\(m\.all_identifiers, \[\]\)\)"
+)
+
+
 class TestBuildListMetabolites:
     """Detail-builder tests for list_metabolites.
 
@@ -7359,25 +7364,28 @@ class TestBuildListMetabolites:
         assert params["metabolite_ids"] == [
             "kegg.compound:C00031", "kegg.compound:C00002"]
 
-    def test_kegg_compound_ids_filter(self):
-        cypher, params = self._build(kegg_compound_ids=["C00031"])
-        assert "m.kegg_compound_id IN $kegg_compound_ids" in cypher
-        assert params["kegg_compound_ids"] == ["C00031"]
-
-    def test_chebi_ids_filter(self):
-        cypher, params = self._build(chebi_ids=["4167", "15422"])
-        assert "m.chebi_id IN $chebi_ids" in cypher
-        assert params["chebi_ids"] == ["4167", "15422"]
-
-    def test_hmdb_ids_filter(self):
-        cypher, params = self._build(hmdb_ids=["HMDB0000122"])
-        assert "m.hmdb_id IN $hmdb_ids" in cypher
-        assert params["hmdb_ids"] == ["HMDB0000122"]
-
-    def test_mnxm_ids_filter(self):
-        cypher, params = self._build(mnxm_ids=["MNXM1364061"])
-        assert "m.mnxm_id IN $mnxm_ids" in cypher
-        assert params["mnxm_ids"] == ["MNXM1364061"]
+    # metabolite-identity surface §B: the four xref filters now match ANY of
+    # the metabolite's identifiers (`m.all_identifiers`, CURIE-only). The api
+    # layer normalises values to CURIEs; the builder receives CURIE lists
+    # (supersedes the exact `m.<xref>_id IN $...` clauses).
+    @pytest.mark.parametrize("kwarg, curies", [
+        ("kegg_compound_ids", ["kegg.compound:C00031"]),
+        ("chebi_ids", ["chebi:4167", "chebi:15422"]),
+        ("hmdb_ids", ["hmdb:HMDB0000122"]),
+        ("mnxm_ids", ["mnx:MNXM1364061"]),
+    ])
+    def test_xref_filter_matches_all_identifiers(self, kwarg, curies):
+        cypher, params = self._build(**{kwarg: curies})
+        m = _ALL_IDENTIFIERS_ANY.search(cypher)
+        assert m, f"{kwarg}: no all_identifiers ANY clause in {cypher!r}"
+        assert params[m.group(1)] == curies
+        legacy = {
+            "kegg_compound_ids": "m.kegg_compound_id IN",
+            "chebi_ids": "m.chebi_id IN",
+            "hmdb_ids": "m.hmdb_id IN",
+            "mnxm_ids": "m.mnxm_id IN",
+        }[kwarg]
+        assert legacy not in cypher
 
     def test_elements_filter_single(self):
         """elements filter uses ALL(... IN coalesce(m.elements, []))."""
@@ -13229,65 +13237,92 @@ class TestClusterTypeVocabulary:
 
 
 # ---------------------------------------------------------------------------
-# Bare metabolite-ID coercion (backlog 3.2, Mode B) — alias-resolver builder
+# Metabolite CURIE resolver (metabolite-identity surface §A; supersedes the
+# backlog 3.2 bare-alias resolver builder)
 # ---------------------------------------------------------------------------
 
 
-class TestBuildResolveMetaboliteAliases:
-    """`build_resolve_metabolite_aliases(raw_ids)` — one UNWIND round-trip
-    mapping bare / xref forms to canonical `Metabolite.id`.
+class TestBuildResolveMetaboliteCuries:
+    """`build_resolve_metabolite_curies(curies)` — metabolite-identity surface
+    (spec docs/tool-specs/metabolite-identity-surface.md §A). Replaces
+    `build_resolve_metabolite_aliases`: one UNWIND round-trip over CURIEs
+    already normalised in the api layer; index path (`Metabolite.id`) first,
+    `all_identifiers` scan only on a miss, then the `recurated_from_ids` and
+    `ChemicalRole` diagnostics branches.
 
     Imports happen inside each test so pre-impl collection still passes.
     """
 
-    def _build(self, raw_ids):
+    def _build(self, curies):
         from multiomics_explorer.kg.queries_lib import (
-            build_resolve_metabolite_aliases,
+            build_resolve_metabolite_curies,
         )
-        return build_resolve_metabolite_aliases(raw_ids)
+        return build_resolve_metabolite_curies(curies)
 
     def test_returns_cypher_and_params(self):
-        out = self._build(["C00064"])
+        out = self._build(["kegg.compound:C00244"])
         assert isinstance(out, tuple) and len(out) == 2
         cypher, params = out
         assert isinstance(cypher, str)
         assert isinstance(params, dict)
 
-    def test_params_is_exactly_raw(self):
-        raw = ["C00064", "CHEBI:17234", "HMDB0000122"]
-        _, params = self._build(raw)
-        assert params == {"raw": raw}
+    def test_params_is_exactly_curies(self):
+        curies = ["kegg.compound:C00244", "chebi:14654", "hmdb:HMDB0000122"]
+        _, params = self._build(curies)
+        assert params == {"curies": curies}
 
-    def test_unwinds_raw(self):
-        cypher, _ = self._build(["C00064"])
-        assert "UNWIND $raw" in cypher
+    def test_unwinds_curies(self):
+        cypher, _ = self._build(["chebi:14654"])
+        assert "UNWIND $curies AS c" in cypher
 
-    def test_matches_all_four_xref_properties(self):
-        cypher, _ = self._build(["C00064"])
-        for prop in ("m.kegg_compound_id", "m.chebi_id", "m.hmdb_id", "m.mnxm_id"):
-            assert prop in cypher, f"missing xref match on {prop}"
+    def test_index_first_match_on_metabolite_id(self):
+        cypher, _ = self._build(["chebi:14654"])
+        assert "MATCH (m:Metabolite {id: c})" in cypher
 
-    def test_matches_metabolite_label(self):
-        cypher, _ = self._build(["C00064"])
-        assert "(m:Metabolite)" in cypher
+    def test_all_identifiers_fallback_only_on_miss(self):
+        cypher, _ = self._build(["chebi:14654"])
+        assert "c IN m.all_identifiers" in cypher
+        assert "size(direct) = 0" in cypher
+        # Index path precedes the list-membership scan.
+        assert cypher.index("{id: c}") < cypher.index("all_identifiers")
 
-    def test_chebi_prefix_is_stripped_case_insensitively(self):
-        """`CHEBI:NNN` → key `NNN` before matching `m.chebi_id`."""
-        cypher, _ = self._build(["CHEBI:17234"])
-        assert "toUpper(raw) STARTS WITH 'CHEBI:'" in cypher
+    def test_recurated_branch(self):
+        cypher, _ = self._build(["kegg.compound:C00525"])
+        assert "recurated_from_ids" in cypher
+        assert "AS recurated_to" in cypher
 
-    def test_returns_raw_and_canonical(self):
-        cypher, _ = self._build(["C00064"])
+    def test_chemical_role_branch(self):
+        cypher, _ = self._build(["chebi:10004"])
+        assert "(r:ChemicalRole)" in cypher
+        assert "AS roles" in cypher
+        # Role match on own id OR any of its chebi: identifiers.
+        assert "r.id = c" in cypher
+        assert "c IN r.all_identifiers" in cypher
+
+    def test_diagnostic_branches_gated_on_no_canonical(self):
+        cypher, _ = self._build(["kegg.compound:C00525"])
+        assert cypher.count("size(canonical) = 0") >= 2
+
+    def test_return_columns(self):
+        cypher, _ = self._build(["chebi:14654"])
         return_clause = cypher[cypher.rfind("RETURN"):]
-        assert "raw" in return_clause
-        assert "AS canonical" in return_clause
-        # Multiple matches are collected, never picked one-of.
-        assert "collect(m.id)" in return_clause
+        for col in ("c AS curie", "canonical", "recurated_to", "AS roles"):
+            assert col in return_clause, f"missing {col!r} in final RETURN"
 
-    def test_no_match_is_optional(self):
-        """Unresolved inputs must still produce a row (empty canonical)."""
-        cypher, _ = self._build(["bogus"])
+    def test_misses_still_produce_a_row(self):
+        """Unresolved CURIEs must still yield a row (OPTIONAL MATCH)."""
+        cypher, _ = self._build(["kegg.compound:C99999"])
         assert "OPTIONAL MATCH" in cypher
+
+    def test_no_legacy_xref_property_matching(self):
+        cypher, _ = self._build(["chebi:14654"])
+        for legacy in ("m.kegg_compound_id =", "m.chebi_id =",
+                       "m.hmdb_id =", "m.mnxm_id ="):
+            assert legacy not in cypher
+
+    def test_legacy_alias_builder_removed(self):
+        import multiomics_explorer.kg.queries_lib as ql
+        assert not hasattr(ql, "build_resolve_metabolite_aliases")
 
 
 # ---------------------------------------------------------------------------
@@ -13702,3 +13737,319 @@ class TestBuildListExperimentsCocultureRole:
         cypher, _ = build_list_experiments_summary(search_text="coculture")
         assert "apoc.coll.frequencies(roles) AS by_coculture_role" in cypher
         assert "score_max" in cypher
+
+
+# ---------------------------------------------------------------------------
+# Metabolite identity surface (spec docs/tool-specs/metabolite-identity-surface.md)
+# §B xref filters → all_identifiers, §C/§C2 structure_kind + KEGG classes on
+# list_metabolites, §D stereo_assignment on the 3 assay tools.
+# ---------------------------------------------------------------------------
+
+_MIS_XREF_KWARGS = {
+    "kegg_compound_ids": ["kegg.compound:C00085"],
+    "chebi_ids": ["chebi:14654"],
+    "hmdb_ids": ["hmdb:HMDB0000122"],
+    "mnxm_ids": ["mnx:MNXM732398"],
+}
+_MIS_STRUCTURE_KIND = "m.structure_kind IN $structure_kind"
+_MIS_KFC = (
+    "ANY(c IN coalesce(m.kegg_functional_categories, []) "
+    "WHERE c IN $kegg_functional_categories)"
+)
+_MIS_KBC = (
+    "ANY(x IN coalesce(m.kegg_brite_classes, []) "
+    "WHERE x IN $kegg_brite_classes)"
+)
+
+
+def _mis_final_return(cypher: str) -> str:
+    return cypher[cypher.rfind("RETURN"):]
+
+
+class TestListMetabolitesWhereIdentitySurface:
+    """`_list_metabolites_where` — §B xref clause + §C/§C2 filter clauses."""
+
+    def _where(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import _list_metabolites_where
+        return _list_metabolites_where(**kwargs)
+
+    @pytest.mark.parametrize("kwarg", sorted(_MIS_XREF_KWARGS))
+    def test_xref_filter_emits_all_identifiers_any(self, kwarg):
+        where, params = self._where(**{kwarg: _MIS_XREF_KWARGS[kwarg]})
+        m = _ALL_IDENTIFIERS_ANY.search(where)
+        assert m, f"{kwarg}: missing all_identifiers ANY clause: {where!r}"
+        assert params[m.group(1)] == _MIS_XREF_KWARGS[kwarg]
+
+    def test_each_xref_filter_is_its_own_condition_and_joined(self):
+        where, params = self._where(**_MIS_XREF_KWARGS)
+        matches = _ALL_IDENTIFIERS_ANY.findall(where)
+        assert len(matches) == 4, where
+        assert len(set(matches)) == 4, "each filter needs its own $param"
+        for name in matches:
+            assert params[name] in _MIS_XREF_KWARGS.values()
+        assert where.count(" AND ") >= 3
+
+    def test_no_legacy_xref_property_clauses(self):
+        where, _ = self._where(**_MIS_XREF_KWARGS)
+        for legacy in ("m.kegg_compound_id IN", "m.chebi_id IN",
+                       "m.hmdb_id IN", "m.mnxm_id IN"):
+            assert legacy not in where
+
+    def test_structure_kind_clause(self):
+        where, params = self._where(structure_kind=["generic", "polymer"])
+        assert _MIS_STRUCTURE_KIND in where
+        assert params["structure_kind"] == ["generic", "polymer"]
+
+    def test_kegg_functional_categories_clause(self):
+        where, params = self._where(kegg_functional_categories=["Peptides"])
+        assert _MIS_KFC in where
+        assert params["kegg_functional_categories"] == ["Peptides"]
+
+    def test_kegg_brite_classes_clause(self):
+        where, params = self._where(kegg_brite_classes=["Lipids: Fatty acyls"])
+        assert _MIS_KBC in where
+        assert params["kegg_brite_classes"] == ["Lipids: Fatty acyls"]
+
+    @pytest.mark.parametrize("kwarg", [
+        "structure_kind", "kegg_functional_categories", "kegg_brite_classes",
+    ])
+    def test_new_filters_absent_when_none(self, kwarg):
+        where, params = self._where(**{kwarg: None})
+        assert kwarg not in params
+        assert where == ""
+
+    def test_new_filters_and_joined_with_existing(self):
+        where, params = self._where(
+            elements=["N"], structure_kind=["defined"],
+            kegg_functional_categories=["Peptides"],
+            kegg_brite_classes=["Lipids: Fatty acyls"],
+        )
+        for clause in (_MIS_STRUCTURE_KIND, _MIS_KFC, _MIS_KBC,
+                       "ALL(e IN $elements WHERE e IN coalesce(m.elements, []))"):
+            assert clause in where
+        assert where.count(" AND ") >= 3
+
+
+class TestBuildListMetabolitesIdentitySurface:
+    """Detail builder: new compact columns (both variants) + filter passthrough."""
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolites
+        return build_list_metabolites(**kwargs)
+
+    @pytest.mark.parametrize("search_text", [None, "glucose"])
+    @pytest.mark.parametrize("col", [
+        "structure_kind", "kegg_functional_categories", "kegg_brite_classes",
+    ])
+    def test_compact_column_present(self, search_text, col):
+        cypher, _ = self._build(search_text=search_text)
+        ret = _mis_final_return(cypher)
+        assert f"m.{col}" in ret, f"{col} not read from m in RETURN"
+        assert f"AS {col}" in ret
+
+    @pytest.mark.parametrize("search_text", [None, "glucose"])
+    def test_filters_passthrough(self, search_text):
+        cypher, params = self._build(
+            search_text=search_text,
+            structure_kind=["generic"],
+            kegg_functional_categories=["Peptides"],
+            kegg_brite_classes=["Lipids: Fatty acyls"],
+            kegg_compound_ids=["kegg.compound:C00085"],
+        )
+        assert _MIS_STRUCTURE_KIND in cypher
+        assert _MIS_KFC in cypher
+        assert _MIS_KBC in cypher
+        assert _ALL_IDENTIFIERS_ANY.search(cypher)
+        assert params["structure_kind"] == ["generic"]
+        assert params["kegg_functional_categories"] == ["Peptides"]
+        assert params["kegg_brite_classes"] == ["Lipids: Fatty acyls"]
+
+
+class TestBuildListMetabolitesSummaryIdentitySurface:
+    """Summary builder: by_structure_kind / by_kegg_functional_category /
+    kegg_functional_unclassified / by_kegg_brite_class / kegg_brite_unclassified
+    on both the search and non-search variants."""
+
+    _KEYS = (
+        "by_structure_kind",
+        "by_kegg_functional_category",
+        "kegg_functional_unclassified",
+        "by_kegg_brite_class",
+        "kegg_brite_unclassified",
+    )
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_metabolites_summary,
+        )
+        return build_list_metabolites_summary(**kwargs)
+
+    @pytest.mark.parametrize("search_text", [None, "glucose"])
+    def test_envelope_keys_in_final_return(self, search_text):
+        cypher, _ = self._build(search_text=search_text)
+        ret = _mis_final_return(cypher)
+        for key in self._KEYS:
+            assert key in ret, f"missing {key} (search_text={search_text!r})"
+
+    @pytest.mark.parametrize("search_text", [None, "glucose"])
+    def test_reads_the_three_properties(self, search_text):
+        cypher, _ = self._build(search_text=search_text)
+        for prop in ("m.structure_kind", "m.kegg_functional_categories",
+                     "m.kegg_brite_classes"):
+            assert prop in cypher
+
+    @pytest.mark.parametrize("search_text", [None, "glucose"])
+    def test_frequencies_and_flatten(self, search_text):
+        cypher, _ = self._build(search_text=search_text)
+        assert "collect(coalesce(m.kegg_functional_categories, []))" in cypher
+        assert "collect(coalesce(m.kegg_brite_classes, []))" in cypher
+        # 5 pre-existing (evidence, organisms, pathways, paper_count, compartment)
+        assert cypher.count("apoc.coll.frequencies(") >= 5 + 3
+
+    @pytest.mark.parametrize("search_text", [None, "glucose"])
+    def test_unclassified_counts_use_empty_size(self, search_text):
+        cypher, _ = self._build(search_text=search_text)
+        assert (
+            "size(coalesce(m.kegg_functional_categories, [])) = 0" in cypher
+        )
+        assert "size(coalesce(m.kegg_brite_classes, [])) = 0" in cypher
+
+    @pytest.mark.parametrize("search_text", [None, "glucose"])
+    def test_filters_passthrough(self, search_text):
+        cypher, params = self._build(
+            search_text=search_text,
+            structure_kind=["generic", "polymer"],
+            kegg_functional_categories=["Peptides"],
+            kegg_brite_classes=["Lipids: Fatty acyls"],
+            chebi_ids=["chebi:14654"],
+        )
+        assert _MIS_STRUCTURE_KIND in cypher
+        assert _MIS_KFC in cypher
+        assert _MIS_KBC in cypher
+        assert _ALL_IDENTIFIERS_ANY.search(cypher)
+        assert params["structure_kind"] == ["generic", "polymer"]
+
+    def test_no_formula_count_builder_accepts_new_filters(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_metabolites_no_formula_count,
+        )
+        cypher, params = build_list_metabolites_no_formula_count(
+            elements=["N"],
+            structure_kind=["generic"],
+            kegg_functional_categories=["Peptides"],
+            kegg_brite_classes=["Lipids: Fatty acyls"],
+            hmdb_ids=["hmdb:HMDB0000122"],
+        )
+        assert _MIS_STRUCTURE_KIND in cypher
+        assert _MIS_KFC in cypher
+        assert _MIS_KBC in cypher
+        assert _ALL_IDENTIFIERS_ANY.search(cypher)
+
+
+_MIS_STEREO_CLAUSE = "r.stereo_assignment IN $stereo_assignment"
+
+
+class TestAssayWhereStereoAssignment:
+    """§D: `stereo_assignment` filter on the quantifies / flags `_where` builders."""
+
+    @pytest.mark.parametrize("helper", [
+        "_metabolites_by_quantifies_assay_where",
+        "_metabolites_by_flags_assay_where",
+    ])
+    def test_clause_and_param(self, helper):
+        import multiomics_explorer.kg.queries_lib as ql
+        conditions, params = getattr(ql, helper)(stereo_assignment=["as_reported"])
+        assert _MIS_STEREO_CLAUSE in conditions
+        assert params["stereo_assignment"] == ["as_reported"]
+
+    @pytest.mark.parametrize("helper", [
+        "_metabolites_by_quantifies_assay_where",
+        "_metabolites_by_flags_assay_where",
+    ])
+    def test_absent_when_none(self, helper):
+        import multiomics_explorer.kg.queries_lib as ql
+        conditions, params = getattr(ql, helper)(stereo_assignment=None)
+        assert conditions == []
+        assert "stereo_assignment" not in params
+
+
+class TestAssayBuildersStereoAssignment:
+    """§D: compact `stereo_assignment` column, filter passthrough and
+    `by_stereo_assignment` summary rollup on the quantifies / flags builders."""
+
+    @pytest.mark.parametrize("builder", [
+        "build_metabolites_by_quantifies_assay",
+        "build_metabolites_by_flags_assay",
+    ])
+    def test_detail_compact_column(self, builder):
+        import multiomics_explorer.kg.queries_lib as ql
+        cypher, _ = getattr(ql, builder)(assay_ids=["a1"])
+        assert "r.stereo_assignment AS stereo_assignment" in cypher
+
+    @pytest.mark.parametrize("builder", [
+        "build_metabolites_by_quantifies_assay",
+        "build_metabolites_by_flags_assay",
+        "build_metabolites_by_quantifies_assay_summary",
+        "build_metabolites_by_flags_assay_summary",
+    ])
+    def test_filter_passthrough(self, builder):
+        import multiomics_explorer.kg.queries_lib as ql
+        cypher, params = getattr(ql, builder)(
+            assay_ids=["a1"], stereo_assignment=["as_reported"])
+        assert _MIS_STEREO_CLAUSE in cypher
+        assert params["stereo_assignment"] == ["as_reported"]
+
+    @pytest.mark.parametrize("builder", [
+        "build_metabolites_by_quantifies_assay_summary",
+        "build_metabolites_by_flags_assay_summary",
+    ])
+    def test_summary_by_stereo_assignment(self, builder):
+        import multiomics_explorer.kg.queries_lib as ql
+        cypher, _ = getattr(ql, builder)(assay_ids=["a1"])
+        assert "r.stereo_assignment" in cypher
+        assert "by_stereo_assignment" in _mis_final_return(cypher)
+        assert "apoc.coll.frequencies" in cypher
+
+
+class TestAssaysByMetaboliteStereoAssignment:
+    """§D on the polymorphic UNION builders — `stereo_assignment` is shared
+    by both arms (rq / rf), never null-padded."""
+
+    _MID = ["kegg.compound:C00041"]
+
+    def test_detail_both_arms_project_column(self):
+        from multiomics_explorer.kg.queries_lib import build_assays_by_metabolite
+        cypher, _ = build_assays_by_metabolite(metabolite_ids=self._MID)
+        assert "rq.stereo_assignment AS stereo_assignment" in cypher
+        assert "rf.stereo_assignment AS stereo_assignment" in cypher
+        assert "null AS stereo_assignment" not in cypher
+        assert "stereo_assignment" in _mis_final_return(cypher)
+
+    @pytest.mark.parametrize("builder", [
+        "build_assays_by_metabolite", "build_assays_by_metabolite_summary",
+    ])
+    def test_filter_on_both_arms(self, builder):
+        import multiomics_explorer.kg.queries_lib as ql
+        cypher, params = getattr(ql, builder)(
+            metabolite_ids=self._MID, stereo_assignment=["as_reported"])
+        assert "rq.stereo_assignment IN $stereo_assignment" in cypher
+        assert "rf.stereo_assignment IN $stereo_assignment" in cypher
+        assert params["stereo_assignment"] == ["as_reported"]
+
+    @pytest.mark.parametrize("builder", [
+        "build_assays_by_metabolite", "build_assays_by_metabolite_summary",
+    ])
+    def test_no_filter_when_none(self, builder):
+        import multiomics_explorer.kg.queries_lib as ql
+        cypher, params = getattr(ql, builder)(metabolite_ids=self._MID)
+        assert "IN $stereo_assignment" not in cypher
+        assert "stereo_assignment" not in params
+
+    def test_summary_rolls_up_both_arms(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_assays_by_metabolite_summary,
+        )
+        cypher, _ = build_assays_by_metabolite_summary(metabolite_ids=self._MID)
+        assert "rq.stereo_assignment" in cypher
+        assert "rf.stereo_assignment" in cypher
+        assert "by_stereo_assignment" in _mis_final_return(cypher)

@@ -4819,3 +4819,222 @@ class TestListExperimentsCocultureRole:
         for r in result["results"]:
             assert r["applies_to"] == ["Tests_coculture_with"]
             assert r["source"] == "vocabulary"
+
+
+# ---------------------------------------------------------------------------
+# Metabolite identity surface (spec docs/tool-specs/metabolite-identity-surface.md)
+# Live values verified on build 2026-10-15T19:17Z.
+# ---------------------------------------------------------------------------
+
+_MIS_MSYSTEMS_FLAG_ASSAYS = [
+    "metabolite_assay:msystems.01261-22:presence_flags_table_s2:"
+    "presence_flag_extracellular",
+    "metabolite_assay:msystems.01261-22:presence_flags_table_s2:"
+    "presence_flag_intracellular",
+]
+_MIS_PNAS_MIT9313_ASSAY = (
+    "metabolite_assay:pnas.2213271120:"
+    "metabolites_intracellular_mit9313:cellular_concentration")
+
+
+@pytest.mark.kg
+class TestMetaboliteIdentitySurface:
+    """§A resolver, §B xref filters, §C/§C2 classes, §D stereo_assignment."""
+
+    # -- §A resolver ---------------------------------------------------------
+    def test_retired_chebi_resolves_to_nitrate(self, conn):
+        out = api.list_metabolites(metabolite_ids=["chebi:14654"], conn=conn)
+        assert [r["metabolite_id"] for r in out["results"]] == [
+            "kegg.compound:C00244"]
+        assert out["resolved_aliases"] == {
+            "chebi:14654": ["kegg.compound:C00244"]}
+        assert out["not_found"]["metabolite_ids"] == []
+
+    def test_recurated_id_lands_in_not_found_with_warning(self, conn):
+        out = api.list_metabolites(
+            metabolite_ids=["kegg.compound:C00525"], conn=conn)
+        assert out["not_found"]["metabolite_ids"] == ["kegg.compound:C00525"]
+        assert out["resolved_aliases"] == {}
+        assert any("kegg.compound:C00078" in w for w in out["warnings"]), \
+            out["warnings"]
+
+    def test_role_id_lands_in_not_found_with_warning(self, conn):
+        out = api.list_metabolites(metabolite_ids=["chebi:10004"], conn=conn)
+        assert out["not_found"]["metabolite_ids"] == ["chebi:10004"]
+        assert any("chebi.role:33229" in w for w in out["warnings"]), \
+            out["warnings"]
+
+    def test_mixed_batch(self, conn):
+        out = api.list_metabolites(
+            metabolite_ids=["kegg.compound:C00244", "chebi:14654",
+                            "kegg.compound:C99999"],
+            conn=conn)
+        assert [r["metabolite_id"] for r in out["results"]] == [
+            "kegg.compound:C00244"]
+        assert out["resolved_aliases"] == {
+            "chebi:14654": ["kegg.compound:C00244"]}
+        assert out["not_found"]["metabolite_ids"] == ["kegg.compound:C99999"]
+
+    def test_genes_by_metabolite_retired_nitrate_returns_rows(self, conn):
+        out = api.genes_by_metabolite(
+            ["chebi:14654"], "Prochlorococcus MED4", conn=conn)
+        assert out["total_matching"] > 0
+        assert out["resolved_aliases"] == {
+            "chebi:14654": ["kegg.compound:C00244"]}
+        assert {r["metabolite_id"] for r in out["results"]} == {
+            "kegg.compound:C00244"}
+
+    # -- §B xref filters -----------------------------------------------------
+    def test_kegg_xref_filter_finds_merged_member(self, conn):
+        out = api.list_metabolites(kegg_compound_ids=["C01327"], conn=conn)
+        assert [r["metabolite_id"] for r in out["results"]] == [
+            "kegg.compound:C00698"]
+
+    def test_kegg_xref_filter_own_id(self, conn):
+        out = api.list_metabolites(kegg_compound_ids=["C00085"], conn=conn)
+        assert [r["metabolite_id"] for r in out["results"]] == [
+            "kegg.compound:C00085"]
+
+    @pytest.mark.parametrize("kwargs", [
+        {"chebi_ids": ["chebi:14654"]},
+        {"chebi_ids": ["17632"]},
+        {"mnxm_ids": ["mnx:MNXM732398"]},
+    ])
+    def test_xref_filters_find_nitrate(self, conn, kwargs):
+        out = api.list_metabolites(conn=conn, **kwargs)
+        assert [r["metabolite_id"] for r in out["results"]] == [
+            "kegg.compound:C00244"]
+
+    def test_chebi_filter_d_glucose(self, conn):
+        """Ask 5 (build 2026-10-15T19:58Z): chebi:17634 sits on D-Glucose."""
+        out = api.list_metabolites(chebi_ids=["17634"], conn=conn)
+        assert [r["metabolite_id"] for r in out["results"]] == [
+            "kegg.compound:C00031"]
+
+    def test_hmdb_filter(self, conn):
+        """KG ask 5 (build 2026-10-15T19:58Z) moved HMDB0000122 off the
+        beta-anomer C00221 onto D-Glucose C00031."""
+        out = api.list_metabolites(hmdb_ids=["hmdb:HMDB0000122"], conn=conn)
+        assert [r["metabolite_id"] for r in out["results"]] == [
+            "kegg.compound:C00031"]
+
+    # -- §C/§C2 classes --------------------------------------------------------
+    def test_structure_kind_generic_polymer(self, conn):
+        out = api.list_metabolites(
+            structure_kind=["generic", "polymer"], summary=True, conn=conn)
+        assert out["total_matching"] == 650
+
+    def test_kegg_functional_category_peptides(self, conn):
+        out = api.list_metabolites(
+            kegg_functional_categories=["Peptides"], summary=True, conn=conn)
+        assert out["total_matching"] == 60
+
+    def test_kegg_brite_class_fatty_acyls(self, conn):
+        out = api.list_metabolites(
+            kegg_brite_classes=["Lipids: Fatty acyls"], summary=True, conn=conn)
+        assert out["total_matching"] == 254
+
+    def test_ouabain_brite_classes(self, conn):
+        out = api.list_metabolites(
+            metabolite_ids=["kegg.compound:C01443"], conn=conn)
+        row = out["results"][0]
+        assert sorted(row["kegg_brite_classes"]) == [
+            "Glycosides: O-glycosides", "Lipids: Sterol lipids",
+            "Natural toxins: Phytotoxins", "Phytochemical compounds: Terpenoids",
+        ]
+        assert row["kegg_functional_categories"] == ["Steroids"]
+        assert row["structure_kind"] == "defined"
+
+    def test_fumarate_unclassified_is_absent(self, conn):
+        out = api.list_metabolites(
+            metabolite_ids=["kegg.compound:C00122"], conn=conn)
+        row = out["results"][0]
+        assert "kegg_functional_categories" not in row
+        assert "kegg_brite_classes" not in row
+
+    def test_summary_not_classified_tails(self, conn):
+        out = api.list_metabolites(summary=True, conn=conn)
+        assert out["by_kegg_functional_category"][-1] == {
+            "kegg_functional_category": "not classified", "count": 2880}
+        assert out["by_kegg_brite_class"][-1] == {
+            "kegg_brite_class": "not classified", "count": 2562}
+        assert {b["structure_kind"]: b["count"]
+                for b in out["by_structure_kind"]} == {
+            "defined": 2564, "generic": 624, "polymer": 26}
+
+    def test_transport_n_breakdown(self, conn):
+        out = api.list_metabolites(
+            evidence_sources=["transport"], elements=["N"], summary=True,
+            conn=conn)
+        assert out["total_matching"] == 672
+        assert {b["structure_kind"]: b["count"]
+                for b in out["by_structure_kind"]} == {
+            "defined": 606, "generic": 62, "polymer": 4}
+        assert out["by_kegg_functional_category"][-1] == {
+            "kegg_functional_category": "not classified", "count": 533}
+
+    def test_unknown_brite_class_warns_and_matches_nothing(self, conn):
+        out = api.list_metabolites(
+            kegg_brite_classes=["Fatty acyls"], summary=True, conn=conn)
+        assert out["total_matching"] == 0
+        assert any("Fatty acyls" in w for w in out["warnings"])
+
+    # -- §D stereo_assignment ------------------------------------------------
+    def test_flags_dominant_form_per_msystems_assay(self, conn):
+        out = api.metabolites_by_flags_assay(
+            assay_ids=_MIS_MSYSTEMS_FLAG_ASSAYS,
+            stereo_assignment=["dominant_form_assumed"], summary=True,
+            conn=conn)
+        assert {b["assay_id"]: b["count"] for b in out["by_assay"]} == {
+            a: 21 for a in _MIS_MSYSTEMS_FLAG_ASSAYS}
+
+    def test_flags_by_stereo_assignment_sums_and_warns(self, conn):
+        out = api.metabolites_by_flags_assay(
+            assay_ids=_MIS_MSYSTEMS_FLAG_ASSAYS, summary=True, conn=conn)
+        assert sum(b["count"] for b in out["by_stereo_assignment"]) \
+            == out["total_matching"]
+        assert {b["stereo_assignment"]: b["count"]
+                for b in out["by_stereo_assignment"]} == {
+            "as_reported": 144, "dominant_form_assumed": 42}
+        assert any("dominant stereo form" in w for w in out["warnings"])
+
+    def test_quantifies_by_stereo_assignment_sums(self, conn):
+        out = api.metabolites_by_quantifies_assay(
+            assay_ids=[_MIS_PNAS_MIT9313_ASSAY], summary=True, conn=conn)
+        assert sum(b["count"] for b in out["by_stereo_assignment"]) \
+            == out["total_matching"]
+
+    def test_assays_by_metabolite_l_ala_all_assumed(self, conn):
+        out = api.assays_by_metabolite(
+            metabolite_ids=["kegg.compound:C00041"], summary=True, conn=conn)
+        assert {b["stereo_assignment"]: b["count"]
+                for b in out["by_stereo_assignment"]} == {
+            "dominant_form_assumed": 6}
+        assert sum(b["count"] for b in out["by_stereo_assignment"]) \
+            == out["total_matching"]
+        filtered = api.assays_by_metabolite(
+            metabolite_ids=["kegg.compound:C00041"],
+            stereo_assignment=["as_reported"], summary=True, conn=conn)
+        assert filtered["total_matching"] == 0
+        assert filtered["not_matched"] == ["kegg.compound:C00041"]
+
+    # -- §E list_filter_values ---------------------------------------------
+    @pytest.mark.parametrize("filter_type, expected", [
+        ("structure_kind", {"defined", "generic", "polymer"}),
+        ("stereo_assignment", {"as_reported", "dominant_form_assumed"}),
+    ])
+    def test_filter_values_small_vocabs(self, conn, filter_type, expected):
+        out = api.list_filter_values(filter_type=filter_type, conn=conn)
+        assert {r["value"] for r in out["results"]} == expected
+        assert out["warnings"] == []
+
+    def test_filter_values_kegg_functional_category(self, conn):
+        out = api.list_filter_values(
+            filter_type="kegg_functional_category", conn=conn)
+        assert len(out["results"]) == 9
+        assert "Peptides" in {r["value"] for r in out["results"]}
+
+    def test_filter_values_kegg_brite_class(self, conn):
+        out = api.list_filter_values(filter_type="kegg_brite_class", conn=conn)
+        assert len(out["results"]) == 28
+        assert "Lipids: Fatty acyls" in {r["value"] for r in out["results"]}

@@ -12639,3 +12639,306 @@ class TestListFilterValuesPartnerRoleWrapper:
         assert result.filter_type == "partner_role"
         assert {r.value for r in result.results} == {"treatment", "background"}
         assert all(r.applies_to == ["Tests_coculture_with"] for r in result.results)
+
+
+# ---------------------------------------------------------------------------
+# Metabolite identity surface (spec docs/tool-specs/metabolite-identity-surface.md)
+# §B/§C/§C2 list_metabolites, §D assay stereo_assignment, §E filter types.
+# No new tool — EXPECTED_TOOLS unchanged.
+# ---------------------------------------------------------------------------
+
+# Frozen Pydantic wording (spec §C / §C2) — exact match.
+_MIS_KFC_PARAM_DESC = (
+    "KEGG br08001 categories (OR). Hand-curated and partial: only ~10% of "
+    "metabolites are listed, so a missing category means 'KEGG did not list "
+    "it', not 'not in it' (fumarate is unclassified). Values: "
+    "list_filter_values('kegg_functional_category')."
+)
+_MIS_KFC_FIELD_DESC = (
+    "KEGG br08001 categories this metabolite is listed under. Absent = KEGG "
+    "did not list it (~90% of metabolites), not 'none apply'. Curated, "
+    "functional headings (amines sit under Peptides)."
+)
+_MIS_KBC_PARAM_DESC = (
+    "Classes from 7 other KEGG compound BRITE trees, as 'Tree: Class' (OR), "
+    "e.g. 'Lipids: Fatty acyls'. Curated and partial (~20% of metabolites): "
+    "unlisted = 'KEGG did not list it', not 'not in it'. Values: "
+    "list_filter_values('kegg_brite_class')."
+)
+_MIS_KBC_FIELD_DESC = (
+    "'Tree: Class' from 7 KEGG compound BRITE trees (lipids, phytochemicals, "
+    "glycosides, pesticides, toxins, endocrine disruptors, bioactive "
+    "peptides). Absent = KEGG did not list it (~80% of metabolites)."
+)
+
+
+def _mis_param_description(tool_fns, name, param):
+    import typing
+    hints = typing.get_type_hints(tool_fns[name], include_extras=True)
+    ann = hints[param]
+    for meta in getattr(ann, "__metadata__", ()):
+        if getattr(meta, "description", None):
+            return meta.description
+    raise AssertionError(f"{name}.{param} has no Field(description=...)")
+
+
+def _mis_row_model(tool_fns, name):
+    import typing
+    resp = typing.get_type_hints(tool_fns[name])["return"]
+    return typing.get_args(resp.model_fields["results"].annotation)[0]
+
+
+def _mis_response_model(tool_fns, name):
+    import typing
+    return typing.get_type_hints(tool_fns[name])["return"]
+
+
+_MIS_LM_API_RETURN = {
+    **_LM_SAMPLE_API_RETURN,
+    "by_structure_kind": [
+        {"structure_kind": "defined", "count": 606},
+        {"structure_kind": "generic", "count": 62},
+        {"structure_kind": "polymer", "count": 4},
+    ],
+    "by_kegg_functional_category": [
+        {"kegg_functional_category": "Peptides", "count": 47},
+        {"kegg_functional_category": "not classified", "count": 533},
+    ],
+    "by_kegg_brite_class": [
+        {"kegg_brite_class": "Lipids: Fatty acyls", "count": 12},
+        {"kegg_brite_class": "not classified", "count": 600},
+    ],
+}
+
+
+class TestListMetabolitesIdentitySurfaceWrapper:
+    """§B/§C/§C2 at the MCP boundary."""
+
+    def test_expected_tools_unchanged(self, tool_fns):
+        assert len(EXPECTED_TOOLS) == 42
+        assert sorted(tool_fns) == sorted(EXPECTED_TOOLS)
+
+    @pytest.mark.asyncio
+    async def test_new_params_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=_MIS_LM_API_RETURN,
+        ) as mock_api:
+            await tool_fns["list_metabolites"](
+                mock_ctx,
+                structure_kind=["generic", "polymer"],
+                kegg_functional_categories=["Peptides"],
+                kegg_brite_classes=["Lipids: Fatty acyls"],
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["structure_kind"] == ["generic", "polymer"]
+        assert kwargs["kegg_functional_categories"] == ["Peptides"]
+        assert kwargs["kegg_brite_classes"] == ["Lipids: Fatty acyls"]
+
+    @pytest.mark.parametrize("param", [
+        "structure_kind", "kegg_functional_categories", "kegg_brite_classes",
+    ])
+    def test_new_params_default_none(self, tool_fns, param):
+        import inspect
+        sig = inspect.signature(tool_fns["list_metabolites"])
+        assert sig.parameters[param].default is None
+
+    def test_kegg_functional_categories_param_description_frozen(self, tool_fns):
+        assert _mis_param_description(
+            tool_fns, "list_metabolites", "kegg_functional_categories",
+        ) == _MIS_KFC_PARAM_DESC
+
+    def test_kegg_brite_classes_param_description_frozen(self, tool_fns):
+        assert _mis_param_description(
+            tool_fns, "list_metabolites", "kegg_brite_classes",
+        ) == _MIS_KBC_PARAM_DESC
+
+    @pytest.mark.parametrize("param", ["kegg_compound_ids", "chebi_ids",
+                                       "hmdb_ids", "mnxm_ids"])
+    def test_xref_param_docs_any_identifier(self, tool_fns, param):
+        """§B: values match any of the metabolite's identifiers, including
+        secondary and retired ones — the param text must say so."""
+        desc = _mis_param_description(tool_fns, "list_metabolites", param).lower()
+        assert "identifier" in desc, desc
+        assert "retired" in desc, desc
+
+    def test_row_fields_and_frozen_descriptions(self):
+        from multiomics_explorer.mcp_server.tools import MetaboliteResult
+        fields = MetaboliteResult.model_fields
+        assert "structure_kind" in fields
+        assert fields["kegg_functional_categories"].description == _MIS_KFC_FIELD_DESC
+        assert fields["kegg_brite_classes"].description == _MIS_KBC_FIELD_DESC
+
+    def test_envelope_fields_on_response_model(self):
+        from multiomics_explorer.mcp_server.tools import ListMetabolitesResponse
+        for key in ("by_structure_kind", "by_kegg_functional_category",
+                    "by_kegg_brite_class"):
+            assert key in ListMetabolitesResponse.model_fields
+        for raw in ("kegg_functional_unclassified", "kegg_brite_unclassified"):
+            assert raw not in ListMetabolitesResponse.model_fields
+
+    @pytest.mark.asyncio
+    async def test_envelope_parses(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=_MIS_LM_API_RETURN,
+        ):
+            result = await tool_fns["list_metabolites"](mock_ctx, summary=True)
+        assert [(b.structure_kind, b.count) for b in result.by_structure_kind] == [
+            ("defined", 606), ("generic", 62), ("polymer", 4)]
+        assert result.by_kegg_functional_category[-1].kegg_functional_category \
+            == "not classified"
+        assert result.by_kegg_functional_category[-1].count == 533
+        assert result.by_kegg_brite_class[0].kegg_brite_class == "Lipids: Fatty acyls"
+        assert result.by_kegg_brite_class[-1].count == 600
+
+    @pytest.mark.asyncio
+    async def test_rows_sparse_kegg_fields(self, tool_fns, mock_ctx):
+        unlisted = {**_LM_SAMPLE_RESULT, "metabolite_id": "kegg.compound:C00122",
+                    "name": "Fumarate", "structure_kind": "defined"}
+        listed = {**_LM_SAMPLE_RESULT, "metabolite_id": "kegg.compound:C01443",
+                  "name": "Ouabain", "structure_kind": "defined",
+                  "kegg_functional_categories": ["Steroids"],
+                  "kegg_brite_classes": ["Glycosides: O-glycosides",
+                                         "Lipids: Sterol lipids"]}
+        api_return = {**_MIS_LM_API_RETURN, "results": [unlisted, listed],
+                      "returned": 2, "total_matching": 2}
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=api_return,
+        ):
+            result = await tool_fns["list_metabolites"](mock_ctx)
+        fum = result.results[0].model_dump()
+        oua = result.results[1].model_dump()
+        assert fum["structure_kind"] == "defined"
+        assert "kegg_functional_categories" not in fum
+        assert "kegg_brite_classes" not in fum
+        assert oua["kegg_functional_categories"] == ["Steroids"]
+        assert oua["kegg_brite_classes"] == [
+            "Glycosides: O-glycosides", "Lipids: Sterol lipids"]
+
+
+_MIS_ASSAY_TOOL_RETURNS = {
+    "metabolites_by_quantifies_assay": (
+        TestMetabolitesByQuantifiesAssayWrapper._SAMPLE_API_RETURN,
+        dict(assay_ids=["a1"]),
+        {"metabolite_id": "kegg.compound:C00041", "name": "L-Alanine",
+         "assay_id": "a1", "stereo_assignment": "dominant_form_assumed"},
+    ),
+    "metabolites_by_flags_assay": (
+        TestMetabolitesByFlagsAssayWrapper._SAMPLE_API_RETURN,
+        dict(assay_ids=["a1"]),
+        {"metabolite_id": "kegg.compound:C00041", "name": "L-Alanine",
+         "assay_id": "a1", "flag_value": True,
+         "stereo_assignment": "dominant_form_assumed"},
+    ),
+    "assays_by_metabolite": (
+        TestAssaysByMetaboliteWrapper._SAMPLE_API_RETURN,
+        dict(metabolite_ids=["kegg.compound:C00041"]),
+        {"metabolite_id": "kegg.compound:C00041", "metabolite_name": "L-Alanine",
+         "assay_id": "a1", "assay_name": "Assay a1",
+         "evidence_kind": "flags", "metric_type": "presence_flag",
+         "flag_value": True, "stereo_assignment": "dominant_form_assumed"},
+    ),
+}
+
+
+class TestAssayStereoAssignmentWrappers:
+    """§D at the MCP boundary for the 3 assay tools."""
+
+    @pytest.mark.parametrize("name", sorted(_MIS_ASSAY_TOOL_RETURNS))
+    def test_param_default_none(self, tool_fns, name):
+        import inspect
+        sig = inspect.signature(tool_fns[name])
+        assert sig.parameters["stereo_assignment"].default is None
+
+    @pytest.mark.parametrize("name", sorted(_MIS_ASSAY_TOOL_RETURNS))
+    def test_param_description_mentions_as_reported(self, tool_fns, name):
+        desc = _mis_param_description(tool_fns, name, "stereo_assignment")
+        assert "as_reported" in desc
+        assert len(desc) <= 250
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("name", sorted(_MIS_ASSAY_TOOL_RETURNS))
+    async def test_param_forwarded(self, tool_fns, mock_ctx, name):
+        api_return, base_kwargs, _ = _MIS_ASSAY_TOOL_RETURNS[name]
+        with patch(
+            f"multiomics_explorer.api.functions.{name}",
+            return_value={**api_return, "by_stereo_assignment": []},
+        ) as mock_api:
+            await tool_fns[name](
+                mock_ctx, **base_kwargs, stereo_assignment=["as_reported"])
+        assert mock_api.call_args.kwargs["stereo_assignment"] == ["as_reported"]
+
+    @pytest.mark.parametrize("name", sorted(_MIS_ASSAY_TOOL_RETURNS))
+    def test_row_model_has_stereo_assignment(self, tool_fns, name):
+        row_model = _mis_row_model(tool_fns, name)
+        field = row_model.model_fields["stereo_assignment"]
+        assert field.description
+
+    @pytest.mark.parametrize("name", sorted(_MIS_ASSAY_TOOL_RETURNS))
+    def test_response_model_has_by_stereo_assignment(self, tool_fns, name):
+        resp = _mis_response_model(tool_fns, name)
+        field = resp.model_fields["by_stereo_assignment"]
+        assert field.get_default(call_default_factory=True) == []
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("name", sorted(_MIS_ASSAY_TOOL_RETURNS))
+    async def test_envelope_and_row_parse(self, tool_fns, mock_ctx, name):
+        api_return, base_kwargs, row = _MIS_ASSAY_TOOL_RETURNS[name]
+        payload = {
+            **api_return,
+            "results": [row], "returned": 1,
+            "by_stereo_assignment": [
+                {"stereo_assignment": "as_reported", "count": 49},
+                {"stereo_assignment": "dominant_form_assumed", "count": 21},
+            ],
+        }
+        with patch(
+            f"multiomics_explorer.api.functions.{name}",
+            return_value=payload,
+        ):
+            result = await tool_fns[name](mock_ctx, **base_kwargs)
+        assert [(b.stereo_assignment, b.count)
+                for b in result.by_stereo_assignment] == [
+            ("as_reported", 49), ("dominant_form_assumed", 21)]
+        assert result.results[0].stereo_assignment == "dominant_form_assumed"
+
+
+class TestListFilterValuesIdentitySurfaceWrapper:
+    """§E: the four new filter_type values are accepted at the MCP boundary."""
+
+    _NEW = ("structure_kind", "kegg_functional_category",
+            "kegg_brite_class", "stereo_assignment")
+
+    def test_filter_type_schema_enum_includes_new_types(self):
+        props = _all_tool_input_schemas()["list_filter_values"]["properties"]
+        for name in self._NEW:
+            assert name in props["filter_type"]["enum"], name
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("filter_type, values, applies_to", [
+        ("structure_kind", ["defined", "generic", "polymer"], ["Metabolite"]),
+        ("kegg_functional_category", ["Peptides", "Lipids"], ["Metabolite"]),
+        ("kegg_brite_class", ["Lipids: Fatty acyls"], ["Metabolite"]),
+        ("stereo_assignment", ["as_reported", "dominant_form_assumed"],
+         ["Assay_flags_metabolite", "Assay_quantifies_metabolite"]),
+    ])
+    async def test_branch_passes_through(self, tool_fns, mock_ctx,
+                                         filter_type, values, applies_to):
+        api_return = {
+            "filter_type": filter_type, "description": "d",
+            "total_entries": len(values), "returned": len(values),
+            "truncated": False, "warnings": [],
+            "results": [{"value": v, "applies_to": applies_to,
+                         "source": "vocabulary"} for v in values],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value=api_return,
+        ) as mock_api:
+            result = await tool_fns["list_filter_values"](
+                mock_ctx, filter_type=filter_type)
+        assert mock_api.call_args[1]["filter_type"] == filter_type
+        assert result.filter_type == filter_type
+        assert [r.value for r in result.results] == values
