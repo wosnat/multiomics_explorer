@@ -116,7 +116,7 @@ examples:
           {"evidence_source": "metabolism", "count": 119},
           {"evidence_source": "transport", "count": 104}
         ],
-        "xref_coverage": {"with_chebi": 135, "with_hmdb": 125, "with_mnxm": 133},
+        "xref_coverage": {"with_chebi": 135, "with_hmdb": 126, "with_mnxm": 133},
         "mass_stats": {"mass_min": 89.094, "mass_median": 179.172, "mass_max": 1353.372},
         "by_measurement_coverage": {
           "by_paper_count": [{"paper_count": 1, "count": 93}, {"paper_count": 2, "count": 37}, {"paper_count": 3, "count": 5}],

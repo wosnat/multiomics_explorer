@@ -442,3 +442,21 @@ Details and live numbers: `multiomics_biocypher_kg/docs/kg-changes/metabolite-id
   ChEBI ids.
 - **Ask 5:** 17 anomer → generic pairs, and 10 of the anomers carry an HMDB id. That makes the fix a
   curated list, not one move, so it stays a follow-up. The table is in §38.
+
+## KG delivery, ask 5 (2026-10-15): generic sugar records moved
+
+Shipped as curated `xref:` overrides (KG change doc §39). We checked HMDB's own record names in
+MNX's local `chem_xref.tsv`.
+- **Moved to the generic node:**
+  - `HMDB0000122` D-Glucose → `C00031`;
+  - `HMDB0000143` D-Galactose → `C00124`;
+  - `HMDB0000660` D-Fructose → `C00095`;
+  - `HMDB0001058` Fructose 1,6-bisphosphate → `C00354`.
+- **Added, previously on no node:**
+  - `HMDB0000124` Fructose 6-phosphate → `C00085`;
+  - `CHEBI:17634` D-glucose → `C00031`.
+- **Left in place:** records named for the anomer (α-glucose, β-galactose, β-G6P, β-GlcNAc,
+  β-F6P), and GDP-mannose on KEGG's hub `C00096`.
+- **No node, edge or paper-row changes**, and the release TSVs are unchanged.
+- **For your resolver:** `HMDB0000122` and `CHEBI:17634` now resolve to `C00031`. `C00031`'s
+  scalar `hmdb_id` is now `HMDB0000122`; `HMDB0304632` stays in `all_identifiers`.

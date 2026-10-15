@@ -80,12 +80,6 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="cazy")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
-
-- `CazyFamily.level_kind`: `cazy_class`, `cazy_family`, `cazy_subfamily`
-- `Gene_has_cazy_family.evidence`: `curated`, `family_inferred`, `domain_inferred`
-- `Gene_has_cazy_family.sources`: `eggnog`, `interproscan`
-
 ## Interpretation
 
 Family level is the unit — `cazy:GT2` (cellulose/chitin-synthase-like

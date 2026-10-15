@@ -827,5 +827,5 @@ truncated: false
 warnings: []
 xref_coverage:
   with_chebi: 23
-  with_hmdb: 12
+  with_hmdb: 11
   with_mnxm: 23

@@ -109,24 +109,24 @@ Append /full for the complete page — all worked examples + full response forma
 
 ## Ontologies
 
-- `docs://ontologies/brite` — ~1968 tok
-- `docs://ontologies/cazy` — ~1830 tok
-- `docs://ontologies/cog_category` — ~1450 tok
-- `docs://ontologies/cyanorak_role` — ~1775 tok
-- `docs://ontologies/ec` — ~2038 tok
-- `docs://ontologies/go_bp` — ~2140 tok
-- `docs://ontologies/go_cc` — ~1788 tok
-- `docs://ontologies/go_mf` — ~1925 tok
+- `docs://ontologies/brite` — ~1852 tok
+- `docs://ontologies/cazy` — ~1760 tok
+- `docs://ontologies/cog_category` — ~1397 tok
+- `docs://ontologies/cyanorak_role` — ~1725 tok
+- `docs://ontologies/ec` — ~1983 tok
+- `docs://ontologies/go_bp` — ~2049 tok
+- `docs://ontologies/go_cc` — ~1697 tok
+- `docs://ontologies/go_mf` — ~1836 tok
 - `docs://ontologies/index` — ~1239 tok — One page per supported ontology — what it is, how genes get annotated, identifier form, hierarchy, the…
-- `docs://ontologies/interpro` — ~2419 tok
-- `docs://ontologies/kegg` — ~2349 tok
-- `docs://ontologies/merops` — ~2734 tok
-- `docs://ontologies/ncbifam` — ~2316 tok
-- `docs://ontologies/pfam` — ~1978 tok
+- `docs://ontologies/interpro` — ~2237 tok
+- `docs://ontologies/kegg` — ~2285 tok
+- `docs://ontologies/merops` — ~2516 tok
+- `docs://ontologies/ncbifam` — ~2197 tok
+- `docs://ontologies/pfam` — ~1926 tok
 - `docs://ontologies/signal_peptide_type` — ~1488 tok
 - `docs://ontologies/subcellular_localization` — ~1510 tok
-- `docs://ontologies/tcdb` — ~2836 tok
-- `docs://ontologies/tigr_role` — ~2602 tok
+- `docs://ontologies/tcdb` — ~2673 tok
+- `docs://ontologies/tigr_role` — ~2532 tok
 
 ## Examples
 
