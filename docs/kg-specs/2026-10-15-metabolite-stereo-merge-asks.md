@@ -369,3 +369,76 @@ pin. Two small requests:
 
 Nothing else from the explorer on this round. We'll absorb the rebuild when it lands: asks 1–4,
 3b and 6, plus 5 if it fits.
+
+## KG reply (2026-10-15, 2): both requests adopted; design closed
+
+**1. Actionable failure message: yes.** For each unresolved group, `canonical_margin_unresolved`
+prints:
+- every member's KEGG id and KEGG name;
+- both counts for each member (gene-reachable reactions and all KEGG reactions);
+- the margin that failed;
+- a ready-to-paste block:
+
+```yaml
+canonical:
+  - id: "kegg.compound:C00085"
+    group: ["kegg.compound:C00085", "kegg.compound:C05345"]
+    reason: "<why this member>"
+```
+
+The same text goes to `metabolite_identity_report.json` (`canonical_margin_unresolved`), so it is
+on record even when the console log has scrolled away.
+
+**2. Second measure: adopted, as a fallback only.** If neither member has a gene-reachable
+reaction (0 vs 0), apply the same ≥ 2× test to **all** KEGG reaction references before failing.
+
+It never runs when the first measure has any signal. On the all-KEGG count the generic `C00085`
+leads (29 vs 18, below 2×), while on gene-reachable reactions β-F6P leads, so the two can
+disagree. The gene-reachable measure stays authoritative.
+
+**Count today: 0 groups are 0 vs 0.** The closest are:
+- `C00992` / `C08230` aquacobalamin / hydroxocobalamin, 1 vs 0;
+- `C15586` / `C01736` nebularine, 1 vs 0.
+
+Both pass, since 1 ≥ 2 × 0. A 1 vs 0 lead counts as a margin by design: one reaction against
+none is a real hub signal.
+
+**Final rule (spec §3.1):**
+1. a `canonical:` pin, if present;
+2. else most gene-reachable reaction references, if ≥ 2× the runner-up;
+3. else, only when that measure is 0 vs 0: most KEGG reaction references, if ≥ 2×;
+4. else step 6 fails with `canonical_margin_unresolved`.
+
+**Rebuild scope:**
+- asks 1–4;
+- 3b (pins for chloride `C00698`, bromide `C01324`, fluoride `C00742`);
+- 6 (`kegg_brite_classes` + its vocabulary + the `kegg_functional_categories` rename);
+- the margin rule;
+- the anomer-xref count;
+- ask 5's `HMDB0000122` / `CHEBI:17634` → `C00031` move, if the override stays small.
+
+Delivered with a post-rebuild section in `docs/kg-changes/metabolite-identity-and-classes.md` (§38)
+and a pointer here.
+
+## KG delivery (2026-10-15): implemented and rebuilt
+
+Details and live numbers: `multiomics_biocypher_kg/docs/kg-changes/metabolite-identity-and-classes.md`
+**§38**. In short:
+- **Asks 1–4, 3b, 6 and the margin rule are shipped.**
+  - `Metabolite` 3,203 → 3,214.
+  - Multi-KEGG nodes 21 → 10 (the 10 you called fine).
+  - `Metabolite_is_stereo_form_of` 68 → 76, including both fructose anomer links.
+  - `C00085` is "D-Fructose 6-phosphate" again, and the Capovilla / Biller fructose-6P rows stay on it.
+  - Halides are named for the ion.
+  - `catalyzed_metabolite_count` is +5 on most organisms.
+- **Two deviations from what we agreed:**
+  - The `kegg_brite_classes` vocabulary node has **no `value_descriptions`**. Its values contain
+    `": "`, the separator of published value descriptions, so they would not split back. The tree
+    codes are in its `description` instead.
+  - The `canonical_margin_unresolved` text appears only in the step-6 error and log, **not** in the
+    report. A failed step 6 writes no file.
+- **One addition:** a ChEBI term shared by separate KEGG nodes now goes to its single unambiguous
+  owner, not to none. Benzaldehyde, (R)-lipoic acid, acetoin, D-ribulose and α-D-galactose regain
+  ChEBI ids.
+- **Ask 5:** 17 anomer → generic pairs, and 10 of the anomers carry an HMDB id. That makes the fix a
+  curated list, not one move, so it stays a follow-up. The table is in §38.
