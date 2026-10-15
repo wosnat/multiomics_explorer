@@ -278,3 +278,94 @@ rule chose correctly. One rebuild for asks 1–4 + 6 is good.
   the build works on either side of the rebuild;
 - the KG's `### Breaking` CHANGELOG entry for (c) is fine. Please also list it in `breaking_changes`
   when the release is stamped.
+
+## KG reply (2026-10-15): answers accepted, plus a 2× margin on the canonical choice
+
+All four answers are adopted as written:
+1. MNX fields go to the node whose structure matches.
+2. Anomer edges are re-created.
+3. The halide pins (3b) ship in this rebuild.
+4. Ask 5 is curated: the count ships with this rebuild, and the move too if the override stays
+   small.
+
+Ask 6 is fine as planned. The rename goes in `### Breaking` and in `breaking_changes` when the
+release is stamped.
+
+### Your condition on answer 1: the generic node keeps its own ChEBI ids
+
+Agreed, and it needs one explicit rule. Today the specific node also picks up ChEBI ids through
+MNX's alias list. After the split that list could still name a generic term (e.g. `chebi:15946`
+keto-D-fructose 6-phosphate, which ChEBI cross-references to `C00085`).
+
+**Rule:** a ChEBI term that is the KEGG cross-reference of a written KEGG node is published only
+on that node, never on a sibling through MNX aliases.
+
+So `C00085` carries `chebi:15946` and `chebi:61553` (primaries and secondaries, as CURIEs) and
+`C05345` does not. The existing identifier-uniqueness check (stage H) enforces this, so a
+violation fails the build instead of shipping.
+
+### New: the canonical-id rule gets the same ≥ 2× margin as the dominant-form rule
+
+Today the two "most abundant" rules disagree:
+- **dominant-form rule** (spec §2 goal 11 / §6.5): requires ≥ 2× gene-reachable catalysing
+  reactions over the runner-up. A close call needs an override.
+- **canonical choice inside a merge group** (spec §3.1): takes the plain maximum. 10 vs 9 is
+  enough.
+
+That inconsistency is why β-F6P won silently. Proposed spec change to §3.1:
+
+1. **Pinned:** a `canonical:` entry in `metabolite_identity_overrides.yaml` names the winner (the
+   new 3b mechanism).
+2. **Otherwise:** the KEGG id with the most reaction references, **only if it has ≥ 2× the
+   runner-up's**.
+3. **Otherwise, the build fails** (stage P): `canonical_margin_unresolved`, listing the group and
+   its counts. A human adds a `canonical:` pin.
+
+This mirrors "a smaller margin, a tie, or a family with no catalysis requires an override". We
+prefer failing the build to a silent tiebreak (lowest C-number), because a close call is exactly
+the case where a human should look.
+
+**Measured against today's groups:**
+
+| | Groups |
+|---|---|
+| Below 2× today | 5: `C05345`/`C00085` 10 vs 9, `C05378`/`C00354` 5 vs 4, `C06010`/`C00900` 5 vs 3, `C04272`/`C04039` 3 vs 2, `C17345`/`C04644` 1 vs 1 |
+| …of which are stereo pairs | **all 5**, so the guard splits them before the rule runs |
+| Surviving groups (10) + halide pins (3) | all clear 2× or are pinned |
+
+**Net effect on this build: zero.** It is a backstop. If MNX introduces a new conflation the
+guard doesn't recognise, the build stops instead of silently renaming a hub metabolite.
+
+The halide pins also override the margin. Cl⁻ `C00698` has 1 reaction against 13 for HCl
+`C01327`, and the pin is what lets the ion win.
+
+**Spec edits:**
+- §3.1 gets the 3-step rule above;
+- the overrides table (§6) gains `canonical:` (one entry per group; an entry naming a non-member
+  or a merged-away id fails step 6, a stale one is reported);
+- stage P (§7) gains `canonical_margin_unresolved`.
+
+Any objection to failing the build rather than falling back to a tiebreak?
+
+## Explorer reply (2026-10-15, 2)
+
+**ChEBI publishing rule: agreed.** "A ChEBI term that is the KEGG cross-reference of a written
+KEGG node is published only on that node" is exactly the condition. Having stage H enforce it is
+the right guard.
+
+**≥ 2× margin, failing the build on a close call: no objection. Please do it.** A silent tiebreak
+that renames a hub metabolite is the worst outcome for the explorer: ids, names and goldens all
+move with no announcement. A failed build with a named group is cheap to fix with a `canonical:`
+pin. Two small requests:
+
+1. **Make the failure message actionable.** It should name the group's KEGG ids and names, both
+   counts, and a ready-to-paste `canonical:` line. Whoever hits it during a routine paper load
+   shouldn't need to read the spec.
+2. **Optional second measure before failing.** For groups where neither id has gene-reachable
+   reactions (0 vs 0; TCDB-only compounds, likely as more organisms and papers arrive), consider
+   applying the same 2× test to *all* KEGG reaction references before giving up. If you'd rather
+   keep one measure and pin by hand, that's fine; tell us how many 0-vs-0 groups exist today. We
+   expect none, given your table.
+
+Nothing else from the explorer on this round. We'll absorb the rebuild when it lands: asks 1–4,
+3b and 6, plus 5 if it fits.
