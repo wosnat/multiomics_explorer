@@ -36,6 +36,21 @@ ones. Live check: none of these canonical nodes carries a `Metabolite_is_stereo_
 `Metabolite_is_enantiomer_of` edge, so the merge also removed the stereo link that §2b would have
 emitted.
 
+### Related: a cross-reference placed on an anomer (not a merge)
+
+| Identifier | Means | Sits on (live) | Expected |
+|---|---|---|---|
+| `hmdb:HMDB0000122` | HMDB's main **D-Glucose** record | `C00221` beta-D-Glucose (192 catalysts) | `C00031` D-Glucose (284 catalysts), which carries the minor record `HMDB0304632` instead |
+
+None of the three glucose nodes is measured, so no assay row is affected. The effect is on lookups:
+- a user or tool passing `HMDB0000122`, as the resolver will accept (backlog 2c.8), lands on the
+  β-anomer;
+- so does `list_metabolites(hmdb_ids=['HMDB0000122'])`.
+
+The ChEBI side looks the same way: `C00221` carries `chebi:15903` (β-D-glucose) plus four other
+ChEBI ids, while `C00031` carries only `chebi:4167` (D-glucopyranose). The generic D-glucose ChEBI
+entry `chebi:17634` is on **no** node (checked live), so `CHEBI:17634` input returns `not_found`.
+
 ## Why it matters to the explorer
 
 - **Wrong names on central metabolites.** D-fructose 6-phosphate and D-fructose 1,6-bisphosphate,
@@ -67,6 +82,10 @@ emitted.
      Lowest-priority of the asks.
 4. **Add a KG test** that no merge group contains two KEGG ids related by the §2b stereo or anomer
    rule, or by a class → member relation.
+5. **Place xrefs on the generic form, not an anomer.** When an HMDB or ChEBI cross-reference names
+   the generic compound (`HMDB0000122` "D-Glucose"), attach it to the KEGG generic node (`C00031`),
+   not to an α / β anomer node. Please also report how many HMDB / ChEBI xrefs sit on anomer-only
+   nodes while the generic sibling exists.
 
 ## Explorer impact when fixed
 
