@@ -24,6 +24,11 @@ from multiomics_explorer.kg import constants as _kg_constants
 # ---------------------------------------------------------------------------
 
 _RESOLVER_MARK = "UNWIND $curies"
+# `build_metabolite_stereo_relatives` (metabolite stereo-form hint) — the
+# genes_by_metabolite hint query; answered `[]` (no relatives) by
+# `_resolver_aware` and skipped by `_non_resolver_calls` so fixed-order
+# response lists stay aligned. Inert before the builder exists.
+_STEREO_RELATIVES_MARK = "AS relative_id"
 _RESOLVER_IDENTITY_PREFIXES = (
     "kegg.compound", "chebi", "mnx", "hmdb", "inchikey",
 )
@@ -48,6 +53,10 @@ def _resolver_aware(responses):
     def _exec(cypher, *args, **params):
         if _RESOLVER_MARK in cypher:
             return _identity_resolver_rows(params.get("curies", []))
+        if _STEREO_RELATIVES_MARK in cypher:
+            # metabolite stereo-form hint: no stereo relatives in these
+            # fixtures (also skips the relative-summary query).
+            return []
         if not queue:
             raise StopIteration
         item = queue.pop(0)
@@ -64,7 +73,7 @@ def _non_resolver_calls(conn):
     out = []
     for c in conn.execute_query.call_args_list:
         cypher = c.args[0] if c.args else c.kwargs.get("cypher", "")
-        if _RESOLVER_MARK not in cypher:
+        if _RESOLVER_MARK not in cypher and _STEREO_RELATIVES_MARK not in cypher:
             out.append(c)
     return out
 
@@ -20630,3 +20639,765 @@ class TestIdentitySurfaceReviewFollowups:
         freq = [{"item": "dominant_form_assumed", "count": 4}]
         _, warnings = _stereo_assignment_envelope(freq, 64)
         assert warnings and warnings[0].startswith("4 of 64 rows")
+
+
+# ===========================================================================
+# Metabolite stereo-form hint (backlog 2c.8 part 3) —
+# docs/tool-specs/metabolite-stereo-hint.md
+#
+# `_StereoKG` is a tiny in-memory chemistry KG answering every query the
+# three tools issue by cypher shape (not by call order), so the tests pin
+# behaviour, not the implementation's query sequence:
+#   - CURIE resolver            → identity
+#   - stereo-relatives builder  → `AS relative_id` (honours $exclude_ids)
+#   - GBM summary               → `gene_count_total`, no $locus_tags
+#   - MBG summary               → `gene_count_total` + $locus_tags
+#   - GBM / MBG detail arms     → Gene_catalyzes_reaction / Gene_has_tcdb_family
+#   - existence probes          → `AS found`
+# New symbols (`_stereo_relatives_in_organism`, `include_stereo_forms`) are
+# reached at call time so pre-impl collection still passes.
+# ===========================================================================
+
+_MSH_ORG = "Prochlorococcus MED4"
+_CYS = "kegg.compound:C00736"      # Cysteine (stereo-unspecified)
+_LCYS = "kegg.compound:C00097"     # L-Cysteine
+_DCYS = "kegg.compound:C00793"     # D-Cysteine
+_ALA = "kegg.compound:C01401"      # Alanine (unspecified)
+_LALA = "kegg.compound:C00041"     # L-Alanine
+_DALA = "kegg.compound:C00133"     # D-Alanine
+_UREA = "kegg.compound:C00086"     # no stereo relatives
+
+_MSH_NAMES = {
+    _CYS: "Cysteine", _LCYS: "L-Cysteine", _DCYS: "D-Cysteine",
+    _ALA: "Alanine", _LALA: "L-Alanine", _DALA: "D-Alanine",
+    _UREA: "Urea",
+}
+# (specific form, unspecified form) — Metabolite_is_stereo_form_of edges.
+_MSH_EDGES = [(_LCYS, _CYS), (_DCYS, _CYS), (_LALA, _ALA), (_DALA, _ALA)]
+
+
+def _msh_entry(mid, reactions, transporters, genes, *, ms=None, inh=0):
+    """A GBM-summary `by_metabolite` entry."""
+    if ms is None:
+        ms = transporters
+    return {
+        "metabolite_id": mid, "name": _MSH_NAMES.get(mid, mid),
+        "formula": None, "rows": reactions + ms + inh, "gene_count": genes,
+        "reaction_count": reactions, "transporter_count": transporters,
+        "metabolism_rows": reactions,
+        "transport_most_specific_rows": ms,
+        "transport_inherited_rows": inh,
+    }
+
+
+def _msh_row(mid, arm, locus="PMM0001"):
+    """A GBM/MBG detail row (GeneReactionMetaboliteTriplet shape)."""
+    metab = arm == "metabolism"
+    return {
+        "locus_tag": locus, "gene_name": None, "product": "x",
+        "evidence_source": arm,
+        "transport_substrate_resolution": None if metab else "resolved",
+        "substrate_depth": None if metab else "most_specific",
+        "tcdb_evidence_score": None if metab else 0.5,
+        "reaction_id": f"kegg.reaction:R_{mid[-6:]}" if metab else None,
+        "reaction_name": "r" if metab else None,
+        "ec_numbers": ["1.1.1.1"] if metab else None,
+        "mass_balance": "balanced" if metab else None,
+        "tcdb_family_id": None if metab else f"tcdb:2.A.{mid[-3:]}",
+        "tcdb_family_name": None if metab else "fam",
+        "metabolite_id": mid,
+        "metabolite_name": _MSH_NAMES.get(mid, mid),
+    }
+
+
+class _StereoKG:
+    """In-memory GraphConnection stand-in (see block comment above)."""
+
+    def __init__(self, entries=None, rows=None, edges=_MSH_EDGES,
+                 known=None, mbg_summary=None, mbg_rows=None):
+        # entries: {metabolite_id: by_metabolite entry} — organism slice.
+        self.entries = dict(entries or {})
+        # rows: {metabolite_id: [detail rows]} — organism slice.
+        self.rows = {k: list(v) for k, v in (rows or {}).items()}
+        self.edges = list(edges)
+        self.known = set(known or _MSH_NAMES) | set(self.entries)
+        self.mbg_summary = mbg_summary
+        self.mbg_rows = list(mbg_rows or [])
+        self.calls: list[tuple[str, dict]] = []
+
+    # -- query classification ------------------------------------------------
+    @staticmethod
+    def _is_stereo(cypher):
+        return "AS relative_id" in cypher
+
+    @staticmethod
+    def _is_summary(cypher):
+        return "gene_count_total" in cypher
+
+    def stereo_calls(self):
+        return [p for c, p in self.calls if self._is_stereo(c)]
+
+    def gbm_summary_calls(self):
+        return [(c, p) for c, p in self.calls
+                if self._is_summary(c) and "locus_tags" not in p]
+
+    # -- relatives -----------------------------------------------------------
+    def _relatives(self, mid):
+        out = []
+        for spec, unspec in self.edges:
+            if spec == mid:
+                out.append((unspec, "unspecified_form"))
+            elif unspec == mid:
+                out.append((spec, "specific_form"))
+        return out
+
+    def _slice(self, params):
+        ids = list(params.get("metabolite_ids") or [])
+        excl = set(params.get("exclude_metabolite_ids") or [])
+        return [m for m in ids if m not in excl]
+
+    def execute_query(self, cypher, **params):
+        self.calls.append((cypher, dict(params)))
+        if _RESOLVER_MARK in cypher:
+            return _identity_resolver_rows(params.get("curies", []))
+        if self._is_stereo(cypher):
+            excl = set(params.get("exclude_ids") or [])
+            out = []
+            for mid in params.get("metabolite_ids") or []:
+                for rid, rel in self._relatives(mid):
+                    if rid in excl:
+                        continue
+                    out.append({"metabolite_id": mid, "relative_id": rid,
+                                "relative_name": _MSH_NAMES.get(rid, rid),
+                                "relation": rel})
+            out.sort(key=lambda r: (r["metabolite_id"], r["relation"],
+                                    r["relative_id"]))
+            return out
+        if self._is_summary(cypher):
+            if "locus_tags" in params:
+                return [dict(self.mbg_summary)] if self.mbg_summary else []
+            ents = [self.entries[m] for m in self._slice(params)
+                    if m in self.entries]
+            return [{
+                "total_matching": sum(e["rows"] for e in ents),
+                "gene_count_total": sum(e["gene_count"] for e in ents),
+                "reaction_count_total": sum(e["reaction_count"] for e in ents),
+                "transporter_count_total": sum(
+                    e["transporter_count"] for e in ents),
+                "metabolite_count_total": len(ents),
+                "rows_by_evidence_source": [],
+                "rows_by_substrate_depth": [],
+                "by_metabolite": [dict(e) for e in ents],
+                "top_reactions": [], "top_tcdb_families": [],
+                "top_gene_categories": [], "top_genes": [],
+            }]
+        if "AS found" in cypher:
+            if "locus_tags" in params:
+                return [{"found": list(params["locus_tags"])}]
+            ids = params.get("ids") or []
+            if "KeggTerm" in cypher:
+                return [{"found": list(ids)}]
+            return [{"found": [i for i in ids if i in self.known]}]
+        if "Gene_catalyzes_reaction" in cypher or "Gene_has_tcdb_family" in cypher:
+            arm = ("metabolism" if "Gene_catalyzes_reaction" in cypher
+                   else "transport")
+            if "locus_tags" in params:
+                return [dict(r) for r in self.mbg_rows
+                        if r["evidence_source"] == arm]
+            out = []
+            for m in self._slice(params):
+                out += [dict(r) for r in self.rows.get(m, [])
+                        if r["evidence_source"] == arm]
+            return out
+        return []
+
+
+def _msh_cys_kg(**overrides):
+    """MED4-like Cysteine slice: Cysteine is transport-only (0 reactions,
+    5 families, 33 genes), L-Cysteine has 13 reactions / 3 families / 38
+    genes, D-Cysteine has no rows. Urea has rows and no relatives."""
+    entries = {
+        _CYS: _msh_entry(_CYS, 0, 5, 33),
+        _LCYS: _msh_entry(_LCYS, 13, 3, 38),
+        _UREA: _msh_entry(_UREA, 4, 2, 6),
+    }
+    rows = {
+        _CYS: [_msh_row(_CYS, "transport", "PMM0100")],
+        _LCYS: [_msh_row(_LCYS, "metabolism", "PMM0200"),
+                _msh_row(_LCYS, "transport", "PMM0201")],
+        _UREA: [_msh_row(_UREA, "metabolism", "PMM0944")],
+    }
+    entries.update(overrides.pop("entries", {}))
+    for k in overrides.pop("drop", []):
+        entries.pop(k, None)
+        rows.pop(k, None)
+    return _StereoKG(entries=entries, rows=rows, **overrides)
+
+
+def _msh_stereo_warnings(out):
+    return [w for w in out["warnings"] if "Stereo forms hold more rows" in w]
+
+
+@pytest.fixture()
+def _msh_identity_organism(monkeypatch):
+    monkeypatch.setattr(
+        api, "_validate_organism_inputs",
+        lambda organism, locus_tags, experiment_ids, conn: organism,
+    )
+
+
+@pytest.fixture()
+def _msh_unresolved_organism(monkeypatch):
+    def _raise(organism, locus_tags, experiment_ids, conn):
+        raise ValueError(f"no organism matching '{organism}'")
+    monkeypatch.setattr(api, "_validate_organism_inputs", _raise)
+
+
+class TestListMetabolitesStereoRelatives:
+    """list_metabolites: `stereo_relatives` is sparse — an empty list is
+    stripped from the row, a non-empty one is kept verbatim."""
+
+    _SUMMARY = {
+        "total_entries": 3214, "total_matching": 2, "top_organisms": [],
+        "top_metabolite_pathways": [], "by_evidence_source": [],
+        "with_chebi": 0, "with_hmdb": 0, "with_mnxm": 0,
+    }
+    _REL = [
+        {"metabolite_id": _LCYS, "name": "L-Cysteine",
+         "relation": "specific_form", "catalyst_gene_count": 652,
+         "transporter_gene_count": 2554},
+        {"metabolite_id": _DCYS, "name": "D-Cysteine",
+         "relation": "specific_form", "catalyst_gene_count": 12,
+         "transporter_gene_count": 0},
+    ]
+
+    def _run(self, rows):
+        conn = MagicMock()
+
+        def _exec(cypher, *args, **params):
+            if _RESOLVER_MARK in cypher:
+                return _identity_resolver_rows(params.get("curies", []))
+            if "total_entries" in cypher:
+                return [dict(self._SUMMARY)]
+            if "AS found" in cypher:
+                return [{"found": list(params.get("ids") or [])}]
+            if "AS metabolite_id" in cypher:
+                return [dict(r) for r in rows]
+            return []
+
+        conn.execute_query.side_effect = _exec
+        return api.list_metabolites(
+            metabolite_ids=[_CYS, _UREA], conn=conn)
+
+    def _base(self, mid, name, rel):
+        return {"metabolite_id": mid, "name": name, "formula": None,
+                "elements": [], "mass": None, "catalyst_gene_count": 0,
+                "organism_count": 1, "transporter_count": 0,
+                "transporter_gene_count": 0, "evidence_sources": [],
+                "pathway_ids": [], "pathway_count": 0,
+                "structure_kind": "defined", "stereo_relatives": rel}
+
+    def test_empty_stereo_relatives_stripped(self):
+        out = self._run([self._base(_UREA, "Urea", [])])
+        assert "stereo_relatives" not in out["results"][0]
+
+    def test_null_stereo_relatives_stripped(self):
+        out = self._run([self._base(_UREA, "Urea", None)])
+        assert "stereo_relatives" not in out["results"][0]
+
+    def test_non_empty_stereo_relatives_kept(self):
+        out = self._run([self._base(_CYS, "Cysteine", list(self._REL)),
+                         self._base(_UREA, "Urea", [])])
+        by_id = {r["metabolite_id"]: r for r in out["results"]}
+        assert by_id[_CYS]["stereo_relatives"] == self._REL
+        assert "stereo_relatives" not in by_id[_UREA]
+
+
+class TestStereoRelativesInOrganism:
+    """`_stereo_relatives_in_organism(conn, metabolite_ids, organism, *,
+    exclude_ids, gbm_filters, arms)` → `{source_id: [StereoRelative]}`."""
+
+    _BOTH = ("metabolism", "transport")
+
+    def _call(self, conn, ids, **kw):
+        kw.setdefault("exclude_ids", [])
+        kw.setdefault("gbm_filters", None)
+        kw.setdefault("arms", self._BOTH)
+        return api._stereo_relatives_in_organism(conn, ids, _MSH_ORG, **kw)
+
+    def test_no_query_for_empty_ids(self):
+        conn = MagicMock()
+        assert self._call(conn, []) == {}
+        conn.execute_query.assert_not_called()
+
+    def test_no_summary_query_when_no_relatives(self):
+        kg = _msh_cys_kg()
+        assert self._call(kg, [_UREA]) == {}
+        assert len(kg.stereo_calls()) == 1
+        assert kg.gbm_summary_calls() == []
+
+    def test_drops_relatives_without_rows(self):
+        """D-Cysteine has no by_metabolite entry in this organism."""
+        kg = _msh_cys_kg()
+        out = self._call(kg, [_CYS])
+        assert out == {_CYS: [{
+            "metabolite_id": _LCYS, "name": "L-Cysteine",
+            "relation": "specific_form", "reaction_count": 13,
+            "transporter_count": 3, "gene_count": 38,
+        }]}
+
+    def test_groups_by_source_and_drops_empty_sources(self):
+        """Alanine's relatives (L-/D-Ala) have no rows → Alanine is absent;
+        L-Cysteine's only relative (Cysteine) has rows."""
+        kg = _msh_cys_kg()
+        out = self._call(kg, [_CYS, _ALA, _LCYS])
+        assert set(out) == {_CYS, _LCYS}
+        assert [r["metabolite_id"] for r in out[_CYS]] == [_LCYS]
+        assert out[_LCYS] == [{
+            "metabolite_id": _CYS, "name": "Cysteine",
+            "relation": "unspecified_form", "reaction_count": 0,
+            "transporter_count": 5, "gene_count": 33,
+        }]
+
+    def test_relative_order_follows_relation_then_id(self):
+        kg = _msh_cys_kg(entries={
+            _LALA: _msh_entry(_LALA, 13, 1, 20),
+            _DALA: _msh_entry(_DALA, 2, 0, 2),
+        })
+        out = self._call(kg, [_ALA])
+        assert [r["metabolite_id"] for r in out[_ALA]] == [_LALA, _DALA]
+        assert {r["relation"] for r in out[_ALA]} == {"specific_form"}
+
+    def test_exclude_ids_forwarded_to_relatives_builder(self):
+        kg = _msh_cys_kg()
+        out = self._call(kg, [_CYS], exclude_ids=[_CYS, _LCYS])
+        assert out == {}
+        assert kg.stereo_calls()[0]["exclude_ids"] == [_CYS, _LCYS]
+        assert kg.stereo_calls()[0]["metabolite_ids"] == [_CYS]
+
+    def test_relative_summary_scope(self):
+        """Summary runs on the distinct relative ids, same organism, the
+        gbm_filters, no exclude list; arms select the arm bodies."""
+        kg = _msh_cys_kg()
+        self._call(kg, [_CYS], gbm_filters={"ec_numbers": ["2.5.1.47"]},
+                   arms=self._BOTH)
+        (cypher, params), = kg.gbm_summary_calls()
+        assert sorted(params["metabolite_ids"]) == sorted([_LCYS, _DCYS])
+        assert params["organism"] == _MSH_ORG
+        assert params.get("ec_numbers") == ["2.5.1.47"]
+        assert not params.get("exclude_metabolite_ids")
+        assert "Gene_catalyzes_reaction" in cypher
+        assert "Gene_has_tcdb_family" in cypher
+
+    def test_relative_summary_single_arm(self):
+        kg = _msh_cys_kg()
+        self._call(kg, [_CYS], arms=("transport",))
+        (cypher, _), = kg.gbm_summary_calls()
+        assert "Gene_catalyzes_reaction" not in cypher
+
+
+@pytest.mark.usefixtures("_msh_identity_organism")
+class TestGenesByMetaboliteStereoHint:
+    """genes_by_metabolite, include_stereo_forms=False (default): hint."""
+
+    def test_hint_fires_when_input_has_rows(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite([_CYS], _MSH_ORG, conn=kg)
+        assert out["not_matched"] == []
+        assert out["stereo_relatives"] == {_CYS: [{
+            "metabolite_id": _LCYS, "name": "L-Cysteine",
+            "relation": "specific_form", "reaction_count": 13,
+            "transporter_count": 3, "gene_count": 38,
+        }]}
+        assert out["stereo_forms_added"] == {}
+
+    def test_by_metabolite_stereo_relative_ids(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite([_CYS, _UREA], _MSH_ORG, conn=kg)
+        by_id = {e["metabolite_id"]: e for e in out["by_metabolite"]}
+        assert by_id[_CYS]["stereo_relative_ids"] == [_LCYS]
+        assert "stereo_relative_ids" not in by_id[_UREA]
+        assert "via_stereo_form_of" not in by_id[_CYS]
+
+    def test_hint_mode_rows_untagged(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite([_CYS], _MSH_ORG, conn=kg)
+        assert set(out["stereo_relatives"]) == {_CYS}
+        assert out["results"]
+        for r in out["results"]:
+            assert "via_stereo_form_of" not in r
+            assert r["metabolite_id"] == _CYS
+
+    def test_stereo_warning_content(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite([_CYS], _MSH_ORG, conn=kg)
+        (w,) = _msh_stereo_warnings(out)
+        assert w.startswith("Stereo forms hold more rows")
+        assert "Cysteine (kegg.compound:C00736)" in w
+        assert "L-Cysteine (kegg.compound:C00097)" in w
+        assert "13 reactions" in w
+        assert "3 transporter families" in w
+        assert "D-Cysteine" not in w
+        assert "Counts never combine across stereo forms" in w
+        assert "stereo_relatives" in w
+        assert "include_stereo_forms=True" in w
+        assert "via_stereo_form_of" in w
+
+    def test_stereo_warning_is_first(self):
+        """Inherited-dominance auto-warning also fires; stereo goes first."""
+        kg = _msh_cys_kg(entries={_CYS: _msh_entry(_CYS, 0, 5, 33, ms=2, inh=9)})
+        out = api.genes_by_metabolite([_CYS], _MSH_ORG, conn=kg)
+        assert len(out["warnings"]) == 2
+        assert out["warnings"][0].startswith("Stereo forms hold more rows")
+        assert "inherited" in out["warnings"][1]
+
+    def test_relative_in_input_not_hinted(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite([_CYS, _LCYS], _MSH_ORG, conn=kg)
+        assert out["stereo_relatives"] == {}
+        assert _msh_stereo_warnings(out) == []
+        for e in out["by_metabolite"]:
+            assert "stereo_relative_ids" not in e
+        for call in kg.stereo_calls():
+            assert {_CYS, _LCYS} <= set(call["exclude_ids"])
+
+    def test_relative_in_exclude_list_not_hinted(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite(
+            [_CYS], _MSH_ORG, exclude_metabolite_ids=[_LCYS], conn=kg)
+        assert out["stereo_relatives"] == {}
+        assert _msh_stereo_warnings(out) == []
+        for call in kg.stereo_calls():
+            assert {_CYS, _LCYS} <= set(call["exclude_ids"])
+
+    def test_exclude_ids_is_inputs_union_excludes(self):
+        kg = _msh_cys_kg()
+        api.genes_by_metabolite(
+            [_ALA], _MSH_ORG, exclude_metabolite_ids=[_DALA], conn=kg)
+        (call,) = kg.stereo_calls()
+        assert call["metabolite_ids"] == [_ALA]
+        assert set(call["exclude_ids"]) == {_ALA, _DALA}
+
+    def test_not_matched_input_hinted(self):
+        """L-Cysteine has no rows here; its unspecified form does."""
+        kg = _msh_cys_kg(drop=[_LCYS])
+        out = api.genes_by_metabolite([_LCYS], _MSH_ORG, conn=kg)
+        assert out["not_matched"] == [_LCYS]
+        assert out["by_metabolite"] == []
+        assert out["stereo_relatives"] == {_LCYS: [{
+            "metabolite_id": _CYS, "name": "Cysteine",
+            "relation": "unspecified_form", "reaction_count": 0,
+            "transporter_count": 5, "gene_count": 33,
+        }]}
+        assert out["warnings"][0].startswith("Stereo forms hold more rows")
+
+    def test_not_found_input_not_a_source(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite(
+            ["kegg.compound:C99999", _CYS], _MSH_ORG, conn=kg)
+        assert out["not_found"]["metabolite_ids"] == ["kegg.compound:C99999"]
+        assert set(out["stereo_relatives"]) == {_CYS}
+        for call in kg.stereo_calls():
+            assert "kegg.compound:C99999" not in call["metabolite_ids"]
+
+    def test_no_relatives_no_hint_keys_empty(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite([_UREA], _MSH_ORG, conn=kg)
+        assert out["stereo_relatives"] == {}
+        assert out["stereo_forms_added"] == {}
+        assert _msh_stereo_warnings(out) == []
+        assert kg.gbm_summary_calls()[1:] == []  # no relative summary
+
+    def test_relatives_without_rows_not_hinted(self):
+        """Alanine's L-/D- forms have no rows in this organism."""
+        kg = _msh_cys_kg(entries={_ALA: _msh_entry(_ALA, 0, 2, 9)})
+        out = api.genes_by_metabolite([_ALA], _MSH_ORG, conn=kg)
+        assert out["stereo_relatives"] == {}
+        assert _msh_stereo_warnings(out) == []
+
+    def test_warning_lists_at_most_five_sources(self):
+        names = {}
+        edges, entries = [], {}
+        srcs = [f"kegg.compound:C9{i:04d}" for i in range(7)]
+        for i, s in enumerate(srcs):
+            rel = f"kegg.compound:C8{i:04d}"
+            names[s], names[rel] = f"Generic{i}", f"L-Form{i}"
+            edges.append((rel, s))
+            entries[s] = _msh_entry(s, 0, 1, 1)
+            entries[rel] = _msh_entry(rel, 2, 0, 2)
+        _MSH_NAMES.update(names)
+        try:
+            kg = _StereoKG(entries=entries, edges=edges)
+            out = api.genes_by_metabolite(srcs, _MSH_ORG, conn=kg)
+        finally:
+            for k in names:
+                _MSH_NAMES.pop(k, None)
+        assert len(out["stereo_relatives"]) == 7
+        (w,) = _msh_stereo_warnings(out)
+        assert "and 2 more" in w
+        assert sum(f"({s})" in w for s in srcs) == 5
+
+    def test_summary_true_still_hints(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite([_CYS], _MSH_ORG, summary=True, conn=kg)
+        assert set(out["stereo_relatives"]) == {_CYS}
+        assert out["results"] == []
+
+    def test_gbm_filters_forwarded_to_relative_summary(self):
+        kg = _msh_cys_kg()
+        api.genes_by_metabolite(
+            [_CYS], _MSH_ORG, ec_numbers=["2.5.1.47"],
+            substrate_depth=["most_specific"], conn=kg)
+        rel_calls = [(c, p) for c, p in kg.gbm_summary_calls()
+                     if p["metabolite_ids"] != [_CYS]]
+        assert len(rel_calls) == 1
+        _, params = rel_calls[0]
+        assert params.get("ec_numbers") == ["2.5.1.47"]
+        assert params.get("substrate_depth") == ["most_specific"]
+        assert not params.get("exclude_metabolite_ids")
+
+    def test_evidence_sources_scope_relative_summary_arms(self):
+        kg = _msh_cys_kg()
+        api.genes_by_metabolite(
+            [_CYS], _MSH_ORG, evidence_sources=["transport"], conn=kg)
+        rel_calls = [(c, p) for c, p in kg.gbm_summary_calls()
+                     if p["metabolite_ids"] != [_CYS]]
+        assert len(rel_calls) == 1
+        assert "Gene_catalyzes_reaction" not in rel_calls[0][0]
+
+
+@pytest.mark.usefixtures("_msh_identity_organism")
+class TestGenesByMetaboliteIncludeStereoForms:
+    """genes_by_metabolite(include_stereo_forms=True): expansion."""
+
+    def test_default_is_false(self):
+        import inspect
+        sig = inspect.signature(api.genes_by_metabolite)
+        assert sig.parameters["include_stereo_forms"].default is False
+
+    def test_expands_metabolite_ids(self):
+        kg = _msh_cys_kg()
+        api.genes_by_metabolite(
+            [_CYS], _MSH_ORG, include_stereo_forms=True, conn=kg)
+        main = kg.gbm_summary_calls()
+        assert len(main) == 1, "no relative-summary query in expansion mode"
+        assert set(main[0][1]["metabolite_ids"]) == {_CYS, _LCYS, _DCYS}
+        (call,) = kg.stereo_calls()
+        assert call["metabolite_ids"] == [_CYS]
+        assert _CYS in call["exclude_ids"]
+
+    def test_stereo_forms_added(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite(
+            [_CYS], _MSH_ORG, include_stereo_forms=True, conn=kg)
+        assert out["stereo_forms_added"] == {_CYS: [_LCYS, _DCYS]}
+
+    def test_rows_tagged_via_stereo_form_of(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite(
+            [_CYS], _MSH_ORG, include_stereo_forms=True, limit=50, conn=kg)
+        by_mid = {}
+        for r in out["results"]:
+            by_mid.setdefault(r["metabolite_id"], []).append(r)
+        assert set(by_mid) == {_CYS, _LCYS}
+        for r in by_mid[_LCYS]:
+            assert r["via_stereo_form_of"] == _CYS
+        for r in by_mid[_CYS]:
+            assert "via_stereo_form_of" not in r
+        assert any(r["evidence_source"] == "metabolism" for r in by_mid[_LCYS])
+
+    def test_by_metabolite_tagged(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite(
+            [_CYS], _MSH_ORG, include_stereo_forms=True, conn=kg)
+        by_id = {e["metabolite_id"]: e for e in out["by_metabolite"]}
+        assert set(by_id) == {_CYS, _LCYS}
+        assert by_id[_LCYS]["via_stereo_form_of"] == _CYS
+        assert "via_stereo_form_of" not in by_id[_CYS]
+        for e in by_id.values():
+            assert "stereo_relative_ids" not in e
+
+    def test_no_hint_no_stereo_warning(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite(
+            [_CYS], _MSH_ORG, include_stereo_forms=True, conn=kg)
+        assert out["stereo_relatives"] == {}
+        assert _msh_stereo_warnings(out) == []
+
+    def test_added_ids_never_in_not_matched(self):
+        """D-Cysteine was added but has no rows → dropped silently."""
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite(
+            [_CYS], _MSH_ORG, include_stereo_forms=True, conn=kg)
+        assert out["not_matched"] == []
+        assert _DCYS not in out["not_found"]["metabolite_ids"]
+
+    def test_caller_input_without_rows_stays_not_matched(self):
+        kg = _msh_cys_kg(drop=[_LCYS])
+        out = api.genes_by_metabolite(
+            [_LCYS], _MSH_ORG, include_stereo_forms=True, conn=kg)
+        assert out["not_matched"] == [_LCYS]
+        assert out["stereo_forms_added"] == {_LCYS: [_CYS]}
+        assert {r["metabolite_id"] for r in out["results"]} == {_CYS}
+        for r in out["results"]:
+            assert r["via_stereo_form_of"] == _LCYS
+
+    def test_shared_relative_tagged_with_first_input(self):
+        """Cysteine is reached from both D- and L-Cysteine; input order
+        (D first) wins, not id order."""
+        kg = _msh_cys_kg(entries={_DCYS: _msh_entry(_DCYS, 2, 0, 2)})
+        out = api.genes_by_metabolite(
+            [_DCYS, _LCYS], _MSH_ORG, include_stereo_forms=True,
+            limit=50, conn=kg)
+        assert out["stereo_forms_added"].get(_DCYS) == [_CYS]
+        assert _CYS not in out["stereo_forms_added"].get(_LCYS, [])
+        by_id = {e["metabolite_id"]: e for e in out["by_metabolite"]}
+        assert by_id[_CYS]["via_stereo_form_of"] == _DCYS
+        for r in out["results"]:
+            if r["metabolite_id"] == _CYS:
+                assert r["via_stereo_form_of"] == _DCYS
+
+    def test_relatives_in_input_or_exclude_not_added(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite(
+            [_CYS, _LCYS], _MSH_ORG, exclude_metabolite_ids=[_DCYS],
+            include_stereo_forms=True, conn=kg)
+        assert out["stereo_forms_added"] == {}
+        (call,) = kg.stereo_calls()
+        assert set(call["exclude_ids"]) == {_CYS, _LCYS, _DCYS}
+
+    def test_input_without_relatives(self):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite(
+            [_UREA], _MSH_ORG, include_stereo_forms=True, conn=kg)
+        assert out["stereo_forms_added"] == {}
+        assert out["stereo_relatives"] == {}
+        assert {r["metabolite_id"] for r in out["results"]} == {_UREA}
+        for r in out["results"]:
+            assert "via_stereo_form_of" not in r
+
+
+class TestGenesByMetaboliteStereoShortCircuit:
+    def test_unresolved_organism_envelope_has_both_keys(
+            self, _msh_unresolved_organism):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite([_CYS], "Nonexistium", conn=kg)
+        assert out["not_found"]["organism"] == "Nonexistium"
+        assert out["stereo_relatives"] == {}
+        assert out["stereo_forms_added"] == {}
+
+    def test_unresolved_organism_with_include_stereo_forms(
+            self, _msh_unresolved_organism):
+        kg = _msh_cys_kg()
+        out = api.genes_by_metabolite(
+            [_CYS], "Nonexistium", include_stereo_forms=True, conn=kg)
+        assert out["stereo_relatives"] == {}
+        assert out["stereo_forms_added"] == {}
+
+
+def _msh_mbg_summary(stereo_linked, *, family_inferred=False):
+    return {
+        "total_matching": 3, "gene_count_total": 1,
+        "reaction_count_total": 1, "transporter_count_total": 1,
+        "metabolite_count_total": 2,
+        "rows_by_evidence_source": [], "rows_by_substrate_depth": [],
+        "by_gene": [{
+            "locus_tag": "PMM0100", "gene_name": None, "product": "x",
+            "rows": 3, "metabolite_count": 2, "reaction_count": 1,
+            "transporter_count": 1, "metabolism_rows": 1,
+            "transport_most_specific_rows": 2, "transport_inherited_rows": 0,
+            "transport_substrate_resolution": (
+                "family_inferred" if family_inferred else "resolved"),
+            "tcdb_evidence_score_max": 0.5,
+        }],
+        "top_reactions": [], "top_tcdb_families": [],
+        "top_gene_categories": [], "top_metabolites": [],
+        "top_metabolite_pathways": [], "by_element": [],
+        "stereo_linked_metabolite_ids": list(stereo_linked),
+    }
+
+
+@pytest.mark.usefixtures("_msh_identity_organism")
+class TestMetabolitesByGeneStereoHint:
+    """metabolites_by_gene: hint over the summary's
+    `stereo_linked_metabolite_ids`, organism-wide relative counts."""
+
+    def _kg(self, stereo_linked=(_CYS,), **kw):
+        kg = _msh_cys_kg(
+            mbg_summary=_msh_mbg_summary(stereo_linked, **kw),
+            mbg_rows=[
+                _msh_row(_CYS, "transport", "PMM0100"),
+                _msh_row(_UREA, "metabolism", "PMM0100"),
+            ])
+        return kg
+
+    def test_envelope_stereo_relatives(self):
+        kg = self._kg()
+        out = api.metabolites_by_gene(["PMM0100"], _MSH_ORG, conn=kg)
+        assert out["stereo_relatives"] == {_CYS: [{
+            "metabolite_id": _LCYS, "name": "L-Cysteine",
+            "relation": "specific_form", "reaction_count": 13,
+            "transporter_count": 3, "gene_count": 38,
+        }]}
+
+    def test_rows_carry_sparse_stereo_relative_ids(self):
+        kg = self._kg()
+        out = api.metabolites_by_gene(["PMM0100"], _MSH_ORG, conn=kg)
+        by_mid = {r["metabolite_id"]: r for r in out["results"]}
+        assert by_mid[_CYS]["stereo_relative_ids"] == [_LCYS]
+        assert "stereo_relative_ids" not in by_mid[_UREA]
+        for r in out["results"]:
+            assert "via_stereo_form_of" not in r
+
+    def test_warning_first(self):
+        kg = self._kg(family_inferred=True)
+        out = api.metabolites_by_gene(["PMM0100"], _MSH_ORG, conn=kg)
+        assert len(out["warnings"]) == 2
+        w = out["warnings"][0]
+        assert w.startswith("Stereo forms hold more rows")
+        assert "L-Cysteine (kegg.compound:C00097)" in w
+        assert "stereo_relatives" in w
+        assert "include_stereo_forms=True" not in w
+        assert "family_inferred" in out["warnings"][1]
+
+    def test_relatives_counted_organism_wide(self):
+        """exclude_ids=[], no gbm filters, both arms — regardless of the
+        mbg call's own filters."""
+        kg = self._kg()
+        api.metabolites_by_gene(
+            ["PMM0100"], _MSH_ORG, ec_numbers=["2.5.1.47"],
+            substrate_depth=["most_specific"],
+            evidence_sources=["transport"], conn=kg)
+        (call,) = kg.stereo_calls()
+        assert call["metabolite_ids"] == [_CYS]
+        assert call["exclude_ids"] == []
+        (cypher, params), = kg.gbm_summary_calls()
+        assert sorted(params["metabolite_ids"]) == sorted([_LCYS, _DCYS])
+        assert not params.get("ec_numbers")
+        assert not params.get("substrate_depth")
+        assert not params.get("exclude_metabolite_ids")
+        assert "Gene_catalyzes_reaction" in cypher
+        assert "Gene_has_tcdb_family" in cypher
+
+    def test_no_stereo_linked_ids_no_query(self):
+        kg = self._kg(stereo_linked=())
+        out = api.metabolites_by_gene(["PMM0100"], _MSH_ORG, conn=kg)
+        assert out["stereo_relatives"] == {}
+        assert kg.stereo_calls() == []
+        assert _msh_stereo_warnings(out) == []
+        for r in out["results"]:
+            assert "stereo_relative_ids" not in r
+
+    def test_linked_ids_whose_relatives_have_no_rows(self):
+        kg = self._kg(stereo_linked=(_ALA,))
+        out = api.metabolites_by_gene(["PMM0100"], _MSH_ORG, conn=kg)
+        assert out["stereo_relatives"] == {}
+        assert _msh_stereo_warnings(out) == []
+
+    def test_unresolved_organism_envelope(self, monkeypatch):
+        def _raise(organism, locus_tags, experiment_ids, conn):
+            raise ValueError(f"no organism matching '{organism}'")
+        monkeypatch.setattr(api, "_validate_organism_inputs", _raise)
+        kg = self._kg()
+        out = api.metabolites_by_gene(["PMM0100"], "Nonexistium", conn=kg)
+        assert out["stereo_relatives"] == {}

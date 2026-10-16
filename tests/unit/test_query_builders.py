@@ -14055,3 +14055,194 @@ class TestAssaysByMetaboliteStereoAssignment:
         assert "rq.stereo_assignment" in cypher
         assert "rf.stereo_assignment" in cypher
         assert "by_stereo_assignment" in _mis_final_return(cypher)
+
+
+# ===========================================================================
+# Metabolite stereo-form hint (backlog 2c.8 part 3) —
+# docs/tool-specs/metabolite-stereo-hint.md
+#
+# New-symbol imports happen inside each test so pre-impl collection passes.
+# ===========================================================================
+
+
+def _msh_stereo_column_block(cypher: str) -> str:
+    """The `COLLECT { ... } AS stereo_relatives` block (or '' if absent)."""
+    end = cypher.find("AS stereo_relatives")
+    if end == -1:
+        return ""
+    start = cypher.rfind("COLLECT", 0, end)
+    return cypher[start:end] if start != -1 else ""
+
+
+class TestBuildListMetabolitesStereoRelatives:
+    """`build_list_metabolites`: per-row `stereo_relatives` COLLECT column in
+    BOTH branches (plain MATCH + fulltext search), KG-wide, all relations
+    (stereo form + enantiomer), from `_METABOLITE_STEREO_RELATIVES_COLUMN`.
+    Not in the summary builder."""
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolites
+        return build_list_metabolites(**kwargs)
+
+    @pytest.mark.parametrize("search_text", [None, "cysteine"])
+    @pytest.mark.parametrize("verbose", [False, True])
+    def test_column_present_in_both_branches(self, search_text, verbose):
+        cypher, params = self._build(search_text=search_text, verbose=verbose)
+        assert "AS stereo_relatives" in cypher, (
+            f"stereo_relatives missing (search_text={search_text!r}, "
+            f"verbose={verbose})")
+        # A pure 1-hop read: no new query params.
+        assert not any("stereo" in k for k in params)
+
+    @pytest.mark.parametrize("search_text", [None, "cysteine"])
+    def test_traverses_both_stereo_edges(self, search_text):
+        cypher, _ = self._build(search_text=search_text)
+        block = _msh_stereo_column_block(cypher)
+        assert block, "no COLLECT {...} AS stereo_relatives block"
+        assert "Metabolite_is_stereo_form_of" in block
+        assert "Metabolite_is_enantiomer_of" in block
+
+    @pytest.mark.parametrize("search_text", [None, "cysteine"])
+    def test_relation_labels(self, search_text):
+        cypher, _ = self._build(search_text=search_text)
+        block = _msh_stereo_column_block(cypher)
+        for label in ("'enantiomer'", "'unspecified_form'", "'specific_form'"):
+            assert label in block, f"{label} missing from stereo COLLECT"
+        assert "startNode(r) = m" in block
+
+    @pytest.mark.parametrize("search_text", [None, "cysteine"])
+    def test_entry_keys(self, search_text):
+        cypher, _ = self._build(search_text=search_text)
+        block = _msh_stereo_column_block(cypher)
+        for key in ("metabolite_id:", "name:", "relation:",
+                    "catalyst_gene_count:", "transporter_gene_count:"):
+            assert key in block, f"{key} missing from stereo entry map"
+        assert "coalesce(o.catalyst_gene_count, 0)" in block
+        assert "coalesce(o.transporter_gene_count, 0)" in block
+
+    @pytest.mark.parametrize("search_text", [None, "cysteine"])
+    def test_entries_ordered_by_relation_then_id(self, search_text):
+        cypher, _ = self._build(search_text=search_text)
+        block = _msh_stereo_column_block(cypher)
+        assert "ORDER BY relation, o.id" in block
+
+    def test_module_constant_used_by_both_branches_not_summary(self):
+        from multiomics_explorer.kg import queries_lib as ql
+        col = ql._METABOLITE_STEREO_RELATIVES_COLUMN
+        assert "AS stereo_relatives" in col
+        for st in (None, "cysteine"):
+            cypher, _ = self._build(search_text=st)
+            assert col.strip() in cypher
+            sum_cypher, _ = ql.build_list_metabolites_summary(search_text=st)
+            assert "stereo_relatives" not in sum_cypher
+
+    def test_docstring_mentions_bounded_collect(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolites
+        doc = build_list_metabolites.__doc__ or ""
+        assert "stereo_relatives" in doc
+        assert "COLLECT" in doc
+
+
+class TestBuildMetaboliteStereoRelatives:
+    """`build_metabolite_stereo_relatives(*, metabolite_ids, exclude_ids=None)`
+    — 1-hop over Metabolite_is_stereo_form_of only (both directions)."""
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolite_stereo_relatives,
+        )
+        return build_metabolite_stereo_relatives(**kwargs)
+
+    def test_returns_cypher_and_params(self):
+        out = self._build(metabolite_ids=["kegg.compound:C00736"])
+        assert isinstance(out, tuple) and len(out) == 2
+        cypher, params = out
+        assert isinstance(cypher, str)
+        assert isinstance(params, dict)
+
+    def test_keyword_only(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolite_stereo_relatives,
+        )
+        with pytest.raises(TypeError):
+            build_metabolite_stereo_relatives(["kegg.compound:C00736"])
+
+    def test_params_default_exclude_is_empty_list(self):
+        """`NOT o.id IN $exclude_ids` needs a list — None would null-filter
+        every row."""
+        _, params = self._build(metabolite_ids=["kegg.compound:C00736"])
+        assert params == {
+            "metabolite_ids": ["kegg.compound:C00736"],
+            "exclude_ids": [],
+        }
+
+    def test_params_exclude_ids_passthrough(self):
+        _, params = self._build(
+            metabolite_ids=["kegg.compound:C00736"],
+            exclude_ids=["kegg.compound:C00097", "kegg.compound:C00736"],
+        )
+        assert params["metabolite_ids"] == ["kegg.compound:C00736"]
+        assert params["exclude_ids"] == [
+            "kegg.compound:C00097", "kegg.compound:C00736"]
+
+    def test_unwinds_metabolite_ids(self):
+        cypher, _ = self._build(metabolite_ids=["x"])
+        assert "UNWIND $metabolite_ids AS mid" in cypher
+        assert "(m:Metabolite {id: mid})" in cypher
+
+    def test_traverses_only_stereo_form_edge_undirected(self):
+        cypher, _ = self._build(metabolite_ids=["x"])
+        assert "-[r:Metabolite_is_stereo_form_of]-(o:Metabolite)" in cypher
+        assert "Metabolite_is_enantiomer_of" not in cypher
+        assert "'enantiomer'" not in cypher
+
+    def test_exclude_clause(self):
+        cypher, _ = self._build(metabolite_ids=["x"], exclude_ids=["y"])
+        assert "NOT o.id IN $exclude_ids" in cypher
+
+    def test_relation_from_edge_direction(self):
+        cypher, _ = self._build(metabolite_ids=["x"])
+        assert "startNode(r) = m" in cypher
+        assert "'unspecified_form'" in cypher
+        assert "'specific_form'" in cypher
+
+    def test_return_keys(self):
+        cypher, _ = self._build(metabolite_ids=["x"])
+        ret = cypher[cypher.rfind("RETURN"):]
+        assert "m.id AS metabolite_id" in ret
+        assert "o.id AS relative_id" in ret
+        assert "o.name AS relative_name" in ret
+        assert "AS relation" in ret
+
+    def test_order_by(self):
+        cypher, _ = self._build(metabolite_ids=["x"])
+        assert "ORDER BY metabolite_id, relation, relative_id" in cypher
+
+
+class TestBuildMetabolitesByGeneSummaryStereoLinked:
+    """`build_metabolites_by_gene_summary` RETURNs
+    `stereo_linked_metabolite_ids` — slice metabolites with a stereo edge
+    (Metabolite_is_stereo_form_of only; no new params)."""
+
+    def _build(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_summary,
+        )
+        kwargs.setdefault("locus_tags", ["PMM0963"])
+        kwargs.setdefault("organism", "Prochlorococcus MED4")
+        return build_metabolites_by_gene_summary(**kwargs)
+
+    @pytest.mark.parametrize("arms", [
+        ("metabolism", "transport"), ("metabolism",), ("transport",),
+    ])
+    def test_column_in_final_return(self, arms):
+        cypher, params = self._build(arms=arms)
+        ret = cypher[cypher.rfind("RETURN"):]
+        assert "stereo_linked_metabolite_ids" in ret
+        assert set(params) == {"locus_tags", "organism"}
+
+    def test_exists_stereo_form_edge(self):
+        cypher, _ = self._build()
+        assert "AS stereo_linked_metabolite_ids" in cypher
+        assert "Metabolite_is_stereo_form_of" in cypher
+        assert "Metabolite_is_enantiomer_of" not in cypher

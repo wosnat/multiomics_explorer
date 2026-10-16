@@ -12946,3 +12946,267 @@ class TestListFilterValuesIdentitySurfaceWrapper:
         assert mock_api.call_args[1]["filter_type"] == filter_type
         assert result.filter_type == filter_type
         assert [r.value for r in result.results] == values
+
+
+# ===========================================================================
+# Metabolite stereo-form hint (backlog 2c.8 part 3) —
+# docs/tool-specs/metabolite-stereo-hint.md
+# New models are imported inside each test so pre-impl collection passes.
+# ===========================================================================
+
+_MSH_CYS = "kegg.compound:C00736"
+_MSH_LCYS = "kegg.compound:C00097"
+_MSH_DCYS = "kegg.compound:C00793"
+
+_MSH_STEREO_RELATIVE = {
+    "metabolite_id": _MSH_LCYS, "name": "L-Cysteine",
+    "relation": "specific_form", "reaction_count": 13,
+    "transporter_count": 3, "gene_count": 38,
+}
+
+_MSH_LM_REL = [
+    {"metabolite_id": _MSH_LCYS, "name": "L-Cysteine",
+     "relation": "specific_form", "catalyst_gene_count": 652,
+     "transporter_gene_count": 2554},
+    {"metabolite_id": _MSH_DCYS, "name": "D-Cysteine",
+     "relation": "specific_form", "catalyst_gene_count": 12,
+     "transporter_gene_count": 0},
+]
+
+
+def _msh_gbm_return(**overrides):
+    import copy
+    out = copy.deepcopy(_GBM_SAMPLE_API_RETURN)
+    out.update(overrides)
+    return out
+
+
+def _msh_mbg_return(**overrides):
+    import copy
+    out = copy.deepcopy(_MBG_SAMPLE_API_RETURN)
+    out.update(overrides)
+    return out
+
+
+def _msh_field_desc(model, field):
+    return model.model_fields[field].description or ""
+
+
+class TestStereoRelativeModels:
+    """New Pydantic models: StereoRelative (organism-scoped, gene-side tools)
+    and MetaboliteStereoRelative (KG-wide, list_metabolites rows)."""
+
+    def test_stereo_relative_fields(self):
+        from multiomics_explorer.mcp_server.tools import StereoRelative
+        assert set(StereoRelative.model_fields) == {
+            "metabolite_id", "name", "relation", "reaction_count",
+            "transporter_count", "gene_count",
+        }
+        m = StereoRelative(**_MSH_STEREO_RELATIVE)
+        assert m.metabolite_id == _MSH_LCYS
+        assert m.gene_count == 38
+        for f in StereoRelative.model_fields:
+            assert _msh_field_desc(StereoRelative, f), f"{f} undocumented"
+
+    def test_metabolite_stereo_relative_fields(self):
+        from multiomics_explorer.mcp_server.tools import MetaboliteStereoRelative
+        assert set(MetaboliteStereoRelative.model_fields) == {
+            "metabolite_id", "name", "relation", "catalyst_gene_count",
+            "transporter_gene_count",
+        }
+        for row in _MSH_LM_REL:
+            MetaboliteStereoRelative(**row)
+        MetaboliteStereoRelative(**{**_MSH_LM_REL[0], "relation": "enantiomer"})
+        MetaboliteStereoRelative(
+            **{**_MSH_LM_REL[0], "relation": "unspecified_form"})
+
+
+class TestListMetabolitesStereoRelativesWrapper:
+
+    def test_row_field(self):
+        from multiomics_explorer.mcp_server.tools import MetaboliteResult
+        f = MetaboliteResult.model_fields["stereo_relatives"]
+        assert f.default is None
+        assert "Counts never combine across stereo forms" in f.description
+        assert "Absent when none" in f.description
+
+    @pytest.mark.asyncio
+    async def test_populated_rows_validate_and_sparse(self, tool_fns, mock_ctx):
+        from multiomics_explorer.mcp_server.tools import MetaboliteStereoRelative
+        cys = {**_LM_SAMPLE_RESULT, "metabolite_id": _MSH_CYS,
+               "name": "Cysteine", "stereo_relatives": _MSH_LM_REL}
+        urea = {**_LM_SAMPLE_RESULT, "metabolite_id": "kegg.compound:C00086",
+                "name": "Urea"}
+        api_return = {**_LM_SAMPLE_API_RETURN, "total_matching": 2,
+                      "returned": 2, "results": [cys, urea]}
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=api_return,
+        ):
+            result = await tool_fns["list_metabolites"](
+                mock_ctx, metabolite_ids=[_MSH_CYS, "kegg.compound:C00086"])
+        rels = result.results[0].stereo_relatives
+        assert all(isinstance(r, MetaboliteStereoRelative) for r in rels)
+        assert [r.metabolite_id for r in rels] == [_MSH_LCYS, _MSH_DCYS]
+        dumped = result.model_dump()
+        assert dumped["results"][0]["stereo_relatives"][0]["catalyst_gene_count"] == 652
+        assert "stereo_relatives" not in dumped["results"][1]
+
+
+class TestGenesByMetaboliteStereoWrapper:
+
+    def test_include_stereo_forms_param(self, tool_fns):
+        import inspect
+        sig = inspect.signature(tool_fns["genes_by_metabolite"])
+        assert sig.parameters["include_stereo_forms"].default is False
+
+    def test_include_stereo_forms_description(self, tool_fns):
+        import typing
+        hints = typing.get_type_hints(
+            tool_fns["genes_by_metabolite"], include_extras=True)
+        desc = " ".join(
+            getattr(m, "description", "") or ""
+            for m in getattr(hints["include_stereo_forms"], "__metadata__", ()))
+        assert "via_stereo_form_of" in desc
+        assert "Enantiomers are never added" in desc
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("value", [True, False])
+    async def test_include_stereo_forms_forwarded(
+            self, tool_fns, mock_ctx, value):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=_msh_gbm_return(
+                stereo_relatives={}, stereo_forms_added={}),
+        ) as mock_api:
+            await tool_fns["genes_by_metabolite"](
+                mock_ctx, metabolite_ids=[_MSH_CYS],
+                organism="Prochlorococcus MED4", include_stereo_forms=value)
+        assert mock_api.call_args.kwargs["include_stereo_forms"] is value
+
+    def test_response_model_fields(self):
+        from multiomics_explorer.mcp_server.tools import (
+            GbmByMetabolite, GeneReactionMetaboliteTriplet,
+            GenesByMetaboliteResponse,
+        )
+        resp = GenesByMetaboliteResponse.model_fields
+        assert "stereo_relatives" in resp
+        assert "stereo_forms_added" in resp
+        assert resp["stereo_relatives"].default_factory() == {}
+        assert resp["stereo_forms_added"].default_factory() == {}
+        for f in ("stereo_relative_ids", "via_stereo_form_of"):
+            assert GbmByMetabolite.model_fields[f].default is None
+        assert GeneReactionMetaboliteTriplet.model_fields[
+            "via_stereo_form_of"].default is None
+
+    def test_warnings_description_mentions_stereo(self):
+        from multiomics_explorer.mcp_server.tools import (
+            GenesByMetaboliteResponse,
+        )
+        desc = GenesByMetaboliteResponse.model_fields["warnings"].description
+        assert "stereo" in desc.lower()
+
+    @pytest.mark.asyncio
+    async def test_hint_envelope_validates(self, tool_fns, mock_ctx):
+        from multiomics_explorer.mcp_server.tools import StereoRelative
+        base = _msh_gbm_return()
+        bm = [{**base["by_metabolite"][0], "metabolite_id": _MSH_CYS,
+               "name": "Cysteine", "stereo_relative_ids": [_MSH_LCYS]}]
+        api_return = _msh_gbm_return(
+            by_metabolite=bm,
+            stereo_relatives={_MSH_CYS: [_MSH_STEREO_RELATIVE]},
+            stereo_forms_added={},
+            warnings=["Stereo forms hold more rows: ..."],
+        )
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=api_return,
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx, metabolite_ids=[_MSH_CYS],
+                organism="Prochlorococcus MED4")
+        (rel,) = result.stereo_relatives[_MSH_CYS]
+        assert isinstance(rel, StereoRelative)
+        assert rel.reaction_count == 13
+        assert result.stereo_forms_added == {}
+        assert result.by_metabolite[0].stereo_relative_ids == [_MSH_LCYS]
+
+    @pytest.mark.asyncio
+    async def test_expansion_envelope_validates(self, tool_fns, mock_ctx):
+        base = _msh_gbm_return()
+        metab = {**base["results"][0], "metabolite_id": _MSH_LCYS,
+                 "via_stereo_form_of": _MSH_CYS}
+        trans = {**base["results"][1], "metabolite_id": _MSH_CYS}
+        bm = [{**base["by_metabolite"][0], "metabolite_id": _MSH_LCYS,
+               "name": "L-Cysteine", "via_stereo_form_of": _MSH_CYS}]
+        api_return = _msh_gbm_return(
+            results=[metab, trans], by_metabolite=bm,
+            stereo_relatives={},
+            stereo_forms_added={_MSH_CYS: [_MSH_LCYS, _MSH_DCYS]},
+        )
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=api_return,
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx, metabolite_ids=[_MSH_CYS],
+                organism="Prochlorococcus MED4", include_stereo_forms=True)
+        assert result.stereo_forms_added == {_MSH_CYS: [_MSH_LCYS, _MSH_DCYS]}
+        assert result.results[0].via_stereo_form_of == _MSH_CYS
+        assert result.by_metabolite[0].via_stereo_form_of == _MSH_CYS
+        dumped = result.model_dump()
+        assert dumped["results"][0]["via_stereo_form_of"] == _MSH_CYS
+        assert "via_stereo_form_of" not in dumped["results"][1]
+
+
+class TestMetabolitesByGeneStereoWrapper:
+
+    def test_response_model_fields(self):
+        from multiomics_explorer.mcp_server.tools import (
+            GeneReactionMetaboliteTriplet, MetabolitesByGeneResponse,
+        )
+        resp = MetabolitesByGeneResponse.model_fields
+        assert "stereo_relatives" in resp
+        assert resp["stereo_relatives"].default_factory() == {}
+        assert "stereo_forms_added" not in resp
+        assert GeneReactionMetaboliteTriplet.model_fields[
+            "stereo_relative_ids"].default is None
+        assert "stereo" in resp["warnings"].description.lower()
+
+    def test_no_include_stereo_forms_param(self, tool_fns):
+        """Out of scope on metabolites_by_gene (spec 'Out of scope') —
+        paired with the envelope-key check so it is red pre-impl."""
+        import inspect
+        from multiomics_explorer.mcp_server.tools import (
+            MetabolitesByGeneResponse,
+        )
+        assert "stereo_relatives" in MetabolitesByGeneResponse.model_fields
+        sig = inspect.signature(tool_fns["metabolites_by_gene"])
+        assert "include_stereo_forms" not in sig.parameters
+
+    @pytest.mark.asyncio
+    async def test_hint_envelope_validates(self, tool_fns, mock_ctx):
+        from multiomics_explorer.mcp_server.tools import StereoRelative
+        base = _msh_mbg_return()
+        row0 = {**base["results"][0], "metabolite_id": _MSH_CYS,
+                "stereo_relative_ids": [_MSH_LCYS]}
+        rows = [row0] + [dict(r) for r in base["results"][1:]]
+        api_return = _msh_mbg_return(
+            results=rows,
+            stereo_relatives={_MSH_CYS: [_MSH_STEREO_RELATIVE]},
+            warnings=["Stereo forms hold more rows: ..."],
+        )
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=api_return,
+        ):
+            result = await tool_fns["metabolites_by_gene"](
+                mock_ctx, locus_tags=["PMM0963"],
+                organism="Prochlorococcus MED4")
+        (rel,) = result.stereo_relatives[_MSH_CYS]
+        assert isinstance(rel, StereoRelative)
+        assert result.results[0].stereo_relative_ids == [_MSH_LCYS]
+        dumped = result.model_dump()
+        assert dumped["results"][0]["stereo_relative_ids"] == [_MSH_LCYS]
+        for r in dumped["results"][1:]:
+            assert "stereo_relative_ids" not in r

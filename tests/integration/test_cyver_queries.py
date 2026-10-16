@@ -180,6 +180,9 @@ _KNOWN_MAP_KEYS = {
     "substrate_depth", "tcdb_evidence_score", "transport_substrate_resolution",
     "tcdb_evidence_score_max", "transported_metabolite_count",
     "transporter_gene_count",
+    # metabolite stereo-form hint: `relation` is a CASE-derived alias inside
+    # list_metabolites' stereo_relatives COLLECT map (not a Metabolite prop).
+    "relation",
 }
 
 # Regex to extract property name from CyVer description:
@@ -250,6 +253,14 @@ def _build_lm_no_formula_count(**kwargs):
 def _build_resolve_metabolite_curies(**kwargs):
     from multiomics_explorer.kg import queries_lib as _ql
     return _ql.build_resolve_metabolite_curies(**kwargs)
+
+
+# Lazy wrapper for the stereo-relatives builder (metabolite stereo-form hint,
+# docs/tool-specs/metabolite-stereo-hint.md): resolved at call time so the
+# module collects before the builder exists (red until Stage 2).
+def _build_metabolite_stereo_relatives(**kwargs):
+    from multiomics_explorer.kg import queries_lib as _ql
+    return _ql.build_metabolite_stereo_relatives(**kwargs)
 
 
 # (test_id, builder_callable, kwargs)
@@ -324,6 +335,10 @@ _BUILDERS: list[tuple[str, ...]] = [
     # --- metabolite identity surface (§A resolver, §B-§C2, §D stereo) ---
     ("resolve_metabolite_curies", _build_resolve_metabolite_curies,
      {"curies": ["chebi:14654", "kegg.compound:C00525", "chebi:10004"]}),
+    # --- metabolite stereo-form hint ---
+    ("metabolite_stereo_relatives", _build_metabolite_stereo_relatives,
+     {"metabolite_ids": ["kegg.compound:C00736", "kegg.compound:C00097"],
+      "exclude_ids": ["kegg.compound:C00793"]}),
     ("list_metabolites_identity_filters", build_list_metabolites,
      {"kegg_compound_ids": ["kegg.compound:C00085"],
       "structure_kind": ["generic"],

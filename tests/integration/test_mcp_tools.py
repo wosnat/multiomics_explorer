@@ -5042,3 +5042,127 @@ class TestMetaboliteIdentitySurface:
         out = api.list_filter_values(filter_type="kegg_brite_class", conn=conn)
         assert len(out["results"]) == 28
         assert "Lipids: Fatty acyls" in {r["value"] for r in out["results"]}
+
+
+# ---------------------------------------------------------------------------
+# Metabolite stereo-form hint (backlog 2c.8 part 3) —
+# docs/tool-specs/metabolite-stereo-hint.md. Live MED4 facts (2026-10-16):
+# Cysteine C00736 = 0 reactions / 5 families / 33 genes (transport-only);
+# L-Cysteine C00097 = 13 / 3 / 38; D-Cysteine C00793 has no MED4 rows.
+# 3-Phospho-D-glycerate C00197 has MED4 rows; its only stereo relative
+# (Glycerate 3-phosphate C00597) has none.
+# ---------------------------------------------------------------------------
+
+_MSH_ORG = "Prochlorococcus MED4"
+_MSH_CYS = "kegg.compound:C00736"
+_MSH_LCYS = "kegg.compound:C00097"
+_MSH_DCYS = "kegg.compound:C00793"
+_MSH_UREA = "kegg.compound:C00086"
+_MSH_3PG = "kegg.compound:C00197"
+
+
+def _msh_stereo_warnings(out):
+    return [w for w in out["warnings"] if "Stereo forms hold more rows" in w]
+
+
+@pytest.mark.kg
+class TestMetaboliteStereoHintKG:
+
+    def test_list_metabolites_cysteine_relatives(self, conn):
+        out = api.list_metabolites(
+            metabolite_ids=[_MSH_CYS, _MSH_UREA], conn=conn)
+        by_id = {r["metabolite_id"]: r for r in out["results"]}
+        rels = by_id[_MSH_CYS]["stereo_relatives"]
+        assert [(r["metabolite_id"], r["relation"]) for r in rels] == [
+            (_MSH_LCYS, "specific_form"), (_MSH_DCYS, "specific_form")]
+        lcys = rels[0]
+        assert lcys["name"] == "L-Cysteine"
+        assert lcys["catalyst_gene_count"] > 0
+        assert lcys["transporter_gene_count"] > 0
+        assert "stereo_relatives" not in by_id[_MSH_UREA]
+
+    def test_list_metabolites_l_cysteine_relations(self, conn):
+        out = api.list_metabolites(metabolite_ids=[_MSH_LCYS], conn=conn)
+        rels = out["results"][0]["stereo_relatives"]
+        assert [(r["metabolite_id"], r["relation"]) for r in rels] == [
+            (_MSH_DCYS, "enantiomer"), (_MSH_CYS, "unspecified_form")]
+
+    def test_gbm_cysteine_hints_l_not_d(self, conn):
+        from multiomics_explorer.mcp_server.tools import (
+            GenesByMetaboliteResponse,
+        )
+        out = api.genes_by_metabolite([_MSH_CYS], _MSH_ORG, conn=conn)
+        GenesByMetaboliteResponse(**out)
+        assert set(out["stereo_relatives"]) == {_MSH_CYS}
+        (rel,) = out["stereo_relatives"][_MSH_CYS]
+        assert rel["metabolite_id"] == _MSH_LCYS
+        assert rel["relation"] == "specific_form"
+        assert (rel["reaction_count"], rel["transporter_count"],
+                rel["gene_count"]) == (13, 3, 38)
+        assert out["stereo_forms_added"] == {}
+        assert out["warnings"][0].startswith("Stereo forms hold more rows")
+        assert "include_stereo_forms=True" in out["warnings"][0]
+        (bm,) = out["by_metabolite"]
+        assert bm["stereo_relative_ids"] == [_MSH_LCYS]
+
+    def test_gbm_both_forms_passed_no_hint(self, conn):
+        out = api.genes_by_metabolite(
+            [_MSH_CYS, _MSH_LCYS], _MSH_ORG, conn=conn)
+        assert out["stereo_relatives"] == {}
+        assert _msh_stereo_warnings(out) == []
+
+    def test_gbm_include_stereo_forms_tags_metabolism_rows(self, conn):
+        from multiomics_explorer.mcp_server.tools import (
+            GenesByMetaboliteResponse,
+        )
+        out = api.genes_by_metabolite(
+            [_MSH_CYS], _MSH_ORG, include_stereo_forms=True, limit=500,
+            conn=conn)
+        GenesByMetaboliteResponse(**out)
+        assert _MSH_LCYS in out["stereo_forms_added"][_MSH_CYS]
+        tagged_metab = [
+            r for r in out["results"]
+            if r["evidence_source"] == "metabolism"
+            and r.get("via_stereo_form_of") == _MSH_CYS]
+        assert tagged_metab
+        assert all(r["metabolite_id"] == _MSH_LCYS for r in tagged_metab)
+        for r in out["results"]:
+            if r["metabolite_id"] == _MSH_CYS:
+                assert "via_stereo_form_of" not in r
+        assert out["not_matched"] == []
+        assert out["stereo_relatives"] == {}
+        assert _msh_stereo_warnings(out) == []
+
+    def test_gbm_urea_no_hint(self, conn):
+        out = api.genes_by_metabolite([_MSH_UREA], _MSH_ORG, conn=conn)
+        assert out["stereo_relatives"] == {}
+        assert out["stereo_forms_added"] == {}
+        assert _msh_stereo_warnings(out) == []
+
+    def test_gbm_stereo_linked_input_relative_without_rows(self, conn):
+        out = api.genes_by_metabolite([_MSH_3PG], _MSH_ORG, conn=conn)
+        assert out["total_matching"] > 0
+        assert out["stereo_relatives"] == {}
+        assert _msh_stereo_warnings(out) == []
+
+    def test_mbg_cysteine_transporter_hints_l_cysteine(self, conn):
+        from multiomics_explorer.mcp_server.tools import (
+            MetabolitesByGeneResponse,
+        )
+        gbm = api.genes_by_metabolite(
+            [_MSH_CYS], _MSH_ORG, evidence_sources=["transport"], limit=1,
+            conn=conn)
+        assert gbm["results"], "no MED4 Cysteine transporter found"
+        locus = gbm["results"][0]["locus_tag"]
+        out = api.metabolites_by_gene([locus], _MSH_ORG, limit=500, conn=conn)
+        MetabolitesByGeneResponse(**out)
+        assert _MSH_CYS in out["stereo_relatives"]
+        assert _MSH_LCYS in {
+            r["metabolite_id"] for r in out["stereo_relatives"][_MSH_CYS]}
+        assert out["warnings"][0].startswith("Stereo forms hold more rows")
+        cys_rows = [r for r in out["results"]
+                    if r["metabolite_id"] == _MSH_CYS]
+        assert cys_rows
+        for r in cys_rows:
+            assert _MSH_LCYS in r["stereo_relative_ids"]
+        assert any("stereo_relative_ids" not in r for r in out["results"])

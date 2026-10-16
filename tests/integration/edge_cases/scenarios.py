@@ -985,6 +985,9 @@ _NO_DISCUSSES_DOI = "10.1126/science.1243457"     # present, no discusses edge
 _UNKNOWN_ASSAY_ID = "metabolite_assay:does_not_exist"
 # backlog 3.2 (bare metabolite-ID coercion): un-prefixed forms of ids above.
 _BARE_UREA_ID = "C00086"   # -> _UREA_ID
+# 3-Phospho-D-glycerate: stereo-linked (Metabolite_is_stereo_form_of ->
+# Glycerate 3-phosphate C00597); C00597 has no MED4 gene rows.
+_STEREO_LINKED_NO_RELATIVE_ROWS_ID = "kegg.compound:C00197"
 _BARE_PEP_ID = "C00074"    # -> _PEP_ID
 _BARE_KEGG_ID = "C00064"   # L-glutamate, kegg.compound:C00064
 # metabolite-identity surface (live build 2026-10-15T19:17Z, spec §A table).
@@ -1044,6 +1047,27 @@ def genes_by_metabolite_scenarios():
             # backlog 3.2: bare urea C-number resolves to _UREA_ID (same rows).
             "bare_metabolite_id",
             dict(metabolite_ids=[_BARE_UREA_ID], organism=fx.CONTROL_ORGANISM)),
+        # metabolite stereo-form hint (backlog 2c.8 part 3): a stereo-linked
+        # input whose only relative (Glycerate 3-phosphate C00597) has no
+        # MED4 rows -> valid envelope, empty stereo_relatives (verified
+        # 2026-10-16: C00197 has 13 MED4 rows, C00597 none).
+        Scenario(
+            "stereo_linked_relative_without_rows",
+            dict(metabolite_ids=[_STEREO_LINKED_NO_RELATIVE_ROWS_ID],
+                 organism=fx.CONTROL_ORGANISM)),
+        Scenario(
+            # include_stereo_forms=True on an input with no stereo relatives
+            # (urea) -> unchanged rows, stereo_forms_added == {}.
+            "include_stereo_forms_no_relatives",
+            dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
+                 include_stereo_forms=True)),
+        Scenario(
+            # include_stereo_forms=True on the genome-only strain (empty
+            # data layers elsewhere; chemistry present).
+            "include_stereo_forms_genome_only_organism",
+            dict(metabolite_ids=[_STEREO_LINKED_NO_RELATIVE_ROWS_ID],
+                 organism=fx.GENOME_ONLY_ORGANISM,
+                 include_stereo_forms=True)),
     ]
 
 
