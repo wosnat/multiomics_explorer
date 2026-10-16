@@ -2,7 +2,7 @@
 
 ## Guides
 
-- `docs://guide/concepts` — ~6308 tok — The knowledge graph integrates Prochlorococcus and Alteromonas multi-omics data: genomes, transcriptomes…
+- `docs://guide/concepts` — ~6325 tok — The knowledge graph integrates Prochlorococcus and Alteromonas multi-omics data: genomes, transcriptomes…
 - `docs://guide/conventions` — ~7035 tok — Patterns that hold across most or all 42 tools — things you'd otherwise re-learn tool by tool.
 - `docs://guide/python_api` — ~4115 tok — The `multiomics_explorer` package exposes the same 42 tools available via MCP, plus a handful of analysis…
 - `docs://guide/start_here` — ~4019 tok — This MCP server exposes 42 tools over a Prochlorococcus/Alteromonas multi-omics KG, in ten families below.
@@ -38,7 +38,7 @@
 - `docs://tools/list_experiments` — ~1621 tok
 - `docs://tools/list_filter_values` — ~1480 tok
 - `docs://tools/list_metabolite_assays` — ~1315 tok
-- `docs://tools/list_metabolites` — ~1875 tok
+- `docs://tools/list_metabolites` — ~1876 tok
 - `docs://tools/list_organisms` — ~937 tok
 - `docs://tools/list_publications` — ~1249 tok
 - `docs://tools/metabolites_by_flags_assay` — ~1553 tok

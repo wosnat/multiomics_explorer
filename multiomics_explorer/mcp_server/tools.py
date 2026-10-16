@@ -7993,9 +7993,9 @@ def register_tools(mcp: FastMCP):
     async def list_metabolites(
         ctx: Context,
         search_text: Annotated[str | None, Field(
-            description="Free-text search on metabolite name (Lucene syntax). "
-            "Index covers Metabolite.name only — element/formula composition "
-            "is filtered through `elements` (presence list), not search. "
+            description="Free-text search (Lucene) over metabolite name, formula "
+            "and identifiers (KEGG / ChEBI / MNX / HMDB ids, InChIKey). A "
+            "formula hit is a token match — for composition use `elements`. "
             "E.g. 'glucose', 'phosphate AND amino'.",
         )] = None,
         metabolite_ids: MetaboliteIdsParam = None,

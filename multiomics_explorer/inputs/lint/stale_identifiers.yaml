@@ -93,3 +93,7 @@
   reason: "KG property renamed to kegg_functional_categories (explorer field of the same name)"
   replacement: "kegg_functional_categories"
   allow_in: '(?i)renamed|rename'
+
+- pattern: '(?i)Metabolite\.name only'
+  reason: "metaboliteFullText covers name + formula + identifier tokens"
+  replacement: "name, formula and identifiers"

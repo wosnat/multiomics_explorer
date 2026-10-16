@@ -13,7 +13,7 @@ docs://tools/list_metabolites; summary=True first.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| search_text | string \| None | None | Free-text search on metabolite name (Lucene syntax). Index covers Metabolite.name only — element/formula composition is filtered through `elements` (presence list), not search. E.g. 'glucose', 'phosphate AND amino'. |
+| search_text | string \| None | None | Free-text search (Lucene) over metabolite name, formula and identifiers (KEGG / ChEBI / MNX / HMDB ids, InChIKey). A formula hit is a token match — for composition use `elements`. E.g. 'glucose', 'phosphate AND amino'. |
 | metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolites. |
 | exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
 | kegg_compound_ids | list[string] \| None | None | KEGG compound ids, bare or prefixed (e.g. ['C00031']). Matches any of the metabolite's identifiers, including secondary and retired ones, so a merged compound's old KEGG id still finds it. |

@@ -460,3 +460,32 @@ MNX's local `chem_xref.tsv`.
 - **No node, edge or paper-row changes**, and the release TSVs are unchanged.
 - **For your resolver:** `HMDB0000122` and `CHEBI:17634` now resolve to `C00031`. `C00031`'s
   scalar `hmdb_id` is now `HMDB0000122`; `HMDB0304632` stays in `all_identifiers`.
+
+---
+
+## Ask 7 (2026-10-16, small, wording only): KEGG classification vocab descriptions say "absent when in none"
+
+Both `ControlledVocabulary` descriptions end with **"Sparse: absent when the metabolite is in none."**
+- `(Metabolite, kegg_functional_categories)`
+- `(Metabolite, kegg_brite_classes)`
+
+That reads as a negative ("this compound belongs to none of these categories"). It's the opposite
+of how the data works and of what the explorer docs now say. KEGG's compound BRITE lists are
+hand-curated, representative lists: fumarate, ethanol and L-carnitine are absent, yet they are
+organic acids and the like. Absent means "KEGG did not list it", not "in none".
+
+The explorer passes these descriptions through verbatim:
+- `list_filter_values(filter_type='kegg_functional_category' / 'kegg_brite_class')` returns them
+  in its `description` field;
+- `kg_schema` / `run_cypher` users read them directly.
+
+So the text contradicts the frozen explorer field descriptions right next to it.
+
+**Ask:** replace the last sentence in both with something like:
+
+> Sparse: absent when KEGG does not list the metabolite in any of these trees. The lists are
+> hand-curated and partial (~10% / ~20% of metabolites), so absence is not evidence that a
+> category does not apply.
+
+Hash-neutral if only `description` changes. If it does move the hash, say so and the explorer
+re-pins. No explorer code change.
