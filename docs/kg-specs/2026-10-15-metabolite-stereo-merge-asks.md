@@ -489,3 +489,74 @@ So the text contradicts the frozen explorer field descriptions right next to it.
 
 Hash-neutral if only `description` changes. If it does move the hash, say so and the explorer
 re-pins. No explorer code change.
+
+## KG reply, ask 7 (2026-10-16): done, hash-neutral
+
+Both descriptions now end with an absence sentence instead of "absent when the metabolite is in
+none":
+- `kegg_functional_categories`: "Sparse: absent when KEGG does not list the metabolite in
+  br08001. The list is hand-curated and partial (about 10% of metabolites), so absence is not
+  evidence that a category does not apply."
+- `kegg_brite_classes`: the same, with "in any of these trees" and "about 20%".
+
+The coverage figures are measured: 334 and 652 of 3,214 metabolites.
+
+**Hash unchanged.** `description` is not in `controlled_vocabularies_hash`; we verified by
+hashing both versions. No other vocabulary uses that wording. The live vocabulary nodes carry the
+new text after the 2026-10-16 rebuild.
+
+## Ask 8 (2026-10-16): missing `Metabolite_is_stereo_form_of` edges on common generic substrates
+
+The explorer is adding a stereo-form hint to `genes_by_metabolite` / `metabolites_by_gene` /
+`list_metabolites` (backlog 2c.8). It works off the stereo edges as they are. A check of
+stereo-unspecified names against their L- / D- / α- / β- named siblings found **14 generic
+nodes with no stereo edge at all**, although a specific form exists and carries the catalysis.
+Most are heavily transported, so the TCDB → catalysis join fails on exactly the compounds an
+analysis would try first (isoleucine, glucose, mannose, galactose).
+
+| Generic node | InChIKey | `structure_kind` | catalysts | transporter genes | Unlinked specific forms (catalysts) |
+|---|---|---|---|---|---|
+| `chebi:17234` glucose | yes | defined | 0 | 3,091 | `C00031` D-Glucose (284), `C00221` β-D-Glucose (192), `C00267` α-D-Glucose (183) |
+| `chebi:37684` mannose | **no** | defined | 0 | 2,958 | `C00159` D-Mannose (15) |
+| `chebi:22599` arabinose | **no** | defined | 0 | 2,780 | `C00259` L-Arabinose (15) |
+| `C01582` Galactose | yes | defined | 0 | 2,627 | `C00124` D-Galactose (72), `C00984` α (58), `C00962` β (16), `C01825` L-Galactose (1) |
+| `C01496` Fructose | **no** | generic | 0 | 2,342 | `C00095` D-Fructose (214), `C02336` β-D-Fructose (119), `C10906` D-Fructose (0) |
+| `chebi:24278` glucoside | **no** | generic | 0 | 2,114 | `C00963` β-D-Glucoside (68) |
+| `chebi:26546` rhamnose | **no** | defined | 0 | 1,691 | `C00507` L-Rhamnose (3), `C02338` β-L (5), `C02476` α-L (5) |
+| `chebi:24898` isoleucine | **no** | defined | 0 | 1,597 | `C00407` L-Isoleucine (121) |
+| `chebi:33709` amino acid | **no** | generic | 0 | 942 | `C00151` L-Amino acid (60), `C00405` D-Amino acid (23) |
+| `chebi:5417` glucosamine | **no** | defined | 0 | 636 | `C00329` D-Glucosamine (20) |
+| `chebi:24175` galacturonate | **no** | generic | 0 | 591 | `C00333` D-Galacturonate (9) |
+| `C05052` Ribulose | yes | defined | 0 | 586 | `C00309` D-Ribulose (3), `C00508` L-Ribulose (5) |
+| `C01452` Sorbose | yes | defined | 0 | 72 | `C00247` L-Sorbose (2), `C00764` D-Sorbose (1) |
+| `chebi:30867` dihydroorotate | yes | defined | 0 | 0 | `C00337` (S)-Dihydroorotate (114) |
+
+Method: an explorer-side name match (strip a leading `L-` / `D-` / `DL-` / `(R)-` / `(S)-` /
+`(±)-` / `α-` / `β-` descriptor; compare to the generic node's name, case-insensitive), kept only
+where linking would change a count. It is a candidate list, not a rule; name matching misses
+anything named differently (e.g. "D-Hexose").
+
+**Three different causes, as far as we can tell:**
+1. **No InChIKey on the generic node** (mannose, arabinose, rhamnose, isoleucine, glucosamine,
+   Fructose, galacturonate, glucoside). The edge rule needs a shared InChIKey connectivity block,
+   so these can never pass. ChEBI's stereo-unspecified records often lack a structure.
+2. **InChIKey present but no edge** (glucose, Galactose, Ribulose, Sorbose, dihydroorotate).
+   Possibly no **direct** ChEBI `is_a` (e.g. D-glucose `is_a` D-glucopyranose `is_a` glucose?),
+   or a connectivity mismatch from a ring vs open-chain record.
+3. **Class terms** (amino acid → L-/D-amino acid, glucoside → β-D-glucoside). These may be
+   deliberately out of scope for a stereo edge. Your call; the explorer is fine either way.
+
+**Asks:**
+- **8a.** For cause 1, allow the edge when the generic record has no structure but ChEBI has a
+  direct `is_a` from the specific form, and the specific form's name minus its descriptor equals
+  the generic name (or a curated `stereo_link:` override). Then report how many edges this
+  adds.
+- **8b.** For cause 2, check why glucose / Galactose / Ribulose / Sorbose / dihydroorotate fail.
+  If it's the direct-`is_a` requirement, allowing a short `is_a` path (≤ 2) within the same
+  connectivity block would cover them. Anomers stay `is_stereo_form_of` edges, as now.
+- **8c.** Say whether class terms (cause 3) should get stereo edges, so the explorer docs can
+  state the rule.
+
+**Explorer impact:** none in code. The hint and `include_stereo_forms` pick up new edges
+automatically. Goldens with these metabolites move on absorb. Until then the explorer docs say
+the edges are incomplete and name these examples.
