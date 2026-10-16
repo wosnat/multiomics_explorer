@@ -129,6 +129,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_metabolite_metabolism,
     build_genes_by_metabolite_transport,
     build_genes_by_metabolite_summary,
+    build_metabolite_stereo_relatives,
     build_metabolites_by_gene_metabolism,
     build_metabolites_by_gene_transport,
     build_metabolites_by_gene_summary,
@@ -8174,8 +8175,11 @@ def _no_formula_warning(n: int, param: str) -> str:
 
 
 # list_metabolites row fields dropped when null (chebi_id) or null / empty
-# (the sparse KEGG class lists).
-_LM_SPARSE_FIELDS = ("chebi_id", "kegg_functional_categories", "kegg_brite_classes")
+# (the sparse KEGG class lists, stereo_relatives).
+_LM_SPARSE_FIELDS = (
+    "chebi_id", "kegg_functional_categories", "kegg_brite_classes",
+    "stereo_relatives",
+)
 
 
 def _with_not_classified(
@@ -8241,6 +8245,13 @@ def list_metabolites(
     transporter_count, evidence_sources,
     chebi_id (sparse), pathway_ids, pathway_count, measured_assay_count,
     measured_paper_count, measured_organisms, measured_compartments.
+    stereo_relatives (sparse — absent when the metabolite has no stereo
+    or enantiomer edge): list of {metabolite_id, name, relation
+    (`specific_form` / `unspecified_form` / `enantiomer`),
+    catalyst_gene_count, transporter_gene_count}, sorted by relation then
+    id. Counts never combine across stereo forms: a 0 catalyst_gene_count
+    on a generic form (e.g. Cysteine) can be non-zero on its specific form
+    (L-Cysteine).
     When verbose=True, also includes: inchikey, smiles, mnxm_id, hmdb_id,
     pathway_names. (For per-organism gene tallies, drill into
     genes_by_metabolite — slice-1 Tool #2.)
@@ -8461,8 +8472,9 @@ def list_metabolites(
     else:
         results = _run_detail(st=effective_search)
 
-    # 6. Sparse-strip null chebi_id and null / empty KEGG class lists
-    # (absent = KEGG did not list the metabolite).
+    # 6. Sparse-strip null chebi_id, null / empty KEGG class lists
+    # (absent = KEGG did not list the metabolite) and empty
+    # stereo_relatives (absent = no stereo / enantiomer edge).
     results = [
         {k: v for k, v in row.items()
          if not (k in _LM_SPARSE_FIELDS and not v)}
@@ -8757,6 +8769,133 @@ def _chemistry_input_probes(
     }
 
 
+# ---------------------------------------------------------------------------
+# Stereo-form hint (backlog 2c.8 part 3) — shared by genes_by_metabolite and
+# metabolites_by_gene. See docs/tool-specs/metabolite-stereo-hint.md.
+# ---------------------------------------------------------------------------
+
+# genes_by_metabolite filters that scope the relative counts identically to
+# the caller's own by_metabolite entries.
+_GBM_STEREO_FILTER_KEYS = (
+    "ec_numbers", "mass_balance", "metabolite_pathway_ids",
+    "gene_categories", "substrate_depth",
+)
+
+_STEREO_WARNING_MAX_SOURCES = 5
+
+
+def _stereo_relatives_in_organism(
+    conn: GraphConnection,
+    metabolite_ids: list[str],
+    organism: str,
+    *,
+    exclude_ids: list[str] | None,
+    gbm_filters: dict | None,
+    arms: tuple[str, ...],
+    source_names: dict[str, str] | None = None,
+) -> dict[str, list[dict]]:
+    """Organism-scoped generic ↔ specific stereo relatives of `metabolite_ids`.
+
+    When `source_names` is given, it is filled with `{source_id: name}` from
+    the relatives query (no extra query).
+
+    Returns `{source_id: [{metabolite_id, name, relation, reaction_count,
+    transporter_count, gene_count}]}`. The counts are the relative's
+    `by_metabolite` entry from `genes_by_metabolite` over the same organism,
+    `gbm_filters` and `arms`. Relatives with no rows in the organism are
+    dropped, and so are sources left with none. Relative order follows the
+    builder (`relation`, then id).
+
+    At most 2 queries: none when `metabolite_ids` is empty, and no summary
+    query when no input has a stereo edge.
+    """
+    if not metabolite_ids:
+        return {}
+    rel_cypher, rel_params = build_metabolite_stereo_relatives(
+        metabolite_ids=list(metabolite_ids),
+        exclude_ids=list(exclude_ids) if exclude_ids is not None else None,
+    )
+    rel_rows = conn.execute_query(rel_cypher, **rel_params)
+    if not rel_rows:
+        return {}
+    if source_names is not None:
+        for r in rel_rows:
+            if r.get("metabolite_name"):
+                source_names.setdefault(r["metabolite_id"], r["metabolite_name"])
+
+    relative_ids: list[str] = []
+    for r in rel_rows:
+        if r["relative_id"] not in relative_ids:
+            relative_ids.append(r["relative_id"])
+
+    filters = {
+        k: v for k, v in (gbm_filters or {}).items()
+        if k in _GBM_STEREO_FILTER_KEYS
+    }
+    sum_cypher, sum_params = build_genes_by_metabolite_summary(
+        metabolite_ids=relative_ids,
+        organism=organism,
+        exclude_metabolite_ids=None,
+        arms=tuple(arms),
+        **filters,
+    )
+    sum_rows = conn.execute_query(sum_cypher, **sum_params)
+    raw = sum_rows[0] if sum_rows else {}
+    entries = {
+        e.get("metabolite_id"): e for e in (raw.get("by_metabolite") or [])
+    }
+
+    out: dict[str, list[dict]] = {}
+    for r in rel_rows:
+        entry = entries.get(r["relative_id"])
+        if not entry or not (entry.get("gene_count") or 0):
+            continue
+        out.setdefault(r["metabolite_id"], []).append({
+            "metabolite_id": r["relative_id"],
+            "name": r.get("relative_name") or entry.get("name"),
+            "relation": r["relation"],
+            "reaction_count": entry.get("reaction_count", 0) or 0,
+            "transporter_count": entry.get("transporter_count", 0) or 0,
+            "gene_count": entry.get("gene_count", 0) or 0,
+        })
+    return out
+
+
+def _stereo_hint_warning(
+    stereo_relatives: dict[str, list[dict]],
+    source_names: dict[str, str],
+    *,
+    suggest_include: bool,
+) -> str:
+    """One warning naming up to 5 sources and their organism-scoped relatives."""
+
+    def _label(mid: str, name: str | None) -> str:
+        return f"{name or mid} ({mid})"
+
+    def _counts(r: dict) -> str:
+        n_rx, n_tf = r["reaction_count"], r["transporter_count"]
+        return (f"{n_rx} reaction{'' if n_rx == 1 else 's'}, "
+                f"{n_tf} transporter famil{'y' if n_tf == 1 else 'ies'}")
+
+    sources = list(stereo_relatives)
+    parts = []
+    for src in sources[:_STEREO_WARNING_MAX_SOURCES]:
+        rels = " and ".join(
+            f"{_label(r['metabolite_id'], r.get('name'))}: {_counts(r)}"
+            for r in stereo_relatives[src]
+        )
+        parts.append(f"{_label(src, source_names.get(src))} → {rels}")
+    text = "Stereo forms hold more rows: " + "; ".join(parts)
+    extra = len(sources) - _STEREO_WARNING_MAX_SOURCES
+    if extra > 0:
+        text += f", and {extra} more"
+    text += ". Counts never combine across stereo forms, see stereo_relatives."
+    if suggest_include:
+        text += (" Re-run with include_stereo_forms=True to add them "
+                 "(rows tagged via_stereo_form_of).")
+    return text
+
+
 def genes_by_metabolite(
     metabolite_ids: list[str],
     organism: str,
@@ -8768,6 +8907,7 @@ def genes_by_metabolite(
     gene_categories: list[str] | None = None,
     substrate_depth: list[str] | None = None,
     evidence_sources: list[str] | None = None,
+    include_stereo_forms: bool = False,
     summary: bool = False,
     verbose: bool = False,
     limit: int = 10,
@@ -8825,6 +8965,29 @@ def genes_by_metabolite(
     Auto-warning: when `inherited` rows outnumber `most_specific` rows on the
     transport arm and `substrate_depth` was not set explicitly.
 
+    Stereo forms: the KG keeps a stereo-unspecified metabolite (Cysteine)
+    and its specific forms (L-Cysteine, D-Cysteine) as separate nodes, and
+    no count combines across them. TCDB substrate lists name the generic
+    form; KEGG reactions name the specific one.
+      - Default (`include_stereo_forms=False`): envelope `stereo_relatives`
+        (dict, `{input_id: [{metabolite_id, name, relation, reaction_count,
+        transporter_count, gene_count}]}`; `{}` when none) lists each
+        input's generic ↔ specific relatives that have rows in this
+        organism, counted under the same filters and arms. Inputs in
+        `not_matched` are covered too. Relatives you passed or excluded are
+        never listed. `by_metabolite[*].stereo_relative_ids` (sparse) marks
+        the inputs that have them, and one warning, first in `warnings`,
+        names up to 5 of them.
+      - `include_stereo_forms=True`: those relatives are queried too. Their
+        rows and `by_metabolite` entries carry `via_stereo_form_of`
+        (the input id that reached them; first input wins on a shared
+        relative). Envelope `stereo_forms_added` (dict, `{input_id:
+        [added_id, ...]}`; `{}` when none) records every added id; an added
+        id with no rows is never in `not_matched`. No hint, no warning.
+    Enantiomers (L ↔ D) are never hinted or added.
+
+    include_stereo_forms: Also query the generic ↔ specific stereo forms of
+        each metabolite_id (e.g. Cysteine ↔ L-Cysteine). Default False.
     exclude_metabolite_ids: Exclude metabolites with these IDs. Set-difference
         semantics with metabolite_ids — exclude wins on overlap (computed on
         the canonical ids). Empty list is no-op.
@@ -8932,6 +9095,8 @@ def genes_by_metabolite(
             "reaction_count_total": 0,
             "transporter_count_total": 0,
             "metabolite_count_total": 0,
+            "stereo_relatives": {},
+            "stereo_forms_added": {},
             "results": [],
         }
     organism = organism_resolved
@@ -8945,6 +9110,35 @@ def genes_by_metabolite(
             arm for arm in ("metabolism", "transport")
             if arm in evidence_sources
         )
+
+    # 2b. Stereo forms. Relatives the caller already passed or excluded are
+    # never hinted or added. In expansion mode the relative ids join the
+    # query list; `stereo_added` maps relative → the first input (in input
+    # order) that reached it. `caller_ids` keeps not_found / not_matched
+    # scoped to what the caller passed.
+    caller_ids = list(metabolite_ids)
+    stereo_exclude_ids = list(dict.fromkeys(
+        caller_ids + list(exclude_metabolite_ids or [])))
+    # An input that is also excluded is not a stereo source either.
+    stereo_source_ids = [
+        m for m in caller_ids if m not in set(exclude_metabolite_ids or [])]
+    stereo_added: dict[str, str] = {}
+    stereo_forms_added: dict[str, list[str]] = {}
+    if include_stereo_forms and stereo_source_ids:
+        rel_cypher, rel_params = build_metabolite_stereo_relatives(
+            metabolite_ids=stereo_source_ids, exclude_ids=stereo_exclude_ids,
+        )
+        rel_by_source: dict[str, list[str]] = {}
+        for r in conn.execute_query(rel_cypher, **rel_params) or []:
+            rel_by_source.setdefault(r["metabolite_id"], []).append(
+                r["relative_id"])
+        for src in stereo_source_ids:
+            for rid in rel_by_source.get(src, []):
+                if rid in stereo_added:
+                    continue
+                stereo_added[rid] = src
+                stereo_forms_added.setdefault(src, []).append(rid)
+        metabolite_ids = caller_ids + list(stereo_added)
 
     # 3. Always run summary builder (envelope rollups even when
     # summary=True).
@@ -9041,16 +9235,24 @@ def genes_by_metabolite(
             combined.sort(key=_gbm_sort_key)
             results = combined[offset:offset + limit]
 
-    # 5. Sparse-strip nullable result columns.
+    # 5. Sparse-strip nullable result columns; tag rows reached through an
+    # added stereo form (expansion mode only).
     results = [
         {k: v for k, v in row.items()
          if not (k in _GBM_SPARSE_FIELDS and v is None)}
         for row in results
     ]
+    if stereo_added:
+        for row in results:
+            src = stereo_added.get(row.get("metabolite_id"))
+            if src is not None:
+                row["via_stereo_form_of"] = src
 
     # 6-7. Compute not_found.metabolite_ids / not_found.metabolite_pathway_ids
     # via the shared existence probes (also used by the organism-unresolved
-    # short-circuit above).
+    # short-circuit above). Scoped to the caller's ids: added stereo forms
+    # are recorded in stereo_forms_added, never in not_found / not_matched.
+    metabolite_ids = caller_ids
     _probes = _chemistry_input_probes(conn, metabolite_ids, metabolite_pathway_ids)
     not_found_metab = _probes["not_found_metabolite_ids"]
     not_found_paths = _probes["not_found_pathway_ids"]
@@ -9094,6 +9296,44 @@ def genes_by_metabolite(
         by_metabolite,
         key=lambda r: r.get("metabolite_id") or "",
     )
+
+    # 10b. Stereo hint (default mode): organism-scoped generic ↔ specific
+    # relatives of every existing input (not_matched inputs included), under
+    # the call's own filters and arms. Expansion mode instead tags the
+    # entries of added relatives.
+    stereo_relatives: dict[str, list[dict]] = {}
+    stereo_source_names: dict[str, str] = {}
+    if include_stereo_forms:
+        if stereo_added:
+            by_metabolite = [
+                {**e, "via_stereo_form_of": stereo_added[e["metabolite_id"]]}
+                if e.get("metabolite_id") in stereo_added else e
+                for e in by_metabolite
+            ]
+    else:
+        stereo_relatives = _stereo_relatives_in_organism(
+            conn,
+            [m for m in stereo_source_ids if m not in not_found_set],
+            organism,
+            exclude_ids=stereo_exclude_ids,
+            source_names=stereo_source_names,
+            gbm_filters={
+                "ec_numbers": ec_numbers,
+                "mass_balance": mass_balance,
+                "metabolite_pathway_ids": metabolite_pathway_ids,
+                "gene_categories": gene_categories,
+                "substrate_depth": substrate_depth,
+            },
+            arms=active_arms,
+        )
+        if stereo_relatives:
+            by_metabolite = [
+                {**e, "stereo_relative_ids": [
+                    r["metabolite_id"]
+                    for r in stereo_relatives[e["metabolite_id"]]]}
+                if e.get("metabolite_id") in stereo_relatives else e
+                for e in by_metabolite
+            ]
 
     # top_* envelopes: sort by gene_count desc + stable tiebreaker, full list
     # here — _cap_breakdowns below caps to 10 on detail calls and keeps the
@@ -9167,6 +9407,13 @@ def genes_by_metabolite(
             "tier by `tcdb_evidence_score`. Per-gene trust lives in "
             "`top_genes[].transport_substrate_resolution`."
         )
+    if stereo_relatives:
+        source_names = {
+            e.get("metabolite_id"): e.get("name") for e in by_metabolite
+            if e.get("name")}
+        source_names.update(stereo_source_names)
+        warnings.insert(0, _stereo_hint_warning(
+            stereo_relatives, source_names, suggest_include=True))
 
     # 12. Assemble + return envelope.
     not_found = {
@@ -9197,6 +9444,8 @@ def genes_by_metabolite(
         "reaction_count_total": raw_summary.get("reaction_count_total", 0) or 0,
         "transporter_count_total": raw_summary.get("transporter_count_total", 0) or 0,
         "metabolite_count_total": raw_summary.get("metabolite_count_total", 0) or 0,
+        "stereo_relatives": stereo_relatives,
+        "stereo_forms_added": stereo_forms_added,
         "results": results,
     }
     return _cap_breakdowns(
@@ -9327,6 +9576,17 @@ def metabolites_by_gene(
     guard against it; the resolution field does. Suppressed when
     `substrate_depth` was set explicitly.
 
+    Stereo forms: the KG keeps a stereo-unspecified metabolite (Cysteine)
+    and its specific forms (L-Cysteine) as separate nodes, and no count
+    combines across them. Envelope `stereo_relatives` (dict, `{metabolite_id:
+    [{metabolite_id, name, relation, reaction_count, transporter_count,
+    gene_count}]}`; `{}` when none) covers every metabolite in the filtered
+    slice with a generic ↔ specific relative that has genes anywhere in the
+    organism (counts are organism-wide, unfiltered, both arms). Rows on the
+    page carry sparse `stereo_relative_ids`, and one warning, first in
+    `warnings`, names up to 5 of them. To pull a relative's genes, call
+    `genes_by_metabolite(metabolite_ids=[...], include_stereo_forms=True)`.
+
     exclude_metabolite_ids: Exclude metabolites with these IDs. Set-difference
         semantics with metabolite_ids — exclude wins on overlap (computed on
         the canonical ids). Empty list is no-op.
@@ -9438,6 +9698,7 @@ def metabolites_by_gene(
             "reaction_count_total": 0,
             "transporter_count_total": 0,
             "metabolite_count_total": 0,
+            "stereo_relatives": {},
             "results": [],
         }
     organism = organism_resolved
@@ -9591,6 +9852,30 @@ def metabolites_by_gene(
          if not (k in _MBG_SPARSE_FIELDS and v is None)}
         for row in results
     ]
+
+    # 5b. Stereo hint: organism-wide generic ↔ specific relatives of every
+    # stereo-linked metabolite in the filtered slice — "where else does this
+    # compound have genes", so no exclude list, no filters, both arms.
+    stereo_source_names: dict[str, str] = {}
+    stereo_relatives = _stereo_relatives_in_organism(
+        conn,
+        sorted(raw_summary.get("stereo_linked_metabolite_ids") or []),
+        organism,
+        exclude_ids=[],
+        gbm_filters=None,
+        arms=("metabolism", "transport"),
+        source_names=stereo_source_names,
+    )
+    # Most consequential first: the warning names only 5 sources.
+    stereo_relatives = dict(sorted(
+        stereo_relatives.items(),
+        key=lambda kv: (-max(r["gene_count"] for r in kv[1]), kv[0]),
+    ))
+    if stereo_relatives:
+        for row in results:
+            rels = stereo_relatives.get(row.get("metabolite_id"))
+            if rels:
+                row["stereo_relative_ids"] = [r["metabolite_id"] for r in rels]
 
     # 6. Compute not_found.locus_tags via existence probe (always run).
     if locus_tags:
@@ -9751,6 +10036,18 @@ def metabolites_by_gene(
     if no_formula_metabolites:
         warnings.append(
             _no_formula_warning(no_formula_metabolites, "metabolite_elements"))
+    if stereo_relatives:
+        known_names: dict[str, str | None] = {
+            r.get("metabolite_id"): r.get("metabolite_name") for r in results
+        }
+        known_names.update({
+            m.get("metabolite_id"): m.get("name") or m.get("metabolite_name")
+            for m in top_metabolites
+        })
+        source_names = {k: v for k, v in known_names.items() if v}
+        source_names.update(stereo_source_names)
+        warnings.insert(0, _stereo_hint_warning(
+            stereo_relatives, source_names, suggest_include=False))
 
     # 14. Assemble + return envelope.
     not_found = {
@@ -9784,6 +10081,7 @@ def metabolites_by_gene(
         "reaction_count_total": raw_summary.get("reaction_count_total", 0) or 0,
         "transporter_count_total": raw_summary.get("transporter_count_total", 0) or 0,
         "metabolite_count_total": raw_summary.get("metabolite_count_total", 0) or 0,
+        "stereo_relatives": stereo_relatives,
         "results": results,
     }
     if no_formula_rows is not None:

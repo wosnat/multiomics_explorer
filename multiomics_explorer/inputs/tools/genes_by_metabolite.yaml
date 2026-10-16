@@ -46,6 +46,8 @@ examples:
         "offset": 0,
         "truncated": false,
         "warnings": [],
+        "stereo_relatives": {},
+        "stereo_forms_added": {},
         "resolved_aliases": {},
         "not_found": {"metabolite_ids": [], "organism": null, "metabolite_pathway_ids": []},
         "not_matched": [],
@@ -231,6 +233,8 @@ examples:
         "warnings": [
           "Most transport rows are `inherited` (23 of 29) — the substrate is reached through a broader family's substrate list, ..."
         ],
+        "stereo_relatives": {},
+        "stereo_forms_added": {},
         "resolved_aliases": {},
         "not_found": {"metabolite_ids": [], "organism": null, "metabolite_pathway_ids": []},
         "not_matched": [],
@@ -471,6 +475,463 @@ examples:
     # inherited rows dominate. To restrict to metabolism alone, add
     # evidence_sources=["metabolism"].
 
+  - title: Generic substrate — Cysteine in MED4 is transport-only; the stereo hint names L-Cysteine
+    call: genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"], organism="Prochlorococcus MED4", summary=True)
+    note: "TCDB names the substrate generically, so Cysteine (stereo form unspecified) has transporters and 0 reactions; KEGG reactions use L-Cysteine. `stereo_relatives` lists the relative with its MED4 counts (exactly what this tool reports for it), `by_metabolite[*].stereo_relative_ids` marks the entry, and the stereo warning comes first in `warnings`. D-Cysteine is not hinted: it has no MED4 genes."
+    response: |
+      {
+        "total_matching": 33,
+        "returned": 0,
+        "offset": 0,
+        "truncated": true,
+        "warnings": [
+          "Stereo forms hold more rows: Cysteine (kegg.compound:C00736) → L-Cysteine (kegg.compound:C00097): 13 reactions, 3 tra...",
+          "Most transport rows are `inherited` (27 of 33) — the substrate is reached through a broader family's substrate list, ..."
+        ],
+        "stereo_relatives": {
+          "kegg.compound:C00736": [
+            {
+              "metabolite_id": "kegg.compound:C00097",
+              "name": "L-Cysteine",
+              "relation": "specific_form",
+              "reaction_count": 13,
+              "transporter_count": 3,
+              "gene_count": 38
+            }
+          ]
+        },
+        "stereo_forms_added": {},
+        "resolved_aliases": {},
+        "not_found": {"metabolite_ids": [], "organism": null, "metabolite_pathway_ids": []},
+        "not_matched": [],
+        "by_metabolite": [
+          {
+            "metabolite_id": "kegg.compound:C00736",
+            "name": "Cysteine",
+            "formula": "C3H7NO2S",
+            "rows": 33,
+            "gene_count": 33,
+            "reaction_count": 0,
+            "transporter_count": 5,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 6,
+            "transport_inherited_rows": 27,
+            "stereo_relative_ids": ["kegg.compound:C00097"]
+          }
+        ],
+        "by_evidence_source": [{"evidence_source": "transport", "count": 33}],
+        "by_substrate_depth": [{"substrate_depth": "inherited", "count": 27}, {"substrate_depth": "most_specific", "count": 6}],
+        "top_reactions": [],
+        "top_reactions_truncated": null,
+        "top_tcdb_families": [
+          {
+            "tcdb_family_id": "tcdb:3.A.1",
+            "tcdb_family_name": "The ATP-binding Cassette (ABC) Superfamily",
+            "level_kind": "tc_family",
+            "substrate_depth": "inherited",
+            "gene_count": 20,
+            "metabolite_count": 1
+          },
+          {
+            "tcdb_family_id": "tcdb:3.A.1.106",
+            "tcdb_family_name": "The Lipid Exporter (LipidE) Family",
+            "level_kind": "tc_subfamily",
+            "substrate_depth": "most_specific",
+            "gene_count": 5,
+            "metabolite_count": 1
+          },
+          {
+            "tcdb_family_id": "tcdb:2.A.7",
+            "tcdb_family_name": "The Drug/Metabolite Transporter (DMT) Superfamily",
+            "level_kind": "tc_family",
+            "substrate_depth": "inherited",
+            "gene_count": 4,
+            "metabolite_count": 1
+          },
+          {
+            "tcdb_family_id": "tcdb:2.A.1",
+            "tcdb_family_name": "The Major Facilitator Superfamily (MFS)",
+            "level_kind": "tc_family",
+            "substrate_depth": "inherited",
+            "gene_count": 3,
+            "metabolite_count": 1
+          },
+          {
+            "tcdb_family_id": "tcdb:2.A.2",
+            "tcdb_family_name": "The Glycoside-Pentoside-Hexuronide (GPH):Cation Symporter Family",
+            "level_kind": "tc_family",
+            "substrate_depth": "most_specific",
+            "gene_count": 1,
+            "metabolite_count": 1
+          }
+        ],
+        "top_tcdb_families_truncated": null,
+        "top_gene_categories": [
+          {"category": "Transport", "gene_count": 18},
+          {"category": "Stress response and adaptation", "gene_count": 5},
+          {"category": "Translation", "gene_count": 2},
+          {"category": "Amino acid metabolism", "gene_count": 1},
+          {"category": "Carbohydrate metabolism", "gene_count": 1},
+          ...
+        ],
+        "top_genes": [
+          {
+            "locus_tag": "PMM0065",
+            "gene_name": "mcyH",
+            "reaction_count": 0,
+            "transporter_count": 1,
+            "metabolite_count": 1,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 1,
+            "transport_inherited_rows": 0,
+            "transport_substrate_resolution": "resolved",
+            "tcdb_evidence_score_max": 0.8
+          },
+          {
+            "locus_tag": "PMM0072",
+            "gene_name": "sufC",
+            "reaction_count": 0,
+            "transporter_count": 1,
+            "metabolite_count": 1,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 0,
+            "transport_inherited_rows": 1,
+            "transport_substrate_resolution": "resolved",
+            "tcdb_evidence_score_max": 0.4
+          },
+          {
+            "locus_tag": "PMM0089",
+            "gene_name": null,
+            "reaction_count": 0,
+            "transporter_count": 1,
+            "metabolite_count": 1,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 0,
+            "transport_inherited_rows": 1,
+            "transport_substrate_resolution": "resolved",
+            "tcdb_evidence_score_max": 0.4
+          },
+          {
+            "locus_tag": "PMM0097",
+            "gene_name": "tolC",
+            "reaction_count": 0,
+            "transporter_count": 1,
+            "metabolite_count": 1,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 0,
+            "transport_inherited_rows": 1,
+            "transport_substrate_resolution": "resolved",
+            "tcdb_evidence_score_max": 0.4
+          },
+          {
+            "locus_tag": "PMM0218",
+            "gene_name": "cgtA",
+            "reaction_count": 0,
+            "transporter_count": 1,
+            "metabolite_count": 1,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 0,
+            "transport_inherited_rows": 1,
+            "transport_substrate_resolution": "resolved",
+            "tcdb_evidence_score_max": 0.0
+          },
+          ...
+        ],
+        "top_genes_truncated": null,
+        "gene_count_total": 33,
+        "reaction_count_total": 0,
+        "transporter_count_total": 5,
+        "metabolite_count_total": 1,
+        "results": []
+      }
+
+  - title: Cross the split — include_stereo_forms=True adds L-Cysteine's reactions, tagged via_stereo_form_of
+    call: genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"], organism="Prochlorococcus MED4", include_stereo_forms=True, limit=3)
+    note: "The generic ↔ specific relatives join the query. Their rows and `by_metabolite` entries carry `via_stereo_form_of` (the input id that pulled them in), `stereo_forms_added` maps input → every relative queried (D-Cysteine is listed but has no MED4 rows, so it adds nothing and stays out of `not_matched`), and no hint fires. Enantiomers are never added. When a generic node's specific forms include a D-form (Alanine → L- and D-Alanine), both are added: check the tagged rows by `metabolite_name`."
+    response: |
+      {
+        "total_matching": 83,
+        "returned": 3,
+        "offset": 0,
+        "truncated": true,
+        "warnings": [
+          "Most transport rows are `inherited` (51 of 57) — the substrate is reached through a broader family's substrate list, ..."
+        ],
+        "stereo_relatives": {},
+        "stereo_forms_added": {"kegg.compound:C00736": ["kegg.compound:C00097", "kegg.compound:C00793"]},
+        "resolved_aliases": {},
+        "not_found": {"metabolite_ids": [], "organism": null, "metabolite_pathway_ids": []},
+        "not_matched": [],
+        "by_metabolite": [
+          {
+            "metabolite_id": "kegg.compound:C00097",
+            "name": "L-Cysteine",
+            "formula": "C3H7NO2S",
+            "rows": 50,
+            "gene_count": 38,
+            "reaction_count": 13,
+            "transporter_count": 3,
+            "metabolism_rows": 26,
+            "transport_most_specific_rows": 0,
+            "transport_inherited_rows": 24,
+            "via_stereo_form_of": "kegg.compound:C00736"
+          },
+          {
+            "metabolite_id": "kegg.compound:C00736",
+            "name": "Cysteine",
+            "formula": "C3H7NO2S",
+            "rows": 33,
+            "gene_count": 33,
+            "reaction_count": 0,
+            "transporter_count": 5,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 6,
+            "transport_inherited_rows": 27
+          }
+        ],
+        "by_evidence_source": [{"evidence_source": "transport", "count": 57}, {"evidence_source": "metabolism", "count": 26}],
+        "by_substrate_depth": [{"substrate_depth": "inherited", "count": 51}, {"substrate_depth": "most_specific", "count": 6}],
+        "top_reactions": [
+          {
+            "reaction_id": "kegg.reaction:R00899",
+            "name": "L-cysteinylglycine dipeptidase; Cys-Gly + H2O <=> L-Cysteine + Glycine",
+            "ec_numbers": ["3.4.11", "3.4.11.1", "3.4.11.2", "3.4.11.23", "3.4.13", ...],
+            "gene_count": 3,
+            "metabolite_count": 1
+          },
+          {
+            "reaction_id": "kegg.reaction:R04859",
+            "name": "O3-acetyl-L-serine:thiosulfate 2-amino-2-carboxyethyltransferase (reducing, L-cysteine-forming); O3-acetyl-L-serine a...",
+            "ec_numbers": ["2.5.1.47", "2.5.1.49"],
+            "gene_count": 3,
+            "metabolite_count": 1
+          },
+          {
+            "reaction_id": "kegg.reaction:R11528",
+            "name": "L-cysteine:sulfur-acceptor sulfurtransferase; L-Cysteine + [Protein]-L-cysteine <=> L-Alanine + [Protein]-S-sulfanyl-...",
+            "ec_numbers": ["2.8.1.7"],
+            "gene_count": 3,
+            "metabolite_count": 1
+          },
+          {
+            "reaction_id": "kegg.reaction:R00782",
+            "name": "L-cysteine hydrogen-sulfide-lyase (deaminating; pyruvate-forming); L-Cysteine + H2O <=> Hydrogen sulfide + Pyruvate +...",
+            "ec_numbers": ["4.1.99.1", "4.4.1.1", "4.4.1.11", "4.4.1.13", "4.4.1.28", ...],
+            "gene_count": 2,
+            "metabolite_count": 1
+          },
+          {
+            "reaction_id": "kegg.reaction:R00897",
+            "name": "O3-acetyl-L-serine:hydrogen-sulfide 2-amino-2-carboxyethyltransferase; O3-acetyl-L-serine acetate-lyase (adding hydro...",
+            "ec_numbers": ["2.5.1.47", "2.5.1.65"],
+            "gene_count": 2,
+            "metabolite_count": 1
+          },
+          ...
+        ],
+        "top_reactions_truncated": true,
+        "top_tcdb_families": [
+          {
+            "tcdb_family_id": "tcdb:3.A.1",
+            "tcdb_family_name": "The ATP-binding Cassette (ABC) Superfamily",
+            "level_kind": "tc_family",
+            "substrate_depth": "inherited",
+            "gene_count": 20,
+            "metabolite_count": 2
+          },
+          {
+            "tcdb_family_id": "tcdb:3.A.1.106",
+            "tcdb_family_name": "The Lipid Exporter (LipidE) Family",
+            "level_kind": "tc_subfamily",
+            "substrate_depth": "most_specific",
+            "gene_count": 5,
+            "metabolite_count": 1
+          },
+          {
+            "tcdb_family_id": "tcdb:2.A.7",
+            "tcdb_family_name": "The Drug/Metabolite Transporter (DMT) Superfamily",
+            "level_kind": "tc_family",
+            "substrate_depth": "inherited",
+            "gene_count": 4,
+            "metabolite_count": 1
+          },
+          {
+            "tcdb_family_id": "tcdb:2.A.1",
+            "tcdb_family_name": "The Major Facilitator Superfamily (MFS)",
+            "level_kind": "tc_family",
+            "substrate_depth": "inherited",
+            "gene_count": 3,
+            "metabolite_count": 2
+          },
+          {
+            "tcdb_family_id": "tcdb:2.A.2",
+            "tcdb_family_name": "The Glycoside-Pentoside-Hexuronide (GPH):Cation Symporter Family",
+            "level_kind": "tc_family",
+            "substrate_depth": "most_specific",
+            "gene_count": 1,
+            "metabolite_count": 1
+          },
+          ...
+        ],
+        "top_tcdb_families_truncated": null,
+        "top_gene_categories": [
+          {"category": "Transport", "gene_count": 18},
+          {"category": "Amino acid metabolism", "gene_count": 9},
+          {"category": "Stress response and adaptation", "gene_count": 7},
+          {"category": "Coenzyme metabolism", "gene_count": 4},
+          {"category": "Translation", "gene_count": 3},
+          ...
+        ],
+        "top_genes": [
+          {
+            "locus_tag": "PMM0409",
+            "gene_name": "metB",
+            "reaction_count": 5,
+            "transporter_count": 0,
+            "metabolite_count": 1,
+            "metabolism_rows": 5,
+            "transport_most_specific_rows": 0,
+            "transport_inherited_rows": 0,
+            "transport_substrate_resolution": null,
+            "tcdb_evidence_score_max": null
+          },
+          {
+            "locus_tag": "PMM0408",
+            "gene_name": null,
+            "reaction_count": 3,
+            "transporter_count": 0,
+            "metabolite_count": 1,
+            "metabolism_rows": 3,
+            "transport_most_specific_rows": 0,
+            "transport_inherited_rows": 0,
+            "transport_substrate_resolution": null,
+            "tcdb_evidence_score_max": null
+          },
+          {
+            "locus_tag": "PMM0123",
+            "gene_name": "cysK",
+            "reaction_count": 2,
+            "transporter_count": 0,
+            "metabolite_count": 1,
+            "metabolism_rows": 2,
+            "transport_most_specific_rows": 0,
+            "transport_inherited_rows": 0,
+            "transport_substrate_resolution": null,
+            "tcdb_evidence_score_max": null
+          },
+          {
+            "locus_tag": "PMM0170",
+            "gene_name": "iscS2",
+            "reaction_count": 2,
+            "transporter_count": 0,
+            "metabolite_count": 1,
+            "metabolism_rows": 2,
+            "transport_most_specific_rows": 0,
+            "transport_inherited_rows": 0,
+            "transport_substrate_resolution": null,
+            "tcdb_evidence_score_max": null
+          },
+          {
+            "locus_tag": "PMM0407",
+            "gene_name": "cysK",
+            "reaction_count": 2,
+            "transporter_count": 0,
+            "metabolite_count": 1,
+            "metabolism_rows": 2,
+            "transport_most_specific_rows": 0,
+            "transport_inherited_rows": 0,
+            "transport_substrate_resolution": null,
+            "tcdb_evidence_score_max": null
+          },
+          ...
+        ],
+        "top_genes_truncated": true,
+        "gene_count_total": 48,
+        "reaction_count_total": 13,
+        "transporter_count_total": 6,
+        "metabolite_count_total": 2,
+        "results": [
+          {
+            "locus_tag": "PMM0409",
+            "gene_name": "metB",
+            "product": "O-succinylhomoserine(thiol)-lyase",
+            "evidence_source": "metabolism",
+            "substrate_depth": null,
+            "tcdb_evidence_score": null,
+            "transport_substrate_resolution": null,
+            "reaction_id": "kegg.reaction:R00782",
+            "reaction_name": "L-cysteine hydrogen-sulfide-lyase (deaminating; pyruvate-forming); L-Cysteine + H2O <=> Hydrogen sulfide + Pyruvate +...",
+            "ec_numbers": ["4.1.99.1", "4.4.1.1", "4.4.1.11", "4.4.1.13", "4.4.1.28", ...],
+            "mass_balance": "balanced",
+            "tcdb_family_id": null,
+            "tcdb_family_name": null,
+            "metabolite_id": "kegg.compound:C00097",
+            "metabolite_name": "L-Cysteine",
+            "metabolite_formula": "C3H7NO2S",
+            "metabolite_mass": 121.161,
+            "metabolite_chebi_id": "17561",
+            "via_stereo_form_of": "kegg.compound:C00736"
+          },
+          {
+            "locus_tag": "PMM1670",
+            "gene_name": "metC",
+            "product": "cystathionine beta-lyase family aluminum resistance protein",
+            "evidence_source": "metabolism",
+            "substrate_depth": null,
+            "tcdb_evidence_score": null,
+            "transport_substrate_resolution": null,
+            "reaction_id": "kegg.reaction:R00782",
+            "reaction_name": "L-cysteine hydrogen-sulfide-lyase (deaminating; pyruvate-forming); L-Cysteine + H2O <=> Hydrogen sulfide + Pyruvate +...",
+            "ec_numbers": ["4.1.99.1", "4.4.1.1", "4.4.1.11", "4.4.1.13", "4.4.1.28", ...],
+            "mass_balance": "balanced",
+            "tcdb_family_id": null,
+            "tcdb_family_name": null,
+            "metabolite_id": "kegg.compound:C00097",
+            "metabolite_name": "L-Cysteine",
+            "metabolite_formula": "C3H7NO2S",
+            "metabolite_mass": 121.161,
+            "metabolite_chebi_id": "17561",
+            "via_stereo_form_of": "kegg.compound:C00736"
+          },
+          {
+            "locus_tag": "PMM0674",
+            "gene_name": "aspC",
+            "product": "aspartate aminotransferase",
+            "evidence_source": "metabolism",
+            "substrate_depth": null,
+            "tcdb_evidence_score": null,
+            "transport_substrate_resolution": null,
+            "reaction_id": "kegg.reaction:R00896",
+            "reaction_name": "L-cysteine:2-oxoglutarate aminotransferase; L-Cysteine + 2-Oxoglutarate <=> Mercaptopyruvate + Glutamate",
+            "ec_numbers": ["2.6.1.1"],
+            "mass_balance": "balanced",
+            "tcdb_family_id": null,
+            "tcdb_family_name": null,
+            "metabolite_id": "kegg.compound:C00097",
+            "metabolite_name": "L-Cysteine",
+            "metabolite_formula": "C3H7NO2S",
+            "metabolite_mass": 121.161,
+            "metabolite_chebi_id": "17561",
+            "via_stereo_form_of": "kegg.compound:C00736"
+          }
+        ]
+      }
+
+  - title: Transporter genes → their generic substrate → transport + catalysis in one call
+    steps: |
+      Step 1: metabolites_by_gene(locus_tags=["PMM0065"],
+                                  organism="Prochlorococcus MED4",
+                                  evidence_sources=["transport"])
+              → Cysteine kegg.compound:C00736 among the substrates; envelope
+                stereo_relatives["kegg.compound:C00736"] names L-Cysteine
+                with its MED4 reaction_count (catalysis lives there)
+
+      Step 2: genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"],
+                                  organism="Prochlorococcus MED4",
+                                  include_stereo_forms=True)
+              → Cysteine transporters + L-Cysteine catalysts in one result;
+                the L-Cysteine rows carry via_stereo_form_of
+
 verbose_fields:
   - gene_category
   - metabolite_inchikey
@@ -498,6 +959,8 @@ chaining:
   - "genes_by_metabolite → transport rows → gene_ontology_terms(locus_tags=[...], ontology='tcdb', organism=...) to see every TCDB family a gene is attached to, including ancestors superseded in the rows here"
   - "genes_by_metabolite → top_reactions → genes_by_ontology(ontology='ec', term_ids=[ec_number], organism=...) for genes in adjacent reactions"
   - "genes_by_metabolite → top_reactions / top_genes → pathway_enrichment for KEGG-pathway context"
+  - "genes_by_metabolite → stereo_relatives (or the stereo warning) → genes_by_metabolite(metabolite_ids=[same ids], organism=..., include_stereo_forms=True) to join generic-form transport with specific-form catalysis"
+  - "metabolites_by_gene(transporter locus_tags) → stereo_relatives → genes_by_metabolite(metabolite_ids=[generic substrate], organism=..., include_stereo_forms=True) for transporters and catalysts of the same compound"
 
 mistakes:
   - >-
@@ -505,6 +968,19 @@ mistakes:
     `metabolites_by_gene` (locus_tags → metabolites); both share the same
     row class, discriminators and per-arm filter scope, so read whichever
     matches your anchor rather than post-filtering the other.
+  - >-
+    0 reactions on a generic substrate does not mean no enzymes. Stereo forms
+    are separate nodes and no count combines across them: TCDB names
+    substrates generically ('Cysteine', `kegg.compound:C00736`), so transport
+    sits there; KEGG reactions use the specific form (L-Cysteine,
+    `kegg.compound:C00097`), so catalysis sits there. Read envelope
+    `stereo_relatives` (organism-scoped counts per relative, under your
+    filters; only relatives with genes here) and the stereo warning, then
+    re-run with `include_stereo_forms=True` for a transport ↔ catalysis join.
+    Keep the single id for exact-form or D-amino-acid questions: a generic's
+    specific forms can include the D-form. Stereo links are incomplete
+    (e.g. mannose, isoleucine), so no hint is not proof of no other form;
+    search by name with `list_metabolites(search_text=...)`.
   - >-
     Read transport evidence as a three-level trust ladder, top down.
     (1) `tcdb_evidence_score` (row) / `tcdb_evidence_score_max` (gene, in

@@ -36,14 +36,15 @@ docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
 ### Envelope
 
 ```expected-keys
-total_matching, returned, offset, truncated, warnings, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+total_matching, returned, offset, truncated, warnings, stereo_relatives, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 - **total_matching** (int): Total row count after all filters, across both arms.
 - **returned** (int): Number of rows in `results` (≤ `limit`).
 - **offset** (int): Echo of the requested offset.
 - **truncated** (bool): True when `offset + limit < total_matching`.
-- **warnings** (list[string]): Diagnostic strings. Currently emitted: gene-anchored auto-warning naming input genes whose `transport_substrate_resolution='family_inferred'` — their substrate breadth is reachability, not capability; a removed-metabolite or chemical-role id (kept in not_found); a `gene_categories` value not found in the live vocabulary; a `not_found.locus_tags` entry differing only by case from a real one (locus_tags are never case-normalised).
+- **warnings** (list[string]): Diagnostic strings. Currently emitted: gene-anchored auto-warning naming input genes whose `transport_substrate_resolution='family_inferred'` — their substrate breadth is reachability, not capability; a removed-metabolite or chemical-role id (kept in not_found); a `gene_categories` value not found in the live vocabulary; a `not_found.locus_tags` entry differing only by case from a real one (locus_tags are never case-normalised); first, a stereo-forms warning when a slice metabolite's stereo relative has genes here.
+- **stereo_relatives** (object): Slice metabolite id -> its stereo forms with genes in this organism (whole organism, not just these genes), e.g. {'kegg.compound:C00736': [L-Cysteine entry]}. Counts never combine across forms.
 - **resolved_aliases** (object): Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.
 - **not_found** (MbgNotFound): Inputs that did not resolve to a KG node — see model.
 - **not_matched** (list[string]): Input locus_tags that resolve to a Gene in the requested organism but produced zero chemistry rows (no Gene_catalyzes_reaction AND no Gene_has_tcdb_family). Distinct from `not_found.locus_tags` (those don't resolve at all).
@@ -87,6 +88,8 @@ total_matching, returned, offset, truncated, warnings, resolved_aliases, not_fou
 | metabolite_formula | string \| None (optional) | Hill-notation formula; null on a minority of metabolites (transport-only ChEBI generics). |
 | metabolite_mass | float \| None (optional) | Monoisotopic mass (Da); null on a minority of metabolites. |
 | metabolite_chebi_id | string \| None (optional) | ChEBI numeric ID; populated on most metabolites. |
+| via_stereo_form_of | string \| None (optional) | genes_by_metabolite with include_stereo_forms=True: the input id this row's metabolite is a stereo form of (e.g. 'kegg.compound:C00736'). Absent on rows for inputs. |
+| stereo_relative_ids | list[string] \| None (optional) | metabolites_by_gene: stereo forms of this row's metabolite with genes in this organism (e.g. ['kegg.compound:C00097']); counts in envelope stereo_relatives. Absent when none. |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -218,6 +221,223 @@ metabolites_by_gene(
 metabolites_by_gene(locus_tags=["PMM0434", "PMM0913"], organism="Prochlorococcus MED4", substrate_depth=["most_specific"], evidence_sources=["transport"], limit=5)
 ```
 
+### Example 9: Stereo hint — a cysteine transporter's generic substrates point at their specific forms
+
+```example-call
+metabolites_by_gene(locus_tags=["PMM0065"], organism="Prochlorococcus MED4", evidence_sources=["transport"], summary=True)
+```
+
+*TCDB names substrates generically, so this transporter reaches Cysteine (stereo form unspecified), not L-Cysteine. Envelope `stereo_relatives` is keyed by each result metabolite that has a stereo relative with MED4 genes; its counts cover the whole organism, not just PMM0065, and match `genes_by_metabolite` on the relative. Next step: `genes_by_metabolite(metabolite_ids=['kegg.compound:C00736'], organism='Prochlorococcus MED4', include_stereo_forms=True)`.*
+
+```example-response
+{
+  "total_matching": 38,
+  "returned": 0,
+  "offset": 0,
+  "truncated": true,
+  "warnings": [
+    "Stereo forms hold more rows: Cysteine (kegg.compound:C00736) → L-Cysteine (kegg.compound:C00097): 13 reactions, 3 tra..."
+  ],
+  "stereo_relatives": {
+    "kegg.compound:C00736": [
+      {
+        "metabolite_id": "kegg.compound:C00097",
+        "name": "L-Cysteine",
+        "relation": "specific_form",
+        "reaction_count": 13,
+        "transporter_count": 3,
+        "gene_count": 38
+      }
+    ]
+  },
+  "resolved_aliases": {},
+  "not_found": {
+    "locus_tags": [],
+    "organism": null,
+    "metabolite_ids": [],
+    "metabolite_pathway_ids": [],
+    "metabolite_elements": []
+  },
+  "not_matched": [],
+  "by_gene": [
+    {
+      "locus_tag": "PMM0065",
+      "gene_name": "mcyH",
+      "product": "ABC transporter, ATPase component",
+      "rows": 38,
+      "metabolite_count": 37,
+      "reaction_count": 0,
+      "transporter_count": 7,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 32,
+      "transport_inherited_rows": 6,
+      "transport_substrate_resolution": "resolved",
+      "tcdb_evidence_score_max": 0.8
+    }
+  ],
+  "by_evidence_source": [{"evidence_source": "transport", "count": 38}],
+  "by_substrate_depth": [{"substrate_depth": "most_specific", "count": 32}, {"substrate_depth": "inherited", "count": 6}],
+  "by_element": [
+    {"element": "C", "metabolite_count": 27},
+    {"element": "H", "metabolite_count": 27},
+    {"element": "O", "metabolite_count": 26},
+    {"element": "N", "metabolite_count": 22},
+    {"element": "S", "metabolite_count": 5},
+    ...
+  ],
+  "by_element_truncated": null,
+  "top_metabolites": [
+    {
+      "metabolite_id": "chebi:135075",
+      "name": "alphaprodine",
+      "formula": "C16H23NO2",
+      "gene_count": 1,
+      "reaction_count": 0,
+      "transporter_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 1,
+      "transport_inherited_rows": 0
+    },
+    {
+      "metabolite_id": "chebi:138159",
+      "name": "chemokine ligand 24",
+      "formula": null,
+      "gene_count": 1,
+      "reaction_count": 0,
+      "transporter_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 1,
+      "transport_inherited_rows": 0
+    },
+    {
+      "metabolite_id": "chebi:25051",
+      "name": "lipid As",
+      "formula": null,
+      "gene_count": 1,
+      "reaction_count": 0,
+      "transporter_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 1,
+      "transport_inherited_rows": 0
+    },
+    {
+      "metabolite_id": "chebi:36080",
+      "name": "protein",
+      "formula": null,
+      "gene_count": 1,
+      "reaction_count": 0,
+      "transporter_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 1,
+      "transport_inherited_rows": 0
+    },
+    {
+      "metabolite_id": "chebi:42478",
+      "name": "ethidium",
+      "formula": "C21H20N3",
+      "gene_count": 1,
+      "reaction_count": 0,
+      "transporter_count": 1,
+      "metabolism_rows": 0,
+      "transport_most_specific_rows": 1,
+      "transport_inherited_rows": 0
+    },
+    ...
+  ],
+  "top_reactions": [],
+  "top_tcdb_families": [
+    {
+      "tcdb_family_id": "tcdb:3.A.1.106",
+      "tcdb_family_name": "The Lipid Exporter (LipidE) Family",
+      "level_kind": "tc_subfamily",
+      "substrate_depth": "most_specific",
+      "gene_count": 1,
+      "metabolite_count": 28
+    },
+    {
+      "tcdb_family_id": "tcdb:3.A.1.110",
+      "tcdb_family_name": "The Protein-2 Exporter (Prot2E) Family",
+      "level_kind": "tc_subfamily",
+      "substrate_depth": "most_specific",
+      "gene_count": 1,
+      "metabolite_count": 2
+    },
+    {
+      "tcdb_family_id": "tcdb:3.A.1.112",
+      "tcdb_family_name": "The Peptide-2 Exporter (Pep2E) Family",
+      "level_kind": "tc_subfamily",
+      "substrate_depth": "most_specific",
+      "gene_count": 1,
+      "metabolite_count": 1
+    },
+    {
+      "tcdb_family_id": "tcdb:3.A.1.113",
+      "tcdb_family_name": "The Peptide-3 Exporter (Pep3E) Family",
+      "level_kind": "tc_subfamily",
+      "substrate_depth": "most_specific",
+      "gene_count": 1,
+      "metabolite_count": 3
+    },
+    {
+      "tcdb_family_id": "tcdb:3.A.1.203.11",
+      "tcdb_family_name": "Putative fatty acid exporter; homodimer.",
+      "level_kind": "tc_specificity",
+      "substrate_depth": "most_specific",
+      "gene_count": 1,
+      "metabolite_count": 1
+    },
+    ...
+  ],
+  "top_gene_categories": [{"category": "Transport", "gene_count": 1}],
+  "top_metabolite_pathways": [
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko01053",
+      "metabolite_pathway_name": "Biosynthesis of siderophore group nonribosomal peptides",
+      "gene_count": 1,
+      "pathway_reaction_count": 3,
+      "pathway_metabolite_count": 7
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko00521",
+      "metabolite_pathway_name": "Streptomycin biosynthesis",
+      "gene_count": 1,
+      "pathway_reaction_count": 8,
+      "pathway_metabolite_count": 11
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko01055",
+      "metabolite_pathway_name": "Biosynthesis of vancomycin group antibiotics",
+      "gene_count": 1,
+      "pathway_reaction_count": 4,
+      "pathway_metabolite_count": 13
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko00910",
+      "metabolite_pathway_name": "Nitrogen metabolism",
+      "gene_count": 1,
+      "pathway_reaction_count": 24,
+      "pathway_metabolite_count": 18
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko00450",
+      "metabolite_pathway_name": "Selenocompound metabolism",
+      "gene_count": 1,
+      "pathway_reaction_count": 13,
+      "pathway_metabolite_count": 19
+    },
+    ...
+  ],
+  "top_metabolite_pathways_truncated": null,
+  "no_formula_excluded": null,
+  "no_formula_excluded_metabolites": null,
+  "gene_count_total": 1,
+  "reaction_count_total": 0,
+  "transporter_count_total": 7,
+  "metabolite_count_total": 37,
+  "results": []
+}
+```
+
 ## Chaining patterns
 
 ```
@@ -229,6 +449,7 @@ gene_overview(locus_tags=[...]) → per-row transport_substrate_resolution='reso
 metabolites_by_gene → top_metabolites → list_metabolites(metabolite_ids=[top_metabolite_ids]) for richer per-metabolite cross-refs (mass, formula, full pathway names)
 metabolites_by_gene → top_metabolites → list_metabolites(metabolite_ids=[top_metabolite_ids], organism_names=[partner_organism]) for cross-organism presence (cross-feeding seed)
 metabolites_by_gene → top_metabolites → genes_by_metabolite(metabolite_ids=[top_metabolite_ids], organism=PARTNER_ORGANISM) (cross-feeding bridge — catalysts + transporters in partner)
+metabolites_by_gene → stereo_relatives → genes_by_metabolite(metabolite_ids=[generic substrate id], organism=..., include_stereo_forms=True) to join this gene's generic-form transport with the specific form's catalysts
 metabolites_by_gene → top_metabolite_pathways → list_metabolites(pathway_ids=[metabolite_pathway_id]) for the full metabolite roster of the pathway (not just gene-set hits)
 metabolites_by_gene → top_metabolite_pathways → genes_by_ontology(ontology='kegg', term_ids=[metabolite_pathway_id], organism=...) for gene-KO-mediated pathway annotations (different surface — see top_metabolite_pathways naming disambiguation)
 metabolites_by_gene → top_metabolite_pathways → pathway_enrichment(...) when gene-set hypothesis test is the goal
@@ -241,6 +462,8 @@ metabolites_by_gene → not_matched (locus_tags with no chemistry edges) → gen
 ## Common mistakes
 
 - Gene-anchored (locus_tags → metabolites). The metabolite-anchored mirror is `genes_by_metabolite` (metabolite → genes); both share the same row class, discriminators and per-arm filter scope.
+
+- A transporter's substrates are usually the generic, stereo-unspecified node ('Cysteine'), because TCDB names them that way; the enzymes sit on the specific form ('L-Cysteine'). Stereo forms are separate nodes and no count combines across them, so don't conclude "no enzyme uses what this gene imports" from these rows. Read envelope `stereo_relatives` (keyed by result metabolite; counts cover the whole organism, not your input genes) and per-row `stereo_relative_ids`, then route to `genes_by_metabolite(..., include_stereo_forms=True)`. Stereo links are incomplete, so no hint is not proof of no other form.
 
 - Single-organism enforced (mirrors `differential_expression_by_gene` and `genes_by_metabolite`). There is no `organisms` list. For cross-organism / cross-feeding work: call MBG once on the focal organism, take `top_metabolites`, then route to `genes_by_metabolite(metabolite_ids=[...], organism=partner)` (or `list_metabolites(metabolite_ids=[...], organism_names=[partner])` for presence-only).
 
@@ -316,7 +539,7 @@ passed. Exclude-wins-on-overlap is computed on the canonical IDs, so currency-co
 from multiomics_explorer import metabolites_by_gene
 
 result = metabolites_by_gene(locus_tags=..., organism=...)
-# returns dict with keys: total_matching, returned, offset, truncated, warnings, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, by_element, by_element_truncated, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, top_metabolite_pathways_truncated, no_formula_excluded, no_formula_excluded_metabolites, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+# returns dict with keys: total_matching, returned, offset, truncated, warnings, stereo_relatives, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, by_element, by_element_truncated, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, top_metabolite_pathways_truncated, no_formula_excluded, no_formula_excluded_metabolites, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 Use package import for bulk data extraction in scripts.

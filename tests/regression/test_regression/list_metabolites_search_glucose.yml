@@ -177,6 +177,13 @@ results:
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
   score: 2.5841
+  stereo_relatives:
+  - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00221'',
+    ''name'': ''beta-D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
+    192}'
+  - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00267'',
+    ''name'': ''alpha-D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
+    183}'
   structure_kind: defined
   transporter_count: 10
   transporter_gene_count: 1436
@@ -301,6 +308,10 @@ results:
   - kegg.pathway:ko01120
   - kegg.pathway:ko01200
   score: 2.2306
+  stereo_relatives:
+  - '{''transporter_gene_count'': 1436, ''metabolite_id'': ''kegg.compound:C00031'',
+    ''name'': ''D-Glucose'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
+    284}'
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -334,6 +345,10 @@ results:
   - kegg.pathway:ko01250
   - kegg.pathway:ko04964
   score: 2.2306
+  stereo_relatives:
+  - '{''transporter_gene_count'': 1436, ''metabolite_id'': ''kegg.compound:C00031'',
+    ''name'': ''D-Glucose'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
+    284}'
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -385,6 +400,13 @@ results:
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
   score: 1.9621
+  stereo_relatives:
+  - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00668'',
+    ''name'': ''alpha-D-Glucose 6-phosphate'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
+    175}'
+  - '{''transporter_gene_count'': 583, ''metabolite_id'': ''kegg.compound:C01172'',
+    ''name'': ''beta-D-Glucose 6-phosphate'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
+    188}'
   structure_kind: defined
   transporter_count: 2
   transporter_gene_count: 866
@@ -431,6 +453,10 @@ results:
   - kegg.pathway:ko01250
   - kegg.pathway:ko04922
   score: 1.9621
+  stereo_relatives:
+  - '{''transporter_gene_count'': 278, ''metabolite_id'': ''chebi:16077'', ''name'':
+    ''D-glucopyranose 1-phosphate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
+    0}'
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -516,6 +542,10 @@ results:
   - kegg.pathway:ko04152
   - kegg.pathway:ko04922
   score: 1.7514
+  stereo_relatives:
+  - '{''transporter_gene_count'': 866, ''metabolite_id'': ''kegg.compound:C00092'',
+    ''name'': ''D-Glucose 6-phosphate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
+    196}'
   structure_kind: defined
   transporter_count: 1
   transporter_gene_count: 0
@@ -549,6 +579,10 @@ results:
   - kegg.pathway:ko04152
   - kegg.pathway:ko04922
   score: 1.7514
+  stereo_relatives:
+  - '{''transporter_gene_count'': 866, ''metabolite_id'': ''kegg.compound:C00092'',
+    ''name'': ''D-Glucose 6-phosphate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
+    196}'
   structure_kind: defined
   transporter_count: 2
   transporter_gene_count: 583
@@ -574,6 +608,10 @@ results:
   pathway_ids:
   - kegg.pathway:ko00500
   score: 1.7514
+  stereo_relatives:
+  - '{''transporter_gene_count'': 278, ''metabolite_id'': ''chebi:16077'', ''name'':
+    ''D-glucopyranose 1-phosphate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
+    0}'
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0

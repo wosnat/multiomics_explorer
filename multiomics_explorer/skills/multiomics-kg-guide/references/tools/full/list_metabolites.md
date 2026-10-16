@@ -88,6 +88,7 @@ total_entries, total_matching, top_organisms, top_metabolite_pathways, by_eviden
 | structure_kind | string \| None (optional) | 'defined' (one molecule), 'generic' (a compound class, e.g. 'amino acid') or 'polymer'. Generic / polymer entries carry a generic formula (R or * groups) and no mass. Values: list_filter_values('structure_kind'). |
 | kegg_functional_categories | list[string] \| None (optional) | KEGG br08001 categories this metabolite is listed under. Absent = KEGG did not list it (~90% of metabolites), not 'none apply'. Curated, functional headings (amines sit under Peptides). |
 | kegg_brite_classes | list[string] \| None (optional) | 'Tree: Class' from 7 KEGG compound BRITE trees (lipids, phytochemicals, glycosides, pesticides, toxins, endocrine disruptors, bioactive peptides). Absent = KEGG did not list it (~80% of metabolites). |
+| stereo_relatives | list[MetaboliteStereoRelative] \| None (optional) | Other stereo forms of this metabolite (1 hop), e.g. Cysteine -> L-Cysteine, D-Cysteine. Counts never combine across stereo forms: a 0 here can be non-zero on a relative. Absent when none. |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -405,7 +406,23 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
       ],
       "measured_compartments": ["extracellular", "vesicle", "whole_cell"],
       "structure_kind": "defined",
-      "kegg_functional_categories": ["Hormones and transmitters", "Peptides"]
+      "kegg_functional_categories": ["Hormones and transmitters", "Peptides"],
+      "stereo_relatives": [
+        {
+          "metabolite_id": "kegg.compound:C00217",
+          "name": "D-Glutamate",
+          "relation": "enantiomer",
+          "catalyst_gene_count": 101,
+          "transporter_gene_count": 28
+        },
+        {
+          "metabolite_id": "kegg.compound:C00302",
+          "name": "Glutamate",
+          "relation": "unspecified_form",
+          "catalyst_gene_count": 69,
+          "transporter_gene_count": 2848
+        }
+      ]
     },
     {
       "metabolite_id": "kegg.compound:C00064",
@@ -438,7 +455,16 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
       ],
       "measured_compartments": ["extracellular", "vesicle", "whole_cell"],
       "structure_kind": "defined",
-      "kegg_functional_categories": ["Peptides"]
+      "kegg_functional_categories": ["Peptides"],
+      "stereo_relatives": [
+        {
+          "metabolite_id": "kegg.compound:C00819",
+          "name": "D-Glutamine",
+          "relation": "enantiomer",
+          "catalyst_gene_count": 13,
+          "transporter_gene_count": 0
+        }
+      ]
     },
     {
       "metabolite_id": "kegg.compound:C00037",
@@ -711,7 +737,166 @@ list_metabolites(metabolite_ids=["chebi:17234"])
 }
 ```
 
-### Example 11: Measured metabolites — measurement coverage envelope
+### Example 11: Stereo relatives — generic Cysteine carries the transport, L-Cysteine the catalysis
+
+```example-call
+list_metabolites(metabolite_ids=["kegg.compound:C00736", "kegg.compound:C00097"])
+```
+
+*Each row's `stereo_relatives` names the other stereo forms with their own KG-wide gene counts: Cysteine's `specific_form` relatives are L- and D-Cysteine, L-Cysteine's are its `enantiomer` D-Cysteine and its `unspecified_form` Cysteine. No count combines across forms. Rows with no relative have no `stereo_relatives` key.*
+
+```example-response
+{
+  "total_entries": 3214,
+  "total_matching": 2,
+  "top_organisms": [
+    {"organism_name": "Alteromonas macleodii AD45", "count": 2},
+    {"organism_name": "Alteromonas macleodii ATCC27126", "count": 2},
+    {"organism_name": "Alteromonas macleodii BGP6", "count": 2},
+    {"organism_name": "Alteromonas macleodii BS11", "count": 2},
+    {"organism_name": "Alteromonas macleodii EZ55", "count": 2},
+    ...
+  ],
+  "top_metabolite_pathways": [
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko00270",
+      "metabolite_pathway_name": "Cysteine and methionine metabolism",
+      "count": 1
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko00311",
+      "metabolite_pathway_name": "Penicillin and cephalosporin biosynthesis",
+      "count": 1
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko00430",
+      "metabolite_pathway_name": "Taurine and hypotaurine metabolism",
+      "count": 1
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko00460",
+      "metabolite_pathway_name": "Cyanoamino acid metabolism",
+      "count": 1
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko00470",
+      "metabolite_pathway_name": "D-Amino acid metabolism",
+      "count": 1
+    },
+    ...
+  ],
+  "by_evidence_source": [
+    {"evidence_source": "transport", "count": 2},
+    {"evidence_source": "metabolism", "count": 1},
+    {"evidence_source": "metabolomics", "count": 1}
+  ],
+  "xref_coverage": {"with_chebi": 2, "with_hmdb": 2, "with_mnxm": 2},
+  "mass_stats": {"mass_min": 121.161, "mass_median": 121.161, "mass_max": 121.161},
+  "by_measurement_coverage": {
+    "by_paper_count": [{"paper_count": 0, "count": 1}, {"paper_count": 1, "count": 1}],
+    "by_compartment": [{"compartment": "extracellular", "count": 1}, {"compartment": "whole_cell", "count": 1}]
+  },
+  "by_structure_kind": [{"structure_kind": "defined", "count": 2}],
+  "by_kegg_functional_category": [
+    {"kegg_functional_category": "Peptides", "count": 1},
+    {"kegg_functional_category": "not classified", "count": 1}
+  ],
+  "by_kegg_brite_class": [{"kegg_brite_class": "not classified", "count": 2}],
+  "score_max": null,
+  "score_median": null,
+  "returned": 2,
+  "offset": 0,
+  "truncated": false,
+  "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": [], "elements": []},
+  "resolved_aliases": {},
+  "warnings": [],
+  "no_formula_excluded": null,
+  "results": [
+    {
+      "metabolite_id": "kegg.compound:C00097",
+      "name": "L-Cysteine",
+      "formula": "C3H7NO2S",
+      "elements": ["C", "H", "N", "O", "S"],
+      "mass": 121.161,
+      "catalyst_gene_count": 652,
+      "organism_count": 43,
+      "transporter_count": 6,
+      "transporter_gene_count": 2554,
+      "evidence_sources": ["metabolism", "metabolomics", "transport"],
+      "chebi_id": "17561",
+      "pathway_ids": [
+        "kegg.pathway:ko00260",
+        "kegg.pathway:ko00270",
+        "kegg.pathway:ko00311",
+        "kegg.pathway:ko00430",
+        "kegg.pathway:ko00460",
+        ...
+      ],
+      "pathway_count": 23,
+      "measured_assay_count": 8,
+      "measured_paper_count": 1,
+      "measured_organisms": ["Prochlorococcus MIT0801", "Prochlorococcus MIT9301", "Prochlorococcus MIT9313"],
+      "measured_compartments": ["extracellular", "whole_cell"],
+      "structure_kind": "defined",
+      "kegg_functional_categories": ["Peptides"],
+      "stereo_relatives": [
+        {
+          "metabolite_id": "kegg.compound:C00793",
+          "name": "D-Cysteine",
+          "relation": "enantiomer",
+          "catalyst_gene_count": 12,
+          "transporter_gene_count": 0
+        },
+        {
+          "metabolite_id": "kegg.compound:C00736",
+          "name": "Cysteine",
+          "relation": "unspecified_form",
+          "catalyst_gene_count": 0,
+          "transporter_gene_count": 3197
+        }
+      ]
+    },
+    {
+      "metabolite_id": "kegg.compound:C00736",
+      "name": "Cysteine",
+      "formula": "C3H7NO2S",
+      "elements": ["C", "H", "N", "O", "S"],
+      "mass": 121.161,
+      "catalyst_gene_count": 0,
+      "organism_count": 43,
+      "transporter_count": 12,
+      "transporter_gene_count": 3197,
+      "evidence_sources": ["transport"],
+      "chebi_id": "15356",
+      "pathway_ids": [],
+      "pathway_count": 0,
+      "measured_assay_count": 0,
+      "measured_paper_count": 0,
+      "measured_organisms": [],
+      "measured_compartments": [],
+      "structure_kind": "defined",
+      "stereo_relatives": [
+        {
+          "metabolite_id": "kegg.compound:C00097",
+          "name": "L-Cysteine",
+          "relation": "specific_form",
+          "catalyst_gene_count": 652,
+          "transporter_gene_count": 2554
+        },
+        {
+          "metabolite_id": "kegg.compound:C00793",
+          "name": "D-Cysteine",
+          "relation": "specific_form",
+          "catalyst_gene_count": 12,
+          "transporter_gene_count": 0
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Example 12: Measured metabolites — measurement coverage envelope
 
 ```example-call
 list_metabolites(evidence_sources=["metabolomics"], summary=True)
@@ -802,7 +987,7 @@ list_metabolites(evidence_sources=["metabolomics"], summary=True)
 }
 ```
 
-### Example 12: Multi-step — find N-metabolites then drill into catalysts
+### Example 13: Multi-step — find N-metabolites then drill into catalysts
 
 ```
 Step 1: list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"], limit=10)
@@ -812,7 +997,7 @@ Step 2: genes_by_metabolite(metabolite_ids=[chosen_ids], organism="Prochlorococc
         → catalysing genes per metabolite
 ```
 
-### Example 13: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O when top_metabolites is dominated by them
+### Example 14: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O when top_metabolites is dominated by them
 
 ```example-call
 list_metabolites(
@@ -835,6 +1020,7 @@ list_metabolites(
 list_organisms (per-row catalyzed_metabolite_count > 0) → list_metabolites(organism_names=[...])
 list_metabolites → genes_by_metabolite(metabolite_ids=[...], organism=...)
 list_metabolites (per-row `transporter_gene_count > 0`) → genes_by_metabolite(metabolite_ids=[...], organism=..., evidence_sources=['transport']) — distinct genes in the transport rows, summed over organisms, equal transporter_gene_count
+list_metabolites (per-row `stereo_relatives`) → genes_by_metabolite(metabolite_ids=[generic id], organism=..., include_stereo_forms=True) — transport on the generic form plus catalysis on the specific form, per organism
 list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)
 differential_expression_by_gene → metabolites_by_gene(metabolite_elements=['N']) → list_metabolites for chemistry context
 list_metabolites (per-row `kegg_brite_classes`, top level only) → run_cypher over `MetaboliteClass` for the deeper KEGG compound classes (docs://analysis/metabolites)
@@ -846,6 +1032,8 @@ list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(m
 - Direction-agnostic — KEGG equation order is unreliable upstream, so joins through Reaction_has_metabolite (catalysis) and Tcdb_family_transports_metabolite (transport) do NOT distinguish substrates from products. Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate. See docs://analysis/metabolites.
 
 - catalyst_gene_count counts the catalysis arm only (genes reaching the metabolite via Gene → Reaction → Metabolite). catalyst_gene_count = 0 does NOT mean metabolomics-only: transport-only metabolites (TCDB substrates with no local catalysis) also read 0. Discriminate via the paired counts: catalyst_gene_count = 0 with `transporter_gene_count > 0` is transport-only; both 0 with `evidence_sources == ['metabolomics']` is measurement-only (no gene path). `transporter_gene_count` counts distinct genes over their deepest TCDB attachments, all organisms — it equals the distinct genes `genes_by_metabolite` returns in transport rows, summed over organisms.
+
+- A 0 `catalyst_gene_count` on a generic (stereo-unspecified) metabolite does not mean no enzyme acts on the compound. Stereo forms are separate nodes and no count combines across them: TCDB names substrates generically, so transport sits on 'Cysteine' (`kegg.compound:C00736`, 0 catalysts), while KEGG reactions use the specific form, so catalysis sits on 'L-Cysteine' (`kegg.compound:C00097`). Read the row's `stereo_relatives` (`relation` = `specific_form` / `unspecified_form` / `enantiomer`, each with its own `catalyst_gene_count` / `transporter_gene_count`), then use `genes_by_metabolite(..., include_stereo_forms=True)` for a per-organism transport ↔ catalysis join. A generic's `specific_form` relatives can include a D-form. Stereo links are incomplete (e.g. 'glucose' `chebi:17234` has none yet), so an absent `stereo_relatives` is not proof of no other form: `search_text` by name lists every form.
 
 - organism_names with multiple values is UNION, not intersection. To find metabolites BOTH organisms reach, run two single-org calls and intersect by `metabolite_id` (per-row `organism_count` tells you how many organisms reach a metabolite, but not which — the envelope `top_organisms` rollup is the only per-organism breakdown).
 

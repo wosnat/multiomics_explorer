@@ -74,6 +74,117 @@ filter. Filter `structure_kind=['defined']` when a question is about specific mo
 
 **Row schema is unified across both annotation arms.** `genes_by_metabolite` and `metabolites_by_gene` rows carry the full cross-arm key set — every row has `evidence_source`, `substrate_depth`, `tcdb_evidence_score`, `reaction_id`, `reaction_name`, `ec_numbers`, `mass_balance`, `tcdb_family_id`, `tcdb_family_name`, with explicit `None` on the fields belonging to the other arm. Code against `evidence_source` to discriminate (or `substrate_depth is not None` for transport-only); the cross-arm `None`s mean every row has identical keys, no `KeyError` branching.
 
+## Stereo forms: generic vs specific nodes
+
+**The rule: a compound's stereo forms are separate metabolite nodes, and no count or row ever
+combines across them.** "Cysteine" (`kegg.compound:C00736`, stereo form unspecified),
+"L-Cysteine" (`kegg.compound:C00097`) and "D-Cysteine" (`kegg.compound:C00793`) are three
+nodes, each with its own `catalyst_gene_count`, `transporter_gene_count` and gene rows.
+
+**Why the split matters.** The three evidence sources name compounds differently, so they land
+on different nodes of the same family:
+
+| Source | Names compounds… | So its evidence sits on… | Example |
+|---|---|---|---|
+| TCDB substrate lists (`transport`) | generically ("cysteine", "alanine") | the **unspecified** node | Cysteine `C00736`: many transporter genes, **0** catalyst genes |
+| KEGG reactions (`metabolism`) | as the specific form | the **specific** node | L-Cysteine `C00097`: the catalysts (and some transport) |
+| Measured compounds whose paper gave no form (`metabolomics`) | placed on the most-catalysed form (`stereo_assignment='dominant_form_assumed'`) | usually the **specific L-form** | 'Alanine' measurements sit on L-Alanine `C00041`, while most alanine transport sits on Alanine `C01401` |
+
+A question that joins transport to catalysis ("is the cysteine this transporter imports also
+used by an enzyme here?") therefore needs both nodes. Stay on one and you silently get half the
+answer: in MED4, `genes_by_metabolite` on Cysteine returns transport rows only (0 reactions),
+while L-Cysteine carries the reactions. A `0` on one form is not a `0` for the compound.
+
+**Relations.** The KG links forms with two edges, and the tools name what the relative is to the
+metabolite it's attached to:
+
+- `specific_form`: the relative is a stereo-specified form of this generic node
+  (Cysteine → L-Cysteine, D-Cysteine).
+- `unspecified_form`: the relative is the generic node of this specific form
+  (L-Cysteine → Cysteine).
+- `enantiomer`: the mirror-image form (L-Cysteine ↔ D-Cysteine). Only `list_metabolites` lists
+  enantiomers. They are different compounds with different enzymes, so the gene tools never hint
+  at them or add them.
+
+A generic node's `specific_form` relatives can include a **D-form**: Alanine `C01401` has both
+L-Alanine `C00041` and D-Alanine `C00133` as specific forms. Relatives are named, never
+filtered. You decide which one fits the question.
+
+**How to read it in each tool.**
+
+- **`list_metabolites`**: per-row `stereo_relatives` (absent when the node has none), with
+  `metabolite_id`, `name`, `relation` and the relative's own KG-wide `catalyst_gene_count` /
+  `transporter_gene_count`. This is the first look: a generic row with `catalyst_gene_count = 0`
+  whose `specific_form` relative has hundreds of catalysts is the split, not missing biology.
+- **`genes_by_metabolite`**: envelope `stereo_relatives`, keyed by input metabolite id. Each
+  entry carries `metabolite_id`, `name`, `relation` (`specific_form` / `unspecified_form`
+  only) and **organism-scoped** `reaction_count` / `transporter_count` / `gene_count`, under
+  the same filters as your call. These are exactly what `genes_by_metabolite` would report in
+  `by_metabolite` for that relative. Only relatives with genes in this organism are listed, and
+  relatives you passed in `metabolite_ids` or `exclude_metabolite_ids` are never hinted. The
+  matching `by_metabolite` entry carries `stereo_relative_ids`, and the first `warnings` entry
+  ("Stereo forms hold more rows: …") names the relatives with their counts. The hint fires
+  whenever a relative has rows, even when the input has rows of its own.
+- **`metabolites_by_gene`**: the same envelope `stereo_relatives`, keyed by every metabolite in
+  your result that has a stereo relative, and per-row `stereo_relative_ids`. The relative's
+  counts cover the **whole organism**, not just your input genes: the question it answers is
+  "where else does this compound have genes here".
+
+**When to cross the split: `genes_by_metabolite(include_stereo_forms=True)`.** This adds each
+input's generic ↔ specific relatives to the query. The added rows and `by_metabolite` entries
+carry `via_stereo_form_of` (the input id they came from), and the envelope's
+`stereo_forms_added` maps each input to every relative it queried, including relatives with no
+rows in this organism (those add nothing and never land in `not_matched`). No hint fires,
+because the relatives are already in the result. Use it for:
+
+- transport ↔ catalysis joins (generic transport, specific catalysis);
+- "every gene that touches cysteine, in any form" screens.
+
+Don't use it for:
+
+- **exact-form questions** ("which genes act on L-cysteine specifically"): query the one id;
+- **D-amino-acid biology** (peptidoglycan D-Ala, racemases): the expansion from a generic
+  node can pull in the L-form *and* the D-form, so check the `via_stereo_form_of` rows by
+  `metabolite_name` and drop the form that doesn't belong.
+
+Enantiomers are never added, and the expansion is one hop. D-Alanine does not reach L-Alanine
+through Alanine.
+
+**MED4 worked example (cysteine).**
+
+```python
+from multiomics_explorer import genes_by_metabolite
+
+r = genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"],   # Cysteine (generic)
+                        organism="Prochlorococcus MED4", summary=True)
+# r["by_metabolite"][0]: reaction_count 0, transport only (TCDB names it generically).
+# r["stereo_relatives"]["kegg.compound:C00736"]: L-Cysteine kegg.compound:C00097,
+#   relation 'specific_form', e.g. 13 reactions / 3 transporter families / 38 genes.
+#   D-Cysteine is not listed: it has no MED4 genes.
+# r["warnings"][0] starts "Stereo forms hold more rows: Cysteine (...) → L-Cysteine (...)"
+
+r = genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"],
+                        organism="Prochlorococcus MED4", include_stereo_forms=True)
+# r["stereo_forms_added"] == {"kegg.compound:C00736":
+#     ["kegg.compound:C00097", "kegg.compound:C00793"]}   # L- and D-Cysteine queried;
+#   D-Cysteine has no MED4 rows, so it adds nothing (and is not in not_matched).
+# L-Cysteine's metabolism rows now appear, each with via_stereo_form_of="kegg.compound:C00736";
+# r["by_metabolite"] has an L-Cysteine entry tagged the same way.
+```
+
+The gene-anchored route is the same split seen from the other side. `metabolites_by_gene` on
+MED4's cysteine transporters (e.g. PMM0065 mcyH, on `tcdb:3.A.1.106`) returns Cysteine
+transport rows plus a `stereo_relatives` entry pointing at L-Cysteine. Chain it into
+`genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"], organism=...,
+include_stereo_forms=True)` to get the transporters and the L-cysteine enzymes in one result.
+
+**Stereo links are incomplete.** Some generic nodes have no link to their specific forms yet
+(mannose, isoleucine and glucose among them: 'glucose' `chebi:17234` is not linked to D-Glucose
+`kegg.compound:C00031`). A missing hint is therefore **not** proof that there is no other form.
+When a generic substrate shows transport only, search by name:
+`list_metabolites(search_text="isoleucine")` lists every node, and you can pass the specific
+form's id to `genes_by_metabolite` yourself.
+
 ## KEGG compound categories: what they are and aren't
 
 `list_metabolites` carries two KEGG classification fields — `kegg_functional_categories` and
@@ -149,6 +260,7 @@ Always restate the row's caveats when the answer touches it. The LLM should neve
 
 - "This gene produces X" — only "this gene catalyses a reaction involving X". This is the permanent convention: upstream KEGG annotation direction is unreliable, so the KG intentionally stays undirected.
 - "This gene transports X" without qualifying the evidence — when the gene reads `transport_substrate_resolution='family_inferred'`, or the row is `substrate_depth='inherited'`, X came down from a lumping family's substrate set; we don't know which specific subfamily applies. Say "this gene belongs to a TCDB family whose substrate set includes X — the annotation can't pin the subfamily, so X is candidate-only". Quote the `tcdb_evidence_score` when you rank candidates.
+- "No gene in this organism acts on X" from a `0` on one stereo form — a generic node (Cysteine) has 0 reactions by construction and the catalysts sit on the specific form (L-Cysteine). Read `stereo_relatives` first (see "Stereo forms: generic vs specific nodes").
 - "Metabolite X was not produced under condition Y" based on metabolomics absence — say "X was not detected in the targeted panel under condition Y" (targeted ≠ comprehensive).
 
 ---
@@ -502,7 +614,8 @@ Four native tools cover the measurement layer (no `run_cypher` needed):
   genes, here L-alanine `kegg.compound:C00041`). The drill-downs add `by_stereo_assignment` to the envelope and a
   `warnings` entry when assumed rows are present; pass `stereo_assignment=['as_reported']` to
   keep only the paper's own calls. Say "measured as alanine (L-form assumed)" when quoting an
-  assumed row.
+  assumed row. Transport for the same compound usually sits on the generic node (Alanine
+  `kegg.compound:C01401`): see "Stereo forms: generic vs specific nodes".
 - **Replicate / normalisation conventions vary by paper.** Read `value_sd` and `n_replicates` on the edge, plus `field_description` on the parent assay (canonical provenance read — `verbose=True` surfaces it). The `value` itself is processed per the paper's pipeline.
 - **Tested-absent vs unmeasured.** See "Tested-absent vs unmeasured" above — the top-level invariant. Tested-absent rows (`value=0` / `detection_status='not_detected'` / `flag_value=false`) are biology, not noise; default-filtering them strips the majority of the layer.
 
@@ -625,6 +738,7 @@ User asks about a metabolite or chemistry
 │   ├─ "produce / catalyse" → Track A1 b1/c1 (metabolism arm)
 │   └─ "transport" → Track A2 b2/c2 (transport arm) + g (substrate resolution / depth)
 ├─ "Which genes act on M?" → genes_by_metabolite (read evidence_source split)
+├─ "M shows transport only / 0 catalysts" → read stereo_relatives; genes_by_metabolite(include_stereo_forms=True) for transport ↔ catalysis joins (Stereo forms section)
 ├─ "Which metabolites does gene X act on?" → metabolites_by_gene
 ├─ "Find metabolite by name → metabolite_id" → list_metabolites(search_text="...")  ← name-search hook; precedes any compound-anchored chain
 ├─ "Find metabolites by element / pathway / mass" → list_metabolites

@@ -209,6 +209,8 @@ results:
   transport_substrate_resolution: resolved
 returned: 10
 row_count: 10
+stereo_forms_added: {}
+stereo_relatives: {}
 top_gene_categories:
 - category: Stress response and adaptation
   gene_count: 5

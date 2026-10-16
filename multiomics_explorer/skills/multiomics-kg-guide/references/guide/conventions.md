@@ -355,14 +355,14 @@ exclusions in `excluded_assays`).
 
 ## Chemistry conventions
 
-Chemistry / metabolomics tools share three conventions: a transport trust
+Chemistry / metabolomics tools share four conventions: a transport trust
 ladder (`tcdb_evidence_score` → `transport_substrate_resolution` →
-`substrate_depth`), undirected KEGG reaction joins, and id resolution on
-`metabolite_ids`: inputs are normalised, then looked up in
-`Metabolite.all_identifiers`, so retired ids resolve (listed in
-`resolved_aliases`); removed compounds and role ids warn.
-`Metabolite.all_identifiers` holds CURIEs (`chebi:14654`);
-`Gene.all_identifiers` holds bare ids (`Q7V3R7`). Detail:
+`substrate_depth`); undirected KEGG reaction joins; id resolution on
+`metabolite_ids` via `Metabolite.all_identifiers` (CURIEs such as
+`chebi:14654`; `Gene.all_identifiers` is bare), so retired ids resolve
+into `resolved_aliases` and removed or role ids warn; and **stereo forms
+are separate nodes** (Cysteine, L-Cysteine), no count crosses them: read
+`stereo_relatives`, or use `include_stereo_forms`. Detail:
 `docs://analysis/metabolites`.
 
 ## Ontology term / ortholog-group ID forms

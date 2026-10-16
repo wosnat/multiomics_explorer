@@ -259,6 +259,7 @@ results:
   transport_substrate_resolution: resolved
 returned: 12
 row_count: 12
+stereo_relatives: {}
 top_gene_categories:
 - category: Transport
   gene_count: 1

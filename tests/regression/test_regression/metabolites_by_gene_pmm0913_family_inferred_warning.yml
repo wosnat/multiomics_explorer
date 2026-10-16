@@ -221,6 +221,178 @@ results:
   transport_substrate_resolution: family_inferred
 returned: 10
 row_count: 10
+stereo_relatives:
+  chebi:36219:
+  - gene_count: 3
+    metabolite_id: kegg.compound:C00243
+    name: Lactose
+    reaction_count: 0
+    relation: unspecified_form
+    transporter_count: 1
+  kegg.compound:C00073:
+  - gene_count: 24
+    metabolite_id: kegg.compound:C01733
+    name: Methionine
+    reaction_count: 0
+    relation: unspecified_form
+    transporter_count: 2
+  kegg.compound:C00095:
+  - gene_count: 3
+    metabolite_id: kegg.compound:C02336
+    name: beta-D-Fructose
+    reaction_count: 3
+    relation: specific_form
+    transporter_count: 0
+  kegg.compound:C00097:
+  - gene_count: 33
+    metabolite_id: kegg.compound:C00736
+    name: Cysteine
+    reaction_count: 0
+    relation: unspecified_form
+    transporter_count: 5
+  kegg.compound:C00137:
+  - gene_count: 3
+    metabolite_id: chebi:24848
+    name: inositol
+    reaction_count: 0
+    relation: unspecified_form
+    transporter_count: 1
+  kegg.compound:C00181:
+  - gene_count: 23
+    metabolite_id: kegg.compound:C01394
+    name: Xylose
+    reaction_count: 0
+    relation: specific_form
+    transporter_count: 2
+  kegg.compound:C00302:
+  - gene_count: 38
+    metabolite_id: kegg.compound:C00025
+    name: L-Glutamate
+    reaction_count: 43
+    relation: specific_form
+    transporter_count: 2
+  - gene_count: 3
+    metabolite_id: kegg.compound:C00217
+    name: D-Glutamate
+    reaction_count: 2
+    relation: specific_form
+    transporter_count: 1
+  kegg.compound:C00487:
+  - gene_count: 3
+    metabolite_id: kegg.compound:C00318
+    name: L-Carnitine
+    reaction_count: 0
+    relation: specific_form
+    transporter_count: 1
+  kegg.compound:C00542:
+  - gene_count: 3
+    metabolite_id: kegg.compound:C02291
+    name: L-Cystathionine
+    reaction_count: 3
+    relation: specific_form
+    transporter_count: 0
+  kegg.compound:C00716:
+  - gene_count: 8
+    metabolite_id: kegg.compound:C00065
+    name: L-Serine
+    reaction_count: 11
+    relation: specific_form
+    transporter_count: 0
+  kegg.compound:C00736:
+  - gene_count: 38
+    metabolite_id: kegg.compound:C00097
+    name: L-Cysteine
+    reaction_count: 13
+    relation: specific_form
+    transporter_count: 3
+  kegg.compound:C01394:
+  - gene_count: 23
+    metabolite_id: kegg.compound:C00181
+    name: D-Xylose
+    reaction_count: 0
+    relation: unspecified_form
+    transporter_count: 2
+  kegg.compound:C01401:
+  - gene_count: 14
+    metabolite_id: kegg.compound:C00041
+    name: L-Alanine
+    reaction_count: 13
+    relation: specific_form
+    transporter_count: 1
+  - gene_count: 5
+    metabolite_id: kegg.compound:C00133
+    name: D-Alanine
+    reaction_count: 2
+    relation: specific_form
+    transporter_count: 1
+  kegg.compound:C01602:
+  - gene_count: 2
+    metabolite_id: kegg.compound:C00077
+    name: L-Ornithine
+    reaction_count: 2
+    relation: specific_form
+    transporter_count: 0
+  - gene_count: 1
+    metabolite_id: kegg.compound:C00515
+    name: D-Ornithine
+    reaction_count: 1
+    relation: specific_form
+    transporter_count: 0
+  kegg.compound:C01733:
+  - gene_count: 29
+    metabolite_id: kegg.compound:C00073
+    name: L-Methionine
+    reaction_count: 9
+    relation: specific_form
+    transporter_count: 1
+  kegg.compound:C02057:
+  - gene_count: 8
+    metabolite_id: kegg.compound:C00079
+    name: L-Phenylalanine
+    reaction_count: 3
+    relation: specific_form
+    transporter_count: 1
+  kegg.compound:C02385:
+  - gene_count: 6
+    metabolite_id: kegg.compound:C00062
+    name: L-Arginine
+    reaction_count: 3
+    relation: specific_form
+    transporter_count: 1
+  - gene_count: 1
+    metabolite_id: kegg.compound:C00792
+    name: D-Arginine
+    reaction_count: 1
+    relation: specific_form
+    transporter_count: 0
+  kegg.compound:C03189:
+  - gene_count: 6
+    metabolite_id: kegg.compound:C00093
+    name: sn-Glycerol 3-phosphate
+    reaction_count: 3
+    relation: specific_form
+    transporter_count: 2
+  kegg.compound:C03465:
+  - gene_count: 4
+    metabolite_id: kegg.compound:C00671
+    name: (S)-3-Methyl-2-oxopentanoic acid
+    reaction_count: 3
+    relation: specific_form
+    transporter_count: 0
+  kegg.compound:C16433:
+  - gene_count: 10
+    metabolite_id: kegg.compound:C00049
+    name: L-Aspartate
+    reaction_count: 12
+    relation: specific_form
+    transporter_count: 0
+  kegg.compound:C16438:
+  - gene_count: 1
+    metabolite_id: kegg.compound:C00152
+    name: L-Asparagine
+    reaction_count: 1
+    relation: specific_form
+    transporter_count: 0
 top_gene_categories:
 - category: Transport
   gene_count: 1
@@ -379,6 +551,14 @@ total_matching: 518
 transporter_count_total: 1
 truncated: true
 warnings:
+- 'Stereo forms hold more rows: Glutamate (kegg.compound:C00302) → L-Glutamate (kegg.compound:C00025):
+  43 reactions, 2 transporter families and D-Glutamate (kegg.compound:C00217): 2 reactions,
+  1 transporter family; Cysteine (kegg.compound:C00736) → L-Cysteine (kegg.compound:C00097):
+  13 reactions, 3 transporter families; L-Cysteine (kegg.compound:C00097) → Cysteine
+  (kegg.compound:C00736): 0 reactions, 5 transporter families; Methionine (kegg.compound:C01733)
+  → L-Methionine (kegg.compound:C00073): 9 reactions, 1 transporter family; L-Methionine
+  (kegg.compound:C00073) → Methionine (kegg.compound:C01733): 0 reactions, 2 transporter
+  families, and 16 more. Counts never combine across stereo forms, see stereo_relatives.'
 - 'transport_substrate_resolution is `family_inferred` for PMM0913: substrate breadth
   is reachability, not capability for these genes — their deepest attachment is a
   lumping superfamily (e.g. 3.A.1), so even their most_specific rows are superfamily-level

@@ -2205,6 +2205,28 @@ def build_resolve_metabolite_curies(curies: list[str]) -> tuple[str, dict]:
     return cypher, {"curies": curies}
 
 
+_METABOLITE_STEREO_RELATIVES_COLUMN = (
+    "COLLECT {\n"
+    "  MATCH (m)-[r:Metabolite_is_stereo_form_of|Metabolite_is_enantiomer_of]-"
+    "(o:Metabolite)\n"
+    "  WITH o, CASE WHEN type(r) = 'Metabolite_is_enantiomer_of' THEN 'enantiomer'\n"
+    "               WHEN startNode(r) = m THEN 'unspecified_form'\n"
+    "               ELSE 'specific_form' END AS relation\n"
+    "  ORDER BY relation, o.id\n"
+    "  RETURN {metabolite_id: o.id, name: o.name, relation: relation,\n"
+    "          catalyst_gene_count: coalesce(o.catalyst_gene_count, 0),\n"
+    "          transporter_gene_count: coalesce(o.transporter_gene_count, 0)}\n"
+    "} AS stereo_relatives"
+)
+"""Per-row 1-hop stereo relatives (stereo form + enantiomer edges, KG-wide).
+
+Shared by both branches of ``build_list_metabolites``. ``relation`` is what the
+relative is to ``m``: ``unspecified_form`` / ``specific_form`` (direction of
+``Metabolite_is_stereo_form_of``, specific -> unspecified) or ``enantiomer``.
+Counts never combine across stereo forms. Bounded (<= 3 relatives per node).
+"""
+
+
 def build_list_metabolites(
     *,
     search_text: str | None = None,
@@ -2237,11 +2259,19 @@ def build_list_metabolites(
     measured_assay_count, measured_paper_count, measured_organisms,
     measured_compartments, structure_kind, kegg_functional_categories,
     kegg_brite_classes (the two KEGG lists are null when KEGG doesn't list
-    the metabolite — sparse; the api layer drops them).
+    the metabolite — sparse; the api layer drops them),
+    stereo_relatives (list of {metabolite_id, name, relation,
+    catalyst_gene_count, transporter_gene_count} over 1-hop
+    Metabolite_is_stereo_form_of / Metabolite_is_enantiomer_of edges,
+    ordered by relation then id; empty list when none — the api layer
+    strips it).
     When search_text is provided, also: score.
     RETURN keys (verbose): adds inchikey, smiles, mnxm_id, hmdb_id,
-    pathway_names. All verbose columns are direct property reads on m;
-    no edge traversal in either compact or verbose mode.
+    pathway_names.
+    Traversal: one bounded 1-hop COLLECT (stereo relatives, via
+    `_METABOLITE_STEREO_RELATIVES_COLUMN`, computed in a WITH before the
+    final RETURN); everything else is direct property reads on m, in both
+    compact and verbose mode.
     """
     where_block, params = _list_metabolites_where(
         search_text=search_text,
@@ -2285,6 +2315,7 @@ def build_list_metabolites(
             "CALL db.index.fulltext.queryNodes('metaboliteFullText', $search)\n"
             "YIELD node AS m, score\n"
             f"{where_block}"
+            f"WITH m, score,\n     {_METABOLITE_STEREO_RELATIVES_COLUMN}\n"
             "RETURN m.id AS metabolite_id,\n"
             "       m.name AS name,\n"
             "       m.formula AS formula,\n"
@@ -2305,7 +2336,8 @@ def build_list_metabolites(
             "       m.structure_kind AS structure_kind,\n"
             "       m.kegg_functional_categories AS kegg_functional_categories,\n"
             "       m.kegg_brite_classes AS kegg_brite_classes,\n"
-            f"       score{verbose_cols}\n"
+            "       score,\n"
+            f"       stereo_relatives{verbose_cols}\n"
             "ORDER BY score DESC, m.organism_count DESC, m.id\n"
             f"{limit_clause}"
         )
@@ -2313,6 +2345,7 @@ def build_list_metabolites(
         cypher = (
             "MATCH (m:Metabolite)\n"
             f"{where_block}"
+            f"WITH m,\n     {_METABOLITE_STEREO_RELATIVES_COLUMN}\n"
             "RETURN m.id AS metabolite_id,\n"
             "       m.name AS name,\n"
             "       m.formula AS formula,\n"
@@ -2332,12 +2365,56 @@ def build_list_metabolites(
             "       coalesce(m.measured_compartments, []) AS measured_compartments,\n"
             "       m.structure_kind AS structure_kind,\n"
             "       m.kegg_functional_categories AS kegg_functional_categories,\n"
-            f"       m.kegg_brite_classes AS kegg_brite_classes{verbose_cols}\n"
+            "       m.kegg_brite_classes AS kegg_brite_classes,\n"
+            f"       stereo_relatives{verbose_cols}\n"
             "ORDER BY m.organism_count DESC, m.catalyst_gene_count DESC, m.id\n"
             f"{limit_clause}"
         )
 
     return cypher, params
+
+
+def build_metabolite_stereo_relatives(
+    *,
+    metabolite_ids: list[str],
+    exclude_ids: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Build Cypher for the 1-hop stereo relatives of metabolites.
+
+    Traverses ``Metabolite_is_stereo_form_of`` only, in both directions
+    (enantiomer edges are deliberately out of scope — different compounds).
+    Spec: ``docs/tool-specs/metabolite-stereo-hint.md`` (shared pieces).
+
+    ``relation`` is what the relative is to the input metabolite:
+    ``unspecified_form`` when the input is the edge's start node (the input is
+    the stereo-specified form), else ``specific_form``.
+
+    RETURN keys: metabolite_id, metabolite_name, relative_id, relative_name,
+    relation.
+    One row per (input, relative); inputs with no edge yield no rows.
+
+    Args:
+        metabolite_ids: Canonical ``Metabolite.id`` values.
+        exclude_ids: Relative ids never to return (e.g. ids the caller already
+            passed or excluded). ``None`` -> ``[]`` (a null list would
+            null-filter every row).
+    """
+    cypher = (
+        "UNWIND $metabolite_ids AS mid\n"
+        "MATCH (m:Metabolite {id: mid})-[r:Metabolite_is_stereo_form_of]-"
+        "(o:Metabolite)\n"
+        "WHERE NOT o.id IN $exclude_ids\n"
+        "RETURN m.id AS metabolite_id, m.name AS metabolite_name,\n"
+        "       o.id AS relative_id,"
+        " o.name AS relative_name,\n"
+        "       CASE WHEN startNode(r) = m THEN 'unspecified_form'"
+        " ELSE 'specific_form' END AS relation\n"
+        "ORDER BY metabolite_id, relation, relative_id"
+    )
+    return cypher, {
+        "metabolite_ids": metabolite_ids,
+        "exclude_ids": list(exclude_ids) if exclude_ids else [],
+    }
 
 
 def build_list_metabolites_summary(
@@ -9885,7 +9962,9 @@ def build_metabolites_by_gene_summary(
     top_metabolites, top_reactions, top_tcdb_families,
     top_gene_categories, top_metabolite_pathways (NEW — chemistry-filtered
     to p.reaction_count >= 3), by_element (NEW — periodic-table-bounded
-    rollup over m.elements).
+    rollup over m.elements), stereo_linked_metabolite_ids (distinct slice
+    metabolite ids with a Metabolite_is_stereo_form_of edge in either
+    direction — sources for the api-side stereo-form hint).
 
     The api/ layer post-processes some apoc.coll outputs into the
     documented top-N shape; the contract here is the RETURN keys and
@@ -9954,6 +10033,9 @@ def build_metabolites_by_gene_summary(
         "     count(DISTINCT r) AS reaction_count_total,\n"
         "     count(DISTINCT tf) AS transporter_count_total,\n"
         "     count(DISTINCT m) AS metabolite_count_total,\n"
+        "     collect(DISTINCT CASE WHEN EXISTS {"
+        " (m)-[:Metabolite_is_stereo_form_of]-() } THEN m.id END)"
+        " AS stereo_linked_metabolite_ids,\n"
         "     collect({\n"
         "       locus_tag: g.locus_tag,\n"
         "       gene_name: g.gene_name,\n"
@@ -9977,7 +10059,8 @@ def build_metabolites_by_gene_summary(
         "       tcdb_evidence_score: tscore\n"
         "     }) AS rows\n"
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
-        "     transporter_count_total, metabolite_count_total, rows,\n"
+        "     transporter_count_total, metabolite_count_total,"
+        " stereo_linked_metabolite_ids, rows,\n"
         "     [es IN apoc.coll.toSet([row IN rows | row.es]) |\n"
         "        {evidence_source: es,\n"
         "         count: size([row IN rows WHERE row.es = es])}]"
@@ -9990,7 +10073,8 @@ def build_metabolites_by_gene_summary(
         " AS rows_by_substrate_depth\n"
         "// Per-input-gene rollup (the gene-anchored mirror of GBM by_metabolite)\n"
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
-        "     transporter_count_total, metabolite_count_total, rows,\n"
+        "     transporter_count_total, metabolite_count_total,"
+        " stereo_linked_metabolite_ids, rows,\n"
         "     rows_by_evidence_source, rows_by_substrate_depth,\n"
         "     [lt IN apoc.coll.toSet([row IN rows | row.locus_tag]) |\n"
         "        {locus_tag: lt,\n"
@@ -10024,7 +10108,8 @@ def build_metabolites_by_gene_summary(
         " AND row.substrate_depth = 'inherited'])}] AS by_gene\n"
         "// Top-N rollups: api/ layer trims to top 10 by gene_count\n"
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
-        "     transporter_count_total, metabolite_count_total,\n"
+        "     transporter_count_total, metabolite_count_total,"
+        " stereo_linked_metabolite_ids,\n"
         "     rows_by_evidence_source, rows_by_substrate_depth,\n"
         "     by_gene, rows,\n"
         "     [rid IN apoc.coll.toSet("
@@ -10095,7 +10180,8 @@ def build_metabolites_by_gene_summary(
         "// Uses m.elements (KG-A3 Hill-parsed presence list); empty\n"
         "// formulas (~31 metabolites) gracefully drop out.\n"
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
-        "     transporter_count_total, metabolite_count_total,\n"
+        "     transporter_count_total, metabolite_count_total,"
+        " stereo_linked_metabolite_ids,\n"
         "     rows_by_evidence_source, rows_by_substrate_depth,\n"
         "     by_gene, top_reactions, top_tcdb_families,\n"
         "     top_gene_categories, top_metabolites, rows,\n"
@@ -10115,7 +10201,8 @@ def build_metabolites_by_gene_summary(
         "// (KG-A5 denorm, transport-extended), so coverage is uniform\n"
         "// across both arms.\n"
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
-        "     transporter_count_total, metabolite_count_total,\n"
+        "     transporter_count_total, metabolite_count_total,"
+        " stereo_linked_metabolite_ids,\n"
         "     rows_by_evidence_source, rows_by_substrate_depth,\n"
         "     by_gene, top_reactions, top_tcdb_families,\n"
         "     top_gene_categories, top_metabolites, by_element, rows,\n"
@@ -10142,7 +10229,7 @@ def build_metabolites_by_gene_summary(
         "       rows_by_evidence_source, rows_by_substrate_depth,\n"
         "       by_gene, top_reactions, top_tcdb_families,\n"
         "       top_gene_categories, top_metabolites, by_element,\n"
-        "       top_metabolite_pathways"
+        "       top_metabolite_pathways, stereo_linked_metabolite_ids"
     )
     return cypher, params
 

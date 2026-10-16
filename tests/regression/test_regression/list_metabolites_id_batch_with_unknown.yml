@@ -90,6 +90,13 @@ results:
   - kegg.pathway:ko05111
   - kegg.pathway:ko05230
   - kegg.pathway:ko05415
+  stereo_relatives:
+  - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00221'',
+    ''name'': ''beta-D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
+    192}'
+  - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00267'',
+    ''name'': ''alpha-D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
+    183}'
   structure_kind: defined
   transporter_count: 10
   transporter_gene_count: 1436

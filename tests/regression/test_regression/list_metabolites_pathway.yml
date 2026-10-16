@@ -222,6 +222,13 @@ results:
   - kegg.pathway:ko05034
   - kegg.pathway:ko05215
   - kegg.pathway:ko05230
+  stereo_relatives:
+  - '{''transporter_gene_count'': 28, ''metabolite_id'': ''kegg.compound:C00217'',
+    ''name'': ''D-Glutamate'', ''relation'': ''enantiomer'', ''catalyst_gene_count'':
+    101}'
+  - '{''transporter_gene_count'': 2848, ''metabolite_id'': ''kegg.compound:C00302'',
+    ''name'': ''Glutamate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
+    69}'
   structure_kind: defined
   transporter_count: 5
   transporter_gene_count: 786
@@ -314,6 +321,10 @@ results:
   - kegg.pathway:ko04974
   - kegg.pathway:ko04978
   - kegg.pathway:ko05230
+  stereo_relatives:
+  - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00819'',
+    ''name'': ''D-Glutamine'', ''relation'': ''enantiomer'', ''catalyst_gene_count'':
+    13}'
   structure_kind: defined
   transporter_count: 12
   transporter_gene_count: 2365

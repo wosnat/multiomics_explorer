@@ -529,6 +529,15 @@ class ClusterEnrichmentResponse(BaseModel):
 # list_metabolites response models (module-level for direct importability)
 # ---------------------------------------------------------------------------
 
+class MetaboliteStereoRelative(BaseModel):
+    """One stereo relative of a list_metabolites row (KG-wide counts)."""
+    metabolite_id: str = Field(description="Relative's full prefixed ID (e.g. 'kegg.compound:C00097' L-Cysteine). Pass it to genes_by_metabolite(metabolite_ids=...).")
+    name: str = Field(description="Relative's name (e.g. 'L-Cysteine').")
+    relation: Literal["specific_form", "unspecified_form", "enantiomer"] = Field(description="What the relative is to this row's metabolite: 'specific_form' (L-Cysteine of Cysteine), 'unspecified_form' (Cysteine of L-Cysteine) or 'enantiomer' (D-Cysteine of L-Cysteine).")
+    catalyst_gene_count: int = Field(default=0, description="KG-wide catalyst genes on the relative (same meaning as the row field), e.g. 652 for L-Cysteine.")
+    transporter_gene_count: int = Field(default=0, description="KG-wide transporter genes on the relative (same meaning as the row field), e.g. 2554 for L-Cysteine.")
+
+
 class MetaboliteResult(SparseRow):
     # compact
     metabolite_id: str = Field(description="Full prefixed ID (e.g. 'kegg.compound:C00031'). Most carry the kegg.compound: namespace; a smaller set carry chebi: (TCDB-curated transport-only substrates).")
@@ -554,6 +563,7 @@ class MetaboliteResult(SparseRow):
     structure_kind: str | None = Field(default=None, description="'defined' (one molecule), 'generic' (a compound class, e.g. 'amino acid') or 'polymer'. Generic / polymer entries carry a generic formula (R or * groups) and no mass. Values: list_filter_values('structure_kind').")
     kegg_functional_categories: list[str] | None = Field(default=None, description="KEGG br08001 categories this metabolite is listed under. Absent = KEGG did not list it (~90% of metabolites), not 'none apply'. Curated, functional headings (amines sit under Peptides).")
     kegg_brite_classes: list[str] | None = Field(default=None, description="'Tree: Class' from 7 KEGG compound BRITE trees (lipids, phytochemicals, glycosides, pesticides, toxins, endocrine disruptors, bioactive peptides). Absent = KEGG did not list it (~80% of metabolites).")
+    stereo_relatives: list[MetaboliteStereoRelative] | None = Field(default=None, description="Other stereo forms of this metabolite (1 hop), e.g. Cysteine -> L-Cysteine, D-Cysteine. Counts never combine across stereo forms: a 0 here can be non-zero on a relative. Absent when none.")
 
     # verbose
     inchikey: str | None = Field(default=None, description="InChIKey structural fingerprint (e.g. 'WQZGKKKJIJFFOK-GASJEMHNSA-N'). Verbose only.")
@@ -762,6 +772,17 @@ class GeneReactionMetaboliteTriplet(SparseRow):
     metabolite_chebi_id: str | None = Field(
         default=None,
         description="ChEBI numeric ID; populated on most metabolites.")
+    via_stereo_form_of: str | None = Field(
+        default=None,
+        description="genes_by_metabolite with include_stereo_forms=True: "
+        "the input id this row's metabolite is a stereo form of (e.g. "
+        "'kegg.compound:C00736'). Absent on rows for inputs.")
+    stereo_relative_ids: list[str] | None = Field(
+        default=None,
+        description="metabolites_by_gene: stereo forms of this row's "
+        "metabolite with genes in this organism (e.g. "
+        "['kegg.compound:C00097']); counts in envelope stereo_relatives. "
+        "Absent when none.")
 
     # verbose-only fields:
     gene_category: str | None = Field(
@@ -799,7 +820,33 @@ class GeneReactionMetaboliteTriplet(SparseRow):
         "Transporters). Pre-computed pointer. Verbose, transport rows only.")
 
 
-class GbmByMetabolite(BaseModel):
+class StereoRelative(BaseModel):
+    """A stereo relative with rows in this organism (genes_by_metabolite /
+    metabolites_by_gene). Counts equal the relative's `by_metabolite` entry
+    from `genes_by_metabolite(metabolite_ids=[relative], organism=...)`."""
+    metabolite_id: str = Field(
+        description="Relative's full prefixed ID (e.g. "
+        "'kegg.compound:C00097' L-Cysteine). Pass it to "
+        "genes_by_metabolite(metabolite_ids=...).")
+    name: str = Field(description="Relative's name (e.g. 'L-Cysteine').")
+    relation: Literal["specific_form", "unspecified_form"] = Field(
+        description="What the relative is to the keyed metabolite: "
+        "'specific_form' (L-Cysteine of Cysteine; can be a D-form) or "
+        "'unspecified_form' (Cysteine of L-Cysteine). Enantiomers are "
+        "never listed here.")
+    reaction_count: int = Field(
+        description="Distinct reactions with genes in this organism on the "
+        "relative (e.g. 13 for L-Cysteine in MED4).")
+    transporter_count: int = Field(
+        description="Distinct TCDB families with genes in this organism on "
+        "the relative (e.g. 3).")
+    gene_count: int = Field(
+        description="Distinct genes across both arms on the relative in "
+        "this organism (e.g. 38). Only relatives with gene_count > 0 are "
+        "listed.")
+
+
+class GbmByMetabolite(SparseRow):
     """Per-metabolite rollup. One entry per matched input metabolite_id.
 
     Cardinality bounded by the input list — kept as `by_*` (full rollup),
@@ -835,6 +882,16 @@ class GbmByMetabolite(BaseModel):
         description="Transport rows with `substrate_depth='inherited'` "
         "(substrate rolled up from a descendant family — reachability, "
         "not a capability claim for this gene).")
+    stereo_relative_ids: list[str] | None = Field(
+        default=None,
+        description="Stereo forms of this metabolite that have rows in this "
+        "organism (e.g. ['kegg.compound:C00097']); counts are in the "
+        "envelope `stereo_relatives`. Absent when none.")
+    via_stereo_form_of: str | None = Field(
+        default=None,
+        description="Set when include_stereo_forms=True added this "
+        "metabolite: the input id it is a stereo form of (e.g. "
+        "'kegg.compound:C00736'). Absent on inputs.")
 
 
 class GbmByEvidenceSource(BaseModel):
@@ -1002,7 +1059,21 @@ class GenesByMetaboliteResponse(BaseModel):
         "are the transport-arm majority and `substrate_depth` was not set "
         "explicitly; a removed-metabolite or chemical-role id (kept in "
         "not_found, with where to look instead); a `gene_categories` "
-        "value not found in the live vocabulary.")
+        "value not found in the live vocabulary; first, a stereo-forms "
+        "warning when a relative (e.g. L-Cysteine of Cysteine) has rows "
+        "here (see `stereo_relatives`).")
+    stereo_relatives: dict[str, list[StereoRelative]] = Field(
+        default_factory=dict,
+        description="Input id -> its stereo forms with rows in this organism "
+        "under the same filters, e.g. {'kegg.compound:C00736': [L-Cysteine "
+        "entry]}. Counts never combine across forms. Empty with "
+        "include_stereo_forms=True.")
+    stereo_forms_added: dict[str, list[str]] = Field(
+        default_factory=dict,
+        description="include_stereo_forms=True: input id -> stereo forms "
+        "added to the query (e.g. {'kegg.compound:C00736': "
+        "['kegg.compound:C00097']}). Added ids with no rows are not in "
+        "not_matched.")
     resolved_aliases: dict[str, list[str]] = Field(
         default_factory=dict,
         description="Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.")
@@ -1383,7 +1454,14 @@ class MetabolitesByGeneResponse(BaseModel):
         "removed-metabolite or chemical-role id (kept in not_found); a "
         "`gene_categories` value not found in the live vocabulary; "
         "a `not_found.locus_tags` entry differing only by case from a real "
-        "one (locus_tags are never case-normalised).")
+        "one (locus_tags are never case-normalised); first, a stereo-forms "
+        "warning when a slice metabolite's stereo relative has genes here.")
+    stereo_relatives: dict[str, list[StereoRelative]] = Field(
+        default_factory=dict,
+        description="Slice metabolite id -> its stereo forms with genes in "
+        "this organism (whole organism, not just these genes), e.g. "
+        "{'kegg.compound:C00736': [L-Cysteine entry]}. Counts never "
+        "combine across forms.")
     resolved_aliases: dict[str, list[str]] = Field(
         default_factory=dict,
         description="Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.")
@@ -8260,6 +8338,12 @@ def register_tools(mcp: FastMCP):
                 "`list_metabolites`.",
             ),
         ] = None,
+        include_stereo_forms: Annotated[bool, Field(
+            description="Also query the generic <-> specific stereo forms of "
+            "each metabolite_id (e.g. Cysteine <-> L-Cysteine; TCDB lists "
+            "generic names, KEGG reactions use specific forms). Added rows "
+            "carry via_stereo_form_of. Enantiomers are never added.",
+        )] = False,
         summary: SummaryParam = False,
         verbose: VerboseParam = False,
         limit: LimitParam = 10,
@@ -8267,9 +8351,9 @@ def register_tools(mcp: FastMCP):
     ) -> GenesByMetaboliteResponse:
         """Metabolite IDs to gene catalysts (via Reaction) and transporters (via TcdbFamily, deepest attachment) in ONE organism.
 
-        Use for the compound-anchored direction; the gene-anchored mirror is `metabolites_by_gene`, family-level TCDB `genes_by_ontology`.
-        Filters: metabolite_ids (+exclude), organism, ec_numbers, metabolite_pathway_ids, gene_categories, substrate_depth, evidence_sources.
-        Returns: by_metabolite, by_evidence_source, by_substrate_depth, top_genes, top_reactions, top_tcdb_families, not_matched; one row = one gene × metabolite.
+        Use for compound → genes; mirror `metabolites_by_gene`, family-level TCDB `genes_by_ontology`.
+        Filters: metabolite_ids (+exclude, +stereo forms), organism, ec_numbers, metabolite_pathway_ids, gene_categories, substrate_depth, evidence_sources.
+        Returns: by_metabolite, by_evidence_source, by_substrate_depth, top_genes, top_reactions, top_tcdb_families, not_matched; one row = gene × metabolite.
         docs://tools/genes_by_metabolite; summary=True first.
         """
         await ctx.info(
@@ -8278,7 +8362,8 @@ def register_tools(mcp: FastMCP):
             f"metabolite_pathway_ids={metabolite_pathway_ids} "
             f"mass_balance={mass_balance} gene_categories={gene_categories} "
             f"substrate_depth={substrate_depth} "
-            f"evidence_sources={evidence_sources} summary={summary} "
+            f"evidence_sources={evidence_sources} "
+            f"include_stereo_forms={include_stereo_forms} summary={summary} "
             f"verbose={verbose} limit={limit} offset={offset}"
         )
         try:
@@ -8293,6 +8378,7 @@ def register_tools(mcp: FastMCP):
                 gene_categories=gene_categories,
                 substrate_depth=substrate_depth,
                 evidence_sources=evidence_sources,
+                include_stereo_forms=include_stereo_forms,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
@@ -8332,6 +8418,11 @@ def register_tools(mcp: FastMCP):
                 resolved_aliases=result.get("resolved_aliases", {}),
                 not_found=not_found,
                 not_matched=result.get("not_matched", []),
+                stereo_relatives={
+                    k: [StereoRelative(**r) for r in v]
+                    for k, v in (result.get("stereo_relatives") or {}).items()
+                },
+                stereo_forms_added=result.get("stereo_forms_added") or {},
                 by_metabolite=by_metabolite,
                 by_evidence_source=by_evidence_source,
                 by_substrate_depth=by_substrate_depth,
@@ -8536,6 +8627,10 @@ def register_tools(mcp: FastMCP):
                 resolved_aliases=result.get("resolved_aliases", {}),
                 not_found=not_found,
                 not_matched=result.get("not_matched", []),
+                stereo_relatives={
+                    k: [StereoRelative(**r) for r in v]
+                    for k, v in (result.get("stereo_relatives") or {}).items()
+                },
                 by_gene=by_gene,
                 by_evidence_source=by_evidence_source,
                 by_substrate_depth=by_substrate_depth,
