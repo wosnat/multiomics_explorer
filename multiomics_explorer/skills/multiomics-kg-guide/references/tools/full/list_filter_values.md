@@ -327,7 +327,7 @@ list_filter_values(filter_type="kegg_functional_category")
 ```example-response
 {
   "filter_type": "kegg_functional_category",
-  "description": "Level-0 categories of KEGG compound BRITE br08001 (compounds with biological roles) that contain this metabolite. Spa...",
+  "description": "Level-0 categories of KEGG compound BRITE br08001 (compounds with biological roles) that list this metabolite. Sparse...",
   "total_entries": 9,
   "returned": 9,
   "truncated": false,
