@@ -370,6 +370,7 @@ released). Details and ready-to-copy caveat paragraphs per edge type:
 - **Rollup:** `Metabolite.go_transport_organism_names` / `_count` on 198 metabolites (count min 1,
   median 10, max 43). Direct gene-to-GO annotations only, no `is_a` propagation, so 10 of the 208
   metabolite targets (reached only by ancestor terms no gene carries) have none.
+  Clarification (final review): "sparse (on GO-reached metabolites)" means absent = no directly annotated gene path, NOT no GO transport edge; to test for an edge, test the edge.
 - **Reach:** 5,436 genes over 43 strains (2,777 MF+BP, 2,122 BP-only, 537 MF-only); MED4 59,
   KT2440 390, DSS-3 332.
 - **`controlled_vocabularies_hash` moved** (`go_transport` added to the `Metabolite.evidence_sources`
