@@ -222,12 +222,67 @@ results:
 returned: 10
 row_count: 10
 stereo_relatives:
+  chebi:17234:
+  - gene_count: 10
+    metabolite_id: kegg.compound:C00031
+    name: D-Glucose
+    reaction_count: 3
+    relation: specific_form
+    transporter_count: 2
+  chebi:22599:
+  - gene_count: 23
+    metabolite_id: kegg.compound:C00259
+    name: L-Arabinose
+    reaction_count: 0
+    relation: specific_form
+    transporter_count: 2
+  chebi:22605:
+  - gene_count: 3
+    metabolite_id: kegg.compound:C01904
+    name: D-Arabitol
+    reaction_count: 0
+    relation: specific_form
+    transporter_count: 1
+  chebi:24898:
+  - gene_count: 25
+    metabolite_id: kegg.compound:C00407
+    name: L-Isoleucine
+    reaction_count: 2
+    relation: specific_form
+    transporter_count: 2
+  chebi:26546:
+  - gene_count: 4
+    metabolite_id: chebi:16055
+    name: aldehydo-L-rhamnose
+    reaction_count: 0
+    relation: specific_form
+    transporter_count: 1
+  chebi:33984:
+  - gene_count: 3
+    metabolite_id: kegg.compound:C01018
+    name: 6-Deoxy-D-galactose
+    reaction_count: 0
+    relation: specific_form
+    transporter_count: 1
+  - gene_count: 3
+    metabolite_id: kegg.compound:C01019
+    name: L-Fucose
+    reaction_count: 0
+    relation: specific_form
+    transporter_count: 1
   chebi:36219:
   - gene_count: 3
     metabolite_id: kegg.compound:C00243
     name: Lactose
     reaction_count: 0
     relation: unspecified_form
+    transporter_count: 1
+  chebi:37684:
+  - gene_count: 3
+    metabolite_id: kegg.compound:C00159
+    name: D-Mannose
+    reaction_count: 0
+    relation: specific_form
     transporter_count: 1
   kegg.compound:C00073:
   - gene_count: 24
@@ -243,6 +298,12 @@ stereo_relatives:
     reaction_count: 3
     relation: specific_form
     transporter_count: 0
+  - gene_count: 24
+    metabolite_id: kegg.compound:C01496
+    name: Fructose
+    reaction_count: 0
+    relation: unspecified_form
+    transporter_count: 3
   kegg.compound:C00097:
   - gene_count: 33
     metabolite_id: kegg.compound:C00736
@@ -250,6 +311,13 @@ stereo_relatives:
     reaction_count: 0
     relation: unspecified_form
     transporter_count: 5
+  kegg.compound:C00121:
+  - gene_count: 27
+    metabolite_id: kegg.compound:C08353
+    name: beta-D-Ribopyranose
+    reaction_count: 0
+    relation: specific_form
+    transporter_count: 3
   kegg.compound:C00137:
   - gene_count: 3
     metabolite_id: chebi:24848
@@ -262,8 +330,15 @@ stereo_relatives:
     metabolite_id: kegg.compound:C01394
     name: Xylose
     reaction_count: 0
-    relation: specific_form
+    relation: unspecified_form
     transporter_count: 2
+  kegg.compound:C00259:
+  - gene_count: 25
+    metabolite_id: chebi:22599
+    name: arabinose
+    reaction_count: 0
+    relation: unspecified_form
+    transporter_count: 4
   kegg.compound:C00302:
   - gene_count: 38
     metabolite_id: kegg.compound:C00025
@@ -276,6 +351,13 @@ stereo_relatives:
     name: D-Glutamate
     reaction_count: 2
     relation: specific_form
+    transporter_count: 1
+  kegg.compound:C00407:
+  - gene_count: 20
+    metabolite_id: chebi:24898
+    name: isoleucine
+    reaction_count: 0
+    relation: unspecified_form
     transporter_count: 1
   kegg.compound:C00487:
   - gene_count: 3
@@ -310,7 +392,7 @@ stereo_relatives:
     metabolite_id: kegg.compound:C00181
     name: D-Xylose
     reaction_count: 0
-    relation: unspecified_form
+    relation: specific_form
     transporter_count: 2
   kegg.compound:C01401:
   - gene_count: 14
@@ -325,6 +407,20 @@ stereo_relatives:
     reaction_count: 2
     relation: specific_form
     transporter_count: 1
+  kegg.compound:C01496:
+  - gene_count: 24
+    metabolite_id: kegg.compound:C00095
+    name: D-Fructose
+    reaction_count: 7
+    relation: specific_form
+    transporter_count: 1
+  kegg.compound:C01582:
+  - gene_count: 5
+    metabolite_id: kegg.compound:C00124
+    name: D-Galactose
+    reaction_count: 1
+    relation: specific_form
+    transporter_count: 2
   kegg.compound:C01602:
   - gene_count: 2
     metabolite_id: kegg.compound:C00077
@@ -379,6 +475,13 @@ stereo_relatives:
     reaction_count: 3
     relation: specific_form
     transporter_count: 0
+  kegg.compound:C08353:
+  - gene_count: 24
+    metabolite_id: kegg.compound:C00121
+    name: D-Ribose
+    reaction_count: 1
+    relation: unspecified_form
+    transporter_count: 2
   kegg.compound:C16433:
   - gene_count: 10
     metabolite_id: kegg.compound:C00049
@@ -556,9 +659,10 @@ warnings:
   1 transporter family; Cysteine (kegg.compound:C00736) → L-Cysteine (kegg.compound:C00097):
   13 reactions, 3 transporter families; L-Cysteine (kegg.compound:C00097) → Cysteine
   (kegg.compound:C00736): 0 reactions, 5 transporter families; Methionine (kegg.compound:C01733)
-  → L-Methionine (kegg.compound:C00073): 9 reactions, 1 transporter family; L-Methionine
-  (kegg.compound:C00073) → Methionine (kegg.compound:C01733): 0 reactions, 2 transporter
-  families, and 16 more. Counts never combine across stereo forms, see stereo_relatives.'
+  → L-Methionine (kegg.compound:C00073): 9 reactions, 1 transporter family; D-Ribose
+  (kegg.compound:C00121) → beta-D-Ribopyranose (kegg.compound:C08353): 0 reactions,
+  3 transporter families, and 29 more. Counts never combine across stereo forms, see
+  stereo_relatives.'
 - 'transport_substrate_resolution is `family_inferred` for PMM0913: substrate breadth
   is reachability, not capability for these genes — their deepest attachment is a
   lumping superfamily (e.g. 3.A.1), so even their most_specific rows are superfamily-level

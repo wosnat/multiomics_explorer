@@ -351,3 +351,22 @@
   note: >
     Of metabolites with catalyst genes, 1,974 have no functional category and 687 have
     either KEGG classification field (KEGG-categories subsection of analysis/metabolites.md).
+
+- id: stereo_link_examples
+  cypher: >
+    MATCH (m:Metabolite)
+    WHERE m.id IN ['chebi:17234', 'chebi:37684', 'chebi:24898', 'chebi:33709', 'kegg.compound:C10906']
+    WITH m, COUNT { (m)-[:Metabolite_is_stereo_form_of]-() } AS n
+    WITH collect([m.id, n]) AS rows
+    RETURN
+      [r IN rows WHERE r[0] = 'chebi:17234'][0][1] > 0 AS glucose_linked,
+      [r IN rows WHERE r[0] = 'chebi:37684'][0][1] > 0 AS mannose_linked,
+      [r IN rows WHERE r[0] = 'chebi:24898'][0][1] > 0 AS isoleucine_linked,
+      [r IN rows WHERE r[0] = 'chebi:33709'][0][1] = 0 AS amino_acid_unlinked,
+      [r IN rows WHERE r[0] = 'kegg.compound:C10906'][0][1] = 0 AS keto_fructose_unlinked
+  expect: {glucose_linked: true, mannose_linked: true, isoleucine_linked: true, amino_acid_unlinked: true, keto_fructose_unlinked: true}
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
+    - multiomics_explorer/inputs/tools/genes_by_metabolite.yaml
+    - multiomics_explorer/inputs/tools/metabolites_by_gene.yaml
+  note: "stereo-link coverage examples quoted in the 'What is and isn't linked' paragraph (generic → specific linked; class terms and ring/open-chain forms not)"

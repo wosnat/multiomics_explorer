@@ -97,6 +97,8 @@ results:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00267'',
     ''name'': ''alpha-D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
     183}'
+  - '{''transporter_gene_count'': 3091, ''metabolite_id'': ''chebi:17234'', ''name'':
+    ''glucose'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'': 0}'
   structure_kind: defined
   transporter_count: 10
   transporter_gene_count: 1436

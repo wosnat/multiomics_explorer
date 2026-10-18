@@ -978,9 +978,9 @@ mistakes:
     filters; only relatives with genes here) and the stereo warning, then
     re-run with `include_stereo_forms=True` for a transport ↔ catalysis join.
     Keep the single id for exact-form or D-amino-acid questions: a generic's
-    specific forms can include the D-form. Stereo links are incomplete
-    (e.g. mannose, isoleucine), so no hint is not proof of no other form;
-    search by name with `list_metabolites(search_text=...)`.
+    specific forms can include the D-form. Class terms ('amino acid') and
+    ring vs open-chain forms are never linked, so no hint is not proof of no
+    related compound; search by name with `list_metabolites(search_text=...)`.
   - >-
     Read transport evidence as a three-level trust ladder, top down.
     (1) `tcdb_evidence_score` (row) / `tcdb_evidence_score_max` (gene, in

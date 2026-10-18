@@ -66,6 +66,10 @@ results:
   pathway_count: 0
   pathway_ids: []
   score: 3.0709
+  stereo_relatives:
+  - '{''transporter_gene_count'': 1436, ''metabolite_id'': ''kegg.compound:C00031'',
+    ''name'': ''D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
+    284}'
   structure_kind: defined
   transporter_count: 18
   transporter_gene_count: 3091
@@ -184,6 +188,8 @@ results:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00267'',
     ''name'': ''alpha-D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
     183}'
+  - '{''transporter_gene_count'': 3091, ''metabolite_id'': ''chebi:17234'', ''name'':
+    ''glucose'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'': 0}'
   structure_kind: defined
   transporter_count: 10
   transporter_gene_count: 1436

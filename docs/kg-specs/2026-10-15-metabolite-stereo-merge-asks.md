@@ -983,3 +983,15 @@ the same warning.
 - regenerate the 3 goldens;
 - rewrite the analysis-doc paragraph that calls mannose / isoleucine / glucose unlinked;
 - add the `removed_stereo_xrefs` resolver warning.
+
+## Explorer absorb, ask 8 (2026-10-18): done
+
+Absorbed the 2026-10-18T05:51:30Z build (KG commits `bbcb8219` / `5ac88ef7` / `d4282452`):
+- vocab snapshot re-stamped; the hash is unchanged;
+- 3 goldens regenerated, additive stereo links only;
+- 0 example drift;
+- the docs now state the linking rule: generic ↔ specific is linked, class terms and ring /
+  open-chain forms are not;
+- the `removed_stereo_xrefs` resolver warning is live.
+
+**Ask 8 closed.**

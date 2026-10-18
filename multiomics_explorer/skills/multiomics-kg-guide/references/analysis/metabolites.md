@@ -178,12 +178,21 @@ transport rows plus a `stereo_relatives` entry pointing at L-Cysteine. Chain it 
 `genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"], organism=...,
 include_stereo_forms=True)` to get the transporters and the L-cysteine enzymes in one result.
 
-**Stereo links are incomplete.** Some generic nodes have no link to their specific forms yet
-(mannose, isoleucine and glucose among them: 'glucose' `chebi:17234` is not linked to D-Glucose
-`kegg.compound:C00031`). A missing hint is therefore **not** proof that there is no other form.
-When a generic substrate shows transport only, search by name:
-`list_metabolites(search_text="isoleucine")` lists every node, and you can pass the specific
-form's id to `genes_by_metabolite` yourself.
+**What is and isn't linked.** A link exists when ChEBI places the specific form under the
+generic one with the same formula and charge (plus a short curated list), so common generic
+substrates are covered: 'glucose' `chebi:17234` → D-Glucose `kegg.compound:C00031`, mannose →
+D-Mannose, isoleucine → L-Isoleucine, fructose → D-Fructose. Two kinds are deliberately **not**
+linked:
+- **class terms** such as 'amino acid' `chebi:33709`, glucoside or galactoside, whose members are
+  different compounds, not stereo forms;
+- **ring vs open-chain forms** such as keto-D-fructose `kegg.compound:C10906` vs D-Fructose.
+
+So a missing hint means "no stereo form in the KG", not "no related compound". For a class term
+or an open-chain form, search by name (`list_metabolites(search_text="fructose")` lists every
+node) and pass the form you want to `genes_by_metabolite` yourself.
+
+An id that names a stereo form the KG has no node for (e.g. D-pipecolic acid `chebi:41582`) stays
+in `not_found` with a warning naming the stereo-unspecified node it was removed from.
 
 ## KEGG compound categories: what they are and aren't
 

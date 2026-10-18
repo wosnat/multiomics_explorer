@@ -411,8 +411,9 @@ mistakes:
     gene imports" from these rows. Read envelope `stereo_relatives` (keyed by
     result metabolite; counts cover the whole organism, not your input genes)
     and per-row `stereo_relative_ids`, then route to
-    `genes_by_metabolite(..., include_stereo_forms=True)`. Stereo links are
-    incomplete, so no hint is not proof of no other form.
+    `genes_by_metabolite(..., include_stereo_forms=True)`. Class terms and
+    ring vs open-chain forms are never linked, so no hint is not proof of no
+    related compound.
   - >-
     Single-organism enforced (mirrors `differential_expression_by_gene` and
     `genes_by_metabolite`). There is no `organisms` list. For
