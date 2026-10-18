@@ -23,7 +23,7 @@ examples:
           },
           "go_mf": {
             "best_level": 2,
-            "best_genome_coverage": 0.5823618854536239,
+            "best_genome_coverage": 0.5793208312214901,
             "best_relevance_rank": 2,
             "n_levels": 7,
             "tree": null,
@@ -41,7 +41,7 @@ examples:
           },
           "go_bp": {
             "best_level": 3,
-            "best_genome_coverage": 0.5458692346680183,
+            "best_genome_coverage": 0.5428281804358844,
             "best_relevance_rank": 5,
             "n_levels": 9,
             "tree": null,
@@ -68,7 +68,7 @@ examples:
           },
           "go_cc": {
             "best_level": 2,
-            "best_genome_coverage": 0.4034465281297516,
+            "best_genome_coverage": 0.40496705524581855,
             "best_relevance_rank": 11,
             "n_levels": 6,
             "tree": null,
@@ -123,7 +123,7 @@ examples:
           "tcdb": {
             "best_level": 0,
             "best_genome_coverage": 0.1804358844399392,
-            "best_relevance_rank": 27,
+            "best_relevance_rank": 28,
             "n_levels": 5,
             "tree": null,
             "tree_code": null,
@@ -282,16 +282,16 @@ examples:
             "ontology_type": "go_mf",
             "level": 2,
             "relevance_rank": 2,
-            "n_terms_with_genes": 35,
-            "n_genes_at_level": 1149,
-            "genome_coverage": 0.5823618854536239,
+            "n_terms_with_genes": 34,
+            "n_genes_at_level": 1143,
+            "genome_coverage": 0.5793208312214901,
             "min_genes_per_term": 5,
-            "q1_genes_per_term": 9.5,
-            "median_genes_per_term": 26.0,
-            "q3_genes_per_term": 98.5,
+            "q1_genes_per_term": 10.0,
+            "median_genes_per_term": 27.0,
+            "q3_genes_per_term": 94.5,
             "max_genes_per_term": 318,
             "n_levels_in_ontology": 7,
-            "best_effort_share": 0.2
+            "best_effort_share": 0.20588235294117646
           },
           {
             "ontology_type": "cyanorak_role",
@@ -322,7 +322,7 @@ examples:
         "by_ontology": {
           "go_bp": {
             "best_level": 3,
-            "best_genome_coverage": 0.5458692346680183,
+            "best_genome_coverage": 0.5428281804358844,
             "best_relevance_rank": 1,
             "n_levels": 9,
             "tree": null,
@@ -341,60 +341,60 @@ examples:
             "ontology_type": "go_bp",
             "level": 3,
             "relevance_rank": 1,
-            "n_terms_with_genes": 69,
-            "n_genes_at_level": 1077,
-            "genome_coverage": 0.5458692346680183,
+            "n_terms_with_genes": 72,
+            "n_genes_at_level": 1071,
+            "genome_coverage": 0.5428281804358844,
             "min_genes_per_term": 5,
             "q1_genes_per_term": 8.0,
-            "median_genes_per_term": 13.0,
-            "q3_genes_per_term": 38.0,
+            "median_genes_per_term": 14.5,
+            "q3_genes_per_term": 37.5,
             "max_genes_per_term": 403,
             "n_levels_in_ontology": 9,
-            "best_effort_share": 0.2028985507246377,
+            "best_effort_share": 0.20833333333333334,
             "example_terms": [
               {"term_id": "go:0043170", "name": "macromolecule metabolic process", "n_genes": 403},
-              {"term_id": "go:0044281", "name": "small molecule metabolic process", "n_genes": 333},
-              {"term_id": "go:0006793", "name": "phosphorus metabolic process", "n_genes": 160}
+              {"term_id": "go:0044281", "name": "small molecule metabolic process", "n_genes": 324},
+              {"term_id": "go:0006793", "name": "phosphorus metabolic process", "n_genes": 143}
             ]
           },
           {
             "ontology_type": "go_bp",
             "level": 4,
             "relevance_rank": 2,
-            "n_terms_with_genes": 133,
-            "n_genes_at_level": 992,
-            "genome_coverage": 0.5027876330461226,
+            "n_terms_with_genes": 135,
+            "n_genes_at_level": 983,
+            "genome_coverage": 0.49822605169792195,
             "min_genes_per_term": 5,
             "q1_genes_per_term": 8.0,
             "median_genes_per_term": 13.0,
-            "q3_genes_per_term": 38.0,
+            "q3_genes_per_term": 35.0,
             "max_genes_per_term": 292,
             "n_levels_in_ontology": 9,
-            "best_effort_share": 0.40601503759398494,
+            "best_effort_share": 0.4074074074074074,
             "example_terms": [
               {"term_id": "go:0006139", "name": "nucleobase-containing compound metabolic process", "n_genes": 292},
-              {"term_id": "go:0009059", "name": "macromolecule biosynthetic process", "n_genes": 277},
-              {"term_id": "go:0019538", "name": "protein metabolic process", "n_genes": 211}
+              {"term_id": "go:0009059", "name": "macromolecule biosynthetic process", "n_genes": 278},
+              {"term_id": "go:0019538", "name": "protein metabolic process", "n_genes": 209}
             ]
           },
           {
             "ontology_type": "go_bp",
             "level": 5,
             "relevance_rank": 3,
-            "n_terms_with_genes": 143,
-            "n_genes_at_level": 882,
-            "genome_coverage": 0.44703497212366955,
+            "n_terms_with_genes": 144,
+            "n_genes_at_level": 867,
+            "genome_coverage": 0.439432336543335,
             "min_genes_per_term": 5,
-            "q1_genes_per_term": 8.0,
+            "q1_genes_per_term": 7.75,
             "median_genes_per_term": 11.0,
-            "q3_genes_per_term": 24.5,
-            "max_genes_per_term": 219,
+            "q3_genes_per_term": 23.25,
+            "max_genes_per_term": 220,
             "n_levels_in_ontology": 9,
-            "best_effort_share": 0.6293706293706294,
+            "best_effort_share": 0.6666666666666666,
             "example_terms": [
-              {"term_id": "go:0010467", "name": "gene expression", "n_genes": 219},
-              {"term_id": "go:0043436", "name": "oxoacid metabolic process", "n_genes": 171},
-              {"term_id": "go:0016070", "name": "RNA metabolic process", "n_genes": 120}
+              {"term_id": "go:0010467", "name": "gene expression", "n_genes": 220},
+              {"term_id": "go:0019752", "name": "carboxylic acid metabolic process", "n_genes": 158},
+              {"term_id": "go:0016070", "name": "RNA metabolic process", "n_genes": 121}
             ]
           },
           ...
@@ -762,7 +762,7 @@ examples:
           },
           "go_mf": {
             "best_level": 2,
-            "best_genome_coverage": 0.5823618854536239,
+            "best_genome_coverage": 0.5793208312214901,
             "best_relevance_rank": 4,
             "n_levels": 7,
             "tree": null,
@@ -771,7 +771,7 @@ examples:
           },
           "go_bp": {
             "best_level": 3,
-            "best_genome_coverage": 0.5458692346680183,
+            "best_genome_coverage": 0.5428281804358844,
             "best_relevance_rank": 6,
             "n_levels": 9,
             "tree": null,
@@ -798,7 +798,7 @@ examples:
           },
           "go_cc": {
             "best_level": 2,
-            "best_genome_coverage": 0.4034465281297516,
+            "best_genome_coverage": 0.40496705524581855,
             "best_relevance_rank": 13,
             "n_levels": 6,
             "tree": null,
@@ -853,7 +853,7 @@ examples:
           "tcdb": {
             "best_level": 0,
             "best_genome_coverage": 0.1804358844399392,
-            "best_relevance_rank": 27,
+            "best_relevance_rank": 28,
             "n_levels": 5,
             "tree": null,
             "tree_code": null,

@@ -655,15 +655,17 @@ class TestGenesByOntologyCorrectnessKG:
         # Verified 2026-04-14; recounted 2026-08-20: 410 → 429 rows,
         # 332 → 349 genes (+17) after InterPro Layer-B GO enrichment added
         # ~45K GO edges; term count unchanged (8), same +17 gene delta as
-        # test_mode1_mixed_levels L1 — Layer-B-consistent.
-        assert r["total_matching"] == 429
-        assert r["total_genes"] == 349
+        # test_mode1_mixed_levels L1 — Layer-B-consistent. Recounted
+        # 2026-10-18 (GO release update, built 2026-10-18T13:42:30Z):
+        # 429 → 447 rows, 349 → 365 genes; term count unchanged (8).
+        assert r["total_matching"] == 447
+        assert r["total_genes"] == 365
         assert r["total_terms"] == 8
         # by_level is a single entry at level 1
         assert len(r["by_level"]) == 1
         assert r["by_level"][0]["level"] == 1
-        assert r["by_level"][0]["n_genes"] == 349
-        assert r["by_level"][0]["row_count"] == 429
+        assert r["by_level"][0]["n_genes"] == 365
+        assert r["by_level"][0]["row_count"] == 447
         # All validation buckets empty (Mode 2)
         assert r["not_found"] == []
         assert r["wrong_ontology"] == []
@@ -1012,7 +1014,7 @@ class TestOntologyTermDetailsCorrectnessKG:
     def test_verified_counts(self, conn, run_query):
         rows = self._rows(conn)
         t = rows["tcdb:3.A.1"]
-        assert (len(t["parents"]), t["children_total"], t["links_total"]) == (1, 55, 129)
+        assert (len(t["parents"]), t["children_total"], t["links_total"]) == (1, 55, 128)  # 129 → 128 2026-10-18: go:0005548 retired by the GO update
         assert len(t["children"]) == 50
         s = rows["merops.family:S14"]
         assert (len(s["parents"]), s["children_total"], s["links_total"]) == (1, 0, 1)

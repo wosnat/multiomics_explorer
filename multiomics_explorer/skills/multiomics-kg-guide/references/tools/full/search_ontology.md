@@ -96,19 +96,19 @@ search_ontology(search_text="replication", ontology=["go_bp"])
 ```example-response
 {
   "mode": "search",
-  "total_entries": 3433,
+  "total_entries": 3322,
   "total_matching": 31,
-  "score_max": 2.681756019592285,
-  "score_median": 1.93581223487854,
+  "score_max": 2.656532049179077,
+  "score_median": 1.913879156112671,
   "returned": 5,
   "offset": 0,
   "truncated": true,
   "by_ontology": [
     {
       "ontology": "go_bp",
-      "total_entries": 3433,
+      "total_entries": 3322,
       "total_matching": 31,
-      "score_max": 2.681756019592285,
+      "score_max": 2.656532049179077,
       "returned": 5,
       "truncated": true
     }
@@ -123,7 +123,7 @@ search_ontology(search_text="replication", ontology=["go_bp"])
       "id": "go:0006260",
       "name": "DNA replication",
       "ontology_type": "go_bp",
-      "score": 2.681756019592285,
+      "score": 2.656532049179077,
       "level": 6,
       "is_informative": true,
       "gene_count": 1340,
@@ -133,7 +133,7 @@ search_ontology(search_text="replication", ontology=["go_bp"])
       "id": "go:0006270",
       "name": "DNA replication initiation",
       "ontology_type": "go_bp",
-      "score": 2.3765029907226562,
+      "score": 2.352276563644409,
       "level": 6,
       "is_informative": true,
       "gene_count": 124,
@@ -143,7 +143,7 @@ search_ontology(search_text="replication", ontology=["go_bp"])
       "id": "go:0006274",
       "name": "DNA replication termination",
       "ontology_type": "go_bp",
-      "score": 2.3765029907226562,
+      "score": 2.352276563644409,
       "level": 6,
       "is_informative": true,
       "gene_count": 7,
@@ -304,8 +304,8 @@ search_ontology(ontology=["go_bp"], limit=3)
 ```example-response
 {
   "mode": "browse",
-  "total_entries": 3433,
-  "total_matching": 3433,
+  "total_entries": 3322,
+  "total_matching": 3322,
   "score_max": null,
   "score_median": null,
   "returned": 3,
@@ -314,8 +314,8 @@ search_ontology(ontology=["go_bp"], limit=3)
   "by_ontology": [
     {
       "ontology": "go_bp",
-      "total_entries": 3433,
-      "total_matching": 3433,
+      "total_entries": 3322,
+      "total_matching": 3322,
       "score_max": null,
       "returned": 3,
       "truncated": true
@@ -325,8 +325,8 @@ search_ontology(ontology=["go_bp"], limit=3)
     {"level": 0, "count": 1},
     {"level": 1, "count": 16},
     {"level": 2, "count": 111},
-    {"level": 3, "count": 324},
-    {"level": 4, "count": 670},
+    {"level": 3, "count": 323},
+    {"level": 4, "count": 667},
     ...
   ],
   "by_interpro_type": [],
@@ -343,7 +343,7 @@ search_ontology(ontology=["go_bp"], limit=3)
       "score": null,
       "level": 0,
       "is_informative": false,
-      "gene_count": 67696,
+      "gene_count": 67458,
       "organism_count": 43
     },
     {
@@ -353,7 +353,7 @@ search_ontology(ontology=["go_bp"], limit=3)
       "score": null,
       "level": 1,
       "is_informative": true,
-      "gene_count": 61414,
+      "gene_count": 61172,
       "organism_count": 43
     },
     {
@@ -363,7 +363,7 @@ search_ontology(ontology=["go_bp"], limit=3)
       "score": null,
       "level": 2,
       "is_informative": true,
-      "gene_count": 48832,
+      "gene_count": 48567,
       "organism_count": 43
     }
   ]
@@ -456,19 +456,19 @@ search_ontology(search_text="transport", ontology=["go_bp", "tcdb"], limit=5)
 ```example-response
 {
   "mode": "search",
-  "total_entries": 4948,
+  "total_entries": 4837,
   "total_matching": 366,
   "score_max": 3.75053071975708,
-  "score_median": 2.0627857446670532,
+  "score_median": 2.0509508848190308,
   "returned": 10,
   "offset": 0,
   "truncated": true,
   "by_ontology": [
     {
       "ontology": "go_bp",
-      "total_entries": 3433,
+      "total_entries": 3322,
       "total_matching": 324,
-      "score_max": 1.5473122596740723,
+      "score_max": 1.5236425399780273,
       "returned": 5,
       "truncated": true
     },
@@ -491,17 +491,17 @@ search_ontology(search_text="transport", ontology=["go_bp", "tcdb"], limit=5)
       "id": "go:0006810",
       "name": "transport",
       "ontology_type": "go_bp",
-      "score": 1.5473122596740723,
+      "score": 1.5236425399780273,
       "level": 3,
       "is_informative": true,
-      "gene_count": 10984,
+      "gene_count": 10992,
       "organism_count": 43
     },
     {
       "id": "go:0015990",
       "name": "electron transport coupled proton transport",
       "ontology_type": "go_bp",
-      "score": 1.3782250881195068,
+      "score": 1.3548328876495361,
       "level": 7,
       "is_informative": true,
       "gene_count": 155,
@@ -511,7 +511,7 @@ search_ontology(search_text="transport", ontology=["go_bp", "tcdb"], limit=5)
       "id": "go:0006821",
       "name": "chloride transport",
       "ontology_type": "go_bp",
-      "score": 1.3485655784606934,
+      "score": 1.3265666961669922,
       "level": 5,
       "is_informative": true,
       "gene_count": 57,
@@ -531,7 +531,7 @@ search_ontology(search_text="nitrate", limit=2)
 ```example-response
 {
   "mode": "search",
-  "total_entries": 49149,
+  "total_entries": 49029,
   "total_matching": 155,
   "score_max": 7.6005682945251465,
   "score_median": 3.41845965385437,
@@ -541,17 +541,17 @@ search_ontology(search_text="nitrate", limit=2)
   "by_ontology": [
     {
       "ontology": "go_bp",
-      "total_entries": 3433,
+      "total_entries": 3322,
       "total_matching": 6,
-      "score_max": 3.5838801860809326,
+      "score_max": 3.556473731994629,
       "returned": 2,
       "truncated": true
     },
     {
       "ontology": "go_mf",
-      "total_entries": 2899,
+      "total_entries": 2890,
       "total_matching": 6,
-      "score_max": 3.2372517585754395,
+      "score_max": 3.241783857345581,
       "returned": 2,
       "truncated": true
     },
@@ -559,7 +559,7 @@ search_ontology(search_text="nitrate", limit=2)
       "ontology": "go_cc",
       "total_entries": 451,
       "total_matching": 1,
-      "score_max": 2.6981472969055176,
+      "score_max": 2.700234889984131,
       "returned": 1,
       "truncated": false
     },
@@ -591,7 +591,7 @@ search_ontology(search_text="nitrate", limit=2)
       "id": "go:0042128",
       "name": "nitrate assimilation",
       "ontology_type": "go_bp",
-      "score": 3.5838801860809326,
+      "score": 3.556473731994629,
       "level": 4,
       "is_informative": true,
       "gene_count": 88,
@@ -601,7 +601,7 @@ search_ontology(search_text="nitrate", limit=2)
       "id": "go:1902025",
       "name": "nitrate import",
       "ontology_type": "go_bp",
-      "score": 3.5838801860809326,
+      "score": 3.556473731994629,
       "level": 5,
       "is_informative": true,
       "gene_count": 54,
@@ -611,7 +611,7 @@ search_ontology(search_text="nitrate", limit=2)
       "id": "go:0008940",
       "name": "nitrate reductase activity",
       "ontology_type": "go_mf",
-      "score": 3.2372517585754395,
+      "score": 3.241783857345581,
       "level": 4,
       "is_informative": true,
       "gene_count": 23,

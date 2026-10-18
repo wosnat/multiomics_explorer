@@ -120,9 +120,9 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
     {"ontology": "ncbifam", "count": 1},
     {"ontology": "go_bp", "count": 1}
   ],
-  "links_out_total": 138,
+  "links_out_total": 137,
   "by_link_kind": [
-    {"link_kind": "composition", "count": 130},
+    {"link_kind": "composition", "count": 129},
     {"link_kind": "router", "count": 7},
     {"link_kind": "membership", "count": 1}
   ],
@@ -371,8 +371,8 @@ ontology_term_details(term_ids=["tcdb:3.A.1"], link_kinds=["composition"])
   "truncated": false,
   "not_found": [],
   "by_ontology": [{"ontology": "tcdb", "count": 1}],
-  "links_out_total": 129,
-  "by_link_kind": [{"link_kind": "composition", "count": 129}],
+  "links_out_total": 128,
+  "by_link_kind": [{"link_kind": "composition", "count": 128}],
   "resolved_aliases": {},
   "warnings": [],
   "results": [
@@ -574,8 +574,8 @@ ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", ve
   "truncated": false,
   "not_found": [],
   "by_ontology": [{"ontology": "go_bp", "count": 1}, {"ontology": "tcdb", "count": 1}],
-  "links_out_total": 129,
-  "by_link_kind": [{"link_kind": "composition", "count": 129}],
+  "links_out_total": 128,
+  "by_link_kind": [{"link_kind": "composition", "count": 128}],
   "resolved_aliases": {},
   "warnings": [],
   "results": [

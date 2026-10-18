@@ -7,7 +7,7 @@ rows:
   level: 6
   name: DNA replication checkpoint signaling
   organism_count: 21
-  score: 2.1336
+  score: 2.1106
   tree: null
   tree_code: null
 - gene_count: 1340
@@ -16,7 +16,7 @@ rows:
   level: 6
   name: DNA replication
   organism_count: 43
-  score: 2.6818
+  score: 2.6565
   tree: null
   tree_code: null
 - gene_count: 722
@@ -25,7 +25,7 @@ rows:
   level: 7
   name: DNA-templated DNA replication
   organism_count: 43
-  score: 2.1336
+  score: 2.1106
   tree: null
   tree_code: null
 - gene_count: 84
@@ -34,7 +34,7 @@ rows:
   level: 7
   name: DNA replication, synthesis of primer
   organism_count: 43
-  score: 1.9358
+  score: 1.9139
   tree: null
   tree_code: null
 - gene_count: 124
@@ -43,7 +43,7 @@ rows:
   level: 6
   name: DNA replication initiation
   organism_count: 43
-  score: 2.3765
+  score: 2.3523
   tree: null
   tree_code: null
 - gene_count: 101
@@ -52,7 +52,7 @@ rows:
   level: 7
   name: DNA strand elongation involved in DNA replication
   organism_count: 41
-  score: 1.633
+  score: 1.6132
   tree: null
   tree_code: null
 - gene_count: 7
@@ -61,7 +61,7 @@ rows:
   level: 6
   name: DNA replication termination
   organism_count: 6
-  score: 2.3765
+  score: 2.3523
   tree: null
   tree_code: null
 - gene_count: 128
@@ -70,7 +70,7 @@ rows:
   level: 7
   name: regulation of DNA replication
   organism_count: 43
-  score: 2.1336
+  score: 2.1106
   tree: null
   tree_code: null
 - gene_count: 72
@@ -79,7 +79,7 @@ rows:
   level: 8
   name: negative regulation of DNA replication
   organism_count: 35
-  score: 1.9358
+  score: 1.9139
   tree: null
   tree_code: null
 - gene_count: 14
@@ -88,7 +88,7 @@ rows:
   level: 2
   name: latent virus replication
   organism_count: 13
-  score: 2.3765
+  score: 2.3523
   tree: null
   tree_code: null
 - gene_count: 69
@@ -97,7 +97,7 @@ rows:
   level: 9
   name: regulation of DNA-templated DNA replication initiation
   organism_count: 35
-  score: 1.633
+  score: 1.6132
   tree: null
   tree_code: null
 - gene_count: 102
@@ -106,7 +106,7 @@ rows:
   level: 7
   name: replication fork processing
   organism_count: 43
-  score: 2.3765
+  score: 2.3523
   tree: null
   tree_code: null
 - gene_count: 35
@@ -115,7 +115,7 @@ rows:
   level: 10
   name: negative regulation of DNA-templated DNA replication initiation
   organism_count: 13
-  score: 1.5145
+  score: 1.4957
   tree: null
   tree_code: null
 - gene_count: 13
@@ -124,7 +124,7 @@ rows:
   level: 10
   name: positive regulation of DNA-templated DNA replication initiation
   organism_count: 13
-  score: 1.5145
+  score: 1.4957
   tree: null
   tree_code: null
 - gene_count: 60
@@ -133,7 +133,7 @@ rows:
   level: 6
   name: DNA replication, Okazaki fragment processing
   organism_count: 40
-  score: 1.9358
+  score: 1.9139
   tree: null
   tree_code: null
 - gene_count: 2
@@ -142,7 +142,7 @@ rows:
   level: 7
   name: replication fork arrest
   organism_count: 2
-  score: 2.3765
+  score: 2.3523
   tree: null
   tree_code: null
 - gene_count: 54
@@ -151,7 +151,7 @@ rows:
   level: 7
   name: DNA replication, removal of RNA primer
   organism_count: 37
-  score: 1.7716
+  score: 1.7507
   tree: null
   tree_code: null
 - gene_count: 25
@@ -160,7 +160,7 @@ rows:
   level: 3
   name: cell cycle DNA replication
   organism_count: 13
-  score: 2.1336
+  score: 2.1106
   tree: null
   tree_code: null
 - gene_count: 25
@@ -169,7 +169,7 @@ rows:
   level: 4
   name: bacterial-type DNA replication
   organism_count: 13
-  score: 2.1336
+  score: 2.1106
   tree: null
   tree_code: null
 - gene_count: 39
@@ -178,7 +178,7 @@ rows:
   level: 6
   name: DNA replication proofreading
   organism_count: 21
-  score: 2.3765
+  score: 2.3523
   tree: null
   tree_code: null
 - gene_count: 143
@@ -187,7 +187,7 @@ rows:
   level: 6
   name: DNA-templated DNA replication maintenance of fidelity
   organism_count: 43
-  score: 1.633
+  score: 1.6132
   tree: null
   tree_code: null
 - gene_count: 13
@@ -196,7 +196,7 @@ rows:
   level: 8
   name: positive regulation of DNA replication
   organism_count: 13
-  score: 1.9358
+  score: 1.9139
   tree: null
   tree_code: null
 - gene_count: 13
@@ -205,7 +205,7 @@ rows:
   level: 8
   name: rolling circle DNA replication
   organism_count: 13
-  score: 2.1336
+  score: 2.1106
   tree: null
   tree_code: null
 - gene_count: 2
@@ -214,7 +214,7 @@ rows:
   level: 7
   name: replication fork arrest involved in DNA replication termination
   organism_count: 2
-  score: 2.2898
+  score: 2.2644
   tree: null
   tree_code: null
 - gene_count: 85
@@ -223,7 +223,7 @@ rows:
   level: 8
   name: replication fork reversal
   organism_count: 43
-  score: 2.3765
+  score: 2.3523
   tree: null
   tree_code: null
 - gene_count: 71
@@ -232,7 +232,7 @@ rows:
   level: 8
   name: regulation of DNA-templated DNA replication
   organism_count: 35
-  score: 1.7716
+  score: 1.7507
   tree: null
   tree_code: null
 - gene_count: 34
@@ -241,7 +241,7 @@ rows:
   level: 7
   name: DNA synthesis involved in DNA replication
   organism_count: 29
-  score: 1.7716
+  score: 1.7507
   tree: null
   tree_code: null
 - gene_count: 11
@@ -250,7 +250,7 @@ rows:
   level: 3
   name: cell cycle DNA replication initiation
   organism_count: 11
-  score: 1.9358
+  score: 1.9139
   tree: null
   tree_code: null
 - gene_count: 11
@@ -259,7 +259,7 @@ rows:
   level: 4
   name: bacterial-type DNA replication initiation
   organism_count: 11
-  score: 1.9358
+  score: 1.9139
   tree: null
   tree_code: null
 - gene_count: 37
@@ -268,7 +268,7 @@ rows:
   level: 9
   name: negative regulation of DNA-templated DNA replication
   organism_count: 13
-  score: 1.633
+  score: 1.6132
   tree: null
   tree_code: null
 - gene_count: 13
@@ -277,6 +277,6 @@ rows:
   level: 9
   name: positive regulation of DNA-templated DNA replication
   organism_count: 13
-  score: 1.633
+  score: 1.6132
   tree: null
   tree_code: null

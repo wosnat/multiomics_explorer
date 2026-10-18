@@ -1,5 +1,5 @@
 by_link_kind:
-- count: 130
+- count: 129
   link_kind: composition
 - count: 5
   link_kind: router
@@ -15,7 +15,7 @@ by_ontology:
 - count: 1
   ontology: go_bp
 case_id: ontology_term_details_batch6_verbose
-links_out_total: 135
+links_out_total: 134
 not_found:
 - bogus:xyz
 offset: 0
@@ -237,10 +237,6 @@ results:
     ''target_id'': ''go:0005543'', ''target_ontology'': ''go_mf'', ''target_name'':
     ''phospholipid binding'', ''props'': {''id'': ''3.A.1-has_go-GO:0005543'', ''curated_tcids'':
     [''3.A.1.204.12'']}}'
-  - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
-    ''target_id'': ''go:0005548'', ''target_ontology'': ''go_mf'', ''target_name'':
-    ''phospholipid transporter activity'', ''props'': {''id'': ''3.A.1-has_go-GO:0005548'',
-    ''curated_tcids'': [''3.A.1.204.12'', ''3.A.1.211.1'', ''3.A.1.211.10'']}}'
   - '{''rel'': ''Tcdb_family_enables_molecular_function'', ''link_kind'': ''composition'',
     ''target_id'': ''go:0008233'', ''target_ontology'': ''go_mf'', ''target_name'':
     ''peptidase activity'', ''props'': {''id'': ''3.A.1-has_go-GO:0008233'', ''curated_tcids'':

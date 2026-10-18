@@ -76,7 +76,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/genes_by_homolog_group/full` — ~2436 tok
 - `docs://tools/genes_by_metabolite/full` — ~14482 tok
 - `docs://tools/genes_by_numeric_metric/full` — ~6747 tok
-- `docs://tools/genes_by_ontology/full` — ~14792 tok
+- `docs://tools/genes_by_ontology/full` — ~15116 tok
 - `docs://tools/genes_in_cluster/full` — ~1960 tok
 - `docs://tools/kg_release_info/full` — ~2211 tok
 - `docs://tools/kg_schema/full` — ~1755 tok
@@ -91,13 +91,13 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/metabolites_by_flags_assay/full` — ~4799 tok
 - `docs://tools/metabolites_by_gene/full` — ~10237 tok
 - `docs://tools/metabolites_by_quantifies_assay/full` — ~6456 tok
-- `docs://tools/ontology_landscape/full` — ~10789 tok
+- `docs://tools/ontology_landscape/full` — ~10796 tok
 - `docs://tools/ontology_term_details/full` — ~9180 tok
 - `docs://tools/pathway_enrichment/full` — ~12463 tok
 - `docs://tools/resolve_gene/full` — ~1520 tok
 - `docs://tools/run_cypher/full` — ~972 tok
 - `docs://tools/search_homolog_groups/full` — ~2275 tok
-- `docs://tools/search_ontology/full` — ~10250 tok
+- `docs://tools/search_ontology/full` — ~10248 tok
 
 ## Analysis
 

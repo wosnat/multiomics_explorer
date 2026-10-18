@@ -21,9 +21,9 @@ by_level:
   n_terms: 1
   row_count: 30
 by_sources:
-- count: 18
+- count: 16
   source: cyanorak
-- count: 13
+- count: 15
   source: uniprot
 - count: 11
   source: ncbi

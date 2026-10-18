@@ -4166,7 +4166,8 @@ class TestOntologyTermDetailsLive:
         assert row["children_total"] == 55
         assert len(row["children"]) == 50
         assert row["children_truncated"] is True
-        assert len(row["links_out"]) == 129
+        # 129 → 128 2026-10-18: GO update retired go:0005548 (its 3.A.1 bridge went with it).
+        assert len(row["links_out"]) == 128
         assert {lk["target_ontology"] for lk in row["links_out"]} >= {"pfam"}
         assert all(lk["link_kind"] == "composition" for lk in row["links_out"])
 
@@ -4216,9 +4217,9 @@ class TestOntologyTermDetailsLive:
 
     def test_envelope_rollups(self, conn):
         result, _ = self._rows(conn)
-        assert result["links_out_total"] == 129 + 1 + 5
+        assert result["links_out_total"] == 128 + 1 + 5
         by_kind = {e["link_kind"]: e["count"] for e in result["by_link_kind"]}
-        assert by_kind == {"composition": 130, "router": 5}
+        assert by_kind == {"composition": 129, "router": 5}
         by_ont = {e["ontology"]: e["count"] for e in result["by_ontology"]}
         assert by_ont == {"tcdb": 1, "merops": 1, "interpro": 1,
                           "ncbifam": 1, "go_bp": 1}
