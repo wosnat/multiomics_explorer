@@ -192,7 +192,7 @@ rows:
   - light
   - oxygen
 - clade: null
-  experiment_count: 10
+  experiment_count: 9
   gene_count: 0
   genus: null
   ncbi_taxon_id: 10239
@@ -200,7 +200,7 @@ rows:
   - MICROARRAY
   - RNASEQ
   organism_name: Phage
-  publication_count: 5
+  publication_count: 4
   species: null
   strain: null
   treatment_types:
@@ -220,7 +220,7 @@ rows:
   treatment_types:
   - salt
 - clade: HLI
-  experiment_count: 119
+  experiment_count: 118
   gene_count: 1973
   genus: Prochlorococcus
   ncbi_taxon_id: 59919
@@ -373,7 +373,7 @@ rows:
   - phosphorus
   - plastic
 - clade: LLIV
-  experiment_count: 40
+  experiment_count: 39
   gene_count: 2906
   genus: Prochlorococcus
   ncbi_taxon_id: 74547
@@ -396,7 +396,6 @@ rows:
   - nitrogen
   - phosphorus
   - tss_mapping
-  - viral
 - clade: HLI
   experiment_count: 0
   gene_count: 1945
@@ -508,6 +507,7 @@ rows:
   ncbi_taxon_id: 89184
   omics_types:
   - EXOPROTEOMICS
+  - PROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
   publication_count: 3
   species: Ruegeria pomeroyi

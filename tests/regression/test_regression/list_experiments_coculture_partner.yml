@@ -39,9 +39,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -90,9 +90,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -125,7 +125,7 @@ rows:
     (control)'
   gene_count: 82
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -139,11 +139,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -176,7 +176,7 @@ rows:
     (control)'
   gene_count: 82
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -190,11 +190,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -243,9 +243,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -294,9 +294,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -329,7 +329,7 @@ rows:
     (control)'
   gene_count: 342
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -343,11 +343,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -379,7 +379,7 @@ rows:
   experiment_name: 'Marinobacter in MED4 coculture: light +5 mM glucose vs light (control)'
   gene_count: 342
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -393,11 +393,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -446,9 +446,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -497,9 +497,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -532,7 +532,7 @@ rows:
     (control)'
   gene_count: 195
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -546,11 +546,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -583,7 +583,7 @@ rows:
     (control)'
   gene_count: 195
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -597,11 +597,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -650,9 +650,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -701,9 +701,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -736,7 +736,7 @@ rows:
     (control)'
   gene_count: 145
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -750,11 +750,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -787,7 +787,7 @@ rows:
     (control)'
   gene_count: 146
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -801,11 +801,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -854,9 +854,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -905,9 +905,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -940,7 +940,7 @@ rows:
     (control)'
   gene_count: 484
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -954,11 +954,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -991,7 +991,7 @@ rows:
     (control)'
   gene_count: 484
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -1005,11 +1005,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -1091,8 +1091,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 1424
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
+  experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
+    PRO99-lowN exponential growth (PROTEOMICS)
   gene_count: 7120
   growth_phases:
   - nutrient_limited
@@ -1168,8 +1168,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (RNASEQ)
+  experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
+    PRO99-lowN exponential growth (RNASEQ)
   gene_count: 9245
   growth_phases:
   - nutrient_limited
@@ -1266,9 +1266,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -1316,9 +1316,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -1350,7 +1350,7 @@ rows:
   experiment_name: 'MED4 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 327
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -1364,11 +1364,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -1400,7 +1400,7 @@ rows:
   experiment_name: 'MED4 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 327
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -1414,11 +1414,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -1455,8 +1455,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2016.70
-  significant_down_count: 272
-  significant_up_count: 24
+  significant_down_count: 300
+  significant_up_count: 42
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -1469,9 +1469,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '272'
+  - '300'
   time_point_significant_up:
-  - '24'
+  - '42'
   time_point_totals:
   - '1714'
   treatment_type:
@@ -1482,8 +1482,8 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - axenic
   - coculture
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -1604,7 +1604,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2016.70
-  significant_down_count: 45
+  significant_down_count: 50
   significant_up_count: 153
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -1618,7 +1618,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '45'
+  - '50'
   time_point_significant_up:
   - '153'
   time_point_totals:
@@ -1965,9 +1965,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2015,9 +2015,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2049,7 +2049,7 @@ rows:
   experiment_name: 'SS120 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 930
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2063,11 +2063,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2099,7 +2099,7 @@ rows:
   experiment_name: 'SS120 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 928
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2113,11 +2113,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2134,8 +2134,8 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - axenic
   - coculture
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -2214,9 +2214,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2264,9 +2264,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2298,7 +2298,7 @@ rows:
   experiment_name: 'WH7803 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 359
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2312,11 +2312,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2348,7 +2348,7 @@ rows:
   experiment_name: 'WH7803 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 359
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2362,11 +2362,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2414,9 +2414,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2464,9 +2464,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2498,7 +2498,7 @@ rows:
   experiment_name: 'WH8102 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 894
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2512,11 +2512,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2548,7 +2548,7 @@ rows:
   experiment_name: 'WH8102 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 895
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2562,11 +2562,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2583,8 +2583,8 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - axenic
   - coculture
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -2663,9 +2663,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2713,9 +2713,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2747,7 +2747,7 @@ rows:
   experiment_name: 'BL107 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 163
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2761,11 +2761,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2797,7 +2797,7 @@ rows:
   experiment_name: 'BL107 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 162
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2811,11 +2811,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:

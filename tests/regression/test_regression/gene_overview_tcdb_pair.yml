@@ -84,7 +84,7 @@ results:
   discussed_in_publication_count: 1
   evidence_sources:
   - metabolism
-  expression_edge_count: 38
+  expression_edge_count: 37
   gene_category: Replication and repair
   gene_name: dnaN
   informative_annotation_types:
@@ -107,7 +107,7 @@ results:
   organism_name: Prochlorococcus MED4
   product: DNA polymerase III, beta subunit
   reaction_count: 4
-  significant_down_count: 1
+  significant_down_count: 2
   significant_up_count: 5
   tcdb_evidence_score_max: null
   tcdb_family_count: 0
@@ -144,7 +144,7 @@ results:
   evidence_sources:
   - metabolomics
   - transport
-  expression_edge_count: 31
+  expression_edge_count: 30
   gene_category: Transport
   gene_name: cbiQ
   informative_annotation_types:

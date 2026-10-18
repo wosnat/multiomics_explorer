@@ -223,10 +223,12 @@ schema:
         coculture_partner: list
         compartment: string
         control: string
+        control_timing: string
         derived_metric_count: int
         derived_metric_gene_count: int
         derived_metric_search_text: string
         derived_metric_value_kinds: list
+        design_notes: string
         distinct_gene_count: int
         experimental_context: string
         gene_count: int

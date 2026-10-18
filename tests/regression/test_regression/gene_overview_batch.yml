@@ -55,7 +55,7 @@ rows:
   - time_course
   discussed_in_publication_count: 0
   evidence_sources: []
-  expression_edge_count: 42
+  expression_edge_count: 41
   gene_category: Unknown
   gene_name: null
   informative_annotation_types:

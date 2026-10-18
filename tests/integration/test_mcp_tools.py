@@ -646,7 +646,8 @@ class TestListExperiments:
     def test_compartment_exoproteome_returns_8(self, conn):
         """compartment='exoproteome' filter returns experiments (pinned baseline)."""
         result = api.list_experiments(compartment="exoproteome", summary=True, conn=conn)
-        assert result["total_matching"] == 10
+        # 10 -> 7 at the 2026-10-18 rebuild: Oleza 2017 re-curated as whole_cell proteomics.
+        assert result["total_matching"] == 7
 
     def test_per_row_compartment_field(self, conn):
         """Each result row has 'compartment' field in {whole_cell, vesicle, exoproteome}."""
@@ -686,7 +687,9 @@ class TestListExperiments:
         """Per-TP growth_phase populated on time-course experiments with phase data."""
         result = api.list_experiments(
             experiment_ids=[
-                "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic"
+                # Martiny 2006 MED4 P starvation: exponential -> acute_stress -> nutrient_limited.
+                # (Was the Weissberg MED4 axenic proteome; all `death` since the 2026-10-18 rebuild.)
+                "10.1073/pnas.0601301103_phosphorus_phosphate_starvation_med4_microarray"
             ],
             conn=conn,
         )
@@ -702,7 +705,7 @@ class TestListExperiments:
         # Stronger: this specific experiment should have phase-varying TPs
         nonnull = [p for p in phases if p]
         assert len(set(nonnull)) >= 2, \
-            f"Expected phase-varying TPs on axenic proteomics, got: {phases}"
+            f"Expected phase-varying TPs on MED4 P starvation, got: {phases}"
         # Experiment-level field is gone (post-F3)
         assert "time_point_growth_phases" not in exp
 

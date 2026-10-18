@@ -4,32 +4,31 @@ rows:
 - by_background_factors:
   - '{''count'': 1, ''item'': ''viral''}'
   - '{''count'': 2, ''item'': ''chemical''}'
-  - '{''count'': 28, ''item'': ''light''}'
+  - '{''count'': 27, ''item'': ''light''}'
   - '{''count'': 3, ''item'': ''darkness''}'
-  - '{''count'': 33, ''item'': ''axenic''}'
+  - '{''count'': 32, ''item'': ''axenic''}'
   - '{''count'': 5, ''item'': ''diel''}'
   - '{''count'': 6, ''item'': ''coculture''}'
   by_cluster_type:
   - '{''count'': 1, ''item'': ''decay_pattern''}'
   - '{''count'': 1, ''item'': ''diel''}'
-  - '{''count'': 5, ''item'': ''time_course''}'
+  - '{''count'': 4, ''item'': ''time_course''}'
   by_coculture_role:
   - '{''count'': 5, ''item'': ''treatment''}'
   - '{''count'': 6, ''item'': ''background''}'
   by_compartment:
   - '{''count'': 2, ''item'': ''vesicle''}'
-  - '{''count'': 43, ''item'': ''whole_cell''}'
+  - '{''count'': 42, ''item'': ''whole_cell''}'
   by_growth_phase:
-  - '{''count'': 1, ''item'': ''death''}'
   - '{''count'': 1, ''item'': ''recovery''}'
   - '{''count'': 15, ''item'': ''acute_stress''}'
   - '{''count'': 2, ''item'': ''darkness''}'
+  - '{''count'': 2, ''item'': ''death''}'
   - '{''count'': 2, ''item'': ''diel''}'
-  - '{''count'': 2, ''item'': ''stationary''}'
   - '{''count'': 3, ''item'': ''acclimated_steady_state''}'
   - '{''count'': 4, ''item'': ''infected''}'
-  - '{''count'': 5, ''item'': ''exponential''}'
-  - '{''count'': 8, ''item'': ''nutrient_limited''}'
+  - '{''count'': 7, ''item'': ''exponential''}'
+  - '{''count'': 7, ''item'': ''nutrient_limited''}'
   by_metric_type:
   - '{''count'': 1, ''item'': ''antisense_tss_count''}'
   - '{''count'': 1, ''item'': ''damping_ratio''}'
@@ -62,10 +61,10 @@ rows:
   - '{''count'': 1, ''item'': ''VESICLE_DNASEQ''}'
   - '{''count'': 1, ''item'': ''VESICLE_PROTEOMICS''}'
   - '{''count'': 14, ''item'': ''RNASEQ''}'
-  - '{''count'': 20, ''item'': ''MICROARRAY''}'
+  - '{''count'': 19, ''item'': ''MICROARRAY''}'
   - '{''count'': 8, ''item'': ''PROTEOMICS''}'
   by_organism:
-  - '{''count'': 45, ''item'': ''Prochlorococcus MED4''}'
+  - '{''count'': 44, ''item'': ''Prochlorococcus MED4''}'
   by_publication:
   - '{''count'': 1, ''item'': ''10.1038/ismej.2014.57''}'
   - '{''count'': 1, ''item'': ''10.1038/ismej.2016.70''}'
@@ -78,9 +77,9 @@ rows:
   - '{''count'': 1, ''item'': ''10.1371/journal.pone.0043432''}'
   - '{''count'': 1, ''item'': ''10.3389/fmicb.2022.1038136''}'
   - '{''count'': 2, ''item'': ''10.1021/pr060460c''}'
+  - '{''count'': 2, ''item'': ''10.1038/ismej.2011.49''}'
   - '{''count'': 2, ''item'': ''10.1126/science.1243457''}'
   - '{''count'': 2, ''item'': ''10.64898/2026.04.15.718746''}'
-  - '{''count'': 3, ''item'': ''10.1038/ismej.2011.49''}'
   - '{''count'': 3, ''item'': ''10.1038/msb4100087''}'
   - '{''count'': 4, ''item'': ''10.1038/ismej.2015.36''}'
   - '{''count'': 4, ''item'': ''10.1128/spectrum.03275-22''}'
@@ -91,7 +90,7 @@ rows:
   - '{''count'': 1, ''item'': ''top_n''}'
   - '{''count'': 13, ''item'': ''filtered_subset''}'
   - '{''count'': 19, ''item'': ''all_detected_genes''}'
-  - '{''count'': 3, ''item'': ''significant_any_timepoint''}'
+  - '{''count'': 2, ''item'': ''significant_any_timepoint''}'
   - '{''count'': 6, ''item'': ''significant_only''}'
   by_treatment_type:
   - '{''count'': 1, ''item'': ''darkness''}'
@@ -104,7 +103,7 @@ rows:
   - '{''count'': 2, ''item'': ''coculture''}'
   - '{''count'': 2, ''item'': ''compartment''}'
   - '{''count'': 2, ''item'': ''diel''}'
-  - '{''count'': 3, ''item'': ''iron''}'
+  - '{''count'': 2, ''item'': ''iron''}'
   - '{''count'': 3, ''item'': ''viral''}'
   - '{''count'': 8, ''item'': ''carbon''}'
   - '{''count'': 8, ''item'': ''nitrogen''}'
@@ -112,5 +111,5 @@ rows:
   - '{''count'': 4, ''item'': ''categorical''}'
   - '{''count'': 5, ''item'': ''boolean''}'
   - '{''count'': 5, ''item'': ''numeric''}'
-  time_course_count: 16
-  total_matching: 45
+  time_course_count: 15
+  total_matching: 44

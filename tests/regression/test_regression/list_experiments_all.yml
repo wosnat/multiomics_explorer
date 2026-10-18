@@ -1,5 +1,5 @@
 case_id: list_experiments_all
-row_count: 209
+row_count: 208
 rows:
 - authors:
   - Guadalupe Gómez-Baena
@@ -39,9 +39,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -90,9 +90,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -125,7 +125,7 @@ rows:
     (control)'
   gene_count: 11
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -139,11 +139,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -175,7 +175,7 @@ rows:
   experiment_name: 'Alteromonas in BL107 coculture: light +5 mM glucose vs light (control)'
   gene_count: 11
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -189,11 +189,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -242,9 +242,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -293,9 +293,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -328,7 +328,7 @@ rows:
     (control)'
   gene_count: 16
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -342,11 +342,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -378,7 +378,7 @@ rows:
   experiment_name: 'Alteromonas in MED4 coculture: light +5 mM glucose vs light (control)'
   gene_count: 16
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -392,11 +392,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -445,9 +445,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -496,9 +496,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -531,7 +531,7 @@ rows:
     (control)'
   gene_count: 54
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -545,11 +545,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -581,7 +581,7 @@ rows:
   experiment_name: 'Alteromonas in SS120 coculture: light +5 mM glucose vs light (control)'
   gene_count: 54
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -595,11 +595,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -648,9 +648,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -699,9 +699,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -734,7 +734,7 @@ rows:
     (control)'
   gene_count: 4
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -748,11 +748,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -785,7 +785,7 @@ rows:
     (control)'
   gene_count: 4
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -799,11 +799,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -852,9 +852,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -903,9 +903,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -938,7 +938,7 @@ rows:
     (control)'
   gene_count: 78
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -952,11 +952,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -989,7 +989,7 @@ rows:
     (control)'
   gene_count: 78
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -1003,11 +1003,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -1286,7 +1286,7 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -1296,8 +1296,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 419
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_400_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 400 ppm pCO2 vs
-    Axenic at 400 ppm pCO2 (RNASEQ)
+  experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 vs Mean Coculture Response
+    across Three Partners at 400 ppm pCO2 (RNASEQ)
   gene_count: 419
   growth_phases:
   - exponential
@@ -1335,7 +1335,7 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -1345,8 +1345,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 188
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_800_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 800 ppm pCO2 vs
-    Axenic at 800 ppm pCO2 (RNASEQ)
+  experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 vs Mean Coculture Response
+    across Three Partners at 800 ppm pCO2 (RNASEQ)
   gene_count: 188
   growth_phases:
   - exponential
@@ -1384,7 +1384,7 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -1394,8 +1394,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 293
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_400_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Synechococcus CC9311 at 400 ppm pCO2 vs Axenic
-    at 400 ppm pCO2 (RNASEQ)
+  experiment_name: EZ55 Coculture with Synechococcus CC9311 vs Mean Coculture Response
+    across Three Partners at 400 ppm pCO2 (RNASEQ)
   gene_count: 293
   growth_phases:
   - exponential
@@ -1433,7 +1433,7 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -1443,8 +1443,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 83
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_800_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Synechococcus CC9311 at 800 ppm pCO2 vs Axenic
-    at 800 ppm pCO2 (RNASEQ)
+  experiment_name: EZ55 Coculture with Synechococcus CC9311 vs Mean Coculture Response
+    across Three Partners at 800 ppm pCO2 (RNASEQ)
   gene_count: 83
   growth_phases:
   - exponential
@@ -1482,7 +1482,7 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -1492,8 +1492,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 136
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_400_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Synechococcus WH8102 at 400 ppm pCO2 vs Axenic
-    at 400 ppm pCO2 (RNASEQ)
+  experiment_name: EZ55 Coculture with Synechococcus WH8102 vs Mean Coculture Response
+    across Three Partners at 400 ppm pCO2 (RNASEQ)
   gene_count: 136
   growth_phases:
   - exponential
@@ -1531,7 +1531,7 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -1541,8 +1541,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 58
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_800_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Synechococcus WH8102 at 800 ppm pCO2 vs Axenic
-    at 800 ppm pCO2 (RNASEQ)
+  experiment_name: EZ55 Coculture with Synechococcus WH8102 vs Mean Coculture Response
+    across Three Partners at 800 ppm pCO2 (RNASEQ)
   gene_count: 58
   growth_phases:
   - exponential
@@ -1581,13 +1581,10 @@ rows:
   - Zhiying Lu
   background_factors:
   - axenic
-  - coculture
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner:
-  - Prochlorococcus MIT9312
-  - Synechococcus CC9311
-  - Synechococcus WH8102
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -1633,6 +1630,7 @@ rows:
   background_factors:
   - axenic
   - coculture
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -1644,7 +1642,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 437
   experiment_id: 10.1038/s43705-022-00197-2_interaction_pco2_coculture_ez55_rnaseq
-  experiment_name: EZ55 pCO2 x Coculture Interaction Effect (RNASEQ)
+  experiment_name: EZ55 Table S4 contrast, labelled pCO2 x coculture interaction by
+    the authors (RNASEQ)
   gene_count: 437
   growth_phases:
   - exponential
@@ -1807,7 +1806,6 @@ rows:
   experiment_name: HOT1A3 Coculture with Prochlorococcus MED4 vs Axenic (RNASEQ)
   gene_count: 11841
   growth_phases:
-  - exponential
   - nutrient_limited
   is_time_course: time_course
   metabolite_assay_count: 0
@@ -1822,7 +1820,7 @@ rows:
   table_scope_detail: ''
   time_point_count: 3
   time_point_growth_phases:
-  - exponential
+  - nutrient_limited
   - nutrient_limited
   - nutrient_limited
   time_point_hours:
@@ -1866,9 +1864,9 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 2225
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
-  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
-    growth (PROTEOMICS)
-  gene_count: 4450
+  experiment_name: HOT1A3 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN day
+    11 (PROTEOMICS)
+  gene_count: 6675
   growth_phases:
   - nutrient_limited
   is_time_course: time_course
@@ -1878,8 +1876,70 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 578
-  significant_up_count: 433
+  significant_down_count: 592
+  significant_up_count: 617
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 3
+  time_point_growth_phases:
+  - nutrient_limited
+  - nutrient_limited
+  - nutrient_limited
+  time_point_hours:
+  - '2136.0'
+  - '432.0'
+  - '744.0'
+  time_point_labels:
+  - day 18
+  - day 31
+  - day 89
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  time_point_significant_down:
+  - '0'
+  - '14'
+  - '578'
+  time_point_significant_up:
+  - '0'
+  - '184'
+  - '433'
+  time_point_totals:
+  - '2225'
+  - '2225'
+  - '2225'
+  treatment_type:
+  - nitrogen
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 3947
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
+  experiment_name: HOT1A3 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN day
+    11 (RNASEQ)
+  gene_count: 7894
+  growth_phases:
+  - nutrient_limited
+  is_time_course: time_course
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_down_count: 858
+  significant_up_count: 328
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 2
@@ -1896,14 +1956,14 @@ rows:
   - '1'
   - '2'
   time_point_significant_down:
-  - '0'
-  - '578'
+  - '366'
+  - '492'
   time_point_significant_up:
-  - '0'
-  - '433'
+  - '151'
+  - '177'
   time_point_totals:
-  - '2225'
-  - '2225'
+  - '3947'
+  - '3947'
   treatment_type:
   - nitrogen
 - authors:
@@ -1922,8 +1982,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 2225
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
-  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
-    growth (PROTEOMICS)
+  experiment_name: HOT1A3 in coculture with MED4, PRO99-lowN nutrient starvation vs
+    PRO99-lowN day 11 (PROTEOMICS)
   gene_count: 11125
   growth_phases:
   - nutrient_limited
@@ -1988,68 +2048,6 @@ rows:
   - Dikla Aharonovich
   - Osnat Weissberg
   background_factors:
-  - axenic
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: []
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 3947
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
-  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
-    growth (RNASEQ)
-  gene_count: 11841
-  growth_phases:
-  - nutrient_limited
-  is_time_course: time_course
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: RNASEQ
-  organism_name: Alteromonas macleodii HOT1A3
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 1648
-  significant_up_count: 778
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 3
-  time_point_growth_phases:
-  - nutrient_limited
-  - nutrient_limited
-  - nutrient_limited
-  time_point_hours:
-  - '-1.0'
-  - '432.0'
-  - '744.0'
-  time_point_labels:
-  - day 18
-  - day 31
-  - days 60+89
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  time_point_significant_down:
-  - '366'
-  - '492'
-  - '790'
-  time_point_significant_up:
-  - '151'
-  - '177'
-  - '450'
-  time_point_totals:
-  - '3947'
-  - '3947'
-  - '3947'
-  treatment_type:
-  - nitrogen
-- authors:
-  - Daniel Sher
-  - Dikla Aharonovich
-  - Osnat Weissberg
-  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -2061,8 +2059,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 3947
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
-  experiment_name: HOT1A3 PRO99-lowN nutrient starvation vs PRO99-lowN exponential
-    growth (RNASEQ)
+  experiment_name: HOT1A3 in coculture with MED4, PRO99-lowN nutrient starvation vs
+    PRO99-lowN day 11 (RNASEQ)
   gene_count: 19735
   growth_phases:
   - nutrient_limited
@@ -2182,7 +2180,8 @@ rows:
   distinct_gene_count: 1879
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 (high Alteromonas
-    inoculum, 5x10^6 cells/ml) vs Pro99 medium growth conditions (RNASEQ)
+    inoculum, 5x10^6 cells/ml) vs coculture with MIT9313 at low Alteromonas inoculum
+    (0.5x10^6 cells/ml) (RNASEQ)
   gene_count: 1879
   growth_phases:
   - exponential
@@ -2193,7 +2192,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1038/ismej.2016.70
-  significant_down_count: 0
+  significant_down_count: 179
   significant_up_count: 188
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -2207,7 +2206,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '179'
   time_point_significant_up:
   - '188'
   time_point_totals:
@@ -2228,8 +2227,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 2295
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
-  experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs Pro99 medium growth
-    conditions (RNASEQ)
+  experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs coculture with
+    Prochlorococcus MED4 (RNASEQ)
   gene_count: 2295
   growth_phases:
   - exponential
@@ -2240,7 +2239,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1038/ismej.2016.70
-  significant_down_count: 0
+  significant_down_count: 82
   significant_up_count: 30
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -2254,7 +2253,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '82'
   time_point_significant_up:
   - '30'
   time_point_totals:
@@ -2445,11 +2444,11 @@ rows:
   - darkness
   - darkness
   time_point_hours:
-  - '1.0'
-  - '5.0'
+  - '36.0'
+  - '40.0'
   time_point_labels:
-  - 1h extended darkness
-  - 5h extended darkness
+  - 1h extended darkness (36h)
+  - 5h extended darkness (40h)
   time_point_orders:
   - '1'
   - '2'
@@ -2484,7 +2483,7 @@ rows:
     NATL2A (RNASEQ)
   gene_count: 740
   growth_phases:
-  - exponential
+  - unknown
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2498,11 +2497,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - exponential
+  - unknown
   time_point_hours:
   - '24.0'
   time_point_labels:
-  - 24h vs 12h
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2533,7 +2532,7 @@ rows:
     NATL2A (RNASEQ)
   gene_count: 740
   growth_phases:
-  - exponential
+  - unknown
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2547,11 +2546,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - exponential
+  - unknown
   time_point_hours:
   - '48.0'
   time_point_labels:
-  - 48h vs 12h
+  - 48h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2600,9 +2599,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2651,9 +2650,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2686,7 +2685,7 @@ rows:
     (control)'
   gene_count: 82
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2700,11 +2699,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2737,7 +2736,7 @@ rows:
     (control)'
   gene_count: 82
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2751,11 +2750,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2804,9 +2803,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2855,9 +2854,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2890,7 +2889,7 @@ rows:
     (control)'
   gene_count: 342
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2904,11 +2903,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -2940,7 +2939,7 @@ rows:
   experiment_name: 'Marinobacter in MED4 coculture: light +5 mM glucose vs light (control)'
   gene_count: 342
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2954,11 +2953,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -3007,9 +3006,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -3058,9 +3057,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -3093,7 +3092,7 @@ rows:
     (control)'
   gene_count: 195
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -3107,11 +3106,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -3144,7 +3143,7 @@ rows:
     (control)'
   gene_count: 195
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -3158,11 +3157,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -3211,9 +3210,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -3262,9 +3261,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -3297,7 +3296,7 @@ rows:
     (control)'
   gene_count: 145
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -3311,11 +3310,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -3348,7 +3347,7 @@ rows:
     (control)'
   gene_count: 146
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -3362,11 +3361,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -3415,9 +3414,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -3466,9 +3465,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -3501,7 +3500,7 @@ rows:
     (control)'
   gene_count: 484
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -3515,11 +3514,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -3552,7 +3551,7 @@ rows:
     (control)'
   gene_count: 484
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -3566,11 +3565,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -3824,12 +3823,11 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 1424
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
+  experiment_name: MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential
+    growth (PROTEOMICS)
   gene_count: 4272
   growth_phases:
   - death
-  - nutrient_limited
   is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -3845,7 +3843,7 @@ rows:
   time_point_growth_phases:
   - death
   - death
-  - nutrient_limited
+  - death
   time_point_hours:
   - '2136.0'
   - '336.0'
@@ -3877,6 +3875,54 @@ rows:
   - Dikla Aharonovich
   - Osnat Weissberg
   background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 1849
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
+  experiment_name: MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential
+    growth (RNASEQ)
+  gene_count: 1849
+  growth_phases:
+  - death
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1101/2025.11.24.690089
+  significant_down_count: 472
+  significant_up_count: 405
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_growth_phases:
+  - death
+  time_point_hours:
+  - '336.0'
+  time_point_labels:
+  - day 14
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '472'
+  time_point_significant_up:
+  - '405'
+  time_point_totals:
+  - '1849'
+  treatment_type:
+  - nitrogen
+- authors:
+  - Daniel Sher
+  - Dikla Aharonovich
+  - Osnat Weissberg
+  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -3888,8 +3934,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 1424
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
+  experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
+    PRO99-lowN exponential growth (PROTEOMICS)
   gene_count: 7120
   growth_phases:
   - nutrient_limited
@@ -3954,61 +4000,6 @@ rows:
   - Dikla Aharonovich
   - Osnat Weissberg
   background_factors:
-  - axenic
-  - light
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: []
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 1849
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (RNASEQ)
-  gene_count: 3698
-  growth_phases:
-  - nutrient_limited
-  is_time_course: time_course
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: RNASEQ
-  organism_name: Prochlorococcus MED4
-  publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 640
-  significant_up_count: 602
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  time_point_count: 2
-  time_point_growth_phases:
-  - nutrient_limited
-  - nutrient_limited
-  time_point_hours:
-  - '-1.0'
-  - '336.0'
-  time_point_labels:
-  - day 14
-  - days 60+89
-  time_point_orders:
-  - '1'
-  - '2'
-  time_point_significant_down:
-  - '168'
-  - '472'
-  time_point_significant_up:
-  - '197'
-  - '405'
-  time_point_totals:
-  - '1849'
-  - '1849'
-  treatment_type:
-  - nitrogen
-- authors:
-  - Daniel Sher
-  - Dikla Aharonovich
-  - Osnat Weissberg
-  background_factors:
   - coculture
   - light
   cluster_types: []
@@ -4020,8 +4011,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (RNASEQ)
+  experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
+    PRO99-lowN exponential growth (RNASEQ)
   gene_count: 9245
   growth_phases:
   - nutrient_limited
@@ -4118,9 +4109,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -4168,9 +4159,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -4202,7 +4193,7 @@ rows:
   experiment_name: 'MED4 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 327
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -4216,11 +4207,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -4252,7 +4243,7 @@ rows:
   experiment_name: 'MED4 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 327
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -4266,11 +4257,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -4423,8 +4414,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2016.70
-  significant_down_count: 272
-  significant_up_count: 24
+  significant_down_count: 300
+  significant_up_count: 42
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -4437,80 +4428,13 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '272'
+  - '300'
   time_point_significant_up:
-  - '24'
+  - '42'
   time_point_totals:
   - '1714'
   treatment_type:
   - coculture
-- authors:
-  - Luke R. Thompson
-  - Qinglu Zeng
-  - Sallie W. Chisholm
-  background_factors:
-  - axenic
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: []
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 32
-  experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark
-  experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) (RNASEQ)
-  gene_count: 49
-  growth_phases:
-  - acute_stress
-  is_time_course: time_course
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: RNASEQ
-  organism_name: Prochlorococcus MED4
-  publication_doi: 10.1371/journal.pone.0165375
-  significant_down_count: 36
-  significant_up_count: 13
-  table_scope: significant_only
-  table_scope_detail: ''
-  time_point_count: 4
-  time_point_growth_phases:
-  - acute_stress
-  - acute_stress
-  - acute_stress
-  - acute_stress
-  time_point_hours:
-  - '1.5'
-  - '2.5'
-  - '4.5'
-  - '8.5'
-  time_point_labels:
-  - 1.5h post-inoculation
-  - 2.5h post-inoculation
-  - 4.5h post-inoculation
-  - 8.5h post-inoculation
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  time_point_significant_down:
-  - '0'
-  - '1'
-  - '26'
-  - '9'
-  time_point_significant_up:
-  - '1'
-  - '2'
-  - '5'
-  - '5'
-  time_point_totals:
-  - '1'
-  - '14'
-  - '3'
-  - '31'
-  treatment_type:
-  - light
 - authors:
   - Luke R. Thompson
   - Qinglu Zeng
@@ -4525,7 +4449,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 38
   experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_infected
-  experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) (RNASEQ)
+  experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) in phage P-HM2
+    infected cultures (RNASEQ)
   gene_count: 51
   growth_phases:
   - infected
@@ -4583,6 +4508,74 @@ rows:
   - '29'
   - '3'
   - '8'
+  treatment_type:
+  - light
+- authors:
+  - Luke R. Thompson
+  - Qinglu Zeng
+  - Sallie W. Chisholm
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 32
+  experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark
+  experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) in uninfected
+    cultures (spent medium, no phage) (RNASEQ)
+  gene_count: 49
+  growth_phases:
+  - acute_stress
+  is_time_course: time_course
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1371/journal.pone.0165375
+  significant_down_count: 36
+  significant_up_count: 13
+  table_scope: significant_only
+  table_scope_detail: ''
+  time_point_count: 4
+  time_point_growth_phases:
+  - acute_stress
+  - acute_stress
+  - acute_stress
+  - acute_stress
+  time_point_hours:
+  - '1.5'
+  - '2.5'
+  - '4.5'
+  - '8.5'
+  time_point_labels:
+  - 1.5h post-inoculation
+  - 2.5h post-inoculation
+  - 4.5h post-inoculation
+  - 8.5h post-inoculation
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  time_point_significant_down:
+  - '0'
+  - '1'
+  - '26'
+  - '9'
+  time_point_significant_up:
+  - '1'
+  - '2'
+  - '5'
+  - '5'
+  time_point_totals:
+  - '1'
+  - '14'
+  - '3'
+  - '31'
   treatment_type:
   - light
 - authors:
@@ -4759,7 +4752,7 @@ rows:
   time_point_hours:
   - '-1.0'
   time_point_labels:
-  - max across 3-24h
+  - max across 70min-24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -4807,7 +4800,7 @@ rows:
   time_point_hours:
   - '-1.0'
   time_point_labels:
-  - max across 3-24h
+  - max across 70min-24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -4857,7 +4850,7 @@ rows:
   time_point_hours:
   - '-1.0'
   time_point_labels:
-  - max across 3-24h
+  - max across 70min-24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -4907,7 +4900,7 @@ rows:
   time_point_hours:
   - '-1.0'
   time_point_labels:
-  - max across 3-24h
+  - max across 70min-24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -5157,113 +5150,8 @@ rows:
   derived_metric_count: 0
   derived_metric_value_kinds: []
   distinct_gene_count: 112
-  experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_med4_med4_microarray_light
-  experiment_name: MED4 Iron starvation (MED4) vs Iron-replete control (MED4) (MICROARRAY)
-  gene_count: 224
-  growth_phases:
-  - acute_stress
-  is_time_course: time_course
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: MICROARRAY
-  organism_name: Prochlorococcus MED4
-  publication_doi: 10.1038/ismej.2011.49
-  significant_down_count: 35
-  significant_up_count: 90
-  table_scope: significant_any_timepoint
-  table_scope_detail: ''
-  time_point_count: 2
-  time_point_growth_phases:
-  - acute_stress
-  - acute_stress
-  time_point_hours:
-  - '12.0'
-  - '24.0'
-  time_point_labels:
-  - 12h
-  - 24h
-  time_point_orders:
-  - '1'
-  - '2'
-  time_point_significant_down:
-  - '13'
-  - '22'
-  time_point_significant_up:
-  - '39'
-  - '51'
-  time_point_totals:
-  - '112'
-  - '112'
-  treatment_type:
-  - iron
-- authors:
-  - Anne W Thompson
-  - Katherine Huang
-  - Mak A Saito
-  - Sallie W Chisholm
-  background_factors:
-  - axenic
-  - light
-  cluster_types:
-  - time_course
-  clustering_analysis_count: 1
-  coculture_partner: []
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 112
-  experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_med4_med4_microarray_light_2
-  experiment_name: MED4 Iron starvation (MED4) vs Iron-replete control (MED4) (MICROARRAY)
-  gene_count: 112
-  growth_phases:
-  - nutrient_limited
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: MICROARRAY
-  organism_name: Prochlorococcus MED4
-  publication_doi: 10.1038/ismej.2011.49
-  significant_down_count: 32
-  significant_up_count: 60
-  table_scope: significant_any_timepoint
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - nutrient_limited
-  time_point_hours:
-  - '48.0'
-  time_point_labels:
-  - 48h
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '32'
-  time_point_significant_up:
-  - '60'
-  time_point_totals:
-  - '112'
-  treatment_type:
-  - iron
-- authors:
-  - Anne W Thompson
-  - Katherine Huang
-  - Mak A Saito
-  - Sallie W Chisholm
-  background_factors:
-  - axenic
-  - light
-  cluster_types:
-  - time_course
-  clustering_analysis_count: 1
-  coculture_partner: []
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 112
-  experiment_id: 10.1038/ismej.2011.49_growth_medium_ironreplete_control_med4_med4_microarray
-  experiment_name: MED4 Iron-replete control (MED4) vs Iron starvation (MED4) (MICROARRAY)
+  experiment_id: 10.1038/ismej.2011.49_iron_rescue_med4_microarray
+  experiment_name: MED4 Iron rescue - after vs before iron re-addition (MED4) (MICROARRAY)
   gene_count: 112
   growth_phases:
   - recovery
@@ -5292,6 +5180,70 @@ rows:
   time_point_significant_up:
   - '40'
   time_point_totals:
+  - '112'
+  treatment_type:
+  - iron
+- authors:
+  - Anne W Thompson
+  - Katherine Huang
+  - Mak A Saito
+  - Sallie W Chisholm
+  background_factors:
+  - axenic
+  - light
+  cluster_types:
+  - time_course
+  clustering_analysis_count: 1
+  coculture_partner: []
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 112
+  experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_med4_med4_microarray_light
+  experiment_name: MED4 Iron starvation (MED4) vs Iron-replete control (MED4) (MICROARRAY)
+  gene_count: 336
+  growth_phases:
+  - acute_stress
+  - nutrient_limited
+  is_time_course: time_course
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2011.49
+  significant_down_count: 67
+  significant_up_count: 150
+  table_scope: significant_any_timepoint
+  table_scope_detail: ''
+  time_point_count: 3
+  time_point_growth_phases:
+  - acute_stress
+  - acute_stress
+  - nutrient_limited
+  time_point_hours:
+  - '12.0'
+  - '24.0'
+  - '48.0'
+  time_point_labels:
+  - 12h
+  - 24h
+  - 48h
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  time_point_significant_down:
+  - '13'
+  - '22'
+  - '32'
+  time_point_significant_up:
+  - '39'
+  - '51'
+  - '60'
+  time_point_totals:
+  - '112'
+  - '112'
   - '112'
   treatment_type:
   - iron
@@ -5417,7 +5369,7 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 45
   experiment_id: 10.1038/nature06130_viral_phage_infected_med4_microarray
-  experiment_name: MED4 Phage infected vs Pro99 medium phage infection baseline (MICROARRAY)
+  experiment_name: MED4 Phage infected vs uninfected spent-medium control (MICROARRAY)
   gene_count: 360
   growth_phases:
   - infected
@@ -5927,6 +5879,7 @@ rows:
   gene_count: 10182
   growth_phases:
   - acute_stress
+  - nutrient_limited
   is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -5944,8 +5897,8 @@ rows:
   - acute_stress
   - acute_stress
   - acute_stress
-  - acute_stress
-  - acute_stress
+  - nutrient_limited
+  - nutrient_limited
   time_point_hours:
   - '0.0'
   - '12.0'
@@ -6452,7 +6405,7 @@ rows:
   - Katelyn G. Jones
   - Kurt G. Castro
   - Maya I. Anjur-Dietrich
-  - Nhi N. Vo
+  - Nhi Vo
   - Sallie W. Chisholm
   - Sierra M. Parker
   background_factors:
@@ -6465,7 +6418,7 @@ rows:
   derived_metric_count: 0
   derived_metric_value_kinds: []
   distinct_gene_count: 234
-  experiment_id: 10.1101/2025.08.05.668435_growth_state_freeliving_planktonic_enrichment_mit9301_rnaseq
+  experiment_id: 10.1038/s41467-026-77598-7_growth_state_freeliving_planktonic_enrichment_mit9301_rnaseq
   experiment_name: MIT9301 Free-living (planktonic) enrichment vs Biofilm (adherent)
     enrichment (RNASEQ)
   gene_count: 234
@@ -6477,7 +6430,7 @@ rows:
   metabolite_count: 0
   omics_type: RNASEQ
   organism_name: Prochlorococcus MIT9301
-  publication_doi: 10.1101/2025.08.05.668435
+  publication_doi: 10.1038/s41467-026-77598-7
   significant_down_count: 97
   significant_up_count: 137
   table_scope: significant_only
@@ -6684,7 +6637,7 @@ rows:
   time_point_hours:
   - '24.0'
   time_point_labels:
-  - day 1 and day 3
+  - day 1
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -6756,8 +6709,8 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - axenic
   - coculture
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -7105,8 +7058,7 @@ rows:
   - Matthew A Fuszard
   - Phillip C Wright
   background_factors:
-  - axenic
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: []
@@ -7200,7 +7152,7 @@ rows:
   time_point_hours:
   - '24.0'
   time_point_labels:
-  - day 1 and day 3
+  - day 1
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -7513,11 +7465,11 @@ rows:
   - Yu-Zhong Zhang
   - Yue Chen
   background_factors:
+  - axenic
   - light
   cluster_types: []
   clustering_analysis_count: 0
-  coculture_partner:
-  - Phage
+  coculture_partner: []
   compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
@@ -7611,7 +7563,7 @@ rows:
   - '427'
   - '427'
   treatment_type:
-  - viral
+  - carbon
 - authors:
   - Daniel Sher
   - Dikla Aharonovich
@@ -7638,7 +7590,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2016.70
-  significant_down_count: 45
+  significant_down_count: 50
   significant_up_count: 153
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -7652,7 +7604,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '45'
+  - '50'
   time_point_significant_up:
   - '153'
   time_point_totals:
@@ -7817,6 +7769,56 @@ rows:
   derived_metric_count: 0
   derived_metric_value_kinds: []
   distinct_gene_count: 97
+  experiment_id: 10.1038/ismej.2011.49_iron_rescue_mit9313_microarray
+  experiment_name: MIT9313 Iron rescue - after vs before iron re-addition (MIT9313)
+    (MICROARRAY)
+  gene_count: 97
+  growth_phases:
+  - recovery
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: MICROARRAY
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2011.49
+  significant_down_count: 35
+  significant_up_count: 10
+  table_scope: significant_any_timepoint
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_growth_phases:
+  - recovery
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - 'R (rescue: 72h vs 53h)'
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '35'
+  time_point_significant_up:
+  - '10'
+  time_point_totals:
+  - '97'
+  treatment_type:
+  - iron
+- authors:
+  - Anne W Thompson
+  - Katherine Huang
+  - Mak A Saito
+  - Sallie W Chisholm
+  background_factors:
+  - axenic
+  - light
+  cluster_types:
+  - time_course
+  clustering_analysis_count: 1
+  coculture_partner: []
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 97
   experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_mit9313_mit9313_microarray
   experiment_name: MIT9313 Iron starvation (MIT9313) vs Iron-replete control (MIT9313)
     (MICROARRAY)
@@ -7863,56 +7865,6 @@ rows:
   time_point_totals:
   - '97'
   - '97'
-  - '97'
-  treatment_type:
-  - iron
-- authors:
-  - Anne W Thompson
-  - Katherine Huang
-  - Mak A Saito
-  - Sallie W Chisholm
-  background_factors:
-  - axenic
-  - light
-  cluster_types:
-  - time_course
-  clustering_analysis_count: 1
-  coculture_partner: []
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 97
-  experiment_id: 10.1038/ismej.2011.49_growth_medium_ironreplete_control_mit9313_mit9313_microarray
-  experiment_name: MIT9313 Iron-replete control (MIT9313) vs Iron starvation (MIT9313)
-    (MICROARRAY)
-  gene_count: 97
-  growth_phases:
-  - recovery
-  is_time_course: single_time_point
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: MICROARRAY
-  organism_name: Prochlorococcus MIT9313
-  publication_doi: 10.1038/ismej.2011.49
-  significant_down_count: 35
-  significant_up_count: 10
-  table_scope: significant_any_timepoint
-  table_scope_detail: ''
-  time_point_count: 1
-  time_point_growth_phases:
-  - recovery
-  time_point_hours:
-  - '-1.0'
-  time_point_labels:
-  - 'R (rescue: 72h vs 53h)'
-  time_point_orders:
-  - '1'
-  time_point_significant_down:
-  - '35'
-  time_point_significant_up:
-  - '10'
-  time_point_totals:
   - '97'
   treatment_type:
   - iron
@@ -8048,6 +8000,7 @@ rows:
   gene_count: 13446
   growth_phases:
   - acute_stress
+  - nutrient_limited
   is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -8065,8 +8018,8 @@ rows:
   - acute_stress
   - acute_stress
   - acute_stress
-  - acute_stress
-  - acute_stress
+  - nutrient_limited
+  - nutrient_limited
   time_point_hours:
   - '0.0'
   - '12.0'
@@ -8141,7 +8094,7 @@ rows:
   significant_down_count: 143
   significant_up_count: 39
   table_scope: filtered_subset
-  table_scope_detail: Genes with q < 0.05 at t=48h, all timepoints reported
+  table_scope_detail: Genes with q < 0.05 at t=24h, all timepoints reported
   time_point_count: 4
   time_point_growth_phases:
   - acute_stress
@@ -8660,105 +8613,8 @@ rows:
   - Qinglu Zeng
   - Xingqin Lin
   background_factors:
-  - diel
-  - viral
-  cluster_types: []
-  clustering_analysis_count: 0
-  coculture_partner: []
-  compartment: whole_cell
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  distinct_gene_count: 34
-  experiment_id: 10.1111/1462-2920.13104_phosphorus_plimited_natl2a_rnaseq_infected
-  experiment_name: NATL2A P-limited vs P-replete control (RNASEQ)
-  gene_count: 272
-  growth_phases:
-  - nutrient_limited
-  - recovery
-  is_time_course: time_course
-  metabolite_assay_count: 0
-  metabolite_compartments: []
-  metabolite_count: 0
-  omics_type: RNASEQ
-  organism_name: Prochlorococcus NATL2A
-  publication_doi: 10.1111/1462-2920.13104
-  significant_down_count: 0
-  significant_up_count: 118
-  table_scope: significant_only
-  table_scope_detail: ''
-  time_point_count: 8
-  time_point_growth_phases:
-  - nutrient_limited
-  - nutrient_limited
-  - nutrient_limited
-  - nutrient_limited
-  - nutrient_limited
-  - nutrient_limited
-  - recovery
-  - recovery
-  time_point_hours:
-  - '47.0'
-  - '48.0'
-  - '49.0'
-  - '51.0'
-  - '55.0'
-  - '55.0'
-  - '59.0'
-  - '59.0'
-  time_point_labels:
-  - 47h
-  - 48h
-  - 49h
-  - 51h
-  - 55h
-  - 55h (P added)
-  - 59h
-  - 59h (P added)
-  time_point_orders:
-  - '1'
-  - '2'
-  - '3'
-  - '4'
-  - '5'
-  - '6'
-  - '7'
-  - '8'
-  time_point_significant_down:
-  - '0'
-  - '0'
-  - '0'
-  - '0'
-  - '0'
-  - '0'
-  - '0'
-  - '0'
-  time_point_significant_up:
-  - '13'
-  - '16'
-  - '18'
-  - '18'
-  - '18'
-  - '18'
-  - '8'
-  - '9'
-  time_point_totals:
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  - '34'
-  treatment_type:
-  - phosphorus
-- authors:
-  - Huiming Ding
-  - Qinglu Zeng
-  - Xingqin Lin
-  background_factors:
   - axenic
-  - diel
+  - light
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: []
@@ -8836,12 +8692,109 @@ rows:
   treatment_type:
   - phosphorus
 - authors:
+  - Huiming Ding
+  - Qinglu Zeng
+  - Xingqin Lin
+  background_factors:
+  - axenic
+  - light
+  - viral
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  distinct_gene_count: 34
+  experiment_id: 10.1111/1462-2920.13104_phosphorus_plimited_natl2a_rnaseq_infected
+  experiment_name: NATL2A P-limited vs P-replete control, phage-infected (RNASEQ)
+  gene_count: 272
+  growth_phases:
+  - infected
+  - recovery
+  is_time_course: time_course
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Prochlorococcus NATL2A
+  publication_doi: 10.1111/1462-2920.13104
+  significant_down_count: 0
+  significant_up_count: 118
+  table_scope: significant_only
+  table_scope_detail: ''
+  time_point_count: 8
+  time_point_growth_phases:
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  - infected
+  - recovery
+  - recovery
+  time_point_hours:
+  - '47.0'
+  - '48.0'
+  - '49.0'
+  - '51.0'
+  - '55.0'
+  - '55.0'
+  - '59.0'
+  - '59.0'
+  time_point_labels:
+  - 47h
+  - 48h
+  - 49h
+  - 51h
+  - 55h
+  - 55h (P added)
+  - 59h
+  - 59h (P added)
+  time_point_orders:
+  - '1'
+  - '2'
+  - '3'
+  - '4'
+  - '5'
+  - '6'
+  - '7'
+  - '8'
+  time_point_significant_down:
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  - '0'
+  time_point_significant_up:
+  - '13'
+  - '16'
+  - '18'
+  - '18'
+  - '18'
+  - '18'
+  - '8'
+  - '9'
+  time_point_totals:
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  - '34'
+  treatment_type:
+  - phosphorus
+- authors:
   - Catherine A Biggs
   - Matthew A Fuszard
   - Phillip C Wright
   background_factors:
-  - axenic
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: []
@@ -8920,9 +8873,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -8970,9 +8923,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -9004,7 +8957,7 @@ rows:
   experiment_name: 'SS120 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 930
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -9018,11 +8971,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -9054,7 +9007,7 @@ rows:
   experiment_name: 'SS120 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 928
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -9068,11 +9021,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -9120,9 +9073,9 @@ rows:
   time_point_growth_phases:
   - acute_stress
   time_point_hours:
-  - '24.0'
+  - '8.0'
   time_point_labels:
-  - 24h
+  - 8h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -9138,8 +9091,7 @@ rows:
   - Matthew A Fuszard
   - Phillip C Wright
   background_factors:
-  - axenic
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner: []
@@ -9309,6 +9261,7 @@ rows:
   gene_count: 1554
   growth_phases:
   - acclimated_steady_state
+  - exponential
   is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -9327,9 +9280,9 @@ rows:
   - acclimated_steady_state
   - acclimated_steady_state
   - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
+  - exponential
+  - exponential
+  - exponential
   time_point_hours:
   - '1440.0'
   - '168.0'
@@ -9402,6 +9355,7 @@ rows:
   gene_count: 1288
   growth_phases:
   - acclimated_steady_state
+  - exponential
   is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -9420,9 +9374,9 @@ rows:
   - acclimated_steady_state
   - acclimated_steady_state
   - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
+  - exponential
+  - exponential
+  - exponential
   time_point_hours:
   - '1440.0'
   - '168.0'
@@ -9485,13 +9439,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner:
   - Synechococcus WH7803
-  compartment: exoproteome
+  compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
   distinct_gene_count: 1724
   experiment_id: 10.1038/nmicrobiol.2017.100_longterm_coculture_rpom_dss3_proteomics
-  experiment_name: R. pomeroyi DSS-3 proteome in long-term coculture with Synechococcus
-    WH7803 (seawater)
+  experiment_name: R. pomeroyi DSS-3 proteome in coculture with Synechococcus WH7803
+    (natural seawater, 10 days)
   gene_count: 1724
   growth_phases:
   - acclimated_steady_state
@@ -9499,7 +9453,7 @@ rows:
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
-  omics_type: EXOPROTEOMICS
+  omics_type: PROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
   publication_doi: 10.1038/nmicrobiol.2017.100
   significant_down_count: 216
@@ -9511,9 +9465,9 @@ rows:
   time_point_growth_phases:
   - acclimated_steady_state
   time_point_hours:
-  - '-1.0'
+  - '240.0'
   time_point_labels:
-  - long-term
+  - 10 days
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -9648,7 +9602,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Shewanella sp. W3-18-1
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 0
+  significant_down_count: 805
   significant_up_count: 490
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs axenic control
@@ -9662,7 +9616,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '805'
   time_point_significant_up:
   - '490'
   time_point_totals:
@@ -9707,7 +9661,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Shewanella sp. W3-18-1
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 0
+  significant_down_count: 249
   significant_up_count: 206
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in lactate co-culture vs axenic control
@@ -9721,7 +9675,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '249'
   time_point_significant_up:
   - '206'
   time_point_totals:
@@ -9767,7 +9721,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Shewanella sp. W3-18-1
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 0
+  significant_down_count: 751
   significant_up_count: 475
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs lactate co-culture
@@ -9781,7 +9735,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '751'
   time_point_significant_up:
   - '475'
   time_point_totals:
@@ -9795,8 +9749,8 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - axenic
   - coculture
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -9876,7 +9830,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Synechococcus PCC 7002
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 0
+  significant_down_count: 342
   significant_up_count: 328
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs axenic control
@@ -9890,7 +9844,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '342'
   time_point_significant_up:
   - '328'
   time_point_totals:
@@ -9935,7 +9889,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Synechococcus PCC 7002
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 0
+  significant_down_count: 626
   significant_up_count: 517
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in lactate co-culture vs axenic control
@@ -9949,7 +9903,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '626'
   time_point_significant_up:
   - '517'
   time_point_totals:
@@ -9995,7 +9949,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Synechococcus PCC 7002
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 0
+  significant_down_count: 270
   significant_up_count: 403
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs lactate co-culture
@@ -10009,7 +9963,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '270'
   time_point_significant_up:
   - '403'
   time_point_totals:
@@ -10054,9 +10008,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -10104,9 +10058,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -10138,7 +10092,7 @@ rows:
   experiment_name: 'WH7803 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 359
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -10152,11 +10106,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -10188,7 +10142,7 @@ rows:
   experiment_name: 'WH7803 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 359
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -10202,11 +10156,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -10317,6 +10271,9 @@ rows:
   gene_count: 1547
   growth_phases:
   - acclimated_steady_state
+  - exponential
+  - nutrient_limited
+  - stationary
   is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -10332,12 +10289,12 @@ rows:
   time_point_count: 7
   time_point_growth_phases:
   - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
+  - exponential
+  - exponential
+  - exponential
+  - nutrient_limited
+  - stationary
+  - stationary
   time_point_hours:
   - '1440.0'
   - '168.0'
@@ -10410,6 +10367,8 @@ rows:
   gene_count: 1309
   growth_phases:
   - acclimated_steady_state
+  - exponential
+  - nutrient_limited
   is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -10428,9 +10387,9 @@ rows:
   - acclimated_steady_state
   - acclimated_steady_state
   - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
+  - exponential
+  - nutrient_limited
+  - nutrient_limited
   time_point_hours:
   - '1440.0'
   - '168.0'
@@ -10493,21 +10452,21 @@ rows:
   clustering_analysis_count: 0
   coculture_partner:
   - Ruegeria pomeroyi DSS-3
-  compartment: exoproteome
+  compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
   distinct_gene_count: 564
   experiment_id: 10.1038/nmicrobiol.2017.100_early_coculture_syn_wh7803_proteomics
-  experiment_name: Synechococcus WH7803 proteome in early coculture with R. pomeroyi
-    DSS-3 (ASW, 35 days)
+  experiment_name: Synechococcus WH7803 proteome in coculture with R. pomeroyi DSS-3
+    (ASW, 35 days)
   gene_count: 564
   growth_phases:
-  - acclimated_steady_state
+  - stationary
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
-  omics_type: EXOPROTEOMICS
+  omics_type: PROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1038/nmicrobiol.2017.100
   significant_down_count: 154
@@ -10517,7 +10476,7 @@ rows:
     co-culture conditions
   time_point_count: 1
   time_point_growth_phases:
-  - acclimated_steady_state
+  - stationary
   time_point_hours:
   - '840.0'
   time_point_labels:
@@ -10544,13 +10503,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner:
   - Ruegeria pomeroyi DSS-3
-  compartment: exoproteome
+  compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
   distinct_gene_count: 1050
   experiment_id: 10.1038/nmicrobiol.2017.100_late_coculture_syn_wh7803_proteomics
-  experiment_name: Synechococcus WH7803 proteome in late coculture with R. pomeroyi
-    DSS-3 (seawater, 10 days)
+  experiment_name: Synechococcus WH7803 proteome in coculture with R. pomeroyi DSS-3
+    (natural seawater, 10 days)
   gene_count: 1050
   growth_phases:
   - acclimated_steady_state
@@ -10558,7 +10517,7 @@ rows:
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
-  omics_type: EXOPROTEOMICS
+  omics_type: PROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1038/nmicrobiol.2017.100
   significant_down_count: 211
@@ -10722,9 +10681,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -10772,9 +10731,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -10806,7 +10765,7 @@ rows:
   experiment_name: 'WH8102 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 894
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -10820,11 +10779,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -10856,7 +10815,7 @@ rows:
   experiment_name: 'WH8102 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 895
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -10870,11 +10829,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -10891,8 +10850,8 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - axenic
   - coculture
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -11322,7 +11281,7 @@ rows:
     (RNA-seq)
   gene_count: 129
   growth_phases:
-  - acclimated_steady_state
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -11337,8 +11296,8 @@ rows:
     > 1.5, padj < 0.05), split by direction
   time_point_count: 2
   time_point_growth_phases:
-  - acclimated_steady_state
-  - acclimated_steady_state
+  - exponential
+  - exponential
   time_point_hours:
   - '96.0'
   - '96.0'
@@ -11381,7 +11340,7 @@ rows:
     (proteomics)
   gene_count: 34
   growth_phases:
-  - acclimated_steady_state
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -11396,7 +11355,7 @@ rows:
     0.05 by t-test of 9 pairwise comparisons)
   time_point_count: 1
   time_point_growth_phases:
-  - acclimated_steady_state
+  - exponential
   time_point_hours:
   - '96.0'
   time_point_labels:
@@ -11448,9 +11407,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -11498,9 +11457,9 @@ rows:
   time_point_growth_phases:
   - darkness
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - darkness
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -11532,7 +11491,7 @@ rows:
   experiment_name: 'BL107 proteomics: light +100 nM glucose vs light (control)'
   gene_count: 163
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -11546,11 +11505,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -11582,7 +11541,7 @@ rows:
   experiment_name: 'BL107 proteomics: light +5 mM glucose vs light (control)'
   gene_count: 162
   growth_phases:
-  - stationary
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -11596,11 +11555,11 @@ rows:
   table_scope_detail: ''
   time_point_count: 1
   time_point_growth_phases:
-  - stationary
+  - exponential
   time_point_hours:
-  - '-1.0'
+  - '24.0'
   time_point_labels:
-  - stationary
+  - 24h
   time_point_orders:
   - '1'
   time_point_significant_down:

@@ -9,11 +9,11 @@ examples:
       {
         "organism_name": "Prochlorococcus MED4",
         "matching_genes": 1967,
-        "total_matching": 60012,
-        "rows_by_status": {"significant_up": 5516, "significant_down": 5538, "not_significant": 48958},
-        "median_abs_log2fc": 1.580899074554445,
+        "total_matching": 58163,
+        "rows_by_status": {"significant_up": 5337, "significant_down": 5398, "not_significant": 47428},
+        "median_abs_log2fc": 1.593186188959271,
         "max_abs_log2fc": 162.295,
-        "experiment_count": 38,
+        "experiment_count": 37,
         "rows_by_treatment_type": {
           "coculture": 5412,
           "carbon": 2015,
@@ -22,12 +22,12 @@ examples:
           "phosphorus": 170,
           "light": 5396,
           "iron": 448,
-          "nitrogen": 40445,
+          "nitrogen": 38596,
           "darkness": 3752
         },
         "rows_by_background_factors": {
-          "light": 50181,
-          "axenic": 36455,
+          "light": 48332,
+          "axenic": 34606,
           "chemical": 198,
           "viral": 51,
           "darkness": 683,
@@ -35,19 +35,18 @@ examples:
           "diel": 7860
         },
         "rows_by_growth_phase": {
-          "exponential": 6991,
-          "acute_stress": 14133,
+          "exponential": 7645,
+          "acute_stress": 10739,
           "acclimated_steady_state": 2310,
           "infected": 472,
-          "nutrient_limited": 24335,
+          "nutrient_limited": 22607,
           "recovery": 112,
-          "death": 2848,
-          "stationary": 654,
+          "death": 6121,
           "darkness": 654,
           "diel": 7503
         },
         "by_table_scope": {
-          "all_detected_genes": 54444,
+          "all_detected_genes": 52595,
           "filtered_subset": 4599,
           "significant_only": 521,
           "significant_any_timepoint": 448
@@ -68,15 +67,6 @@ examples:
             "table_scope": "all_detected_genes",
             "matching_genes": 1849,
             "rows_by_status": {"significant_up": 553, "significant_down": 834, "not_significant": 7858}
-          },
-          {
-            "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
-            "treatment_type": ["nitrogen"],
-            "omics_type": "RNASEQ",
-            "is_time_course": "time_course",
-            "table_scope": "all_detected_genes",
-            "matching_genes": 1849,
-            "rows_by_status": {"significant_up": 602, "significant_down": 640, "not_significant": 2456}
           },
           {
             "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic",
@@ -105,6 +95,15 @@ examples:
             "matching_genes": 1424,
             "rows_by_status": {"significant_up": 609, "significant_down": 394, "not_significant": 6117}
           },
+          {
+            "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
+            "treatment_type": ["nitrogen"],
+            "omics_type": "RNASEQ",
+            "is_time_course": "single_time_point",
+            "table_scope": "all_detected_genes",
+            "matching_genes": 1849,
+            "rows_by_status": {"significant_up": 405, "significant_down": 472, "not_significant": 972}
+          },
           ...
         ],
         "experiments_truncated": null,
@@ -132,18 +131,18 @@ examples:
       {
         "organism_name": "Alteromonas macleodii HOT1A3",
         "matching_genes": 2,
-        "total_matching": 6,
-        "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4},
-        "median_abs_log2fc": 2.7846347522016206,
-        "max_abs_log2fc": 3.5913485347500225,
+        "total_matching": 4,
+        "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 4},
+        "median_abs_log2fc": null,
+        "max_abs_log2fc": null,
         "experiment_count": 1,
-        "rows_by_treatment_type": {"nitrogen": 6},
-        "rows_by_background_factors": {"axenic": 6, "light": 6},
-        "rows_by_growth_phase": {"nutrient_limited": 6},
-        "by_table_scope": {"all_detected_genes": 6},
+        "rows_by_treatment_type": {"nitrogen": 4},
+        "rows_by_background_factors": {"axenic": 4, "light": 4},
+        "rows_by_growth_phase": {"nutrient_limited": 4},
+        "by_table_scope": {"all_detected_genes": 4},
         "top_categories": [
-          {"category": "Inorganic ion transport", "total_genes": 1, "significant_genes": 1},
-          {"category": "Signal transduction", "total_genes": 1, "significant_genes": 1}
+          {"category": "Inorganic ion transport", "total_genes": 1, "significant_genes": 0},
+          {"category": "Signal transduction", "total_genes": 1, "significant_genes": 0}
         ],
         "experiments": [
           {
@@ -153,7 +152,7 @@ examples:
             "is_time_course": "time_course",
             "table_scope": "all_detected_genes",
             "matching_genes": 2,
-            "rows_by_status": {"significant_up": 2, "significant_down": 0, "not_significant": 4}
+            "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 4}
           }
         ],
         "experiments_truncated": null,
@@ -163,42 +162,10 @@ examples:
         "warnings": [],
         "not_found_experiments": [],
         "not_matched_experiments": [],
-        "returned": 6,
+        "returned": 4,
         "offset": 0,
         "truncated": false,
         "results": [
-          {
-            "locus_tag": "ACZ81_01830",
-            "gene_name": "amtB",
-            "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic",
-            "treatment_type": ["nitrogen"],
-            "timepoint": "days 60+89",
-            "timepoint_hours": null,
-            "timepoint_order": 3,
-            "log2fc": 3.5913485347500225,
-            "padj": 1.134324271714239e-12,
-            "rank": 77,
-            "rank_up": 29,
-            "rank_down": null,
-            "expression_status": "significant_up",
-            "growth_phase": "nutrient_limited"
-          },
-          {
-            "locus_tag": "ACZ81_15555",
-            "gene_name": "glnL",
-            "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic",
-            "treatment_type": ["nitrogen"],
-            "timepoint": "days 60+89",
-            "timepoint_hours": null,
-            "timepoint_order": 3,
-            "log2fc": 1.9779209696532185,
-            "padj": 2.312257501433529e-06,
-            "rank": 410,
-            "rank_up": 95,
-            "rank_down": null,
-            "expression_status": "significant_up",
-            "growth_phase": "nutrient_limited"
-          },
           {
             "locus_tag": "ACZ81_01830",
             "gene_name": "amtB",
@@ -210,6 +177,38 @@ examples:
             "log2fc": 0.8560175767959709,
             "padj": 0.2588535702469227,
             "rank": 1103,
+            "rank_up": null,
+            "rank_down": null,
+            "expression_status": "not_significant",
+            "growth_phase": "nutrient_limited"
+          },
+          {
+            "locus_tag": "ACZ81_01830",
+            "gene_name": "amtB",
+            "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic",
+            "treatment_type": ["nitrogen"],
+            "timepoint": "day 31",
+            "timepoint_hours": 744.0,
+            "timepoint_order": 2,
+            "log2fc": 0.5554277673766344,
+            "padj": 0.5104041330731693,
+            "rank": 1715,
+            "rank_up": null,
+            "rank_down": null,
+            "expression_status": "not_significant",
+            "growth_phase": "nutrient_limited"
+          },
+          {
+            "locus_tag": "ACZ81_15555",
+            "gene_name": "glnL",
+            "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic",
+            "treatment_type": ["nitrogen"],
+            "timepoint": "day 31",
+            "timepoint_hours": 744.0,
+            "timepoint_order": 2,
+            "log2fc": 0.4591817421638743,
+            "padj": 0.5046507150018495,
+            "rank": 2012,
             "rank_up": null,
             "rank_down": null,
             "expression_status": "not_significant",

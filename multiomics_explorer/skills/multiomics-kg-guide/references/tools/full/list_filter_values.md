@@ -205,9 +205,9 @@ list_filter_values(filter_type="compartment")
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "whole_cell", "count": 183},
+    {"value": "whole_cell", "count": 185},
     {"value": "vesicle", "count": 13},
-    {"value": "exoproteome", "count": 10},
+    {"value": "exoproteome", "count": 7},
     ...
   ]
 }
@@ -228,9 +228,9 @@ list_filter_values(filter_type="omics_type")
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "EXOPROTEOMICS", "count": 10},
+    {"value": "EXOPROTEOMICS", "count": 7},
     {"value": "METABOLOMICS", "count": 12},
-    {"value": "MICROARRAY", "count": 30},
+    {"value": "MICROARRAY", "count": 29},
     ...
   ]
 }
@@ -246,14 +246,14 @@ list_filter_values(filter_type="growth_phase")
 {
   "filter_type": "growth_phase",
   "description": null,
-  "total_entries": 10,
-  "returned": 10,
+  "total_entries": 11,
+  "returned": 11,
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "exponential", "count": 37},
+    {"value": "exponential", "count": 70},
     {"value": "darkness", "count": 33},
-    {"value": "stationary", "count": 32},
+    {"value": "acute_stress", "count": 26},
     ...
   ]
 }

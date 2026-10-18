@@ -25,7 +25,7 @@ rows:
   - boolean
   - categorical
   - numeric
-  experiment_count: 119
+  experiment_count: 118
   gene_count: 1973
   genus: Prochlorococcus
   growth_phases:
@@ -38,7 +38,6 @@ rows:
   - infected
   - nutrient_limited
   - recovery
-  - stationary
   interpro_gene_count: 1545
   measured_metabolite_count: 0
   ncbi_taxon_id: 59919

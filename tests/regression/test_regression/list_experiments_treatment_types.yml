@@ -7,7 +7,7 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -17,8 +17,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 419
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_400_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 400 ppm pCO2 vs
-    Axenic at 400 ppm pCO2 (RNASEQ)
+  experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 vs Mean Coculture Response
+    across Three Partners at 400 ppm pCO2 (RNASEQ)
   gene_count: 419
   growth_phases:
   - exponential
@@ -56,7 +56,7 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -66,8 +66,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 188
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_800_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 at 800 ppm pCO2 vs
-    Axenic at 800 ppm pCO2 (RNASEQ)
+  experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 vs Mean Coculture Response
+    across Three Partners at 800 ppm pCO2 (RNASEQ)
   gene_count: 188
   growth_phases:
   - exponential
@@ -105,7 +105,7 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -115,8 +115,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 293
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_400_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Synechococcus CC9311 at 400 ppm pCO2 vs Axenic
-    at 400 ppm pCO2 (RNASEQ)
+  experiment_name: EZ55 Coculture with Synechococcus CC9311 vs Mean Coculture Response
+    across Three Partners at 400 ppm pCO2 (RNASEQ)
   gene_count: 293
   growth_phases:
   - exponential
@@ -154,7 +154,7 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -164,8 +164,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 83
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_800_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Synechococcus CC9311 at 800 ppm pCO2 vs Axenic
-    at 800 ppm pCO2 (RNASEQ)
+  experiment_name: EZ55 Coculture with Synechococcus CC9311 vs Mean Coculture Response
+    across Three Partners at 800 ppm pCO2 (RNASEQ)
   gene_count: 83
   growth_phases:
   - exponential
@@ -203,7 +203,7 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -213,8 +213,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 136
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_400_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Synechococcus WH8102 at 400 ppm pCO2 vs Axenic
-    at 400 ppm pCO2 (RNASEQ)
+  experiment_name: EZ55 Coculture with Synechococcus WH8102 vs Mean Coculture Response
+    across Three Partners at 400 ppm pCO2 (RNASEQ)
   gene_count: 136
   growth_phases:
   - exponential
@@ -252,7 +252,7 @@ rows:
   - Melissa Walker
   - Zhiying Lu
   background_factors:
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   coculture_partner:
@@ -262,8 +262,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 58
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_800_ez55_rnaseq
-  experiment_name: EZ55 Coculture with Synechococcus WH8102 at 800 ppm pCO2 vs Axenic
-    at 800 ppm pCO2 (RNASEQ)
+  experiment_name: EZ55 Coculture with Synechococcus WH8102 vs Mean Coculture Response
+    across Three Partners at 800 ppm pCO2 (RNASEQ)
   gene_count: 58
   growth_phases:
   - exponential
@@ -313,7 +313,6 @@ rows:
   experiment_name: HOT1A3 Coculture with Prochlorococcus MED4 vs Axenic (RNASEQ)
   gene_count: 11841
   growth_phases:
-  - exponential
   - nutrient_limited
   is_time_course: time_course
   metabolite_assay_count: 0
@@ -328,7 +327,7 @@ rows:
   table_scope_detail: ''
   time_point_count: 3
   time_point_growth_phases:
-  - exponential
+  - nutrient_limited
   - nutrient_limited
   - nutrient_limited
   time_point_hours:
@@ -372,7 +371,8 @@ rows:
   distinct_gene_count: 1879
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 (high Alteromonas
-    inoculum, 5x10^6 cells/ml) vs Pro99 medium growth conditions (RNASEQ)
+    inoculum, 5x10^6 cells/ml) vs coculture with MIT9313 at low Alteromonas inoculum
+    (0.5x10^6 cells/ml) (RNASEQ)
   gene_count: 1879
   growth_phases:
   - exponential
@@ -383,7 +383,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1038/ismej.2016.70
-  significant_down_count: 0
+  significant_down_count: 179
   significant_up_count: 188
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -397,7 +397,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '179'
   time_point_significant_up:
   - '188'
   time_point_totals:
@@ -418,8 +418,8 @@ rows:
   derived_metric_value_kinds: []
   distinct_gene_count: 2295
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
-  experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs Pro99 medium growth
-    conditions (RNASEQ)
+  experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs coculture with
+    Prochlorococcus MED4 (RNASEQ)
   gene_count: 2295
   growth_phases:
   - exponential
@@ -430,7 +430,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1038/ismej.2016.70
-  significant_down_count: 0
+  significant_down_count: 82
   significant_up_count: 30
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -444,7 +444,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '82'
   time_point_significant_up:
   - '30'
   time_point_totals:
@@ -532,8 +532,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2016.70
-  significant_down_count: 272
-  significant_up_count: 24
+  significant_down_count: 300
+  significant_up_count: 42
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -546,9 +546,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '272'
+  - '300'
   time_point_significant_up:
-  - '24'
+  - '42'
   time_point_totals:
   - '1714'
   treatment_type:
@@ -579,7 +579,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MIT9313
   publication_doi: 10.1038/ismej.2016.70
-  significant_down_count: 45
+  significant_down_count: 50
   significant_up_count: 153
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -593,7 +593,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '45'
+  - '50'
   time_point_significant_up:
   - '153'
   time_point_totals:
@@ -865,6 +865,7 @@ rows:
   gene_count: 1554
   growth_phases:
   - acclimated_steady_state
+  - exponential
   is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -883,9 +884,9 @@ rows:
   - acclimated_steady_state
   - acclimated_steady_state
   - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
+  - exponential
+  - exponential
+  - exponential
   time_point_hours:
   - '1440.0'
   - '168.0'
@@ -958,6 +959,7 @@ rows:
   gene_count: 1288
   growth_phases:
   - acclimated_steady_state
+  - exponential
   is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -976,9 +978,9 @@ rows:
   - acclimated_steady_state
   - acclimated_steady_state
   - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
+  - exponential
+  - exponential
+  - exponential
   time_point_hours:
   - '1440.0'
   - '168.0'
@@ -1041,13 +1043,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner:
   - Synechococcus WH7803
-  compartment: exoproteome
+  compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
   distinct_gene_count: 1724
   experiment_id: 10.1038/nmicrobiol.2017.100_longterm_coculture_rpom_dss3_proteomics
-  experiment_name: R. pomeroyi DSS-3 proteome in long-term coculture with Synechococcus
-    WH7803 (seawater)
+  experiment_name: R. pomeroyi DSS-3 proteome in coculture with Synechococcus WH7803
+    (natural seawater, 10 days)
   gene_count: 1724
   growth_phases:
   - acclimated_steady_state
@@ -1055,7 +1057,7 @@ rows:
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
-  omics_type: EXOPROTEOMICS
+  omics_type: PROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
   publication_doi: 10.1038/nmicrobiol.2017.100
   significant_down_count: 216
@@ -1067,9 +1069,9 @@ rows:
   time_point_growth_phases:
   - acclimated_steady_state
   time_point_hours:
-  - '-1.0'
+  - '240.0'
   time_point_labels:
-  - long-term
+  - 10 days
   time_point_orders:
   - '1'
   time_point_significant_down:
@@ -1204,7 +1206,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Shewanella sp. W3-18-1
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 0
+  significant_down_count: 805
   significant_up_count: 490
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs axenic control
@@ -1218,7 +1220,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '805'
   time_point_significant_up:
   - '490'
   time_point_totals:
@@ -1263,7 +1265,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Shewanella sp. W3-18-1
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 0
+  significant_down_count: 249
   significant_up_count: 206
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in lactate co-culture vs axenic control
@@ -1277,7 +1279,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '249'
   time_point_significant_up:
   - '206'
   time_point_totals:
@@ -1323,7 +1325,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Shewanella sp. W3-18-1
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 0
+  significant_down_count: 751
   significant_up_count: 475
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs lactate co-culture
@@ -1337,7 +1339,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '751'
   time_point_significant_up:
   - '475'
   time_point_totals:
@@ -1383,7 +1385,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Synechococcus PCC 7002
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 0
+  significant_down_count: 342
   significant_up_count: 328
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs axenic control
@@ -1397,7 +1399,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '342'
   time_point_significant_up:
   - '328'
   time_point_totals:
@@ -1442,7 +1444,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Synechococcus PCC 7002
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 0
+  significant_down_count: 626
   significant_up_count: 517
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in lactate co-culture vs axenic control
@@ -1456,7 +1458,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '626'
   time_point_significant_up:
   - '517'
   time_point_totals:
@@ -1502,7 +1504,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Synechococcus PCC 7002
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 0
+  significant_down_count: 270
   significant_up_count: 403
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs lactate co-culture
@@ -1516,7 +1518,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '270'
   time_point_significant_up:
   - '403'
   time_point_totals:
@@ -1546,6 +1548,9 @@ rows:
   gene_count: 1547
   growth_phases:
   - acclimated_steady_state
+  - exponential
+  - nutrient_limited
+  - stationary
   is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -1561,12 +1566,12 @@ rows:
   time_point_count: 7
   time_point_growth_phases:
   - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
+  - exponential
+  - exponential
+  - exponential
+  - nutrient_limited
+  - stationary
+  - stationary
   time_point_hours:
   - '1440.0'
   - '168.0'
@@ -1639,6 +1644,8 @@ rows:
   gene_count: 1309
   growth_phases:
   - acclimated_steady_state
+  - exponential
+  - nutrient_limited
   is_time_course: time_course
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -1657,9 +1664,9 @@ rows:
   - acclimated_steady_state
   - acclimated_steady_state
   - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
-  - acclimated_steady_state
+  - exponential
+  - nutrient_limited
+  - nutrient_limited
   time_point_hours:
   - '1440.0'
   - '168.0'
@@ -1722,21 +1729,21 @@ rows:
   clustering_analysis_count: 0
   coculture_partner:
   - Ruegeria pomeroyi DSS-3
-  compartment: exoproteome
+  compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
   distinct_gene_count: 564
   experiment_id: 10.1038/nmicrobiol.2017.100_early_coculture_syn_wh7803_proteomics
-  experiment_name: Synechococcus WH7803 proteome in early coculture with R. pomeroyi
-    DSS-3 (ASW, 35 days)
+  experiment_name: Synechococcus WH7803 proteome in coculture with R. pomeroyi DSS-3
+    (ASW, 35 days)
   gene_count: 564
   growth_phases:
-  - acclimated_steady_state
+  - stationary
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
-  omics_type: EXOPROTEOMICS
+  omics_type: PROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1038/nmicrobiol.2017.100
   significant_down_count: 154
@@ -1746,7 +1753,7 @@ rows:
     co-culture conditions
   time_point_count: 1
   time_point_growth_phases:
-  - acclimated_steady_state
+  - stationary
   time_point_hours:
   - '840.0'
   time_point_labels:
@@ -1773,13 +1780,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner:
   - Ruegeria pomeroyi DSS-3
-  compartment: exoproteome
+  compartment: whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
   distinct_gene_count: 1050
   experiment_id: 10.1038/nmicrobiol.2017.100_late_coculture_syn_wh7803_proteomics
-  experiment_name: Synechococcus WH7803 proteome in late coculture with R. pomeroyi
-    DSS-3 (seawater, 10 days)
+  experiment_name: Synechococcus WH7803 proteome in coculture with R. pomeroyi DSS-3
+    (natural seawater, 10 days)
   gene_count: 1050
   growth_phases:
   - acclimated_steady_state
@@ -1787,7 +1794,7 @@ rows:
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
-  omics_type: EXOPROTEOMICS
+  omics_type: PROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1038/nmicrobiol.2017.100
   significant_down_count: 211
@@ -1996,7 +2003,7 @@ rows:
     (RNA-seq)
   gene_count: 129
   growth_phases:
-  - acclimated_steady_state
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2011,8 +2018,8 @@ rows:
     > 1.5, padj < 0.05), split by direction
   time_point_count: 2
   time_point_growth_phases:
-  - acclimated_steady_state
-  - acclimated_steady_state
+  - exponential
+  - exponential
   time_point_hours:
   - '96.0'
   - '96.0'
@@ -2055,7 +2062,7 @@ rows:
     (proteomics)
   gene_count: 34
   growth_phases:
-  - acclimated_steady_state
+  - exponential
   is_time_course: single_time_point
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -2070,7 +2077,7 @@ rows:
     0.05 by t-test of 9 pairwise comparisons)
   time_point_count: 1
   time_point_growth_phases:
-  - acclimated_steady_state
+  - exponential
   time_point_hours:
   - '96.0'
   time_point_labels:

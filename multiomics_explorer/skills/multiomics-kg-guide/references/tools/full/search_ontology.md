@@ -1134,7 +1134,7 @@ search_ontology(search_text="calvin", ontology=["kegg"])
       "score": 4.122564792633057,
       "level": 2,
       "is_informative": true,
-      "discussed_by_n_publications": 23,
+      "discussed_by_n_publications": 24,
       "gene_count": 714,
       "organism_count": 43
     }

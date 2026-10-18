@@ -20,16 +20,16 @@ examples:
         "by_organism_truncated": true,
         "by_treatment_type": [
           {"treatment_type": "coculture", "count": 11},
-          {"treatment_type": "carbon", "count": 6},
+          {"treatment_type": "carbon", "count": 7},
           {"treatment_type": "light", "count": 6},
-          {"treatment_type": "viral", "count": 5},
           {"treatment_type": "growth_phase", "count": 4},
+          {"treatment_type": "compartment", "count": 4},
           ...
         ],
         "by_background_factors": [
-          {"background_factor": "light", "count": 33},
           {"background_factor": "axenic", "count": 33},
-          {"background_factor": "diel", "count": 9},
+          {"background_factor": "light", "count": 32},
+          {"background_factor": "diel", "count": 10},
           {"background_factor": "coculture", "count": 8},
           {"background_factor": "darkness", "count": 3},
           ...
@@ -37,9 +37,9 @@ examples:
         "by_omics_type": [
           {"omics_type": "RNASEQ", "count": 26},
           {"omics_type": "MICROARRAY", "count": 10},
-          {"omics_type": "PROTEOMICS", "count": 8},
-          {"omics_type": "EXOPROTEOMICS", "count": 4},
+          {"omics_type": "PROTEOMICS", "count": 9},
           {"omics_type": "VESICLE_PROTEOMICS", "count": 3},
+          {"omics_type": "METABOLOMICS", "count": 3},
           ...
         ],
         "by_cluster_type": [
@@ -64,9 +64,9 @@ examples:
         ],
         "by_metric_type_truncated": true,
         "by_compartment": [
-          {"compartment": "whole_cell", "count": 44},
-          {"compartment": "exoproteome", "count": 4},
+          {"compartment": "whole_cell", "count": 45},
           {"compartment": "vesicle", "count": 3},
+          {"compartment": "exoproteome", "count": 3},
           {"compartment": "extracellular", "count": 1}
         ],
         "by_discusses_coverage": {"has_discusses": 45, "no_discusses": 4},
@@ -76,6 +76,30 @@ examples:
         "not_found": [],
         "warnings": [],
         "results": [
+          {
+            "doi": "10.1038/s41467-026-77598-7",
+            "title": "Biofilm formation and dynamics in the marine cyanobacterium Prochlorococcus",
+            "authors": ["Maya I. Anjur-Dietrich", "Katelyn G. Jones", "James I. Mullet", "Nhi Vo", "Kurt G. Castro", ...],
+            "year": 2026,
+            "journal": "Nature Communications",
+            "study_type": "Physiology|Transcriptomics|Metagenomics|Ecology",
+            "organisms": ["Prochlorococcus MIT9301"],
+            "experiment_count": 1,
+            "treatment_types": ["growth_phase"],
+            "background_factors": ["axenic", "light"],
+            "omics_types": ["RNASEQ"],
+            "clustering_analysis_count": 0,
+            "cluster_types": [],
+            "growth_phases": ["exponential"],
+            "derived_metric_count": 0,
+            "derived_metric_value_kinds": [],
+            "compartments": ["whole_cell"],
+            "metabolite_count": 0,
+            "metabolite_assay_count": 0,
+            "metabolite_compartments": [],
+            "discussed_gene_count": 5,
+            "discussed_pathway_count": 3
+          },
           {
             "doi": "10.64898/2026.04.15.718746",
             "title": "Extreme genome reduction selectively retains modular regulatory architecture in Prochlorococcus MED4: conserved trans...",
@@ -122,30 +146,6 @@ examples:
             "metabolite_assay_count": 0,
             "metabolite_compartments": [],
             "discussed_gene_count": 2,
-            "discussed_pathway_count": 2
-          },
-          {
-            "doi": "10.1101/2025.08.05.668435",
-            "title": "Biofilm formation and dynamics in the marine cyanobacterium Prochlorococcus",
-            "authors": ["Maya I. Anjur-Dietrich", "Katelyn G. Jones", "James I. Mullet", "Nhi N. Vo", "Kurt G. Castro", ...],
-            "year": 2025,
-            "journal": "bioRxiv",
-            "study_type": "Ecology, Microbiology",
-            "organisms": ["Prochlorococcus MIT9301"],
-            "experiment_count": 1,
-            "treatment_types": ["growth_phase"],
-            "background_factors": ["axenic", "light"],
-            "omics_types": ["RNASEQ"],
-            "clustering_analysis_count": 0,
-            "cluster_types": [],
-            "growth_phases": ["exponential"],
-            "derived_metric_count": 0,
-            "derived_metric_value_kinds": [],
-            "compartments": ["whole_cell"],
-            "metabolite_count": 0,
-            "metabolite_assay_count": 0,
-            "metabolite_compartments": [],
-            "discussed_gene_count": 5,
             "discussed_pathway_count": 2
           },
           ...
@@ -466,16 +466,16 @@ examples:
         "by_organism_truncated": true,
         "by_treatment_type": [
           {"treatment_type": "coculture", "count": 11},
-          {"treatment_type": "carbon", "count": 6},
+          {"treatment_type": "carbon", "count": 7},
           {"treatment_type": "light", "count": 6},
-          {"treatment_type": "viral", "count": 5},
           {"treatment_type": "growth_phase", "count": 4},
+          {"treatment_type": "compartment", "count": 4},
           ...
         ],
         "by_background_factors": [
-          {"background_factor": "light", "count": 33},
           {"background_factor": "axenic", "count": 33},
-          {"background_factor": "diel", "count": 9},
+          {"background_factor": "light", "count": 32},
+          {"background_factor": "diel", "count": 10},
           {"background_factor": "coculture", "count": 8},
           {"background_factor": "darkness", "count": 3},
           ...
@@ -483,9 +483,9 @@ examples:
         "by_omics_type": [
           {"omics_type": "RNASEQ", "count": 26},
           {"omics_type": "MICROARRAY", "count": 10},
-          {"omics_type": "PROTEOMICS", "count": 8},
-          {"omics_type": "EXOPROTEOMICS", "count": 4},
+          {"omics_type": "PROTEOMICS", "count": 9},
           {"omics_type": "VESICLE_PROTEOMICS", "count": 3},
+          {"omics_type": "METABOLOMICS", "count": 3},
           ...
         ],
         "by_cluster_type": [
@@ -510,9 +510,9 @@ examples:
         ],
         "by_metric_type_truncated": true,
         "by_compartment": [
-          {"compartment": "whole_cell", "count": 44},
-          {"compartment": "exoproteome", "count": 4},
+          {"compartment": "whole_cell", "count": 45},
           {"compartment": "vesicle", "count": 3},
+          {"compartment": "exoproteome", "count": 3},
           {"compartment": "extracellular", "count": 1}
         ],
         "by_discusses_coverage": {"has_discusses": 45, "no_discusses": 4},
@@ -522,6 +522,30 @@ examples:
         "not_found": [],
         "warnings": [],
         "results": [
+          {
+            "doi": "10.1038/s41467-026-77598-7",
+            "title": "Biofilm formation and dynamics in the marine cyanobacterium Prochlorococcus",
+            "authors": ["Maya I. Anjur-Dietrich", "Katelyn G. Jones", "James I. Mullet", "Nhi Vo", "Kurt G. Castro", ...],
+            "year": 2026,
+            "journal": "Nature Communications",
+            "study_type": "Physiology|Transcriptomics|Metagenomics|Ecology",
+            "organisms": ["Prochlorococcus MIT9301"],
+            "experiment_count": 1,
+            "treatment_types": ["growth_phase"],
+            "background_factors": ["axenic", "light"],
+            "omics_types": ["RNASEQ"],
+            "clustering_analysis_count": 0,
+            "cluster_types": [],
+            "growth_phases": ["exponential"],
+            "derived_metric_count": 0,
+            "derived_metric_value_kinds": [],
+            "compartments": ["whole_cell"],
+            "metabolite_count": 0,
+            "metabolite_assay_count": 0,
+            "metabolite_compartments": [],
+            "discussed_gene_count": 5,
+            "discussed_pathway_count": 3
+          },
           {
             "doi": "10.64898/2026.04.15.718746",
             "title": "Extreme genome reduction selectively retains modular regulatory architecture in Prochlorococcus MED4: conserved trans...",
@@ -568,30 +592,6 @@ examples:
             "metabolite_assay_count": 0,
             "metabolite_compartments": [],
             "discussed_gene_count": 2,
-            "discussed_pathway_count": 2
-          },
-          {
-            "doi": "10.1101/2025.08.05.668435",
-            "title": "Biofilm formation and dynamics in the marine cyanobacterium Prochlorococcus",
-            "authors": ["Maya I. Anjur-Dietrich", "Katelyn G. Jones", "James I. Mullet", "Nhi N. Vo", "Kurt G. Castro", ...],
-            "year": 2025,
-            "journal": "bioRxiv",
-            "study_type": "Ecology, Microbiology",
-            "organisms": ["Prochlorococcus MIT9301"],
-            "experiment_count": 1,
-            "treatment_types": ["growth_phase"],
-            "background_factors": ["axenic", "light"],
-            "omics_types": ["RNASEQ"],
-            "clustering_analysis_count": 0,
-            "cluster_types": [],
-            "growth_phases": ["exponential"],
-            "derived_metric_count": 0,
-            "derived_metric_value_kinds": [],
-            "compartments": ["whole_cell"],
-            "metabolite_count": 0,
-            "metabolite_assay_count": 0,
-            "metabolite_compartments": [],
-            "discussed_gene_count": 5,
             "discussed_pathway_count": 2
           },
           ...

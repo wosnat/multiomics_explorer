@@ -6,7 +6,7 @@ rows:
   - Katelyn G. Jones
   - Kurt G. Castro
   - Maya I. Anjur-Dietrich
-  - Nhi N. Vo
+  - Nhi Vo
   - Sallie W. Chisholm
   - Sierra M. Parker
   background_factors:
@@ -19,12 +19,12 @@ rows:
   derived_metric_count: 0
   derived_metric_value_kinds: []
   discussed_gene_count: 5
-  discussed_pathway_count: 2
-  doi: 10.1101/2025.08.05.668435
+  discussed_pathway_count: 3
+  doi: 10.1038/s41467-026-77598-7
   experiment_count: 1
   growth_phases:
   - exponential
-  journal: bioRxiv
+  journal: Nature Communications
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
@@ -32,11 +32,11 @@ rows:
   - RNASEQ
   organisms:
   - Prochlorococcus MIT9301
-  study_type: Ecology, Microbiology
+  study_type: Physiology|Transcriptomics|Metagenomics|Ecology
   title: Biofilm formation and dynamics in the marine cyanobacterium Prochlorococcus
   treatment_types:
   - growth_phase
-  year: 2025
+  year: 2026
 - authors:
   - Aldo Arellano
   - Allison Coe
@@ -404,6 +404,7 @@ rows:
   experiment_count: 3
   growth_phases:
   - exponential
+  - unknown
   journal: The ISME Journal
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -543,7 +544,7 @@ rows:
   discussed_gene_count: 32
   discussed_pathway_count: 0
   doi: 10.1038/ismej.2011.49
-  experiment_count: 5
+  experiment_count: 4
   growth_phases:
   - acute_stress
   - nutrient_limited
@@ -746,6 +747,7 @@ rows:
   growth_phases:
   - acute_stress
   - exponential
+  - nutrient_limited
   journal: Molecular Systems Biology
   metabolite_assay_count: 0
   metabolite_compartments: []

@@ -46,7 +46,7 @@ rows:
   genus: Alteromonas
   growth_phases:
   - darkness
-  - stationary
+  - exponential
   interpro_gene_count: 3746
   measured_metabolite_count: 0
   ncbi_taxon_id: 232
@@ -210,7 +210,6 @@ rows:
   - axenic
   - coculture
   - diel
-  - light
   catalyzed_metabolite_count: 1426
   clade: null
   cluster_types: []
@@ -318,6 +317,7 @@ rows:
   - darkness
   - diel
   - exponential
+  - unknown
   interpro_gene_count: 3584
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
@@ -412,7 +412,7 @@ rows:
   gene_count: 0
   genus: Escherichia
   growth_phases:
-  - acclimated_steady_state
+  - exponential
   interpro_gene_count: 0
   measured_metabolite_count: 0
   ncbi_taxon_id: 562
@@ -449,7 +449,7 @@ rows:
   genus: Marinobacter
   growth_phases:
   - darkness
-  - stationary
+  - exponential
   interpro_gene_count: 3780
   measured_metabolite_count: 0
   ncbi_taxon_id: 225937
@@ -516,12 +516,11 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 10
+  experiment_count: 9
   gene_count: 0
   genus: null
   growth_phases:
   - acute_stress
-  - exponential
   - infected
   interpro_gene_count: 0
   measured_metabolite_count: 0
@@ -534,7 +533,7 @@ rows:
   organism_name: Phage
   organism_type: treatment
   peptidase_gene_count: 0
-  publication_count: 5
+  publication_count: 4
   reaction_count: 0
   reference_database: null
   reference_proteome: null
@@ -603,7 +602,7 @@ rows:
   - boolean
   - categorical
   - numeric
-  experiment_count: 119
+  experiment_count: 118
   gene_count: 1973
   genus: Prochlorococcus
   growth_phases:
@@ -616,7 +615,6 @@ rows:
   - infected
   - nutrient_limited
   - recovery
-  - stationary
   interpro_gene_count: 1545
   measured_metabolite_count: 0
   ncbi_taxon_id: 59919
@@ -980,7 +978,7 @@ rows:
   - boolean
   - categorical
   - numeric
-  experiment_count: 40
+  experiment_count: 39
   gene_count: 2906
   genus: Prochlorococcus
   growth_phases:
@@ -1018,7 +1016,6 @@ rows:
   - nitrogen
   - phosphorus
   - tss_mapping
-  - viral
 - background_factors: []
   catalyzed_metabolite_count: 1018
   clade: HLI
@@ -1109,9 +1106,11 @@ rows:
   - darkness
   - diel
   - exponential
+  - infected
   - nutrient_limited
   - recovery
   - stationary
+  - unknown
   interpro_gene_count: 1567
   measured_metabolite_count: 0
   ncbi_taxon_id: 59920
@@ -1228,6 +1227,7 @@ rows:
   - axenic
   - coculture
   - darkness
+  - diel
   - light
   catalyzed_metabolite_count: 1046
   clade: LLII
@@ -1317,6 +1317,9 @@ rows:
   genus: Ruegeria
   growth_phases:
   - acclimated_steady_state
+  - exponential
+  - nutrient_limited
+  - stationary
   interpro_gene_count: 3953
   measured_metabolite_count: 0
   ncbi_taxon_id: 89184
@@ -1324,6 +1327,7 @@ rows:
   nonpeptidase_homolog_gene_count: 33
   omics_types:
   - EXOPROTEOMICS
+  - PROTEOMICS
   organism_name: Ruegeria pomeroyi DSS-3
   organism_type: genome_strain
   peptidase_gene_count: 111
@@ -1373,7 +1377,7 @@ rows:
 - background_factors:
   - axenic
   - coculture
-  - light
+  - diel
   catalyzed_metabolite_count: 1128
   clade: I
   cluster_types: []
@@ -1459,7 +1463,9 @@ rows:
   growth_phases:
   - acclimated_steady_state
   - darkness
+  - exponential
   - infected
+  - nutrient_limited
   - stationary
   interpro_gene_count: 2079
   measured_metabolite_count: 0
@@ -1505,7 +1511,6 @@ rows:
   - darkness
   - exponential
   - infected
-  - stationary
   interpro_gene_count: 2105
   measured_metabolite_count: 0
   ncbi_taxon_id: 84588
@@ -1610,7 +1615,7 @@ rows:
   gene_count: 2714
   genus: Synechococcus
   growth_phases:
-  - acclimated_steady_state
+  - exponential
   interpro_gene_count: 2336
   measured_metabolite_count: 0
   ncbi_taxon_id: 1350461
@@ -1647,7 +1652,7 @@ rows:
   genus: Synechococcus
   growth_phases:
   - darkness
-  - stationary
+  - exponential
   interpro_gene_count: 1998
   measured_metabolite_count: 0
   ncbi_taxon_id: 313625

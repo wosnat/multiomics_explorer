@@ -471,7 +471,7 @@ rows:
   score: 2.7067
   tree: null
   tree_code: null
-- discussed_by_n_publications: 6
+- discussed_by_n_publications: 7
   gene_count: 1721
   id: kegg.pathway:ko00860
   is_informative: true

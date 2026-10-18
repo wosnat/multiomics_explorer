@@ -104,7 +104,7 @@ rows:
   experiment_count: 60
   growth_phases:
   - darkness
-  - stationary
+  - exponential
   journal: Microbiology Spectrum
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -468,7 +468,7 @@ rows:
   discussed_gene_count: 32
   discussed_pathway_count: 0
   doi: 10.1038/ismej.2011.49
-  experiment_count: 5
+  experiment_count: 4
   growth_phases:
   - acute_stress
   - nutrient_limited
@@ -704,6 +704,7 @@ rows:
   growth_phases:
   - acute_stress
   - exponential
+  - nutrient_limited
   journal: Molecular Systems Biology
   metabolite_assay_count: 0
   metabolite_compartments: []

@@ -95,7 +95,7 @@ rows:
   coordinate_source: ncbi
   discussed_in_publication_count: 1
   end: 1331
-  expression_edge_count: 38
+  expression_edge_count: 37
   function_description: Confers DNA tethering and processivity to DNA polymerases
     and other proteins. Acts as a clamp, forming a ring around DNA (a reaction catalyzed
     by the clamp-loading complex) which diffuses in an ATP-independent manner freely
@@ -159,7 +159,7 @@ rows:
   seed_ortholog_evalue: 0.0
   sequence: MEIVCNQNEFNYAIQLVSKAVASRPTHPILANLLLTADQGTNKISLTGFDLNLGIQTSFDATVNKSGAITIPSKLLSEIVNKLPSETPVSLDVDESSDNILIKSDRGSFNIKGIPSDDYPSLPFVESGTSLNIDPSSFLKALKLTIFASSSDDSKQLLTGVNFTFNLKYLESAATDGHRLAVVLVDNKENFDEKEDFASNEENLSVTIPTRSLREIEKLVSLRSSENSIKLFYDKGQVVFISSNQIITTRTLEGSYPNYSQLIPDNFTKIFTFNTKKIIESLERIAVLADQQSSVVKIKLNEKDLALVSADAQDIGNASELVPVSFYFDQFDIAFNVRYLLEGLKVISSENVIFKCNLPTTPAVLVPEDNINSFTYLVMPVQVRS
   sequence_source: ncbi
-  significant_down_count: 1
+  significant_down_count: 2
   significant_up_count: 5
   start: 174
   strand: +

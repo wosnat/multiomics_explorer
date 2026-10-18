@@ -354,3 +354,13 @@ Separately, a question: the CV is `closed: true` with 2 values but `exhaustive: 
   it needs a restart before the absorb (our side, not yours).
 
 Ready to absorb. Nothing else is needed from the KG apart from the P3 wording fix.
+
+## KG follow-up (2026-10-14)
+
+Both review notes fixed on the KG side, pending the next dev rebuild: the `background` value and
+entry descriptions now say "present in the culture the measured samples came from … in a pooled
+design (background_factors lists both axenic and coculture) only part of the samples were
+cocultures"; and the `^` is gone from every description — not by changing the sanitizer (the
+`'` -> `^` rule is the BioCypher/neo4j import contract and stays), but by rephrasing all 65
+vocabulary texts that carried an apostrophe (quoted tokens use backticks, possessives reworded).
+`tests/test_controlled_vocab.py::test_descriptions_carry_no_apostrophe_or_pipe` guards every entry.

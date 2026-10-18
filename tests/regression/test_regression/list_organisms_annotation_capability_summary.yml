@@ -71,7 +71,7 @@ results:
   genus: Alteromonas
   growth_phases:
   - darkness
-  - stationary
+  - exponential
   interpro_gene_count: 3746
   measured_metabolite_count: 0
   ncbi_taxon_id: 232
@@ -104,12 +104,11 @@ results:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 10
+  experiment_count: 9
   gene_count: 0
   genus: null
   growth_phases:
   - acute_stress
-  - exponential
   - infected
   interpro_gene_count: 0
   measured_metabolite_count: 0
@@ -122,7 +121,7 @@ results:
   organism_name: Phage
   organism_type: treatment
   peptidase_gene_count: 0
-  publication_count: 5
+  publication_count: 4
   reaction_count: 0
   species: null
   strain: null
@@ -154,7 +153,7 @@ results:
   - boolean
   - categorical
   - numeric
-  experiment_count: 119
+  experiment_count: 118
   gene_count: 1973
   genus: Prochlorococcus
   growth_phases:
@@ -167,7 +166,6 @@ results:
   - infected
   - nutrient_limited
   - recovery
-  - stationary
   interpro_gene_count: 1545
   measured_metabolite_count: 0
   ncbi_taxon_id: 59919

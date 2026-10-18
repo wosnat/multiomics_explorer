@@ -1,5 +1,5 @@
 case_id: de_by_gene_verbose
-row_count: 38
+row_count: 37
 rows:
 - background_factors:
   - light
@@ -8,7 +8,7 @@ rows:
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
     (RNASEQ)
-  expression_status: not_significant
+  expression_status: significant_down
   gene_category: Replication and repair
   gene_name: dnaN
   growth_phase: exponential
@@ -18,7 +18,7 @@ rows:
   padj: 0.0311
   product: DNA polymerase III, beta subunit
   rank: 581
-  rank_down: null
+  rank_down: 277
   rank_up: null
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -59,12 +59,12 @@ rows:
   - light
   coculture_partner: []
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (RNASEQ)
+  experiment_name: MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential
+    growth (RNASEQ)
   expression_status: significant_up
   gene_category: Replication and repair
   gene_name: dnaN
-  growth_phase: nutrient_limited
+  growth_phase: death
   locus_tag: PMM0001
   log2fc: 1.885
   omics_type: RNASEQ
@@ -117,7 +117,7 @@ rows:
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
-  growth_phase: acute_stress
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: 1.1985
   omics_type: MICROARRAY
@@ -145,7 +145,7 @@ rows:
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
-  growth_phase: stationary
+  growth_phase: exponential
   locus_tag: PMM0001
   log2fc: -1.1726
   omics_type: PROTEOMICS
@@ -156,8 +156,8 @@ rows:
   rank_up: null
   table_scope: all_detected_genes
   table_scope_detail: ''
-  timepoint: stationary
-  timepoint_hours: null
+  timepoint: 24h
+  timepoint_hours: 24.0
   timepoint_order: 1
   treatment: Light + 5 mM glucose addition
   treatment_type:
@@ -195,8 +195,8 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
+  experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
+    PRO99-lowN exponential growth (PROTEOMICS)
   expression_status: significant_up
   gene_category: Replication and repair
   gene_name: dnaN
@@ -333,7 +333,7 @@ rows:
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
-  growth_phase: acute_stress
+  growth_phase: nutrient_limited
   locus_tag: PMM0001
   log2fc: 0.8628
   omics_type: MICROARRAY
@@ -383,8 +383,8 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
+  experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
+    PRO99-lowN exponential growth (PROTEOMICS)
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
@@ -432,40 +432,13 @@ rows:
   treatment_type:
   - coculture
 - background_factors:
-  - axenic
-  - light
-  coculture_partner: []
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (RNASEQ)
-  expression_status: not_significant
-  gene_category: Replication and repair
-  gene_name: dnaN
-  growth_phase: nutrient_limited
-  locus_tag: PMM0001
-  log2fc: 0.6293
-  omics_type: RNASEQ
-  padj: 0.0641
-  product: DNA polymerase III, beta subunit
-  rank: 834
-  rank_down: null
-  rank_up: null
-  table_scope: all_detected_genes
-  table_scope_detail: ''
-  timepoint: days 60+89
-  timepoint_hours: null
-  timepoint_order: 2
-  treatment: PRO99-lowN nutrient starvation
-  treatment_type:
-  - nitrogen
-- background_factors:
   - coculture
   - light
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
+  experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
+    PRO99-lowN exponential growth (PROTEOMICS)
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
@@ -492,8 +465,8 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
+  experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
+    PRO99-lowN exponential growth (PROTEOMICS)
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
@@ -520,8 +493,8 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
+  experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
+    PRO99-lowN exponential growth (PROTEOMICS)
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
@@ -591,8 +564,8 @@ rows:
   rank_up: null
   table_scope: all_detected_genes
   table_scope_detail: ''
-  timepoint: darkness
-  timepoint_hours: null
+  timepoint: 24h
+  timepoint_hours: 24.0
   timepoint_order: 1
   treatment: Darkness + 5 mM glucose addition
   treatment_type:
@@ -602,12 +575,12 @@ rows:
   - light
   coculture_partner: []
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
+  experiment_name: MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential
+    growth (PROTEOMICS)
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
-  growth_phase: nutrient_limited
+  growth_phase: death
   locus_tag: PMM0001
   log2fc: 0.3774
   omics_type: PROTEOMICS
@@ -700,8 +673,8 @@ rows:
   rank_up: null
   table_scope: all_detected_genes
   table_scope_detail: ''
-  timepoint: darkness
-  timepoint_hours: null
+  timepoint: 24h
+  timepoint_hours: 24.0
   timepoint_order: 1
   treatment: Darkness + 100 nM glucose addition
   treatment_type:
@@ -793,8 +766,8 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (RNASEQ)
+  experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
+    PRO99-lowN exponential growth (RNASEQ)
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
@@ -821,8 +794,8 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (RNASEQ)
+  experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
+    PRO99-lowN exponential growth (RNASEQ)
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
@@ -854,7 +827,7 @@ rows:
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
-  growth_phase: stationary
+  growth_phase: exponential
   locus_tag: PMM0001
   log2fc: 0.121
   omics_type: PROTEOMICS
@@ -865,8 +838,8 @@ rows:
   rank_up: null
   table_scope: all_detected_genes
   table_scope_detail: ''
-  timepoint: stationary
-  timepoint_hours: null
+  timepoint: 24h
+  timepoint_hours: 24.0
   timepoint_order: 1
   treatment: Light + 100 nM glucose addition
   treatment_type:
@@ -876,8 +849,8 @@ rows:
   - light
   coculture_partner: []
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
+  experiment_name: MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential
+    growth (PROTEOMICS)
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
@@ -903,8 +876,8 @@ rows:
   - light
   coculture_partner: []
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (PROTEOMICS)
+  experiment_name: MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential
+    growth (PROTEOMICS)
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
@@ -958,8 +931,8 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (RNASEQ)
+  experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
+    PRO99-lowN exponential growth (RNASEQ)
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
@@ -986,8 +959,8 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (RNASEQ)
+  experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
+    PRO99-lowN exponential growth (RNASEQ)
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN
@@ -1014,8 +987,8 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
-  experiment_name: MED4 PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth
-    (RNASEQ)
+  experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
+    PRO99-lowN exponential growth (RNASEQ)
   expression_status: not_significant
   gene_category: Replication and repair
   gene_name: dnaN

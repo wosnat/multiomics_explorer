@@ -1,5 +1,5 @@
 case_id: differential_expression_by_ortholog_significant
-row_count: 49
+row_count: 48
 rows:
 - background_factors:
   - axenic
@@ -34,7 +34,7 @@ rows:
   organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
-  timepoint: max across 3-24h
+  timepoint: max across 70min-24h
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
@@ -53,7 +53,7 @@ rows:
   organism_name: Prochlorococcus MED4
   significant_down: 1
   significant_up: 0
-  timepoint: max across 3-24h
+  timepoint: max across 70min-24h
   timepoint_hours: null
   timepoint_order: 1
   treatment_type:
@@ -86,7 +86,7 @@ rows:
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
-  growth_phase: acute_stress
+  growth_phase: nutrient_limited
   not_significant: 0
   organism_name: Prochlorococcus MED4
   significant_down: 1
@@ -105,7 +105,7 @@ rows:
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
-  growth_phase: acute_stress
+  growth_phase: nutrient_limited
   not_significant: 0
   organism_name: Prochlorococcus MED4
   significant_down: 1
@@ -261,7 +261,7 @@ rows:
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
-  growth_phase: nutrient_limited
+  growth_phase: death
   not_significant: 0
   organism_name: Prochlorococcus MED4
   significant_down: 1
@@ -269,25 +269,6 @@ rows:
   timepoint: day 14
   timepoint_hours: 336.0
   timepoint_order: 1
-  treatment_type:
-  - nitrogen
-- background_factors:
-  - axenic
-  - light
-  coculture_partner: []
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  growth_phase: nutrient_limited
-  not_significant: 0
-  organism_name: Prochlorococcus MED4
-  significant_down: 1
-  significant_up: 0
-  timepoint: days 60+89
-  timepoint_hours: null
-  timepoint_order: 2
   treatment_type:
   - nitrogen
 - background_factors:
@@ -357,7 +338,7 @@ rows:
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_mit9313_mit9313_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
-  growth_phase: acute_stress
+  growth_phase: nutrient_limited
   not_significant: 0
   organism_name: Prochlorococcus MIT9313
   significant_down: 1
@@ -376,7 +357,7 @@ rows:
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_mit9313_mit9313_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
-  growth_phase: acute_stress
+  growth_phase: nutrient_limited
   not_significant: 0
   organism_name: Prochlorococcus MIT9313
   significant_down: 1
@@ -593,13 +574,13 @@ rows:
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_ss120_proteomics
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
-  growth_phase: stationary
+  growth_phase: exponential
   not_significant: 0
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   significant_down: 0
   significant_up: 1
-  timepoint: stationary
-  timepoint_hours: null
+  timepoint: 24h
+  timepoint_hours: 24.0
   timepoint_order: 1
   treatment_type:
   - carbon
@@ -726,7 +707,7 @@ rows:
   experiment_id: 10.1038/nmicrobiol.2017.100_early_coculture_syn_wh7803_proteomics
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
-  growth_phase: acclimated_steady_state
+  growth_phase: stationary
   not_significant: 0
   organism_name: Synechococcus WH7803
   significant_down: 0

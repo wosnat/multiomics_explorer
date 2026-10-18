@@ -87,7 +87,7 @@ rows:
   background_factors:
   - axenic
   - coculture
-  - light
+  - diel
   cluster_types: []
   clustering_analysis_count: 0
   compartments:
@@ -138,7 +138,7 @@ rows:
   doi: 10.1186/s13068-022-02163-5
   experiment_count: 2
   growth_phases:
-  - acclimated_steady_state
+  - exponential
   journal: Biotechnology for Biofuels and Bioproducts
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -176,6 +176,9 @@ rows:
   experiment_count: 4
   growth_phases:
   - acclimated_steady_state
+  - exponential
+  - nutrient_limited
+  - stationary
   journal: Environmental Microbiology
   metabolite_assay_count: 0
   metabolite_compartments: []
@@ -202,7 +205,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments:
-  - exoproteome
+  - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
   discussed_gene_count: 11
@@ -211,12 +214,13 @@ rows:
   experiment_count: 3
   growth_phases:
   - acclimated_steady_state
+  - stationary
   journal: Nature Microbiology
   metabolite_assay_count: 0
   metabolite_compartments: []
   metabolite_count: 0
   omics_types:
-  - EXOPROTEOMICS
+  - PROTEOMICS
   organisms:
   - Ruegeria pomeroyi DSS-3
   - Synechococcus WH7803
@@ -245,6 +249,7 @@ rows:
   experiment_count: 3
   growth_phases:
   - exponential
+  - unknown
   journal: The ISME Journal
   metabolite_assay_count: 0
   metabolite_compartments: []

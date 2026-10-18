@@ -129,13 +129,13 @@ list_experiments(summary=True)
 
 ```example-response
 {
-  "total_entries": 209,
-  "total_matching": 209,
+  "total_entries": 208,
+  "total_matching": 208,
   "returned": 0,
   "offset": 0,
   "truncated": true,
   "by_organism": [
-    {"organism_name": "Prochlorococcus MED4", "count": 45},
+    {"organism_name": "Prochlorococcus MED4", "count": 44},
     {"organism_name": "Alteromonas (MarRef v6)", "count": 20},
     {"organism_name": "Marinobacter (MarRef v6)", "count": 20},
     {"organism_name": "Prochlorococcus MIT9313", "count": 18},
@@ -144,7 +144,7 @@ list_experiments(summary=True)
   ],
   "by_organism_truncated": null,
   "by_treatment_type": [
-    {"treatment_type": "carbon", "count": 78},
+    {"treatment_type": "carbon", "count": 79},
     {"treatment_type": "coculture", "count": 36},
     {"treatment_type": "compartment", "count": 17},
     {"treatment_type": "nitrogen", "count": 16},
@@ -153,18 +153,18 @@ list_experiments(summary=True)
   ],
   "by_treatment_type_truncated": null,
   "by_background_factors": [
-    {"background_factor": "light", "count": 127},
-    {"background_factor": "axenic", "count": 90},
-    {"background_factor": "coculture", "count": 78},
+    {"background_factor": "light", "count": 119},
+    {"background_factor": "axenic", "count": 85},
+    {"background_factor": "coculture", "count": 77},
     {"background_factor": "darkness", "count": 37},
-    {"background_factor": "diel", "count": 19},
+    {"background_factor": "diel", "count": 31},
     ...
   ],
   "by_background_factors_truncated": null,
   "by_omics_type": [
-    {"omics_type": "PROTEOMICS", "count": 74},
+    {"omics_type": "PROTEOMICS", "count": 77},
     {"omics_type": "RNASEQ", "count": 71},
-    {"omics_type": "MICROARRAY", "count": 30},
+    {"omics_type": "MICROARRAY", "count": 29},
     {"omics_type": "METABOLOMICS", "count": 12},
     {"omics_type": "VESICLE_PROTEOMICS", "count": 10},
     ...
@@ -182,21 +182,21 @@ list_experiments(summary=True)
     {"table_scope": "all_detected_genes", "count": 111},
     {"table_scope": "significant_only", "count": 40},
     {"table_scope": "filtered_subset", "count": 21},
-    {"table_scope": "significant_any_timepoint", "count": 13},
+    {"table_scope": "significant_any_timepoint", "count": 12},
     {"table_scope": "top_n", "count": 7}
   ],
   "by_cluster_type": [
-    {"cluster_type": "time_course", "count": 9},
+    {"cluster_type": "time_course", "count": 8},
     {"cluster_type": "diel", "count": 2},
     {"cluster_type": "condition_comparison", "count": 2},
     {"cluster_type": "decay_pattern", "count": 1}
   ],
   "by_growth_phase": [
-    {"growth_phase": "exponential", "count": 37},
+    {"growth_phase": "exponential", "count": 70},
     {"growth_phase": "darkness", "count": 33},
-    {"growth_phase": "stationary", "count": 32},
     {"growth_phase": "acute_stress", "count": 26},
-    {"growth_phase": "acclimated_steady_state", "count": 23},
+    {"growth_phase": "acclimated_steady_state", "count": 20},
+    {"growth_phase": "nutrient_limited", "count": 17},
     ...
   ],
   "by_value_kind": [
@@ -214,13 +214,13 @@ list_experiments(summary=True)
   ],
   "by_metric_type_truncated": null,
   "by_compartment": [
-    {"compartment": "whole_cell", "count": 183},
+    {"compartment": "whole_cell", "count": 185},
     {"compartment": "vesicle", "count": 13},
-    {"compartment": "exoproteome", "count": 10},
+    {"compartment": "exoproteome", "count": 7},
     {"compartment": "extracellular", "count": 3}
   ],
-  "by_coculture_role": [{"coculture_role": "background", "count": 78}, {"coculture_role": "treatment", "count": 44}],
-  "time_course_count": 41,
+  "by_coculture_role": [{"coculture_role": "background", "count": 77}, {"coculture_role": "treatment", "count": 43}],
+  "time_course_count": 40,
   "score_max": null,
   "score_median": null,
   "not_found": [],
@@ -303,7 +303,7 @@ list_experiments(compartment="vesicle", limit=2)
 
 ```example-response
 {
-  "total_entries": 209,
+  "total_entries": 208,
   "total_matching": 13,
   "returned": 2,
   "offset": 0,
@@ -445,7 +445,7 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
 
 ```example-response
 {
-  "total_entries": 209,
+  "total_entries": 208,
   "total_matching": 2,
   "returned": 2,
   "offset": 0,

@@ -1,6 +1,21 @@
 case_id: de_by_gene_significant_only
-row_count: 6
+row_count: 7
 rows:
+- experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
+  expression_status: significant_down
+  gene_name: dnaN
+  growth_phase: exponential
+  locus_tag: PMM0001
+  log2fc: -2.8863
+  padj: 0.0311
+  rank: 581
+  rank_down: 277
+  rank_up: null
+  timepoint: 20h
+  timepoint_hours: 20.0
+  timepoint_order: 1
+  treatment_type:
+  - coculture
 - experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   expression_status: significant_up
   gene_name: dnaN
@@ -19,7 +34,7 @@ rows:
 - experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   expression_status: significant_up
   gene_name: dnaN
-  growth_phase: nutrient_limited
+  growth_phase: death
   locus_tag: PMM0001
   log2fc: 1.885
   padj: 0.0
