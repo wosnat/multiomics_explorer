@@ -4862,6 +4862,19 @@ class TestMetaboliteIdentitySurface:
         assert any("kegg.compound:C00078" in w for w in out["warnings"]), \
             out["warnings"]
 
+    def test_removed_stereo_xref_lands_in_not_found_with_warning(self, conn):
+        rows = conn.execute_query(
+            "MATCH (m:Metabolite) WHERE m.removed_stereo_xrefs IS NOT NULL "
+            "RETURN m.id AS id, m.removed_stereo_xrefs[0] AS x LIMIT 1")
+        if not rows:
+            pytest.skip("KG predates Metabolite.removed_stereo_xrefs")
+        gen, removed = rows[0]["id"], rows[0]["x"]
+        out = api.list_metabolites(metabolite_ids=[removed], conn=conn)
+        assert out["not_found"]["metabolite_ids"] == [removed]
+        assert out["resolved_aliases"] == {}
+        assert any(gen in w and "stereo" in w for w in out["warnings"]), \
+            out["warnings"]
+
     def test_role_id_lands_in_not_found_with_warning(self, conn):
         out = api.list_metabolites(metabolite_ids=["chebi:10004"], conn=conn)
         assert out["not_found"]["metabolite_ids"] == ["chebi:10004"]

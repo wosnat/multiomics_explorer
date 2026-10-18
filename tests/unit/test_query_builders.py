@@ -13299,6 +13299,18 @@ class TestBuildResolveMetaboliteCuries:
         assert "r.id = c" in cypher
         assert "c IN r.all_identifiers" in cypher
 
+    def test_removed_stereo_xref_branch(self):
+        """An id removed from a generic node because it names a more
+        specific stereo form (`Metabolite.removed_stereo_xrefs`) is a
+        diagnostic, never a resolution."""
+        cypher, _ = self._build(["chebi:41582"])
+        assert "removed_stereo_xrefs" in cypher
+        assert "AS stereo_removed_from" in cypher
+        return_clause = cypher[cypher.rfind("RETURN"):]
+        assert "stereo_removed_from" in return_clause
+        # Gated like the other diagnostics.
+        assert cypher.count("size(canonical) = 0") >= 3
+
     def test_diagnostic_branches_gated_on_no_canonical(self):
         cypher, _ = self._build(["kegg.compound:C00525"])
         assert cypher.count("size(canonical) = 0") >= 2

@@ -8012,7 +8012,7 @@ def _canonicalize_metabolite_ids(
     Each input is normalised to a CURIE (`_normalize_metabolite_curie`)
     and looked up by `build_resolve_metabolite_curies`: `Metabolite.id`
     first, then `Metabolite.all_identifiers`, then the diagnostic
-    `recurated_from_ids` and `ChemicalRole` branches.
+    `recurated_from_ids`, `removed_stereo_xrefs` and `ChemicalRole` branches.
 
     Returns `(canonical_ids, resolved_aliases, warnings)`:
       - `canonical_ids`: input order preserved, resolved inputs replaced by
@@ -8025,8 +8025,9 @@ def _canonicalize_metabolite_ids(
         prefix / retired-id normalisation); an input that already is the
         canonical id is not reported.
       - `warnings`: a recurated id (names the node now holding its paper
-        measurements), a chemical-role id (names the role), and the
-        defensive multi-match expansion.
+        measurements), a removed stereo-specific id (names the
+        stereo-unspecified node it was removed from), a chemical-role id
+        (names the role), and the defensive multi-match expansion.
     """
     if not ids:
         return ids, {}, []
@@ -8069,6 +8070,8 @@ def _canonicalize_metabolite_ids(
             continue
         _push(raw)
         recurated = [t for t in (row.get("recurated_to") or []) if t.get("id")]
+        stereo_from = [
+            t for t in (row.get("stereo_removed_from") or []) if t.get("id")]
         roles = [r for r in (row.get("roles") or []) if r.get("id")]
         if recurated:
             targets = ", ".join(f"{t['id']} ({t.get('name')})" for t in recurated)
@@ -8076,6 +8079,14 @@ def _canonicalize_metabolite_ids(
                 f"'{raw}' was removed; its paper measurements now live on "
                 f"{targets} — pass that id to see them."
             )
+        elif stereo_from:
+            for t in stereo_from:
+                _warn(
+                    f"'{raw}' is a stereo-specific form with no node in the "
+                    f"KG; it was removed from {t.get('name')} ({t['id']}), "
+                    f"its stereo-unspecified form. Use that id, or a linked "
+                    f"specific form (list_metabolites stereo_relatives)."
+                )
         elif roles:
             for r in roles:
                 _warn(

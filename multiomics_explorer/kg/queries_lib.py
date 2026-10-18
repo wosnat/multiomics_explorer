@@ -2165,12 +2165,13 @@ def build_resolve_metabolite_curies(curies: list[str]) -> tuple[str, dict]:
        every entry lives on exactly one node);
     3. on no canonical hit, diagnostics: ``recurated_from_ids`` (a dropped
        node whose paper rows now live on another, *different* compound —
-       never an identity) and ``ChemicalRole`` (own id or its ``chebi:``
-       identifiers).
+       never an identity), ``removed_stereo_xrefs`` (an id that names a more
+       specific stereo form than the node it was removed from; that form has
+       no node) and ``ChemicalRole`` (own id or its ``chebi:`` identifiers).
 
     Returns one row per input (``OPTIONAL MATCH``; misses yield empty lists),
-    columns ``curie``, ``canonical`` (list of ids), ``recurated_to`` and
-    ``roles`` (lists of ``{id, name}``). One row per *distinct* CURIE
+    columns ``curie``, ``canonical`` (list of ids), ``recurated_to``,
+    ``stereo_removed_from`` and ``roles`` (lists of ``{id, name}``). One row per *distinct* CURIE
     (duplicates collapse in the aggregation); row order is not guaranteed —
     key by ``curie``.
 
@@ -2196,9 +2197,15 @@ def build_resolve_metabolite_curies(curies: list[str]) -> tuple[str, dict]:
         "WITH c, canonical,\n"
         "     [x IN collect({id: t.id, name: t.name}) WHERE x.id IS NOT NULL]"
         " AS recurated_to\n"
+        "OPTIONAL MATCH (sg:Metabolite)\n"
+        "WHERE size(canonical) = 0\n"
+        "  AND c IN coalesce(sg.removed_stereo_xrefs, [])\n"
+        "WITH c, canonical, recurated_to,\n"
+        "     [x IN collect({id: sg.id, name: sg.name}) WHERE x.id IS NOT NULL]"
+        " AS stereo_removed_from\n"
         "OPTIONAL MATCH (r:ChemicalRole)\n"
         "WHERE size(canonical) = 0 AND (r.id = c OR c IN r.all_identifiers)\n"
-        "RETURN c AS curie, canonical, recurated_to,\n"
+        "RETURN c AS curie, canonical, recurated_to, stereo_removed_from,\n"
         "       [x IN collect({id: r.id, name: r.name}) WHERE x.id IS NOT NULL]"
         " AS roles"
     )

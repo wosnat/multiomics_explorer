@@ -843,3 +843,143 @@ term**. That is ChEBI's own statement that it is a more specific stereo form.
 - **E** (no stereo edges for class terms).
 - **The 3 wrong existing edges removed:** (R)/(S)-acetoin, geranyl diphosphate → polyprenyl
   diphosphate, dicis-ζ-carotene → all-trans.
+
+## KG delivery, ask 8 (2026-10-18): implemented and rebuilt
+
+Details: KG change doc `docs/kg-changes/metabolite-identity-and-classes.md` **§40**. In short:
+- **Stereo edges:** `Metabolite_is_stereo_form_of` 76 → **99**: +27 (§40 lists every pair), −4.
+  The removals are the 3 wrong edges we named, plus Xylose → D-xylose, which was in the wrong
+  direction and is now D-xylose → Xylose.
+- **Your table:** 11 of your 14 rows are linked; the 3 class terms are not, as agreed.
+- **Nothing else moves:** no node, `structure_kind`, repoint, paper row or dominant-form change.
+- **Narrowed D:** 14 `chebi:` nodes change. 2 lose their InChIKey (glucose, allose), 10 have it
+  replaced, and 8 carry `removed_stereo_xrefs`.
+- **Remap:** new basis `stereo_form_removed`; 1 row, `chebi:144635` → `chebi:64307`.
+- **What we added beyond the agreed scope:**
+  - 3 extra curated links: sorbose ×2, plus xylose, which KEGG cross-references both ways;
+  - a `no_stereo_link:` entry for keto-D-fructose `C10906`, your Q2;
+  - the geometric-token rule now handles `9,9'-dicis-` locant forms;
+  - conjugate acids / bases count as a node's own identity, but tautomers don't: ChEBI pairs
+    L-dopachrome with DHICA as tautomers;
+  - formula-less ChEBI terms may sit mid-path (rhamnose).
+- **One correction:** `removed_stereo_xrefs` has no `ControlledVocabulary` entry, matching
+  `recurated_from_ids`; our earlier reply said it would.
+
+## KG review request, ask 8 (2026-10-18)
+
+The dev graph (`bolt://localhost:7687`) carries the Ask 8 rebuild. The KG suite passes (1,290);
+nothing is committed or released yet. Before we commit, please review against your own use. Full
+pair lists are in KG change doc §40.
+
+**1. The 27 new `Metabolite_is_stereo_form_of` edges.** Each should read "specific form →
+stereo-unspecified form of the same compound". The ones we're least sure about:
+- `C19891` 1D-chiro-inositol → `chebi:24848` inositol (chiro is one inositol stereoisomer);
+- `C08353` β-D-ribopyranose → `C00121` D-ribose (an anomer → its generic);
+- `chebi:16055` aldehydo-L-rhamnose → rhamnose (an open-chain form, but stereo-specified L);
+- `C00818` D-glucarate → `chebi:30613` glucarate(2-) (generic at the dianion);
+- `C00181` D-xylose → `C01394` Xylose (curated, because KEGG cross-references `C01394` to
+  α-D-xylose).
+
+```cypher
+MATCH (s:Metabolite)-[:Metabolite_is_stereo_form_of]->(g:Metabolite)
+RETURN s.id, s.name, g.id, g.name ORDER BY g.name
+```
+
+**2. The 4 removed edges.** Do any goldens or doc examples use them?
+- (R)-acetoin → (S)-acetoin;
+- geranyl diphosphate → all-trans-polyprenyl diphosphate;
+- Xylose → D-xylose;
+- 9,9'-dicis-ζ-carotene → all-trans-ζ-carotene.
+
+**3. `removed_stereo_xrefs`** (8 nodes) for your resolver warning. Check the wording against real
+cases:
+- pipecolic acid → `chebi:41582` D-pipecolic acid, plus 3 more ChEBI ids;
+- dihydroorotate → (R)-acid;
+- 2-aminoadipic acid → D-;
+- allose → L-allopyranose;
+- Tyr-Tyr → L,L;
+- 2,4-diaminobutyric acid → D-;
+- D-glucosyl group → α-;
+- lysyl group → D-.
+
+```cypher
+MATCH (m:Metabolite) WHERE m.removed_stereo_xrefs IS NOT NULL
+RETURN m.id, m.name, m.removed_stereo_xrefs
+```
+
+**4. InChIKey changes on `chebi:` nodes:**
+- glucose and allose now have **no** InChIKey;
+- 10 nodes have their own ChEBI term's key;
+- the MNX keys of bromate, iodate, chlorate, oxaliplatin and α-cyclodextrin still resolve through
+  `all_identifiers`.
+
+Does your InChIKey resolver path or any golden depend on the old keys?
+
+**5. The new remap basis `stereo_form_removed`.** One row: `chebi:144635` → `chebi:64307`. Does
+the resolver need a message for it, like `remeasured_elsewhere`?
+
+**6. The deviations from the agreed scope:**
+- 3 extra curated links (sorbose ×2, xylose);
+- keto-D-fructose `C10906` blocked from stereo edges;
+- the geometric-token rule extended to locant forms;
+- conjugates but not tautomers counted as a node's own identity;
+- formula-less ChEBI terms allowed mid-path;
+- no `ControlledVocabulary` entry for `removed_stereo_xrefs`.
+
+Objections?
+
+Please reply below, under `## Explorer review, ask 8`.
+
+## Explorer review, ask 8 (2026-10-18)
+
+Reviewed against the dev graph (built 2026-10-18T05:51Z) with the explorer's own suites. Explorer
+`main` already carries the stereo-form hint. **No objections; OK to commit and release.**
+
+**Evidence:**
+- **Regression:** 181 of 184 goldens unchanged. The 3 that move (`list_metabolites_search_glucose`,
+  `list_metabolites_id_batch_with_unknown`, `metabolites_by_gene_pmm0913_family_inferred_warning`)
+  move by **additions only**: new `stereo_relatives` entries such as glucose → D-Glucose, mannose →
+  D-Mannose, isoleucine → L-Isoleucine, arabinose → L-Arabinose, fucose → L-/6-deoxy-D-galactose.
+  No existing value changes.
+- **Integration:** 564 metabolite / stereo / resolver tests pass, and doc examples show 0 drift.
+  The only failure is the vocab-snapshot stamp, which is a routine absorb item.
+
+**1. The 27 new edges: all accepted.** On the five you flagged:
+- **1D-chiro-inositol → inositol:** right. The inositols are the textbook stereoisomer family,
+  and myo-, scyllo- and muco- link the same way.
+- **β-D-ribopyranose → D-ribose:** consistent with α/β-D-glucose → D-glucose (anomer → its
+  generic).
+- **aldehydo-L-rhamnose → rhamnose:** consistent with Q2. The ring / open-chain difference isn't
+  a stereo edge, so there's no edge to L-Rhamnose. It is L-specified, so → the stereo-unspecified
+  rhamnose is correct.
+- **D-glucarate → glucarate(2-):** fine; the charge state of the generic term doesn't matter.
+- **D-xylose → Xylose (curated):** fine, and the direction fix is right.
+
+**2. The 4 removed edges:** no golden or doc example uses them.
+
+**3. `removed_stereo_xrefs`:**
+- None of the 17 ids is on any other node (no `all_identifiers` hit), so the resolver's
+  fallback is reached only for genuinely absent forms.
+- The removed ids have no name in the KG, so the warning won't try to name them. Planned
+  wording: "`chebi:41582` is a stereo-specific form with no node in the KG; it was removed from
+  pipecolic acid (`chebi:17964`), its stereo-unspecified form. Use that id, or a linked specific
+  form (`stereo_relatives`)." The id stays in `not_found`.
+
+**4. InChIKey changes:** no golden, example or resolver test depends on the old keys of glucose,
+allose or the 10 replaced nodes.
+
+**5. `stereo_form_removed` remap basis:** no separate message. The explorer never reads the
+remap TSV at runtime. `chebi:144635` sits in `chebi:64307`'s `removed_stereo_xrefs`, so it gets
+the same warning.
+
+**6. Deviations:**
+- No objections.
+- **No `ControlledVocabulary` entry for `removed_stereo_xrefs` is correct.** It's an open
+  identifier list that the explorer neither filters nor rolls up on, the same as
+  `recurated_from_ids`.
+
+**Explorer absorb, after your commit / release:**
+- re-snapshot vocab;
+- regenerate the 3 goldens;
+- rewrite the analysis-doc paragraph that calls mannose / isoleucine / glucose unlinked;
+- add the `removed_stereo_xrefs` resolver warning.

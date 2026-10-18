@@ -17696,10 +17696,12 @@ class _AliasConn:
     """
 
     def __init__(self, alias_map: dict | None = None, responses=None,
-                 recurated: dict | None = None, roles: dict | None = None):
+                 recurated: dict | None = None, roles: dict | None = None,
+                 stereo_removed: dict | None = None):
         self.alias_map = alias_map or {}
         self.recurated = recurated or {}
         self.roles = roles or {}
+        self.stereo_removed = stereo_removed or {}
         self.responses = list(responses or [])
         self.calls: list[tuple[str, dict]] = []
 
@@ -17710,7 +17712,8 @@ class _AliasConn:
                 {"curie": c,
                  "canonical": list(self.alias_map.get(c, [])),
                  "recurated_to": list(self.recurated.get(c, [])),
-                 "roles": list(self.roles.get(c, []))}
+                 "roles": list(self.roles.get(c, [])),
+                 "stereo_removed_from": list(self.stereo_removed.get(c, []))}
                 for c in params["curies"]
             ]
         if "AS organisms" in cypher:
@@ -17964,6 +17967,42 @@ class TestCanonicalizeMetaboliteIds:
             "C00064": ["kegg.compound:C00064"],
             "CHEBI:17234": ["kegg.compound:C00064"],
         }
+
+    # -- removed stereo xrefs (diagnostic, never a resolution) -------------
+    def test_removed_stereo_xref_kept_verbatim_with_warning(self):
+        conn = _AliasConn(stereo_removed={"chebi:41582": [
+            {"id": "chebi:17964", "name": "pipecolic acid"}]})
+        ids, aliases, warnings = self._fn()(conn, ["CHEBI:41582"])
+        assert ids == ["CHEBI:41582"]          # caller's form → not_found
+        assert aliases == {}
+        assert len(warnings) == 1
+        w = warnings[0]
+        assert "'CHEBI:41582'" in w
+        assert "chebi:17964" in w and "pipecolic acid" in w
+        assert "stereo" in w
+        assert "stereo_relatives" in w
+
+    def test_removed_stereo_xref_ignored_when_resolved(self):
+        """A canonical hit wins; the diagnostic never fires alongside it."""
+        conn = _AliasConn(
+            {"chebi:41582": ["kegg.compound:C00408"]},
+            stereo_removed={"chebi:41582": [
+                {"id": "chebi:17964", "name": "pipecolic acid"}]})
+        ids, _, warnings = self._fn()(conn, ["chebi:41582"])
+        assert ids == ["kegg.compound:C00408"]
+        assert warnings == []
+
+    def test_missing_stereo_removed_key_is_tolerated(self):
+        """Older resolver rows without the column behave as before."""
+        class _Old(_AliasConn):
+            def execute_query(self, cypher, **params):
+                rows = super().execute_query(cypher, **params)
+                for r in rows:
+                    r.pop("stereo_removed_from", None)
+                return rows
+        ids, _, warnings = self._fn()(_Old(), ["chebi:41582"])
+        assert ids == ["chebi:41582"]
+        assert warnings == []
 
 
 # ---- per-tool plumbing ------------------------------------------------------
