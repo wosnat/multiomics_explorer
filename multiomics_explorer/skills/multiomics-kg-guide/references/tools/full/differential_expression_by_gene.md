@@ -48,7 +48,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 - **rows_by_growth_phase** (object): Row counts by growth phase. Growth phase is a timepoint-level condition, not gene-specific.
 - **by_table_scope** (object): Row counts by experiment table_scope (e.g. {'all_detected_genes': 100, 'significant_only': 50}). `all_detected_genes` keeps tested-absent (`not_significant`) rows; any other scope (`significant_only`, `significant_any_timepoint`, `filtered_subset`, `top_n`) collapses tested-absent with not-detected. Check before reading missing rows. See `docs://guide/conventions`.
 - **top_categories** (list[ExpressionTopCategory]): Top gene categories by significant gene count, max 5
-- **experiments** (list[ExpressionByExperiment]): Per-experiment summary, sorted by significant row count desc. Compact by default (experiment_id, treatment_type, table_scope, is_time_course, matching_genes, rows_by_status, omics_type); verbose=True restores experiment_name, background_factors, coculture_partner, table_scope_detail, and the nested per-timepoint breakdown. Capped to the first 10 entries; summary=True returns the full list —  experiment_count always reflects the full count.
+- **experiments** (list[ExpressionByExperiment]): Per-experiment summary, sorted by significant row count desc. Compact by default (experiment_id, treatment_type, table_scope, control_timing, design_notes (omitted when absent), is_time_course, matching_genes, rows_by_status, omics_type); verbose=True restores experiment_name, background_factors, coculture_partner, table_scope_detail, and the nested per-timepoint breakdown. Capped to the first 10 entries; summary=True returns the full list —  experiment_count always reflects the full count.
 - **experiments_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **not_found** (list[string]): Input locus_tags not found in KG
 - **no_expression** (list[string]): Locus tags in KG with NO Changes_expression_of edge at all in the organism
@@ -71,6 +71,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 | timepoint | string \| None | Timepoint label (e.g. 'days 60+89'). Null when edge has no label. |
 | timepoint_hours | float \| None | Numeric hours (e.g. 432.0). Null for non-numeric labels. |
 | timepoint_order | int | Sort key for time course order (e.g. 3) |
+| control_timing | string \| None (optional) | Experiment's control-arm timing: 'matched' (same time or growth state), 'baseline' (control sampled at another time) or 'mixed'. timepoint / growth_phase are the treatment arm's; see experiments[].design_notes. |
 | log2fc | float | Log2 fold change (e.g. 3.591). Positive = up. |
 | padj | float \| None | Adjusted p-value (e.g. 1.13e-12). Null if not computed. |
 | rank | int | Rank by |log2FC| within experiment x timepoint; 1 = strongest (e.g. 77). KG property `rank_by_effect`. Direction-blind and populated on EVERY reported edge — the only genome-wide rank on this row (see rank_up / rank_down). |
@@ -161,6 +162,8 @@ differential_expression_by_gene(organism="MED4", summary=True)
       "omics_type": "RNASEQ",
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
+      "control_timing": "baseline",
+      "design_notes": "Each timepoint (day 18, day 31, day 60, day 89) is coculture MED4 vs the same coculture series sampled on day 11 (exp...",
       "matching_genes": 1849,
       "rows_by_status": {"significant_up": 553, "significant_down": 834, "not_significant": 7858}
     },
@@ -170,6 +173,8 @@ differential_expression_by_gene(organism="MED4", summary=True)
       "omics_type": "PROTEOMICS",
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
+      "control_timing": "baseline",
+      "design_notes": "day 14, day 31 and day 89: axenic MED4 vs axenic MED4 sampled on day 7 (exponential). Day 7 and day 14 come from the ...",
       "matching_genes": 1424,
       "rows_by_status": {"significant_up": 599, "significant_down": 556, "not_significant": 3117}
     },
@@ -179,6 +184,8 @@ differential_expression_by_gene(organism="MED4", summary=True)
       "omics_type": "RNASEQ",
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
+      "control_timing": "matched",
+      "design_notes": "Control for 2h and 4h is the normal-diel circadian time-course sample at the same ZT (ZT 2 and ZT 4, lights on, diel)...",
       "matching_genes": 1876,
       "rows_by_status": {"significant_up": 556, "significant_down": 469, "not_significant": 2727}
     },
@@ -188,6 +195,8 @@ differential_expression_by_gene(organism="MED4", summary=True)
       "omics_type": "PROTEOMICS",
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
+      "control_timing": "baseline",
+      "design_notes": "Each timepoint (day 18, day 31, day 60, day 89, days 60+89) is coculture MED4 vs the same coculture series sampled on...",
       "matching_genes": 1424,
       "rows_by_status": {"significant_up": 609, "significant_down": 394, "not_significant": 6117}
     },
@@ -197,6 +206,8 @@ differential_expression_by_gene(organism="MED4", summary=True)
       "omics_type": "RNASEQ",
       "is_time_course": "single_time_point",
       "table_scope": "all_detected_genes",
+      "control_timing": "baseline",
+      "design_notes": "day 14: axenic MED4 vs the same axenic series sampled on day 7 (exponential); axenic MED4 was a separate repeat exper...",
       "matching_genes": 1849,
       "rows_by_status": {"significant_up": 405, "significant_down": 472, "not_significant": 972}
     },
@@ -258,6 +269,8 @@ differential_expression_by_gene(locus_tags=["ACZ81_01830", "ACZ81_15555"], exper
       "omics_type": "RNASEQ",
       "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
+      "control_timing": "baseline",
+      "design_notes": "day 18 and day 31: axenic HOT1A3 vs the same axenic series sampled on day 11 (nutrient_limited, Alteromonas declines ...",
       "matching_genes": 2,
       "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 4}
     }
@@ -281,6 +294,7 @@ differential_expression_by_gene(locus_tags=["ACZ81_01830", "ACZ81_15555"], exper
       "timepoint": "day 18",
       "timepoint_hours": 432.0,
       "timepoint_order": 1,
+      "control_timing": "baseline",
       "log2fc": 0.8560175767959709,
       "padj": 0.2588535702469227,
       "rank": 1103,
@@ -297,6 +311,7 @@ differential_expression_by_gene(locus_tags=["ACZ81_01830", "ACZ81_15555"], exper
       "timepoint": "day 31",
       "timepoint_hours": 744.0,
       "timepoint_order": 2,
+      "control_timing": "baseline",
       "log2fc": 0.5554277673766344,
       "padj": 0.5104041330731693,
       "rank": 1715,
@@ -313,6 +328,7 @@ differential_expression_by_gene(locus_tags=["ACZ81_01830", "ACZ81_15555"], exper
       "timepoint": "day 31",
       "timepoint_hours": 744.0,
       "timepoint_order": 2,
+      "control_timing": "baseline",
       "log2fc": 0.4591817421638743,
       "padj": 0.5046507150018495,
       "rank": 2012,
@@ -470,6 +486,8 @@ They are populated ONLY on the significant subset — `rank_up` is non-null on s
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
+- A DE timepoint label (e.g. 'day 18') and `growth_phase` describe the treatment arm; check `control_timing` / `design_notes` before reading it as both arms' state. See docs://guide/conventions.
+
 - For cross-experiment summarization (which treatments does this gene set respond to?) see `docs://analysis/expression` — `response_matrix` for gene × treatment pivots, `gene_set_compare` for two-set overlap. For pathway-level interpretation chain to `pathway_enrichment` (`docs://analysis/enrichment`).
 
 ```mistake
@@ -477,7 +495,7 @@ Expecting per-timepoint counts, experiment_name, or table_scope_detail inside `e
 ```
 
 ```correction
-`summary=True` (and every call by default) is the cheap landscape — each `experiments[]` entry is compact (experiment_id, treatment_type, table_scope, is_time_course, matching_genes, rows_by_status, omics_type). Per-timepoint counts and the other experiment metadata (experiment_name, background_factors, coculture_partner, table_scope_detail) need `verbose=True`.
+`summary=True` (and every call by default) is the cheap landscape — each `experiments[]` entry is compact (experiment_id, treatment_type, table_scope, control_timing, design_notes when present, is_time_course, matching_genes, rows_by_status, omics_type). Per-timepoint counts and the other experiment metadata (experiment_name, background_factors, coculture_partner, table_scope_detail) need `verbose=True`.
 ```
 
 - At least one of `organism` / `locus_tags` / `experiment_ids` is required — calling with none of the three raises ValueError. Use list_organisms for organisms, resolve_gene for locus_tags, or list_experiments for experiment_ids.

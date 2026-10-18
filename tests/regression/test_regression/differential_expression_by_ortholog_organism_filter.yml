@@ -7,6 +7,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1021/pr060460c_light_HL_vs_LL_med4_proteomics
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -26,6 +27,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1021/pr060460c_light_ML_vs_LL_med4_proteomics
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -45,6 +47,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_0004_co2_med4_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -64,6 +67,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_and_no_med4_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -83,6 +87,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -102,6 +107,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -121,6 +127,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -140,6 +147,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -159,6 +167,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -178,6 +187,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -197,6 +207,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -216,6 +227,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -235,6 +247,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -254,6 +267,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -273,6 +287,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -292,6 +307,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -311,6 +327,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -330,6 +347,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -349,6 +367,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -368,6 +387,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -387,6 +407,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -407,6 +428,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -427,6 +449,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -447,6 +470,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -467,6 +491,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -487,6 +512,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -506,6 +532,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -526,6 +553,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -546,6 +574,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -566,6 +595,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -586,6 +616,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -606,6 +637,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -625,6 +657,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -644,6 +677,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -663,6 +697,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -682,6 +717,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -701,6 +737,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -720,6 +757,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -739,6 +777,7 @@ rows:
   - Alteromonas macleodii HOT1A3
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -758,6 +797,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_nitrite_as_mit9313_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -777,6 +817,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_mit9313_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -796,6 +837,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: mixed
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_mit9313_mit9313_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -815,6 +857,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: mixed
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_mit9313_mit9313_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -834,6 +877,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: mixed
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_mit9313_mit9313_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -853,6 +897,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: mixed
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_mit9313_mit9313_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -872,6 +917,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: mixed
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_mit9313_mit9313_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
@@ -891,6 +937,7 @@ rows:
   coculture_partner: []
   consensus_gene_name: psbB
   consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: mixed
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_mit9313_mit9313_microarray
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570

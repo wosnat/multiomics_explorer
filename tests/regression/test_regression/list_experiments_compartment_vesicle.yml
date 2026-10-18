@@ -16,9 +16,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_ad45
   experiment_name: AD45 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -61,9 +63,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_atcc27126
   experiment_name: ATCC27126 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -106,9 +110,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_bgp6
   experiment_name: BGP6 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -151,9 +157,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_bs11
   experiment_name: BS11 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -196,9 +204,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_hot1a3
   experiment_name: HOT1A3 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -241,9 +251,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_mit1002
   experiment_name: MIT1002 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -285,11 +297,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - boolean
   - categorical
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1126/science.1243457_vesicle_proteomics_med4
   experiment_name: MED4 vesicle proteome (LC-MS/MS, presence + Mascot probability
@@ -332,9 +346,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 1
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1126/science.1243457_vesicle_dnaseq_med4
   experiment_name: MED4 vesicle-encapsulated DNA-seq (top-50 ORFs by avg read coverage)
@@ -381,8 +397,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1111/1462-2920.15834_vesicle_metabolomics_mit9312
   experiment_name: MIT9312 extracellular vesicle targeted metabolome (Table S7)
@@ -429,9 +447,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9312
   experiment_name: MIT9312 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -477,8 +497,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1111/1462-2920.15834_vesicle_metabolomics_mit9313
   experiment_name: MIT9313 extracellular vesicle targeted metabolome (Table S7)
@@ -525,9 +547,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9313
   experiment_name: MIT9313 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -568,11 +592,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - boolean
   - categorical
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1126/science.1243457_vesicle_proteomics_mit9313
   experiment_name: MIT9313 vesicle proteome (LC-MS/MS, presence + Mascot probability

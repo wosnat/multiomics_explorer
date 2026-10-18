@@ -22,6 +22,10 @@ rows:
   - '{''count'': 185, ''item'': ''whole_cell''}'
   - '{''count'': 3, ''item'': ''extracellular''}'
   - '{''count'': 7, ''item'': ''exoproteome''}'
+  by_control_timing:
+  - '{''count'': 151, ''item'': ''matched''}'
+  - '{''count'': 18, ''item'': ''baseline''}'
+  - '{''count'': 4, ''item'': ''mixed''}'
   by_growth_phase:
   - '{''count'': 17, ''item'': ''nutrient_limited''}'
   - '{''count'': 2, ''item'': ''death''}'

@@ -14258,3 +14258,124 @@ class TestBuildMetabolitesByGeneSummaryStereoLinked:
         assert "AS stereo_linked_metabolite_ids" in cypher
         assert "Metabolite_is_stereo_form_of" in cypher
         assert "Metabolite_is_enantiomer_of" not in cypher
+
+
+# ---------------------------------------------------------------------------
+# Control-timing surface (docs/tool-specs/control-timing-surface.md)
+# ---------------------------------------------------------------------------
+class TestBuildListExperimentsControlTiming:
+    """list_experiments: compact control_timing + sparse design_notes
+    columns, control_timing filter, by_control_timing summary key."""
+
+    def test_returns_control_timing_column(self):
+        cypher, _ = build_list_experiments()
+        assert "e.control_timing AS control_timing" in cypher
+
+    def test_returns_design_notes_column_compact(self):
+        cypher, _ = build_list_experiments(verbose=False)
+        assert "e.design_notes AS design_notes" in cypher
+
+    def test_search_branch_also_returns_columns(self):
+        cypher, _ = build_list_experiments(search_text="viability")
+        assert "e.control_timing AS control_timing" in cypher
+        assert "e.design_notes AS design_notes" in cypher
+
+    def test_control_timing_filter(self):
+        cypher, params = build_list_experiments(
+            control_timing=["baseline", "mixed"],
+        )
+        assert "e.control_timing IN $control_timings" in cypher
+        assert params["control_timings"] == ["baseline", "mixed"]
+
+    def test_control_timing_none_no_filter(self):
+        cypher, params = build_list_experiments(control_timing=None)
+        assert "$control_timings" not in cypher
+        assert "control_timings" not in params
+
+    def test_control_timing_combined_with_organism(self):
+        cypher, params = build_list_experiments(
+            organism="MED4", control_timing=["matched"],
+        )
+        assert "e.control_timing IN $control_timings" in cypher
+        assert "toLower($organism)" in cypher
+        assert " AND " in cypher
+        assert params["control_timings"] == ["matched"]
+
+    def test_summary_control_timing_filter(self):
+        cypher, params = build_list_experiments_summary(
+            control_timing=["baseline"],
+        )
+        assert "e.control_timing IN $control_timings" in cypher
+        assert params["control_timings"] == ["baseline"]
+
+    def test_summary_control_timing_none_no_filter(self):
+        cypher, params = build_list_experiments_summary(control_timing=None)
+        assert "$control_timings" not in cypher
+        assert "control_timings" not in params
+
+    def test_summary_returns_by_control_timing(self):
+        cypher, _ = build_list_experiments_summary()
+        assert "e.control_timing" in cypher
+        assert "AS by_control_timing" in cypher
+        assert "apoc.coll.frequencies" in cypher
+
+    def test_summary_by_control_timing_with_search_text(self):
+        cypher, _ = build_list_experiments_summary(search_text="viability")
+        assert "AS by_control_timing" in cypher
+
+
+class TestBuildDifferentialExpressionByGeneControlTiming:
+    """differential_expression_by_gene: control_timing on every detail row
+    (compact) + control_timing / design_notes in the per-experiment map."""
+
+    def test_detail_compact_returns_control_timing(self):
+        cypher, _ = build_differential_expression_by_gene(organism="MED4")
+        assert "e.control_timing AS control_timing" in cypher
+
+    def test_detail_verbose_returns_control_timing_once(self):
+        cypher, _ = build_differential_expression_by_gene(
+            organism="MED4", verbose=True,
+        )
+        assert cypher.count("e.control_timing AS control_timing") == 1
+
+    def test_detail_does_not_return_design_notes(self):
+        """design_notes lives on the experiments[] envelope, not per row."""
+        cypher, _ = build_differential_expression_by_gene(
+            organism="MED4", verbose=True,
+        )
+        assert "design_notes" not in cypher
+
+    def test_summary_by_experiment_map_has_control_timing(self):
+        cypher, _ = build_differential_expression_by_gene_summary_by_experiment(
+            organism="MED4",
+        )
+        assert "control_timing: e.control_timing" in cypher
+
+    def test_summary_by_experiment_map_has_design_notes(self):
+        cypher, _ = build_differential_expression_by_gene_summary_by_experiment(
+            organism="MED4",
+        )
+        assert "design_notes: e.design_notes" in cypher
+
+
+class TestBuildDifferentialExpressionByOrthologResultsControlTiming:
+    """differential_expression_by_ortholog: compact control_timing per row;
+    no design_notes (drill via list_experiments)."""
+
+    def test_compact_returns_control_timing(self):
+        cypher, _ = build_differential_expression_by_ortholog_results(
+            group_ids=["cyanorak:CK_00000364"],
+        )
+        assert "e.control_timing AS control_timing" in cypher
+
+    def test_verbose_returns_control_timing_once(self):
+        cypher, _ = build_differential_expression_by_ortholog_results(
+            group_ids=["cyanorak:CK_00000364"], verbose=True,
+        )
+        assert cypher.count("e.control_timing AS control_timing") == 1
+
+    def test_no_design_notes(self):
+        cypher, _ = build_differential_expression_by_ortholog_results(
+            group_ids=["cyanorak:CK_00000364"], verbose=True,
+        )
+        assert "design_notes" not in cypher

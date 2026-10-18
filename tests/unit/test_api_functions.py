@@ -21440,3 +21440,323 @@ class TestMetabolitesByGeneStereoHint:
         kg = self._kg()
         out = api.metabolites_by_gene(["PMM0100"], "Nonexistium", conn=kg)
         assert out["stereo_relatives"] == {}
+
+
+# ---------------------------------------------------------------------------
+# Control-timing surface (docs/tool-specs/control-timing-surface.md)
+# ---------------------------------------------------------------------------
+class TestListExperimentsControlTiming:
+    """list_experiments: control_timing filter forwarded, closed-vocab
+    warning, by_control_timing envelope, compact control_timing and sparse
+    design_notes on rows."""
+
+    _E7 = "10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq"
+
+    def _summary_result(self, **overrides):
+        row = {
+            "total_matching": 2, "time_course_count": 0,
+            "by_organism": [{"item": "Prochlorococcus MED4", "count": 2}],
+            "by_treatment_type": [], "by_background_factors": [],
+            "by_omics_type": [{"item": "RNASEQ", "count": 2}],
+            "by_publication": [], "by_table_scope": [],
+            "by_cluster_type": [], "by_growth_phase": [],
+            "by_control_timing": [
+                {"item": "matched", "count": 1},
+                {"item": "baseline", "count": 1},
+            ],
+        }
+        row.update(overrides)
+        return [row]
+
+    def _row(self, **overrides):
+        row = {
+            "experiment_id": self._E7, "experiment_name": "E7",
+            "publication_doi": "10.1101/2025.11.24.690089",
+            "organism_name": "Prochlorococcus MED4",
+            "treatment_type": ["coculture"], "coculture_partner": [],
+            "omics_type": "RNASEQ", "is_time_course": "single_time_point",
+            "table_scope": "all_detected_genes", "table_scope_detail": None,
+            "control_timing": "matched",
+            "design_notes": "Coculture d18 vs axenic d14, matched by growth state.",
+            "gene_count": 10, "distinct_gene_count": 10,
+            "significant_up_count": 1, "significant_down_count": 1,
+            "time_point_count": 1, "time_point_labels": ["d18"],
+            "time_point_orders": [1], "time_point_hours": [432.0],
+            "time_point_totals": [10], "time_point_significant_up": [1],
+            "time_point_significant_down": [1],
+            "clustering_analysis_count": 0, "cluster_types": [],
+        }
+        row.update(overrides)
+        return row
+
+    def test_control_timing_forwarded_to_summary_and_detail(
+        self, mock_conn, monkeypatch,
+    ):
+        monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(), self._summary_result(), [self._row()],
+        ]
+        api.list_experiments(
+            control_timing=["baseline", "mixed"], conn=mock_conn,
+        )
+        summary_call = mock_conn.execute_query.call_args_list[0]
+        assert "e.control_timing IN $control_timings" in summary_call[0][0]
+        assert summary_call[1]["control_timings"] == ["baseline", "mixed"]
+        # total_entries query stays unfiltered
+        total_call = mock_conn.execute_query.call_args_list[1]
+        assert "control_timings" not in total_call[1]
+        detail_call = mock_conn.execute_query.call_args_list[2]
+        assert "e.control_timing IN $control_timings" in detail_call[0][0]
+        assert detail_call[1]["control_timings"] == ["baseline", "mixed"]
+
+    def test_control_timing_passed_to_closed_vocab_warnings(
+        self, mock_conn, monkeypatch,
+    ):
+        seen = {}
+
+        def fake_warn(conn, **kw):
+            seen.update(kw)
+            return []
+        monkeypatch.setattr(api, "_closed_vocab_warnings", fake_warn)
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(), self._summary_result(),
+        ]
+        api.list_experiments(
+            control_timing=["matched"], summary=True, conn=mock_conn,
+        )
+        assert seen.get("control_timing") == ["matched"]
+
+    def test_closed_vocab_registry_entry(self):
+        assert api._CLOSED_VOCAB_PARAMS["control_timing"] == (
+            "Experiment", "control_timing", "control_timing")
+
+    def test_unknown_control_timing_warns_never_raises(
+        self, mock_conn, monkeypatch,
+    ):
+        def fake_read(conn, applies_to, prop, kind, *, cache=True):
+            vals = (["baseline", "matched", "mixed"]
+                    if (applies_to, prop) == ("Experiment", "control_timing")
+                    else [])
+            return {"values": vals, "value_descriptions": {},
+                    "description": "d", "source": "vocabulary",
+                    "warning": None}
+        monkeypatch.setattr(api, "_read_vocab_values", fake_read)
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total_matching=0, by_control_timing=[]),
+            self._summary_result(),
+        ]
+        out = api.list_experiments(
+            control_timing=["bogus"], summary=True, conn=mock_conn,
+        )
+        assert any(
+            "'bogus'" in w
+            and "list_filter_values(filter_type='control_timing')" in w
+            for w in out["warnings"]
+        ), out["warnings"]
+
+    def test_by_control_timing_renamed(self, mock_conn, monkeypatch):
+        monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(), self._summary_result(),
+        ]
+        out = api.list_experiments(summary=True, conn=mock_conn)
+        assert out["by_control_timing"] == [
+            {"control_timing": "matched", "count": 1},
+            {"control_timing": "baseline", "count": 1},
+        ]
+
+    def test_by_control_timing_empty_when_absent(self, mock_conn, monkeypatch):
+        monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(total_matching=0, by_control_timing=[]),
+            self._summary_result(),
+        ]
+        out = api.list_experiments(summary=True, conn=mock_conn)
+        assert out["by_control_timing"] == []
+
+    def test_row_carries_control_timing_and_design_notes(
+        self, mock_conn, monkeypatch,
+    ):
+        monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(), self._summary_result(), [self._row()],
+        ]
+        out = api.list_experiments(conn=mock_conn)
+        r = out["results"][0]
+        assert r["control_timing"] == "matched"
+        assert r["design_notes"].startswith("Coculture d18")
+
+    def test_design_notes_key_dropped_when_null(self, mock_conn, monkeypatch):
+        """Sparse: no design_notes in the KG -> key absent from the row;
+        control_timing stays (None on a no-DE experiment)."""
+        monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        mock_conn.execute_query.side_effect = [
+            self._summary_result(), self._summary_result(),
+            [self._row(),
+             self._row(experiment_id="no_de_exp", control_timing=None,
+                       design_notes=None)],
+        ]
+        out = api.list_experiments(conn=mock_conn)
+        with_notes, without_notes = out["results"]
+        assert "design_notes" in with_notes
+        assert "design_notes" not in without_notes
+        assert "control_timing" in without_notes
+        assert without_notes["control_timing"] is None
+
+
+class TestListFilterValuesControlTiming:
+    """list_filter_values(filter_type='control_timing'): node vocab on
+    Experiment, value descriptions carried per row."""
+
+    def test_registered_in_multi_label_vocabs(self):
+        prop, labels, kind = api._MULTI_LABEL_VOCABS["control_timing"]
+        assert prop == "control_timing"
+        assert tuple(labels) == ("Experiment",)
+        assert kind == "node"
+
+    def test_reads_experiment_vocab_with_descriptions(self, monkeypatch):
+        calls = []
+
+        def fake_read(conn, applies_to, prop, kind, *, cache=True):
+            calls.append((applies_to, prop, kind))
+            return {"values": ["baseline", "matched", "mixed"],
+                    "value_descriptions": {
+                        "matched": "control sampled at the same time or growth state",
+                        "baseline": "control sampled once at another time",
+                        "mixed": "control timing differs across timepoints",
+                    },
+                    "description": "When the control arm was sampled",
+                    "source": "vocabulary", "warning": None}
+        monkeypatch.setattr(api, "_read_vocab_values", fake_read)
+        out = api.list_filter_values(filter_type="control_timing", conn=MagicMock())
+        assert out["filter_type"] == "control_timing"
+        by_value = {r["value"]: r for r in out["results"]}
+        assert set(by_value) == {"baseline", "matched", "mixed"}
+        for row in out["results"]:
+            assert row["applies_to"] == ["Experiment"]
+            assert row["source"] == "vocabulary"
+        assert by_value["baseline"]["description"] == (
+            "control sampled once at another time")
+        assert calls == [("Experiment", "control_timing", "node")]
+
+    def test_unknown_filter_type_error_lists_control_timing(self, mock_conn):
+        with pytest.raises(ValueError) as exc_info:
+            api.list_filter_values(filter_type="bogus", conn=mock_conn)
+        assert "control_timing" in str(exc_info.value)
+
+
+class TestDifferentialExpressionByGeneControlTiming:
+    """differential_expression_by_gene: control_timing on every detail row;
+    experiments[] carries compact control_timing + sparse design_notes."""
+
+    def _organism_result(self):
+        return [{"organisms": ["Prochlorococcus MED4"]}]
+
+    def _global_summary(self):
+        return [{
+            "total_matching": 2, "matching_genes": 1,
+            "rows_by_status": [{"item": "significant_up", "count": 2}],
+            "rows_by_treatment_type": [{"item": "coculture", "count": 2}],
+            "rows_by_background_factors": [],
+            "by_table_scope": [{"item": "all_detected_genes", "count": 2}],
+            "median_abs_log2fc": 2.0, "max_abs_log2fc": 3.0,
+        }]
+
+    def _exp(self, exp_id, control_timing, design_notes):
+        return {
+            "experiment_id": exp_id, "experiment_name": f"Exp {exp_id}",
+            "treatment_type": ["coculture"], "omics_type": "RNASEQ",
+            "background_factors": [], "coculture_partner": [],
+            "is_time_course": "single_time_point",
+            "table_scope": "all_detected_genes", "table_scope_detail": None,
+            "control_timing": control_timing, "design_notes": design_notes,
+            "matching_genes": 1,
+            "rows_by_status": [{"item": "significant_up", "count": 1}],
+            "timepoints": [{
+                "timepoint": "d18", "timepoint_hours": 432.0,
+                "timepoint_order": 1, "growth_phase": "death",
+                "matching_genes": 1,
+                "rows_by_status": [{"item": "significant_up", "count": 1}],
+            }],
+        }
+
+    def _experiment_summary(self):
+        return [{
+            "organism_name": "Prochlorococcus MED4",
+            "experiments": [
+                self._exp("exp_matched", "matched",
+                          "Coculture d18 vs axenic d14 (growth-state match)."),
+                self._exp("exp_baseline", "baseline", None),
+            ],
+        }]
+
+    def _diagnostics_summary(self):
+        return [{"top_categories": [], "not_found": [],
+                 "no_expression": [], "filtered_out": []}]
+
+    def _detail_rows(self):
+        base = {
+            "locus_tag": "PMM0001", "gene_name": "dnaN",
+            "treatment_type": ["coculture"], "timepoint": "d18",
+            "timepoint_hours": 432.0, "timepoint_order": 1,
+            "log2fc": 3.0, "padj": 1e-5, "rank": 1, "rank_up": 1,
+            "rank_down": None, "expression_status": "significant_up",
+            "growth_phase": "death",
+        }
+        return [
+            {**base, "experiment_id": "exp_matched", "control_timing": "matched"},
+            {**base, "experiment_id": "exp_baseline", "control_timing": "baseline"},
+        ]
+
+    def _side_effect(self):
+        return [
+            self._organism_result(), self._global_summary(),
+            self._experiment_summary(), self._diagnostics_summary(),
+            self._detail_rows(),
+        ]
+
+    def test_compact_keys_include_control_timing_and_design_notes(self):
+        assert "control_timing" in api._DE_EXPERIMENT_COMPACT_KEYS
+        assert "design_notes" in api._DE_EXPERIMENT_COMPACT_KEYS
+
+    def test_detail_rows_carry_control_timing(self, mock_conn):
+        mock_conn.execute_query.side_effect = self._side_effect()
+        out = api.differential_expression_by_gene(
+            locus_tags=["PMM0001"], conn=mock_conn,
+        )
+        assert [r["control_timing"] for r in out["results"]] == [
+            "matched", "baseline"]
+
+    def test_compact_experiments_carry_control_timing_sparse_design_notes(
+        self, mock_conn,
+    ):
+        mock_conn.execute_query.side_effect = self._side_effect()
+        out = api.differential_expression_by_gene(
+            locus_tags=["PMM0001"], conn=mock_conn,
+        )
+        by_id = {e["experiment_id"]: e for e in out["experiments"]}
+        assert by_id["exp_matched"]["control_timing"] == "matched"
+        assert by_id["exp_matched"]["design_notes"].startswith("Coculture d18")
+        assert by_id["exp_baseline"]["control_timing"] == "baseline"
+        assert "design_notes" not in by_id["exp_baseline"]
+        # compact still drops the verbose-only fields
+        assert "experiment_name" not in by_id["exp_matched"]
+        assert "timepoints" not in by_id["exp_matched"]
+
+    def test_verbose_experiments_also_drop_null_design_notes(self, mock_conn):
+        mock_conn.execute_query.side_effect = self._side_effect()
+        out = api.differential_expression_by_gene(
+            locus_tags=["PMM0001"], verbose=True, conn=mock_conn,
+        )
+        by_id = {e["experiment_id"]: e for e in out["experiments"]}
+        assert by_id["exp_matched"]["control_timing"] == "matched"
+        assert "design_notes" in by_id["exp_matched"]
+        assert by_id["exp_baseline"]["control_timing"] == "baseline"
+        assert "design_notes" not in by_id["exp_baseline"]

@@ -4,9 +4,9 @@
 
 Differential-expression and characterization experiments with per-timepoint, DM and metabolomics rollups.
 
-Use to pick experiment_ids and read each one's table_scope before interpreting missing DE rows; for study-level metadata use `list_publications`.
-Filters: organism, coculture_partner, coculture_role, table_scope, experiment_ids, search_text, time_course_only, plus the publication / condition filters.
-Returns: by_organism, by_treatment_type, by_table_scope, by_omics_type, by_growth_phase, not_found; one row = one experiment.
+Use to pick experiment_ids and read their table_scope before interpreting missing DE rows; for study-level metadata use `list_publications`.
+Filters: organism, coculture_partner, coculture_role, table_scope, experiment_ids, search_text, time_course_only, plus publication / condition filters.
+Returns: by_organism, by_treatment_type, by_table_scope, by_control_timing, by_omics_type, by_growth_phase, not_found; one row = one experiment.
 docs://tools/list_experiments; summary=True first.
 
 ## Parameters
@@ -21,10 +21,11 @@ docs://tools/list_experiments; summary=True first.
 | publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | coculture_partner | string \| None | None | Filter by coculture partner organism (case-insensitive substring match against any entry of the coculture_partner list). Matches treatment AND background partners — do not combine with treatment_type=['coculture'] unless you want coculture-vs-axenic comparisons only. E.g. 'Alteromonas', 'HOT1A3'. |
 | coculture_role | string ('treatment', 'background') \| None | None | Keep experiments with a partner of this role: 'treatment' (the partner's presence is the contrast: coculture vs axenic, or phage) or 'background' (contrast is something else). With coculture_partner=, both hold for one partner. |
-| search_text | string \| None | None | Free-text search on experiment name, treatment, control, experimental context, and light condition (Lucene fulltext, case-insensitive). E.g. 'continuous light', 'diel'. |
+| search_text | string \| None | None | Free-text search on experiment name, treatment, control, experimental context, light condition and design_notes (Lucene fulltext, case-insensitive). E.g. 'continuous light', 'diel'. |
 | time_course_only | bool | False | If true, return only time-course experiments (multiple time points). |
 | table_scope | list[string] \| None | None | Filter by table scope — what genes the source DE table contains. Values: 'all_detected_genes', 'significant_any_timepoint', 'significant_only', 'top_n', 'filtered_subset'. E.g. ['all_detected_genes'] for fair cross-experiment comparison. |
 | experiment_ids | list[string] \| None | None | Restrict to specific experiments by id (exact match). Combines with other filters via AND. `not_found` in the response lists any provided ids that did not match. Mirrors the filter shape on sibling tools (pathway_enrichment, ontology_landscape). |
+| control_timing | list[string] \| None | None | Keep experiments whose control arm timing is one of: 'matched' (same time or growth state), 'baseline' (control sampled at another time), 'mixed'. Experiments without DE never match. Live values: list_filter_values('control_timing'). |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
@@ -44,7 +45,7 @@ list_experiments(summary=True)
 ## Response sketch
 
 ```expected-keys
-total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, by_coculture_role, time_course_count, score_max, score_median, not_found, warnings, results
+total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_control_timing, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, by_coculture_role, time_course_count, score_max, score_median, not_found, warnings, results
 ```
 
 Result row: `experiment_id, experiment_name, publication_doi, authors, organism_name, treatment_type, background_factors, coculture_partner, omics_type, is_time_course, table_scope, table_scope_detail, …`

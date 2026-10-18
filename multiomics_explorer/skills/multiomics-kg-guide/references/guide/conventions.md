@@ -164,12 +164,10 @@ productive — `docs://guide/start_here` lists the pairs.
 
 ## Partial-failure buckets: `not_found` vs `not_matched`
 
-Most batch tools surface two kinds of partial failure rather than
-raising: **`not_found`** — the input ID doesn't exist in the KG at all
-(almost always a typo/stale ID); **`not_matched`** — the ID exists but
-has no edge to the target after filters (e.g. a locus_tag in a different
-organism, a DOI naming no genes/pathways in prose) — the row exists, but
-the question doesn't apply.
+Batch tools report partial failure instead of raising: **`not_found`** —
+the ID isn't in the KG (typo / stale ID); **`not_matched`** — the ID exists
+but has no edge to the target after filters (e.g. a locus_tag in another
+organism).
 
 The **key shape** depends on how many ID batches the tool accepts:
 
@@ -180,15 +178,13 @@ The **key shape** depends on how many ID batches the tool accepts:
 | Suffixed flat lists — `not_found_<bucket>` / `not_matched_<bucket>` | `genes_by_homolog_group` (`_groups`, `_organisms`), `differential_expression_by_ortholog` (`_groups`, `_organisms`, `_experiments`), `differential_expression_by_gene` (`not_found` + `_experiments`), `genes_in_cluster` (`_clusters`, `not_matched_organism`), `genes_by_{numeric,boolean,categorical}_metric` (`_ids`, `_metric_types`, `not_matched_organism`) |
 | tool-specific diagnostic buckets — `wrong_ontology`, `wrong_level`, `filtered_out`; `no_expression`, `not_found_experiments`; `no_groups` | `genes_by_ontology`, `differential_expression_by_gene`, `gene_response_profile`, `gene_homologs` |
 
-E.g. `gene_overview(locus_tags=["PMM0001","NOPE"])` → `not_found:
-["NOPE"]`. Tools with no ID batch (`genes_by_function`, `search_ontology`,
+Tools with no ID batch (`genes_by_function`, `search_ontology`,
 `search_homolog_groups`, `list_clustering_analyses`, `list_derived_metrics`,
 `resolve_gene`) have no `not_found` — an empty `results` is simply no
 match.
 
-Always inspect both buckets. An empty `results` plus a populated
-`not_found` or `not_matched` is *not* "no biology" — it's a routing
-problem.
+Always inspect both: empty `results` with a populated `not_found` /
+`not_matched` is a routing problem, not "no biology".
 
 ---
 
@@ -236,9 +232,8 @@ the primary headline. See `docs://analysis/metabolites`.
 
 ### Expression: `table_scope` decides what absence means
 
-The expression layer (`Changes_expression_of` edges) has the same
-question — tested-and-not-significant, or never reported? — but the
-answer depends on the parent experiment's `table_scope`:
+Tested-and-not-significant, or never reported? For DE edges the answer
+depends on the experiment's `table_scope`:
 
 - `table_scope='all_detected_genes'` — the paper reported every
   detected gene including non-significant ones. Tested-absent rows are
@@ -249,13 +244,20 @@ answer depends on the parent experiment's `table_scope`:
   tested-absent collapses with not-detected and you can't tell which
   from the KG.
 
-Always check the experiment's `table_scope` (on `list_experiments` and
-the per-row context of `differential_expression_by_gene`) before drawing
-conclusions from missing rows — the same gene can carry both shapes
-across different experiments. `table_scope` is **sparse**: a
-characterization study (mRNA decay, promoter mapping) or a
-metabolomics-only experiment carries no `table_scope` property at all,
-never an empty string, and `table_scope=[...]` filters never match it.
+Check `table_scope` before reading missing rows — one gene can carry
+both shapes across experiments. `table_scope` is **sparse**: absent (never `''`) on experiments
+without DE (mRNA decay, promoter mapping, metabolomics-only), so
+`table_scope=[...]` filters never match them.
+
+### Expression: timepoints describe the treatment arm
+
+`timepoint` and `growth_phase` describe the **treatment** arm.
+`control_timing` says when the control was sampled: `matched` (same time
+or same growth state), `baseline` (another time, e.g. one early
+reference) or `mixed`. `design_notes` names which timepoint's control was
+sampled when and in what state — read it before comparing timepoints,
+even on `matched` (it may be a growth-state match).
+`control_timing` is absent without DE; filter `list_experiments(control_timing=[...])`.
 
 ### Dense experiment metadata
 

@@ -5182,3 +5182,100 @@ class TestMetaboliteStereoHintKG:
         for r in cys_rows:
             assert _MSH_LCYS in r["stereo_relative_ids"]
         assert any("stereo_relative_ids" not in r for r in out["results"])
+
+
+# ---------------------------------------------------------------------------
+# Control-timing surface (docs/tool-specs/control-timing-surface.md).
+# KG 2026-10-18T07:51Z: control_timing CV {matched 151, baseline 18,
+# mixed 4}; design_notes sparse on 138 experiments.
+# ---------------------------------------------------------------------------
+_CT_E7 = "10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq"
+
+
+@pytest.mark.kg
+class TestControlTimingSurface:
+
+    def test_list_experiments_baseline_mixed_count(self, conn):
+        out = api.list_experiments(
+            control_timing=["baseline", "mixed"], summary=True, conn=conn)
+        assert out["total_matching"] == 22
+        counts = {b["control_timing"]: b["count"]
+                  for b in out["by_control_timing"]}
+        assert counts == {"baseline": 18, "mixed": 4}
+        assert out["warnings"] == []
+
+    def test_list_experiments_rows_match_filter(self, conn):
+        out = api.list_experiments(
+            control_timing=["baseline", "mixed"], limit=50, conn=conn)
+        assert out["returned"] == 22
+        for r in out["results"]:
+            assert r["control_timing"] in ("baseline", "mixed")
+            # every non-matched experiment carries design_notes (18 + 4)
+            assert r.get("design_notes")
+
+    def test_e7_matched_with_design_notes(self, conn):
+        out = api.list_experiments(experiment_ids=[_CT_E7], conn=conn)
+        assert out["returned"] == 1
+        row = out["results"][0]
+        assert row["control_timing"] == "matched"
+        assert isinstance(row.get("design_notes"), str)
+        assert row["design_notes"].strip()
+
+    def test_list_experiments_design_notes_sparse(self, conn):
+        """No row carries a null/'' design_notes key; at least one row omits it."""
+        out = api.list_experiments(limit=500, conn=conn)
+        assert any("design_notes" not in r for r in out["results"])
+        for r in out["results"]:
+            if "design_notes" in r:
+                assert r["design_notes"]
+
+    def test_unknown_control_timing_warns(self, conn):
+        out = api.list_experiments(
+            control_timing=["bogus"], summary=True, conn=conn)
+        assert out["total_matching"] == 0
+        assert any("'bogus'" in w and "control_timing" in w
+                   for w in out["warnings"]), out["warnings"]
+
+    def test_list_filter_values_control_timing(self, conn):
+        out = api.list_filter_values(filter_type="control_timing", conn=conn)
+        assert {r["value"] for r in out["results"]} == {
+            "matched", "baseline", "mixed"}
+        for r in out["results"]:
+            assert r["applies_to"] == ["Experiment"]
+
+    def test_de_by_gene_rows_carry_control_timing(self, conn):
+        out = api.differential_expression_by_gene(
+            locus_tags=["PMM0001"], limit=None, conn=conn)
+        assert out["results"]
+        values = [r["control_timing"] for r in out["results"]]
+        assert set(values) <= {"matched", "baseline", "mixed"}
+        assert "baseline" in values
+        assert "matched" in values
+
+    def test_de_by_gene_experiments_envelope(self, conn):
+        out = api.differential_expression_by_gene(
+            locus_tags=["PMM0001"], summary=True, conn=conn)
+        assert out["experiments"]
+        for e in out["experiments"]:
+            assert e["control_timing"] in ("matched", "baseline", "mixed")
+            if "design_notes" in e:
+                assert e["design_notes"]
+        assert any("design_notes" in e for e in out["experiments"])
+
+    def test_de_by_ortholog_rows_carry_control_timing(self, conn):
+        homs = api.gene_homologs(locus_tags=["PMM0001"], conn=conn)
+        gid = homs["results"][0]["group_id"]
+        out = api.differential_expression_by_ortholog(
+            group_ids=[gid], limit=50, conn=conn)
+        assert out["results"]
+        for r in out["results"]:
+            assert r["control_timing"] in ("matched", "baseline", "mixed")
+            assert "design_notes" not in r
+
+    @pytest.mark.asyncio
+    async def test_wrapper_wire_omits_null_design_notes(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["list_experiments"](ctx, limit=500)
+        dumped = response.model_dump()
+        assert any("design_notes" not in r for r in dumped["results"])
+        assert all("control_timing" in r for r in dumped["results"])

@@ -13,7 +13,7 @@ docs://tools/list_filter_values.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment', 'omics_type', 'evidence_source', 'evidence', 'sources', 'call_class', 'interpro_type', 'ncbifam_family_type', 'merops_catalytic_type', 'merops_family_class', 'best_hit_kind', 'pfam_support', 'attachment_depth', 'trust_axes', 'link_kinds', 'cluster_type', 'treatment_type', 'background_factors', 'table_scope', 'detection_status', 'expression_status', 'partner_role', 'structure_kind', 'kegg_functional_category', 'kegg_brite_class', 'stereo_assignment') | gene_category | Which filter to enumerate: gene/expression (incl. cluster_type), DerivedMetric, chemistry (detection_status, structure_kind, kegg_functional_category, kegg_brite_class, stereo_assignment), experiment (incl. partner_role) or a trust vocabulary. |
+| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment', 'omics_type', 'evidence_source', 'evidence', 'sources', 'call_class', 'interpro_type', 'ncbifam_family_type', 'merops_catalytic_type', 'merops_family_class', 'best_hit_kind', 'pfam_support', 'attachment_depth', 'trust_axes', 'link_kinds', 'cluster_type', 'treatment_type', 'background_factors', 'table_scope', 'detection_status', 'expression_status', 'partner_role', 'structure_kind', 'kegg_functional_category', 'kegg_brite_class', 'stereo_assignment', 'control_timing') | gene_category | Which filter to enumerate: gene/expression (incl. cluster_type), DerivedMetric, chemistry (detection_status, structure_kind, kegg_functional_category, kegg_brite_class, stereo_assignment), experiment (partner_role, control_timing) or trust. |
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') \| None | None | Scope a trust filter_type (e.g. 'trust_axes') to one ontology key. Ignored on non-trust filter types. |
 
 ## Example
@@ -58,6 +58,7 @@ Result row: `value, count, tree_code, source, applies_to, description`
 - list_filter_values(filter_type='growth_phase') → list_experiments(growth_phases=[...]) / list_derived_metrics(growth_phases=[...]) / differential_expression_by_gene(growth_phases=[...])
 - list_filter_values(filter_type='partner_role') → list_experiments(coculture_role=...) to separate coculture-vs-axenic (treatment) partners from background partners
 - list_filter_values(filter_type='table_scope') → list_experiments(table_scope=[...]) to keep only experiments whose DE table reports every detected gene
+- list_filter_values(filter_type='control_timing') → list_experiments(control_timing=[...]) to find experiments whose control was sampled at another time, then read their design_notes
 - list_filter_values(filter_type='value_kind') → list_derived_metrics(value_kind=...) / list_metabolite_assays(value_kind=...) → the matching genes_by_{kind}_metric or metabolites_by_{quantifies,flags}_assay drill-down
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/list_filter_values/full`

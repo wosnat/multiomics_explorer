@@ -65,6 +65,8 @@ examples:
             "omics_type": "RNASEQ",
             "is_time_course": "time_course",
             "table_scope": "all_detected_genes",
+            "control_timing": "baseline",
+            "design_notes": "Each timepoint (day 18, day 31, day 60, day 89) is coculture MED4 vs the same coculture series sampled on day 11 (exp...",
             "matching_genes": 1849,
             "rows_by_status": {"significant_up": 553, "significant_down": 834, "not_significant": 7858}
           },
@@ -74,6 +76,8 @@ examples:
             "omics_type": "PROTEOMICS",
             "is_time_course": "time_course",
             "table_scope": "all_detected_genes",
+            "control_timing": "baseline",
+            "design_notes": "day 14, day 31 and day 89: axenic MED4 vs axenic MED4 sampled on day 7 (exponential). Day 7 and day 14 come from the ...",
             "matching_genes": 1424,
             "rows_by_status": {"significant_up": 599, "significant_down": 556, "not_significant": 3117}
           },
@@ -83,6 +87,8 @@ examples:
             "omics_type": "RNASEQ",
             "is_time_course": "time_course",
             "table_scope": "all_detected_genes",
+            "control_timing": "matched",
+            "design_notes": "Control for 2h and 4h is the normal-diel circadian time-course sample at the same ZT (ZT 2 and ZT 4, lights on, diel)...",
             "matching_genes": 1876,
             "rows_by_status": {"significant_up": 556, "significant_down": 469, "not_significant": 2727}
           },
@@ -92,6 +98,8 @@ examples:
             "omics_type": "PROTEOMICS",
             "is_time_course": "time_course",
             "table_scope": "all_detected_genes",
+            "control_timing": "baseline",
+            "design_notes": "Each timepoint (day 18, day 31, day 60, day 89, days 60+89) is coculture MED4 vs the same coculture series sampled on...",
             "matching_genes": 1424,
             "rows_by_status": {"significant_up": 609, "significant_down": 394, "not_significant": 6117}
           },
@@ -101,6 +109,8 @@ examples:
             "omics_type": "RNASEQ",
             "is_time_course": "single_time_point",
             "table_scope": "all_detected_genes",
+            "control_timing": "baseline",
+            "design_notes": "day 14: axenic MED4 vs the same axenic series sampled on day 7 (exponential); axenic MED4 was a separate repeat exper...",
             "matching_genes": 1849,
             "rows_by_status": {"significant_up": 405, "significant_down": 472, "not_significant": 972}
           },
@@ -151,6 +161,8 @@ examples:
             "omics_type": "RNASEQ",
             "is_time_course": "time_course",
             "table_scope": "all_detected_genes",
+            "control_timing": "baseline",
+            "design_notes": "day 18 and day 31: axenic HOT1A3 vs the same axenic series sampled on day 11 (nutrient_limited, Alteromonas declines ...",
             "matching_genes": 2,
             "rows_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 4}
           }
@@ -174,6 +186,7 @@ examples:
             "timepoint": "day 18",
             "timepoint_hours": 432.0,
             "timepoint_order": 1,
+            "control_timing": "baseline",
             "log2fc": 0.8560175767959709,
             "padj": 0.2588535702469227,
             "rank": 1103,
@@ -190,6 +203,7 @@ examples:
             "timepoint": "day 31",
             "timepoint_hours": 744.0,
             "timepoint_order": 2,
+            "control_timing": "baseline",
             "log2fc": 0.5554277673766344,
             "padj": 0.5104041330731693,
             "rank": 1715,
@@ -206,6 +220,7 @@ examples:
             "timepoint": "day 31",
             "timepoint_hours": 744.0,
             "timepoint_order": 2,
+            "control_timing": "baseline",
             "log2fc": 0.4591817421638743,
             "padj": 0.5046507150018495,
             "rank": 2012,
@@ -313,7 +328,8 @@ mistakes:
   - "Use summary=True first to see the landscape, then drill into specific genes/experiments"
   - "Check by_table_scope in the summary to understand data completeness before drawing conclusions"
   - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"
+  - "A DE timepoint label (e.g. 'day 18') and `growth_phase` describe the treatment arm; check `control_timing` / `design_notes` before reading it as both arms' state. See docs://guide/conventions."
   - "For cross-experiment summarization (which treatments does this gene set respond to?) see `docs://analysis/expression` — `response_matrix` for gene × treatment pivots, `gene_set_compare` for two-set overlap. For pathway-level interpretation chain to `pathway_enrichment` (`docs://analysis/enrichment`)."
   - wrong: "Expecting per-timepoint counts, experiment_name, or table_scope_detail inside `experiments[]` from a plain call"
-    right: "`summary=True` (and every call by default) is the cheap landscape — each `experiments[]` entry is compact (experiment_id, treatment_type, table_scope, is_time_course, matching_genes, rows_by_status, omics_type). Per-timepoint counts and the other experiment metadata (experiment_name, background_factors, coculture_partner, table_scope_detail) need `verbose=True`."
+    right: "`summary=True` (and every call by default) is the cheap landscape — each `experiments[]` entry is compact (experiment_id, treatment_type, table_scope, control_timing, design_notes when present, is_time_course, matching_genes, rows_by_status, omics_type). Per-timepoint counts and the other experiment metadata (experiment_name, background_factors, coculture_partner, table_scope_detail) need `verbose=True`."
   - "At least one of `organism` / `locus_tags` / `experiment_ids` is required — calling with none of the three raises ValueError. Use list_organisms for organisms, resolve_gene for locus_tags, or list_experiments for experiment_ids."

@@ -77,6 +77,7 @@ total_matching, matching_genes, matching_groups, experiment_count, median_abs_lo
 | timepoint | string \| None | Timepoint label (e.g. '24h'). Null when edge has no label. |
 | timepoint_hours | float \| None | Numeric hours (e.g. 24.0). Null for non-numeric labels. |
 | timepoint_order | int | Sort key for time course order (e.g. 3) |
+| control_timing | string \| None (optional) | Experiment's control-arm timing: 'matched' (same time or growth state), 'baseline' (control sampled at another time) or 'mixed'. timepoint / growth_phase are the treatment arm's; read design_notes via list_experiments(experiment_ids=...). |
 | genes_with_expression | int | Group members with expression at this timepoint |
 | total_genes | int | Total group members in this organism (computed) |
 | significant_up | int | Genes significantly upregulated |
@@ -150,6 +151,8 @@ differential_expression_by_ortholog → genes_by_homolog_group(organisms=[...]) 
 - treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows and reports in the envelope `warnings` (naming the valid set) — check `warnings` before trusting an empty result. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical.
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
+
+- A DE timepoint label (e.g. 'day 18') and `growth_phase` describe the treatment arm; check `control_timing` / `design_notes` before reading it as both arms' state. See docs://guide/conventions.
 
 - For cross-experiment summarization patterns see `docs://analysis/expression` — covers `response_matrix` for gene × treatment-group pivots and `gene_set_compare` for two-set comparisons.
 

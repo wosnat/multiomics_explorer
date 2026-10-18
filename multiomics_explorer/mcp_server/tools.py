@@ -1873,13 +1873,13 @@ def register_tools(mcp: FastMCP):
                     "table_scope", "detection_status", "expression_status",
                     "partner_role", "structure_kind",
                     "kegg_functional_category", "kegg_brite_class",
-                    "stereo_assignment"],
+                    "stereo_assignment", "control_timing"],
             Field(description=(
                 "Which filter to enumerate: gene/expression (incl. "
                 "cluster_type), DerivedMetric, chemistry (detection_status, structure_kind, "
                 "kegg_functional_category, kegg_brite_class, "
-                "stereo_assignment), experiment (incl. partner_role) or a "
-                "trust vocabulary."
+                "stereo_assignment), experiment (partner_role, "
+                "control_timing) or trust."
             )),
         ] = "gene_category",
         ontology: Annotated[OntologyKey | None, Field(
@@ -3889,6 +3889,8 @@ def register_tools(mcp: FastMCP):
         is_time_course: bool = Field(description="Whether experiment has multiple time points.")
         table_scope: str | None = Field(default=None, description="What genes the source DE table contains. Values: all_detected_genes (tested-absent rows kept — `not_significant` represents real biology), significant_any_timepoint, significant_only (tested-absent rows collapsed), top_n, filtered_subset. Critical for interpreting missing genes — see docs://guide/conventions.")
         table_scope_detail: str | None = Field(default=None, description="Free-text clarification of table_scope (e.g. 'FDR < 0.05 and |logFC| > 0.8').")
+        control_timing: str | None = Field(default=None, description="Whether the control arm was sampled at the same time / growth state as the treatment ('matched'), at another time ('baseline'), or partly ('mixed'). Null when no DE contrast; timepoint / growth_phase describe the treatment arm.")
+        design_notes: str | None = Field(default=None, description="Curator note on how treatment and control arms were sampled / matched (names timepoints). Present only when the KG has one; read before comparing timepoints.")
         gene_count: int = Field(description="Cumulative row count across timepoints (= sum(time_point_totals) for time-course experiments — a 6-TP experiment with 1697 genes/TP has gene_count=10182). Equals distinct_gene_count for non-time-course experiments.")
         distinct_gene_count: int = Field(description="Distinct gene count across the experiment — unique gene IDs with at least one measurement edge, regardless of timepoint. Use for detection-power / pathway-background sizing. distinct_gene_count <= gene_count.")
         genes_by_status: GeneStatusBreakdown = Field(description="Gene counts by expression status.")
@@ -3964,6 +3966,10 @@ def register_tools(mcp: FastMCP):
         coculture_role: str = Field(description="Coculture partner role ('treatment' or 'background').")
         count: int = Field(description="Number of matching experiments with a partner of this role.")
 
+    class ControlTimingBreakdown(BaseModel):
+        control_timing: str = Field(description="Control-arm timing ('matched', 'baseline', 'mixed').")
+        count: int = Field(description="Number of experiments with this control timing.")
+
     class ExpCompartmentBreakdown(BaseModel):
         compartment: str = Field(description="Wet-lab fraction (e.g. 'whole_cell', 'vesicle', 'exoproteome').")
         count: int = Field(description="Number of experiments in this compartment.")
@@ -3984,6 +3990,7 @@ def register_tools(mcp: FastMCP):
         by_publication: list[PublicationBreakdown] = Field(description="Experiment counts per publication, sorted desc.")
         by_publication_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         by_table_scope: list[TableScopeBreakdown] = Field(description="Experiment counts per table scope, sorted desc.")
+        by_control_timing: list[ControlTimingBreakdown] = Field(default_factory=list, description="Experiment counts per control_timing, sorted desc. Experiments without DE (null control_timing) are not counted.")
         by_cluster_type: list[ClusterTypeBreakdown] = Field(default_factory=list, description="Experiment counts per cluster type, sorted desc.")
         by_growth_phase: list[GrowthPhaseBreakdown] = Field(default_factory=list, description="Experiment counts per growth phase, sorted desc.")
         by_value_kind: list[ExpValueKindBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric value_kind across matching experiments.")
@@ -3995,7 +4002,7 @@ def register_tools(mcp: FastMCP):
         score_max: float | None = Field(default=None, description="Max Lucene relevance score, present only when search_text is used.")
         score_median: float | None = Field(default=None, description="Median Lucene relevance score, present only when search_text is used.")
         not_found: list[str] = Field(default_factory=list, description="Input experiment_ids that did not match any Experiment node (empty unless experiment_ids was provided).")
-        warnings: list[str] = Field(default_factory=list, description="A closed-vocabulary filter value (treatment_type / background_factors / omics_type / table_scope / growth_phases / compartment) not found in the live vocabulary (see list_filter_values), or an organism that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.")
+        warnings: list[str] = Field(default_factory=list, description="A closed-vocabulary filter value (treatment_type / background_factors / omics_type / table_scope / control_timing / growth_phases / compartment) not found in the live vocabulary (see list_filter_values), or an organism that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.")
         results: list[ExperimentResult] = Field(description="Individual experiments (empty when summary=true).")
 
     @mcp.tool(
@@ -4024,8 +4031,8 @@ def register_tools(mcp: FastMCP):
         )] = None,
         search_text: Annotated[str | None, Field(
             description="Free-text search on experiment name, treatment, control, "
-            "experimental context, and light condition (Lucene fulltext, "
-            "case-insensitive). E.g. 'continuous light', 'diel'.",
+            "experimental context, light condition and design_notes (Lucene "
+            "fulltext, case-insensitive). E.g. 'continuous light', 'diel'.",
         )] = None,
         time_course_only: Annotated[bool, Field(
             description="If true, return only time-course experiments "
@@ -4044,6 +4051,12 @@ def register_tools(mcp: FastMCP):
             "lists any provided ids that did not match. Mirrors the filter "
             "shape on sibling tools (pathway_enrichment, ontology_landscape).",
         )] = None,
+        control_timing: Annotated[list[str] | None, Field(
+            description="Keep experiments whose control arm timing is one of: "
+            "'matched' (same time or growth state), 'baseline' (control sampled "
+            "at another time), 'mixed'. Experiments without DE never match. "
+            "Live values: list_filter_values('control_timing').",
+        )] = None,
         compartment: CompartmentParam = None,
         summary: SummaryParam = False,
         verbose: VerboseParam = False,
@@ -4052,9 +4065,9 @@ def register_tools(mcp: FastMCP):
     ) -> ListExperimentsResponse:
         """Differential-expression and characterization experiments with per-timepoint, DM and metabolomics rollups.
 
-        Use to pick experiment_ids and read each one's table_scope before interpreting missing DE rows; for study-level metadata use `list_publications`.
-        Filters: organism, coculture_partner, coculture_role, table_scope, experiment_ids, search_text, time_course_only, plus the publication / condition filters.
-        Returns: by_organism, by_treatment_type, by_table_scope, by_omics_type, by_growth_phase, not_found; one row = one experiment.
+        Use to pick experiment_ids and read their table_scope before interpreting missing DE rows; for study-level metadata use `list_publications`.
+        Filters: organism, coculture_partner, coculture_role, table_scope, experiment_ids, search_text, time_course_only, plus publication / condition filters.
+        Returns: by_organism, by_treatment_type, by_table_scope, by_control_timing, by_omics_type, by_growth_phase, not_found; one row = one experiment.
         docs://tools/list_experiments; summary=True first.
         """
         await ctx.info(f"list_experiments summary={summary} organism={organism} "
@@ -4070,6 +4083,7 @@ def register_tools(mcp: FastMCP):
                 coculture_role=coculture_role, search_text=search_text,
                 time_course_only=time_course_only, table_scope=table_scope,
                 experiment_ids=experiment_ids, compartment=compartment,
+                control_timing=control_timing,
                 summary=summary,
                 verbose=verbose, limit=limit, offset=offset, conn=conn,
             )
@@ -4081,6 +4095,7 @@ def register_tools(mcp: FastMCP):
             by_omics_type = [OmicsTypeBreakdown(**b) for b in result["by_omics_type"]]
             by_publication = [PublicationBreakdown(**b) for b in result["by_publication"]]
             by_table_scope = [TableScopeBreakdown(**b) for b in result["by_table_scope"]]
+            by_control_timing = [ControlTimingBreakdown(**b) for b in result.get("by_control_timing", [])]
             by_cluster_type = [ClusterTypeBreakdown(**b) for b in result.get("by_cluster_type", [])]
             by_growth_phase = [GrowthPhaseBreakdown(**b) for b in result.get("by_growth_phase", [])]
             by_value_kind = [ExpValueKindBreakdown(**b) for b in result.get("by_value_kind", [])]
@@ -4120,6 +4135,7 @@ def register_tools(mcp: FastMCP):
                 by_publication=by_publication,
                 by_publication_truncated=result.get("by_publication_truncated"),
                 by_table_scope=by_table_scope,
+                by_control_timing=by_control_timing,
                 by_cluster_type=by_cluster_type,
                 by_growth_phase=by_growth_phase,
                 by_value_kind=by_value_kind,
@@ -4227,6 +4243,19 @@ def register_tools(mcp: FastMCP):
             description="Free-text clarification of table_scope"
             " (e.g. 'Top 50% of genes by expression level'). Verbose only.",
         )
+        control_timing: str | None = Field(
+            default=None,
+            description="Control-arm timing: 'matched' (same time or growth"
+            " state as treatment), 'baseline' (control sampled at another"
+            " time) or 'mixed'. Row timepoint / growth_phase describe the"
+            " treatment arm.",
+        )
+        design_notes: str | None = Field(
+            default=None,
+            description="Curator note on how treatment and control arms were"
+            " sampled / matched (names timepoints). Omitted when the KG has"
+            " none; read before comparing timepoints.",
+        )
         matching_genes: int = Field(
             description="Distinct genes with data in this experiment (e.g. 5)",
         )
@@ -4276,6 +4305,13 @@ def register_tools(mcp: FastMCP):
         )
         timepoint_order: int = Field(
             description="Sort key for time course order (e.g. 3)",
+        )
+        control_timing: str | None = Field(
+            default=None,
+            description="Experiment's control-arm timing: 'matched' (same"
+            " time or growth state), 'baseline' (control sampled at another"
+            " time) or 'mixed'. timepoint / growth_phase are the treatment"
+            " arm's; see experiments[].design_notes.",
         )
         log2fc: float = Field(
             description="Log2 fold change (e.g. 3.591). Positive = up.",
@@ -4418,8 +4454,9 @@ def register_tools(mcp: FastMCP):
         experiments: list[ExpressionByExperiment] = Field(
             description="Per-experiment summary, sorted by significant row"
             " count desc. Compact by default (experiment_id, treatment_type,"
-            " table_scope, is_time_course, matching_genes, rows_by_status,"
-            " omics_type); verbose=True restores experiment_name,"
+            " table_scope, control_timing, design_notes (omitted when absent),"
+            " is_time_course, matching_genes, rows_by_status, omics_type);"
+            " verbose=True restores experiment_name,"
             " background_factors, coculture_partner, table_scope_detail,"
             " and the nested per-timepoint breakdown. Capped to the first 10"
             " entries; summary=True returns the full list — "
@@ -4957,6 +4994,13 @@ def register_tools(mcp: FastMCP):
         )
         timepoint_order: int = Field(
             description="Sort key for time course order (e.g. 3)",
+        )
+        control_timing: str | None = Field(
+            default=None,
+            description="Experiment's control-arm timing: 'matched' (same"
+            " time or growth state), 'baseline' (control sampled at another"
+            " time) or 'mixed'. timepoint / growth_phase are the treatment"
+            " arm's; read design_notes via list_experiments(experiment_ids=...).",
         )
         genes_with_expression: int = Field(
             description="Group members with expression at this timepoint",

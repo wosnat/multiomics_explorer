@@ -20,8 +20,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Control for 2h and 4h is the normal-diel circadian time-course sample
+    at the same ZT (ZT 2 and ZT 4, lights on, diel), not ZT 0 as one Methods sentence
+    suggests; the reported log2FC reproduce the same-ZT contrast from the GEO GSE314951
+    counts (r = 1.00) and not the ZT 0 contrast (r below 0.6).
   distinct_gene_count: 1876
   experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
   experiment_name: MED4 extended darkness past dawn vs normal light period (RNA-seq)
@@ -82,8 +87,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Control for 14h and 16h is the normal-diel circadian time-course sample
+    at the same ZT (ZT 14 and ZT 16, lights off, diel), not ZT 0 or ZT 12; the reported
+    log2FC reproduce the same-ZT contrast from the GEO GSE314951 counts (r = 1.00)
+    and not the ZT 12 contrast (r below 0.82).
   distinct_gene_count: 1876
   experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
   experiment_name: MED4 extended light past dusk vs normal dark period (RNA-seq)
@@ -136,8 +146,14 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the axenic MED4 control
+    came from a separate repeat experiment sampled on days 7 and 14 to match axenic
+    MED4 growth dynamics (Methods p. 14). day 11: coculture day 11 vs axenic day 7
+    (both exponential). day 18: coculture day 18 vs axenic day 14 (death, axenic MED4
+    lost viability around day 11).'
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
@@ -191,8 +207,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'day 14, day 31 and day 89: axenic MED4 vs axenic MED4 sampled on
+    day 7 (exponential). Day 7 and day 14 come from the axenic repeat experiment;
+    the methods do not say which run day 31 and day 89 came from.'
   distinct_gene_count: 1424
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential
@@ -253,8 +273,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'day 14: axenic MED4 vs the same axenic series sampled on day 7 (exponential);
+    axenic MED4 was a separate repeat experiment sampled on days 7 and 14. No axenic
+    MED4 RNA exists after day 14.'
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   experiment_name: MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential
@@ -302,8 +326,12 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Each timepoint (day 18, day 31, day 60, day 89, days 60+89) is coculture
+    MED4 vs the same coculture series sampled on day 11 (exponential). days 60+89
+    pools the day 60 and day 89 samples.
   distinct_gene_count: 1424
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
@@ -379,8 +407,12 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Each timepoint (day 18, day 31, day 60, day 89) is coculture MED4
+    vs the same coculture series sampled on day 11 (exponential). days 60+89 pools
+    the day 60 and day 89 samples.
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
@@ -458,8 +490,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -508,8 +544,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -558,8 +598,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +100 nM glucose vs light (control)'
@@ -608,8 +652,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +5 mM glucose vs light (control)'
@@ -657,8 +705,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 1953
   experiment_id: 10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq
   experiment_name: MED4 Low salinity acclimation (28 psu) vs Normal seawater salinity
@@ -709,8 +759,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 857
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
@@ -770,8 +822,10 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 1714
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
@@ -817,8 +871,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Dark and light arms come from two experiments run on separate days,
+    each split from its own mid-log (exponential) mother culture; arms are compared
+    at the same hours post-inoculation.
   distinct_gene_count: 38
   experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_infected
   experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) in phage P-HM2
@@ -892,8 +950,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Dark and light arms come from two experiments run on separate days,
+    each split from its own mid-log (exponential) mother culture; arms are compared
+    at the same hours post-inoculation.
   distinct_gene_count: 32
   experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark
   experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) in uninfected
@@ -961,8 +1023,10 @@ rows:
   coculture_partner:
   - Phage
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 23
   experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_dark
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in dark
@@ -1023,8 +1087,10 @@ rows:
   coculture_partner:
   - Phage
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 29
   experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_light
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in light
@@ -1098,8 +1164,14 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'max across 70min-24h: the air-sparged culture at each time is compared
+    with its own t = 0 sample (taken immediately after centrifugation and resuspension,
+    before sparging; exponential). Table S1 reports the maximal log2 fold change versus
+    t = 0 over the time course; significance by betr time-series test against t =
+    0.'
   distinct_gene_count: 166
   experiment_id: 10.1038/ismej.2015.36_carbon_air_0036_co2_21_med4_microarray
   experiment_name: MED4 Air (0.036% CO2 / 21% O2) vs Time 0 (pre-shock) (MICROARRAY)
@@ -1145,8 +1217,14 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'max across 70min-24h: gas-shocked and air-sparged control bottles
+    were split from one pooled culture at t = 0 and sampled in parallel at the same
+    times (exponential). The value is the extremum over time of the log2 change versus
+    t = 0 under the gas minus the same change in air; significance by betr against
+    the parallel air time course.'
   distinct_gene_count: 4
   experiment_id: 10.1038/ismej.2015.36_carbon_ambient_co2_no_o2_med4_microarray
   experiment_name: MED4 Ambient CO2, no O2 (0.036% CO2 / 0% O2) vs Air (0.036% CO2
@@ -1193,10 +1271,16 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 3
   derived_metric_value_kinds:
   - boolean
   - categorical
+  design_notes: 'max across 70min-24h: gas-shocked and air-sparged control bottles
+    were split from one pooled culture at t = 0 and sampled in parallel at the same
+    times (exponential). The value is the extremum over time of the log2 change versus
+    t = 0 under the gas minus the same change in air; significance by betr against
+    the parallel air time course.'
   distinct_gene_count: 285
   experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_0004_co2_med4_microarray
   experiment_name: MED4 Low CO2 (0.004% CO2 / 21% O2) vs Air (0.036% CO2 / 21% O2)
@@ -1243,10 +1327,16 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 2
   derived_metric_value_kinds:
   - boolean
   - categorical
+  design_notes: 'max across 70min-24h: gas-shocked and air-sparged control bottles
+    were split from one pooled culture at t = 0 and sampled in parallel at the same
+    times (exponential). The value is the extremum over time of the log2 change versus
+    t = 0 under the gas minus the same change in air; significance by betr against
+    the parallel air time course.'
   distinct_gene_count: 252
   experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_and_no_med4_microarray
   experiment_name: MED4 Low CO2 and no O2 (0.004% CO2 / 0% O2) vs Air (0.036% CO2
@@ -1298,9 +1388,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1186/1471-2180-14-11_expression_profiling_med4_rnaseq
   experiment_name: MED4 steady-state expression profiling across growth conditions
@@ -1342,10 +1434,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 5
   derived_metric_value_kinds:
   - boolean
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1038/ismej.2014.57_tss_mapping_med4
   experiment_name: MED4 transcriptome architecture mapping (TSS map, 454 + Solexa
@@ -1389,11 +1483,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - boolean
   - categorical
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1126/science.1243457_vesicle_proteomics_med4
   experiment_name: MED4 vesicle proteome (LC-MS/MS, presence + Mascot probability
@@ -1436,9 +1532,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 1
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1126/science.1243457_vesicle_dnaseq_med4
   experiment_name: MED4 vesicle-encapsulated DNA-seq (top-50 ORFs by avg read coverage)
@@ -1477,9 +1575,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 6
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel
   experiment_name: MED4 diel paired transcript-protein analysis (Waldbauer 2012)
@@ -1519,8 +1619,13 @@ rows:
   clustering_analysis_count: 1
   coculture_partner: []
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'R (rescue: 70h vs 48h): the -Fe cultures 21h after iron addition
+    at 49h (sampled at 70h) vs the same -Fe cultures before rescue, sampled at 48h
+    (nutrient_limited, iron-starved). Within-culture before/after comparison, no parallel
+    untreated control at 70h.'
   distinct_gene_count: 112
   experiment_id: 10.1038/ismej.2011.49_iron_rescue_med4_microarray
   experiment_name: MED4 Iron rescue - after vs before iron re-addition (MED4) (MICROARRAY)
@@ -1568,8 +1673,12 @@ rows:
   clustering_analysis_count: 1
   coculture_partner: []
   compartment: whole_cell
+  control_timing: mixed
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: '12h and 24h: no-added-iron (-Fe) vs iron-replete (+Fe) cultures sampled
+    at the same hour. 48h: -Fe sampled at 48h vs +Fe sampled at 24h (exponential),
+    because the 48h +Fe array hybridized poorly (p. 1582) - not matched.'
   distinct_gene_count: 112
   experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_med4_med4_microarray_light
   experiment_name: MED4 Iron starvation (MED4) vs Iron-replete control (MED4) (MICROARRAY)
@@ -1635,10 +1744,12 @@ rows:
   clustering_analysis_count: 1
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 4
   derived_metric_value_kinds:
   - boolean
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1186/gb-2010-11-5-r54_rifampicin_rna_decay_med4
   experiment_name: MED4 genome-wide mRNA half-life measurement (rifampicin transcription
@@ -1688,8 +1799,10 @@ rows:
   clustering_analysis_count: 1
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1371/journal.pone.0005135_diel_cycling_med4_microarray
   experiment_name: MED4 diel gene expression profiling over 48h light-dark cycle
@@ -1737,8 +1850,14 @@ rows:
   coculture_partner:
   - Phage
   compartment: whole_cell
+  control_timing: mixed
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Paired uninfected control cultures (amended with filter-sterilized
+    spent medium) were sampled alongside the infected cultures; 1h, 2h, 3h, 4h and
+    8h compare infected vs control at the same hour. 5h, 6h and 7h: no control arrays
+    at those hours - infected cells were compared with the control arrays from 4 h
+    and 8 h (exponential), which gave the same profiles - not matched.'
   distinct_gene_count: 45
   experiment_id: 10.1038/nature06130_viral_phage_infected_med4_microarray
   experiment_name: MED4 Phage infected vs uninfected spent-medium control (MICROARRAY)
@@ -1833,8 +1952,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 179
   experiment_id: 10.1021/pr060460c_light_HL_vs_LL_med4_proteomics
   experiment_name: 'MED4 proteomics: high light (100 uE) vs low light (20 uE) (iTRAQ)'
@@ -1882,8 +2003,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 178
   experiment_id: 10.1021/pr060460c_light_ML_vs_LL_med4_proteomics
   experiment_name: 'MED4 proteomics: medium light (60 uE) vs low light (20 uE) (iTRAQ)'
@@ -1931,8 +2054,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_blue_light_13_umol_med4_microarray
   experiment_name: MED4 Blue light (13 umol photons m-2 s-1) vs Darkness control (MICROARRAY)
@@ -1981,8 +2106,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_dcmu_white_light_13_med4_microarray
   experiment_name: MED4 DCMU + white light (13 umol photons m-2 s-1) vs White light
@@ -2031,8 +2158,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_green_light_13_umol_med4_microarray
   experiment_name: MED4 Green light (13 umol photons m-2 s-1) vs Darkness control
@@ -2085,8 +2214,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'steady state: log-phase cultures acclimated to the alternative N
+    source vs log-phase cultures on ammonium (exponential). Methods do not state that
+    both arms were harvested on the same day; matched by growth state, assumed from
+    the acclimated parallel-culture design.'
   distinct_gene_count: 1697
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
   experiment_name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99
@@ -2138,8 +2272,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'steady state: log-phase cultures acclimated to the alternative N
+    source vs log-phase cultures on ammonium (exponential). Methods do not state that
+    both arms were harvested on the same day; matched by growth state, assumed from
+    the acclimated parallel-culture design.'
   distinct_gene_count: 1697
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
   experiment_name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99
@@ -2187,8 +2326,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_high_white_light_55_med4_microarray
   experiment_name: MED4 High white light (55 umol photons m-2 s-1) vs Darkness control
@@ -2242,8 +2383,10 @@ rows:
   clustering_analysis_count: 1
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 1697
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
@@ -2326,8 +2469,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 34
   experiment_id: 10.1073/pnas.0601301103_phosphorus_phosphate_starvation_med4_microarray
   experiment_name: MED4 Phosphate starvation vs P-replete Pro99 medium (MICROARRAY)
@@ -2404,8 +2549,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_red_light_13_umol_med4_microarray
   experiment_name: MED4 Red light (13 umol photons m-2 s-1) vs Darkness control (MICROARRAY)
@@ -2453,8 +2600,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_white_light_13_umol_med4_microarray
   experiment_name: MED4 White light (13 umol photons m-2 s-1) vs Darkness control

@@ -246,6 +246,7 @@ _VOCAB_CONTEXTS = {
     "treatment[_ ]types?": "treatment_type",
     "background[_ ]factors": "background_factors",
     "compartments?": "compartment",
+    "control[_ ]timing": "control_timing",
 }
 # `kw=['a', 'b']`, `kw: "a"`, `kw (e.g. ['a', 'b'])`, `kw="a"`
 _VOCAB_ASSIGN_RE = (

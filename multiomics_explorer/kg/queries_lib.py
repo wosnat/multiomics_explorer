@@ -3027,6 +3027,7 @@ def _list_experiments_where(
     growth_phases: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     compartment: str | None = None,
+    control_timing: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build WHERE clause and params for experiment queries.
 
@@ -3114,6 +3115,10 @@ def _list_experiments_where(
         conditions.append("e.compartment = $compartment")
         params["compartment"] = compartment
 
+    if control_timing:
+        conditions.append("e.control_timing IN $control_timings")
+        params["control_timings"] = control_timing
+
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
     return where_block, params
 
@@ -3133,6 +3138,7 @@ def build_list_experiments(
     growth_phases: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     compartment: str | None = None,
+    control_timing: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -3141,8 +3147,9 @@ def build_list_experiments(
 
     RETURN keys (compact): experiment_id, experiment_name, publication_doi,
     authors, organism_name, treatment_type, coculture_partner, omics_type,
-    is_time_course, table_scope, table_scope_detail,
-    gene_count, distinct_gene_count, significant_up_count,
+    is_time_course, table_scope, table_scope_detail, control_timing
+    (null on experiments with no DE contrast), design_notes (sparse,
+    null when absent), gene_count, distinct_gene_count, significant_up_count,
     significant_down_count, time_point_count, time_point_labels,
     time_point_orders, time_point_hours, time_point_totals,
     time_point_significant_up, time_point_significant_down,
@@ -3162,6 +3169,9 @@ def build_list_experiments(
     coculture_partner, role and name must hold for the same partner.
     compartment: when provided, restricts to experiments in that wet-lab
     compartment (scalar equality: e.compartment = $compartment).
+    control_timing: when provided, keep experiments whose control_timing
+    is in the list (e.control_timing IN $control_timings); experiments with
+    no DE contrast (null control_timing) never match.
 
     Note on derived_metric_types vs reports_derived_metric_types:
     Both fields are sourced from ``e.reports_derived_metric_types`` today —
@@ -3179,6 +3189,7 @@ def build_list_experiments(
         time_course_only=time_course_only, table_scope=table_scope,
         background_factors=background_factors, growth_phases=growth_phases,
         experiment_ids=experiment_ids, compartment=compartment,
+        control_timing=control_timing,
     )
 
     verbose_cols = (
@@ -3226,6 +3237,8 @@ def build_list_experiments(
         "       e.is_time_course AS is_time_course,\n"
         "       e.table_scope AS table_scope,\n"
         "       e.table_scope_detail AS table_scope_detail,\n"
+        "       e.control_timing AS control_timing,\n"
+        "       e.design_notes AS design_notes,\n"
         "       e.gene_count AS gene_count,\n"
         "       e.distinct_gene_count AS distinct_gene_count,\n"
         "       e.significant_up_count AS significant_up_count,\n"
@@ -3287,6 +3300,7 @@ def build_list_experiments_summary(
     growth_phases: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     compartment: str | None = None,
+    control_timing: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary aggregation Cypher for list_experiments.
 
@@ -3296,8 +3310,8 @@ def build_list_experiments_summary(
 
     RETURN keys: total_matching, time_course_count, by_organism,
     by_treatment_type, by_background_factors, by_omics_type, by_publication,
-    by_table_scope, by_cluster_type, by_growth_phase,
-    by_value_kind, by_metric_type, by_compartment, by_coculture_role
+    by_table_scope, by_control_timing (no-DE experiments not counted),
+    by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, by_coculture_role
     (frequencies of distinct Tests_coculture_with.partner_role per
     experiment; axenic experiments count in none).
     RETURN keys (search_text): adds score_max, score_median.
@@ -3314,6 +3328,7 @@ def build_list_experiments_summary(
         time_course_only=time_course_only, table_scope=table_scope,
         background_factors=background_factors, growth_phases=growth_phases,
         experiment_ids=experiment_ids, compartment=compartment,
+        control_timing=control_timing,
     )
 
     collect_cols = (
@@ -3324,6 +3339,7 @@ def build_list_experiments_summary(
         "     collect(p.doi) AS dois,\n"
         "     collect(e.is_time_course) AS tc,\n"
         "     collect(e.table_scope) AS scopes,\n"
+        "     collect(e.control_timing) AS cts,\n"
         "     apoc.coll.flatten(collect(coalesce(e.cluster_types, []))) AS ctypes"
         ",\n     apoc.coll.flatten(collect(coalesce(e.growth_phases, []))) AS gps"
         ",\n     apoc.coll.flatten(\n"
@@ -3344,6 +3360,7 @@ def build_list_experiments_summary(
         "       apoc.coll.frequencies(omics) AS by_omics_type,\n"
         "       apoc.coll.frequencies(dois) AS by_publication,\n"
         "       apoc.coll.frequencies(scopes) AS by_table_scope,\n"
+        "       apoc.coll.frequencies(cts) AS by_control_timing,\n"
         "       apoc.coll.frequencies(ctypes) AS by_cluster_type"
         ",\n       apoc.coll.frequencies(gps) AS by_growth_phase"
         ",\n       apoc.coll.frequencies(vks) AS by_value_kind"
@@ -5464,6 +5481,8 @@ def build_differential_expression_by_gene_summary_by_experiment(
     rows_by_status at both experiment and timepoint level (APOC list format).
     is_time_course included per experiment so api/ can null-out timepoints.
     timepoints include growth_phase from the edge.
+    Each experiment dict also carries control_timing and design_notes
+    (sparse; null when absent — api/ drops the key).
     """
     conditions, params = _differential_expression_where(
         organism=organism, locus_tags=locus_tags,
@@ -5498,6 +5517,8 @@ def build_differential_expression_by_gene_summary_by_experiment(
         "              is_time_course: e.is_time_course,\n"
         "              table_scope: e.table_scope,\n"
         "              table_scope_detail: e.table_scope_detail,\n"
+        "              control_timing: e.control_timing,\n"
+        "              design_notes: e.design_notes,\n"
         "              matching_genes: matching_genes,\n"
         "              rows_by_status: rows_by_status,\n"
         "              timepoints: timepoints}) AS experiments,\n"
@@ -5713,9 +5734,10 @@ def build_differential_expression_by_gene(
 ) -> tuple[str, dict]:
     """Build detail Cypher for differential_expression_by_gene.
 
-    RETURN keys (compact — 14): locus_tag, gene_name,
+    RETURN keys (compact — 15): locus_tag, gene_name,
     experiment_id, treatment_type, timepoint, timepoint_hours, timepoint_order,
-    log2fc, padj, rank, rank_up, rank_down, expression_status, growth_phase.
+    log2fc, padj, rank, rank_up, rank_down, expression_status, growth_phase,
+    control_timing.
     RETURN keys (verbose): adds product, experiment_name, treatment,
     gene_category, omics_type, coculture_partner, table_scope,
     table_scope_detail.
@@ -5769,6 +5791,7 @@ def build_differential_expression_by_gene(
         "       r.rank_down AS rank_down,\n"
         "       r.expression_status AS expression_status"
         ",\n       r.growth_phase AS growth_phase"
+        ",\n       e.control_timing AS control_timing"
         f"{verbose_cols}\n"
         "ORDER BY ABS(r.log2_fold_change) DESC, g.locus_tag ASC,"
         " e.id ASC, r.time_point_order ASC"
@@ -6313,9 +6336,9 @@ def build_differential_expression_by_ortholog_results(
 ) -> tuple[str, dict]:
     """Build detail Cypher for differential_expression_by_ortholog.
 
-    RETURN keys (compact — 14): group_id, consensus_gene_name,
+    RETURN keys (compact — 15): group_id, consensus_gene_name,
     consensus_product, experiment_id, treatment_type, organism_name,
-    coculture_partner, timepoint, timepoint_hours, timepoint_order,
+    coculture_partner, control_timing, timepoint, timepoint_hours, timepoint_order,
     growth_phase, genes_with_expression, significant_up, significant_down,
     not_significant.
     RETURN keys (verbose): adds experiment_name, treatment, omics_type,
@@ -6365,6 +6388,7 @@ def build_differential_expression_by_ortholog_results(
         "       coalesce(e.background_factors, []) AS background_factors,\n"
         "       e.organism_name AS organism_name,\n"
         "       e.coculture_partner AS coculture_partner,\n"
+        "       e.control_timing AS control_timing,\n"
         "       tp AS timepoint,\n"
         "       tph AS timepoint_hours,\n"
         "       tpo AS timepoint_order,\n"

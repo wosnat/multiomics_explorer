@@ -69,6 +69,13 @@ vocabularies:
       - extracellular
       - vesicle
       - whole_cell
+  control_timing:
+    Experiment:
+      closed: true
+      values:
+      - baseline
+      - matched
+      - mixed
   detection_status:
     Assay_quantifies_metabolite:
       closed: true

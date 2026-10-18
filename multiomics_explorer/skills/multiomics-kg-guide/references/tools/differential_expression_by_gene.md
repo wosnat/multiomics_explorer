@@ -42,7 +42,7 @@ differential_expression_by_gene(organism="MED4", summary=True)
 organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc, max_abs_log2fc, experiment_count, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_categories, experiments, not_found, no_expression, filtered_out, warnings, not_found_experiments, not_matched_experiments, returned, offset, truncated, results
 ```
 
-Result row: `locus_tag, gene_name, experiment_id, treatment_type, timepoint, timepoint_hours, timepoint_order, log2fc, padj, rank, rank_up, rank_down, …`
+Result row: `locus_tag, gene_name, experiment_id, treatment_type, timepoint, timepoint_hours, timepoint_order, control_timing, log2fc, padj, rank, rank_up, …`
 
 ## Common mistakes
 

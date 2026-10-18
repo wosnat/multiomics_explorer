@@ -4,9 +4,9 @@
 
 Differential-expression and characterization experiments with per-timepoint, DM and metabolomics rollups.
 
-Use to pick experiment_ids and read each one's table_scope before interpreting missing DE rows; for study-level metadata use `list_publications`.
-Filters: organism, coculture_partner, coculture_role, table_scope, experiment_ids, search_text, time_course_only, plus the publication / condition filters.
-Returns: by_organism, by_treatment_type, by_table_scope, by_omics_type, by_growth_phase, not_found; one row = one experiment.
+Use to pick experiment_ids and read their table_scope before interpreting missing DE rows; for study-level metadata use `list_publications`.
+Filters: organism, coculture_partner, coculture_role, table_scope, experiment_ids, search_text, time_course_only, plus publication / condition filters.
+Returns: by_organism, by_treatment_type, by_table_scope, by_control_timing, by_omics_type, by_growth_phase, not_found; one row = one experiment.
 docs://tools/list_experiments; summary=True first.
 
 ## Parameters
@@ -21,10 +21,11 @@ docs://tools/list_experiments; summary=True first.
 | publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | coculture_partner | string \| None | None | Filter by coculture partner organism (case-insensitive substring match against any entry of the coculture_partner list). Matches treatment AND background partners — do not combine with treatment_type=['coculture'] unless you want coculture-vs-axenic comparisons only. E.g. 'Alteromonas', 'HOT1A3'. |
 | coculture_role | string ('treatment', 'background') \| None | None | Keep experiments with a partner of this role: 'treatment' (the partner's presence is the contrast: coculture vs axenic, or phage) or 'background' (contrast is something else). With coculture_partner=, both hold for one partner. |
-| search_text | string \| None | None | Free-text search on experiment name, treatment, control, experimental context, and light condition (Lucene fulltext, case-insensitive). E.g. 'continuous light', 'diel'. |
+| search_text | string \| None | None | Free-text search on experiment name, treatment, control, experimental context, light condition and design_notes (Lucene fulltext, case-insensitive). E.g. 'continuous light', 'diel'. |
 | time_course_only | bool | False | If true, return only time-course experiments (multiple time points). |
 | table_scope | list[string] \| None | None | Filter by table scope — what genes the source DE table contains. Values: 'all_detected_genes', 'significant_any_timepoint', 'significant_only', 'top_n', 'filtered_subset'. E.g. ['all_detected_genes'] for fair cross-experiment comparison. |
 | experiment_ids | list[string] \| None | None | Restrict to specific experiments by id (exact match). Combines with other filters via AND. `not_found` in the response lists any provided ids that did not match. Mirrors the filter shape on sibling tools (pathway_enrichment, ontology_landscape). |
+| control_timing | list[string] \| None | None | Keep experiments whose control arm timing is one of: 'matched' (same time or growth state), 'baseline' (control sampled at another time), 'mixed'. Experiments without DE never match. Live values: list_filter_values('control_timing'). |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
@@ -38,7 +39,7 @@ docs://tools/list_experiments; summary=True first.
 ### Envelope
 
 ```expected-keys
-total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, by_coculture_role, time_course_count, score_max, score_median, not_found, warnings, results
+total_entries, total_matching, returned, offset, truncated, by_organism, by_treatment_type, by_background_factors, by_omics_type, by_publication, by_table_scope, by_control_timing, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_compartment, by_coculture_role, time_course_count, score_max, score_median, not_found, warnings, results
 ```
 
 - **total_entries** (int): Total experiments in the KG (unfiltered).
@@ -56,6 +57,7 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 - **by_publication** (list[PublicationBreakdown]): Experiment counts per publication, sorted desc.
 - **by_publication_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_table_scope** (list[TableScopeBreakdown]): Experiment counts per table scope, sorted desc.
+- **by_control_timing** (list[ControlTimingBreakdown]): Experiment counts per control_timing, sorted desc. Experiments without DE (null control_timing) are not counted.
 - **by_cluster_type** (list[ClusterTypeBreakdown]): Experiment counts per cluster type, sorted desc.
 - **by_growth_phase** (list[GrowthPhaseBreakdown]): Experiment counts per growth phase, sorted desc.
 - **by_value_kind** (list[ExpValueKindBreakdown]): Experiment counts by DerivedMetric value_kind across matching experiments.
@@ -67,7 +69,7 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 - **score_max** (float | None): Max Lucene relevance score, present only when search_text is used.
 - **score_median** (float | None): Median Lucene relevance score, present only when search_text is used.
 - **not_found** (list[string]): Input experiment_ids that did not match any Experiment node (empty unless experiment_ids was provided).
-- **warnings** (list[string]): A closed-vocabulary filter value (treatment_type / background_factors / omics_type / table_scope / growth_phases / compartment) not found in the live vocabulary (see list_filter_values), or an organism that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.
+- **warnings** (list[string]): A closed-vocabulary filter value (treatment_type / background_factors / omics_type / table_scope / control_timing / growth_phases / compartment) not found in the live vocabulary (see list_filter_values), or an organism that matches no OrganismTaxon. Advisory only — never changes which rows are returned. Empty when clean.
 
 ### Per-result fields
 
@@ -85,6 +87,8 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | is_time_course | bool | Whether experiment has multiple time points. |
 | table_scope | string \| None (optional) | What genes the source DE table contains. Values: all_detected_genes (tested-absent rows kept — `not_significant` represents real biology), significant_any_timepoint, significant_only (tested-absent rows collapsed), top_n, filtered_subset. Critical for interpreting missing genes — see docs://guide/conventions. |
 | table_scope_detail | string \| None (optional) | Free-text clarification of table_scope (e.g. 'FDR < 0.05 and |logFC| > 0.8'). |
+| control_timing | string \| None (optional) | Whether the control arm was sampled at the same time / growth state as the treatment ('matched'), at another time ('baseline'), or partly ('mixed'). Null when no DE contrast; timepoint / growth_phase describe the treatment arm. |
+| design_notes | string \| None (optional) | Curator note on how treatment and control arms were sampled / matched (names timepoints). Present only when the KG has one; read before comparing timepoints. |
 | gene_count | int | Cumulative row count across timepoints (= sum(time_point_totals) for time-course experiments — a 6-TP experiment with 1697 genes/TP has gene_count=10182). Equals distinct_gene_count for non-time-course experiments. |
 | distinct_gene_count | int | Distinct gene count across the experiment — unique gene IDs with at least one measurement edge, regardless of timepoint. Use for detection-power / pathway-background sizing. distinct_gene_count <= gene_count. |
 | genes_by_status | GeneStatusBreakdown | Gene counts by expression status. |
@@ -185,6 +189,11 @@ list_experiments(summary=True)
     {"table_scope": "significant_any_timepoint", "count": 12},
     {"table_scope": "top_n", "count": 7}
   ],
+  "by_control_timing": [
+    {"control_timing": "matched", "count": 151},
+    {"control_timing": "baseline", "count": 18},
+    {"control_timing": "mixed", "count": 4}
+  ],
   "by_cluster_type": [
     {"cluster_type": "time_course", "count": 8},
     {"cluster_type": "diel", "count": 2},
@@ -259,7 +268,91 @@ list_experiments(organism="MED4", treatment_type=["nitrogen"], time_course_only=
 
 *treatment_type values are short nouns from a live vocabulary ('nitrogen', not 'nitrogen_stress') — an unknown value returns 0 rows, not an error.*
 
-### Example 6: From publication to expression data
+### Example 6: Experiments whose control was sampled at another time
+
+```example-call
+list_experiments(control_timing=["baseline", "mixed"], summary=True)
+```
+
+*Timepoint labels and growth_phase describe the treatment arm. On these experiments some or all contrasts compare against a control sampled at another time — read each row's design_notes (detail mode) before comparing timepoints. Values: list_filter_values(filter_type='control_timing').*
+
+```example-response
+{
+  "total_entries": 208,
+  "total_matching": 22,
+  "returned": 0,
+  "offset": 0,
+  "truncated": true,
+  "by_organism": [
+    {"organism_name": "Prochlorococcus MED4", "count": 8},
+    {"organism_name": "Alteromonas macleodii HOT1A3", "count": 4},
+    {"organism_name": "Synechococcus WH7803", "count": 3},
+    {"organism_name": "Alteromonas macleodii MIT1002", "count": 2},
+    {"organism_name": "Prochlorococcus MIT9313", "count": 2},
+    ...
+  ],
+  "by_organism_truncated": null,
+  "by_treatment_type": [
+    {"treatment_type": "nitrogen", "count": 9},
+    {"treatment_type": "coculture", "count": 4},
+    {"treatment_type": "iron", "count": 3},
+    {"treatment_type": "growth_phase", "count": 2},
+    {"treatment_type": "viral", "count": 2},
+    ...
+  ],
+  "by_treatment_type_truncated": null,
+  "by_background_factors": [
+    {"background_factor": "light", "count": 22},
+    {"background_factor": "axenic", "count": 10},
+    {"background_factor": "coculture", "count": 6}
+  ],
+  "by_background_factors_truncated": null,
+  "by_omics_type": [
+    {"omics_type": "RNASEQ", "count": 8},
+    {"omics_type": "MICROARRAY", "count": 6},
+    {"omics_type": "PROTEOMICS", "count": 4},
+    {"omics_type": "EXOPROTEOMICS", "count": 4}
+  ],
+  "by_publication": [
+    {"publication_doi": "10.1101/2025.11.24.690089", "count": 8},
+    {"publication_doi": "10.1111/1462-2920.14012", "count": 4},
+    {"publication_doi": "10.1038/ismej.2011.49", "count": 3},
+    {"publication_doi": "10.1038/ismej.2016.82", "count": 2},
+    {"publication_doi": "10.1038/ismej.2015.36", "count": 1},
+    ...
+  ],
+  "by_publication_truncated": null,
+  "by_table_scope": [
+    {"table_scope": "all_detected_genes", "count": 14},
+    {"table_scope": "significant_any_timepoint", "count": 5},
+    {"table_scope": "significant_only", "count": 2},
+    {"table_scope": "filtered_subset", "count": 1}
+  ],
+  "by_control_timing": [{"control_timing": "baseline", "count": 18}, {"control_timing": "mixed", "count": 4}],
+  "by_cluster_type": [{"cluster_type": "time_course", "count": 6}],
+  "by_growth_phase": [
+    {"growth_phase": "nutrient_limited", "count": 11},
+    {"growth_phase": "acclimated_steady_state", "count": 4},
+    {"growth_phase": "exponential", "count": 4},
+    {"growth_phase": "acute_stress", "count": 3},
+    {"growth_phase": "recovery", "count": 3},
+    ...
+  ],
+  "by_value_kind": [],
+  "by_metric_type": [],
+  "by_metric_type_truncated": null,
+  "by_compartment": [{"compartment": "whole_cell", "count": 18}, {"compartment": "exoproteome", "count": 4}],
+  "by_coculture_role": [{"coculture_role": "background", "count": 6}, {"coculture_role": "treatment", "count": 6}],
+  "time_course_count": 16,
+  "score_max": null,
+  "score_median": null,
+  "not_found": [],
+  "warnings": [],
+  "results": []
+}
+```
+
+### Example 7: From publication to expression data
 
 ```
 Step 1: list_publications(search_text="Biller")
@@ -272,7 +365,7 @@ Step 3: differential_expression_by_gene(organism="MED4", experiment_ids=["..."])
         → get gene-level results
 ```
 
-### Example 7: Orient then drill down
+### Example 8: Orient then drill down
 
 ```
 Step 1: list_experiments(summary=True)
@@ -287,7 +380,7 @@ Step 3: differential_expression_by_gene(organism="MED4", experiment_ids=["..."])
         → get gene-level results
 ```
 
-### Example 8: Fetch metadata for a known experiment_id list
+### Example 9: Fetch metadata for a known experiment_id list
 
 ```example-call
 list_experiments(experiment_ids=["10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq", "10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq"], verbose=True)
@@ -295,7 +388,7 @@ list_experiments(experiment_ids=["10.1101/2025.11.24.690089_coculture_prochloroc
 
 *experiment_ids are the KG's Experiment.id strings (DOI-prefixed); copy them from an earlier list_experiments result — unknown ids land in not_found.*
 
-### Example 9: Find vesicle-fraction experiments
+### Example 10: Find vesicle-fraction experiments
 
 ```example-call
 list_experiments(compartment="vesicle", limit=2)
@@ -341,6 +434,7 @@ list_experiments(compartment="vesicle", limit=2)
     {"table_scope": "significant_only", "count": 2},
     {"table_scope": "all_detected_genes", "count": 2}
   ],
+  "by_control_timing": [],
   "by_cluster_type": [],
   "by_growth_phase": [],
   "by_value_kind": [
@@ -385,6 +479,7 @@ list_experiments(compartment="vesicle", limit=2)
       "is_time_course": false,
       "table_scope": "top_n",
       "table_scope_detail": "Top-N most-abundant MV proteins per strain; complementary cell-fraction percentages provided where the protein was al...",
+      "control_timing": null,
       "gene_count": 0,
       "distinct_gene_count": 0,
       "genes_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 0},
@@ -419,6 +514,7 @@ list_experiments(compartment="vesicle", limit=2)
       "is_time_course": false,
       "table_scope": "top_n",
       "table_scope_detail": "Top-N most-abundant MV proteins per strain; complementary cell-fraction percentages provided where the protein was al...",
+      "control_timing": null,
       "gene_count": 0,
       "distinct_gene_count": 0,
       "genes_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 0},
@@ -437,7 +533,7 @@ list_experiments(compartment="vesicle", limit=2)
 }
 ```
 
-### Example 10: Inspect metabolomics-bearing experiments (per-row metabolite rollups)
+### Example 11: Inspect metabolomics-bearing experiments (per-row metabolite rollups)
 
 ```example-call
 list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell", "10.1073/pnas.2213271120_chitosan_addition_mit9313_metabolomics"])
@@ -466,6 +562,7 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
   ],
   "by_publication_truncated": null,
   "by_table_scope": [],
+  "by_control_timing": [],
   "by_cluster_type": [],
   "by_growth_phase": [],
   "by_value_kind": [],
@@ -499,6 +596,7 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
       "is_time_course": false,
       "table_scope": null,
       "table_scope_detail": "",
+      "control_timing": null,
       "gene_count": 0,
       "distinct_gene_count": 0,
       "genes_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 0},
@@ -533,6 +631,7 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
       "is_time_course": false,
       "table_scope": null,
       "table_scope_detail": "",
+      "control_timing": null,
       "gene_count": 0,
       "distinct_gene_count": 0,
       "genes_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 0},
@@ -551,7 +650,7 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
 }
 ```
 
-### Example 11: gene_count vs distinct_gene_count for time-course experiments
+### Example 12: gene_count vs distinct_gene_count for time-course experiments
 
 ```
 Each result row carries both `gene_count` (cumulative row count
@@ -645,13 +744,15 @@ result['results'][0]['time_point_growth_phases']
 
 - `table_scope` decides whether a missing gene means 'not affected' or 'not reported': `all_detected_genes` keeps tested-absent rows, every other scope collapses them. Filter with `table_scope=['all_detected_genes']` to keep only experiments fair for cross-experiment comparison. See docs://guide/conventions.
 
+- A DE timepoint label (e.g. 'day 18') and `growth_phase` describe the treatment arm; check `control_timing` / `design_notes` before reading it as both arms' state. See docs://guide/conventions.
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import list_experiments
 
 result = list_experiments()
-# returns dict with keys: total_entries, total_matching, returned, offset, truncated, by_organism, by_organism_truncated, by_treatment_type, by_treatment_type_truncated, by_background_factors, by_background_factors_truncated, by_omics_type, by_publication, by_publication_truncated, by_table_scope, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_metric_type_truncated, by_compartment, by_coculture_role, time_course_count, score_max, score_median, not_found, warnings, results
+# returns dict with keys: total_entries, total_matching, returned, offset, truncated, by_organism, by_organism_truncated, by_treatment_type, by_treatment_type_truncated, by_background_factors, by_background_factors_truncated, by_omics_type, by_publication, by_publication_truncated, by_table_scope, by_control_timing, by_cluster_type, by_growth_phase, by_value_kind, by_metric_type, by_metric_type_truncated, by_compartment, by_coculture_role, time_course_count, score_max, score_median, not_found, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

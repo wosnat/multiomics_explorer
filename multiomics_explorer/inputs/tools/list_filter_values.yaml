@@ -482,7 +482,9 @@ response_notes:
       fallback + warning), `expression_status` (the `Changes_expression_of`
       edge). DerivedMetric: `metric_type`, `value_kind`
       (`numeric` / `boolean` / `categorical`), `compartment` (wet-lab
-      fraction), `table_scope` (Experiment.table_scope). Chemistry:
+      fraction), `table_scope` (Experiment.table_scope), `control_timing`
+      (Experiment.control_timing — whether the control arm was sampled at
+      the treatment arm's time or growth state). Chemistry:
       `evidence_source` (Metabolite.evidence_sources values),
       `structure_kind`, `kegg_functional_category` (KEGG br08001) and
       `kegg_brite_class` (the 7 other KEGG compound trees; no per-value
@@ -519,6 +521,7 @@ chaining:
   - "list_filter_values(filter_type='growth_phase') → list_experiments(growth_phases=[...]) / list_derived_metrics(growth_phases=[...]) / differential_expression_by_gene(growth_phases=[...])"
   - "list_filter_values(filter_type='partner_role') → list_experiments(coculture_role=...) to separate coculture-vs-axenic (treatment) partners from background partners"
   - "list_filter_values(filter_type='table_scope') → list_experiments(table_scope=[...]) to keep only experiments whose DE table reports every detected gene"
+  - "list_filter_values(filter_type='control_timing') → list_experiments(control_timing=[...]) to find experiments whose control was sampled at another time, then read their design_notes"
   - "list_filter_values(filter_type='value_kind') → list_derived_metrics(value_kind=...) / list_metabolite_assays(value_kind=...) → the matching genes_by_{kind}_metric or metabolites_by_{quantifies,flags}_assay drill-down"
 
 mistakes:

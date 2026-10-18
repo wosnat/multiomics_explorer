@@ -3508,7 +3508,8 @@
      "structure_kind",
      "kegg_functional_category",
      "kegg_brite_class",
-     "stereo_assignment"
+     "stereo_assignment",
+     "control_timing"
     ],
     "type": "string"
    }

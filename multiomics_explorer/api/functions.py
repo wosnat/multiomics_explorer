@@ -706,6 +706,7 @@ _CLOSED_VOCAB_PARAMS: dict[str, tuple[str, str, str] | None] = {
     "background_factors": ("Experiment", "background_factors", "background_factors"),
     "compartment": ("Experiment", "compartment", "compartment"),
     "table_scope": ("Experiment", "table_scope", "table_scope"),
+    "control_timing": ("Experiment", "control_timing", "control_timing"),
     # growth_phase has no ControlledVocabulary node (always a pivot read);
     # `growth_phases` is the real Experiment property (list<string>) — the
     # edge-level `Changes_expression_of.growth_phase` singular used by
@@ -2067,6 +2068,7 @@ _MULTI_LABEL_VOCABS: dict[str, tuple[str, tuple[str, ...], str]] = {
                            ("Experiment", "DerivedMetric", "MetaboliteAssay",
                             "ClusteringAnalysis"), "node"),
     "table_scope": ("table_scope", ("Experiment",), "node"),
+    "control_timing": ("control_timing", ("Experiment",), "node"),
     "detection_status": ("detection_status",
                          ("Assay_quantifies_metabolite",), "edge"),
     "expression_status": ("expression_status",
@@ -2127,6 +2129,10 @@ def list_filter_values(
         ClusteringAnalysis); values are unioned across labels and each row's
         ``applies_to`` lists only the labels that carry it.
       - ``table_scope``: Experiment.table_scope values (single label).
+      - ``control_timing``: Experiment.control_timing values (``matched`` /
+        ``baseline`` / ``mixed``; single label) — when the control arm was
+        sampled relative to the treatment arm; the values accepted by
+        ``list_experiments(control_timing=...)``.
       - ``detection_status``: values on the ``Assay_quantifies_metabolite``
         edge (``applies_to`` names the relationship type).
       - ``expression_status``: values on the ``Changes_expression_of`` edge
@@ -2746,6 +2752,7 @@ def list_experiments(
     growth_phases: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     compartment: str | None = None,
+    control_timing: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -2758,9 +2765,14 @@ def list_experiments(
 
     Always returns: total_entries, total_matching, by_organism,
     by_treatment_type, by_background_factors, by_omics_type,
-    by_publication, by_table_scope, by_cluster_type, by_growth_phase,
-    by_value_kind, by_metric_type, by_compartment, by_coculture_role,
-    time_course_count, returned, truncated, not_found, warnings, results.
+    by_publication, by_table_scope, by_control_timing, by_cluster_type,
+    by_growth_phase, by_value_kind, by_metric_type, by_compartment,
+    by_coculture_role, time_course_count, returned, truncated, not_found,
+    warnings, results.
+
+    by_control_timing: list of {control_timing, count} — matching
+    experiments per control_timing value, count desc. Experiments with no
+    DE contrast carry no control_timing and are not counted.
 
     by_coculture_role: list of {coculture_role, count} — matching
     experiments per partner role ('treatment' / 'background'), count desc.
@@ -2769,8 +2781,8 @@ def list_experiments(
     total_matching. [] when no matching experiment has a partner.
 
     warnings: a closed-vocabulary filter value (treatment_type /
-    background_factors / omics_type / table_scope / growth_phases /
-    compartment) not in the live vocabulary, or an organism that matches no
+    background_factors / omics_type / table_scope / control_timing /
+    growth_phases / compartment) not in the live vocabulary, or an organism that matches no
     OrganismTaxon. Advisory only — never changes which rows are returned.
 
     summary=True is sugar for limit=0: results is empty list,
@@ -2779,6 +2791,7 @@ def list_experiments(
     Per result (compact): experiment_id, experiment_name, publication_doi,
     authors, organism_name, treatment_type, background_factors, coculture_partner,
     omics_type, is_time_course (bool), table_scope, table_scope_detail,
+    control_timing, design_notes (omitted when the KG has none),
     gene_count, distinct_gene_count, genes_by_status (dict),
     clustering_analysis_count, cluster_types, growth_phases,
     timepoints (list, omitted if not time-course),
@@ -2832,6 +2845,19 @@ def list_experiments(
     sibling tools (pathway_enrichment, ontology_landscape, etc.).
     `not_found` in the envelope lists any provided IDs that did not match.
 
+    control_timing: if provided, keeps experiments whose control_timing is
+    in the list. Values: 'matched' (control sampled at the same time or
+    growth state as the treatment arm), 'baseline' (control sampled once,
+    at another time), 'mixed' (matched at some timepoints only). Valid
+    values: list_filter_values(filter_type='control_timing'). Experiments
+    with no DE contrast have control_timing None and never match.
+
+    Per-row timepoint labels and growth_phase describe the treatment arm;
+    control_timing says when the control was sampled. Read design_notes
+    (free text: which control each timepoint was compared to, and how the
+    match was made) before comparing timepoints — a 'matched' experiment
+    may be matched by growth state rather than by sampling day.
+
     Raises ValueError if coculture_role is not 'treatment' or 'background'.
 
     gene_count vs distinct_gene_count
@@ -2863,7 +2889,7 @@ def list_experiments(
         conn, treatment_type=treatment_type,
         background_factors=background_factors, omics_type=omics_type,
         table_scope=table_scope, growth_phases=growth_phases,
-        compartment=compartment,
+        compartment=compartment, control_timing=control_timing,
     )
     warnings += _organism_zero_match_warning(conn, organism)
     filter_kwargs = dict(
@@ -2874,7 +2900,7 @@ def list_experiments(
         search_text=search_text,
         time_course_only=time_course_only, table_scope=table_scope,
         growth_phases=growth_phases, experiment_ids=experiment_ids,
-        compartment=compartment,
+        compartment=compartment, control_timing=control_timing,
     )
 
     def _run_summary(st=search_text, final=False):
@@ -2920,6 +2946,8 @@ def list_experiments(
         "by_omics_type": _rename_freq(raw_summary["by_omics_type"], "omics_type"),
         "by_publication": _rename_freq(raw_summary["by_publication"], "publication_doi"),
         "by_table_scope": _rename_freq(raw_summary["by_table_scope"], "table_scope"),
+        "by_control_timing": _rename_freq(
+            raw_summary.get("by_control_timing", []), "control_timing"),
         "by_cluster_type": _rename_freq(raw_summary["by_cluster_type"], "cluster_type"),
         "by_growth_phase": _rename_freq(raw_summary.get("by_growth_phase", []), "growth_phase"),
         "by_value_kind": _rename_freq(
@@ -3035,6 +3063,10 @@ def list_experiments(
             r["timepoints"] = timepoints
         # Non-time-course: omit timepoints key entirely. tp_growth_phases is
         # popped above so the experiment-level field never leaks into r.
+
+        # Sparse: design_notes only when the KG carries it.
+        if r.get("design_notes") is None:
+            r.pop("design_notes", None)
 
         # Gate verbose-only fields
         if not verbose:
@@ -4477,6 +4509,7 @@ _VALID_DIRECTIONS_BY_ORTHOLOG = {"up", "down", "both"}
 _DE_EXPERIMENT_COMPACT_KEYS = (
     "experiment_id", "treatment_type", "table_scope",
     "is_time_course", "matching_genes", "rows_by_status", "omics_type",
+    "control_timing", "design_notes",
 )
 
 
@@ -4644,9 +4677,19 @@ def differential_expression_by_gene(
         when it exceeds that; summary=True returns the full list. Each
         experiment entry is compact by default ({experiment_id,
         treatment_type, table_scope, is_time_course, matching_genes,
-        rows_by_status, omics_type}); verbose=True restores experiment_name,
-        background_factors, coculture_partner, table_scope_detail,
-        timepoints.
+        rows_by_status, omics_type, control_timing, design_notes});
+        design_notes is omitted when the KG has none. verbose=True restores
+        experiment_name, background_factors, coculture_partner,
+        table_scope_detail, timepoints.
+
+    control_timing: every result row and experiments[] entry carries the
+    experiment's control_timing ('matched' / 'baseline' / 'mixed'). A row's
+    timepoint and growth_phase describe the treatment arm; control_timing
+    says whether the control was sampled at the same time or growth state
+    ('matched'), once at another time ('baseline'), or only at some
+    timepoints ('mixed' — every row of that experiment reads 'mixed'). Read
+    the experiment's design_notes before comparing timepoints; a 'matched'
+    experiment may be matched by growth state rather than sampling day.
 
     growth_phases: if provided, restricts DE rows to those whose edge-level
     growth_phase property matches any of the specified values (case-insensitive).
@@ -4767,6 +4810,10 @@ def differential_expression_by_gene(
             {k: v for k, v in e.items() if k in _DE_EXPERIMENT_COMPACT_KEYS}
             for e in experiments
         ]
+    # Sparse in both modes: design_notes only when the KG carries it.
+    for e in experiments:
+        if e.get("design_notes") is None:
+            e.pop("design_notes", None)
 
     # --- Summary query 3: categories + batch diagnostics ---
     diag_cypher, diag_params = (
@@ -4877,11 +4924,15 @@ def differential_expression_by_ortholog(
     returned, truncated, results.
     Per result (compact): group_id, consensus_gene_name, consensus_product,
     experiment_id, treatment_type, organism_name, coculture_partner,
-    timepoint, timepoint_hours, timepoint_order,
+    timepoint, timepoint_hours, timepoint_order, control_timing,
     genes_with_expression, total_genes,
     significant_up, significant_down, not_significant.
     Per result (verbose): adds experiment_name, treatment, omics_type,
     table_scope, table_scope_detail.
+    control_timing ('matched' / 'baseline' / 'mixed'): timepoint labels
+    describe the treatment arm; control_timing says when the control was
+    sampled. For the per-timepoint detail read design_notes via
+    list_experiments(experiment_ids=[...]).
 
     group_ids: Accepts the canonical prefixed form (`cyanorak:CK_00000364`,
         `eggnog:COG0592@2`) or a bare accession (`CK_00000364`,

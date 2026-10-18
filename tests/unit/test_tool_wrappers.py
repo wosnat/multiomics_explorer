@@ -13210,3 +13210,234 @@ class TestMetabolitesByGeneStereoWrapper:
         assert dumped["results"][0]["stereo_relative_ids"] == [_MSH_LCYS]
         for r in dumped["results"][1:]:
             assert "stereo_relative_ids" not in r
+
+
+# ---------------------------------------------------------------------------
+# Control-timing surface (docs/tool-specs/control-timing-surface.md)
+# ---------------------------------------------------------------------------
+class TestListExperimentsControlTimingWrapper:
+    """list_experiments wrapper: control_timing param forwarded,
+    by_control_timing breakdown, ExperimentResult.control_timing (compact)
+    and sparse design_notes (omitted on the wire when the api row lacks it)."""
+
+    _SUMMARY = {
+        **TestListExperimentsWrapper._SAMPLE_SUMMARY,
+        "by_control_timing": [
+            {"control_timing": "matched", "count": 151},
+            {"control_timing": "baseline", "count": 18},
+            {"control_timing": "mixed", "count": 4},
+        ],
+    }
+
+    @classmethod
+    def _detail(cls):
+        import copy
+        with_notes = copy.deepcopy(TestListExperimentsWrapper._SAMPLE_EXP)
+        with_notes["control_timing"] = "matched"
+        with_notes["design_notes"] = "Coculture d18 vs axenic d14."
+        without_notes = copy.deepcopy(TestListExperimentsWrapper._SAMPLE_EXP)
+        without_notes["experiment_id"] = "no_de_exp"
+        without_notes["control_timing"] = None
+        return {**cls._SUMMARY, "returned": 2, "truncated": True,
+                "results": [with_notes, without_notes]}
+
+    @pytest.mark.asyncio
+    async def test_control_timing_param_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._detail(),
+        ) as mock_api:
+            await tool_fns["list_experiments"](
+                mock_ctx, control_timing=["baseline", "mixed"],
+            )
+        assert mock_api.call_args[1]["control_timing"] == ["baseline", "mixed"]
+
+    @pytest.mark.asyncio
+    async def test_control_timing_default_none(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._detail(),
+        ) as mock_api:
+            await tool_fns["list_experiments"](mock_ctx)
+        assert mock_api.call_args[1]["control_timing"] is None
+
+    @pytest.mark.asyncio
+    async def test_by_control_timing_in_response(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._SUMMARY,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, summary=True)
+        assert [(b.control_timing, b.count) for b in result.by_control_timing] == [
+            ("matched", 151), ("baseline", 18), ("mixed", 4)]
+        assert type(result.by_control_timing[0]).__name__ == "ControlTimingBreakdown"
+
+    @pytest.mark.asyncio
+    async def test_by_control_timing_defaults_empty(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=TestListExperimentsWrapper._SAMPLE_SUMMARY,
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx, summary=True)
+        assert result.by_control_timing == []
+
+    @pytest.mark.asyncio
+    async def test_row_fields_and_sparse_design_notes_on_wire(
+        self, tool_fns, mock_ctx,
+    ):
+        with patch(
+            "multiomics_explorer.api.functions.list_experiments",
+            return_value=self._detail(),
+        ):
+            result = await tool_fns["list_experiments"](mock_ctx)
+        with_notes, without_notes = result.results
+        assert with_notes.control_timing == "matched"
+        assert with_notes.design_notes == "Coculture d18 vs axenic d14."
+        assert without_notes.control_timing is None
+        dumped = result.model_dump()
+        assert dumped["results"][0]["design_notes"] == "Coculture d18 vs axenic d14."
+        assert dumped["results"][0]["control_timing"] == "matched"
+        assert "design_notes" not in dumped["results"][1]
+
+    def test_model_fields_declared(self, tool_fns):
+        import typing
+        fn = tool_fns["list_experiments"]
+        resp = typing.get_type_hints(fn)["return"]
+        assert "by_control_timing" in resp.model_fields
+        row_model = typing.get_args(resp.model_fields["results"].annotation)[0]
+        assert "control_timing" in row_model.model_fields
+        assert "design_notes" in row_model.model_fields
+
+
+class TestListFilterValuesControlTimingWrapper:
+
+    def test_filter_type_literal_includes_control_timing(self, tool_fns):
+        import typing
+        hints = typing.get_type_hints(
+            tool_fns["list_filter_values"], include_extras=True)
+        assert "'control_timing'" in str(hints["filter_type"])
+
+    @pytest.mark.asyncio
+    async def test_control_timing_branch_passes_through(self, tool_fns, mock_ctx):
+        api_return = {
+            "filter_type": "control_timing",
+            "description": "When the control arm was sampled",
+            "total_entries": 3, "returned": 3, "truncated": False,
+            "warnings": [],
+            "results": [
+                {"value": "baseline", "applies_to": ["Experiment"],
+                 "source": "vocabulary", "description": "once, at another time"},
+                {"value": "matched", "applies_to": ["Experiment"],
+                 "source": "vocabulary", "description": "same time or growth state"},
+                {"value": "mixed", "applies_to": ["Experiment"],
+                 "source": "vocabulary", "description": "partly"},
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_filter_values",
+            return_value=api_return,
+        ) as mock_api:
+            result = await tool_fns["list_filter_values"](
+                mock_ctx, filter_type="control_timing",
+            )
+        assert mock_api.call_args[1].get("filter_type", (
+            mock_api.call_args[0][0] if mock_api.call_args[0] else None
+        )) == "control_timing"
+        assert result.filter_type == "control_timing"
+        assert {r.value for r in result.results} == {"baseline", "matched", "mixed"}
+        assert all(r.applies_to == ["Experiment"] for r in result.results)
+
+
+class TestDifferentialExpressionByGeneControlTimingWrapper:
+    """ExpressionRow.control_timing (compact, every row);
+    ExpressionByExperiment.control_timing + sparse design_notes."""
+
+    @classmethod
+    def _data(cls):
+        import copy
+        data = copy.deepcopy(TestDifferentialExpressionByGeneWrapper._SAMPLE_API_RETURN)
+        compact_exp = {
+            "experiment_id": "exp1", "treatment_type": ["nitrogen_stress"],
+            "table_scope": "all_detected_genes",
+            "is_time_course": "time_course", "matching_genes": 5,
+            "rows_by_status": {"significant_up": 3, "significant_down": 0,
+                               "not_significant": 12},
+            "omics_type": "RNASEQ",
+            "control_timing": "baseline",
+            "design_notes": "Control sampled once at t0.",
+        }
+        compact_exp2 = {**compact_exp, "experiment_id": "exp2",
+                        "control_timing": "matched"}
+        compact_exp2.pop("design_notes")
+        data["experiments"] = [compact_exp, compact_exp2]
+        data["experiment_count"] = 2
+        for r in data["results"]:
+            r["control_timing"] = "baseline"
+        return data
+
+    @pytest.mark.asyncio
+    async def test_row_control_timing(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=self._data(),
+        ):
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4",
+            )
+        assert result.results[0].control_timing == "baseline"
+        dumped = result.model_dump()
+        assert dumped["results"][0]["control_timing"] == "baseline"
+
+    @pytest.mark.asyncio
+    async def test_experiment_control_timing_and_sparse_design_notes(
+        self, tool_fns, mock_ctx,
+    ):
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=self._data(),
+        ):
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4",
+            )
+        e1, e2 = result.experiments
+        assert e1.control_timing == "baseline"
+        assert e1.design_notes == "Control sampled once at t0."
+        assert e2.control_timing == "matched"
+        dumped = result.model_dump()
+        assert dumped["experiments"][0]["design_notes"] == "Control sampled once at t0."
+        assert dumped["experiments"][1]["control_timing"] == "matched"
+        assert "design_notes" not in dumped["experiments"][1]
+
+    def test_model_fields_declared(self, tool_fns):
+        import typing
+        resp = typing.get_type_hints(tool_fns["differential_expression_by_gene"])["return"]
+        row_model = typing.get_args(resp.model_fields["results"].annotation)[0]
+        exp_model = typing.get_args(resp.model_fields["experiments"].annotation)[0]
+        assert "control_timing" in row_model.model_fields
+        assert "control_timing" in exp_model.model_fields
+        assert "design_notes" in exp_model.model_fields
+
+
+class TestDifferentialExpressionByOrthologControlTimingWrapper:
+
+    @pytest.mark.asyncio
+    async def test_row_control_timing(self, tool_fns, mock_ctx):
+        import copy
+        data = copy.deepcopy(TestDifferentialExpressionByOrthologWrapper._SAMPLE_API_RETURN)
+        data["results"][0]["control_timing"] = "mixed"
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_ortholog",
+            return_value=data,
+        ):
+            result = await tool_fns["differential_expression_by_ortholog"](
+                mock_ctx, group_ids=["g1"],
+            )
+        assert result.results[0].control_timing == "mixed"
+        assert result.model_dump()["results"][0]["control_timing"] == "mixed"
+
+    def test_model_fields_declared(self, tool_fns):
+        import typing
+        resp = typing.get_type_hints(tool_fns["differential_expression_by_ortholog"])["return"]
+        row_model = typing.get_args(resp.model_fields["results"].annotation)[0]
+        assert "control_timing" in row_model.model_fields
+        assert "design_notes" not in row_model.model_fields

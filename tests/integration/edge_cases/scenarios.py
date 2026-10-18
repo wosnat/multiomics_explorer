@@ -688,6 +688,23 @@ def list_experiments_scenarios():
         Scenario(
             "coculture_treatment_type_background_role",
             dict(treatment_type=["coculture"], coculture_role="background")),
+        # Control-timing surface (docs/tool-specs/control-timing-surface.md).
+        # Live 2026-10-18T07:51Z: the 4 'mixed' experiments are MED4 / NATL2A
+        # / MIT9313; EZ55 carries only 'matched' (10) + null (2) ->
+        # filter-empty, no crash. `MATCH (e:Experiment) WHERE
+        # e.control_timing='mixed' RETURN e.organism_name`.
+        Scenario(
+            "control_timing_mixed_organism_without_mixed",
+            dict(control_timing=["mixed"],
+                 organism="Alteromonas macleodii EZ55")),
+        Scenario(
+            "control_timing_mixed_organism_without_mixed_summary",
+            dict(control_timing=["mixed"],
+                 organism="Alteromonas macleodii EZ55", summary=True)),
+        # Unknown closed-vocab value -> warning, empty result, never a raise.
+        Scenario(
+            "control_timing_unknown_value",
+            dict(control_timing=["bogus"])),
     ]
 
 

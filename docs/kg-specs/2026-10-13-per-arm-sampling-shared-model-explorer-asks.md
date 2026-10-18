@@ -552,3 +552,15 @@ Counts: 174 DE experiments — 150 `matched`, 21 `baseline`, 3 `mixed` (Thompson
 Experiments: its MED4 48h contrast merged into the starvation experiment as `mixed`). Weissberg
 `coculture_alteromonas_hot1a3_med4_rnaseq` reads `matched` (growth-state match vs the axenic repeat on
 days 7 / 14), not `mixed` as S1 assumed. Curation log: KG `plans/control_timing_curation.md`.
+
+## Explorer status (2026-10-18)
+
+Absorbed the 2026-10-18T07:51Z build (live: 151 `matched` / 18 `baseline` / 4 `mixed` over 173 DE
+experiments; the 150 / 21 / 3 over 174 above predates the closure pass and the Thompson merge).
+Surfaced per `docs/tool-specs/control-timing-surface.md`: `list_experiments` compact
+`control_timing` + sparse `design_notes`, `control_timing` filter, `by_control_timing`;
+`list_filter_values(filter_type='control_timing')`; `control_timing` on every
+`differential_expression_by_gene` / `differential_expression_by_ortholog` row, plus `control_timing`
+and sparse `design_notes` in the by-gene `experiments[]` envelope; `docs://guide/conventions`
+treatment-arm paragraph. `design_notes` turned out to be on 138 experiments (116 `matched`), not
+~15, so it is kept compact on every row that has one. `statistical_model_id` was never built. Dialog closed.

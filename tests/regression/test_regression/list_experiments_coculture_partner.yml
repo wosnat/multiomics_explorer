@@ -15,8 +15,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus sp. BL107
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 82
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: darkness +100 nM glucose vs darkness
@@ -66,8 +70,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus sp. BL107
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 82
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: darkness +5 mM glucose vs darkness
@@ -117,8 +125,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus sp. BL107
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 82
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: light +100 nM glucose vs light
@@ -168,8 +180,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus sp. BL107
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 82
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: light +5 mM glucose vs light
@@ -219,8 +235,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 342
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: darkness +100 nM glucose vs darkness
@@ -270,8 +290,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 342
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: darkness +5 mM glucose vs darkness
@@ -321,8 +345,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 342
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +100 nM glucose vs light
@@ -372,8 +400,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 342
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +5 mM glucose vs light (control)'
@@ -422,8 +454,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 195
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: darkness +100 nM glucose vs darkness
@@ -473,8 +509,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 195
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: darkness +5 mM glucose vs darkness
@@ -524,8 +564,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 195
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: light +100 nM glucose vs light
@@ -575,8 +619,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 195
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: light +5 mM glucose vs light
@@ -626,8 +674,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH7803
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 146
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: darkness +100 nM glucose vs
@@ -677,8 +729,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH7803
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 145
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: darkness +5 mM glucose vs darkness
@@ -728,8 +784,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH7803
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 145
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: light +100 nM glucose vs light
@@ -779,8 +839,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH7803
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 146
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: light +5 mM glucose vs light
@@ -830,8 +894,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 483
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: darkness +100 nM glucose vs
@@ -881,8 +949,13 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The test behind these p-values
+    could not be reproduced from the per-sample columns; the other three comparisons
+    in this table are one-tailed paired t-tests (half the two-tailed value).
   distinct_gene_count: 484
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: darkness +5 mM glucose vs darkness
@@ -932,8 +1005,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 484
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: light +100 nM glucose vs light
@@ -983,8 +1060,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 484
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: light +5 mM glucose vs light
@@ -1031,8 +1112,14 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the axenic MED4 control
+    came from a separate repeat experiment sampled on days 7 and 14 to match axenic
+    MED4 growth dynamics (Methods p. 14). day 11: coculture day 11 vs axenic day 7
+    (both exponential). day 18: coculture day 18 vs axenic day 14 (death, axenic MED4
+    lost viability around day 11).'
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
@@ -1087,8 +1174,12 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Each timepoint (day 18, day 31, day 60, day 89, days 60+89) is coculture
+    MED4 vs the same coculture series sampled on day 11 (exponential). days 60+89
+    pools the day 60 and day 89 samples.
   distinct_gene_count: 1424
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
@@ -1164,8 +1255,12 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Each timepoint (day 18, day 31, day 60, day 89) is coculture MED4
+    vs the same coculture series sampled on day 11 (exponential). days 60+89 pools
+    the day 60 and day 89 samples.
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
@@ -1243,8 +1338,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -1293,8 +1392,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -1343,8 +1446,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +100 nM glucose vs light (control)'
@@ -1393,8 +1500,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +5 mM glucose vs light (control)'
@@ -1439,8 +1550,10 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 1714
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
@@ -1489,8 +1602,14 @@ rows:
   coculture_partner:
   - Alteromonas macleodii EZ55
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: both pCO2 arms were
+    acclimated for three transfer cycles and harvested in exponential growth in the
+    final cycle (Methods p. 2). The MIT9312 libraries are re-analysed from Hennon
+    2017. adjusted_p_value on these edges is the unadjusted p-value reported by the
+    paper (no multiple-testing correction).'
   distinct_gene_count: 37
   experiment_id: 10.1038/s43705-022-00197-2_carbon_stress_elevated_pco2_800_ppm_mit9312_rnaseq
   experiment_name: MIT9312 Elevated pCO2 (800 ppm) vs Ambient pCO2 (400 ppm) (RNASEQ)
@@ -1542,8 +1661,11 @@ rows:
   coculture_partner:
   - Alteromonas macleodii EZ55
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction).
   distinct_gene_count: 102
   experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_mit9312_rnaseq
   experiment_name: MIT9312 Elevated CO2 (800 ppm) vs Ambient CO2 (400 ppm) (RNASEQ)
@@ -1588,8 +1710,10 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 2267
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
@@ -1635,8 +1759,10 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 2268
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
@@ -1694,8 +1820,10 @@ rows:
   coculture_partner:
   - Alteromonas macleodii MIT1002
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 2015
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
   experiment_name: NATL2A Dark-tolerant co-culture under 13:11 diel light:dark cycle
@@ -1786,9 +1914,12 @@ rows:
   coculture_partner:
   - Alteromonas macleodii MIT1002
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 2
   derived_metric_value_kinds:
   - boolean
+  design_notes: Dark and diel arms were split from the same bottles at 24 h and sampled
+    at the same times at every timepoint.
   distinct_gene_count: 1954
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
   experiment_name: NATL2A Extended darkness vs 13:11 diel light:dark cycle control
@@ -1849,8 +1980,13 @@ rows:
   coculture_partner:
   - Alteromonas macleodii MIT1002
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Each time point compares coculture and axenic bottles split from the
+    same starter cultures and sampled at the same time. At -12h Alteromonas had not
+    yet been added (added at 0 h), so that contrast is a pre-treatment baseline check
+    between two axenic sets of bottles.
   distinct_gene_count: 353
   experiment_id: 10.1038/ismej.2016.82_coculture_alteromonas_macleodii_mit1002_natl2a_rnaseq
   experiment_name: NATL2A Co-culture with Alteromonas macleodii MIT1002 vs Axenic
@@ -1942,8 +2078,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 930
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -1992,8 +2132,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 929
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -2042,8 +2186,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 930
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: light +100 nM glucose vs light (control)'
@@ -2092,8 +2240,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 928
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: light +5 mM glucose vs light (control)'
@@ -2141,8 +2293,13 @@ rows:
   coculture_partner:
   - Alteromonas macleodii EZ55
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: both pCO2 arms were
+    acclimated for three transfer cycles and harvested in exponential growth in the
+    final cycle (Methods p. 2). adjusted_p_value on these edges is the unadjusted
+    p-value reported by the paper (no multiple-testing correction).'
   distinct_gene_count: 27
   experiment_id: 10.1038/s43705-022-00197-2_carbon_stress_elevated_pco2_800_ppm_cc9311_rnaseq
   experiment_name: CC9311 Elevated pCO2 (800 ppm) vs Ambient pCO2 (400 ppm) (RNASEQ)
@@ -2191,8 +2348,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -2241,8 +2402,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -2291,8 +2456,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: light +100 nM glucose vs light (control)'
@@ -2341,8 +2510,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: light +5 mM glucose vs light (control)'
@@ -2391,8 +2564,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 895
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -2441,8 +2618,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 895
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -2491,8 +2672,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 894
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: light +100 nM glucose vs light (control)'
@@ -2541,8 +2726,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 895
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: light +5 mM glucose vs light (control)'
@@ -2590,8 +2779,13 @@ rows:
   coculture_partner:
   - Alteromonas macleodii EZ55
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: both pCO2 arms were
+    acclimated for three transfer cycles and harvested in exponential growth in the
+    final cycle (Methods p. 2). adjusted_p_value on these edges is the unadjusted
+    p-value reported by the paper (no multiple-testing correction).'
   distinct_gene_count: 12
   experiment_id: 10.1038/s43705-022-00197-2_carbon_stress_elevated_pco2_800_ppm_wh8102_rnaseq
   experiment_name: WH8102 Elevated pCO2 (800 ppm) vs Ambient pCO2 (400 ppm) (RNASEQ)
@@ -2640,8 +2834,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 163
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -2690,8 +2888,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 163
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -2740,8 +2942,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 163
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: light +100 nM glucose vs light (control)'
@@ -2790,8 +2996,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 162
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: light +5 mM glucose vs light (control)'

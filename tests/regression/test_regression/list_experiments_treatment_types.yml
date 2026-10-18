@@ -13,8 +13,17 @@ rows:
   coculture_partner:
   - Prochlorococcus MIT9312
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'logFC is the partner deviation from the partner-averaged coculture
+    response at 400 ppm, not partner vs axenic (adding the general coculture logFC
+    of Table S5 recovers the vs-axenic value); the three partner tables at 400 ppm
+    sum to zero per gene. Matched by growth state, not by sampling day: arms are acclimated
+    cultures harvested in exponential growth; the axenic EZ55 and MIT9312 coculture
+    libraries are from Hennon 2017, the Synechococcus cocultures were grown later.
+    adjusted_p_value on these edges is the unadjusted p-value reported by the paper
+    (no multiple-testing correction).'
   distinct_gene_count: 419
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 vs Mean Coculture Response
@@ -62,8 +71,21 @@ rows:
   coculture_partner:
   - Prochlorococcus MIT9312
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'The paper presents logFC as the partner deviation from the partner-averaged
+    coculture response at 800 ppm (Fig. 2, Table S5), not partner vs axenic (adding
+    the general coculture logFC of Table S5 recovers the vs-axenic value); the three
+    partner tables at 800 ppm sum to zero per gene. Matched by growth state, not by
+    sampling day: arms are acclimated cultures harvested in exponential growth; the
+    axenic EZ55 and MIT9312 coculture libraries are from Hennon 2017, the Synechococcus
+    cocultures were grown later. Caveat: the author script has no contrast for that
+    quantity; Tables S12 to S14 more likely are its contrasts 7 to 9 (partner-specific
+    pCO2 interaction minus the mean of the three, Methods item v). Their logFC runs
+    opposite to the matching 400 ppm table on shared genes (r = -0.61, -0.83, -0.97
+    for MIT9312, CC9311, WH8102). adjusted_p_value on these edges is the unadjusted
+    p-value reported by the paper (no multiple-testing correction).'
   distinct_gene_count: 188
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 vs Mean Coculture Response
@@ -111,8 +133,17 @@ rows:
   coculture_partner:
   - Synechococcus CC9311
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'logFC is the partner deviation from the partner-averaged coculture
+    response at 400 ppm, not partner vs axenic (adding the general coculture logFC
+    of Table S5 recovers the vs-axenic value); the three partner tables at 400 ppm
+    sum to zero per gene. Matched by growth state, not by sampling day: arms are acclimated
+    cultures harvested in exponential growth; the axenic EZ55 and MIT9312 coculture
+    libraries are from Hennon 2017, the Synechococcus cocultures were grown later.
+    adjusted_p_value on these edges is the unadjusted p-value reported by the paper
+    (no multiple-testing correction).'
   distinct_gene_count: 293
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus CC9311 vs Mean Coculture Response
@@ -160,8 +191,21 @@ rows:
   coculture_partner:
   - Synechococcus CC9311
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'The paper presents logFC as the partner deviation from the partner-averaged
+    coculture response at 800 ppm (Fig. 2, Table S5), not partner vs axenic (adding
+    the general coculture logFC of Table S5 recovers the vs-axenic value); the three
+    partner tables at 800 ppm sum to zero per gene. Matched by growth state, not by
+    sampling day: arms are acclimated cultures harvested in exponential growth; the
+    axenic EZ55 and MIT9312 coculture libraries are from Hennon 2017, the Synechococcus
+    cocultures were grown later. Caveat: the author script has no contrast for that
+    quantity; Tables S12 to S14 more likely are its contrasts 7 to 9 (partner-specific
+    pCO2 interaction minus the mean of the three, Methods item v). Their logFC runs
+    opposite to the matching 400 ppm table on shared genes (r = -0.61, -0.83, -0.97
+    for MIT9312, CC9311, WH8102). adjusted_p_value on these edges is the unadjusted
+    p-value reported by the paper (no multiple-testing correction).'
   distinct_gene_count: 83
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus CC9311 vs Mean Coculture Response
@@ -209,8 +253,17 @@ rows:
   coculture_partner:
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'logFC is the partner deviation from the partner-averaged coculture
+    response at 400 ppm, not partner vs axenic (adding the general coculture logFC
+    of Table S5 recovers the vs-axenic value); the three partner tables at 400 ppm
+    sum to zero per gene. Matched by growth state, not by sampling day: arms are acclimated
+    cultures harvested in exponential growth; the axenic EZ55 and MIT9312 coculture
+    libraries are from Hennon 2017, the Synechococcus cocultures were grown later.
+    adjusted_p_value on these edges is the unadjusted p-value reported by the paper
+    (no multiple-testing correction).'
   distinct_gene_count: 136
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus WH8102 vs Mean Coculture Response
@@ -258,8 +311,21 @@ rows:
   coculture_partner:
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'The paper presents logFC as the partner deviation from the partner-averaged
+    coculture response at 800 ppm (Fig. 2, Table S5), not partner vs axenic (adding
+    the general coculture logFC of Table S5 recovers the vs-axenic value); the three
+    partner tables at 800 ppm sum to zero per gene. Matched by growth state, not by
+    sampling day: arms are acclimated cultures harvested in exponential growth; the
+    axenic EZ55 and MIT9312 coculture libraries are from Hennon 2017, the Synechococcus
+    cocultures were grown later. Caveat: the author script has no contrast for that
+    quantity; Tables S12 to S14 more likely are its contrasts 7 to 9 (partner-specific
+    pCO2 interaction minus the mean of the three, Methods item v). Their logFC runs
+    opposite to the matching 400 ppm table on shared genes (r = -0.61, -0.83, -0.97
+    for MIT9312, CC9311, WH8102). adjusted_p_value on these edges is the unadjusted
+    p-value reported by the paper (no multiple-testing correction).'
   distinct_gene_count: 58
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus WH8102 vs Mean Coculture Response
@@ -306,8 +372,11 @@ rows:
   coculture_partner:
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Coculture vs axenic HOT1A3 with both arms sampled on the same day
+    (day 11, day 18, day 31) of the same experiment run.
   distinct_gene_count: 3947
   experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MED4 vs Axenic (RNASEQ)
@@ -366,8 +435,11 @@ rows:
   coculture_partner:
   - Prochlorococcus MIT9313
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Both arms are 20 h HOT1A3 cocultures with MIT9313, differing only
+    in the HOT1A3 inoculum (high vs 0.5x10^6 cells/ml).
   distinct_gene_count: 1879
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 (high Alteromonas
@@ -414,8 +486,12 @@ rows:
   coculture_partner:
   - Prochlorococcus MIT9313
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Both arms are 20 h HOT1A3 cocultures: HOT1A3 with MIT9313 (treatment)
+    vs HOT1A3 with MED4 (control). MED4 is a partner of the control arm only and is
+    not recorded as a coculture partner.'
   distinct_gene_count: 2295
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs coculture with
@@ -462,8 +538,14 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the axenic MED4 control
+    came from a separate repeat experiment sampled on days 7 and 14 to match axenic
+    MED4 growth dynamics (Methods p. 14). day 11: coculture day 11 vs axenic day 7
+    (both exponential). day 18: coculture day 18 vs axenic day 14 (death, axenic MED4
+    lost viability around day 11).'
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
@@ -516,8 +598,10 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 1714
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
@@ -563,8 +647,10 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 2267
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
@@ -610,8 +696,10 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 2268
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
@@ -658,8 +746,13 @@ rows:
   coculture_partner:
   - Alteromonas macleodii MIT1002
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Each time point compares coculture and axenic bottles split from the
+    same starter cultures and sampled at the same time. At -12h Alteromonas had not
+    yet been added (added at 0 h), so that contrast is a pre-treatment baseline check
+    between two axenic sets of bottles.
   distinct_gene_count: 353
   experiment_id: 10.1038/ismej.2016.82_coculture_alteromonas_macleodii_mit1002_natl2a_rnaseq
   experiment_name: NATL2A Co-culture with Alteromonas macleodii MIT1002 vs Axenic
@@ -753,8 +846,10 @@ rows:
   coculture_partner:
   - Synechococcus elongatus PCC 7942
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 5103
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_pputida_axenic_rnaseq
   experiment_name: P. putida cscRABY coculture with S. elongatus cscB vs axenic P.
@@ -806,8 +901,10 @@ rows:
   coculture_partner:
   - Synechococcus elongatus PCC 7942
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 228
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_pputida_axenic_proteomics
   experiment_name: P. putida cscRABY coculture with S. elongatus cscB vs axenic P.
@@ -856,8 +953,15 @@ rows:
   coculture_partner:
   - Synechococcus WH7803
   compartment: exoproteome
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Every timepoint (day 3, day 7, day 14, day 21, day 32, day 60, day
+    100) is compared with day 1 of the same coculture series (separate triplicate
+    flasks harvested per day), so the control is the day 1 coculture exoproteome (exponential,
+    one day after co-inoculation); there is no axenic arm. In ASW day 21 marks the
+    exponential to stable-state transition. Each contrast is a separate two-sample
+    t-test in Perseus.
   distinct_gene_count: 222
   experiment_id: 10.1111/1462-2920.14012_rpom_dss3_exoproteome_asw
   experiment_name: R. pomeroyi DSS-3 exoproteome time course in ASW coculture with
@@ -950,8 +1054,14 @@ rows:
   coculture_partner:
   - Synechococcus WH7803
   compartment: exoproteome
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Every timepoint (day 3, day 7, day 14, day 21, day 32, day 60, day
+    100) is compared with day 1 of the same coculture series (separate triplicate
+    flasks harvested per day), so the control is the day 1 coculture exoproteome (exponential,
+    one day after co-inoculation); there is no axenic arm. In SW the coculture reaches
+    its stable state at day 21. Each contrast is a separate two-sample t-test in Perseus.
   distinct_gene_count: 184
   experiment_id: 10.1111/1462-2920.14012_rpom_dss3_exoproteome_sw
   experiment_name: R. pomeroyi DSS-3 exoproteome time course in SW coculture with
@@ -1044,8 +1154,10 @@ rows:
   coculture_partner:
   - Synechococcus WH7803
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 1724
   experiment_id: 10.1038/nmicrobiol.2017.100_longterm_coculture_rpom_dss3_proteomics
   experiment_name: R. pomeroyi DSS-3 proteome in coculture with Synechococcus WH7803
@@ -1093,10 +1205,12 @@ rows:
   coculture_partner:
   - Synechococcus WH7803
   compartment: exoproteome
+  control_timing: null
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1002/pmic.201400562_dss3_exoproteome_with_wh7803
   experiment_name: Ruegeria pomeroyi DSS-3 exoproteome in co-culture with Synechococcus
@@ -1136,10 +1250,12 @@ rows:
   coculture_partner:
   - Synechococcus WH8102
   compartment: exoproteome
+  control_timing: null
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1002/pmic.201400562_dss3_exoproteome_with_wh8102
   experiment_name: Ruegeria pomeroyi DSS-3 exoproteome in co-culture with Synechococcus
@@ -1191,8 +1307,13 @@ rows:
   coculture_partner:
   - Synechococcus PCC 7002
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the conditions are
+    successive steady states of one chemostat (axenic, then lactate coculture, then
+    HCO3- coculture), each sampled after at least five volume changes under steady-state
+    conditions.'
   distinct_gene_count: 1295
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_axenic_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture (HCO3-) vs axenic (SOLiD RNA-seq)
@@ -1250,8 +1371,13 @@ rows:
   coculture_partner:
   - Synechococcus PCC 7002
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the conditions are
+    successive steady states of one chemostat (axenic, then lactate coculture, then
+    HCO3- coculture), each sampled after at least five volume changes under steady-state
+    conditions.'
   distinct_gene_count: 455
   experiment_id: 10.1038/ismej.2014.69_coculture_lactate_vs_axenic_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture (lactate) vs axenic (SOLiD RNA-seq)
@@ -1309,8 +1435,13 @@ rows:
   coculture_partner:
   - Synechococcus PCC 7002
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the conditions are
+    successive steady states of one chemostat (axenic, then lactate coculture, then
+    HCO3- coculture), each sampled after at least five volume changes under steady-state
+    conditions.'
   distinct_gene_count: 1226
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_lactate_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture HCO3- vs coculture lactate (SOLiD
@@ -1370,8 +1501,13 @@ rows:
   coculture_partner:
   - Shewanella sp. W3-18-1
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the conditions are
+    successive steady states of one chemostat (axenic, then lactate coculture, then
+    HCO3- coculture), each sampled after at least five volume changes under steady-state
+    conditions.'
   distinct_gene_count: 670
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_axenic_syn7002_rnaseq
   experiment_name: Synechococcus 7002 coculture (HCO3-) vs axenic (SOLiD RNA-seq)
@@ -1429,8 +1565,13 @@ rows:
   coculture_partner:
   - Shewanella sp. W3-18-1
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the conditions are
+    successive steady states of one chemostat (axenic, then lactate coculture, then
+    HCO3- coculture), each sampled after at least five volume changes under steady-state
+    conditions.'
   distinct_gene_count: 1143
   experiment_id: 10.1038/ismej.2014.69_coculture_lactate_vs_axenic_syn7002_rnaseq
   experiment_name: Synechococcus 7002 coculture (lactate) vs axenic (SOLiD RNA-seq)
@@ -1488,8 +1629,13 @@ rows:
   coculture_partner:
   - Shewanella sp. W3-18-1
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the conditions are
+    successive steady states of one chemostat (axenic, then lactate coculture, then
+    HCO3- coculture), each sampled after at least five volume changes under steady-state
+    conditions.'
   distinct_gene_count: 673
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_lactate_syn7002_rnaseq
   experiment_name: Synechococcus 7002 coculture HCO3- vs coculture lactate (SOLiD
@@ -1539,8 +1685,15 @@ rows:
   coculture_partner:
   - Ruegeria pomeroyi DSS-3
   compartment: exoproteome
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Every timepoint (day 3, day 7, day 14, day 21, day 32, day 60, day
+    100) is compared with day 1 of the same coculture series (separate triplicate
+    flasks harvested per day), so the control is the day 1 coculture exoproteome (exponential,
+    one day after co-inoculation); there is no axenic arm. In ASW day 21 marks the
+    exponential to stable-state transition. Each contrast is a separate two-sample
+    t-test in Perseus.
   distinct_gene_count: 221
   experiment_id: 10.1111/1462-2920.14012_syn_wh7803_exoproteome_asw
   experiment_name: Synechococcus WH7803 exoproteome time course in ASW coculture with
@@ -1635,8 +1788,14 @@ rows:
   coculture_partner:
   - Ruegeria pomeroyi DSS-3
   compartment: exoproteome
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Every timepoint (day 3, day 7, day 14, day 21, day 32, day 60, day
+    100) is compared with day 1 of the same coculture series (separate triplicate
+    flasks harvested per day), so the control is the day 1 coculture exoproteome (exponential,
+    one day after co-inoculation); there is no axenic arm. In SW the coculture reaches
+    its stable state at day 21. Each contrast is a separate two-sample t-test in Perseus.
   distinct_gene_count: 187
   experiment_id: 10.1111/1462-2920.14012_syn_wh7803_exoproteome_sw
   experiment_name: Synechococcus WH7803 exoproteome time course in SW coculture with
@@ -1730,8 +1889,12 @@ rows:
   coculture_partner:
   - Ruegeria pomeroyi DSS-3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Cells were collected at 35 days (arrow in Fig. 1c), when both the
+    co-culture and the axenic cultures were at maximal cell density after exponential
+    growth, before the axenic cultures died (4-6 weeks).
   distinct_gene_count: 564
   experiment_id: 10.1038/nmicrobiol.2017.100_early_coculture_syn_wh7803_proteomics
   experiment_name: Synechococcus WH7803 proteome in coculture with R. pomeroyi DSS-3
@@ -1781,8 +1944,10 @@ rows:
   coculture_partner:
   - Ruegeria pomeroyi DSS-3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 1050
   experiment_id: 10.1038/nmicrobiol.2017.100_late_coculture_syn_wh7803_proteomics
   experiment_name: Synechococcus WH7803 proteome in coculture with R. pomeroyi DSS-3
@@ -1832,8 +1997,10 @@ rows:
   coculture_partner:
   - Vibrio parahaemolyticus
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 574
   experiment_id: 10.1111/j.1462-2920.2009.01997.x_vibrio_coculture_wh8102_microarray
   experiment_name: WH8102 coculture with V. parahaemolyticus vs monoculture (microarray)
@@ -1891,8 +2058,10 @@ rows:
   coculture_partner:
   - Pseudomonas putida KT2440
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 2626
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_rnaseq
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
@@ -1944,8 +2113,10 @@ rows:
   coculture_partner:
   - Pseudomonas putida KT2440
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 522
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_proteomics
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
@@ -1995,8 +2166,13 @@ rows:
   coculture_partner:
   - Escherichia coli
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Methods do not state the RNA sampling day; the axenic control was
+    collected "meanwhile" in the same amount (5 OD750), so a matched harvest at 4
+    days is assumed from the parallel design (the proteomics methods state the same
+    incubation time).
   distinct_gene_count: 129
   experiment_id: 10.1186/s13068-022-02163-5_coculture_ecoli_vs_axenic_utex2973_rnaseq
   experiment_name: S. elongatus UTEX 2973 cscB+ coculture with E. coli ABKm vs axenic
@@ -2054,8 +2230,10 @@ rows:
   coculture_partner:
   - Escherichia coli
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 34
   experiment_id: 10.1186/s13068-022-02163-5_coculture_ecoli_vs_axenic_utex2973_proteomics
   experiment_name: S. elongatus UTEX 2973 cscB+ coculture with E. coli ABKm vs axenic

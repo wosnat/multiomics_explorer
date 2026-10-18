@@ -5,6 +5,7 @@ rows:
   - light
   coculture_partner:
   - Alteromonas macleodii HOT1A3
+  control_timing: matched
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
     (RNASEQ)
@@ -32,6 +33,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
   expression_status: significant_up
@@ -58,6 +60,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   experiment_name: MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (RNASEQ)
@@ -85,6 +88,7 @@ rows:
   - light
   coculture_partner:
   - Alteromonas macleodii HOT1A3
+  control_timing: matched
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
   expression_status: significant_down
@@ -111,6 +115,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
@@ -140,6 +145,7 @@ rows:
   coculture_partner:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
+  control_timing: matched
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +5 mM glucose vs light (control)'
   expression_status: not_significant
@@ -166,6 +172,7 @@ rows:
   - axenic
   - diel
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
   experiment_name: MED4 extended light past dusk vs normal dark period (RNA-seq)
   expression_status: significant_up
@@ -194,6 +201,7 @@ rows:
   - light
   coculture_partner:
   - Alteromonas macleodii HOT1A3
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
     PRO99-lowN exponential growth (PROTEOMICS)
@@ -221,6 +229,7 @@ rows:
   - axenic
   - diel
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
   experiment_name: MED4 extended darkness past dawn vs normal light period (RNA-seq)
   expression_status: significant_up
@@ -248,6 +257,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
@@ -275,6 +285,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
   expression_status: not_significant
@@ -301,6 +312,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
   expression_status: not_significant
@@ -327,6 +339,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
@@ -354,6 +367,7 @@ rows:
   - axenic
   - diel
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
   experiment_name: MED4 extended darkness past dawn vs normal light period (RNA-seq)
   expression_status: not_significant
@@ -382,6 +396,7 @@ rows:
   - light
   coculture_partner:
   - Alteromonas macleodii HOT1A3
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
     PRO99-lowN exponential growth (PROTEOMICS)
@@ -409,6 +424,7 @@ rows:
   - light
   coculture_partner:
   - Alteromonas macleodii HOT1A3
+  control_timing: matched
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
   expression_status: not_significant
@@ -436,6 +452,7 @@ rows:
   - light
   coculture_partner:
   - Alteromonas macleodii HOT1A3
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
     PRO99-lowN exponential growth (PROTEOMICS)
@@ -464,6 +481,7 @@ rows:
   - light
   coculture_partner:
   - Alteromonas macleodii HOT1A3
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
     PRO99-lowN exponential growth (PROTEOMICS)
@@ -492,6 +510,7 @@ rows:
   - light
   coculture_partner:
   - Alteromonas macleodii HOT1A3
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
     PRO99-lowN exponential growth (PROTEOMICS)
@@ -519,6 +538,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
@@ -548,6 +568,7 @@ rows:
   coculture_partner:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
+  control_timing: matched
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +5 mM glucose vs darkness (control)'
   expression_status: not_significant
@@ -574,6 +595,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (PROTEOMICS)
@@ -601,6 +623,7 @@ rows:
   - axenic
   - diel
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
   experiment_name: MED4 extended light past dusk vs normal dark period (RNA-seq)
   expression_status: not_significant
@@ -628,6 +651,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
   experiment_name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99
     medium (MED4) (MICROARRAY)
@@ -657,6 +681,7 @@ rows:
   coculture_partner:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
+  control_timing: matched
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +100 nM glucose vs darkness (control)'
   expression_status: not_significant
@@ -683,6 +708,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
   experiment_name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99
     medium (MED4) (MICROARRAY)
@@ -710,6 +736,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
@@ -737,6 +764,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
@@ -765,6 +793,7 @@ rows:
   - light
   coculture_partner:
   - Alteromonas macleodii HOT1A3
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
     PRO99-lowN exponential growth (RNASEQ)
@@ -793,6 +822,7 @@ rows:
   - light
   coculture_partner:
   - Alteromonas macleodii HOT1A3
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
     PRO99-lowN exponential growth (RNASEQ)
@@ -822,6 +852,7 @@ rows:
   coculture_partner:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
+  control_timing: matched
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +100 nM glucose vs light (control)'
   expression_status: not_significant
@@ -848,6 +879,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (PROTEOMICS)
@@ -875,6 +907,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential
     growth (PROTEOMICS)
@@ -902,6 +935,7 @@ rows:
   - axenic
   - light
   coculture_partner: []
+  control_timing: matched
   experiment_id: 10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq
   experiment_name: MED4 Low salinity acclimation (28 psu) vs Normal seawater salinity
     (34 psu) (RNASEQ)
@@ -930,6 +964,7 @@ rows:
   - light
   coculture_partner:
   - Alteromonas macleodii HOT1A3
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
     PRO99-lowN exponential growth (RNASEQ)
@@ -958,6 +993,7 @@ rows:
   - light
   coculture_partner:
   - Alteromonas macleodii HOT1A3
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
     PRO99-lowN exponential growth (RNASEQ)
@@ -986,6 +1022,7 @@ rows:
   - light
   coculture_partner:
   - Alteromonas macleodii HOT1A3
+  control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
     PRO99-lowN exponential growth (RNASEQ)

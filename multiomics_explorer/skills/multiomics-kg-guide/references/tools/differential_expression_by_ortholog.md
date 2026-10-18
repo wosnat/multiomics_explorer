@@ -42,7 +42,7 @@ differential_expression_by_ortholog(group_ids=["cyanorak:CK_00000570"])
 total_matching, matching_genes, matching_groups, experiment_count, median_abs_log2fc, max_abs_log2fc, returned, offset, truncated, by_organism, rows_by_status, rows_by_treatment_type, rows_by_background_factors, rows_by_growth_phase, by_table_scope, top_groups, top_experiments, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, not_found_experiments, not_matched_experiments, resolved_aliases, warnings, results
 ```
 
-Result row: `group_id, consensus_gene_name, consensus_product, experiment_id, treatment_type, background_factors, organism_name, coculture_partner, timepoint, timepoint_hours, timepoint_order, genes_with_expression, …`
+Result row: `group_id, consensus_gene_name, consensus_product, experiment_id, treatment_type, background_factors, organism_name, coculture_partner, timepoint, timepoint_hours, timepoint_order, control_timing, …`
 
 ## Common mistakes
 

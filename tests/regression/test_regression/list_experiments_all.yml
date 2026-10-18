@@ -15,8 +15,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Synechococcus sp. BL107
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 11
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_bl107_proteomics
   experiment_name: 'Alteromonas in BL107 coculture: darkness +100 nM glucose vs darkness
@@ -66,8 +70,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Synechococcus sp. BL107
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 11
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_bl107_proteomics
   experiment_name: 'Alteromonas in BL107 coculture: darkness +5 mM glucose vs darkness
@@ -117,8 +125,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Synechococcus sp. BL107
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 11
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_bl107_proteomics
   experiment_name: 'Alteromonas in BL107 coculture: light +100 nM glucose vs light
@@ -168,8 +180,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Synechococcus sp. BL107
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 11
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_bl107_proteomics
   experiment_name: 'Alteromonas in BL107 coculture: light +5 mM glucose vs light (control)'
@@ -218,8 +234,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: darkness +100 nM glucose vs darkness
@@ -269,8 +289,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: darkness +5 mM glucose vs darkness
@@ -320,8 +344,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: light +100 nM glucose vs light
@@ -371,8 +399,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 16
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_med4_proteomics
   experiment_name: 'Alteromonas in MED4 coculture: light +5 mM glucose vs light (control)'
@@ -421,8 +453,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 54
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_ss120_proteomics
   experiment_name: 'Alteromonas in SS120 coculture: darkness +100 nM glucose vs darkness
@@ -472,8 +508,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 54
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_ss120_proteomics
   experiment_name: 'Alteromonas in SS120 coculture: darkness +5 mM glucose vs darkness
@@ -523,8 +563,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 54
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_ss120_proteomics
   experiment_name: 'Alteromonas in SS120 coculture: light +100 nM glucose vs light
@@ -574,8 +618,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 54
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_ss120_proteomics
   experiment_name: 'Alteromonas in SS120 coculture: light +5 mM glucose vs light (control)'
@@ -624,8 +672,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Synechococcus WH7803
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 4
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_wh7803_proteomics
   experiment_name: 'Alteromonas in WH7803 coculture: darkness +100 nM glucose vs darkness
@@ -675,8 +727,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Synechococcus WH7803
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 4
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_wh7803_proteomics
   experiment_name: 'Alteromonas in WH7803 coculture: darkness +5 mM glucose vs darkness
@@ -726,8 +782,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Synechococcus WH7803
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 4
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_wh7803_proteomics
   experiment_name: 'Alteromonas in WH7803 coculture: light +100 nM glucose vs light
@@ -777,8 +837,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Synechococcus WH7803
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 4
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_wh7803_proteomics
   experiment_name: 'Alteromonas in WH7803 coculture: light +5 mM glucose vs light
@@ -828,8 +892,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 78
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_alt_in_wh8102_proteomics
   experiment_name: 'Alteromonas in WH8102 coculture: darkness +100 nM glucose vs darkness
@@ -879,8 +947,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 78
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_alt_in_wh8102_proteomics
   experiment_name: 'Alteromonas in WH8102 coculture: darkness +5 mM glucose vs darkness
@@ -930,8 +1002,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 78
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_alt_in_wh8102_proteomics
   experiment_name: 'Alteromonas in WH8102 coculture: light +100 nM glucose vs light
@@ -981,8 +1057,12 @@ rows:
   - Marinobacter (MarRef v6)
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 78
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_alt_in_wh8102_proteomics
   experiment_name: 'Alteromonas in WH8102 coculture: light +5 mM glucose vs light
@@ -1033,9 +1113,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_ad45
   experiment_name: AD45 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -1078,9 +1160,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_atcc27126
   experiment_name: ATCC27126 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -1123,9 +1207,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_bgp6
   experiment_name: BGP6 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -1168,9 +1254,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_bs11
   experiment_name: BS11 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -1210,9 +1298,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: exoproteome
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - boolean
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1128/aem.00798-26_ez55_exudate_proteome
   experiment_name: EZ55 exudate (>50 kDa cell-free supernatant) proteome
@@ -1251,9 +1341,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - boolean
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1128/aem.00798-26_ez55_whole_cell_proteome
   experiment_name: EZ55 whole-cell proteome (crude cell lysate)
@@ -1292,8 +1384,17 @@ rows:
   coculture_partner:
   - Prochlorococcus MIT9312
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'logFC is the partner deviation from the partner-averaged coculture
+    response at 400 ppm, not partner vs axenic (adding the general coculture logFC
+    of Table S5 recovers the vs-axenic value); the three partner tables at 400 ppm
+    sum to zero per gene. Matched by growth state, not by sampling day: arms are acclimated
+    cultures harvested in exponential growth; the axenic EZ55 and MIT9312 coculture
+    libraries are from Hennon 2017, the Synechococcus cocultures were grown later.
+    adjusted_p_value on these edges is the unadjusted p-value reported by the paper
+    (no multiple-testing correction).'
   distinct_gene_count: 419
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 vs Mean Coculture Response
@@ -1341,8 +1442,21 @@ rows:
   coculture_partner:
   - Prochlorococcus MIT9312
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'The paper presents logFC as the partner deviation from the partner-averaged
+    coculture response at 800 ppm (Fig. 2, Table S5), not partner vs axenic (adding
+    the general coculture logFC of Table S5 recovers the vs-axenic value); the three
+    partner tables at 800 ppm sum to zero per gene. Matched by growth state, not by
+    sampling day: arms are acclimated cultures harvested in exponential growth; the
+    axenic EZ55 and MIT9312 coculture libraries are from Hennon 2017, the Synechococcus
+    cocultures were grown later. Caveat: the author script has no contrast for that
+    quantity; Tables S12 to S14 more likely are its contrasts 7 to 9 (partner-specific
+    pCO2 interaction minus the mean of the three, Methods item v). Their logFC runs
+    opposite to the matching 400 ppm table on shared genes (r = -0.61, -0.83, -0.97
+    for MIT9312, CC9311, WH8102). adjusted_p_value on these edges is the unadjusted
+    p-value reported by the paper (no multiple-testing correction).'
   distinct_gene_count: 188
   experiment_id: 10.1038/s43705-022-00197-2_coculture_prochlorococcus_mit9312_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Prochlorococcus MIT9312 vs Mean Coculture Response
@@ -1390,8 +1504,17 @@ rows:
   coculture_partner:
   - Synechococcus CC9311
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'logFC is the partner deviation from the partner-averaged coculture
+    response at 400 ppm, not partner vs axenic (adding the general coculture logFC
+    of Table S5 recovers the vs-axenic value); the three partner tables at 400 ppm
+    sum to zero per gene. Matched by growth state, not by sampling day: arms are acclimated
+    cultures harvested in exponential growth; the axenic EZ55 and MIT9312 coculture
+    libraries are from Hennon 2017, the Synechococcus cocultures were grown later.
+    adjusted_p_value on these edges is the unadjusted p-value reported by the paper
+    (no multiple-testing correction).'
   distinct_gene_count: 293
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus CC9311 vs Mean Coculture Response
@@ -1439,8 +1562,21 @@ rows:
   coculture_partner:
   - Synechococcus CC9311
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'The paper presents logFC as the partner deviation from the partner-averaged
+    coculture response at 800 ppm (Fig. 2, Table S5), not partner vs axenic (adding
+    the general coculture logFC of Table S5 recovers the vs-axenic value); the three
+    partner tables at 800 ppm sum to zero per gene. Matched by growth state, not by
+    sampling day: arms are acclimated cultures harvested in exponential growth; the
+    axenic EZ55 and MIT9312 coculture libraries are from Hennon 2017, the Synechococcus
+    cocultures were grown later. Caveat: the author script has no contrast for that
+    quantity; Tables S12 to S14 more likely are its contrasts 7 to 9 (partner-specific
+    pCO2 interaction minus the mean of the three, Methods item v). Their logFC runs
+    opposite to the matching 400 ppm table on shared genes (r = -0.61, -0.83, -0.97
+    for MIT9312, CC9311, WH8102). adjusted_p_value on these edges is the unadjusted
+    p-value reported by the paper (no multiple-testing correction).'
   distinct_gene_count: 83
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_cc9311_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus CC9311 vs Mean Coculture Response
@@ -1488,8 +1624,17 @@ rows:
   coculture_partner:
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'logFC is the partner deviation from the partner-averaged coculture
+    response at 400 ppm, not partner vs axenic (adding the general coculture logFC
+    of Table S5 recovers the vs-axenic value); the three partner tables at 400 ppm
+    sum to zero per gene. Matched by growth state, not by sampling day: arms are acclimated
+    cultures harvested in exponential growth; the axenic EZ55 and MIT9312 coculture
+    libraries are from Hennon 2017, the Synechococcus cocultures were grown later.
+    adjusted_p_value on these edges is the unadjusted p-value reported by the paper
+    (no multiple-testing correction).'
   distinct_gene_count: 136
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_400_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus WH8102 vs Mean Coculture Response
@@ -1537,8 +1682,21 @@ rows:
   coculture_partner:
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'The paper presents logFC as the partner deviation from the partner-averaged
+    coculture response at 800 ppm (Fig. 2, Table S5), not partner vs axenic (adding
+    the general coculture logFC of Table S5 recovers the vs-axenic value); the three
+    partner tables at 800 ppm sum to zero per gene. Matched by growth state, not by
+    sampling day: arms are acclimated cultures harvested in exponential growth; the
+    axenic EZ55 and MIT9312 coculture libraries are from Hennon 2017, the Synechococcus
+    cocultures were grown later. Caveat: the author script has no contrast for that
+    quantity; Tables S12 to S14 more likely are its contrasts 7 to 9 (partner-specific
+    pCO2 interaction minus the mean of the three, Methods item v). Their logFC runs
+    opposite to the matching 400 ppm table on shared genes (r = -0.61, -0.83, -0.97
+    for MIT9312, CC9311, WH8102). adjusted_p_value on these edges is the unadjusted
+    p-value reported by the paper (no multiple-testing correction).'
   distinct_gene_count: 58
   experiment_id: 10.1038/s43705-022-00197-2_coculture_synechococcus_wh8102_at_800_ez55_rnaseq
   experiment_name: EZ55 Coculture with Synechococcus WH8102 vs Mean Coculture Response
@@ -1586,8 +1744,15 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'This table is the pCO2 effect in axenic EZ55 only (author script),
+    not an average over coculture conditions. Matched by growth state, not by sampling
+    day: arms are acclimated cultures harvested in exponential growth; the axenic
+    EZ55 and MIT9312 coculture libraries are from Hennon 2017, the Synechococcus cocultures
+    were grown later. adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction).'
   distinct_gene_count: 126
   experiment_id: 10.1038/s43705-022-00197-2_carbon_stress_elevated_pco2_800_ppm_ez55_rnaseq
   experiment_name: EZ55 Elevated pCO2 (800 ppm) vs Ambient pCO2 (400 ppm) (RNASEQ)
@@ -1638,8 +1803,20 @@ rows:
   - Synechococcus CC9311
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'The author script defines this table as the mean of the three partner-specific
+    pCO2 interaction coefficients minus the axenic pCO2 coefficient, not a clean interaction
+    term; Table S5 also presents these values as the general coculture response at
+    800 ppm. Matched by growth state, not by sampling day: arms are acclimated cultures
+    harvested in exponential growth; the axenic EZ55 and MIT9312 coculture libraries
+    are from Hennon 2017, the Synechococcus cocultures were grown later. Because the
+    interaction coefficients already measure the partner pCO2 response relative to
+    axenic, subtracting the axenic coefficient again leaves a quantity the paper does
+    not define; on the 115 genes shared with Table S2 the logFC is opposite in sign
+    (r = -0.98). adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction).'
   distinct_gene_count: 437
   experiment_id: 10.1038/s43705-022-00197-2_interaction_pco2_coculture_ez55_rnaseq
   experiment_name: EZ55 Table S4 contrast, labelled pCO2 x coculture interaction by
@@ -1691,8 +1868,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction).
   distinct_gene_count: 98
   experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_axenic
   experiment_name: EZ55 Elevated CO2 (800 ppm) vs Ambient CO2 (400 ppm) (RNASEQ)
@@ -1744,9 +1924,12 @@ rows:
   coculture_partner:
   - Prochlorococcus MIT9312
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 8
   derived_metric_value_kinds:
   - boolean
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction).
   distinct_gene_count: 695
   experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_ez55_rnaseq_coculture
   experiment_name: EZ55 Elevated CO2 (800 ppm) vs Ambient CO2 (400 ppm) (RNASEQ)
@@ -1799,8 +1982,11 @@ rows:
   coculture_partner:
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Coculture vs axenic HOT1A3 with both arms sampled on the same day
+    (day 11, day 18, day 31) of the same experiment run.
   distinct_gene_count: 3947
   experiment_id: 10.1101/2025.11.24.690089_coculture_prochlorococcus_med4_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MED4 vs Axenic (RNASEQ)
@@ -1860,8 +2046,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'day 18, day 31 and day 89: axenic HOT1A3 vs the same axenic series
+    sampled on day 11 (nutrient_limited, Alteromonas has no exponential phase in this
+    medium).'
   distinct_gene_count: 2225
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_axenic
   experiment_name: HOT1A3 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN day
@@ -1922,8 +2112,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'day 18 and day 31: axenic HOT1A3 vs the same axenic series sampled
+    on day 11 (nutrient_limited, Alteromonas declines from the start and has no exponential
+    phase in this medium). No axenic HOT1A3 RNA exists after day 31.'
   distinct_gene_count: 3947
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_axenic
   experiment_name: HOT1A3 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN day
@@ -1978,8 +2172,13 @@ rows:
   coculture_partner:
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Each timepoint (day 18, day 31, day 60, day 89, days 60+89) is coculture
+    HOT1A3 vs the same coculture series sampled on day 11 (nutrient_limited, Alteromonas
+    has no exponential phase in this medium). days 60+89 pools the day 60 and day
+    89 samples.
   distinct_gene_count: 2225
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_proteomics_coculture
   experiment_name: HOT1A3 in coculture with MED4, PRO99-lowN nutrient starvation vs
@@ -2055,8 +2254,13 @@ rows:
   coculture_partner:
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Each timepoint (day 18, day 31, day 60, day 89) is coculture HOT1A3
+    vs the same coculture series sampled on day 11 (nutrient_limited, Alteromonas
+    has no exponential phase in this medium). days 60+89 pools the day 60 and day
+    89 samples.
   distinct_gene_count: 3947
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_hot1a3_rnaseq_coculture
   experiment_name: HOT1A3 in coculture with MED4, PRO99-lowN nutrient starvation vs
@@ -2135,9 +2339,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_hot1a3
   experiment_name: HOT1A3 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -2175,8 +2381,11 @@ rows:
   coculture_partner:
   - Prochlorococcus MIT9313
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Both arms are 20 h HOT1A3 cocultures with MIT9313, differing only
+    in the HOT1A3 inoculum (high vs 0.5x10^6 cells/ml).
   distinct_gene_count: 1879
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 (high Alteromonas
@@ -2223,8 +2432,12 @@ rows:
   coculture_partner:
   - Prochlorococcus MIT9313
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Both arms are 20 h HOT1A3 cocultures: HOT1A3 with MIT9313 (treatment)
+    vs HOT1A3 with MED4 (control). MED4 is a partner of the control arm only and is
+    not recorded as a coculture partner.'
   distinct_gene_count: 2295
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 vs coculture with
@@ -2281,8 +2494,10 @@ rows:
   coculture_partner:
   - Prochlorococcus NATL2A
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 3856
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq
   experiment_name: MIT1002 Dark-tolerant co-culture under 13:11 diel light:dark cycle
@@ -2375,9 +2590,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1093/femsml/uqac025_vesicle_proteomics_mit1002
   experiment_name: MIT1002 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -2418,9 +2635,11 @@ rows:
   coculture_partner:
   - Prochlorococcus NATL2A
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 2
   derived_metric_value_kinds:
   - boolean
+  design_notes: null
   distinct_gene_count: 175
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_mit1002_rnaseq
   experiment_name: MIT1002 Extended darkness vs 13:11 diel light:dark cycle control
@@ -2475,8 +2694,15 @@ rows:
   coculture_partner:
   - Prochlorococcus NATL2A
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: '24h vs 12h: both arms are the same three cocultures; the control
+    was sampled 12 h after Alteromonas addition, when the Alteromonas population had
+    stopped declining but was not yet growing (growth phase unknown, lag-like). coculture_48_hours_after_coculturing_mit1002_rnaseq
+    uses the same 12 h reference samples. At 24 h (the treatment arm) the Alteromonas
+    population was stable, not yet growing (p. 2833, Fig. 1a), so growth_phase is
+    unknown rather than exponential.'
   distinct_gene_count: 740
   experiment_id: 10.1038/ismej.2016.82_coculture_24_hours_after_coculturing_mit1002_rnaseq
   experiment_name: MIT1002 24 hours vs 12 hours after co-culturing with Prochlorococcus
@@ -2524,8 +2750,15 @@ rows:
   coculture_partner:
   - Prochlorococcus NATL2A
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: '48h vs 12h: both arms are the same three cocultures; the control
+    was sampled 12 h after Alteromonas addition, when the Alteromonas population had
+    stopped declining but was not yet growing (growth phase unknown, lag-like). coculture_24_hours_after_coculturing_mit1002_rnaseq
+    uses the same 12 h reference samples. At 48 h (the treatment arm) the Alteromonas
+    population was only beginning to grow again after a decline and a stable day (p.
+    2833, p. 2837 and p. 2839, Fig. 1a), so growth_phase is unknown rather than exponential.'
   distinct_gene_count: 740
   experiment_id: 10.1038/ismej.2016.82_coculture_48_hours_after_coculturing_mit1002_rnaseq
   experiment_name: MIT1002 48 hours vs 12 hours after co-culturing with Prochlorococcus
@@ -2575,8 +2808,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus sp. BL107
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 82
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: darkness +100 nM glucose vs darkness
@@ -2626,8 +2863,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus sp. BL107
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 82
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: darkness +5 mM glucose vs darkness
@@ -2677,8 +2918,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus sp. BL107
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 82
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: light +100 nM glucose vs light
@@ -2728,8 +2973,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus sp. BL107
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 82
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_bl107_proteomics
   experiment_name: 'Marinobacter in BL107 coculture: light +5 mM glucose vs light
@@ -2779,8 +3028,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 342
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: darkness +100 nM glucose vs darkness
@@ -2830,8 +3083,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 342
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: darkness +5 mM glucose vs darkness
@@ -2881,8 +3138,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 342
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +100 nM glucose vs light
@@ -2932,8 +3193,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus MED4
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 342
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_med4_proteomics
   experiment_name: 'Marinobacter in MED4 coculture: light +5 mM glucose vs light (control)'
@@ -2982,8 +3247,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 195
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: darkness +100 nM glucose vs darkness
@@ -3033,8 +3302,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 195
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: darkness +5 mM glucose vs darkness
@@ -3084,8 +3357,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 195
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: light +100 nM glucose vs light
@@ -3135,8 +3412,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 195
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_ss120_proteomics
   experiment_name: 'Marinobacter in SS120 coculture: light +5 mM glucose vs light
@@ -3186,8 +3467,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH7803
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 146
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: darkness +100 nM glucose vs
@@ -3237,8 +3522,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH7803
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 145
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: darkness +5 mM glucose vs darkness
@@ -3288,8 +3577,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH7803
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 145
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: light +100 nM glucose vs light
@@ -3339,8 +3632,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH7803
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 146
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_wh7803_proteomics
   experiment_name: 'Marinobacter in WH7803 coculture: light +5 mM glucose vs light
@@ -3390,8 +3687,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 483
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: darkness +100 nM glucose vs
@@ -3441,8 +3742,13 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The test behind these p-values
+    could not be reproduced from the per-sample columns; the other three comparisons
+    in this table are one-tailed paired t-tests (half the two-tailed value).
   distinct_gene_count: 484
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: darkness +5 mM glucose vs darkness
@@ -3492,8 +3798,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 484
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: light +100 nM glucose vs light
@@ -3543,8 +3853,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Synechococcus WH8102
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 484
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_marino_in_wh8102_proteomics
   experiment_name: 'Marinobacter in WH8102 coculture: light +5 mM glucose vs light
@@ -3592,8 +3906,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'acclimated: both arms harvested in exponential phase but on different
+    days because the 5% salt culture grows about half as fast (Fig. 1) - control on
+    days 2 and 4, salt treatment on days 4 and 6. Matched by growth state, not by
+    calendar time.'
   distinct_gene_count: 1879
   experiment_id: 10.1016/j.micres.2015.04.006_salt_saltacclimated_5_salt_as9601_rnaseq
   experiment_name: AS9601 Salt-acclimated (5% salt) vs Normal seawater control (3.8%
@@ -3648,8 +3967,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Control for 2h and 4h is the normal-diel circadian time-course sample
+    at the same ZT (ZT 2 and ZT 4, lights on, diel), not ZT 0 as one Methods sentence
+    suggests; the reported log2FC reproduce the same-ZT contrast from the GEO GSE314951
+    counts (r = 1.00) and not the ZT 0 contrast (r below 0.6).
   distinct_gene_count: 1876
   experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
   experiment_name: MED4 extended darkness past dawn vs normal light period (RNA-seq)
@@ -3710,8 +4034,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Control for 14h and 16h is the normal-diel circadian time-course sample
+    at the same ZT (ZT 14 and ZT 16, lights off, diel), not ZT 0 or ZT 12; the reported
+    log2FC reproduce the same-ZT contrast from the GEO GSE314951 counts (r = 1.00)
+    and not the ZT 12 contrast (r below 0.82).
   distinct_gene_count: 1876
   experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
   experiment_name: MED4 extended light past dusk vs normal dark period (RNA-seq)
@@ -3764,8 +4093,14 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the axenic MED4 control
+    came from a separate repeat experiment sampled on days 7 and 14 to match axenic
+    MED4 growth dynamics (Methods p. 14). day 11: coculture day 11 vs axenic day 7
+    (both exponential). day 18: coculture day 18 vs axenic day 14 (death, axenic MED4
+    lost viability around day 11).'
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Axenic (RNASEQ)
@@ -3819,8 +4154,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'day 14, day 31 and day 89: axenic MED4 vs axenic MED4 sampled on
+    day 7 (exponential). Day 7 and day 14 come from the axenic repeat experiment;
+    the methods do not say which run day 31 and day 89 came from.'
   distinct_gene_count: 1424
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic
   experiment_name: MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential
@@ -3881,8 +4220,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'day 14: axenic MED4 vs the same axenic series sampled on day 7 (exponential);
+    axenic MED4 was a separate repeat experiment sampled on days 7 and 14. No axenic
+    MED4 RNA exists after day 14.'
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   experiment_name: MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential
@@ -3930,8 +4273,12 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Each timepoint (day 18, day 31, day 60, day 89, days 60+89) is coculture
+    MED4 vs the same coculture series sampled on day 11 (exponential). days 60+89
+    pools the day 60 and day 89 samples.
   distinct_gene_count: 1424
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
@@ -4007,8 +4354,12 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Each timepoint (day 18, day 31, day 60, day 89) is coculture MED4
+    vs the same coculture series sampled on day 11 (exponential). days 60+89 pools
+    the day 60 and day 89 samples.
   distinct_gene_count: 1849
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
@@ -4086,8 +4437,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -4136,8 +4491,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -4186,8 +4545,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +100 nM glucose vs light (control)'
@@ -4236,8 +4599,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 327
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_med4_proteomics
   experiment_name: 'MED4 proteomics: light +5 mM glucose vs light (control)'
@@ -4285,8 +4652,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 1953
   experiment_id: 10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_med4_rnaseq
   experiment_name: MED4 Low salinity acclimation (28 psu) vs Normal seawater salinity
@@ -4337,8 +4706,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 857
   experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   experiment_name: MED4 N-depleted Pro99 medium vs N-replete Pro99 medium (RNASEQ)
@@ -4398,8 +4769,10 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 1714
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   experiment_name: MED4 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth conditions
@@ -4445,8 +4818,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Dark and light arms come from two experiments run on separate days,
+    each split from its own mid-log (exponential) mother culture; arms are compared
+    at the same hours post-inoculation.
   distinct_gene_count: 38
   experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_infected
   experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) in phage P-HM2
@@ -4520,8 +4897,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Dark and light arms come from two experiments run on separate days,
+    each split from its own mid-log (exponential) mother culture; arms are compared
+    at the same hours post-inoculation.
   distinct_gene_count: 32
   experiment_id: 10.1371/journal.pone.0165375_light_stress_constant_dark_med4_rnaseq_dark
   experiment_name: MED4 Constant dark vs Constant light (90 µE m-2 s-1) in uninfected
@@ -4589,8 +4970,10 @@ rows:
   coculture_partner:
   - Phage
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 23
   experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_dark
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in dark
@@ -4651,8 +5034,10 @@ rows:
   coculture_partner:
   - Phage
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 29
   experiment_id: 10.1371/journal.pone.0165375_viral_phage_phm2_lysate_med4_rnaseq_light
   experiment_name: MED4 Phage (P-HM2) lysate vs Spent medium (uninfected) in light
@@ -4726,8 +5111,14 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'max across 70min-24h: the air-sparged culture at each time is compared
+    with its own t = 0 sample (taken immediately after centrifugation and resuspension,
+    before sparging; exponential). Table S1 reports the maximal log2 fold change versus
+    t = 0 over the time course; significance by betr time-series test against t =
+    0.'
   distinct_gene_count: 166
   experiment_id: 10.1038/ismej.2015.36_carbon_air_0036_co2_21_med4_microarray
   experiment_name: MED4 Air (0.036% CO2 / 21% O2) vs Time 0 (pre-shock) (MICROARRAY)
@@ -4773,8 +5164,14 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'max across 70min-24h: gas-shocked and air-sparged control bottles
+    were split from one pooled culture at t = 0 and sampled in parallel at the same
+    times (exponential). The value is the extremum over time of the log2 change versus
+    t = 0 under the gas minus the same change in air; significance by betr against
+    the parallel air time course.'
   distinct_gene_count: 4
   experiment_id: 10.1038/ismej.2015.36_carbon_ambient_co2_no_o2_med4_microarray
   experiment_name: MED4 Ambient CO2, no O2 (0.036% CO2 / 0% O2) vs Air (0.036% CO2
@@ -4821,10 +5218,16 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 3
   derived_metric_value_kinds:
   - boolean
   - categorical
+  design_notes: 'max across 70min-24h: gas-shocked and air-sparged control bottles
+    were split from one pooled culture at t = 0 and sampled in parallel at the same
+    times (exponential). The value is the extremum over time of the log2 change versus
+    t = 0 under the gas minus the same change in air; significance by betr against
+    the parallel air time course.'
   distinct_gene_count: 285
   experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_0004_co2_med4_microarray
   experiment_name: MED4 Low CO2 (0.004% CO2 / 21% O2) vs Air (0.036% CO2 / 21% O2)
@@ -4871,10 +5274,16 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 2
   derived_metric_value_kinds:
   - boolean
   - categorical
+  design_notes: 'max across 70min-24h: gas-shocked and air-sparged control bottles
+    were split from one pooled culture at t = 0 and sampled in parallel at the same
+    times (exponential). The value is the extremum over time of the log2 change versus
+    t = 0 under the gas minus the same change in air; significance by betr against
+    the parallel air time course.'
   distinct_gene_count: 252
   experiment_id: 10.1038/ismej.2015.36_carbon_low_co2_and_no_med4_microarray
   experiment_name: MED4 Low CO2 and no O2 (0.004% CO2 / 0% O2) vs Air (0.036% CO2
@@ -4926,9 +5335,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1186/1471-2180-14-11_expression_profiling_med4_rnaseq
   experiment_name: MED4 steady-state expression profiling across growth conditions
@@ -4970,10 +5381,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 5
   derived_metric_value_kinds:
   - boolean
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1038/ismej.2014.57_tss_mapping_med4
   experiment_name: MED4 transcriptome architecture mapping (TSS map, 454 + Solexa
@@ -5017,11 +5430,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - boolean
   - categorical
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1126/science.1243457_vesicle_proteomics_med4
   experiment_name: MED4 vesicle proteome (LC-MS/MS, presence + Mascot probability
@@ -5064,9 +5479,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 1
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1126/science.1243457_vesicle_dnaseq_med4
   experiment_name: MED4 vesicle-encapsulated DNA-seq (top-50 ORFs by avg read coverage)
@@ -5105,9 +5522,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 6
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1371/journal.pone.0043432_waldbauer_2012_med4_paired_diel
   experiment_name: MED4 diel paired transcript-protein analysis (Waldbauer 2012)
@@ -5147,8 +5566,13 @@ rows:
   clustering_analysis_count: 1
   coculture_partner: []
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'R (rescue: 70h vs 48h): the -Fe cultures 21h after iron addition
+    at 49h (sampled at 70h) vs the same -Fe cultures before rescue, sampled at 48h
+    (nutrient_limited, iron-starved). Within-culture before/after comparison, no parallel
+    untreated control at 70h.'
   distinct_gene_count: 112
   experiment_id: 10.1038/ismej.2011.49_iron_rescue_med4_microarray
   experiment_name: MED4 Iron rescue - after vs before iron re-addition (MED4) (MICROARRAY)
@@ -5196,8 +5620,12 @@ rows:
   clustering_analysis_count: 1
   coculture_partner: []
   compartment: whole_cell
+  control_timing: mixed
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: '12h and 24h: no-added-iron (-Fe) vs iron-replete (+Fe) cultures sampled
+    at the same hour. 48h: -Fe sampled at 48h vs +Fe sampled at 24h (exponential),
+    because the 48h +Fe array hybridized poorly (p. 1582) - not matched.'
   distinct_gene_count: 112
   experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_med4_med4_microarray_light
   experiment_name: MED4 Iron starvation (MED4) vs Iron-replete control (MED4) (MICROARRAY)
@@ -5263,10 +5691,12 @@ rows:
   clustering_analysis_count: 1
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 4
   derived_metric_value_kinds:
   - boolean
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1186/gb-2010-11-5-r54_rifampicin_rna_decay_med4
   experiment_name: MED4 genome-wide mRNA half-life measurement (rifampicin transcription
@@ -5316,8 +5746,10 @@ rows:
   clustering_analysis_count: 1
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1371/journal.pone.0005135_diel_cycling_med4_microarray
   experiment_name: MED4 diel gene expression profiling over 48h light-dark cycle
@@ -5365,8 +5797,14 @@ rows:
   coculture_partner:
   - Phage
   compartment: whole_cell
+  control_timing: mixed
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Paired uninfected control cultures (amended with filter-sterilized
+    spent medium) were sampled alongside the infected cultures; 1h, 2h, 3h, 4h and
+    8h compare infected vs control at the same hour. 5h, 6h and 7h: no control arrays
+    at those hours - infected cells were compared with the control arrays from 4 h
+    and 8 h (exponential), which gave the same profiles - not matched.'
   distinct_gene_count: 45
   experiment_id: 10.1038/nature06130_viral_phage_infected_med4_microarray
   experiment_name: MED4 Phage infected vs uninfected spent-medium control (MICROARRAY)
@@ -5461,8 +5899,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 179
   experiment_id: 10.1021/pr060460c_light_HL_vs_LL_med4_proteomics
   experiment_name: 'MED4 proteomics: high light (100 uE) vs low light (20 uE) (iTRAQ)'
@@ -5510,8 +5950,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 178
   experiment_id: 10.1021/pr060460c_light_ML_vs_LL_med4_proteomics
   experiment_name: 'MED4 proteomics: medium light (60 uE) vs low light (20 uE) (iTRAQ)'
@@ -5559,8 +6001,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_blue_light_13_umol_med4_microarray
   experiment_name: MED4 Blue light (13 umol photons m-2 s-1) vs Darkness control (MICROARRAY)
@@ -5609,8 +6053,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_dcmu_white_light_13_med4_microarray
   experiment_name: MED4 DCMU + white light (13 umol photons m-2 s-1) vs White light
@@ -5659,8 +6105,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_green_light_13_umol_med4_microarray
   experiment_name: MED4 Green light (13 umol photons m-2 s-1) vs Darkness control
@@ -5713,8 +6161,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'steady state: log-phase cultures acclimated to the alternative N
+    source vs log-phase cultures on ammonium (exponential). Methods do not state that
+    both arms were harvested on the same day; matched by growth state, assumed from
+    the acclimated parallel-culture design.'
   distinct_gene_count: 1697
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
   experiment_name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99
@@ -5766,8 +6219,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'steady state: log-phase cultures acclimated to the alternative N
+    source vs log-phase cultures on ammonium (exponential). Methods do not state that
+    both arms were harvested on the same day; matched by growth state, assumed from
+    the acclimated parallel-culture design.'
   distinct_gene_count: 1697
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
   experiment_name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99
@@ -5815,8 +6273,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_high_white_light_55_med4_microarray
   experiment_name: MED4 High white light (55 umol photons m-2 s-1) vs Darkness control
@@ -5870,8 +6330,10 @@ rows:
   clustering_analysis_count: 1
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 1697
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
@@ -5954,8 +6416,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 34
   experiment_id: 10.1073/pnas.0601301103_phosphorus_phosphate_starvation_med4_microarray
   experiment_name: MED4 Phosphate starvation vs P-replete Pro99 medium (MICROARRAY)
@@ -6032,8 +6496,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_red_light_13_umol_med4_microarray
   experiment_name: MED4 Red light (13 umol photons m-2 s-1) vs Darkness control (MICROARRAY)
@@ -6081,8 +6547,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 198
   experiment_id: 10.1128/JB.01097-06_light_stress_white_light_13_umol_med4_microarray
   experiment_name: MED4 White light (13 umol photons m-2 s-1) vs Darkness control
@@ -6146,8 +6614,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Untreated parallel exponential cultures are the control; methods do
+    not state their harvest time relative to the UV shock plus 1h recovery (1h post-shock),
+    so matched is assumed from the parallel design.
   distinct_gene_count: 2003
   experiment_id: 10.1016/j.cell.2022.12.006_uv_dna_damage_mit0604
   experiment_name: MIT0604 UV shock vs untreated control (RNA-seq)
@@ -6209,8 +6681,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Untreated parallel exponential cultures are the control; methods do
+    not state their harvest time relative to the 2h mitomycin C exposure (timepoint
+    2h), so matched is assumed from the parallel design.
   distinct_gene_count: 2003
   experiment_id: 10.1016/j.cell.2022.12.006_mmc_dna_damage_mit0604
   experiment_name: MIT0604 mitomycin C DNA-damage induction vs untreated control (RNA-seq)
@@ -6273,8 +6749,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Treatment-vs-treatment contrast: mitomycin C arm (2h exposure) vs
+    UV arm (1h post-shock); both are parallel exponential cultures of the same nine-culture
+    experiment, harvest times not stated, matched assumed.'
   distinct_gene_count: 2003
   experiment_id: 10.1016/j.cell.2022.12.006_mmc_vs_uv_mit0604
   experiment_name: MIT0604 mitomycin C vs UV shock (treatment-vs-treatment contrast,
@@ -6326,8 +6806,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: extracellular
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_0801_extracellular
   experiment_name: MIT0801 metabolite diversity (extracellular pool)
@@ -6371,8 +6853,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_0801_whole_cell
   experiment_name: MIT0801 metabolite diversity (intracellular pool)
@@ -6415,8 +6899,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 234
   experiment_id: 10.1038/s41467-026-77598-7_growth_state_freeliving_planktonic_enrichment_mit9301_rnaseq
   experiment_name: MIT9301 Free-living (planktonic) enrichment vs Biofilm (adherent)
@@ -6468,8 +6954,10 @@ rows:
   clustering_analysis_count: 1
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1128/mbio.03425-22_thermal_acclimation_mit9301_rnaseq
   experiment_name: MIT9301 long-term thermal acclimation RNA-seq across 5 temperatures
@@ -6512,8 +7000,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: extracellular
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_extracellular
   experiment_name: MIT9301 metabolite diversity (extracellular pool)
@@ -6557,8 +7047,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell
   experiment_name: MIT9301 metabolite diversity (intracellular pool)
@@ -6612,8 +7104,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 25
   experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9303_rnaseq
   experiment_name: MIT9303 chitosan addition RNA-seq (primary degrader, full pathway)
@@ -6674,8 +7168,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9303_metabolomics
   experiment_name: MIT9303 chitosan addition — intracellular metabolomics
@@ -6716,8 +7212,14 @@ rows:
   coculture_partner:
   - Alteromonas macleodii EZ55
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: both pCO2 arms were
+    acclimated for three transfer cycles and harvested in exponential growth in the
+    final cycle (Methods p. 2). The MIT9312 libraries are re-analysed from Hennon
+    2017. adjusted_p_value on these edges is the unadjusted p-value reported by the
+    paper (no multiple-testing correction).'
   distinct_gene_count: 37
   experiment_id: 10.1038/s43705-022-00197-2_carbon_stress_elevated_pco2_800_ppm_mit9312_rnaseq
   experiment_name: MIT9312 Elevated pCO2 (800 ppm) vs Ambient pCO2 (400 ppm) (RNASEQ)
@@ -6771,8 +7273,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1111/1462-2920.15834_vesicle_metabolomics_mit9312
   experiment_name: MIT9312 extracellular vesicle targeted metabolome (Table S7)
@@ -6819,9 +7323,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9312
   experiment_name: MIT9312 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -6867,8 +7373,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1111/1462-2920.15834_cells_metabolomics_mit9312
   experiment_name: MIT9312 whole-cell targeted metabolome (Table S7)
@@ -6911,8 +7419,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'HDPE exposure: the paper gives 120 min, while the GEO GSE118155 protocol
+    says the HDPE and control cultures were harvested after 180 min; the timepoint
+    follows the paper.'
   distinct_gene_count: 396
   experiment_id: 10.1038/s42003-019-0410-x_plastic_hdpe_plastic_leachate_50_mit9312_rnaseq
   experiment_name: MIT9312 HDPE plastic leachate (50% dilution) vs AMP1 media control
@@ -6963,8 +7475,15 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: '90 min: PVC-exposed cultures were harvested after 90 min and the
+    shared AMP1 no-leachate control after 180 min (GEO GSE118155 protocol; the paper
+    does not state the control harvest time). Treated as matched: treatment and control
+    are parallel exponential cultures and the exposure length is part of the treatment.
+    The same three control libraries serve as control for the HDPE experiment of this
+    strain.'
   distinct_gene_count: 583
   experiment_id: 10.1038/s42003-019-0410-x_plastic_pvc_plastic_leachate_2_mit9312_rnaseq
   experiment_name: MIT9312 PVC plastic leachate (2% dilution) vs AMP1 media control
@@ -7017,8 +7536,11 @@ rows:
   coculture_partner:
   - Alteromonas macleodii EZ55
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction).
   distinct_gene_count: 102
   experiment_id: 10.1038/ismej.2017.189_carbon_stress_elevated_co2_800_ppm_mit9312_rnaseq
   experiment_name: MIT9312 Elevated CO2 (800 ppm) vs Ambient CO2 (400 ppm) (RNASEQ)
@@ -7063,8 +7585,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: Pi-replete and Pi-deplete
+    cultures were grown in parallel and each harvested at the onset of stationary
+    phase (supplementary methods); no common harvest date is stated.'
   distinct_gene_count: 38
   experiment_id: 10.1186/2046-9063-8-7_pi_limitation_mit9312_itraq
   experiment_name: 'MIT9312 proteomics: Pi replete vs Pi deplete (iTRAQ)'
@@ -7126,8 +7652,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 72
   experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9313_rnaseq
   experiment_name: MIT9313 chitosan addition RNA-seq (secondary degrader, partial
@@ -7189,8 +7717,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1073/pnas.2213271120_chitosan_addition_mit9313_metabolomics
   experiment_name: MIT9313 chitosan addition — intracellular metabolomics
@@ -7234,8 +7764,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: extracellular
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9313_extracellular
   experiment_name: MIT9313 metabolite diversity (extracellular pool)
@@ -7279,8 +7811,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1128/msystems.01261-22_kujawinski_metabolomics_9313_whole_cell
   experiment_name: MIT9313 metabolite diversity (intracellular pool)
@@ -7327,8 +7861,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1111/1462-2920.15834_vesicle_metabolomics_mit9313
   experiment_name: MIT9313 extracellular vesicle targeted metabolome (Table S7)
@@ -7375,9 +7911,11 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1111/1462-2920.15834_vesicle_proteomics_mit9313
   experiment_name: MIT9313 vesicle vs whole-cell proteome (label-free LC-MS/MS)
@@ -7423,8 +7961,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1111/1462-2920.15834_cells_metabolomics_mit9313
   experiment_name: MIT9313 whole-cell targeted metabolome (Table S7)
@@ -7471,8 +8011,17 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'The treatment is cell-free viral lysate (vDOM), not a phage infection:
+    vDOM was made by lysing axenic Synechococcus WH8102 with cyanophage S-ShM2 and
+    passing the lysate through a 0.2 um filter to remove cell debris. A 0.2 um filter
+    does not retain phage particles, so S-ShM2 virions were probably present, but
+    S-ShM2 does not infect Prochlorococcus MIT9313; no phage is recorded as a treatment
+    organism. treatment_type is carbon because the added variable is dissolved organic
+    matter (the paper also reports high combined amino acids, i.e. organic nitrogen,
+    in the vDOM).'
   distinct_gene_count: 427
   experiment_id: 10.1111/1462-2920.14513_viral_viral_dom_vdom_addition_mit9313_rnaseq
   experiment_name: MIT9313 Viral DOM (vDOM) addition vs Pro99 growth medium control
@@ -7574,8 +8123,10 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 2267
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_05e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
@@ -7621,8 +8172,10 @@ rows:
   coculture_partner:
   - Alteromonas macleodii HOT1A3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 2268
   experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_mit9313_rnaseq_inoc_5e6
   experiment_name: MIT9313 Coculture with Alteromonas HOT1A3 vs Pro99 medium growth
@@ -7673,10 +8226,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 5
   derived_metric_value_kinds:
   - boolean
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1038/ismej.2014.57_tss_mapping_mit9313
   experiment_name: MIT9313 transcriptome architecture mapping (TSS map, 454 + Solexa
@@ -7720,11 +8275,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: vesicle
+  control_timing: null
   derived_metric_count: 3
   derived_metric_value_kinds:
   - boolean
   - categorical
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1126/science.1243457_vesicle_proteomics_mit9313
   experiment_name: MIT9313 vesicle proteome (LC-MS/MS, presence + Mascot probability
@@ -7766,8 +8323,13 @@ rows:
   clustering_analysis_count: 1
   coculture_partner: []
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'R (rescue: 72h vs 53h): the -Fe cultures 18h after iron addition
+    at 54h (sampled at 72h) vs the same -Fe cultures before rescue, sampled at 53h
+    (nutrient_limited, iron-starved). Within-culture before/after comparison, no parallel
+    untreated control at 72h.'
   distinct_gene_count: 97
   experiment_id: 10.1038/ismej.2011.49_iron_rescue_mit9313_microarray
   experiment_name: MIT9313 Iron rescue - after vs before iron re-addition (MIT9313)
@@ -7816,8 +8378,10 @@ rows:
   clustering_analysis_count: 1
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 97
   experiment_id: 10.1038/ismej.2011.49_iron_iron_starvation_mit9313_mit9313_microarray
   experiment_name: MIT9313 Iron starvation (MIT9313) vs Iron-replete control (MIT9313)
@@ -7884,8 +8448,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'steady state: log-phase cultures acclimated to the alternative N
+    source vs log-phase cultures on ammonium (exponential). Methods do not state that
+    both arms were harvested on the same day; matched by growth state, assumed from
+    the acclimated parallel-culture design.'
   distinct_gene_count: 2241
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_nitrite_as_mit9313_microarray
   experiment_name: MIT9313 Growth on nitrite as sole N source (MIT9313) vs N-replete
@@ -7937,8 +8506,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'steady state: log-phase cultures acclimated to the alternative N
+    source vs log-phase cultures on ammonium (exponential). Methods do not state that
+    both arms were harvested on the same day; matched by growth state, assumed from
+    the acclimated parallel-culture design.'
   distinct_gene_count: 2241
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_mit9313_microarray
   experiment_name: MIT9313 Growth on urea as sole N source (MIT9313) vs N-replete
@@ -7991,8 +8565,13 @@ rows:
   clustering_analysis_count: 1
   coculture_partner: []
   compartment: whole_cell
+  control_timing: mixed
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: '-N vs +NH4 cultures sampled in parallel after resuspension at t=0,
+    matched at 6h, 12h and 48h. 24h: -N sampled at 24h vs +NH4 sampled at 12h (exponential),
+    because the 24h +NH4 arrays hybridized poorly. 0h: one of the +NH4 0h arrays was
+    replaced by a +NH4 3h array; 3h is matched.'
   distinct_gene_count: 2241
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_mit9313_mit9313_microarray
   experiment_name: MIT9313 Nitrogen deprivation (MIT9313) vs N-replete Pro99 medium
@@ -8075,8 +8654,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 177
   experiment_id: 10.1073/pnas.0601301103_phosphorus_phosphate_starvation_mit9313_microarray
   experiment_name: MIT9313 Phosphate starvation vs P-replete Pro99 medium (MICROARRAY)
@@ -8146,8 +8727,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 2190
   experiment_id: 10.3389/fmicb.2022.1038136_salt_low_salinity_acclimation_28_natl1a_rnaseq
   experiment_name: NATL1A Low salinity acclimation (28 psu) vs Normal seawater salinity
@@ -8205,8 +8788,10 @@ rows:
   coculture_partner:
   - Alteromonas macleodii MIT1002
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 2015
   experiment_id: 10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_natl2a_rnaseq
   experiment_name: NATL2A Dark-tolerant co-culture under 13:11 diel light:dark cycle
@@ -8299,8 +8884,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'HDPE exposure: the paper gives 120 min, while the GEO GSE118155 protocol
+    says the HDPE and control cultures were harvested after 180 min; the timepoint
+    follows the paper.'
   distinct_gene_count: 131
   experiment_id: 10.1038/s42003-019-0410-x_plastic_hdpe_plastic_leachate_50_natl2a_rnaseq
   experiment_name: NATL2A HDPE plastic leachate (50% dilution) vs AMP1 media control
@@ -8351,8 +8940,15 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: '90 min: PVC-exposed cultures were harvested after 90 min and the
+    shared AMP1 no-leachate control after 180 min (GEO GSE118155 protocol; the paper
+    does not state the control harvest time). Treated as matched: treatment and control
+    are parallel exponential cultures and the exposure length is part of the treatment.
+    The same three control libraries serve as control for the HDPE experiment of this
+    strain.'
   distinct_gene_count: 64
   experiment_id: 10.1038/s42003-019-0410-x_plastic_pvc_plastic_leachate_2_natl2a_rnaseq
   experiment_name: NATL2A PVC plastic leachate (2% dilution) vs AMP1 media control
@@ -8400,10 +8996,13 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 3
   derived_metric_value_kinds:
   - boolean
   - categorical
+  design_notes: Dark and diel arms were split from the same bottles at 24 h and sampled
+    at the same times at every timepoint.
   distinct_gene_count: 1954
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_axenic
   experiment_name: NATL2A Extended darkness vs 13:11 diel light:dark cycle control
@@ -8466,9 +9065,12 @@ rows:
   coculture_partner:
   - Alteromonas macleodii MIT1002
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 2
   derived_metric_value_kinds:
   - boolean
+  design_notes: Dark and diel arms were split from the same bottles at 24 h and sampled
+    at the same times at every timepoint.
   distinct_gene_count: 1954
   experiment_id: 10.1128/mSystems.00040-18_darkness_extended_darkness_natl2a_rnaseq_coculture
   experiment_name: NATL2A Extended darkness vs 13:11 diel light:dark cycle control
@@ -8529,8 +9131,13 @@ rows:
   coculture_partner:
   - Alteromonas macleodii MIT1002
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Each time point compares coculture and axenic bottles split from the
+    same starter cultures and sampled at the same time. At -12h Alteromonas had not
+    yet been added (added at 0 h), so that contrast is a pre-treatment baseline check
+    between two axenic sets of bottles.
   distinct_gene_count: 353
   experiment_id: 10.1038/ismej.2016.82_coculture_alteromonas_macleodii_mit1002_natl2a_rnaseq
   experiment_name: NATL2A Co-culture with Alteromonas macleodii MIT1002 vs Axenic
@@ -8619,8 +9226,14 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: mixed
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: '4h, 24h, 46h, 59h and 59h (P added): P-limited (or P re-added at
+    46h) cultures vs the nutrient-replete control sampled at the same hour (Table
+    S1 lists replete libraries at 4, 24, 46 and 59 h). 50h (P added): no replete library
+    exists at 50 h, so the control was sampled at another time (46 h or 59 h, exponential,
+    not stated) - not matched.'
   distinct_gene_count: 34
   experiment_id: 10.1111/1462-2920.13104_phosphorus_plimited_natl2a_rnaseq_uninfected
   experiment_name: NATL2A P-limited vs P-replete control (RNASEQ)
@@ -8703,8 +9316,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 34
   experiment_id: 10.1111/1462-2920.13104_phosphorus_plimited_natl2a_rnaseq_infected
   experiment_name: NATL2A P-limited vs P-replete control, phage-infected (RNASEQ)
@@ -8799,8 +9414,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: Pi-replete and Pi-deplete
+    cultures were grown in parallel and each harvested in mid-exponential phase (supplementary
+    methods); no common harvest date is stated.'
   distinct_gene_count: 63
   experiment_id: 10.1186/2046-9063-8-7_pi_limitation_natl2a_itraq
   experiment_name: 'NATL2A proteomics: Pi replete vs Pi deplete (iTRAQ)'
@@ -8850,8 +9469,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 930
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -8900,8 +9523,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 929
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -8950,8 +9577,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 930
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: light +100 nM glucose vs light (control)'
@@ -9000,8 +9631,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 928
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_ss120_proteomics
   experiment_name: 'SS120 proteomics: light +5 mM glucose vs light (control)'
@@ -9050,8 +9685,10 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Axenic status of the SS120 cultures is not stated in the paper.
   distinct_gene_count: 362
   experiment_id: 10.1128/mSystems.00008-17_azaserine_ss120_proteomics
   experiment_name: 'SS120 proteomics: control vs azaserine (N-limitation proxy)'
@@ -9096,8 +9733,12 @@ rows:
   clustering_analysis_count: 0
   coculture_partner: []
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: Pi-replete and Pi-deplete
+    cultures were grown in parallel and each harvested at the onset of stationary
+    phase (supplementary methods); no common harvest date is stated.'
   distinct_gene_count: 34
   experiment_id: 10.1186/2046-9063-8-7_pi_limitation_ss120_itraq
   experiment_name: 'SS120 proteomics: Pi replete vs Pi deplete (iTRAQ)'
@@ -9149,8 +9790,10 @@ rows:
   coculture_partner:
   - Synechococcus elongatus PCC 7942
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 5103
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_pputida_axenic_rnaseq
   experiment_name: P. putida cscRABY coculture with S. elongatus cscB vs axenic P.
@@ -9202,8 +9845,10 @@ rows:
   coculture_partner:
   - Synechococcus elongatus PCC 7942
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 228
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_pputida_axenic_proteomics
   experiment_name: P. putida cscRABY coculture with S. elongatus cscB vs axenic P.
@@ -9252,8 +9897,15 @@ rows:
   coculture_partner:
   - Synechococcus WH7803
   compartment: exoproteome
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Every timepoint (day 3, day 7, day 14, day 21, day 32, day 60, day
+    100) is compared with day 1 of the same coculture series (separate triplicate
+    flasks harvested per day), so the control is the day 1 coculture exoproteome (exponential,
+    one day after co-inoculation); there is no axenic arm. In ASW day 21 marks the
+    exponential to stable-state transition. Each contrast is a separate two-sample
+    t-test in Perseus.
   distinct_gene_count: 222
   experiment_id: 10.1111/1462-2920.14012_rpom_dss3_exoproteome_asw
   experiment_name: R. pomeroyi DSS-3 exoproteome time course in ASW coculture with
@@ -9346,8 +9998,14 @@ rows:
   coculture_partner:
   - Synechococcus WH7803
   compartment: exoproteome
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Every timepoint (day 3, day 7, day 14, day 21, day 32, day 60, day
+    100) is compared with day 1 of the same coculture series (separate triplicate
+    flasks harvested per day), so the control is the day 1 coculture exoproteome (exponential,
+    one day after co-inoculation); there is no axenic arm. In SW the coculture reaches
+    its stable state at day 21. Each contrast is a separate two-sample t-test in Perseus.
   distinct_gene_count: 184
   experiment_id: 10.1111/1462-2920.14012_rpom_dss3_exoproteome_sw
   experiment_name: R. pomeroyi DSS-3 exoproteome time course in SW coculture with
@@ -9440,8 +10098,10 @@ rows:
   coculture_partner:
   - Synechococcus WH7803
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 1724
   experiment_id: 10.1038/nmicrobiol.2017.100_longterm_coculture_rpom_dss3_proteomics
   experiment_name: R. pomeroyi DSS-3 proteome in coculture with Synechococcus WH7803
@@ -9489,10 +10149,12 @@ rows:
   coculture_partner:
   - Synechococcus WH7803
   compartment: exoproteome
+  control_timing: null
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1002/pmic.201400562_dss3_exoproteome_with_wh7803
   experiment_name: Ruegeria pomeroyi DSS-3 exoproteome in co-culture with Synechococcus
@@ -9532,10 +10194,12 @@ rows:
   coculture_partner:
   - Synechococcus WH8102
   compartment: exoproteome
+  control_timing: null
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
   - numeric
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1002/pmic.201400562_dss3_exoproteome_with_wh8102
   experiment_name: Ruegeria pomeroyi DSS-3 exoproteome in co-culture with Synechococcus
@@ -9587,8 +10251,13 @@ rows:
   coculture_partner:
   - Synechococcus PCC 7002
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the conditions are
+    successive steady states of one chemostat (axenic, then lactate coculture, then
+    HCO3- coculture), each sampled after at least five volume changes under steady-state
+    conditions.'
   distinct_gene_count: 1295
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_axenic_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture (HCO3-) vs axenic (SOLiD RNA-seq)
@@ -9646,8 +10315,13 @@ rows:
   coculture_partner:
   - Synechococcus PCC 7002
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the conditions are
+    successive steady states of one chemostat (axenic, then lactate coculture, then
+    HCO3- coculture), each sampled after at least five volume changes under steady-state
+    conditions.'
   distinct_gene_count: 455
   experiment_id: 10.1038/ismej.2014.69_coculture_lactate_vs_axenic_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture (lactate) vs axenic (SOLiD RNA-seq)
@@ -9705,8 +10379,13 @@ rows:
   coculture_partner:
   - Synechococcus PCC 7002
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the conditions are
+    successive steady states of one chemostat (axenic, then lactate coculture, then
+    HCO3- coculture), each sampled after at least five volume changes under steady-state
+    conditions.'
   distinct_gene_count: 1226
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_lactate_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture HCO3- vs coculture lactate (SOLiD
@@ -9756,8 +10435,13 @@ rows:
   coculture_partner:
   - Alteromonas macleodii EZ55
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: both pCO2 arms were
+    acclimated for three transfer cycles and harvested in exponential growth in the
+    final cycle (Methods p. 2). adjusted_p_value on these edges is the unadjusted
+    p-value reported by the paper (no multiple-testing correction).'
   distinct_gene_count: 27
   experiment_id: 10.1038/s43705-022-00197-2_carbon_stress_elevated_pco2_800_ppm_cc9311_rnaseq
   experiment_name: CC9311 Elevated pCO2 (800 ppm) vs Ambient pCO2 (400 ppm) (RNASEQ)
@@ -9815,8 +10499,13 @@ rows:
   coculture_partner:
   - Shewanella sp. W3-18-1
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the conditions are
+    successive steady states of one chemostat (axenic, then lactate coculture, then
+    HCO3- coculture), each sampled after at least five volume changes under steady-state
+    conditions.'
   distinct_gene_count: 670
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_axenic_syn7002_rnaseq
   experiment_name: Synechococcus 7002 coculture (HCO3-) vs axenic (SOLiD RNA-seq)
@@ -9874,8 +10563,13 @@ rows:
   coculture_partner:
   - Shewanella sp. W3-18-1
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the conditions are
+    successive steady states of one chemostat (axenic, then lactate coculture, then
+    HCO3- coculture), each sampled after at least five volume changes under steady-state
+    conditions.'
   distinct_gene_count: 1143
   experiment_id: 10.1038/ismej.2014.69_coculture_lactate_vs_axenic_syn7002_rnaseq
   experiment_name: Synechococcus 7002 coculture (lactate) vs axenic (SOLiD RNA-seq)
@@ -9933,8 +10627,13 @@ rows:
   coculture_partner:
   - Shewanella sp. W3-18-1
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: the conditions are
+    successive steady states of one chemostat (axenic, then lactate coculture, then
+    HCO3- coculture), each sampled after at least five volume changes under steady-state
+    conditions.'
   distinct_gene_count: 673
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_lactate_syn7002_rnaseq
   experiment_name: Synechococcus 7002 coculture HCO3- vs coculture lactate (SOLiD
@@ -9985,8 +10684,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -10035,8 +10738,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -10085,8 +10792,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: light +100 nM glucose vs light (control)'
@@ -10135,8 +10846,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 359
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_wh7803_proteomics
   experiment_name: 'WH7803 proteomics: light +5 mM glucose vs light (control)'
@@ -10184,8 +10899,15 @@ rows:
   coculture_partner:
   - Phage
   compartment: whole_cell
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Every infected timepoint (15 min, 1h, 3h, 5h, 7h) is compared with
+    one parallel uninfected control culture sampled 30 min after the start (exponential),
+    so no contrast is matched. A second uninfected control sampled at 8 h was not
+    used because edgeR found no differences between the 30 min and 8 h controls. adjusted_p_value
+    on these edges is the unadjusted p-value reported by the paper (no multiple-testing
+    correction).
   distinct_gene_count: 2455
   experiment_id: 10.1002/mbo3.1150_viral_s_sbp1_infection_wh7803_rnaseq
   experiment_name: WH7803 Cyanopodovirus S-SBP1 infection vs Uninfected control (RNASEQ)
@@ -10262,8 +10984,15 @@ rows:
   coculture_partner:
   - Ruegeria pomeroyi DSS-3
   compartment: exoproteome
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Every timepoint (day 3, day 7, day 14, day 21, day 32, day 60, day
+    100) is compared with day 1 of the same coculture series (separate triplicate
+    flasks harvested per day), so the control is the day 1 coculture exoproteome (exponential,
+    one day after co-inoculation); there is no axenic arm. In ASW day 21 marks the
+    exponential to stable-state transition. Each contrast is a separate two-sample
+    t-test in Perseus.
   distinct_gene_count: 221
   experiment_id: 10.1111/1462-2920.14012_syn_wh7803_exoproteome_asw
   experiment_name: Synechococcus WH7803 exoproteome time course in ASW coculture with
@@ -10358,8 +11087,14 @@ rows:
   coculture_partner:
   - Ruegeria pomeroyi DSS-3
   compartment: exoproteome
+  control_timing: baseline
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Every timepoint (day 3, day 7, day 14, day 21, day 32, day 60, day
+    100) is compared with day 1 of the same coculture series (separate triplicate
+    flasks harvested per day), so the control is the day 1 coculture exoproteome (exponential,
+    one day after co-inoculation); there is no axenic arm. In SW the coculture reaches
+    its stable state at day 21. Each contrast is a separate two-sample t-test in Perseus.
   distinct_gene_count: 187
   experiment_id: 10.1111/1462-2920.14012_syn_wh7803_exoproteome_sw
   experiment_name: Synechococcus WH7803 exoproteome time course in SW coculture with
@@ -10453,8 +11188,12 @@ rows:
   coculture_partner:
   - Ruegeria pomeroyi DSS-3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Cells were collected at 35 days (arrow in Fig. 1c), when both the
+    co-culture and the axenic cultures were at maximal cell density after exponential
+    growth, before the axenic cultures died (4-6 weeks).
   distinct_gene_count: 564
   experiment_id: 10.1038/nmicrobiol.2017.100_early_coculture_syn_wh7803_proteomics
   experiment_name: Synechococcus WH7803 proteome in coculture with R. pomeroyi DSS-3
@@ -10504,8 +11243,10 @@ rows:
   coculture_partner:
   - Ruegeria pomeroyi DSS-3
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 1050
   experiment_id: 10.1038/nmicrobiol.2017.100_late_coculture_syn_wh7803_proteomics
   experiment_name: Synechococcus WH7803 proteome in coculture with R. pomeroyi DSS-3
@@ -10561,8 +11302,14 @@ rows:
   coculture_partner:
   - Phage
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Uninfected control cultures were sampled at every timepoint ("2-5
+    min", "30 min" to "240 min") in triplicate, and the limma log-ratios are infected
+    vs control at the same timepoint. For the 2-5 min point the control column is
+    labelled 0 and a figure legend calls it the control prior to infection, so that
+    control may precede the infected sample by a few minutes.
   distinct_gene_count: 2525
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh7803
   experiment_name: WH7803 cyanophage Syn9 infection time course (microarray)
@@ -10658,8 +11405,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 895
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -10708,8 +11459,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 895
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -10758,8 +11513,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 894
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: light +100 nM glucose vs light (control)'
@@ -10808,8 +11567,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from a paired t-test.
   distinct_gene_count: 895
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_wh8102_proteomics
   experiment_name: 'WH8102 proteomics: light +5 mM glucose vs light (control)'
@@ -10857,8 +11620,13 @@ rows:
   coculture_partner:
   - Alteromonas macleodii EZ55
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state, not by sampling day: both pCO2 arms were
+    acclimated for three transfer cycles and harvested in exponential growth in the
+    final cycle (Methods p. 2). adjusted_p_value on these edges is the unadjusted
+    p-value reported by the paper (no multiple-testing correction).'
   distinct_gene_count: 12
   experiment_id: 10.1038/s43705-022-00197-2_carbon_stress_elevated_pco2_800_ppm_wh8102_rnaseq
   experiment_name: WH8102 Elevated pCO2 (800 ppm) vs Ambient pCO2 (400 ppm) (RNASEQ)
@@ -10912,8 +11680,14 @@ rows:
   coculture_partner:
   - Phage
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Uninfected control cultures were sampled at every timepoint ("2-5
+    min", "0.5 h" to "4 h") in triplicate, and the limma log-ratios are infected vs
+    control at the same timepoint. For the 2-5 min point the control column is labelled
+    0 and a figure legend calls it the control prior to infection, so that control
+    may precede the infected sample by a few minutes.
   distinct_gene_count: 2509
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8102
   experiment_name: WH8102 cyanophage Syn9 infection time course (microarray)
@@ -11008,8 +11782,10 @@ rows:
   coculture_partner:
   - Vibrio parahaemolyticus
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 574
   experiment_id: 10.1111/j.1462-2920.2009.01997.x_vibrio_coculture_wh8102_microarray
   experiment_name: WH8102 coculture with V. parahaemolyticus vs monoculture (microarray)
@@ -11070,8 +11846,14 @@ rows:
   coculture_partner:
   - Phage
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Uninfected control cultures were sampled at every timepoint ("2-5
+    min", "0.5 h" to "4 h") in triplicate, and the limma log-ratios are infected vs
+    control at the same timepoint. For the 2-5 min point the control column is labelled
+    0 and a figure legend calls it the control prior to infection, so that control
+    may precede the infected sample by a few minutes.
   distinct_gene_count: 2589
   experiment_id: 10.1038/ismej.2015.210_syn9_infection_wh8109
   experiment_name: WH8109 cyanophage Syn9 infection time course (microarray)
@@ -11169,8 +11951,10 @@ rows:
   coculture_partner:
   - Pseudomonas putida KT2440
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 2626
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_rnaseq
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
@@ -11222,8 +12006,10 @@ rows:
   coculture_partner:
   - Pseudomonas putida KT2440
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 522
   experiment_id: 10.1038/s42003-024-06098-5_coculture_vs_selongatus_axenic_proteomics
   experiment_name: S. elongatus cscB coculture with P. putida cscRABY vs axenic S.
@@ -11273,8 +12059,13 @@ rows:
   coculture_partner:
   - Escherichia coli
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: Methods do not state the RNA sampling day; the axenic control was
+    collected "meanwhile" in the same amount (5 OD750), so a matched harvest at 4
+    days is assumed from the parallel design (the proteomics methods state the same
+    incubation time).
   distinct_gene_count: 129
   experiment_id: 10.1186/s13068-022-02163-5_coculture_ecoli_vs_axenic_utex2973_rnaseq
   experiment_name: S. elongatus UTEX 2973 cscB+ coculture with E. coli ABKm vs axenic
@@ -11332,8 +12123,10 @@ rows:
   coculture_partner:
   - Escherichia coli
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 34
   experiment_id: 10.1186/s13068-022-02163-5_coculture_ecoli_vs_axenic_utex2973_proteomics
   experiment_name: S. elongatus UTEX 2973 cscB+ coculture with E. coli ABKm vs axenic
@@ -11384,8 +12177,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 163
   experiment_id: 10.1128/spectrum.03275-22_dark_low_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: darkness +100 nM glucose vs darkness (control)'
@@ -11434,8 +12231,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 163
   experiment_id: 10.1128/spectrum.03275-22_dark_high_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: darkness +5 mM glucose vs darkness (control)'
@@ -11484,8 +12285,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 163
   experiment_id: 10.1128/spectrum.03275-22_light_low_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: light +100 nM glucose vs light (control)'
@@ -11534,8 +12339,12 @@ rows:
   - Alteromonas (MarRef v6)
   - Marinobacter (MarRef v6)
   compartment: whole_cell
+  control_timing: matched
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: adjusted_p_value on these edges is the unadjusted p-value reported
+    by the paper (no multiple-testing correction). The p-values are one-tailed (half
+    the two-tailed value) from an unpaired Student t-test.
   distinct_gene_count: 162
   experiment_id: 10.1128/spectrum.03275-22_light_high_glucose_bl107_proteomics
   experiment_name: 'BL107 proteomics: light +5 mM glucose vs light (control)'
@@ -11591,8 +12400,10 @@ rows:
   coculture_partner:
   - Meiothermus ruber
   compartment: whole_cell
+  control_timing: null
   derived_metric_count: 0
   derived_metric_value_kinds: []
+  design_notes: null
   distinct_gene_count: 0
   experiment_id: 10.1128/mSystems.00181-16_coculture_bp1_mruber_light_oxygen_rnaseq
   experiment_name: BP-1 transcriptome profiling in coculture with M. ruber across

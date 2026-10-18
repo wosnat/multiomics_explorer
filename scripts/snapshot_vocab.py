@@ -31,6 +31,7 @@ SNAPSHOT_PROPERTIES = [
     "compartment",
     "omics_type",
     "table_scope",
+    "control_timing",
     "growth_phase",
     "value_kind",
     "detection_status",

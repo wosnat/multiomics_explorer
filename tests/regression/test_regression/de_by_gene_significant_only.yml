@@ -1,7 +1,8 @@
 case_id: de_by_gene_significant_only
 row_count: 7
 rows:
-- experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
+- control_timing: matched
+  experiment_id: 10.1038/ismej.2016.70_coculture_alteromonas_hot1a3_med4_rnaseq
   expression_status: significant_down
   gene_name: dnaN
   growth_phase: exponential
@@ -16,7 +17,8 @@ rows:
   timepoint_order: 1
   treatment_type:
   - coculture
-- experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
+- control_timing: matched
+  experiment_id: 10.1038/ismej.2017.88_nitrogen_stress_ndepleted_pro99_medium_med4_rnaseq
   expression_status: significant_up
   gene_name: dnaN
   growth_phase: acute_stress
@@ -31,7 +33,8 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
-- experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
+- control_timing: baseline
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic
   expression_status: significant_up
   gene_name: dnaN
   growth_phase: death
@@ -46,7 +49,8 @@ rows:
   timepoint_order: 1
   treatment_type:
   - nitrogen
-- experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
+- control_timing: matched
+  experiment_id: 10.1101/2025.11.24.690089_coculture_alteromonas_hot1a3_med4_rnaseq
   expression_status: significant_down
   gene_name: dnaN
   growth_phase: nutrient_limited
@@ -61,7 +65,8 @@ rows:
   timepoint_order: 2
   treatment_type:
   - coculture
-- experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
+- control_timing: matched
+  experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
   expression_status: significant_up
   gene_name: dnaN
   growth_phase: diel
@@ -76,7 +81,8 @@ rows:
   timepoint_order: 2
   treatment_type:
   - light
-- experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
+- control_timing: baseline
+  experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   expression_status: significant_up
   gene_name: dnaN
   growth_phase: nutrient_limited
@@ -91,7 +97,8 @@ rows:
   timepoint_order: 2
   treatment_type:
   - nitrogen
-- experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
+- control_timing: matched
+  experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
   expression_status: significant_up
   gene_name: dnaN
   growth_phase: diel

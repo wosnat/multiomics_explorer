@@ -19,7 +19,9 @@ Three tools cover DE at different grains — pick by the shape of the question:
 | `gene_response_profile` | Cross-experiment rollup for ONE organism (inferred from `locus_tags`) — one row per gene, responses bucketed per treatment group with timepoints collapsed, broadest first |
 
 Use `differential_expression_by_gene` for row-level fold changes and
-timepoint dynamics. Use `differential_expression_by_ortholog` to compare a
+timepoint dynamics — a row's timepoint and `growth_phase` are the treatment
+arm's; check its `control_timing` and the experiment's `design_notes` before
+comparing timepoints (docs://guide/conventions). Use `differential_expression_by_ortholog` to compare a
 group's response across strains — per-gene detail still comes from
 `differential_expression_by_gene`, membership from `genes_by_homolog_group`.
 Both DE tools take `treatment_type=` / `background_factors=` /
