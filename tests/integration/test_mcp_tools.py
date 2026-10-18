@@ -2624,9 +2624,10 @@ class TestListMetabolites:
         """N-bearing metabolites total (1693 → 1688 at the 2026-10-15
         metabolite-identity rebuild: merges + role removal; → 1692 at the
         2026-10-15T19:17Z stereo-guard rebuild: 9 stereo splits + 2
-        keep_separate)."""
+        keep_separate; → 1694 at the 2026-10-18T18:40Z GO-transport rebuild:
+        2 of the 29 new GO-substrate nodes carry N)."""
         result = api.list_metabolites(elements=["N"], conn=conn)
-        assert result["total_matching"] == 1692
+        assert result["total_matching"] == 1694
 
     def test_elements_n_and_p_filter(self, conn):
         """Multi-element AND filter (must contain both N and P)."""
@@ -4943,12 +4944,13 @@ class TestMetaboliteIdentitySurface:
     def test_structure_kind_generic_polymer(self, conn):
         out = api.list_metabolites(
             structure_kind=["generic", "polymer"], summary=True, conn=conn)
-        assert out["total_matching"] == 650
+        # 650 → 675 2026-10-18T18:40Z: 25 of the 29 new GO-substrate nodes are generic.
+        assert out["total_matching"] == 675
 
     def test_kegg_functional_category_peptides(self, conn):
         out = api.list_metabolites(
             kegg_functional_categories=["Peptides"], summary=True, conn=conn)
-        assert out["total_matching"] == 60
+        assert out["total_matching"] == 61  # 60 → 61: a new GO-substrate node
 
     def test_kegg_brite_class_fatty_acyls(self, conn):
         out = api.list_metabolites(
@@ -4975,13 +4977,14 @@ class TestMetaboliteIdentitySurface:
 
     def test_summary_not_classified_tails(self, conn):
         out = api.list_metabolites(summary=True, conn=conn)
+        # +29 GO-substrate nodes 2026-10-18T18:40Z (4 defined, 25 generic).
         assert out["by_kegg_functional_category"][-1] == {
-            "kegg_functional_category": "not classified", "count": 2880}
+            "kegg_functional_category": "not classified", "count": 2908}
         assert out["by_kegg_brite_class"][-1] == {
-            "kegg_brite_class": "not classified", "count": 2562}
+            "kegg_brite_class": "not classified", "count": 2591}
         assert {b["structure_kind"]: b["count"]
                 for b in out["by_structure_kind"]} == {
-            "defined": 2564, "generic": 624, "polymer": 26}
+            "defined": 2568, "generic": 649, "polymer": 26}
 
     def test_transport_n_breakdown(self, conn):
         out = api.list_metabolites(

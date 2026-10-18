@@ -271,14 +271,15 @@ list_filter_values(filter_type="evidence_source")
 {
   "filter_type": "evidence_source",
   "description": null,
-  "total_entries": 3,
-  "returned": 3,
+  "total_entries": 4,
+  "returned": 4,
   "truncated": false,
   "warnings": [],
   "results": [
     {"value": "metabolism", "count": 2221},
     {"value": "transport", "count": 1382},
-    {"value": "metabolomics", "count": 135}
+    {"value": "go_transport", "count": 208},
+    ...
   ]
 }
 ```

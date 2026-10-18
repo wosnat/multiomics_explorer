@@ -3,6 +3,8 @@ by_evidence_source:
   evidence_source: metabolism
 - count: 14
   evidence_source: transport
+- count: 8
+  evidence_source: go_transport
 - count: 2
   evidence_source: metabolomics
 by_kegg_brite_class:
@@ -103,6 +105,7 @@ results:
   - H
   - N
   evidence_sources:
+  - go_transport
   - metabolism
   - transport
   formula: H4N
@@ -146,6 +149,7 @@ results:
   - N
   - O
   evidence_sources:
+  - go_transport
   - metabolism
   - metabolomics
   - transport
@@ -237,6 +241,7 @@ results:
   elements:
   - O
   evidence_sources:
+  - go_transport
   - metabolism
   - transport
   formula: O2
@@ -335,6 +340,7 @@ results:
   - H
   - O
   evidence_sources:
+  - go_transport
   - metabolism
   - transport
   formula: CHO3
@@ -375,6 +381,7 @@ results:
   - H
   - O
   evidence_sources:
+  - go_transport
   - metabolism
   - transport
   formula: CHO2
@@ -474,6 +481,7 @@ results:
   - N
   - O
   evidence_sources:
+  - go_transport
   - metabolism
   - transport
   formula: NO2
@@ -505,6 +513,7 @@ results:
   - N
   - O
   evidence_sources:
+  - go_transport
   - metabolism
   - transport
   formula: HNO3
@@ -534,6 +543,7 @@ results:
   - N
   - O
   evidence_sources:
+  - go_transport
   - metabolism
   - transport
   formula: CNO
@@ -799,7 +809,7 @@ top_organisms:
   organism_name: Alteromonas mediterranea AltDE1
 - count: 15
   organism_name: Alteromonas macleodii BGP6
-total_entries: 3214
+total_entries: 3243
 total_matching: 18
 truncated: false
 warnings: []

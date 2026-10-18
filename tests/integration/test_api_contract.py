@@ -1474,12 +1474,13 @@ class TestPhase1PlumbingContract:
         assert "RNASEQ" in values
         assert "PROTEOMICS" in values
 
-    def test_list_filter_values_evidence_source_three_values(self, conn):
+    def test_list_filter_values_evidence_source_four_values(self, conn):
         """Spec §6.5: evidence_source filter returns metabolism / transport /
-        metabolomics with non-zero counts."""
+        metabolomics with non-zero counts; + go_transport (GO transport
+        substrates, KG 2026-10-18T18:40Z)."""
         result = api.list_filter_values(filter_type="evidence_source", conn=conn)
         values = {r["value"] for r in result["results"]}
-        assert values == {"metabolism", "transport", "metabolomics"}
+        assert values == {"metabolism", "transport", "metabolomics", "go_transport"}
         for r in result["results"]:
             assert r["count"] > 0
 

@@ -312,7 +312,7 @@ top_metabolite_pathways:
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-  pathway_metabolite_count: 1626
+  pathway_metabolite_count: 1627
   pathway_reaction_count: 1718
 top_metabolites:
 - formula: null

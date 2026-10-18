@@ -3,6 +3,8 @@ by_evidence_source:
   evidence_source: metabolism
 - count: 1382
   evidence_source: transport
+- count: 208
+  evidence_source: go_transport
 - count: 135
   evidence_source: metabolomics
 by_kegg_brite_class:
@@ -63,12 +65,12 @@ by_kegg_brite_class:
 - count: 1
   kegg_brite_class: 'Phytochemical compounds: Shikimate / acetate-malonate pathway
     derived compounds'
-- count: 2562
+- count: 2591
   kegg_brite_class: not classified
 by_kegg_functional_category:
 - count: 65
   kegg_functional_category: Carbohydrates
-- count: 60
+- count: 61
   kegg_functional_category: Peptides
 - count: 47
   kegg_functional_category: Nucleic acids
@@ -84,7 +86,7 @@ by_kegg_functional_category:
   kegg_functional_category: Hormones and transmitters
 - count: 15
   kegg_functional_category: Steroids
-- count: 2880
+- count: 2908
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment:
@@ -95,7 +97,7 @@ by_measurement_coverage:
   - compartment: whole_cell
     count: 135
   by_paper_count:
-  - count: 3079
+  - count: 3108
     paper_count: 0
   - count: 93
     paper_count: 1
@@ -104,16 +106,16 @@ by_measurement_coverage:
   - count: 5
     paper_count: 3
 by_structure_kind:
-- count: 2564
+- count: 2568
   structure_kind: defined
-- count: 624
+- count: 649
   structure_kind: generic
 - count: 26
   structure_kind: polymer
 case_id: list_metabolites_all
 mass_stats:
   mass_max: 5227.103
-  mass_median: 246.263
+  mass_median: 246.194
   mass_min: 1.00794
 not_found:
   elements: []
@@ -129,6 +131,7 @@ results:
   - H
   - O
   evidence_sources:
+  - go_transport
   - metabolism
   - transport
   formula: H2O
@@ -306,6 +309,7 @@ results:
   - O
   - P
   evidence_sources:
+  - go_transport
   - metabolism
   - transport
   formula: HO4P
@@ -337,7 +341,7 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 1626
+- count: 1627
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
 - count: 618
@@ -355,7 +359,7 @@ top_metabolite_pathways:
 - count: 125
   metabolite_pathway_id: kegg.pathway:ko01230
   metabolite_pathway_name: Biosynthesis of amino acids
-- count: 122
+- count: 124
   metabolite_pathway_id: kegg.pathway:ko02010
   metabolite_pathway_name: ABC transporters
 - count: 105
@@ -388,11 +392,11 @@ top_organisms:
   organism_name: Marinobacter (MarRef v6)
 - count: 2271
   organism_name: Alteromonas mediterranea AltDE1
-total_entries: 3214
-total_matching: 3214
+total_entries: 3243
+total_matching: 3243
 truncated: true
 warnings: []
 xref_coverage:
-  with_chebi: 3089
+  with_chebi: 3118
   with_hmdb: 1495
-  with_mnxm: 3203
+  with_mnxm: 3232

@@ -304,7 +304,7 @@
     RETURN count(m) AS metabolites,
            sum(CASE WHEN size(coalesce(m.kegg_functional_categories, [])) > 0 THEN 1 ELSE 0 END)
              AS with_functional_category
-  expect: {metabolites: 3214, with_functional_category: 334}
+  expect: {metabolites: 3243, with_functional_category: 335}
   tolerance: {rel: 0.05}
   used_in:
     - multiomics_explorer/mcp_server/tools.py
@@ -312,7 +312,7 @@
     - multiomics_explorer/inputs/tools/list_metabolites.yaml
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
   note: >
-    KEGG br08001 functional categories are partial: 334 of 3,214 metabolites carry one
+    KEGG br08001 functional categories are partial: 335 of 3,243 metabolites carry one
     (docs: '~10% listed' / 'absent for ~90%'). Fails ⇒ rewrite the coverage figure in the
     kegg_functional_categories descriptions and the KEGG-categories subsection.
 
@@ -325,7 +325,7 @@
            sum(CASE WHEN size(coalesce(m.kegg_functional_categories, []))
                        + size(coalesce(m.kegg_brite_classes, [])) > 0 THEN 1 ELSE 0 END)
              AS with_either
-  expect: {metabolites: 3214, with_brite_class: 652, with_either: 883}
+  expect: {metabolites: 3243, with_brite_class: 652, with_either: 884}
   tolerance: {rel: 0.05}
   used_in:
     - multiomics_explorer/mcp_server/tools.py
@@ -333,8 +333,8 @@
     - multiomics_explorer/inputs/tools/list_metabolites.yaml
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
   note: >
-    KEGG compound BRITE classes (7 trees other than br08001): 652 of 3,214 metabolites
-    (docs: '~20%' / 'absent for ~80%'); 883 (~27%) carry either field.
+    KEGG compound BRITE classes (7 trees other than br08001): 652 of 3,243 metabolites
+    (docs: '~20%' / 'absent for ~80%'); 884 (~27%) carry either field.
 
 - id: metabolite_kegg_classification_catalysed
   cypher: >
@@ -370,3 +370,15 @@
     - multiomics_explorer/inputs/tools/genes_by_metabolite.yaml
     - multiomics_explorer/inputs/tools/metabolites_by_gene.yaml
   note: "stereo-link coverage examples quoted in the 'What is and isn't linked' paragraph (generic → specific linked; class terms and ring/open-chain forms not)"
+
+- id: metabolite_go_transport_route
+  cypher: >
+    MATCH (m:Metabolite) WHERE 'go_transport' IN coalesce(m.evidence_sources, [])
+    RETURN count(m) AS go_transport_metabolites
+  expect: {go_transport_metabolites: 208}
+  tolerance: {rel: 0.05}
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
+  note: >
+    GO transport substrates (KG build 2026-10-18T18:40Z): 208 metabolites carry
+    evidence_sources 'go_transport'. Fails ⇒ rewrite the "fourth value" paragraph.

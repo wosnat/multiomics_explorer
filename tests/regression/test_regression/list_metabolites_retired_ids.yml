@@ -1,5 +1,7 @@
 by_evidence_source:
 - count: 1
+  evidence_source: go_transport
+- count: 1
   evidence_source: metabolism
 - count: 1
   evidence_source: transport
@@ -42,6 +44,7 @@ results:
   - N
   - O
   evidence_sources:
+  - go_transport
   - metabolism
   - transport
   formula: HNO3
@@ -108,7 +111,7 @@ top_organisms:
   organism_name: Alteromonas mediterranea AltDE1
 - count: 1
   organism_name: Alteromonas (MarRef v6)
-total_entries: 3214
+total_entries: 3243
 total_matching: 1
 truncated: false
 warnings:

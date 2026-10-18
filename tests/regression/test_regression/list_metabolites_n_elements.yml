@@ -5,6 +5,8 @@ by_evidence_source:
   evidence_source: transport
 - count: 101
   evidence_source: metabolomics
+- count: 85
+  evidence_source: go_transport
 by_kegg_brite_class:
 - count: 118
   kegg_brite_class: 'Lipids: Fatty acyls'
@@ -50,10 +52,10 @@ by_kegg_brite_class:
   kegg_brite_class: 'Natural toxins: Marine biotoxins'
 - count: 1
   kegg_brite_class: 'Phytochemical compounds: Terpenoids'
-- count: 1403
+- count: 1405
   kegg_brite_class: not classified
 by_kegg_functional_category:
-- count: 60
+- count: 61
   kegg_functional_category: Peptides
 - count: 47
   kegg_functional_category: Nucleic acids
@@ -69,7 +71,7 @@ by_kegg_functional_category:
   kegg_functional_category: Lipids
 - count: 2
   kegg_functional_category: Steroids
-- count: 1498
+- count: 1499
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment:
@@ -80,7 +82,7 @@ by_measurement_coverage:
   - compartment: whole_cell
     count: 101
   by_paper_count:
-  - count: 1591
+  - count: 1593
     paper_count: 0
   - count: 68
     paper_count: 1
@@ -89,9 +91,9 @@ by_measurement_coverage:
   - count: 1
     paper_count: 3
 by_structure_kind:
-- count: 1441
+- count: 1442
   structure_kind: defined
-- count: 246
+- count: 247
   structure_kind: generic
 - count: 5
   structure_kind: polymer
@@ -100,7 +102,7 @@ mass_stats:
   mass_max: 5227.103
   mass_median: 324.262
   mass_min: 18.039
-no_formula_excluded: 237
+no_formula_excluded: 258
 not_found:
   elements: []
   metabolite_ids: []
@@ -376,7 +378,7 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 899
+- count: 900
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
 - count: 327
@@ -400,7 +402,7 @@ top_metabolite_pathways:
 - count: 71
   metabolite_pathway_id: kegg.pathway:ko00230
   metabolite_pathway_name: Purine metabolism
-- count: 70
+- count: 71
   metabolite_pathway_id: kegg.pathway:ko02010
   metabolite_pathway_name: ABC transporters
 - count: 57
@@ -427,14 +429,14 @@ top_organisms:
   organism_name: Alteromonas macleodii ATCC27126
 - count: 1259
   organism_name: Alteromonas macleodii HOT1A3
-total_entries: 3214
-total_matching: 1692
+total_entries: 3243
+total_matching: 1694
 truncated: true
 warnings:
-- 237 metabolites have no formula and can never match an element filter (often generic
+- 258 metabolites have no formula and can never match an element filter (often generic
   classes such as 'amino acid' or 'dipeptide'). Re-run without elements to inspect
   them.
 xref_coverage:
-  with_chebi: 1624
+  with_chebi: 1626
   with_hmdb: 891
-  with_mnxm: 1688
+  with_mnxm: 1690

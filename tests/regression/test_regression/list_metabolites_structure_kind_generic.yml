@@ -3,6 +3,8 @@ by_evidence_source:
   evidence_source: metabolism
 - count: 330
   evidence_source: transport
+- count: 77
+  evidence_source: go_transport
 by_kegg_brite_class:
 - count: 34
   kegg_brite_class: 'Lipids: Fatty acyls'
@@ -14,22 +16,22 @@ by_kegg_brite_class:
   kegg_brite_class: 'Lipids: Sphingolipids'
 - count: 1
   kegg_brite_class: 'Lipids: Sterol lipids'
-- count: 551
+- count: 576
   kegg_brite_class: not classified
 by_kegg_functional_category:
 - count: 19
   kegg_functional_category: Lipids
 - count: 2
   kegg_functional_category: Antibiotics
-- count: 603
+- count: 628
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment: []
   by_paper_count:
-  - count: 624
+  - count: 649
     paper_count: 0
 by_structure_kind:
-- count: 624
+- count: 649
   structure_kind: generic
 case_id: list_metabolites_structure_kind_generic
 mass_stats:
@@ -100,11 +102,11 @@ top_organisms:
   organism_name: Alteromonas macleodii BS11
 - count: 509
   organism_name: Alteromonas (MarRef v6)
-total_entries: 3214
-total_matching: 624
+total_entries: 3243
+total_matching: 649
 truncated: true
 warnings: []
 xref_coverage:
-  with_chebi: 541
+  with_chebi: 566
   with_hmdb: 2
-  with_mnxm: 622
+  with_mnxm: 647

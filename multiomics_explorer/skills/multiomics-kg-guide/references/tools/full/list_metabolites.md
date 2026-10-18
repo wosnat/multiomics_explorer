@@ -134,7 +134,7 @@ list_metabolites(metabolite_ids=["chebi:14654"])
 
 ```example-response
 {
-  "total_entries": 3214,
+  "total_entries": 3243,
   "total_matching": 1,
   "top_organisms": [
     {"organism_name": "Alteromonas macleodii AD45", "count": 1},
@@ -168,7 +168,11 @@ list_metabolites(metabolite_ids=["chebi:14654"])
     },
     ...
   ],
-  "by_evidence_source": [{"evidence_source": "metabolism", "count": 1}, {"evidence_source": "transport", "count": 1}],
+  "by_evidence_source": [
+    {"evidence_source": "go_transport", "count": 1},
+    {"evidence_source": "metabolism", "count": 1},
+    {"evidence_source": "transport", "count": 1}
+  ],
   "xref_coverage": {"with_chebi": 1, "with_hmdb": 0, "with_mnxm": 1},
   "mass_stats": {"mass_min": 63.012, "mass_median": 63.012, "mass_max": 63.012},
   "by_measurement_coverage": {"by_paper_count": [{"paper_count": 0, "count": 1}], "by_compartment": []},
@@ -195,7 +199,7 @@ list_metabolites(metabolite_ids=["chebi:14654"])
       "organism_count": 43,
       "transporter_count": 15,
       "transporter_gene_count": 3549,
-      "evidence_sources": ["metabolism", "transport"],
+      "evidence_sources": ["go_transport", "metabolism", "transport"],
       "chebi_id": "48107",
       "pathway_ids": [
         "kegg.pathway:ko00910",
@@ -224,8 +228,8 @@ list_metabolites(structure_kind=["generic"], summary=True)
 
 ```example-response
 {
-  "total_entries": 3214,
-  "total_matching": 624,
+  "total_entries": 3243,
+  "total_matching": 649,
   "top_organisms": [
     {"organism_name": "Alteromonas macleodii MIT1002", "count": 522},
     {"organism_name": "Alteromonas macleodii HOT1A3", "count": 521},
@@ -262,15 +266,19 @@ list_metabolites(structure_kind=["generic"], summary=True)
     },
     ...
   ],
-  "by_evidence_source": [{"evidence_source": "metabolism", "count": 332}, {"evidence_source": "transport", "count": 330}],
-  "xref_coverage": {"with_chebi": 541, "with_hmdb": 2, "with_mnxm": 622},
+  "by_evidence_source": [
+    {"evidence_source": "metabolism", "count": 332},
+    {"evidence_source": "transport", "count": 330},
+    {"evidence_source": "go_transport", "count": 77}
+  ],
+  "xref_coverage": {"with_chebi": 566, "with_hmdb": 2, "with_mnxm": 647},
   "mass_stats": {"mass_min": null, "mass_median": null, "mass_max": null},
-  "by_measurement_coverage": {"by_paper_count": [{"paper_count": 0, "count": 624}], "by_compartment": []},
-  "by_structure_kind": [{"structure_kind": "generic", "count": 624}],
+  "by_measurement_coverage": {"by_paper_count": [{"paper_count": 0, "count": 649}], "by_compartment": []},
+  "by_structure_kind": [{"structure_kind": "generic", "count": 649}],
   "by_kegg_functional_category": [
     {"kegg_functional_category": "Lipids", "count": 19},
     {"kegg_functional_category": "Antibiotics", "count": 2},
-    {"kegg_functional_category": "not classified", "count": 603}
+    {"kegg_functional_category": "not classified", "count": 628}
   ],
   "by_kegg_brite_class": [
     {"kegg_brite_class": "Lipids: Fatty acyls", "count": 34},
@@ -301,8 +309,8 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
 
 ```example-response
 {
-  "total_entries": 3214,
-  "total_matching": 60,
+  "total_entries": 3243,
+  "total_matching": 61,
   "top_organisms": [
     {"organism_name": "Alteromonas mediterranea AltDE", "count": 54},
     {"organism_name": "Alteromonas macleodii ATCC27126", "count": 53},
@@ -315,7 +323,7 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
     {
       "metabolite_pathway_id": "kegg.pathway:ko01100",
       "metabolite_pathway_name": "Metabolic pathways",
-      "count": 57
+      "count": 58
     },
     {
       "metabolite_pathway_id": "kegg.pathway:ko01110",
@@ -325,7 +333,7 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
     {
       "metabolite_pathway_id": "kegg.pathway:ko00470",
       "metabolite_pathway_name": "D-Amino acid metabolism",
-      "count": 29
+      "count": 30
     },
     {
       "metabolite_pathway_id": "kegg.pathway:ko01230",
@@ -342,28 +350,29 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
   "by_evidence_source": [
     {"evidence_source": "metabolism", "count": 52},
     {"evidence_source": "transport", "count": 47},
-    {"evidence_source": "metabolomics", "count": 26}
+    {"evidence_source": "metabolomics", "count": 26},
+    {"evidence_source": "go_transport", "count": 24}
   ],
-  "xref_coverage": {"with_chebi": 60, "with_hmdb": 56, "with_mnxm": 60},
+  "xref_coverage": {"with_chebi": 61, "with_hmdb": 56, "with_mnxm": 61},
   "mass_stats": {"mass_min": 62.092, "mass_median": 133.171, "mass_max": 776.872},
   "by_measurement_coverage": {
-    "by_paper_count": [{"paper_count": 0, "count": 34}, {"paper_count": 1, "count": 14}, {"paper_count": 2, "count": 12}],
+    "by_paper_count": [{"paper_count": 0, "count": 35}, {"paper_count": 1, "count": 14}, {"paper_count": 2, "count": 12}],
     "by_compartment": [
       {"compartment": "extracellular", "count": 19},
       {"compartment": "vesicle", "count": 18},
       {"compartment": "whole_cell", "count": 26}
     ]
   },
-  "by_structure_kind": [{"structure_kind": "defined", "count": 60}],
+  "by_structure_kind": [{"structure_kind": "defined", "count": 61}],
   "by_kegg_functional_category": [
-    {"kegg_functional_category": "Peptides", "count": 60},
+    {"kegg_functional_category": "Peptides", "count": 61},
     {"kegg_functional_category": "Hormones and transmitters", "count": 10},
     {"kegg_functional_category": "not classified", "count": 0}
   ],
   "by_kegg_brite_class": [
     {"kegg_brite_class": "Phytochemical compounds: Alkaloids", "count": 3},
     {"kegg_brite_class": "Lipids: Fatty acyls", "count": 1},
-    {"kegg_brite_class": "not classified", "count": 56}
+    {"kegg_brite_class": "not classified", "count": 57}
   ],
   "score_max": null,
   "score_median": null,
@@ -385,7 +394,7 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
       "organism_count": 43,
       "transporter_count": 5,
       "transporter_gene_count": 786,
-      "evidence_sources": ["metabolism", "metabolomics", "transport"],
+      "evidence_sources": ["go_transport", "metabolism", "metabolomics", "transport"],
       "chebi_id": "16015",
       "pathway_ids": [
         "kegg.pathway:ko00220",
@@ -476,7 +485,7 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
       "organism_count": 43,
       "transporter_count": 10,
       "transporter_gene_count": 2011,
-      "evidence_sources": ["metabolism", "transport"],
+      "evidence_sources": ["go_transport", "metabolism", "transport"],
       "chebi_id": "15428",
       "pathway_ids": [
         "kegg.pathway:ko00120",
@@ -506,7 +515,7 @@ list_metabolites(kegg_brite_classes=["Lipids: Fatty acyls"], limit=3)
 
 ```example-response
 {
-  "total_entries": 3214,
+  "total_entries": 3243,
   "total_matching": 254,
   "top_organisms": [
     {"organism_name": "Ruegeria pomeroyi DSS-3", "count": 214},
@@ -547,7 +556,8 @@ list_metabolites(kegg_brite_classes=["Lipids: Fatty acyls"], limit=3)
   "by_evidence_source": [
     {"evidence_source": "metabolism", "count": 225},
     {"evidence_source": "transport", "count": 58},
-    {"evidence_source": "metabolomics", "count": 6}
+    {"evidence_source": "metabolomics", "count": 6},
+    {"evidence_source": "go_transport", "count": 5}
   ],
   "xref_coverage": {"with_chebi": 247, "with_hmdb": 158, "with_mnxm": 253},
   "mass_stats": {"mass_min": 45.017, "mass_median": 281.46, "mass_max": 1120.059},
@@ -648,7 +658,7 @@ list_metabolites(kegg_brite_classes=["Lipids: Fatty acyls"], limit=3)
       "organism_count": 43,
       "transporter_count": 13,
       "transporter_gene_count": 4031,
-      "evidence_sources": ["metabolism", "transport"],
+      "evidence_sources": ["go_transport", "metabolism", "transport"],
       "chebi_id": "15366",
       "pathway_ids": [
         "kegg.pathway:ko00010",
@@ -685,7 +695,7 @@ list_metabolites(metabolite_ids=["chebi:17234"])
 
 ```example-response
 {
-  "total_entries": 3214,
+  "total_entries": 3243,
   "total_matching": 1,
   "top_organisms": [
     {"organism_name": "Alteromonas macleodii AD45", "count": 1},
@@ -731,7 +741,16 @@ list_metabolites(metabolite_ids=["chebi:17234"])
       "measured_paper_count": 0,
       "measured_organisms": [],
       "measured_compartments": [],
-      "structure_kind": "defined"
+      "structure_kind": "defined",
+      "stereo_relatives": [
+        {
+          "metabolite_id": "kegg.compound:C00031",
+          "name": "D-Glucose",
+          "relation": "specific_form",
+          "catalyst_gene_count": 284,
+          "transporter_gene_count": 1436
+        }
+      ]
     }
   ]
 }
@@ -747,7 +766,7 @@ list_metabolites(metabolite_ids=["kegg.compound:C00736", "kegg.compound:C00097"]
 
 ```example-response
 {
-  "total_entries": 3214,
+  "total_entries": 3243,
   "total_matching": 2,
   "top_organisms": [
     {"organism_name": "Alteromonas macleodii AD45", "count": 2},
@@ -787,6 +806,7 @@ list_metabolites(metabolite_ids=["kegg.compound:C00736", "kegg.compound:C00097"]
   ],
   "by_evidence_source": [
     {"evidence_source": "transport", "count": 2},
+    {"evidence_source": "go_transport", "count": 1},
     {"evidence_source": "metabolism", "count": 1},
     {"evidence_source": "metabolomics", "count": 1}
   ],
@@ -822,7 +842,7 @@ list_metabolites(metabolite_ids=["kegg.compound:C00736", "kegg.compound:C00097"]
       "organism_count": 43,
       "transporter_count": 6,
       "transporter_gene_count": 2554,
-      "evidence_sources": ["metabolism", "metabolomics", "transport"],
+      "evidence_sources": ["go_transport", "metabolism", "metabolomics", "transport"],
       "chebi_id": "17561",
       "pathway_ids": [
         "kegg.pathway:ko00260",
@@ -904,7 +924,7 @@ list_metabolites(evidence_sources=["metabolomics"], summary=True)
 
 ```example-response
 {
-  "total_entries": 3214,
+  "total_entries": 3243,
   "total_matching": 135,
   "top_organisms": [
     {"organism_name": "Prochlorococcus MIT9313", "count": 134},
@@ -945,7 +965,8 @@ list_metabolites(evidence_sources=["metabolomics"], summary=True)
   "by_evidence_source": [
     {"evidence_source": "metabolomics", "count": 135},
     {"evidence_source": "metabolism", "count": 119},
-    {"evidence_source": "transport", "count": 104}
+    {"evidence_source": "transport", "count": 104},
+    {"evidence_source": "go_transport", "count": 41}
   ],
   "xref_coverage": {"with_chebi": 135, "with_hmdb": 126, "with_mnxm": 133},
   "mass_stats": {"mass_min": 89.094, "mass_median": 179.172, "mass_max": 1353.372},

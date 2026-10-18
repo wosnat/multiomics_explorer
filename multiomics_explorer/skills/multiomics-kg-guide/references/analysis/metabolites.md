@@ -21,6 +21,8 @@ The `metabolism` and `transport` rows share tools — the `evidence_source` fiel
 
 The `Metabolite.evidence_sources` list field on each Metabolite node already indicates which of the three pipelines contribute (e.g., `['metabolism', 'transport', 'metabolomics']`); read this to route quickly.
 
+A fourth value, `go_transport`, marks the 208 metabolites that a GO transport term names as its primary input (GO's `has primary input` axiom; edges `Molecular_function_transports_metabolite` / `Biological_process_transports_metabolite` from the GO term). It is a term definition, not a gene fact, and it is kept apart from `transport` (TCDB): `organism_count`, `transporter_gene_count` and `catalyst_gene_count` ignore it. The drill-down tools above do not walk this route yet — use `run_cypher` (Gene → GO term → Metabolite).
+
 **Metabolite ID forms.** Canonical `Metabolite.id` carries a namespace prefix: `kegg.compound:C00064`
 (KEGG-keyed, the large majority) or `chebi:17234` (ChEBI-only, mostly TCDB substrates). Each
 node also lists every identifier it answers to in `all_identifiers` — lower-case-prefixed
@@ -207,7 +209,7 @@ list and both are **partial**. Read this before using either to include, exclude
    curators place selected **representative** compounds under functional headings. It is not an
    exhaustive or rule-based chemical classification. A compound is in a category only if KEGG
    listed it there; the KG copies KEGG's assignments and never infers a category.
-2. **Coverage is low.** Only 334 of 3,214 metabolites (~10%) carry a category. Common central
+2. **Coverage is low.** Only 335 of 3,243 metabolites (~10%) carry a category. Common central
    metabolites the KG catalyses are often unclassified: 1,974 metabolites with catalyst genes
    have no category — fumarate, ethanol, L-carnitine and D-ribulose 5-phosphate among them.
 3. **Absence means "KEGG didn't list it", not "not in this category".** Fumarate is an organic
@@ -238,8 +240,8 @@ list and both are **partial**. Read this before using either to include, exclude
    (pesticides, toxins, endocrine disruptors). The tree prefix keeps same-named classes apart
    (`Pesticides: Pesticides` vs `Endocrine disrupting compounds: Pesticides and herbicides`).
    Coverage:
-   - 652 of 3,214 metabolites (~20%) have a class;
-   - with both fields, 883 (~27%) have something;
+   - 652 of 3,243 metabolites (~20%) have a class;
+   - with both fields, 884 (~27%) have something;
    - 687 of the 2,221 metabolites with catalyst genes have something.
 
    Only the top level of each tree is on the row. Deeper classes (e.g. the lipid subclass

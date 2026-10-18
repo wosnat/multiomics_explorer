@@ -83,9 +83,9 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/list_clustering_analyses/full` — ~2571 tok
 - `docs://tools/list_derived_metrics/full` — ~3493 tok
 - `docs://tools/list_experiments/full` — ~10460 tok
-- `docs://tools/list_filter_values/full` — ~7030 tok
+- `docs://tools/list_filter_values/full` — ~7032 tok
 - `docs://tools/list_metabolite_assays/full` — ~3970 tok
-- `docs://tools/list_metabolites/full` — ~13584 tok
+- `docs://tools/list_metabolites/full` — ~13754 tok
 - `docs://tools/list_organisms/full` — ~12678 tok
 - `docs://tools/list_publications/full` — ~8817 tok
 - `docs://tools/metabolites_by_flags_assay/full` — ~4799 tok
