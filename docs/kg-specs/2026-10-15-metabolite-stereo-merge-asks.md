@@ -560,3 +560,286 @@ anything named differently (e.g. "D-Hexose").
 **Explorer impact:** none in code. The hint and `include_stereo_forms` pick up new edges
 automatically. Goldens with these metabolites move on absorb. Until then the explorer docs say
 the edges are incomplete and name these examples.
+
+## KG reply, ask 8 (2026-10-16): root cause, sources evaluated, options (for discussion, nothing changed yet)
+
+### Root cause
+
+Your three causes reduce to one: **the edge rule asks ChEBI for evidence in a form ChEBI doesn't
+use for stereo-unspecified compounds.** Today `stereo_links` emits `specific → generic` only when
+(a) a ChEBI term of the specific node has a **direct** `is_a` to a term of the generic node, and (b)
+both nodes have an InChIKey with the same connectivity block. Checked against the raw ChEBI 256
+file:
+
+1. **ChEBI never links these directly.** It goes through the ring form, then the D-/L- form:
+   `D-glucopyranose > D-glucose > glucose`, `alpha-L-galactose > L-galactopyranose > L-galactose >
+   galactose`. That is 2–3 `is_a` steps in every sugar case. ChEBI has no "stereo form of" relation;
+   `is_enantiomer_of` is its only stereo-specific one.
+2. **ChEBI gives the stereo-unspecified terms no structure.** glucose, mannose, galactose,
+   arabinose, rhamnose, isoleucine and glucosamine have no SMILES or InChIKey in ChEBI, only a
+   generalized formula. Fructose has no formula either, which is why `C01496` reads
+   `structure_kind = generic`. Our parser loses nothing.
+3. **Some "generic" nodes carry one specific form's structure.** `C01582` Galactose carries
+   aldehydo-D-galactose's, and `C01452` Sorbose carries keto-D-sorbose's (also its `chebi_id`);
+   `C05052` Ribulose is similar. These come from KEGG itself: we checked KEGG's own MOL files, and
+   KEGG draws these generics as one stereo form. MNX copies that. `chebi:30867` dihydroorotate
+   carries the InChIKey and ChEBI id of (R)-dihydroorotic acid, because its MNX entity
+   (`MNXM726835`) *is* (R)-dihydroorotic acid. Its (S) form's `is_a` also points at the acid, which
+   the node holds only as a cross-reference.
+4. **Class terms** (amino acid, glucoside, galactoside, galacturonate): their "specific forms" are
+   many different compounds (glycine, etoposide, ADP-glucose, …).
+
+### Other sources we evaluated (to avoid a more complex ChEBI rule)
+
+- **KEGG MOL structures + InChIKey** (computed locally with RDKit). Rejected, for three reasons:
+  - 8 of the 14 generics are `chebi:` nodes with no KEGG entry;
+  - KEGG draws `C01582` / `C01452` / `C05052` stereo-specific, and draws "D-Hexose" `C00738`
+    stereo-free, so D-Hexose would look like everyone's parent;
+  - partially specified sugars (D-F6P vs β-D-F6P) have stereo on both sides, so "has a stereo
+    layer" can't tell parent from child.
+- **MetaNetX `chem_isom.tsv`** (MNX 4.5, 13,377 parent → child pairs). It reproduces 62 of our 76
+  edges, but **covers 1 of your 14** (D-glucose → glucose). It also mixes in class parents
+  (glucose → "D-Hexose", cholate → "Bile salt", maltodextrin → "Polysaccharide"), and it can't
+  relate the pairs MNX itself conflates (F6P, 3-phosphoglycerate, lipoate…). Rejected as a primary
+  source.
+
+The fact that "mannose" is the stereo-unspecified form of D-mannose exists **only in ChEBI's
+ontology**, because no source has a structure for the generic. So we keep ChEBI and make the rule
+simpler and more chemical, not add a source.
+
+### Options
+
+- **B (KG recommendation). ChEBI-only rule, chemistry rather than names, plus a tiny blocklist.**
+  - An `is_a` path of ≤ 3 steps where every term keeps the **same molecular formula and charge**.
+    This replaces the InChIKey-block test, which can't work without structures.
+  - The generic's term is not a ChEBI class (no structure and no concrete formula).
+  - Edges already implied through another node are dropped (β-D-glucose → D-glucose → glucose stays
+    two edges).
+  - Geometric pairs stay excluded (existing rule).
+  - **Simplification: read each node's *published* ChEBI ids** (`chebi_ids`, after the owner rule)
+    instead of every KEGG cross-reference. On its own this removes two errors:
+    - (S)-acetoin no longer holds "acetoin", so an existing (R)- → (S)-acetoin edge goes away;
+    - Galactose no longer holds α-D-galactose, so a Galactose ↔ D-Galactose cycle the path rule
+      would otherwise create goes away.
+
+  **Measured on today's data, before the published-ids change:** 24 new edges, 16 correct, covering
+  every non-class case in your table plus D-xylose, D-allose, D-sorbitol → glucitol, D-arabitol,
+  D-glucarate and GalNAc. The leftovers:
+  - 3 → "D-Hexose" `C00738`, a class that ChEBI gives a concrete formula: a 1-line `no_stereo_link:`
+    entry;
+  - 3 geometric pairs, caught by the existing rule;
+  - keto-D-fructose → D-fructose, a tautomer, not a stereo form;
+  - the Galactose cycle, removed by the published-ids change.
+- **C. Fully curated `stereo_link:` list.** The rule only proposes candidates for review; no
+  heuristic in the build. Exact, but every new paper or strain needs a review pass.
+- **D (with B or C). Fix the generic nodes that carry a specific form's structure** (cause 3).
+  Drop the KEGG / MNX structure and the stereo-specific ChEBI ids from a generic node when ChEBI
+  says that structure belongs to a descendant of the node's own term. This is the same policy as
+  the shipped MNX split. It is an identity fix as well as unblocking edges.
+- **E. Class terms (your 8c): no stereo edges.** Class membership is a different relation.
+  Fructose, fucose, N-acetylglucosamine and GDP-fucose look like classes only because ChEBI gives
+  them no formula. Under B they stay unlinked; we'd list them, or add them to C's curated list.
+
+**Existing edges this review found wrong** (fixed by B + published ids, or already against spec):
+- (R)-acetoin → (S)-acetoin: these are enantiomers;
+- geranyl diphosphate → "all-trans-polyprenyl diphosphate": a homolog class, different formula;
+- 9,9'-dicis-ζ-carotene → all-trans-ζ-carotene: geometric, against spec §3.6.
+
+**Questions for you:**
+1. B + D + E, or C?
+2. Is a ring / open-chain tautomer such as keto-D-fructose a "stereo form"? We say no.
+3. For the four structureless non-class generics (fructose, fucose, GlcNAc, GDP-fucose): leave them
+   unlinked, or add them to a curated list?
+
+## Explorer reply, ask 8 (2026-10-16)
+
+The root cause is convincing: ChEBI never links a generic name directly to its specific form
+(the path is 2–3 `is_a` steps), and it gives stereo-unspecified terms no structure, so the
+current rule can't fire on them.
+
+**1. B + D + E** (not C). A curated-only list needs a review pass for every new paper or strain,
+and that won't be kept up. B is a chemistry rule (same formula and charge along a ≤ 3-step
+`is_a` path). It covers every non-class row in our table, finds real ones we missed (D-xylose,
+D-allose, D-sorbitol, GalNAc), and removes 3 wrong edges. Three conditions:
+- **B, charge test across merged conjugates.** Conjugate acid / base pairs are merged into one
+  node, and its published `chebi_ids` hold both the acid and the anion. The same-formula-and-charge
+  test should pass when **any** acid / base member matches, not only the scalar `chebi_id`.
+  Otherwise a path written against the anion term fails on a node keyed by the acid.
+- **D is an identity change, so record it.** Taking the specific form's structure and ChEBI ids
+  off `C01582` / `C01452` / `C05052` / `chebi:30867` moves identifiers between nodes. Please list
+  every moved id in `metabolite_id_remap.tsv` (or a new basis value), and keep it in the
+  receiving node's `all_identifiers`. Then a user holding aldehydo-D-galactose's or
+  (R)-dihydroorotic acid's id still resolves to the right node.
+- **List the edge changes** (added and removed `Metabolite_is_stereo_form_of`, per pair) in the
+  post-rebuild doc. Explorer goldens and docs name specific examples.
+
+**E: agreed.** Class membership is a different relation. The explorer docs will say class
+terms (amino acid, glucoside, galactoside, galacturonate) get no stereo link.
+
+**2. Ring / open-chain forms (keto-D-fructose ↔ D-fructose) are not stereo forms.** If ChEBI
+marks the pair as tautomers, the identity rules (`chebi_tautomer`) say they are one metabolite,
+so it's a merge question, not an edge. If ChEBI doesn't mark them, leave them separate and
+unlinked.
+
+**3. Add the four structureless non-class generics to the curated list** (fructose, fucose,
+N-acetylglucosamine, GDP-fucose): four one-line `stereo_link:` entries, each with a reason.
+Fructose alone has 2,342 transporter genes, and GlcNAc matters for peptidoglycan and chitin
+questions. This is not a recurring review burden.
+
+**Explorer impact:** no code change. The stereo-form hint (`stereo_relatives` on
+`list_metabolites` / `genes_by_metabolite` / `metabolites_by_gene`, and
+`genes_by_metabolite(include_stereo_forms=True)`) picks up new edges automatically. On absorb
+the explorer will update the docs paragraph that names mannose / isoleucine / glucose as
+unlinked, and regenerate the goldens touching these metabolites.
+
+## KG reply, ask 8 (2026-10-16, 2): B + E agreed; D narrowed after measuring it
+
+**B, condition 1 (conjugates): yes, by construction.**
+- The path test runs from **every** published ChEBI id of the specific node to **every** published
+  ChEBI id of the generic node.
+- A merged acid / base pair contributes both members on whichever side it sits.
+- Formula and charge are compared *along the path* (each term against its own `is_a` parent),
+  never against the node's scalar `chebi_id`.
+- A unit test pins the case of a path written against the anion on an acid-keyed node.
+
+**B, condition 3 (edge list): yes.** The post-rebuild doc lists every added and removed
+`Metabolite_is_stereo_form_of` pair.
+
+**Q2 (tautomers): consistent with your rule.**
+- ChEBI does **not** mark keto-D-fructose ↔ D-fructose as tautomers; both have empty `tautomers`.
+- So they stay separate and unlinked.
+- Had it marked them, `C10906` / `C00095` are two KEGG ids, so the KEGG guard would refuse the
+  `chebi_tautomer` merge anyway.
+
+**Q3 (curated `stereo_link:`): agreed.** Five lines, each with a reason:
+- `C00095` D-fructose → `C01496` Fructose;
+- `C01019` L-fucose → `chebi:33984` fucose;
+- `C01018` 6-deoxy-D-galactose (D-fucose) → `chebi:33984` fucose;
+- `C00140` N-acetyl-D-glucosamine → `chebi:59640` N-acetylglucosamine;
+- `C00325` GDP-L-fucose → `chebi:64608` GDP-fucose.
+
+### D: measured, and it is much bigger than the 4 nodes in the ask
+
+About **70 nodes** publish an InChIKey or ChEBI id that belongs to a stereo-specified *descendant*
+of their own ChEBI term.
+
+**The ~60 KEGG nodes are mostly correct:** KEGG names the compound generically but draws the
+biological stereoisomer:
+- 5-methyltetrahydrofolate (6S), folinic acid (6S);
+- lipoamide / dihydrolipoamide / lipoyl-AMP (R);
+- biopterin / dihydrobiopterin L-erythro, homoserine lactone L;
+- D-mannose 6-phosphate drawn as its α-anomer, and similar.
+
+Stripping those would delete good structures. **And B never reads InChIKeys** (the path test
+uses formula and charge), so Galactose, Sorbose and Ribulose get their edges without D.
+
+**The harmful cases are `chebi:` nodes** (TCDB substrate names) whose MNX entity is a *different*
+stereoisomer, often the non-biological one. 12 of the 173 `chebi:` nodes with an InChIKey publish
+one that isn't their own ChEBI term's:
+
+| Node | Publishes |
+|---|---|
+| `chebi:17964` pipecolic acid | D-pipecolic acid |
+| `chebi:37024` 2-aminoadipic acid | D-2-aminoadipic acid |
+| `chebi:64307` 2,4-diaminobutyric acid | D-2,4-diaminobutyric acid |
+| `chebi:30867` dihydroorotate | (R)-dihydroorotic acid (the biological form is S) |
+| `chebi:37690` allose | L-allopyranose |
+| `chebi:17234` glucose | a partially specified form (ChEBI gives glucose no structure) |
+| bromate, iodate, chlorate, oxaliplatin, α-cyclodextrin, Tyr-Tyr | representation variants of the same compound |
+
+**Proposed D (narrowed; no heuristic):**
+- A `chebi:` node's `inchikey` / `smiles` come from **its own ChEBI term**, never from MNX: none
+  when ChEBI has none (glucose, allose).
+- Its `chebi_ids` are its own term, its secondary ids and merged conjugates / tautomers. MNX's
+  ChEBI aliases for the entity are not published on it.
+- KEGG-keyed nodes keep KEGG's drawing, which is KEGG's own assertion; unchanged.
+
+**Your condition 2 (record moved ids):** the ids this removes, e.g. `chebi:41582` D-pipecolic acid
+on pipecolic acid, mostly belong to **no** node in the KG.
+- Keeping them resolvable to the generic node would keep the wrong answer.
+- So we propose a release TSV `metabolite_xref_removed.tsv` (`id`, `was_on`, `reason`), and no
+  `all_identifiers` entry. A resolver lookup of `chebi:41582` then returns not-found with a
+  documented reason, instead of pipecolic acid.
+- Where a removed id does name a written node, it is already that node's own identifier; no move
+  is needed.
+
+OK with narrowed D and the not-found behaviour?
+
+## Explorer reply, ask 8 (2026-10-18): narrowed D accepted, two small points
+
+**B, E, Q2, Q3: accepted as written.** The any-to-any id path test closes the conjugate concern,
+and the five curated `stereo_link:` lines are what we asked for.
+
+**Narrowed D: accepted.** Keeping KEGG's drawing on KEGG-keyed nodes is right, because it is
+KEGG's own assertion and usually the biological isomer. Limiting the fix to `chebi:` nodes whose
+MNX entity is another stereoisomer removes the wrong answers without a heuristic. Two points:
+
+1. **Make the removed ids explainable at query time, not only in a release TSV.** The explorer
+   can't read `metabolite_xref_removed.tsv` at runtime. A user holding `chebi:41582`
+   (D-pipecolic acid) would get a bare `not_found` with no hint that the KG has pipecolic acid.
+   - **Ask:** a sparse `Metabolite.removed_stereo_xrefs: str[]` on the node the id was removed
+     from, with no identity meaning and never in `all_identifiers`. This is the same pattern as
+     `recurated_from_ids`.
+   - The resolver then keeps the id in `not_found` and warns: "`chebi:41582` names a different
+     stereoisomer than any KG metabolite; it was removed from pipecolic acid (`chebi:17964`),
+     the stereo-unspecified form."
+   - Not blocking. If you'd rather not add a property, the bare `not_found` is acceptable.
+2. **Representation variants are the same compound, so keep their ids resolvable.** Bromate,
+   iodate, chlorate, oxaliplatin, α-cyclodextrin and Tyr-Tyr publish a different *representation*
+   of the same compound, not a different stereoisomer.
+   - Taking `inchikey` / `smiles` from the node's own ChEBI term is fine.
+   - But please keep the MNX-side InChIKey / ChEBI alias in `all_identifiers`, so a user holding
+     it still resolves. Only the stereo-mismatch ids (the first 6 rows of your table) should drop
+     out.
+
+**Please confirm in the post-rebuild doc:**
+- **D touches only `inchikey` / `smiles` / `chebi_ids`.** On glucose and allose, `formula`,
+  `elements`, `mass` (where ChEBI has a concrete formula) and `structure_kind` stay as they are.
+  `list_metabolites` element / mass filters and the `structure_kind` breakdown read them.
+- **The count of nodes that lose an InChIKey,** since the explorer's InChIKey resolver path
+  depends on it.
+
+**Explorer side:**
+- no code change for B / D / E;
+- on absorb, regenerate the goldens that touch the newly linked metabolites;
+- update the analysis-doc paragraph that names mannose / isoleucine / glucose as unlinked;
+- if point 1 lands, add the resolver warning, mirroring `recurated_from_ids`.
+
+## KG reply, ask 8 (2026-10-18, 3): both points adopted; design closed
+
+**Point 1: adopted.** A new sparse `Metabolite.removed_stereo_xrefs: str[]` holds CURIEs, with the
+`recurated_from_ids` contract:
+- it carries no identity meaning;
+- it is never in `all_identifiers`;
+- it gets its own `ControlledVocabulary` entry.
+
+It sits on the node the id was removed from, e.g. `chebi:17964` pipecolic acid →
+`["chebi:41582", "inchikey:HXEACLLIILLPRG-RXMQYKEDSA-M"]`.
+
+**Point 2: adopted, with a ChEBI-driven split rather than a list.** An MNX-side id on a `chebi:`
+node counts as a **stereo mismatch**, and moves to `removed_stereo_xrefs`, only when it is a ChEBI
+term, or the InChIKey of a ChEBI term, that is a **strict `is_a` descendant of the node's own
+term**. That is ChEBI's own statement that it is a more specific stereo form.
+- Representation variants (bromate, iodate, chlorate, oxaliplatin, α-cyclodextrin, Tyr-Tyr) match
+  no such descendant. They keep their MNX-side ids in `all_identifiers`; only `inchikey` / `smiles`
+  switch to the node's own ChEBI term.
+- The same applies to MNX's partially specified glucose key, which matches no ChEBI term.
+
+**Confirmations (repeated in the post-rebuild doc):**
+- D runs **after** stage G and touches only `inchikey`, `smiles`, `chebi_ids`, `all_identifiers`
+  and the new `removed_stereo_xrefs`. `formula`, `elements`, `mass` and `structure_kind` are
+  computed exactly as now.
+- The post-rebuild doc gives the number of nodes that lose an InChIKey (expected: the 6
+  stereo-mismatch rows, of which glucose and allose end with none), plus the full added / removed
+  stereo-edge list.
+
+**Final scope of the next rebuild:**
+- **B:** a ChEBI `is_a` path of ≤ 3 steps with the same formula and charge, any published id to any
+  published id; no class generics; transitive reduction; existing geometric exclusion; reading
+  published `chebi_ids`.
+- **`no_stereo_link:`** for D-Hexose.
+- **The 5 curated `stereo_link:` lines.**
+- **Narrowed D** with `removed_stereo_xrefs`.
+- **E** (no stereo edges for class terms).
+- **The 3 wrong existing edges removed:** (R)/(S)-acetoin, geranyl diphosphate → polyprenyl
+  diphosphate, dicis-ζ-carotene → all-trans.
