@@ -10,7 +10,7 @@ by_ontology:
   truncated: true
 - ontology: tcdb
   returned: 5
-  score_max: 3.75053071975708
+  score_max: 3.735538959503174
   total_entries: 1515
   total_matching: 42
   truncated: true
@@ -65,7 +65,7 @@ results:
   name: Inner membrane transport protein YdhP
   ontology_type: tcdb
   organism_count: 13
-  score: 3.7505
+  score: 3.7355
 - gene_count: 5
   id: tcdb:2.A.1.4.6
   is_informative: true
@@ -74,7 +74,7 @@ results:
     including C 3 organophosphates).
   ontology_type: tcdb
   organism_count: 5
-  score: 2.5783
+  score: 2.5629
 - gene_count: 6
   id: tcdb:3.A.1.17.3
   is_informative: true
@@ -82,7 +82,7 @@ results:
   name: Putative hydroxymethylpyrimidine transport system, ThiXYZ.
   ontology_type: tcdb
   organism_count: 4
-  score: 3.3182
+  score: 3.3033
 - gene_count: 6
   id: tcdb:3.A.1.17.6
   is_informative: true
@@ -90,7 +90,7 @@ results:
   name: Putative hydroxymethylpyrimidine transport system, ThiXYZ.
   ontology_type: tcdb
   organism_count: 4
-  score: 3.0931
+  score: 3.0782
 - gene_count: 1
   id: tcdb:4.A.1.1.5
   is_informative: true
@@ -98,11 +98,11 @@ results:
   name: N-Acetylglucosamine (NAG) porter (PtsBC1C2)(also may facilitate xylose transport).
   ontology_type: tcdb
   organism_count: 1
-  score: 2.9301
+  score: 2.9138
 returned: 10
 row_count: 10
-score_max: 3.75053071975708
-score_median: 2.0509508848190308
+score_max: 3.735538959503174
+score_median: 2.0432791709899902
 skipped_ontologies: []
 total_entries: 4837
 total_matching: 366

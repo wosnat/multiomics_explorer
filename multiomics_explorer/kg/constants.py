@@ -71,12 +71,15 @@ VALID_OMICS_TYPES: set[str] = {
 # kegg_functional_categories, new closed vocab Metabolite.kegg_brite_classes,
 # built 2026-10-15T19:17Z; + per-arm sampling: new closed vocab
 # Experiment.control_timing {matched, baseline, mixed}, every description
-# rephrased without apostrophes, built 2026-10-18T07:51Z). The recipe lives KG-side (docs/kg-changes/
+# rephrased without apostrophes, built 2026-10-18T07:51Z; + TCDB diamond
+# best hit: six new open sparse entries Gene_has_tcdb_family.best_hit_{tcids,
+# names, identity, substrate_tcids, substrate_ids, substrate_names}, built
+# 2026-10-19T17:03Z). The recipe lives KG-side (docs/kg-changes/
 # vocabulary-contract.md). A mismatch means baked docs / parameter descriptions
 # may list stale values — filters still validate live. Must equal the live
 # KG's value at release cut.
 EXPECTED_CONTROLLED_VOCABULARIES_HASH: str = (
-    "sha256:89c63aa0e491adf6de401351b4c3109c04697d456950d9a51351ee6e140dac06"
+    "sha256:eaf6e672af08a1c4071c79bcffbc7a98cda8a3f449f2af96ab322558c8edc54d"
 )
 
 EXPECTED_KG_SHAPE: dict[str, tuple[str, ...] | str] = {

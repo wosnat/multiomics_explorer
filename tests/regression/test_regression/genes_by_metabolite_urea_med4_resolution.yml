@@ -43,7 +43,7 @@ results:
   substrate_depth: most_specific
   tcdb_evidence_score: 0.6
   tcdb_family_id: tcdb:3.A.1.4.4
-  tcdb_family_name: The high-affinity (
+  tcdb_family_name: The high-affinity (<1 μM) urea porter
   transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
@@ -79,7 +79,7 @@ results:
   substrate_depth: most_specific
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.4
-  tcdb_family_name: The high-affinity (
+  tcdb_family_name: The high-affinity (<1 μM) urea porter
   transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
@@ -115,7 +115,7 @@ results:
   substrate_depth: most_specific
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.4
-  tcdb_family_name: The high-affinity (
+  tcdb_family_name: The high-affinity (<1 μM) urea porter
   transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
@@ -151,7 +151,7 @@ results:
   substrate_depth: most_specific
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.4
-  tcdb_family_name: The high-affinity (
+  tcdb_family_name: The high-affinity (<1 μM) urea porter
   transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
@@ -187,7 +187,7 @@ results:
   substrate_depth: most_specific
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.4
-  tcdb_family_name: The high-affinity (
+  tcdb_family_name: The high-affinity (<1 μM) urea porter
   transport_substrate_resolution: resolved
 - ec_numbers: null
   evidence_source: transport
@@ -272,7 +272,7 @@ top_tcdb_families:
   metabolite_count: 1
   substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.4.4
-  tcdb_family_name: The high-affinity (
+  tcdb_family_name: The high-affinity (<1 μM) urea porter
 - gene_count: 5
   level_kind: tc_specificity
   metabolite_count: 1

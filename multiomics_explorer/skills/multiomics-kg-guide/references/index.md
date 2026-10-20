@@ -74,7 +74,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/genes_by_categorical_metric/full` — ~6068 tok
 - `docs://tools/genes_by_function/full` — ~2692 tok
 - `docs://tools/genes_by_homolog_group/full` — ~2436 tok
-- `docs://tools/genes_by_metabolite/full` — ~14482 tok
+- `docs://tools/genes_by_metabolite/full` — ~14501 tok
 - `docs://tools/genes_by_numeric_metric/full` — ~6747 tok
 - `docs://tools/genes_by_ontology/full` — ~15116 tok
 - `docs://tools/genes_in_cluster/full` — ~1960 tok
@@ -97,7 +97,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/resolve_gene/full` — ~1520 tok
 - `docs://tools/run_cypher/full` — ~972 tok
 - `docs://tools/search_homolog_groups/full` — ~2275 tok
-- `docs://tools/search_ontology/full` — ~10248 tok
+- `docs://tools/search_ontology/full` — ~10249 tok
 
 ## Analysis
 
@@ -105,7 +105,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://analysis/derived_metrics` — ~2743 tok — The DerivedMetric (DM) node family: what DMs are, how to discover them, and how to drill into gene-level…
 - `docs://analysis/enrichment` — ~7252 tok — How to run over-representation analysis (ORA) with the `multiomics_explorer` package: the building blocks…
 - `docs://analysis/expression` — ~2361 tok — The differential-expression (DE) tool family and the two analysis utilities that reshape its output into…
-- `docs://analysis/metabolites` — ~14375 tok — LLM-facing decision-tree guide for metabolite questions.
+- `docs://analysis/metabolites` — ~14509 tok — LLM-facing decision-tree guide for metabolite questions.
 
 ## Ontologies
 
