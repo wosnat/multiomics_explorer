@@ -549,7 +549,9 @@ class MetaboliteResult(SparseRow):
     organism_count: int = Field(default=0, description="Distinct organisms reaching this metabolite via any chemistry path. When > 0, narrow with organism_names filter.")
     transporter_count: int = Field(default=0, description="Distinct transporter systems (TcdbFamily nodes) whose substrate edge to this metabolite is substrate_depth='most_specific'. Systems, not genes — pair with transporter_gene_count and catalyst_gene_count; drill via genes_by_metabolite.")
     transporter_gene_count: int = Field(default=0, description="Distinct genes (all organisms) whose deepest TCDB attachment transports this metabolite (precomputed Metabolite.transporter_gene_count). catalyst_gene_count=0 with transporter_gene_count>0 = transport-only; drill via genes_by_metabolite.")
-    evidence_sources: list[str] = Field(default_factory=list, description="Path provenance — values from {'metabolism', 'transport', 'metabolomics'}. 'metabolism' = at least one Reaction in KG involves this compound; 'transport' = at least one TcdbFamily curates this as substrate; 'metabolomics' = at least one MetaboliteAssay measures this compound. E.g. ['metabolism', 'transport'].")
+    evidence_sources: list[str] = Field(default_factory=list, description="Path provenance — values from {'metabolism', 'transport', 'metabolomics', 'go_transport'}. 'metabolism' = a Reaction involves this compound; 'transport' = a TcdbFamily curates it as substrate; 'metabolomics' = a MetaboliteAssay measures it; 'go_transport' = a GO transport term names it. E.g. ['metabolism', 'transport'].")
+    go_transport_organism_names: list[str] | None = Field(default=None, description="Organisms with a gene directly annotated to a GO transport term for this target. Absent = no directly annotated gene path, not 'no GO transport edge'. Drill via genes_by_metabolite(evidence_sources=['go_transport']).")
+    go_transport_organism_count: int | None = Field(default=None, description="Number of organisms in go_transport_organism_names. Absent = no directly annotated gene path, not 'no GO transport edge'.")
     chebi_id: str | None = Field(default=None, description="ChEBI ID (raw numeric, e.g. '4167'). Populated on most metabolites — 100% of chebi:-IDed transport-only metabolites (extracted from the ID itself), plus the kegg.compound:-IDed metabolites that cross-ref ChEBI.")
     pathway_ids: list[str] = Field(default_factory=list, description="KEGG pathway memberships (e.g. ['kegg.pathway:ko00010', 'kegg.pathway:ko01100']). Empty when no Metabolite_in_pathway edges. Drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...).")
     pathway_count: int = Field(default=0, description="Distinct count of KEGG pathways this metabolite is in (e.g. 5). Routing signal — when > 0, drill in via genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...) for genes annotated to those pathways. Equal to size(pathway_ids).")
@@ -643,7 +645,7 @@ class ListMetabolitesResponse(BaseModel):
     total_matching: int = Field(description="Metabolites matching filters.")
     top_organisms: list[MetTopOrganism] = Field(default_factory=list, description="Top 10 organisms by metabolite count (within matched set), sorted desc.")
     top_metabolite_pathways: list[MetTopPathway] = Field(default_factory=list, description="Top 10 pathways by metabolite count (within matched set), sorted desc. Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology`).")
-    by_evidence_source: list[MetEvidenceSourceBreakdown] = Field(default_factory=list, description="Frequency of evidence_sources values across matched set. Bounded by the {metabolism, transport, metabolomics} domain.")
+    by_evidence_source: list[MetEvidenceSourceBreakdown] = Field(default_factory=list, description="Frequency of evidence_sources values across matched set. Bounded by the {metabolism, transport, metabolomics, go_transport} domain.")
     xref_coverage: MetXrefCoverage = Field(description="Cross-ref ID coverage within matched set.")
     mass_stats: MetMassStats = Field(description="Mass distribution within matched set.")
     by_measurement_coverage: MetMeasurementCoverage = Field(default_factory=MetMeasurementCoverage, description="Metabolomics measurement coverage rollup across matched metabolites. Two sub-rollups: by_paper_count (frequency by measured_paper_count value) + by_compartment (frequency by measured_compartments value).")
@@ -700,11 +702,11 @@ class GeneReactionMetaboliteTriplet(SparseRow):
         description="Annotated gene product description (high-signal short "
         "label, e.g. 'ABC-type urea transporter, ATPase component UrtE').")
 
-    evidence_source: Literal["metabolism", "transport"] = Field(
+    evidence_source: Literal["metabolism", "transport", "go_transport"] = Field(
         description="Path through which this row reaches the metabolite. "
         "'metabolism' = `Gene → Reaction → Metabolite`. 'transport' = "
         "`Gene → TcdbFamily → Metabolite` via the gene's deepest TCDB "
-        "attachments only. Metabolomics evidence has no gene anchor here.")
+        "attachments only. 'go_transport' = `Gene → GO term → target`. Metabolomics evidence has no gene anchor here.")
     substrate_depth: Literal["most_specific", "inherited"] | None = Field(
         default=None,
         description="Transport rows only (None on metabolism rows). "
@@ -756,6 +758,46 @@ class GeneReactionMetaboliteTriplet(SparseRow):
         "human-readable (e.g. 'The ATP-binding Cassette (ABC) Superfamily'); "
         "for tc_subfamily / tc_specificity it falls back to the tcdb_id. "
         "Transport rows only.")
+
+    # GO-transport-arm fields (None on metabolism / transport rows)
+    go_term_id: str | None = Field(
+        default=None,
+        description="GO route rows only. The gene's own GO term (e.g. "
+        "'go:0015891'). A term definition, not a gene fact: the term "
+        "names the target; the gene is annotated to the term.")
+    go_term_name: str | None = Field(
+        default=None,
+        description="Name of `go_term_id` (e.g. 'siderophore transport'). "
+        "GO route rows only.")
+    go_namespace: Literal["molecular_function", "biological_process"] | None = Field(
+        default=None,
+        description="GO route rows only. Namespace of the term. BP terms "
+        "are broader than MF ones (a process, not a specific activity).")
+    go_evidence: str | None = Field(
+        default=None,
+        description="GO route rows only. Evidence class of the gene→GO "
+        "annotation (e.g. 'curated').")
+    go_sources: list[str] | None = Field(
+        default=None,
+        description="GO route rows only. Annotation sources behind the "
+        "gene→GO edge (e.g. ['ncbi']).")
+    go_term_depth: int | None = Field(
+        default=None,
+        description="GO route rows only. 0 = the gene's own term names the "
+        "target; n = is_a hops up to the naming ancestor (inherited; needs "
+        "go_include_ancestors=True).")
+    go_axiom_term_id: str | None = Field(
+        default=None,
+        description="GO route rows only. Term that names the target: the "
+        "gene's own term at depth 0, the ancestor when inherited.")
+    go_axiom_term_name: str | None = Field(
+        default=None,
+        description="Name of `go_axiom_term_id`. GO route rows only.")
+    target_kind: Literal["metabolite", "chemical_role"] | None = Field(
+        default=None,
+        description="What `metabolite_id` is: a 'metabolite' or a "
+        "'chemical_role' (e.g. siderophore, chebi.role:26672). Roles have "
+        "no formula or mass.")
 
     # always-populated metabolite fields
     metabolite_id: str = Field(
@@ -818,6 +860,10 @@ class GeneReactionMetaboliteTriplet(SparseRow):
         default=None,
         description="TCDB class ancestor (e.g. 'tcdb:3' for Primary Active "
         "Transporters). Pre-computed pointer. Verbose, transport rows only.")
+    go_chebi_ids: list[str] | None = Field(
+        default=None,
+        description="ChEBI ids carried by the GO term (e.g. "
+        "['CHEBI:26672']). Verbose, GO route rows only.")
 
 
 class StereoRelative(BaseModel):
@@ -882,6 +928,10 @@ class GbmByMetabolite(SparseRow):
         description="Transport rows with `substrate_depth='inherited'` "
         "(substrate rolled up from a descendant family — reachability, "
         "not a capability claim for this gene).")
+    go_transport_rows: int = Field(
+        default=0,
+        description="GO route (go_transport) rows in the filtered slice. "
+        "`rows` = metabolism + transport tiers + this.")
     stereo_relative_ids: list[str] | None = Field(
         default=None,
         description="Stereo forms of this metabolite that have rows in this "
@@ -897,10 +947,10 @@ class GbmByMetabolite(SparseRow):
 class GbmByEvidenceSource(BaseModel):
     """Frequency rollup over `evidence_source` values present in the slice.
 
-    ≤2 entries — `metabolism` and/or `transport`. (Metabolomics has no gene
+    ≤3 entries — `metabolism`, `transport` and/or `go_transport`. (Metabolomics has no gene
     anchor and never produces rows here.)
     """
-    evidence_source: Literal["metabolism", "transport"] = Field(
+    evidence_source: Literal["metabolism", "transport", "go_transport"] = Field(
         description="Path through which the gene reaches the metabolite.")
     count: int = Field(
         description="Row count for this evidence_source in the filtered slice.")
@@ -1004,6 +1054,10 @@ class GbmTopGene(BaseModel):
         description="Transport-arm rows for this gene with "
         "`substrate_depth='inherited'` (rolled up from a descendant "
         "family).")
+    go_transport_rows: int = Field(
+        default=0,
+        description="GO route (go_transport) rows in the filtered slice. "
+        "`rows` = metabolism + transport tiers + this.")
     transport_substrate_resolution: str | None = Field(
         default=None,
         description="Gene-level `Gene.transport_substrate_resolution`: "
@@ -1017,6 +1071,16 @@ class GbmTopGene(BaseModel):
         "`evidence_score` over its TCDB calls, in [0,1]. Rank, don't "
         "filter; 0 = uncorroborated DIAMOND hit. None = no TCDB call "
         "(never a sentinel).")
+
+
+class RowsByGoTermDepth(BaseModel):
+    """Row count per `go_term_depth` over GO route rows (present only when
+    the go_transport arm is active)."""
+    go_term_depth: int = Field(
+        description="0 = the gene's own GO term names the target; n = is_a "
+        "hops to the naming ancestor (inherited; go_include_ancestors=True).")
+    count: int = Field(
+        description="GO route rows at this depth in the filtered slice.")
 
 
 class GbmNotFound(BaseModel):
@@ -1045,7 +1109,7 @@ class GbmNotFound(BaseModel):
 class GenesByMetaboliteResponse(BaseModel):
     """Top-level response envelope for genes_by_metabolite."""
     total_matching: int = Field(
-        description="Total row count after all filters, across both arms.")
+        description="Total row count after all filters, across all arms.")
     returned: int = Field(
         description="Number of rows in `results` (≤ `limit`).")
     offset: int = Field(
@@ -1098,6 +1162,11 @@ class GenesByMetaboliteResponse(BaseModel):
         default_factory=list,
         description="Frequency over `substrate_depth` values across "
         "transport rows only (≤2 entries; metabolism rows are excluded).")
+    rows_by_go_term_depth: list[RowsByGoTermDepth] = Field(
+        default_factory=list,
+        description="GO route rows per `go_term_depth`, sorted by depth "
+        "asc. Present only when the go_transport arm is active; depth > 0 "
+        "rows need go_include_ancestors=True.")
     top_reactions: list[GbmTopReaction] = Field(
         default_factory=list,
         description="Top 10 reactions by gene_count in the metabolism arm. "
@@ -1179,6 +1248,10 @@ class MbgByGene(BaseModel):
         description="Transport rows with `substrate_depth='inherited'` "
         "(substrate rolled up from a descendant family — reachability, "
         "not a capability claim for this gene).")
+    go_transport_rows: int = Field(
+        default=0,
+        description="GO route (go_transport) rows in the filtered slice. "
+        "`rows` = metabolism + transport tiers + this.")
     transport_substrate_resolution: str | None = Field(
         default=None,
         description="Gene-level `Gene.transport_substrate_resolution`: "
@@ -1197,11 +1270,11 @@ class MbgByGene(BaseModel):
 class MbgByEvidenceSource(BaseModel):
     """Frequency rollup over `evidence_source` values present in the slice.
 
-    ≤2 entries — `metabolism` and/or `transport`. Identical shape to GBM's
+    ≤3 entries — `metabolism`, `transport` and/or `go_transport`. Identical shape to GBM's
     `GbmByEvidenceSource`. (Metabolomics has no gene anchor and never
     produces rows here.)
     """
-    evidence_source: Literal["metabolism", "transport"] = Field(
+    evidence_source: Literal["metabolism", "transport", "go_transport"] = Field(
         description="Path through which the gene reaches the metabolite. "
         "'metabolism' = `Gene → Reaction → Metabolite`. 'transport' = "
         "`Gene → TcdbFamily → Metabolite` via the gene's deepest TCDB "
@@ -1289,6 +1362,10 @@ class MbgTopMetabolite(BaseModel):
     transport_inherited_rows: int = Field(
         description="Transport-arm rows with `substrate_depth='inherited'` "
         "for this metabolite (rolled up from a descendant family).")
+    go_transport_rows: int = Field(
+        default=0,
+        description="GO route (go_transport) rows in the filtered slice. "
+        "`rows` = metabolism + transport tiers + this.")
 
 
 class MbgTopReaction(BaseModel):
@@ -1438,7 +1515,7 @@ class MbgNotFound(BaseModel):
 class MetabolitesByGeneResponse(BaseModel):
     """Top-level response envelope for metabolites_by_gene."""
     total_matching: int = Field(
-        description="Total row count after all filters, across both arms.")
+        description="Total row count after all filters, across all arms.")
     returned: int = Field(
         description="Number of rows in `results` (≤ `limit`).")
     offset: int = Field(
@@ -1486,6 +1563,11 @@ class MetabolitesByGeneResponse(BaseModel):
         default_factory=list,
         description="Frequency over `substrate_depth` values across "
         "transport rows only (≤2 entries; metabolism rows are excluded).")
+    rows_by_go_term_depth: list[RowsByGoTermDepth] = Field(
+        default_factory=list,
+        description="GO route rows per `go_term_depth`, sorted by depth "
+        "asc. Present only when the go_transport arm is active; depth > 0 "
+        "rows need go_include_ancestors=True.")
     by_element: list[MbgByElement] = Field(
         default_factory=list,
         description="Element-presence rollup across the metabolites the "
@@ -1623,6 +1705,10 @@ class KGIdentity(BaseModel):
             "null as unknown."
         ),
     )
+    go_transport_excluded_targets: list[str] | None = Field(
+        default=None,
+        description="Chemical-role / metabolite ids curated out of the GO transport route (coupling ions, upper-level classes). An empty GO answer for these is curation, not biology; TCDB rows still answer. Null on older KGs.",
+    )
     gene_count: int | None = Field(default=None, description="Number of Gene nodes in the KG.")
     experiment_count: int | None = Field(default=None, description="Number of Experiment nodes in the KG.")
     paper_count: int | None = Field(default=None, description="Number of Publication nodes in the KG.")
@@ -1715,7 +1801,8 @@ def register_tools(mcp: FastMCP):
             default_factory=dict,
             description="Relationship types mapped to their definitions. "
                         "Each value is {'source_labels': [...], 'target_labels': [...], "
-                        "'properties': {'prop_name': 'type_string', ...}}. "
+                        "'properties': {'prop_name': 'type_string', ...}, "
+                        "'description': optional caveat text for edge types that carry one}. "
                         "Empty when `section='nodes'`.",
         )
         not_found_labels: list[str] = Field(
@@ -8177,13 +8264,13 @@ def register_tools(mcp: FastMCP):
             "`Metabolite_in_pathway`. `not_found.pathway_ids` lists unknown IDs.",
         )] = None,
         evidence_sources: Annotated[
-            list[Literal["metabolism", "transport", "metabolomics"]] | None,
+            list[Literal["metabolism", "transport", "metabolomics", "go_transport"]] | None,
             Field(
-                description="Filter by evidence path. Set-membership ANY "
-                "semantics — ['transport'] returns transport-only AND dual. "
-                "Valid values: 'metabolism' (catalysis-reachable), 'transport' "
-                "(TCDB-curated substrate), 'metabolomics' (measured by a "
-                "MetaboliteAssay). Other values raise at the MCP boundary.",
+                description="Filter by evidence path (ANY). Values: "
+                "'metabolism' (catalysis-reachable), 'transport' (TCDB "
+                "substrate), 'metabolomics' (measured by a MetaboliteAssay), "
+                "'go_transport' (named by a GO transport term). Other values "
+                "raise at the MCP boundary.",
             ),
         ] = None,
         structure_kind: Annotated[list[str] | None, Field(
@@ -8372,16 +8459,20 @@ def register_tools(mcp: FastMCP):
             ),
         ] = None,
         evidence_sources: Annotated[
-            list[Literal["metabolism", "transport"]] | None,
+            list[Literal["metabolism", "transport", "go_transport"]] | None,
             Field(
-                description="Path selector — restricts which arms execute. "
-                "Set to `['metabolism']` to skip transport entirely (no rollup "
-                "noise); `['transport']` to skip metabolism. Default fires both "
-                "arms. Note: `'metabolomics'` is NOT a valid value here — "
-                "metabolomics evidence has no gene anchor and surfaces only in "
+                description="Path selector — restricts which arms execute "
+                "(metabolism, transport, go_transport). Default fires all "
+                "three. `['metabolism']` skips transport rollup noise. "
+                "'metabolomics' is NOT valid here (no gene anchor); see "
                 "`list_metabolites`.",
             ),
         ] = None,
+        go_include_ancestors: Annotated[bool, Field(
+            description="GO route only: also return inherited rows, where a "
+            "gene's GO term reaches the target through is_a ancestors "
+            "(go_term_depth > 0). Default False = directly annotated terms.",
+        )] = False,
         include_stereo_forms: Annotated[bool, Field(
             description="Also query the generic <-> specific stereo forms of "
             "each metabolite_id (e.g. Cysteine <-> L-Cysteine; TCDB lists "
@@ -8407,6 +8498,7 @@ def register_tools(mcp: FastMCP):
             f"mass_balance={mass_balance} gene_categories={gene_categories} "
             f"substrate_depth={substrate_depth} "
             f"evidence_sources={evidence_sources} "
+            f"go_include_ancestors={go_include_ancestors} "
             f"include_stereo_forms={include_stereo_forms} summary={summary} "
             f"verbose={verbose} limit={limit} offset={offset}"
         )
@@ -8422,6 +8514,7 @@ def register_tools(mcp: FastMCP):
                 gene_categories=gene_categories,
                 substrate_depth=substrate_depth,
                 evidence_sources=evidence_sources,
+                go_include_ancestors=go_include_ancestors,
                 include_stereo_forms=include_stereo_forms,
                 summary=summary,
                 verbose=verbose,
@@ -8470,6 +8563,10 @@ def register_tools(mcp: FastMCP):
                 by_metabolite=by_metabolite,
                 by_evidence_source=by_evidence_source,
                 by_substrate_depth=by_substrate_depth,
+                rows_by_go_term_depth=[
+                    RowsByGoTermDepth(**b)
+                    for b in result.get("rows_by_go_term_depth", [])
+                ],
                 top_reactions=top_reactions,
                 top_reactions_truncated=result.get("top_reactions_truncated"),
                 top_tcdb_families=top_tcdb_families,
@@ -8576,17 +8673,20 @@ def register_tools(mcp: FastMCP):
             ),
         ] = None,
         evidence_sources: Annotated[
-            list[Literal["metabolism", "transport"]] | None,
+            list[Literal["metabolism", "transport", "go_transport"]] | None,
             Field(
-                description="Path selector — restricts which arms "
-                "execute. Set to `['metabolism']` to skip transport "
-                "entirely (no rollup noise); `['transport']` to skip "
-                "metabolism. Default fires both arms. Note: "
-                "`'metabolomics'` is NOT a valid value here — "
-                "metabolomics evidence has no gene anchor and surfaces "
-                "only in `list_metabolites`.",
+                description="Path selector — restricts which arms execute "
+                "(metabolism, transport, go_transport). Default fires all "
+                "three. `['metabolism']` skips transport rollup noise. "
+                "'metabolomics' is NOT valid here (no gene anchor); see "
+                "`list_metabolites`.",
             ),
         ] = None,
+        go_include_ancestors: Annotated[bool, Field(
+            description="GO route only: also return inherited rows, where a "
+            "gene's GO term reaches the target through is_a ancestors "
+            "(go_term_depth > 0). Default False = directly annotated terms.",
+        )] = False,
         summary: SummaryParam = False,
         verbose: VerboseParam = False,
         limit: LimitParam = 10,
@@ -8608,7 +8708,8 @@ def register_tools(mcp: FastMCP):
             f"mass_balance={mass_balance} "
             f"gene_categories={gene_categories} "
             f"substrate_depth={substrate_depth} "
-            f"evidence_sources={evidence_sources} summary={summary} "
+            f"evidence_sources={evidence_sources} "
+            f"go_include_ancestors={go_include_ancestors} summary={summary} "
             f"verbose={verbose} limit={limit} offset={offset}"
         )
         try:
@@ -8625,6 +8726,7 @@ def register_tools(mcp: FastMCP):
                 gene_categories=gene_categories,
                 substrate_depth=substrate_depth,
                 evidence_sources=evidence_sources,
+                go_include_ancestors=go_include_ancestors,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
@@ -8678,6 +8780,10 @@ def register_tools(mcp: FastMCP):
                 by_gene=by_gene,
                 by_evidence_source=by_evidence_source,
                 by_substrate_depth=by_substrate_depth,
+                rows_by_go_term_depth=[
+                    RowsByGoTermDepth(**b)
+                    for b in result.get("rows_by_go_term_depth", [])
+                ],
                 by_element=by_element,
                 by_element_truncated=result.get("by_element_truncated"),
                 top_metabolites=top_metabolites,
