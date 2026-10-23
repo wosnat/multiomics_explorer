@@ -79,7 +79,7 @@ mcp = FastMCP(
         "only when you need every worked example; docs://guide/conventions "
         "(~7k) for cross-tool semantics; "
         "docs://analysis/{enrichment,metabolites,annotation_evidence,"
-        "expression,derived_metrics} for methodology."
+        "expression,derived_metrics,transport} for methodology."
     ),
     lifespan=lifespan,
 )
