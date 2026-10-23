@@ -568,15 +568,11 @@ the 7 ids with no node, alongside `not_found`.
   scenario (`gbm_go_arm_empty_organism`) uses siderophore `chebi.role:26672` in
   `Prochlorococcus MED4`: 0 GO rows, 25 TCDB rows, envelope keys present.
 
-## 10. Open questions for the user
+## 10. Open questions for the user (all resolved — spec FROZEN 2026-10-23)
 
 Q1 and Q2 were resolved by D12 and D13.
 
-- **Q3** `has_chemistry` / gene_overview `transport` tag still test only TCDB→Metabolite. 29 corpus
-  genes have a deepest TCDB **role** edge and no other chemistry; mbg will now return rows for them
-  while `has_chemistry` stays false. Design §3.4 widens only to the GO route. Widen the TCDB
-  EXISTS to role edges too (+29 genes corpus), or leave for the TCDB redesign? Recommendation:
-  leave (design text; TCDB redesign pending), note in backlog.
+- **Q3** resolved (user, 2026-10-23): `has_chemistry` / the gene_overview `transport` tag stay TCDB→Metabolite only; the 29 genes with only a deepest TCDB role edge are a backlog item for the TCDB redesign.
 
 ## 11. Implementation order (Mode B, plan Tasks 3–4)
 
