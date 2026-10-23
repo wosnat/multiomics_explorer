@@ -1785,7 +1785,7 @@
     transport_most_specific_rows / transport_inherited_rows) and by_gene[]
     transport_substrate_resolution='resolved' + tcdb_evidence_score_max=0.8.
     13 deepest-attachment transport rows (== gene_overview
-    transported_metabolite_count; the all-edges walk gave 551).
+    transported_metabolite_count; the all-edges walk gives 518 distinct metabolites).
   params:
     locus_tags: [PMM0392]
     organism: Prochlorococcus MED4
