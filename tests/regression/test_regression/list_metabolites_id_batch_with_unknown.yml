@@ -46,6 +46,40 @@ results:
   - metabolism
   - transport
   formula: C6H12O6
+  go_transport_organism_count: 32
+  go_transport_organism_names:
+  - Alteromonas (MarRef v6)
+  - Alteromonas macleodii AD45
+  - Alteromonas macleodii ATCC27126
+  - Alteromonas macleodii BGP6
+  - Alteromonas macleodii BS11
+  - Alteromonas macleodii EZ55
+  - Alteromonas macleodii HOT1A3
+  - Alteromonas macleodii MIT1002
+  - Alteromonas mediterranea AltDE
+  - Alteromonas mediterranea AltDE1
+  - Prochlorococcus AS9601
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT0604
+  - Prochlorococcus MIT0801
+  - Prochlorococcus MIT1327
+  - Prochlorococcus MIT9202
+  - Prochlorococcus MIT9215
+  - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9313
+  - Prochlorococcus MIT9515
+  - Prochlorococcus NATL1A
+  - Prochlorococcus NATL2A
+  - Prochlorococcus PAC1
+  - Prochlorococcus SB
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  - Shewanella sp. W3-18-1
+  - Synechococcus CC9311
+  - Synechococcus WH8102
+  - Synechococcus WH8109
+  - Synechococcus sp. BL107
   kegg_functional_categories:
   - Carbohydrates
   mass: 180.156

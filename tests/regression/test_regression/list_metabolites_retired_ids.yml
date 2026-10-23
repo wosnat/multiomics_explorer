@@ -48,6 +48,34 @@ results:
   - metabolism
   - transport
   formula: HNO3
+  go_transport_organism_count: 26
+  go_transport_organism_names:
+  - Alteromonas (MarRef v6)
+  - Alteromonas macleodii AD45
+  - Alteromonas macleodii ATCC27126
+  - Alteromonas macleodii BGP6
+  - Alteromonas macleodii BS11
+  - Alteromonas macleodii EZ55
+  - Alteromonas macleodii HOT1A3
+  - Alteromonas macleodii MIT1002
+  - Alteromonas mediterranea AltDE
+  - Alteromonas mediterranea AltDE1
+  - Marinobacter (MarRef v6)
+  - Meiothermus ruber
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT0604
+  - Prochlorococcus PAC1
+  - Prochlorococcus SB
+  - Pseudomonas putida KT2440
+  - Synechococcus CC9311
+  - Synechococcus PCC 7002
+  - Synechococcus WH7803
+  - Synechococcus WH8102
+  - Synechococcus WH8109
+  - Synechococcus elongatus PCC 7942
+  - Synechococcus elongatus UTEX 2973
+  - Synechococcus sp. BL107
+  - Thermosynechococcus vestitus BP-1
   mass: 63.012
   measured_assay_count: 0
   measured_compartments: []

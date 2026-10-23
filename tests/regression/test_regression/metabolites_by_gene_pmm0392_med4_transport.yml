@@ -12,27 +12,28 @@ by_element:
 - element: P
   metabolite_count: 2
 by_evidence_source:
-- count: 12
+- count: 13
   evidence_source: transport
 by_gene:
 - gene_name: cbiQ
+  go_transport_rows: 0
   locus_tag: PMM0392
   metabolism_rows: 0
-  metabolite_count: 12
+  metabolite_count: 13
   product: transmembrane component of ECF transporter energizing module
   reaction_count: 0
-  rows: 12
+  rows: 13
   tcdb_evidence_score_max: 0.8
   transport_inherited_rows: 0
-  transport_most_specific_rows: 12
+  transport_most_specific_rows: 13
   transport_substrate_resolution: resolved
   transporter_count: 5
 by_substrate_depth:
-- count: 12
+- count: 13
   substrate_depth: most_specific
 case_id: metabolites_by_gene_pmm0392_med4_transport
 gene_count_total: 1
-metabolite_count_total: 12
+metabolite_count_total: 13
 not_found:
   locus_tags: []
   metabolite_elements: []
@@ -47,6 +48,38 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_id: chebi.role:33229
+  metabolite_name: vitamin (role)
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  substrate_depth: most_specific
+  target_kind: chemical_role
+  tcdb_evidence_score: 0.8
+  tcdb_family_id: tcdb:3.A.1.32
+  tcdb_family_name: The Cobalamin Precursor (B 12 -P) Family
+  transport_substrate_resolution: resolved
+- ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0392
   mass_balance: null
   metabolite_chebi_id: '30411'
@@ -56,6 +89,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.32
   tcdb_family_name: The Cobalamin Precursor (B 12 -P) Family
@@ -63,6 +97,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0392
   mass_balance: null
   metabolite_chebi_id: '16238'
@@ -74,6 +116,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
@@ -81,6 +124,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0392
   mass_balance: null
   metabolite_chebi_id: '17621'
@@ -92,6 +143,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
@@ -99,6 +151,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0392
   mass_balance: null
   metabolite_chebi_id: '15956'
@@ -110,6 +170,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
@@ -117,6 +178,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0392
   mass_balance: null
   metabolite_chebi_id: '17509'
@@ -128,6 +197,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.33
   tcdb_family_name: The Methylthioadenosine (MTA) Family
@@ -135,6 +205,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0392
   mass_balance: null
   metabolite_chebi_id: '27638'
@@ -146,6 +224,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.33
   tcdb_family_name: The Methylthioadenosine (MTA) Family
@@ -153,6 +232,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0392
   mass_balance: null
   metabolite_chebi_id: '17015'
@@ -164,6 +251,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
@@ -171,6 +259,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0392
   mass_balance: null
   metabolite_chebi_id: '25107'
@@ -182,6 +278,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.33
   tcdb_family_name: The Methylthioadenosine (MTA) Family
@@ -189,6 +286,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0392
   mass_balance: null
   metabolite_chebi_id: '18385'
@@ -200,6 +305,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.30
   tcdb_family_name: The Thiamin Precursor (Thi-P) Family
@@ -207,6 +313,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0392
   mass_balance: null
   metabolite_chebi_id: '72346'
@@ -218,6 +332,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
@@ -225,6 +340,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0392
   mass_balance: null
   metabolite_chebi_id: '64299'
@@ -235,6 +358,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.6
   tcdb_family_id: tcdb:3.A.1.28
   tcdb_family_name: The Queuosine (Queuosine) Family
@@ -242,6 +366,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0392
   mass_balance: null
   metabolite_chebi_id: '27470'
@@ -253,12 +385,14 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.6
   tcdb_family_id: tcdb:3.A.1.28
   tcdb_family_name: The Queuosine (Queuosine) Family
   transport_substrate_resolution: resolved
-returned: 12
-row_count: 12
+returned: 13
+row_count: 13
+rows_by_go_term_depth: []
 stereo_relatives: {}
 top_gene_categories:
 - category: Transport
@@ -317,6 +451,17 @@ top_metabolite_pathways:
 top_metabolites:
 - formula: null
   gene_count: 1
+  go_transport_rows: 0
+  metabolism_rows: 0
+  metabolite_id: chebi.role:33229
+  name: vitamin (role)
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: null
+  gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi:30411
   name: cobalamin
@@ -326,6 +471,7 @@ top_metabolites:
   transporter_count: 1
 - formula: C17H21N5O6*2
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi:64299
   name: queuosine residue
@@ -335,6 +481,7 @@ top_metabolites:
   transporter_count: 1
 - formula: C27H33N9O15P2
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00016
   name: FAD
@@ -344,6 +491,7 @@ top_metabolites:
   transporter_count: 1
 - formula: C17H21N4O9P
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00061
   name: FMN
@@ -353,6 +501,7 @@ top_metabolites:
   transporter_count: 1
 - formula: C10H15N2O3S
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00120
   name: Biotin
@@ -362,6 +511,7 @@ top_metabolites:
   transporter_count: 1
 - formula: C11H15N5O3S
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00170
   name: 5^-Methylthioadenosine
@@ -371,6 +521,7 @@ top_metabolites:
   transporter_count: 1
 - formula: Co
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00175
   name: Cobalt ion
@@ -380,6 +531,7 @@ top_metabolites:
   transporter_count: 1
 - formula: C17H19N4O6
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00255
   name: Riboflavin
@@ -389,18 +541,10 @@ top_metabolites:
   transporter_count: 1
 - formula: Mg
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00305
   name: Magnesium cation
-  reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
-  transporter_count: 1
-- formula: C12H17N4OS
-  gene_count: 1
-  metabolism_rows: 0
-  metabolite_id: kegg.compound:C00378
-  name: Thiamine
   reaction_count: 0
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
@@ -427,7 +571,7 @@ top_tcdb_families:
   tcdb_family_name: The Thiamin Precursor (Thi-P) Family
 - gene_count: 1
   level_kind: tc_subfamily
-  metabolite_count: 1
+  metabolite_count: 2
   substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.32
   tcdb_family_name: The Cobalamin Precursor (B 12 -P) Family
@@ -437,7 +581,7 @@ top_tcdb_families:
   substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.33
   tcdb_family_name: The Methylthioadenosine (MTA) Family
-total_matching: 12
+total_matching: 13
 transporter_count_total: 5
 truncated: false
 warnings: []

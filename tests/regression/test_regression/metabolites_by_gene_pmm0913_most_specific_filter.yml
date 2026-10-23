@@ -21,27 +21,28 @@ by_element:
   metabolite_count: 2
 by_element_truncated: true
 by_evidence_source:
-- count: 217
+- count: 242
   evidence_source: transport
 by_gene:
 - gene_name: salY
+  go_transport_rows: 0
   locus_tag: PMM0913
   metabolism_rows: 0
-  metabolite_count: 217
+  metabolite_count: 242
   product: putative ABC efflux system
   reaction_count: 0
-  rows: 217
+  rows: 242
   tcdb_evidence_score_max: 0.8
   transport_inherited_rows: 0
-  transport_most_specific_rows: 217
+  transport_most_specific_rows: 242
   transport_substrate_resolution: family_inferred
   transporter_count: 1
 by_substrate_depth:
-- count: 217
+- count: 242
   substrate_depth: most_specific
 case_id: metabolites_by_gene_pmm0913_most_specific_filter
 gene_count_total: 1
-metabolite_count_total: 217
+metabolite_count_total: 242
 not_found:
   locus_tags: []
   metabolite_elements: []
@@ -56,17 +57,23 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0913
   mass_balance: null
-  metabolite_chebi_id: '104011'
-  metabolite_formula: C9H9N2O3
-  metabolite_id: chebi:104011
-  metabolite_mass: 193.182
-  metabolite_name: p-aminohippuric acid
+  metabolite_id: chebi.role:22153
+  metabolite_name: acaricide
   product: putative ABC efflux system
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: chemical_role
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
@@ -74,15 +81,23 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0913
   mass_balance: null
-  metabolite_chebi_id: '133008'
-  metabolite_id: chebi:133008
-  metabolite_name: Epclusa
+  metabolite_id: chebi.role:22587
+  metabolite_name: antiviral agent
   product: putative ABC efflux system
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: chemical_role
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
@@ -90,17 +105,23 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0913
   mass_balance: null
-  metabolite_chebi_id: '133462'
-  metabolite_formula: C11H6N2O6S3
-  metabolite_id: chebi:133462
-  metabolite_mass: 358.378
-  metabolite_name: firefly sulfoluciferin
+  metabolite_id: chebi.role:22676
+  metabolite_name: auxin
   product: putative ABC efflux system
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: chemical_role
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
@@ -108,15 +129,23 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0913
   mass_balance: null
-  metabolite_chebi_id: '134179'
-  metabolite_id: chebi:134179
-  metabolite_name: volatile organic compound
+  metabolite_id: chebi.role:23530
+  metabolite_name: cytokinin
   product: putative ABC efflux system
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: chemical_role
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
@@ -124,15 +153,23 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0913
   mass_balance: null
-  metabolite_chebi_id: '22315'
-  metabolite_id: chebi:22315
-  metabolite_name: alkaloid
+  metabolite_id: chebi.role:24127
+  metabolite_name: fungicide
   product: putative ABC efflux system
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: chemical_role
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
@@ -140,15 +177,23 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0913
   mass_balance: null
-  metabolite_chebi_id: '22563'
-  metabolite_id: chebi:22563
-  metabolite_name: anion
+  metabolite_id: chebi.role:24527
+  metabolite_name: herbicide
   product: putative ABC efflux system
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: chemical_role
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
@@ -156,15 +201,23 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0913
   mass_balance: null
-  metabolite_chebi_id: '23219'
-  metabolite_id: chebi:23219
-  metabolite_name: bile acid taurine conjugate
+  metabolite_id: chebi.role:25212
+  metabolite_name: metabolite
   product: putative ABC efflux system
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: chemical_role
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
@@ -172,15 +225,23 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0913
   mass_balance: null
-  metabolite_chebi_id: '23403'
-  metabolite_id: chebi:23403
-  metabolite_name: coumarins
+  metabolite_id: chebi.role:25435
+  metabolite_name: mutagen
   product: putative ABC efflux system
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: chemical_role
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
@@ -188,15 +249,23 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0913
   mass_balance: null
-  metabolite_chebi_id: '23447'
-  metabolite_id: chebi:23447
-  metabolite_name: cyclic nucleotide
+  metabolite_id: chebi.role:26115
+  metabolite_name: phytoalexin
   product: putative ABC efflux system
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: chemical_role
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
@@ -204,15 +273,23 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: salY
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0913
   mass_balance: null
-  metabolite_chebi_id: '23765'
-  metabolite_id: chebi:23765
-  metabolite_name: quinolone
+  metabolite_id: chebi.role:26130
+  metabolite_name: biological pigment
   product: putative ABC efflux system
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: chemical_role
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
@@ -276,92 +353,102 @@ top_metabolite_pathways:
   pathway_reaction_count: 8
 top_metabolite_pathways_truncated: true
 top_metabolites:
-- formula: C9H9N2O3
+- formula: null
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
-  metabolite_id: chebi:104011
-  name: p-aminohippuric acid
+  metabolite_id: chebi.role:22153
+  name: acaricide
   reaction_count: 0
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
   transporter_count: 1
 - formula: null
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
-  metabolite_id: chebi:133008
-  name: Epclusa
-  reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
-  transporter_count: 1
-- formula: C11H6N2O6S3
-  gene_count: 1
-  metabolism_rows: 0
-  metabolite_id: chebi:133462
-  name: firefly sulfoluciferin
+  metabolite_id: chebi.role:22587
+  name: antiviral agent
   reaction_count: 0
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
   transporter_count: 1
 - formula: null
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
-  metabolite_id: chebi:134179
-  name: volatile organic compound
+  metabolite_id: chebi.role:22676
+  name: auxin
   reaction_count: 0
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
   transporter_count: 1
 - formula: null
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
-  metabolite_id: chebi:22315
-  name: alkaloid
+  metabolite_id: chebi.role:23530
+  name: cytokinin
   reaction_count: 0
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
   transporter_count: 1
 - formula: null
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
-  metabolite_id: chebi:22563
-  name: anion
+  metabolite_id: chebi.role:24127
+  name: fungicide
   reaction_count: 0
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
   transporter_count: 1
 - formula: null
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
-  metabolite_id: chebi:23219
-  name: bile acid taurine conjugate
+  metabolite_id: chebi.role:24527
+  name: herbicide
   reaction_count: 0
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
   transporter_count: 1
 - formula: null
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
-  metabolite_id: chebi:23403
-  name: coumarins
+  metabolite_id: chebi.role:25212
+  name: metabolite
   reaction_count: 0
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
   transporter_count: 1
 - formula: null
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
-  metabolite_id: chebi:23447
-  name: cyclic nucleotide
+  metabolite_id: chebi.role:25435
+  name: mutagen
   reaction_count: 0
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
   transporter_count: 1
 - formula: null
   gene_count: 1
+  go_transport_rows: 0
   metabolism_rows: 0
-  metabolite_id: chebi:23765
-  name: quinolone
+  metabolite_id: chebi.role:26115
+  name: phytoalexin
+  reaction_count: 0
+  transport_inherited_rows: 0
+  transport_most_specific_rows: 1
+  transporter_count: 1
+- formula: null
+  gene_count: 1
+  go_transport_rows: 0
+  metabolism_rows: 0
+  metabolite_id: chebi.role:26130
+  name: biological pigment
   reaction_count: 0
   transport_inherited_rows: 0
   transport_most_specific_rows: 1
@@ -370,11 +457,11 @@ top_reactions: []
 top_tcdb_families:
 - gene_count: 1
   level_kind: tc_family
-  metabolite_count: 217
+  metabolite_count: 242
   substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1
   tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-total_matching: 217
+total_matching: 242
 transporter_count_total: 1
 truncated: true
 warnings: []

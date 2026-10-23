@@ -4,6 +4,7 @@ by_evidence_source:
 by_metabolite:
 - formula: CH4N2O
   gene_count: 5
+  go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00086
   name: Urea
@@ -30,6 +31,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtA
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0970
   mass_balance: null
   metabolite_chebi_id: '16199'
@@ -41,6 +50,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.6
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: The high-affinity (<1 μM) urea porter
@@ -48,6 +58,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtA
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0970
   mass_balance: null
   metabolite_chebi_id: '16199'
@@ -59,6 +77,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.6
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
@@ -66,6 +85,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtB
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0971
   mass_balance: null
   metabolite_chebi_id: '16199'
@@ -77,6 +104,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: The high-affinity (<1 μM) urea porter
@@ -84,6 +112,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtB
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0971
   mass_balance: null
   metabolite_chebi_id: '16199'
@@ -95,6 +131,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
@@ -102,6 +139,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtC
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0972
   mass_balance: null
   metabolite_chebi_id: '16199'
@@ -113,6 +158,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: The high-affinity (<1 μM) urea porter
@@ -120,6 +166,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtC
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0972
   mass_balance: null
   metabolite_chebi_id: '16199'
@@ -131,6 +185,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
@@ -138,6 +193,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtD
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0973
   mass_balance: null
   metabolite_chebi_id: '16199'
@@ -149,6 +212,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: The high-affinity (<1 μM) urea porter
@@ -156,6 +220,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtD
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0973
   mass_balance: null
   metabolite_chebi_id: '16199'
@@ -167,6 +239,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
@@ -174,6 +247,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtE
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0974
   mass_balance: null
   metabolite_chebi_id: '16199'
@@ -185,6 +266,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: The high-affinity (<1 μM) urea porter
@@ -192,6 +274,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtE
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0974
   mass_balance: null
   metabolite_chebi_id: '16199'
@@ -203,6 +293,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
@@ -216,6 +307,7 @@ top_gene_categories:
   gene_count: 5
 top_genes:
 - gene_name: urtA
+  go_transport_rows: 0
   locus_tag: PMM0970
   metabolism_rows: 0
   metabolite_count: 1
@@ -226,6 +318,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtB
+  go_transport_rows: 0
   locus_tag: PMM0971
   metabolism_rows: 0
   metabolite_count: 1
@@ -236,6 +329,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtC
+  go_transport_rows: 0
   locus_tag: PMM0972
   metabolism_rows: 0
   metabolite_count: 1
@@ -246,6 +340,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtD
+  go_transport_rows: 0
   locus_tag: PMM0973
   metabolism_rows: 0
   metabolite_count: 1
@@ -256,6 +351,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtE
+  go_transport_rows: 0
   locus_tag: PMM0974
   metabolism_rows: 0
   metabolite_count: 1

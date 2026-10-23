@@ -1,16 +1,19 @@
 by_evidence_source:
 - count: 30
   evidence_source: transport
+- count: 11
+  evidence_source: go_transport
 - count: 4
   evidence_source: metabolism
 by_metabolite:
 - formula: CH4N2O
   gene_count: 29
+  go_transport_rows: 11
   metabolism_rows: 4
   metabolite_id: kegg.compound:C00086
   name: Urea
   reaction_count: 2
-  rows: 34
+  rows: 45
   transport_inherited_rows: 20
   transport_most_specific_rows: 10
   transporter_count: 3
@@ -35,6 +38,14 @@ results:
   - 3.5.1.5
   evidence_source: metabolism
   gene_name: ureC
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0963
   mass_balance: balanced
   metabolite_chebi_id: '16199'
@@ -46,6 +57,7 @@ results:
   reaction_id: kegg.reaction:R00131
   reaction_name: urea amidohydrolase; Urea + H2O <=> CO2 + 2 Ammonia
   substrate_depth: null
+  target_kind: metabolite
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
@@ -54,6 +66,14 @@ results:
   - 3.5.1.5
   evidence_source: metabolism
   gene_name: ureB
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0964
   mass_balance: balanced
   metabolite_chebi_id: '16199'
@@ -65,6 +85,7 @@ results:
   reaction_id: kegg.reaction:R00131
   reaction_name: urea amidohydrolase; Urea + H2O <=> CO2 + 2 Ammonia
   substrate_depth: null
+  target_kind: metabolite
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
@@ -73,6 +94,14 @@ results:
   - 3.5.1.5
   evidence_source: metabolism
   gene_name: ureA
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0965
   mass_balance: balanced
   metabolite_chebi_id: '16199'
@@ -84,6 +113,7 @@ results:
   reaction_id: kegg.reaction:R00131
   reaction_name: urea amidohydrolase; Urea + H2O <=> CO2 + 2 Ammonia
   substrate_depth: null
+  target_kind: metabolite
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
@@ -91,6 +121,14 @@ results:
 - ec_numbers: null
   evidence_source: transport
   gene_name: urtB
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0971
   mass_balance: null
   metabolite_chebi_id: '16199'
@@ -102,6 +140,7 @@ results:
   reaction_id: null
   reaction_name: null
   substrate_depth: most_specific
+  target_kind: metabolite
   tcdb_evidence_score: 0.8
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: The high-affinity (<1 μM) urea porter
@@ -111,6 +150,14 @@ results:
   - 3.5.3.11
   evidence_source: metabolism
   gene_name: speB
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM1686
   mass_balance: balanced
   metabolite_chebi_id: '16199'
@@ -122,12 +169,16 @@ results:
   reaction_id: kegg.reaction:R01157
   reaction_name: agmatine amidinohydrolase; Agmatine + H2O <=> Putrescine + Urea
   substrate_depth: null
+  target_kind: metabolite
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
   transport_substrate_resolution: null
 returned: 5
 row_count: 5
+rows_by_go_term_depth:
+- count: 11
+  go_term_depth: 0
 stereo_forms_added: {}
 stereo_relatives: {}
 top_gene_categories:
@@ -151,6 +202,7 @@ top_gene_categories:
   gene_count: 1
 top_genes:
 - gene_name: urtA
+  go_transport_rows: 2
   locus_tag: PMM0970
   metabolism_rows: 0
   metabolite_count: 1
@@ -161,6 +213,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtB
+  go_transport_rows: 2
   locus_tag: PMM0971
   metabolism_rows: 0
   metabolite_count: 1
@@ -171,6 +224,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtC
+  go_transport_rows: 2
   locus_tag: PMM0972
   metabolism_rows: 0
   metabolite_count: 1
@@ -181,6 +235,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtD
+  go_transport_rows: 2
   locus_tag: PMM0973
   metabolism_rows: 0
   metabolite_count: 1
@@ -191,6 +246,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: urtE
+  go_transport_rows: 3
   locus_tag: PMM0974
   metabolism_rows: 0
   metabolite_count: 1
@@ -201,6 +257,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: sufC
+  go_transport_rows: 0
   locus_tag: PMM0072
   metabolism_rows: 0
   metabolite_count: 1
@@ -211,6 +268,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 1
 - gene_name: null
+  go_transport_rows: 0
   locus_tag: PMM0089
   metabolism_rows: 0
   metabolite_count: 1
@@ -221,6 +279,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 1
 - gene_name: tolC
+  go_transport_rows: 0
   locus_tag: PMM0097
   metabolism_rows: 0
   metabolite_count: 1
@@ -231,6 +290,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 1
 - gene_name: cgtA
+  go_transport_rows: 0
   locus_tag: PMM0218
   metabolism_rows: 0
   metabolite_count: 1
@@ -241,6 +301,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 1
 - gene_name: minD
+  go_transport_rows: 0
   locus_tag: PMM0321
   metabolism_rows: 0
   metabolite_count: 1
@@ -284,7 +345,7 @@ top_tcdb_families:
   substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
-total_matching: 34
+total_matching: 45
 transporter_count_total: 3
 truncated: true
 warnings:

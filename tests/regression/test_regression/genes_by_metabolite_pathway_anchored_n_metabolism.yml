@@ -6,6 +6,7 @@ by_evidence_source:
 by_metabolite:
 - formula: C5H10N2O3
   gene_count: 48
+  go_transport_rows: 0
   metabolism_rows: 32
   metabolite_id: kegg.compound:C00064
   name: L-Glutamine
@@ -16,6 +17,7 @@ by_metabolite:
   transporter_count: 3
 - formula: NO2
   gene_count: 27
+  go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00088
   name: Nitrite
@@ -60,6 +62,14 @@ results:
   - 6.3.5.7
   evidence_source: metabolism
   gene_name: carB
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0825
   mass_balance: balanced
   metabolite_chebi_id: '18050'
@@ -71,6 +81,7 @@ results:
   reaction_id: kegg.reaction:R00256
   reaction_name: L-glutamine amidohydrolase; L-Glutamine + H2O <=> L-Glutamate + Ammonia
   substrate_depth: null
+  target_kind: metabolite
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
@@ -79,6 +90,14 @@ results:
   - 6.3.1.2
   evidence_source: metabolism
   gene_name: glnA
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0920
   mass_balance: balanced
   metabolite_chebi_id: '18050'
@@ -91,6 +110,7 @@ results:
   reaction_name: L-glutamate:ammonia ligase (ADP-forming); ATP + L-Glutamate + Ammonia
     <=> ADP + Orthophosphate + L-Glutamine
   substrate_depth: null
+  target_kind: metabolite
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
@@ -113,6 +133,14 @@ results:
   - 6.3.5.7
   evidence_source: metabolism
   gene_name: carA
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM0951
   mass_balance: balanced
   metabolite_chebi_id: '18050'
@@ -124,6 +152,7 @@ results:
   reaction_id: kegg.reaction:R00256
   reaction_name: L-glutamine amidohydrolase; L-Glutamine + H2O <=> L-Glutamate + Ammonia
   substrate_depth: null
+  target_kind: metabolite
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
@@ -132,6 +161,14 @@ results:
   - 6.3.5.1
   evidence_source: metabolism
   gene_name: nadE
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM1446
   mass_balance: balanced
   metabolite_chebi_id: '18050'
@@ -144,6 +181,7 @@ results:
   reaction_name: deamido-NAD+:L-glutamine amido-ligase (AMP-forming); ATP + Deamino-NAD+
     + L-Glutamine + H2O <=> AMP + Diphosphate + NAD+ + L-Glutamate
   substrate_depth: null
+  target_kind: metabolite
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
@@ -152,6 +190,14 @@ results:
   - 1.4.7.1
   evidence_source: metabolism
   gene_name: glsF
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
   locus_tag: PMM1512
   mass_balance: balanced
   metabolite_chebi_id: '18050'
@@ -165,12 +211,14 @@ results:
     + 2 Oxidized ferredoxin <=> L-Glutamine + 2-Oxoglutarate + 2 Reduced ferredoxin
     + 2 H+
   substrate_depth: null
+  target_kind: metabolite
   tcdb_evidence_score: null
   tcdb_family_id: null
   tcdb_family_name: null
   transport_substrate_resolution: null
 returned: 5
 row_count: 5
+rows_by_go_term_depth: []
 stereo_forms_added: {}
 stereo_relatives: {}
 top_gene_categories:
@@ -196,6 +244,7 @@ top_gene_categories:
   gene_count: 1
 top_genes:
 - gene_name: guaA
+  go_transport_rows: 0
   locus_tag: PMM0037
   metabolism_rows: 2
   metabolite_count: 1
@@ -206,6 +255,7 @@ top_genes:
   transport_substrate_resolution: null
   transporter_count: 0
 - gene_name: gatB
+  go_transport_rows: 0
   locus_tag: PMM0048
   metabolism_rows: 2
   metabolite_count: 1
@@ -216,6 +266,7 @@ top_genes:
   transport_substrate_resolution: null
   transporter_count: 0
 - gene_name: pabC
+  go_transport_rows: 0
   locus_tag: PMM0184
   metabolism_rows: 2
   metabolite_count: 1
@@ -226,6 +277,7 @@ top_genes:
   transport_substrate_resolution: null
   transporter_count: 0
 - gene_name: gatC
+  go_transport_rows: 0
   locus_tag: PMM0235
   metabolism_rows: 2
   metabolite_count: 1
@@ -236,6 +288,7 @@ top_genes:
   transport_substrate_resolution: null
   transporter_count: 0
 - gene_name: cynA
+  go_transport_rows: 0
   locus_tag: PMM0370
   metabolism_rows: 0
   metabolite_count: 1
@@ -246,6 +299,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: cynB
+  go_transport_rows: 0
   locus_tag: PMM0371
   metabolism_rows: 0
   metabolite_count: 1
@@ -256,6 +310,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 2
 - gene_name: null
+  go_transport_rows: 0
   locus_tag: PMM0695
   metabolism_rows: 2
   metabolite_count: 1
@@ -266,6 +321,7 @@ top_genes:
   transport_substrate_resolution: null
   transporter_count: 0
 - gene_name: carB
+  go_transport_rows: 0
   locus_tag: PMM0825
   metabolism_rows: 2
   metabolite_count: 1
@@ -276,6 +332,7 @@ top_genes:
   transport_substrate_resolution: null
   transporter_count: 0
 - gene_name: gatA
+  go_transport_rows: 0
   locus_tag: PMM0946
   metabolism_rows: 2
   metabolite_count: 1
@@ -286,6 +343,7 @@ top_genes:
   transport_substrate_resolution: resolved
   transporter_count: 0
 - gene_name: carA
+  go_transport_rows: 0
   locus_tag: PMM0951
   metabolism_rows: 2
   metabolite_count: 1

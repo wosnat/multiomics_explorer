@@ -57,6 +57,8 @@ results:
   evidence_sources:
   - transport
   formula: C6H12O6
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 180.156
   measured_assay_count: 0
   measured_compartments: []
@@ -88,6 +90,8 @@ results:
   - metabolomics
   - transport
   formula: C15H22N2O17P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   kegg_functional_categories:
   - Vitamins and cofactors
   mass: 564.286
@@ -136,6 +140,40 @@ results:
   - metabolism
   - transport
   formula: C6H12O6
+  go_transport_organism_count: 32
+  go_transport_organism_names:
+  - Alteromonas (MarRef v6)
+  - Alteromonas macleodii AD45
+  - Alteromonas macleodii ATCC27126
+  - Alteromonas macleodii BGP6
+  - Alteromonas macleodii BS11
+  - Alteromonas macleodii EZ55
+  - Alteromonas macleodii HOT1A3
+  - Alteromonas macleodii MIT1002
+  - Alteromonas mediterranea AltDE
+  - Alteromonas mediterranea AltDE1
+  - Prochlorococcus AS9601
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT0604
+  - Prochlorococcus MIT0801
+  - Prochlorococcus MIT1327
+  - Prochlorococcus MIT9202
+  - Prochlorococcus MIT9215
+  - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9313
+  - Prochlorococcus MIT9515
+  - Prochlorococcus NATL1A
+  - Prochlorococcus NATL2A
+  - Prochlorococcus PAC1
+  - Prochlorococcus SB
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  - Shewanella sp. W3-18-1
+  - Synechococcus CC9311
+  - Synechococcus WH8102
+  - Synechococcus WH8109
+  - Synechococcus sp. BL107
   kegg_functional_categories:
   - Carbohydrates
   mass: 180.156
@@ -208,6 +246,8 @@ results:
   - metabolism
   - transport
   formula: C16H24N2O16P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 562.314
   measured_assay_count: 0
   measured_compartments: []
@@ -242,6 +282,8 @@ results:
   evidence_sources:
   - metabolism
   formula: C16H23N5O15P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 587.328
   measured_assay_count: 0
   measured_compartments: []
@@ -272,6 +314,8 @@ results:
   evidence_sources:
   - metabolism
   formula: C15H23N3O16P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 563.302
   measured_assay_count: 0
   measured_compartments: []
@@ -300,6 +344,8 @@ results:
   evidence_sources:
   - metabolism
   formula: C6H12O6
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 180.156
   measured_assay_count: 0
   measured_compartments: []
@@ -333,6 +379,8 @@ results:
   evidence_sources:
   - metabolism
   formula: C6H12O6
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 180.156
   measured_assay_count: 0
   measured_compartments: []
@@ -373,6 +421,8 @@ results:
   - metabolomics
   - transport
   formula: C6H11O9P
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 258.119
   measured_assay_count: 14
   measured_compartments:
@@ -430,6 +480,8 @@ results:
   - metabolism
   - metabolomics
   formula: C6H11O9P
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 258.119
   measured_assay_count: 4
   measured_compartments:
@@ -478,6 +530,8 @@ results:
   evidence_sources:
   - transport
   formula: C6H12O5
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   kegg_functional_categories:
   - Carbohydrates
   mass: 164.157
@@ -503,6 +557,8 @@ results:
   evidence_sources:
   - transport
   formula: C7H14O6
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 194.183
   measured_assay_count: 0
   measured_compartments: []
@@ -528,6 +584,8 @@ results:
   - metabolism
   - transport
   formula: C6H11O9P
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 258.119
   measured_assay_count: 0
   measured_compartments: []
@@ -569,6 +627,8 @@ results:
   - metabolism
   - transport
   formula: C6H11O9P
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 258.119
   measured_assay_count: 0
   measured_compartments: []
@@ -605,6 +665,8 @@ results:
   evidence_sources:
   - metabolism
   formula: C6H11O9P
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 258.119
   measured_assay_count: 0
   measured_compartments: []
@@ -635,6 +697,8 @@ results:
   evidence_sources:
   - metabolism
   formula: C15H23N3O14P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 531.304
   measured_assay_count: 0
   measured_compartments: []
@@ -663,6 +727,8 @@ results:
   evidence_sources:
   - metabolism
   formula: C16H22N2O15P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 544.299
   measured_assay_count: 0
   measured_compartments: []
@@ -696,6 +762,8 @@ results:
   evidence_sources:
   - metabolism
   formula: C15H21N3O15P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 545.287
   measured_assay_count: 0
   measured_compartments: []
@@ -724,6 +792,8 @@ results:
   evidence_sources:
   - metabolism
   formula: C15H21N3O14P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 529.288
   measured_assay_count: 0
   measured_compartments: []
@@ -752,6 +822,8 @@ results:
   evidence_sources:
   - metabolism
   formula: C16H26N3O14P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 546.339
   measured_assay_count: 0
   measured_compartments: []
@@ -782,6 +854,8 @@ results:
   evidence_sources:
   - metabolism
   formula: C12H23O14P
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 422.276
   measured_assay_count: 0
   measured_compartments: []
@@ -809,6 +883,8 @@ results:
   evidence_sources:
   - metabolism
   formula: C16H25N3O13P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 529.332
   measured_assay_count: 0
   measured_compartments: []
@@ -838,6 +914,8 @@ results:
   evidence_sources:
   - metabolism
   formula: C18H32O16
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 504.438
   measured_assay_count: 0
   measured_compartments: []

@@ -61,6 +61,8 @@ results:
   - metabolism
   - transport
   formula: CO2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 44.009
   measured_assay_count: 0
   measured_compartments: []
@@ -109,6 +111,51 @@ results:
   - metabolism
   - transport
   formula: H4N
+  go_transport_organism_count: 43
+  go_transport_organism_names:
+  - Alteromonas (MarRef v6)
+  - Alteromonas macleodii AD45
+  - Alteromonas macleodii ATCC27126
+  - Alteromonas macleodii BGP6
+  - Alteromonas macleodii BS11
+  - Alteromonas macleodii EZ55
+  - Alteromonas macleodii HOT1A3
+  - Alteromonas macleodii MIT1002
+  - Alteromonas mediterranea AltDE
+  - Alteromonas mediterranea AltDE1
+  - Marinobacter (MarRef v6)
+  - Meiothermus ruber
+  - Prochlorococcus AS9601
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT0604
+  - Prochlorococcus MIT0801
+  - Prochlorococcus MIT1314
+  - Prochlorococcus MIT1327
+  - Prochlorococcus MIT9202
+  - Prochlorococcus MIT9215
+  - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9313
+  - Prochlorococcus MIT9515
+  - Prochlorococcus NATL1A
+  - Prochlorococcus NATL2A
+  - Prochlorococcus PAC1
+  - Prochlorococcus RSP50
+  - Prochlorococcus SB
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  - Pseudomonas putida KT2440
+  - Ruegeria pomeroyi DSS-3
+  - Shewanella sp. W3-18-1
+  - Synechococcus CC9311
+  - Synechococcus PCC 7002
+  - Synechococcus WH7803
+  - Synechococcus WH8102
+  - Synechococcus WH8109
+  - Synechococcus elongatus PCC 7942
+  - Synechococcus elongatus UTEX 2973
+  - Synechococcus sp. BL107
+  - Thermosynechococcus vestitus BP-1
   mass: 18.039
   measured_assay_count: 0
   measured_compartments: []
@@ -154,6 +201,35 @@ results:
   - metabolomics
   - transport
   formula: C5H8NO4
+  go_transport_organism_count: 27
+  go_transport_organism_names:
+  - Prochlorococcus AS9601
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT0604
+  - Prochlorococcus MIT0801
+  - Prochlorococcus MIT1314
+  - Prochlorococcus MIT1327
+  - Prochlorococcus MIT9202
+  - Prochlorococcus MIT9215
+  - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9313
+  - Prochlorococcus MIT9515
+  - Prochlorococcus NATL1A
+  - Prochlorococcus NATL2A
+  - Prochlorococcus PAC1
+  - Prochlorococcus RSP50
+  - Prochlorococcus SB
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  - Pseudomonas putida KT2440
+  - Ruegeria pomeroyi DSS-3
+  - Shewanella sp. W3-18-1
+  - Synechococcus PCC 7002
+  - Synechococcus WH7803
+  - Synechococcus WH8102
+  - Synechococcus sp. BL107
+  - Thermosynechococcus vestitus BP-1
   kegg_functional_categories:
   - Hormones and transmitters
   - Peptides
@@ -245,6 +321,21 @@ results:
   - metabolism
   - transport
   formula: O2
+  go_transport_organism_count: 13
+  go_transport_organism_names:
+  - Alteromonas (MarRef v6)
+  - Alteromonas macleodii AD45
+  - Alteromonas macleodii ATCC27126
+  - Alteromonas macleodii BGP6
+  - Alteromonas macleodii BS11
+  - Alteromonas macleodii EZ55
+  - Alteromonas macleodii HOT1A3
+  - Alteromonas macleodii MIT1002
+  - Alteromonas mediterranea AltDE
+  - Alteromonas mediterranea AltDE1
+  - Marinobacter (MarRef v6)
+  - Ruegeria pomeroyi DSS-3
+  - Shewanella sp. W3-18-1
   mass: 31.998
   measured_assay_count: 0
   measured_compartments: []
@@ -283,6 +374,8 @@ results:
   - metabolomics
   - transport
   formula: C5H10N2O3
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   kegg_functional_categories:
   - Peptides
   mass: 146.146
@@ -344,6 +437,20 @@ results:
   - metabolism
   - transport
   formula: CHO3
+  go_transport_organism_count: 12
+  go_transport_organism_names:
+  - Prochlorococcus MIT1327
+  - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9313
+  - Synechococcus CC9311
+  - Synechococcus PCC 7002
+  - Synechococcus WH7803
+  - Synechococcus WH8102
+  - Synechococcus WH8109
+  - Synechococcus elongatus PCC 7942
+  - Synechococcus elongatus UTEX 2973
+  - Synechococcus sp. BL107
+  - Thermosynechococcus vestitus BP-1
   mass: 61.016
   measured_assay_count: 0
   measured_compartments: []
@@ -385,6 +492,26 @@ results:
   - metabolism
   - transport
   formula: CHO2
+  go_transport_organism_count: 18
+  go_transport_organism_names:
+  - Alteromonas macleodii AD45
+  - Alteromonas macleodii ATCC27126
+  - Alteromonas macleodii BGP6
+  - Alteromonas macleodii BS11
+  - Alteromonas macleodii EZ55
+  - Alteromonas macleodii HOT1A3
+  - Alteromonas macleodii MIT1002
+  - Alteromonas mediterranea AltDE
+  - Alteromonas mediterranea AltDE1
+  - Marinobacter (MarRef v6)
+  - Prochlorococcus MIT0801
+  - Prochlorococcus MIT9313
+  - Pseudomonas putida KT2440
+  - Ruegeria pomeroyi DSS-3
+  - Shewanella sp. W3-18-1
+  - Synechococcus CC9311
+  - Synechococcus PCC 7002
+  - Synechococcus WH8109
   kegg_brite_classes:
   - 'Lipids: Fatty acyls'
   kegg_functional_categories:
@@ -425,6 +552,8 @@ results:
   - metabolism
   - transport
   formula: CH2NO5P
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 139.003
   measured_assay_count: 0
   measured_compartments: []
@@ -459,6 +588,8 @@ results:
   evidence_sources:
   - metabolism
   formula: CH2NO2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 60.032
   measured_assay_count: 0
   measured_compartments: []
@@ -485,6 +616,25 @@ results:
   - metabolism
   - transport
   formula: NO2
+  go_transport_organism_count: 17
+  go_transport_organism_names:
+  - Alteromonas (MarRef v6)
+  - Prochlorococcus MIT0604
+  - Prochlorococcus MIT0801
+  - Prochlorococcus MIT1327
+  - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9313
+  - Prochlorococcus NATL1A
+  - Prochlorococcus NATL2A
+  - Prochlorococcus PAC1
+  - Prochlorococcus SB
+  - Pseudomonas putida KT2440
+  - Synechococcus CC9311
+  - Synechococcus PCC 7002
+  - Synechococcus WH7803
+  - Synechococcus WH8102
+  - Synechococcus WH8109
+  - Synechococcus sp. BL107
   mass: 46.005
   measured_assay_count: 0
   measured_compartments: []
@@ -517,6 +667,34 @@ results:
   - metabolism
   - transport
   formula: HNO3
+  go_transport_organism_count: 26
+  go_transport_organism_names:
+  - Alteromonas (MarRef v6)
+  - Alteromonas macleodii AD45
+  - Alteromonas macleodii ATCC27126
+  - Alteromonas macleodii BGP6
+  - Alteromonas macleodii BS11
+  - Alteromonas macleodii EZ55
+  - Alteromonas macleodii HOT1A3
+  - Alteromonas macleodii MIT1002
+  - Alteromonas mediterranea AltDE
+  - Alteromonas mediterranea AltDE1
+  - Marinobacter (MarRef v6)
+  - Meiothermus ruber
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT0604
+  - Prochlorococcus PAC1
+  - Prochlorococcus SB
+  - Pseudomonas putida KT2440
+  - Synechococcus CC9311
+  - Synechococcus PCC 7002
+  - Synechococcus WH7803
+  - Synechococcus WH8102
+  - Synechococcus WH8109
+  - Synechococcus elongatus PCC 7942
+  - Synechococcus elongatus UTEX 2973
+  - Synechococcus sp. BL107
+  - Thermosynechococcus vestitus BP-1
   mass: 63.012
   measured_assay_count: 0
   measured_compartments: []
@@ -547,6 +725,11 @@ results:
   - metabolism
   - transport
   formula: CNO
+  go_transport_organism_count: 3
+  go_transport_organism_names:
+  - Prochlorococcus MED4
+  - Prochlorococcus SB
+  - Synechococcus WH8102
   mass: 42.017
   measured_assay_count: 0
   measured_compartments: []
@@ -572,6 +755,8 @@ results:
   - metabolism
   - transport
   formula: N2O
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 44.013
   measured_assay_count: 0
   measured_compartments: []
@@ -597,6 +782,8 @@ results:
   evidence_sources:
   - metabolism
   formula: CN*
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: null
   measured_assay_count: 0
   measured_compartments: []
@@ -623,6 +810,8 @@ results:
   - metabolism
   - transport
   formula: CH3NO
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 45.041
   measured_assay_count: 0
   measured_compartments: []
@@ -648,6 +837,8 @@ results:
   evidence_sources:
   - metabolism
   formula: 'NO'
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 30.006
   measured_assay_count: 0
   measured_compartments: []
@@ -710,6 +901,8 @@ results:
   - metabolism
   - transport
   formula: H3NO
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 33.03
   measured_assay_count: 0
   measured_compartments: []
@@ -734,6 +927,8 @@ results:
   evidence_sources:
   - metabolism
   formula: N2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 28.014
   measured_assay_count: 0
   measured_compartments: []

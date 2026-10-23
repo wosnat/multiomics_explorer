@@ -135,6 +135,13 @@ results:
   - metabolism
   - transport
   formula: H2O
+  go_transport_organism_count: 5
+  go_transport_organism_names:
+  - Meiothermus ruber
+  - Pseudomonas putida KT2440
+  - Ruegeria pomeroyi DSS-3
+  - Shewanella sp. W3-18-1
+  - Synechococcus PCC 7002
   mass: 18.015
   measured_assay_count: 0
   measured_compartments: []
@@ -177,6 +184,8 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   kegg_brite_classes:
   - 'Glycosides: N-glycosides'
   kegg_functional_categories:
@@ -236,6 +245,8 @@ results:
   - metabolism
   - transport
   formula: H
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 1.0079
   measured_assay_count: 0
   measured_compartments: []
@@ -286,6 +297,8 @@ results:
   - metabolism
   - transport
   formula: HO7P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 174.949
   measured_assay_count: 0
   measured_compartments: []
@@ -313,6 +326,51 @@ results:
   - metabolism
   - transport
   formula: HO4P
+  go_transport_organism_count: 43
+  go_transport_organism_names:
+  - Alteromonas (MarRef v6)
+  - Alteromonas macleodii AD45
+  - Alteromonas macleodii ATCC27126
+  - Alteromonas macleodii BGP6
+  - Alteromonas macleodii BS11
+  - Alteromonas macleodii EZ55
+  - Alteromonas macleodii HOT1A3
+  - Alteromonas macleodii MIT1002
+  - Alteromonas mediterranea AltDE
+  - Alteromonas mediterranea AltDE1
+  - Marinobacter (MarRef v6)
+  - Meiothermus ruber
+  - Prochlorococcus AS9601
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT0604
+  - Prochlorococcus MIT0801
+  - Prochlorococcus MIT1314
+  - Prochlorococcus MIT1327
+  - Prochlorococcus MIT9202
+  - Prochlorococcus MIT9215
+  - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9313
+  - Prochlorococcus MIT9515
+  - Prochlorococcus NATL1A
+  - Prochlorococcus NATL2A
+  - Prochlorococcus PAC1
+  - Prochlorococcus RSP50
+  - Prochlorococcus SB
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  - Pseudomonas putida KT2440
+  - Ruegeria pomeroyi DSS-3
+  - Shewanella sp. W3-18-1
+  - Synechococcus CC9311
+  - Synechococcus PCC 7002
+  - Synechococcus WH7803
+  - Synechococcus WH8102
+  - Synechococcus WH8109
+  - Synechococcus elongatus PCC 7942
+  - Synechococcus elongatus UTEX 2973
+  - Synechococcus sp. BL107
+  - Thermosynechococcus vestitus BP-1
   mass: 95.978
   measured_assay_count: 0
   measured_compartments: []
@@ -372,26 +430,26 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko00860
   metabolite_pathway_name: Porphyrin metabolism
 top_organisms:
-- count: 2419
+- count: 2447
   organism_name: Pseudomonas putida KT2440
-- count: 2367
+- count: 2387
   organism_name: Alteromonas macleodii EZ55
-- count: 2363
+- count: 2378
   organism_name: Ruegeria pomeroyi DSS-3
-- count: 2309
-  organism_name: Alteromonas (MarRef v6)
-- count: 2306
+- count: 2321
   organism_name: Alteromonas macleodii MIT1002
-- count: 2293
+- count: 2319
+  organism_name: Alteromonas (MarRef v6)
+- count: 2308
   organism_name: Alteromonas macleodii BGP6
-- count: 2291
+- count: 2306
   organism_name: Alteromonas macleodii HOT1A3
-- count: 2282
+- count: 2297
   organism_name: Alteromonas macleodii AD45
-- count: 2279
+- count: 2297
   organism_name: Marinobacter (MarRef v6)
-- count: 2271
-  organism_name: Alteromonas mediterranea AltDE1
+- count: 2287
+  organism_name: Shewanella sp. W3-18-1
 total_entries: 3243
 total_matching: 3243
 truncated: true

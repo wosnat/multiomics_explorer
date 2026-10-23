@@ -94,7 +94,7 @@ mass_stats:
   mass_max: 5227.103
   mass_median: 336.173
   mass_min: 18.039
-no_formula_excluded: 171
+no_formula_excluded: 176
 not_found:
   elements: []
   metabolite_ids: []
@@ -115,6 +115,8 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   kegg_brite_classes:
   - 'Glycosides: N-glycosides'
   kegg_functional_categories:
@@ -179,6 +181,8 @@ results:
   - metabolomics
   - transport
   formula: C10H12N5O10P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   kegg_brite_classes:
   - 'Glycosides: N-glycosides'
   kegg_functional_categories:
@@ -233,6 +237,8 @@ results:
   - metabolomics
   - transport
   formula: C21H26N7O14P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   kegg_functional_categories:
   - Vitamins and cofactors
   mass: 662.422
@@ -280,6 +286,8 @@ results:
   - metabolomics
   - transport
   formula: C21H27N7O14P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 663.43
   measured_assay_count: 6
   measured_compartments:
@@ -316,6 +324,8 @@ results:
   - metabolomics
   - transport
   formula: C10H12N5O7P
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   kegg_brite_classes:
   - 'Glycosides: N-glycosides'
   kegg_functional_categories:
@@ -425,7 +435,7 @@ total_entries: 3243
 total_matching: 1003
 truncated: true
 warnings:
-- 171 metabolites have no formula and can never match an element filter (often generic
+- 176 metabolites have no formula and can never match an element filter (often generic
   classes such as 'amino acid' or 'dipeptide'). Re-run without elements to inspect
   them.
 xref_coverage:

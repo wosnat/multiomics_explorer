@@ -123,6 +123,8 @@ results:
   - metabolism
   - transport
   formula: C10H12N5O13P3
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   kegg_brite_classes:
   - 'Glycosides: N-glycosides'
   kegg_functional_categories:
@@ -187,6 +189,8 @@ results:
   - metabolomics
   - transport
   formula: C10H12N5O10P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   kegg_brite_classes:
   - 'Glycosides: N-glycosides'
   kegg_functional_categories:
@@ -241,6 +245,8 @@ results:
   - metabolomics
   - transport
   formula: C21H26N7O14P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   kegg_functional_categories:
   - Vitamins and cofactors
   mass: 662.422
@@ -288,6 +294,8 @@ results:
   - metabolomics
   - transport
   formula: C21H27N7O14P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   mass: 663.43
   measured_assay_count: 6
   measured_compartments:
@@ -324,6 +332,8 @@ results:
   - metabolomics
   - transport
   formula: C10H12N5O7P
+  go_transport_organism_count: null
+  go_transport_organism_names: null
   kegg_brite_classes:
   - 'Glycosides: N-glycosides'
   kegg_functional_categories:
@@ -409,7 +419,7 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko00330
   metabolite_pathway_name: Arginine and proline metabolism
 top_organisms:
-- count: 1338
+- count: 1341
   organism_name: Pseudomonas putida KT2440
 - count: 1328
   organism_name: Ruegeria pomeroyi DSS-3

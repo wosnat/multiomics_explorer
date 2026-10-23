@@ -82,26 +82,26 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko00785
   metabolite_pathway_name: Lipoic acid metabolism
 top_organisms:
-- count: 522
-  organism_name: Alteromonas macleodii MIT1002
-- count: 521
-  organism_name: Alteromonas macleodii HOT1A3
-- count: 520
-  organism_name: Alteromonas macleodii BGP6
-- count: 520
-  organism_name: Alteromonas mediterranea AltDE1
-- count: 518
+- count: 537
   organism_name: Alteromonas macleodii EZ55
-- count: 518
+- count: 536
+  organism_name: Alteromonas macleodii MIT1002
+- count: 535
+  organism_name: Alteromonas macleodii HOT1A3
+- count: 534
+  organism_name: Alteromonas macleodii BGP6
+- count: 533
+  organism_name: Alteromonas mediterranea AltDE1
+- count: 532
   organism_name: Alteromonas mediterranea AltDE
-- count: 516
+- count: 530
   organism_name: Alteromonas macleodii ATCC27126
-- count: 513
+- count: 527
   organism_name: Alteromonas macleodii AD45
-- count: 511
-  organism_name: Alteromonas macleodii BS11
-- count: 509
-  organism_name: Alteromonas (MarRef v6)
+- count: 527
+  organism_name: Pseudomonas putida KT2440
+- count: 525
+  organism_name: Shewanella sp. W3-18-1
 total_entries: 3243
 total_matching: 649
 truncated: true
