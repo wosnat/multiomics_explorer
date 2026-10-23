@@ -10341,10 +10341,20 @@ def metabolites_by_gene(
             "non-lumping attachment (not all) — resolved genes can still "
             "contribute `inherited` rows (read per-row `substrate_depth`)."
         )
-    if go_active and any(
-        r.get("evidence_source") == "go_transport"
-        and r.get("metabolite_id") == _NEUROTRANSMITTER_ROLE_ID
-        for r in results
+    # Page rows OR the (uncapped) summary top_metabolites rollup, so the
+    # warning also fires on summary=True and when the role's rows fall
+    # past `limit`.
+    if go_active and (
+        any(
+            r.get("evidence_source") == "go_transport"
+            and r.get("metabolite_id") == _NEUROTRANSMITTER_ROLE_ID
+            for r in results
+        )
+        or any(
+            m.get("metabolite_id") == _NEUROTRANSMITTER_ROLE_ID
+            and (m.get("go_transport_rows") or 0) > 0
+            for m in (raw_summary.get("top_metabolites") or [])
+        )
     ):
         warnings.append(_NEUROTRANSMITTER_WARNING)
     if no_formula_metabolites:
@@ -11828,6 +11838,8 @@ _KG_IDENTITY_FIELDS = (
 
 # `Schema_info.go_transport_excluded_targets`, read once per KG endpoint
 # (GraphConnection) or per connection object (fakes / custom conns).
+# The cache lives for the process (like the kg_release_info cache): restart
+# the server after a KG rebuild.
 _GO_EXCLUDED_BY_ENDPOINT: dict[tuple, frozenset[str]] = {}
 _GO_EXCLUDED_BY_CONN: "weakref.WeakKeyDictionary" = weakref.WeakKeyDictionary()
 

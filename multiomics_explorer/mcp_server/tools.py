@@ -549,7 +549,7 @@ class MetaboliteResult(SparseRow):
     organism_count: int = Field(default=0, description="Distinct organisms reaching this metabolite via any chemistry path. When > 0, narrow with organism_names filter.")
     transporter_count: int = Field(default=0, description="Distinct transporter systems (TcdbFamily nodes) whose substrate edge to this metabolite is substrate_depth='most_specific'. Systems, not genes — pair with transporter_gene_count and catalyst_gene_count; drill via genes_by_metabolite.")
     transporter_gene_count: int = Field(default=0, description="Distinct genes (all organisms) whose deepest TCDB attachment transports this metabolite (precomputed Metabolite.transporter_gene_count). catalyst_gene_count=0 with transporter_gene_count>0 = transport-only; drill via genes_by_metabolite.")
-    evidence_sources: list[str] = Field(default_factory=list, description="Path provenance — values from {'metabolism', 'transport', 'metabolomics', 'go_transport'}. 'metabolism' = a Reaction involves this compound; 'transport' = a TcdbFamily curates it as substrate; 'metabolomics' = a MetaboliteAssay measures it; 'go_transport' = a GO transport term names it. E.g. ['metabolism', 'transport'].")
+    evidence_sources: list[str] = Field(default_factory=list, description="Path provenance, any of 'metabolism', 'transport', 'metabolomics', 'go_transport' (e.g. ['metabolism', 'transport']). Definitions: list_filter_values(filter_type='evidence_source').")
     go_transport_organism_names: list[str] | None = Field(default=None, description="Organisms with a gene directly annotated to a GO transport term for this target. Absent = no directly annotated gene path, not 'no GO transport edge'. Drill via genes_by_metabolite(evidence_sources=['go_transport']).")
     go_transport_organism_count: int | None = Field(default=None, description="Number of organisms in go_transport_organism_names. Absent = no directly annotated gene path, not 'no GO transport edge'.")
     chebi_id: str | None = Field(default=None, description="ChEBI ID (raw numeric, e.g. '4167'). Populated on most metabolites — 100% of chebi:-IDed transport-only metabolites (extracted from the ID itself), plus the kegg.compound:-IDed metabolites that cross-ref ChEBI.")
@@ -1162,10 +1162,10 @@ class GenesByMetaboliteResponse(BaseModel):
         default_factory=list,
         description="Frequency over `substrate_depth` values across "
         "transport rows only (≤2 entries; metabolism rows are excluded).")
-    rows_by_go_term_depth: list[RowsByGoTermDepth] = Field(
-        default_factory=list,
+    rows_by_go_term_depth: list[RowsByGoTermDepth] | None = Field(
+        default=None,
         description="GO route rows per `go_term_depth`, sorted by depth "
-        "asc. Present only when the go_transport arm is active; depth > 0 "
+        "asc. Null unless the go_transport arm is active; depth > 0 "
         "rows need go_include_ancestors=True.")
     top_reactions: list[GbmTopReaction] = Field(
         default_factory=list,
@@ -1563,10 +1563,10 @@ class MetabolitesByGeneResponse(BaseModel):
         default_factory=list,
         description="Frequency over `substrate_depth` values across "
         "transport rows only (≤2 entries; metabolism rows are excluded).")
-    rows_by_go_term_depth: list[RowsByGoTermDepth] = Field(
-        default_factory=list,
+    rows_by_go_term_depth: list[RowsByGoTermDepth] | None = Field(
+        default=None,
         description="GO route rows per `go_term_depth`, sorted by depth "
-        "asc. Present only when the go_transport arm is active; depth > 0 "
+        "asc. Null unless the go_transport arm is active; depth > 0 "
         "rows need go_include_ancestors=True.")
     by_element: list[MbgByElement] = Field(
         default_factory=list,
@@ -1707,7 +1707,7 @@ class KGIdentity(BaseModel):
     )
     go_transport_excluded_targets: list[str] | None = Field(
         default=None,
-        description="Chemical-role / metabolite ids curated out of the GO transport route (coupling ions, upper-level classes). An empty GO answer for these is curation, not biology; TCDB rows still answer. Null on older KGs.",
+        description="Metabolite ids curated out of the GO transport route (coupling ions, upper-level classes). An empty GO answer for these is curation, not biology; TCDB rows still answer. Null on older KGs.",
     )
     gene_count: int | None = Field(default=None, description="Number of Gene nodes in the KG.")
     experiment_count: int | None = Field(default=None, description="Number of Experiment nodes in the KG.")
@@ -8563,10 +8563,11 @@ def register_tools(mcp: FastMCP):
                 by_metabolite=by_metabolite,
                 by_evidence_source=by_evidence_source,
                 by_substrate_depth=by_substrate_depth,
-                rows_by_go_term_depth=[
-                    RowsByGoTermDepth(**b)
-                    for b in result.get("rows_by_go_term_depth", [])
-                ],
+                rows_by_go_term_depth=(
+                    [RowsByGoTermDepth(**b)
+                     for b in result["rows_by_go_term_depth"]]
+                    if result.get("rows_by_go_term_depth") is not None
+                    else None),
                 top_reactions=top_reactions,
                 top_reactions_truncated=result.get("top_reactions_truncated"),
                 top_tcdb_families=top_tcdb_families,
@@ -8780,10 +8781,11 @@ def register_tools(mcp: FastMCP):
                 by_gene=by_gene,
                 by_evidence_source=by_evidence_source,
                 by_substrate_depth=by_substrate_depth,
-                rows_by_go_term_depth=[
-                    RowsByGoTermDepth(**b)
-                    for b in result.get("rows_by_go_term_depth", [])
-                ],
+                rows_by_go_term_depth=(
+                    [RowsByGoTermDepth(**b)
+                     for b in result["rows_by_go_term_depth"]]
+                    if result.get("rows_by_go_term_depth") is not None
+                    else None),
                 by_element=by_element,
                 by_element_truncated=result.get("by_element_truncated"),
                 top_metabolites=top_metabolites,

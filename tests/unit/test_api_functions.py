@@ -22389,3 +22389,31 @@ class TestGoTransportMbgStereoArms:
                        go_include_ancestors=True)
         assert tuple(kw["arms"]) == _GO_ARMS
         assert kw["include_ancestors"] is False
+
+
+class TestGoTransportMbgNeurotransmitterSummary:
+    def test_neurotransmitter_warning_mbg_summary_true(self, monkeypatch):
+        rec = {}
+        _install_mbg_builders(monkeypatch, rec)
+        summary = {**_GO_SUMMARY, "top_metabolites": [{
+            "metabolite_id": "chebi.role:25512", "name": "neurotransmitter",
+            "gene_count": 1, "go_transport_rows": 2,
+        }]}
+        conn = _GoConn(summary=summary)
+        out = api.metabolites_by_gene(
+            ["PMM0970"], "Prochlorococcus MED4", summary=True, conn=conn)
+        assert out["results"] == []
+        assert _NEUROTRANSMITTER_WARNING in out["warnings"]
+
+    def test_no_neurotransmitter_warning_when_role_has_no_go_rows(
+            self, monkeypatch):
+        rec = {}
+        _install_mbg_builders(monkeypatch, rec)
+        summary = {**_GO_SUMMARY, "top_metabolites": [{
+            "metabolite_id": "chebi.role:25512", "name": "neurotransmitter",
+            "gene_count": 1, "go_transport_rows": 0,
+        }]}
+        out = api.metabolites_by_gene(
+            ["PMM0970"], "Prochlorococcus MED4", summary=True,
+            conn=_GoConn(summary=summary))
+        assert _NEUROTRANSMITTER_WARNING not in out["warnings"]
