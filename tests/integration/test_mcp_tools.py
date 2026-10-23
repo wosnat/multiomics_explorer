@@ -5283,3 +5283,479 @@ class TestControlTimingSurface:
         dumped = response.model_dump()
         assert any("design_notes" not in r for r in dumped["results"])
         assert all("control_timing" in r for r in dumped["results"])
+
+
+# ---------------------------------------------------------------------------
+# GO transport surface (RED) — docs/tool-specs/go-transport-surface.md §7
+# Live numbers pinned at KG built_at 2026-10-19T17:03:46Z.
+# ---------------------------------------------------------------------------
+
+_GOT_MED4 = "Prochlorococcus MED4"
+_GOT_ALT = "Alteromonas mediterranea AltDE1"  # D12: exact strain, never "AltDE"
+_GOT_UREA = "kegg.compound:C00086"
+_GOT_SIDEROPHORE = "chebi.role:26672"
+_GOT_MED4_GBM_TARGETS = [
+    "kegg.compound:C00086", "kegg.compound:C00009", "kegg.compound:C00238",
+    "kegg.compound:C01356", "chebi:16646",
+]
+_GOT_GO_EDGES = (
+    "Molecular_function_transports_metabolite|"
+    "Biological_process_transports_metabolite|"
+    "Molecular_function_transports_chemical_role|"
+    "Biological_process_transports_chemical_role"
+)
+
+
+def _got_by_source(results, source):
+    return [r for r in results if r["evidence_source"] == source]
+
+
+def _got_med4_go_genes(conn):
+    rows = conn.execute_query(
+        "MATCH (g:Gene {organism_name: $o})-[:Gene_enables_molecular_function"
+        "|Gene_involved_in_biological_process]->()-[:" + _GOT_GO_EDGES + "]->() "
+        "RETURN collect(DISTINCT g.locus_tag) AS lts", o=_GOT_MED4)
+    return sorted(rows[0]["lts"])
+
+
+@pytest.mark.kg
+class TestGoTransportGenesByMetabolite:
+    def test_urea_med4_go_rows(self, conn):
+        """Spec §7.1: 11 GO rows over PMM0970-PMM0974 (urtA 2, urtB 2, urtC 2,
+        urtD 2, urtE 3); all arms 45."""
+        r = api.genes_by_metabolite(
+            [_GOT_UREA], _GOT_MED4, limit=100, verbose=True, conn=conn)
+        go = _got_by_source(r["results"], "go_transport")
+        assert len(go) == 11
+        per_gene = {}
+        for row in go:
+            per_gene[row["locus_tag"]] = per_gene.get(row["locus_tag"], 0) + 1
+        assert per_gene == {
+            "PMM0970": 2, "PMM0971": 2, "PMM0972": 2, "PMM0973": 2,
+            "PMM0974": 3}
+        assert {tuple(x["go_chebi_ids"]) for x in go} == {("CHEBI:16199",)}
+        assert all(x["go_term_depth"] == 0 for x in go)
+        assert all(x["target_kind"] == "metabolite" for x in go)
+        urta = {x["go_term_id"]: x for x in go if x["locus_tag"] == "PMM0970"}
+        assert urta["go:0033221"]["go_namespace"] == "molecular_function"
+        assert urta["go:0033221"]["go_evidence"] == "curated"
+        assert urta["go:0033221"]["go_sources"] == ["ncbi"]
+        assert urta["go:0015840"]["go_namespace"] == "biological_process"
+        assert urta["go:0015840"]["go_sources"] == ["cyanorak", "ncbi"]
+        assert any(x["go_term_id"] == "go:0071918" for x in go)
+        assert len(_got_by_source(r["results"], "metabolism")) == 4
+        assert len(_got_by_source(r["results"], "transport")) == 30
+        assert r["total_matching"] == 45
+        assert r["gene_count_total"] == 29
+        assert r["transporter_count_total"] == 3
+        assert r["rows_by_go_term_depth"] == [{"go_term_depth": 0, "count": 11}]
+        assert {e["evidence_source"]: e["count"]
+                for e in r["by_evidence_source"]}["go_transport"] == 11
+
+    def test_urea_med4_ancestors_unchanged(self, conn):
+        r = api.genes_by_metabolite(
+            [_GOT_UREA], _GOT_MED4, go_include_ancestors=True, limit=100,
+            conn=conn)
+        assert r["total_matching"] == 45
+        assert r["rows_by_go_term_depth"] == [{"go_term_depth": 0, "count": 11}]
+
+    def test_gbm_three_arm_paging_continuity(self, conn):
+        """Review Focus 1: pages of 10 concatenate to exactly the full sorted
+        45 rows; first GO row at index 34 (after 34 metabolism + TCDB rows)."""
+        def key(r):
+            return (r["evidence_source"], r["locus_tag"],
+                    r.get("tcdb_family_id"), r.get("reaction_id"),
+                    r.get("go_term_id"), r["metabolite_id"])
+        full = api.genes_by_metabolite(
+            [_GOT_UREA], _GOT_MED4, limit=100, conn=conn)["results"]
+        assert len(full) == 45
+        idx_first_go = next(
+            i for i, r in enumerate(full) if r["evidence_source"] == "go_transport")
+        assert idx_first_go == 34
+        assert all(r["evidence_source"] != "go_transport" for r in full[:34])
+        paged = []
+        for off in range(0, 50, 10):
+            page = api.genes_by_metabolite(
+                [_GOT_UREA], _GOT_MED4, limit=10, offset=off, conn=conn)
+            assert page["total_matching"] == 45
+            paged.extend(page["results"])
+        assert [key(r) for r in paged] == [key(r) for r in full]
+        assert len({key(r) for r in paged}) == 45
+
+    def test_gbm_role_siderophore_altde1(self, conn):
+        """Spec §7.3 (D12): 32 GO + 96 TCDB = 128, genes 112."""
+        r = api.genes_by_metabolite(
+            [_GOT_SIDEROPHORE], _GOT_ALT, limit=500, conn=conn)
+        go = _got_by_source(r["results"], "go_transport")
+        assert len(go) == 32
+        assert len(_got_by_source(r["results"], "transport")) == 96
+        assert r["total_matching"] == 128
+        assert r["gene_count_total"] == 112
+        assert r["transporter_count_total"] == 6
+        assert all(x["target_kind"] == "chemical_role" for x in r["results"])
+        assert all(x["metabolite_id"] == _GOT_SIDEROPHORE for x in r["results"])
+        row = next(x for x in go if x["locus_tag"] == "amad1_16875")
+        assert row["go_term_id"] == "go:0015891"
+        assert row["go_term_name"] == "siderophore transport"
+        assert row["go_namespace"] == "biological_process"
+        assert row["go_evidence"] == "curated"
+        assert row["go_sources"] == ["ncbi"]
+        assert not any("not a metabolite" in w for w in r["warnings"])
+        assert r["not_found"]["metabolite_ids"] == []
+
+    def test_gbm_mixed_role_and_metabolite_batch(self, conn):
+        """Review Focus 2: both target kinds; 2 + 169 + 32 = 203."""
+        r = api.genes_by_metabolite(
+            [_GOT_SIDEROPHORE, _GOT_UREA], _GOT_ALT, limit=500, conn=conn)
+        assert r["total_matching"] == 203
+        assert len(_got_by_source(r["results"], "metabolism")) == 2
+        assert len(_got_by_source(r["results"], "transport")) == 169
+        assert len(_got_by_source(r["results"], "go_transport")) == 32
+        assert {x["target_kind"] for x in r["results"]} == {
+            "metabolite", "chemical_role"}
+
+    def test_gbm_exclude_role_id(self, conn):
+        """Review Focus 2: a role id in exclude_metabolite_ids drops its rows
+        (metabolism 2 + transport 73, GO 0 = 75)."""
+        r = api.genes_by_metabolite(
+            [_GOT_SIDEROPHORE, _GOT_UREA], _GOT_ALT,
+            exclude_metabolite_ids=[_GOT_SIDEROPHORE], limit=500, conn=conn,
+            evidence_sources=["metabolism", "transport", "go_transport"])
+        assert r["total_matching"] == 75
+        assert len(_got_by_source(r["results"], "go_transport")) == 0
+        assert len(_got_by_source(r["results"], "transport")) == 73
+        assert len(_got_by_source(r["results"], "metabolism")) == 2
+        assert all(x["metabolite_id"] != _GOT_SIDEROPHORE for x in r["results"])
+
+    def test_gbm_go_arm_empty_med4_siderophore(self, conn):
+        """D13 / Review Focus 3: GO 0, TCDB 25 (all inherited); envelope keys
+        present, no crash."""
+        r = api.genes_by_metabolite(
+            [_GOT_SIDEROPHORE], _GOT_MED4, limit=100, conn=conn)
+        assert len(_got_by_source(r["results"], "go_transport")) == 0
+        tcdb = _got_by_source(r["results"], "transport")
+        assert len(tcdb) == 25
+        assert {x["substrate_depth"] for x in tcdb} == {"inherited"}
+        assert r["total_matching"] == 25
+        assert r["rows_by_go_term_depth"] == []
+        for key in ("by_metabolite", "by_evidence_source", "top_genes",
+                    "not_found", "not_matched", "warnings"):
+            assert key in r
+
+    def test_gbm_role_neurotransmitter_putida(self, conn):
+        r = api.genes_by_metabolite(
+            ["chebi.role:25512"], "Pseudomonas putida KT2440", limit=200,
+            conn=conn)
+        assert len(_got_by_source(r["results"], "go_transport")) == 5
+        assert len(_got_by_source(r["results"], "transport")) == 65
+        assert r["total_matching"] == 70
+        assert any(
+            "chebi.role:25512 (neurotransmitter) on the GO route is mostly "
+            "bacterial NSS amino-acid transporters" in w
+            for w in r["warnings"])
+
+    def test_gbm_ancestors_respect_exclude(self, conn):
+        """Review Focus 4: GO-only, MED4, 5 targets: 45 with ancestors, 37
+        when the inherited-only target C01356 is excluded."""
+        kw = dict(evidence_sources=["go_transport"], summary=True, conn=conn)
+        base = api.genes_by_metabolite(
+            _GOT_MED4_GBM_TARGETS, _GOT_MED4, go_include_ancestors=True, **kw)
+        assert base["total_matching"] == 45
+        assert base["rows_by_go_term_depth"] == [
+            {"go_term_depth": 0, "count": 33}, {"go_term_depth": 1, "count": 12}]
+        excl = api.genes_by_metabolite(
+            _GOT_MED4_GBM_TARGETS, _GOT_MED4, go_include_ancestors=True,
+            exclude_metabolite_ids=["kegg.compound:C01356"], **kw)
+        assert excl["total_matching"] == 37
+        assert excl["rows_by_go_term_depth"] == [
+            {"go_term_depth": 0, "count": 32}, {"go_term_depth": 1, "count": 5}]
+        assert all(
+            m["metabolite_id"] != "kegg.compound:C01356"
+            for m in excl["by_metabolite"])
+
+    @pytest.mark.parametrize("kwargs,expected", [
+        ({}, 33),
+        ({"gene_categories": ["Transport"]}, 6),
+        ({"metabolite_pathway_ids": ["kegg.pathway:ko02010"]}, 25),
+        ({"exclude_metabolite_ids": ["kegg.compound:C00086"]}, 22),
+    ])
+    def test_gbm_shared_filters_change_go_arm(self, conn, kwargs, expected):
+        """Spec §7.7: no shared filter is a no-op on the GO arm."""
+        r = api.genes_by_metabolite(
+            _GOT_MED4_GBM_TARGETS, _GOT_MED4, evidence_sources=["go_transport"],
+            summary=True, conn=conn, **kwargs)
+        assert r["total_matching"] == expected
+
+    def test_gbm_excluded_target_without_node_warns(self, conn):
+        """Review Focus 5: chebi:23906 has no node -> not_found AND warning."""
+        r = api.genes_by_metabolite(["chebi:23906"], _GOT_MED4, conn=conn)
+        assert "chebi:23906" in r["not_found"]["metabolite_ids"]
+        assert any(
+            "'chebi:23906' is excluded from the GO transport route by "
+            "curation" in w for w in r["warnings"])
+
+    @pytest.mark.parametrize("mid,expected_total", [
+        ("kegg.compound:C00080", 381),   # GO 0 + metabolism 250 + transport 131
+        ("kegg.compound:C01330", 71),    # GO 0 + transport 71
+    ])
+    def test_gbm_excluded_target_with_node(self, conn, mid, expected_total):
+        r = api.genes_by_metabolite([mid], _GOT_MED4, limit=1, conn=conn)
+        assert r["total_matching"] == expected_total
+        go_count = {e["evidence_source"]: e["count"]
+                    for e in r["by_evidence_source"]}.get("go_transport", 0)
+        assert go_count == 0
+        assert any(f"'{mid}' is excluded from the GO transport route by "
+                   "curation" in w for w in r["warnings"])
+
+    def test_gbm_excluded_warning_silent_without_go_arm(self, conn):
+        r = api.genes_by_metabolite(
+            ["kegg.compound:C00080"], _GOT_MED4, limit=1,
+            evidence_sources=["metabolism", "transport"], conn=conn)
+        assert not any("by curation" in w for w in r["warnings"])
+
+    def test_gbm_role_with_no_edges_is_not_matched(self, conn):
+        """D8: chebi.role:23357 has no edges anywhere -> not_matched."""
+        r = api.genes_by_metabolite(
+            ["chebi.role:23357"], _GOT_MED4, conn=conn)
+        assert r["total_matching"] == 0
+        assert "chebi.role:23357" in r["not_matched"]
+        assert "chebi.role:23357" not in r["not_found"]["metabolite_ids"]
+
+    def test_gbm_stereo_relative_counts_match_recall(self, conn):
+        """Spec §7.9: C00025 -> relative C00302 (Glutamate); relative counts
+        equal a re-call (include_ancestors threaded through)."""
+        for anc in (False, True):
+            r = api.genes_by_metabolite(
+                ["kegg.compound:C00025"], _GOT_MED4,
+                go_include_ancestors=anc, summary=True, conn=conn)
+            rel = {x["metabolite_id"]: x
+                   for x in r["stereo_relatives"]["kegg.compound:C00025"]}
+            assert "kegg.compound:C00302" in rel
+            re = api.genes_by_metabolite(
+                ["kegg.compound:C00302"], _GOT_MED4,
+                go_include_ancestors=anc, summary=True, conn=conn)
+            entry = re["by_metabolite"][0]
+            assert rel["kegg.compound:C00302"]["gene_count"] == entry["gene_count"]
+        base = api.genes_by_metabolite(
+            ["kegg.compound:C00302"], _GOT_MED4, summary=True, conn=conn)
+        e = base["by_metabolite"][0]
+        assert e["rows"] == 31
+        assert e["gene_count"] == 30
+        assert e["go_transport_rows"] == 1
+
+    def test_gbm_response_model_validates(self, conn):
+        from multiomics_explorer.mcp_server.tools import (
+            GenesByMetaboliteResponse,
+        )
+        r = api.genes_by_metabolite(
+            [_GOT_UREA], _GOT_MED4, limit=100, verbose=True, conn=conn)
+        model = GenesByMetaboliteResponse(**r)
+        go = [x for x in model.results if x.evidence_source == "go_transport"]
+        assert len(go) == 11
+        assert go[0].go_term_id is not None
+        assert [(e.go_term_depth, e.count) for e in model.rows_by_go_term_depth] == [(0, 11)]
+
+
+@pytest.mark.kg
+class TestGoTransportMetabolitesByGene:
+    def test_mbg_pmm0970_go_rows_after_tcdb(self, conn):
+        """Spec §7.4: 4 TCDB then 2 GO; metabolite_count_total 3."""
+        r = api.metabolites_by_gene(
+            ["PMM0970"], _GOT_MED4, limit=50, conn=conn)
+        rows = r["results"]
+        assert [x["evidence_source"] for x in rows] == (
+            ["transport"] * 4 + ["go_transport"] * 2)
+        go = rows[4:]
+        assert [x["go_term_id"] for x in go] == ["go:0033221", "go:0015840"]
+        assert [x["go_namespace"] for x in go] == [
+            "molecular_function", "biological_process"]
+        assert all(x["metabolite_id"] == _GOT_UREA for x in go)
+        assert all(x["go_term_depth"] == 0 for x in go)
+        assert r["total_matching"] == 6
+        assert r["metabolite_count_total"] == 3
+        assert {e["evidence_source"]: e["count"]
+                for e in r["by_evidence_source"]} == {
+            "transport": 4, "go_transport": 2}
+
+    def test_mbg_ancestors_pmm0970(self, conn):
+        r = api.metabolites_by_gene(
+            ["PMM0970"], _GOT_MED4, go_include_ancestors=True,
+            evidence_sources=["go_transport"], conn=conn)
+        assert r["total_matching"] == 3
+        inh = [x for x in r["results"] if x["go_term_depth"] == 1]
+        assert len(inh) == 1
+        assert inh[0]["metabolite_id"] == "chebi:64708"
+        assert inh[0]["go_term_id"] == "go:0015840"
+        assert inh[0]["go_axiom_term_id"] == "go:0019755"
+        assert inh[0]["go_axiom_term_name"] == "one-carbon compound transport"
+
+    def test_mbg_ancestors_murj_lipid(self, conn):
+        """Spec §7.2: PMM0261 ancestors -> one GO row, Lipid, depth 1;
+        default call: 0 GO rows (3 TCDB)."""
+        on = api.metabolites_by_gene(
+            ["PMM0261"], _GOT_MED4, go_include_ancestors=True, conn=conn)
+        go = _got_by_source(on["results"], "go_transport")
+        assert len(go) == 1
+        assert go[0]["metabolite_id"] == "kegg.compound:C01356"
+        assert go[0]["go_term_id"] == "go:0034204"
+        assert go[0]["go_term_depth"] == 1
+        assert go[0]["go_axiom_term_id"] == "go:0006869"
+        assert go[0]["go_axiom_term_name"] == "lipid transport"
+        assert on["total_matching"] == 4
+        off = api.metabolites_by_gene(["PMM0261"], _GOT_MED4, conn=conn)
+        assert _got_by_source(off["results"], "go_transport") == []
+        assert off["total_matching"] == 3
+        assert off["rows_by_go_term_depth"] == []
+
+    def test_mbg_ancestors_with_elements(self, conn):
+        """Review Focus 4: metabolite_elements=['N'] drops role rows and
+        formula-less inherited classes (spec §7.7)."""
+        tags = _got_med4_go_genes(conn) + ["PMM0261"]
+        kw = dict(evidence_sources=["go_transport"], limit=500, conn=conn)
+        full = api.metabolites_by_gene(
+            tags, _GOT_MED4, go_include_ancestors=True, **kw)
+        assert full["total_matching"] == 199
+        assert any(x["target_kind"] == "chemical_role" for x in full["results"])
+        n = api.metabolites_by_gene(
+            tags, _GOT_MED4, go_include_ancestors=True,
+            metabolite_elements=["N"], **kw)
+        assert n["total_matching"] == 46
+        assert all(x["target_kind"] == "metabolite" for x in n["results"])
+        assert n["rows_by_go_term_depth"] == [
+            {"go_term_depth": 0, "count": 43}, {"go_term_depth": 1, "count": 3}]
+        direct = api.metabolites_by_gene(
+            tags, _GOT_MED4, metabolite_elements=["N"], **kw)
+        assert direct["total_matching"] == 43
+
+    @pytest.mark.parametrize("kwargs,expected", [
+        ({}, 126),
+        ({"gene_categories": ["Transport"]}, 40),
+        ({"metabolite_pathway_ids": ["kegg.pathway:ko02010"]}, 58),
+        ({"exclude_metabolite_ids": ["kegg.compound:C00086"]}, 115),
+        ({"metabolite_elements": ["N"]}, 43),
+        ({"metabolite_ids": ["kegg.compound:C00086"]}, 11),
+    ])
+    def test_mbg_shared_filters_change_go_arm(self, conn, kwargs, expected):
+        tags = _got_med4_go_genes(conn) + ["PMM0261"]
+        r = api.metabolites_by_gene(
+            tags, _GOT_MED4, evidence_sources=["go_transport"], summary=True,
+            conn=conn, **kwargs)
+        assert r["total_matching"] == expected
+
+    def test_mbg_tcdb_role_rows_move_tolc_rollups(self, conn):
+        """Spec §7.3: PMM0097 transport-only 535 -> 572 (+37 role rows)."""
+        r = api.metabolites_by_gene(
+            ["PMM0097"], _GOT_MED4, evidence_sources=["transport"],
+            summary=True, conn=conn)
+        assert r["total_matching"] == 572
+        depth = {e["substrate_depth"]: e["count"]
+                 for e in r["by_substrate_depth"]}
+        assert depth == {"most_specific": 242, "inherited": 330}
+        assert r["transporter_count_total"] == 2
+
+    def test_mbg_ancestors_gene_without_ancestors_identical(self, conn):
+        """PMM0085 (ktrA): ancestors add nothing."""
+        a = api.metabolites_by_gene(["PMM0085"], _GOT_MED4, limit=500, conn=conn)
+        b = api.metabolites_by_gene(
+            ["PMM0085"], _GOT_MED4, go_include_ancestors=True, limit=500,
+            conn=conn)
+        assert a["results"] == b["results"]
+
+    def test_mbg_paging_continuity(self, conn):
+        """Spec §7.8: PMM0970 + PMM0261 with ancestors, limit=3 -> 11 rows,
+        first GO row at index 7."""
+        kw = dict(go_include_ancestors=True, conn=conn)
+        full = api.metabolites_by_gene(
+            ["PMM0970", "PMM0261"], _GOT_MED4, limit=50, **kw)["results"]
+        assert len(full) == 11
+        assert next(i for i, r in enumerate(full)
+                    if r["evidence_source"] == "go_transport") == 7
+        paged = []
+        for off in range(0, 12, 3):
+            paged.extend(api.metabolites_by_gene(
+                ["PMM0970", "PMM0261"], _GOT_MED4, limit=3, offset=off,
+                **kw)["results"])
+        assert paged == full
+
+    def test_mbg_response_model_validates(self, conn):
+        from multiomics_explorer.mcp_server.tools import (
+            MetabolitesByGeneResponse,
+        )
+        r = api.metabolites_by_gene(
+            ["PMM0970"], _GOT_MED4, limit=50, verbose=True, conn=conn)
+        model = MetabolitesByGeneResponse(**r)
+        assert [(e.go_term_depth, e.count) for e in model.rows_by_go_term_depth] == [(0, 2)]
+        assert model.results[-1].go_chebi_ids == ["CHEBI:16199"]
+
+
+@pytest.mark.kg
+class TestGoTransportPassThroughs:
+    def test_gene_overview_med4_go_transport_tag(self, conn):
+        """Spec §7.6: 59 MED4 genes tagged go_transport; two GO-only."""
+        tags = [r["locus_tag"] for r in conn.execute_query(
+            "MATCH (g:Gene {organism_name: $o}) RETURN g.locus_tag AS locus_tag",
+            o=_GOT_MED4)]
+        r = api.gene_overview(tags, verbose=False, limit=len(tags), conn=conn)
+        tagged = [x for x in r["results"]
+                  if "go_transport" in (x.get("evidence_sources") or [])]
+        assert len(tagged) == 59
+        only = sorted(
+            x["locus_tag"] for x in tagged if x["evidence_sources"] == ["go_transport"])
+        assert only == ["PMM0533", "PMM0866"]
+        pmm0970 = next(x for x in r["results"] if x["locus_tag"] == "PMM0970")
+        assert "go_transport" in pmm0970["evidence_sources"]
+
+    def test_gene_overview_has_chemistry_widened(self, conn):
+        """Spec §7.6: has_chemistry over all MED4 genes 786 -> 788."""
+        tags = [r["locus_tag"] for r in conn.execute_query(
+            "MATCH (g:Gene {organism_name: $o}) RETURN g.locus_tag AS locus_tag",
+            o=_GOT_MED4)]
+        r = api.gene_overview(tags, summary=True, conn=conn)
+        assert r["has_chemistry"] == 788
+
+    def test_list_metabolites_med4_union(self, conn):
+        """Spec §7.6: organism filter unions go_transport_organism_names."""
+        r = api.list_metabolites(
+            organism_names=[_GOT_MED4], summary=True, conn=conn)
+        assert r["total_matching"] == 1891
+        top = {o["organism_name"]: o["count"] for o in r["top_organisms"]}
+        assert top[_GOT_MED4] == 1891
+
+    def test_list_metabolites_go_transport_source(self, conn):
+        r = api.list_metabolites(
+            evidence_sources=["go_transport"], summary=True, conn=conn)
+        assert r["total_matching"] == 208
+        both = api.list_metabolites(
+            evidence_sources=["go_transport"], organism_names=[_GOT_MED4],
+            summary=True, conn=conn)
+        assert both["total_matching"] == 165
+
+    def test_list_metabolites_rows_carry_go_organisms(self, conn):
+        r = api.list_metabolites(
+            metabolite_ids=[_GOT_UREA], organism_names=[_GOT_MED4], conn=conn)
+        row = r["results"][0]
+        assert "go_transport_organism_names" in row
+        assert _GOT_MED4 in row["go_transport_organism_names"]
+        assert row["go_transport_organism_count"] >= 1
+
+    def test_kg_release_info_carries_excluded_targets(self, conn):
+        r = api.kg_release_info(conn)
+        excluded = r["kg"]["go_transport_excluded_targets"]
+        assert len(excluded) == 13
+        assert "kegg.compound:C00080" in excluded
+        assert "chebi:23906" in excluded
+
+    def test_kg_schema_go_edge_descriptions(self, conn):
+        r = api.kg_schema(conn=conn)
+        rels = r["relationships"]
+        for name in (
+            "Molecular_function_transports_metabolite",
+            "Biological_process_transports_metabolite",
+            "Molecular_function_transports_chemical_role",
+            "Biological_process_transports_chemical_role",
+        ):
+            assert name in rels
+            assert rels[name]["description"]
+        assert rels["Molecular_function_transports_metabolite"][
+            "description"].startswith("GO defines this molecular-function term")
+        assert "Tcdb_family_transports_chemical_role" in rels

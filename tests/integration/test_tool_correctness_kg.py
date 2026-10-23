@@ -1044,3 +1044,116 @@ class TestOntologyTermDetailsCorrectnessKG:
         assert g["properties"]["id"] == "go:0006979"
         assert len(g["genes_by_organism"]) == kg_count(
             "MATCH (t {id: 'go:0006979'}) RETURN t.organism_count")
+
+
+# ---------------------------------------------------------------------------
+# GO transport surface (RED) — independent-Cypher ground truth
+# ---------------------------------------------------------------------------
+
+_GO_ROUTE = (
+    "(g:Gene)-[r:Gene_enables_molecular_function|Gene_involved_in_biological_process]"
+    "->(go)-[t:Molecular_function_transports_metabolite|"
+    "Biological_process_transports_metabolite|"
+    "Molecular_function_transports_chemical_role|"
+    "Biological_process_transports_chemical_role]->(m:Metabolite|ChemicalRole)"
+)
+
+
+@pytest.mark.kg
+class TestGoTransportCorrectnessKG:
+    _ORG = "Prochlorococcus MED4"
+
+    def test_gbm_go_rows_match_independent_cypher(self, conn, kg_count):
+        """api GO row count == direct edge count (gene x own term x target)."""
+        direct = kg_count(
+            "MATCH " + _GO_ROUTE + " WHERE m.id = $m AND g.organism_name = $o "
+            "RETURN count(*)", m="kegg.compound:C00086", o=self._ORG)
+        r = api.genes_by_metabolite(
+            ["kegg.compound:C00086"], self._ORG, evidence_sources=["go_transport"],
+            summary=True, conn=conn)
+        assert direct == 11
+        assert r["total_matching"] == direct
+
+    def test_gbm_namespace_comes_from_edge_type_not_label(self, conn):
+        """MF term nodes lack the GeneOntology label BP nodes carry; the
+        namespace must still be right for every row."""
+        r = api.genes_by_metabolite(
+            ["kegg.compound:C00086"], self._ORG, evidence_sources=["go_transport"],
+            limit=50, conn=conn)
+        edge_ns = {
+            row["go_id"]: ("molecular_function"
+                           if row["t"].startswith("Molecular_function")
+                           else "biological_process")
+            for row in conn.execute_query(
+                "MATCH " + _GO_ROUTE + " WHERE m.id = 'kegg.compound:C00086' "
+                "AND g.organism_name = $o "
+                "RETURN DISTINCT go.id AS go_id, type(t) AS t", o=self._ORG)
+        }
+        assert r["results"]
+        for row in r["results"]:
+            assert row["go_namespace"] == edge_ns[row["go_term_id"]]
+
+    def test_gbm_go_evidence_matches_gene_go_edge(self, conn):
+        r = api.genes_by_metabolite(
+            ["kegg.compound:C00086"], self._ORG, evidence_sources=["go_transport"],
+            limit=50, conn=conn)
+        for row in r["results"]:
+            e = conn.execute_query(
+                "MATCH (g:Gene {locus_tag: $lt})-[r:Gene_enables_molecular_function"
+                "|Gene_involved_in_biological_process]->(go {id: $go}) "
+                "RETURN r.evidence AS ev, r.sources AS src",
+                lt=row["locus_tag"], go=row["go_term_id"])
+            assert len(e) == 1
+            assert e[0]["ev"] == row["go_evidence"]
+            assert e[0]["src"] == row["go_sources"]
+
+    def test_gbm_ancestors_inherited_rows_are_not_direct(self, conn, kg_count):
+        """Every depth>=1 row is for a (gene, target) pair the gene does not
+        reach directly through GO; its axiom term is a real is_a ancestor."""
+        r = api.metabolites_by_gene(
+            ["PMM0261", "PMM0970"], self._ORG, go_include_ancestors=True,
+            evidence_sources=["go_transport"], limit=50, conn=conn)
+        inherited = [x for x in r["results"] if x["go_term_depth"] >= 1]
+        assert inherited
+        for x in inherited:
+            direct = kg_count(
+                "MATCH (g:Gene {locus_tag: $lt})-[:Gene_enables_molecular_function"
+                "|Gene_involved_in_biological_process]->()-[:"
+                "Molecular_function_transports_metabolite|"
+                "Biological_process_transports_metabolite|"
+                "Molecular_function_transports_chemical_role|"
+                "Biological_process_transports_chemical_role]->(m {id: $m}) "
+                "RETURN count(*)", lt=x["locus_tag"], m=x["metabolite_id"])
+            assert direct == 0
+            hops = kg_count(
+                "MATCH (own {id: $own}), (ax {id: $ax}), "
+                "p = shortestPath((own)-[:Molecular_function_is_a_molecular_function"
+                "|Biological_process_is_a_biological_process*1..]->(ax)) "
+                "RETURN length(p)", own=x["go_term_id"], ax=x["go_axiom_term_id"])
+            assert hops == x["go_term_depth"]
+
+    def test_gene_overview_go_tag_matches_independent_exists(self, conn, kg_count):
+        direct = kg_count(
+            "MATCH (g:Gene {organism_name: $o}) "
+            "WHERE EXISTS { MATCH (g)-[:Gene_enables_molecular_function"
+            "|Gene_involved_in_biological_process]->()-[:"
+            "Molecular_function_transports_metabolite|"
+            "Biological_process_transports_metabolite|"
+            "Molecular_function_transports_chemical_role|"
+            "Biological_process_transports_chemical_role]->() } "
+            "RETURN count(g)", o=self._ORG)
+        assert direct == 59
+        cypher, params = build_gene_overview(locus_tags=["PMM0970", "PMM0533"])
+        rows = {r["locus_tag"]: r for r in conn.execute_query(cypher, **params)}
+        assert "go_transport" in rows["PMM0970"]["evidence_sources"]
+        assert rows["PMM0533"]["evidence_sources"] == ["go_transport"]
+
+    def test_list_metabolites_go_organisms_match_node_property(self, conn, kg_count):
+        n = kg_count(
+            "MATCH (m:Metabolite) WHERE $o IN coalesce(m.go_transport_organism_names, []) "
+            "RETURN count(m)", o=self._ORG)
+        assert n == 45
+        r = api.list_metabolites(
+            evidence_sources=["go_transport"], organism_names=[self._ORG],
+            summary=True, conn=conn)
+        assert r["total_matching"] >= n

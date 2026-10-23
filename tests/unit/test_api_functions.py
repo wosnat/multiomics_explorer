@@ -21760,3 +21760,585 @@ class TestDifferentialExpressionByGeneControlTiming:
         assert "design_notes" in by_id["exp_matched"]
         assert by_id["exp_baseline"]["control_timing"] == "baseline"
         assert "design_notes" not in by_id["exp_baseline"]
+
+
+# ---------------------------------------------------------------------------
+# GO transport surface (RED) — docs/tool-specs/go-transport-surface.md
+# ---------------------------------------------------------------------------
+
+_GO_ARMS = ("metabolism", "transport", "go_transport")
+_GO_EXCLUDED_WARNING = (
+    "'{id}' is excluded from the GO transport route by curation (coupling "
+    "ion or upper-level class) — an empty GO answer is not biology; TCDB "
+    "rows still answer."
+)
+_NEUROTRANSMITTER_WARNING = (
+    "chebi.role:25512 (neurotransmitter) on the GO route is mostly "
+    "bacterial NSS amino-acid transporters, not neurotransmitter transport."
+)
+
+
+def _go_row(**kw):
+    row = {
+        "locus_tag": "PMM0970", "gene_name": "urtA", "product": "p",
+        "evidence_source": "go_transport",
+        "substrate_depth": None, "tcdb_evidence_score": None,
+        "transport_substrate_resolution": None,
+        "reaction_id": None, "reaction_name": None, "ec_numbers": None,
+        "mass_balance": None, "tcdb_family_id": None, "tcdb_family_name": None,
+        "metabolite_id": "kegg.compound:C00086", "metabolite_name": "Urea",
+        "metabolite_formula": "CH4N2O", "metabolite_mass": 60.0,
+        "metabolite_chebi_id": "16199",
+        "go_term_id": "go:0033221", "go_term_name": "n",
+        "go_namespace": "molecular_function", "go_evidence": "curated",
+        "go_sources": ["ncbi"], "go_term_depth": 0,
+        "go_axiom_term_id": "go:0033221", "go_axiom_term_name": "n",
+        "target_kind": "metabolite",
+    }
+    row.update(kw)
+    return row
+
+
+def _non_go_row(source="transport", depth="most_specific", **kw):
+    row = _go_row(
+        evidence_source=source, substrate_depth=depth,
+        go_term_id=None, go_term_name=None, go_namespace=None,
+        go_evidence=None, go_sources=None, go_term_depth=None,
+        go_axiom_term_id=None, go_axiom_term_name=None,
+        tcdb_evidence_score=0.5 if source == "transport" else None,
+        tcdb_family_id="tcdb:3.A.1" if source == "transport" else None,
+        reaction_id="kegg.reaction:R1" if source == "metabolism" else None,
+    )
+    row.update(kw)
+    return row
+
+
+class _GoConn:
+    """Marker-dispatching conn: patched builders return `("ARM:<name>", {})`
+    / `("SUMMARY", {})`; the conn answers by marker. Resolver, probe,
+    Schema_info and stereo queries are answered generically."""
+
+    def __init__(self, arm_rows=None, summary=None, excluded=None,
+                 missing_ids=()):
+        self.arm_rows = arm_rows or {}
+        self.summary = summary or {}
+        self.excluded = list(excluded or [])
+        self.missing = set(missing_ids)
+        self.arm_calls = []
+
+    def execute_query(self, cypher, **params):
+        if "UNWIND $curies" in cypher:
+            return [
+                {"curie": c,
+                 "canonical": [] if c in self.missing else [c],
+                 "recurated_to": [], "roles": []}
+                for c in params.get("curies", [])
+            ]
+        if "AS relative_id" in cypher:
+            return []
+        if "Schema_info" in cypher:
+            return [{
+                "schema_info": {
+                    "go_transport_excluded_targets": self.excluded,
+                },
+                "labels": [], "rel_types": [],
+            }]
+        if cypher == "SUMMARY":
+            return [self.summary]
+        if cypher.startswith("ARM:"):
+            self.arm_calls.append((cypher, params))
+            return list(self.arm_rows.get(cypher[4:], []))
+        if "AS found" in cypher:
+            ids = params.get("ids") or params.get("locus_tags") or []
+            return [{"found": [i for i in ids if i not in self.missing]}]
+        return []
+
+
+def _install_gbm_builders(monkeypatch, record):
+    for arm in ("metabolism", "transport", "go_transport"):
+        def _mk(arm=arm):
+            def _b(**kw):
+                record.setdefault(arm, []).append(kw)
+                return f"ARM:{arm}", {}
+            return _b
+        monkeypatch.setattr(
+            api, f"build_genes_by_metabolite_{arm}", _mk(), raising=True)
+
+    def _s(**kw):
+        record.setdefault("summary", []).append(kw)
+        return "SUMMARY", {}
+    monkeypatch.setattr(api, "build_genes_by_metabolite_summary", _s)
+    monkeypatch.setattr(
+        api, "_validate_organism_inputs",
+        lambda organism, locus_tags, experiment_ids, conn: organism,
+    )
+
+
+def _install_mbg_builders(monkeypatch, record):
+    for arm in ("metabolism", "transport", "go_transport"):
+        def _mk(arm=arm):
+            def _b(**kw):
+                record.setdefault(arm, []).append(kw)
+                return f"ARM:{arm}", {}
+            return _b
+        monkeypatch.setattr(
+            api, f"build_metabolites_by_gene_{arm}", _mk(), raising=True)
+
+    def _s(**kw):
+        record.setdefault("summary", []).append(kw)
+        return "SUMMARY", {}
+    monkeypatch.setattr(api, "build_metabolites_by_gene_summary", _s)
+    monkeypatch.setattr(
+        api, "_validate_organism_inputs",
+        lambda organism, locus_tags, experiment_ids, conn: organism,
+    )
+
+
+_GO_SUMMARY = {
+    "total_matching": 3, "gene_count_total": 2,
+    "reaction_count_total": 1, "transporter_count_total": 1,
+    "metabolite_count_total": 1,
+    "rows_by_evidence_source": [
+        {"evidence_source": "metabolism", "count": 1},
+        {"evidence_source": "transport", "count": 1},
+        {"evidence_source": "go_transport", "count": 1},
+    ],
+    "rows_by_substrate_depth": [{"substrate_depth": "most_specific", "count": 1}],
+    "rows_by_go_term_depth": [
+        {"go_term_depth": 1, "count": 2}, {"go_term_depth": 0, "count": 5},
+    ],
+    "by_metabolite": [], "by_gene": [], "top_genes": [],
+    "top_metabolites": [], "top_reactions": [], "top_tcdb_families": [],
+    "top_gene_categories": [], "top_metabolite_pathways": [], "by_element": [],
+}
+
+
+class TestGoTransportApiGbm:
+    _METS = ["kegg.compound:C00086"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _run(self, monkeypatch, conn=None, **kw):
+        rec = {}
+        _install_gbm_builders(monkeypatch, rec)
+        conn = conn or _GoConn(
+            arm_rows={
+                "metabolism": [_non_go_row("metabolism", None)],
+                "transport": [_non_go_row()],
+                "go_transport": [_go_row()],
+            },
+            summary=_GO_SUMMARY,
+        )
+        metabolite_ids = kw.pop("metabolite_ids", self._METS)
+        out = api.genes_by_metabolite(metabolite_ids, self._ORG, conn=conn, **kw)
+        return out, rec, conn
+
+    def test_gbm_default_arms_include_go_transport(self, monkeypatch):
+        out, rec, _ = self._run(monkeypatch)
+        assert len(rec["metabolism"]) == 1
+        assert len(rec["transport"]) == 1
+        assert len(rec["go_transport"]) == 1
+        assert tuple(rec["summary"][0]["arms"]) == _GO_ARMS
+        assert {r["evidence_source"] for r in out["results"]} == set(_GO_ARMS)
+
+    def test_gbm_rejects_unknown_evidence_source(self):
+        with pytest.raises(ValueError) as ei:
+            api.genes_by_metabolite(
+                self._METS, self._ORG, evidence_sources=["bogus"],
+                conn=MagicMock(),
+            )
+        assert "['metabolism', 'transport', 'go_transport']" in str(ei.value)
+
+    def test_gbm_rejects_metabolomics(self):
+        with pytest.raises(ValueError):
+            api.genes_by_metabolite(
+                self._METS, self._ORG, evidence_sources=["metabolomics"],
+                conn=MagicMock(),
+            )
+
+    def test_gbm_valid_evidence_source_constants(self):
+        assert api._VALID_EVIDENCE_SOURCES == (
+            "metabolism", "transport", "metabolomics", "go_transport")
+        assert api._VALID_EVIDENCE_SOURCES_GBM == _GO_ARMS
+        assert api._VALID_EVIDENCE_SOURCES_MBG == _GO_ARMS
+
+    def test_gbm_go_only_dispatches_only_go_arm(self, monkeypatch):
+        out, rec, _ = self._run(
+            monkeypatch, evidence_sources=["go_transport"])
+        assert "metabolism" not in rec and "transport" not in rec
+        assert len(rec["go_transport"]) == 1
+        assert tuple(rec["summary"][0]["arms"]) == ("go_transport",)
+
+    def test_gbm_go_include_ancestors_threads_to_builders(self, monkeypatch):
+        _, rec, _ = self._run(monkeypatch, go_include_ancestors=True)
+        assert rec["go_transport"][0]["include_ancestors"] is True
+        assert rec["summary"][0]["include_ancestors"] is True
+
+    def test_gbm_go_include_ancestors_default_false(self, monkeypatch):
+        _, rec, _ = self._run(monkeypatch)
+        assert rec["go_transport"][0]["include_ancestors"] is False
+        assert rec["summary"][0]["include_ancestors"] is False
+
+    def test_gbm_go_builder_gets_no_arm_scoped_filters(self, monkeypatch):
+        _, rec, _ = self._run(
+            monkeypatch, ec_numbers=["3.5.1.5"], mass_balance="balanced",
+            substrate_depth=["most_specific"],
+            gene_categories=["Transport"],
+        )
+        kw = rec["go_transport"][0]
+        for k in ("ec_numbers", "mass_balance", "substrate_depth"):
+            assert k not in kw
+        assert kw["gene_categories"] == ["Transport"]
+
+    def test_gbm_envelope_rows_by_go_term_depth_sorted(self, monkeypatch):
+        out, _, _ = self._run(monkeypatch)
+        assert out["rows_by_go_term_depth"] == [
+            {"go_term_depth": 0, "count": 5}, {"go_term_depth": 1, "count": 2},
+        ]
+        assert {"evidence_source": "go_transport", "count": 1} in (
+            out["by_evidence_source"])
+
+    def test_gbm_envelope_omits_depth_rollup_without_go_arm(self, monkeypatch):
+        out, _, _ = self._run(
+            monkeypatch, evidence_sources=["metabolism", "transport"])
+        assert "rows_by_go_term_depth" not in out
+
+    def test_gbm_go_rows_keep_cross_arm_fields_explicit_none(self, monkeypatch):
+        out, _, _ = self._run(monkeypatch)
+        go = [r for r in out["results"] if r["evidence_source"] == "go_transport"][0]
+        assert go["substrate_depth"] is None
+        assert go["tcdb_family_id"] is None
+        non_go = [r for r in out["results"] if r["evidence_source"] != "go_transport"]
+        for r in non_go:
+            assert r["go_term_depth"] is None
+            assert r["go_axiom_term_name"] is None
+
+    def test_gbm_sort_go_after_tcdb(self):
+        rows = [
+            _go_row(go_term_depth=1, go_term_id="go:2"),
+            _go_row(go_term_depth=0, go_namespace="biological_process",
+                    go_term_id="go:1"),
+            _non_go_row("transport", "inherited"),
+            _go_row(go_term_depth=0, go_evidence="domain_inferred",
+                    go_term_id="go:0"),
+            _non_go_row("transport", "most_specific"),
+            _go_row(go_term_depth=0, go_evidence="family_inferred",
+                    go_term_id="go:0"),
+            _non_go_row("metabolism", None),
+            _go_row(go_term_depth=0, go_evidence="curated", go_term_id="go:0"),
+        ]
+        out = sorted(rows, key=api._gbm_sort_key)
+        shape = [
+            (r["evidence_source"], r["substrate_depth"], r["go_term_depth"],
+             r["go_namespace"], r["go_evidence"])
+            for r in out
+        ]
+        assert shape == [
+            ("metabolism", None, None, None, None),
+            ("transport", "most_specific", None, None, None),
+            ("transport", "inherited", None, None, None),
+            ("go_transport", None, 0, "molecular_function", "curated"),
+            ("go_transport", None, 0, "molecular_function", "family_inferred"),
+            ("go_transport", None, 0, "molecular_function", "domain_inferred"),
+            ("go_transport", None, 0, "biological_process", "curated"),
+            ("go_transport", None, 1, "molecular_function", "curated"),
+        ]
+
+    def test_gbm_sort_go_orders_by_metabolite_within_depth(self):
+        a = _go_row(metabolite_id="a:1", go_term_depth=0)
+        b = _go_row(metabolite_id="b:1", go_term_depth=0)
+        c = _go_row(metabolite_id="a:1", go_term_depth=1)
+        assert sorted([c, b, a], key=api._gbm_sort_key) == [a, b, c]
+
+    def test_gbm_mode3_paging_pages_into_go_rows(self, monkeypatch):
+        """Global sort + slice: offset past the non-GO rows lands on GO."""
+        arm_rows = {
+            "metabolism": [_non_go_row("metabolism", None, locus_tag="g1")],
+            "transport": [_non_go_row(locus_tag="g2")],
+            "go_transport": [
+                _go_row(locus_tag="g3", go_term_id="go:1"),
+                _go_row(locus_tag="g4", go_term_id="go:2"),
+            ],
+        }
+        summary = {**_GO_SUMMARY, "total_matching": 4}
+        conn = _GoConn(arm_rows=arm_rows, summary=summary)
+        out, rec, _ = self._run(monkeypatch, conn=conn, limit=2, offset=2)
+        assert [r["evidence_source"] for r in out["results"]] == [
+            "go_transport", "go_transport"]
+        # over-fetch contract: every arm asked for limit+offset from 0
+        assert rec["go_transport"][0]["limit"] == 4
+        assert rec["go_transport"][0]["offset"] == 0
+
+    def test_gbm_excluded_target_warning(self, monkeypatch):
+        conn = _GoConn(
+            arm_rows={"go_transport": []}, summary=_GO_SUMMARY,
+            excluded=["kegg.compound:C00080"],
+        )
+        out, _, _ = self._run(
+            monkeypatch, conn=conn, metabolite_ids=["kegg.compound:C00080"])
+        msg = _GO_EXCLUDED_WARNING.format(id="kegg.compound:C00080")
+        assert msg in out["warnings"]
+        assert any("by curation" in w for w in out["warnings"])
+
+    def test_gbm_excluded_target_without_node_warns_and_not_found(
+            self, monkeypatch):
+        conn = _GoConn(
+            summary=_GO_SUMMARY, excluded=["chebi:23906"],
+            missing_ids=["chebi:23906"],
+        )
+        out, _, _ = self._run(
+            monkeypatch, conn=conn, metabolite_ids=["chebi:23906"])
+        assert "chebi:23906" in out["not_found"]["metabolite_ids"]
+        assert _GO_EXCLUDED_WARNING.format(id="chebi:23906") in out["warnings"]
+
+    def test_gbm_excluded_warning_requires_go_arm(self, monkeypatch):
+        conn = _GoConn(
+            summary=_GO_SUMMARY, excluded=["kegg.compound:C00080"])
+        out, _, _ = self._run(
+            monkeypatch, conn=conn, metabolite_ids=["kegg.compound:C00080"],
+            evidence_sources=["metabolism", "transport"])
+        assert not any("by curation" in w for w in out["warnings"])
+
+    def test_gbm_non_excluded_target_no_curation_warning(self, monkeypatch):
+        conn = _GoConn(
+            summary=_GO_SUMMARY, excluded=["kegg.compound:C00080"])
+        out, _, _ = self._run(monkeypatch, conn=conn)
+        assert not any("by curation" in w for w in out["warnings"])
+
+    def test_neurotransmitter_role_warning_gbm_input(self, monkeypatch):
+        out, _, _ = self._run(
+            monkeypatch, metabolite_ids=["chebi.role:25512"])
+        assert _NEUROTRANSMITTER_WARNING in out["warnings"]
+
+    def test_neurotransmitter_warning_requires_go_arm(self, monkeypatch):
+        out, _, _ = self._run(
+            monkeypatch, metabolite_ids=["chebi.role:25512"],
+            evidence_sources=["transport"])
+        assert _NEUROTRANSMITTER_WARNING not in out["warnings"]
+
+    def test_gbm_role_id_kept_without_not_a_metabolite_warning(
+            self, monkeypatch):
+        out, rec, _ = self._run(
+            monkeypatch, metabolite_ids=["chebi.role:26672"])
+        assert rec["go_transport"][0]["metabolite_ids"] == ["chebi.role:26672"]
+        assert not any("not a metabolite" in w for w in out["warnings"])
+
+    def test_gbm_existence_probe_accepts_chemical_role(self):
+        conn = MagicMock()
+        conn.execute_query.return_value = [{"found": []}]
+        api._chemistry_input_probes(conn, ["chebi.role:26672"], None)
+        cypher = conn.execute_query.call_args_list[0].args[0]
+        assert "ChemicalRole" in cypher
+
+
+class TestGoTransportApiMbg:
+    _LOCI = ["PMM0970", "PMM0261"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _run(self, monkeypatch, conn=None, **kw):
+        rec = {}
+        _install_mbg_builders(monkeypatch, rec)
+        conn = conn or _GoConn(
+            arm_rows={
+                "metabolism": [_non_go_row("metabolism", None)],
+                "transport": [_non_go_row()],
+                "go_transport": [_go_row()],
+            },
+            summary=_GO_SUMMARY,
+        )
+        locus_tags = kw.pop("locus_tags", self._LOCI)
+        out = api.metabolites_by_gene(locus_tags, self._ORG, conn=conn, **kw)
+        return out, rec, conn
+
+    def test_mbg_default_arms_include_go_transport(self, monkeypatch):
+        out, rec, _ = self._run(monkeypatch)
+        assert len(rec["go_transport"]) == 1
+        assert tuple(rec["summary"][0]["arms"]) == _GO_ARMS
+        assert {r["evidence_source"] for r in out["results"]} == set(_GO_ARMS)
+
+    def test_mbg_rejects_unknown_evidence_source(self):
+        with pytest.raises(ValueError) as ei:
+            api.metabolites_by_gene(
+                self._LOCI, self._ORG, evidence_sources=["bogus"],
+                conn=MagicMock(),
+            )
+        assert "['metabolism', 'transport', 'go_transport']" in str(ei.value)
+
+    def test_mbg_go_include_ancestors_threads_to_builders(self, monkeypatch):
+        _, rec, _ = self._run(
+            monkeypatch, go_include_ancestors=True, metabolite_elements=["N"])
+        assert rec["go_transport"][0]["include_ancestors"] is True
+        assert rec["summary"][0]["include_ancestors"] is True
+
+    def test_mbg_go_builder_takes_shared_filters(self, monkeypatch):
+        _, rec, _ = self._run(
+            monkeypatch, metabolite_ids=["kegg.compound:C00086"],
+            gene_categories=["Transport"], metabolite_elements=["N"],
+            ec_numbers=["3.5.1.5"], substrate_depth=["most_specific"],
+        )
+        kw = rec["go_transport"][0]
+        assert kw["metabolite_ids"] == ["kegg.compound:C00086"]
+        assert kw["gene_categories"] == ["Transport"]
+        assert kw["metabolite_elements"] == ["N"]
+        for k in ("ec_numbers", "mass_balance", "substrate_depth"):
+            assert k not in kw
+
+    def test_mbg_envelope_rows_by_go_term_depth(self, monkeypatch):
+        out, _, _ = self._run(monkeypatch)
+        assert out["rows_by_go_term_depth"] == [
+            {"go_term_depth": 0, "count": 5}, {"go_term_depth": 1, "count": 2},
+        ]
+
+    def test_mbg_envelope_omits_depth_rollup_without_go_arm(self, monkeypatch):
+        out, _, _ = self._run(monkeypatch, evidence_sources=["metabolism"])
+        assert "rows_by_go_term_depth" not in out
+
+    def test_mbg_sort_go_tiers_after_tcdb(self):
+        idx = {"A": 0, "B": 1}
+        rows = [
+            _go_row(locus_tag="A", go_term_depth=1),
+            _go_row(locus_tag="B", go_term_depth=0, go_term_id="go:2"),
+            _non_go_row("transport", "inherited", locus_tag="B"),
+            _go_row(locus_tag="A", go_term_depth=0,
+                    go_namespace="biological_process"),
+            _non_go_row("transport", "most_specific", locus_tag="B"),
+            _go_row(locus_tag="A", go_term_depth=0, go_evidence="family_inferred"),
+            _non_go_row("metabolism", None, locus_tag="B"),
+            _go_row(locus_tag="A", go_term_depth=0, go_evidence="curated"),
+        ]
+        out = sorted(rows, key=lambda r: api._mbg_sort_key(r, idx))
+        shape = [
+            (r["evidence_source"], r["substrate_depth"], r["go_term_depth"],
+             r["locus_tag"], r["go_namespace"], r["go_evidence"])
+            for r in out
+        ]
+        assert shape == [
+            ("metabolism", None, None, "B", None, None),
+            ("transport", "most_specific", None, "B", None, None),
+            ("transport", "inherited", None, "B", None, None),
+            ("go_transport", None, 0, "A", "molecular_function", "curated"),
+            ("go_transport", None, 0, "A", "molecular_function", "family_inferred"),
+            ("go_transport", None, 0, "A", "biological_process", "curated"),
+            ("go_transport", None, 0, "B", "molecular_function", "curated"),
+            ("go_transport", None, 1, "A", "molecular_function", "curated"),
+        ]
+
+    def test_neurotransmitter_role_warning_mbg_row(self, monkeypatch):
+        conn = _GoConn(
+            arm_rows={"go_transport": [_go_row(
+                metabolite_id="chebi.role:25512",
+                metabolite_name="neurotransmitter",
+                target_kind="chemical_role")]},
+            summary=_GO_SUMMARY,
+        )
+        out, _, _ = self._run(
+            monkeypatch, conn=conn, evidence_sources=["go_transport"])
+        assert _NEUROTRANSMITTER_WARNING in out["warnings"]
+
+    def test_neurotransmitter_warning_absent_without_such_row(
+            self, monkeypatch):
+        out, _, _ = self._run(monkeypatch)
+        assert _NEUROTRANSMITTER_WARNING not in out["warnings"]
+
+    def test_neurotransmitter_warning_requires_go_arm_mbg(self, monkeypatch):
+        conn = _GoConn(
+            arm_rows={"transport": [_non_go_row(
+                metabolite_id="chebi.role:25512",
+                target_kind="chemical_role")]},
+            summary=_GO_SUMMARY,
+        )
+        out, _, _ = self._run(
+            monkeypatch, conn=conn, evidence_sources=["transport"])
+        assert _NEUROTRANSMITTER_WARNING not in out["warnings"]
+
+
+class _AliasConnRoles:
+    """Resolver stub flagging chebi.role ids as roles (no Metabolite match)."""
+
+    def __init__(self):
+        self.calls = []
+
+    def execute_query(self, cypher, **params):
+        self.calls.append(cypher)
+        return [
+            {"curie": c, "canonical": [], "recurated_to": [],
+             "stereo_removed_from": [],
+             "roles": [{"id": c, "name": "siderophore"}]}
+            for c in params["curies"]
+        ]
+
+
+class TestCanonicalizeRolesAreTargets:
+    def test_canonicalize_roles_are_targets_true_passes_role_without_warning(self):
+        ids, aliases, warnings = api._canonicalize_metabolite_ids(
+            _AliasConnRoles(), ["chebi.role:26672"], roles_are_targets=True)
+        assert ids == ["chebi.role:26672"]
+        assert aliases == {}
+        assert warnings == []
+
+    def test_canonicalize_roles_are_targets_false_keeps_role_warning(self):
+        ids, _, warnings = api._canonicalize_metabolite_ids(
+            _AliasConnRoles(), ["chebi.role:26672"], roles_are_targets=False)
+        assert ids == ["chebi.role:26672"]
+        assert any("not a metabolite" in w for w in warnings)
+
+    def test_canonicalize_roles_default_keeps_role_warning(self):
+        _, _, warnings = api._canonicalize_metabolite_ids(
+            _AliasConnRoles(), ["chebi.role:26672"])
+        assert any("not a metabolite" in w for w in warnings)
+
+
+class TestListMetabolitesGoTransportApi:
+    def test_list_metabolites_accepts_go_transport(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_entries": 0, "total_matching": 0,
+              "by_evidence_source": [], "by_organism": []}],
+            [],
+        ]
+        out = api.list_metabolites(
+            evidence_sources=["go_transport"], conn=mock_conn)
+        assert isinstance(out, dict)
+
+    def test_list_metabolites_still_rejects_bogus(self, mock_conn):
+        with pytest.raises(ValueError):
+            api.list_metabolites(evidence_sources=["bogus"], conn=mock_conn)
+
+
+class TestKgReleaseInfoGoExcludedTargets:
+    def test_kg_release_info_passes_excluded_targets(self):
+        conn = MagicMock()
+        conn.execute_query.return_value = [{
+            "schema_info": {
+                "version": "0.1.0", "built_at": "2026-10-19T17:03:46Z",
+                "mcp_min_version": "0.0.1",
+                "go_transport_excluded_targets": [
+                    "chebi:24834", "kegg.compound:C00080"],
+            },
+            "labels": ["Schema_info"], "rel_types": [],
+        }]
+        report = api.kg_release_info(conn)
+        assert "go_transport_excluded_targets" in api._KG_IDENTITY_FIELDS
+        assert report["kg"]["go_transport_excluded_targets"] == [
+            "chebi:24834", "kegg.compound:C00080"]
+
+
+class TestKgSchemaEdgeDescriptions:
+    def test_kg_schema_relationship_description_from_yaml(self, mock_conn):
+        mock_schema = MagicMock()
+        mock_schema.to_dict.return_value = {
+            "nodes": {},
+            "relationships": {
+                "Molecular_function_transports_metabolite": {
+                    "source_labels": ["Entity"],
+                    "target_labels": ["Metabolite"],
+                    "properties": {},
+                },
+            },
+        }
+        with patch(
+            "multiomics_explorer.api.functions.load_schema_from_neo4j",
+            return_value=mock_schema,
+        ):
+            result = api.kg_schema(conn=mock_conn)
+        desc = result["relationships"][
+            "Molecular_function_transports_metabolite"]["description"]
+        assert desc.startswith("GO defines this molecular-function term")

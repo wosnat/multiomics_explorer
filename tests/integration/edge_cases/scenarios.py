@@ -1088,6 +1088,49 @@ def genes_by_metabolite_scenarios():
     ]
 
 
+def go_transport_gbm_scenarios():
+    """GO transport surface (spec docs/tool-specs/go-transport-surface.md
+    D12/D13/§7.9). Added to genes_by_metabolite_scenarios() below."""
+    return [
+        Scenario(
+            # D13: no organism lacks GO-route genes (discovery Cypher:
+            #   MATCH (g:Gene)-[:Gene_enables_molecular_function|
+            #     Gene_involved_in_biological_process]->()-[:Molecular_function_
+            #     transports_metabolite|...]->() RETURN g.organism_name,
+            #     count(DISTINCT g) -> every organism with genes has >= 1).
+            # The empty GO arm is the siderophore role in MED4: GO 0 rows,
+            # TCDB 25 rows (all inherited); envelope keys must be present.
+            "gbm_go_arm_empty_organism",
+            dict(metabolite_ids=["chebi.role:26672"],
+                 organism=fx.CONTROL_ORGANISM,
+                 evidence_sources=["transport", "go_transport"])),
+        Scenario(
+            # 54 ChemicalRole nodes carry no TCDB/GO edges (e.g. 23357):
+            # 0 rows, not_matched (D8), never a crash.
+            "gbm_role_id_no_edges",
+            dict(metabolite_ids=["chebi.role:23357"],
+                 organism=fx.CONTROL_ORGANISM,
+                 evidence_sources=["go_transport"])),
+        Scenario(
+            # Curation-excluded target with no node (chebi:23906): lands in
+            # not_found AND carries the curation warning.
+            "gbm_excluded_target_no_node",
+            dict(metabolite_ids=["chebi:23906"],
+                 organism=fx.CONTROL_ORGANISM,
+                 evidence_sources=["go_transport"])),
+    ]
+
+
+def go_transport_mbg_scenarios():
+    return [
+        Scenario(
+            # PMM0085 (ktrA, MED4): ancestors add nothing -> identical rows.
+            "mbg_ancestors_gene_without_ancestors",
+            dict(locus_tags=["PMM0085"], organism=fx.CONTROL_ORGANISM,
+                 go_include_ancestors=True)),
+    ]
+
+
 def metabolites_by_gene_scenarios():
     # gene locus_tags -> metabolites. SINGLE-ORGANISM enforced. Structured
     # not_found (MbgNotFound) -> input_ids omitted. PMM1720 (the no-DE gene)
@@ -1459,8 +1502,10 @@ SCENARIO_BUILDERS = {
     # give list_filter_values real degenerate axes (vocab -> pivot -> warning).
     "list_filter_values": list_filter_values_scenarios,
     # Batch D
-    "genes_by_metabolite": genes_by_metabolite_scenarios,
-    "metabolites_by_gene": metabolites_by_gene_scenarios,
+    "genes_by_metabolite": (
+        lambda: genes_by_metabolite_scenarios() + go_transport_gbm_scenarios()),
+    "metabolites_by_gene": (
+        lambda: metabolites_by_gene_scenarios() + go_transport_mbg_scenarios()),
     "metabolites_by_quantifies_assay": metabolites_by_quantifies_assay_scenarios,
     "metabolites_by_flags_assay": metabolites_by_flags_assay_scenarios,
     "assays_by_metabolite": assays_by_metabolite_scenarios,

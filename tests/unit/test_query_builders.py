@@ -14379,3 +14379,290 @@ class TestBuildDifferentialExpressionByOrthologResultsControlTiming:
             group_ids=["cyanorak:CK_00000364"], verbose=True,
         )
         assert "design_notes" not in cypher
+
+
+# ---------------------------------------------------------------------------
+# GO transport surface (RED) — docs/tool-specs/go-transport-surface.md
+# ---------------------------------------------------------------------------
+
+_GO_TARGET_EDGES = (
+    "Molecular_function_transports_metabolite|"
+    "Biological_process_transports_metabolite|"
+    "Molecular_function_transports_chemical_role|"
+    "Biological_process_transports_chemical_role"
+)
+_GO_ISA_WALK = (
+    "Molecular_function_is_a_molecular_function|"
+    "Biological_process_is_a_biological_process*1.."
+)
+
+
+class TestBuildGoTransportArm:
+    """GO arm detail builders for genes_by_metabolite / metabolites_by_gene."""
+
+    def _gbm(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_go_transport,
+        )
+        kwargs.setdefault("metabolite_ids", ["kegg.compound:C00086"])
+        kwargs.setdefault("organism", "Prochlorococcus MED4")
+        return build_genes_by_metabolite_go_transport(**kwargs)
+
+    def _mbg(self, **kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_go_transport,
+        )
+        kwargs.setdefault("locus_tags", ["PMM0970"])
+        kwargs.setdefault("organism", "Prochlorococcus MED4")
+        return build_metabolites_by_gene_go_transport(**kwargs)
+
+    def test_gbm_go_transport_builder_walks_both_edge_types(self):
+        cypher, _ = self._gbm()
+        assert _GO_TARGET_EDGES in cypher
+        assert (
+            "Gene_enables_molecular_function|"
+            "Gene_involved_in_biological_process" in cypher
+        )
+        assert "'go_transport' AS evidence_source" in cypher
+        assert "(m:Metabolite|ChemicalRole)" in cypher
+
+    def test_gbm_go_transport_namespace_from_edge_type(self):
+        cypher, _ = self._gbm()
+        assert "type(t)" in cypher
+        assert "labels(go)[0]" not in cypher
+        assert "AS go_namespace" in cypher
+
+    def test_gbm_go_transport_include_ancestors_adds_isa_walk(self):
+        on, _ = self._gbm(include_ancestors=True)
+        off, _ = self._gbm(include_ancestors=False)
+        assert _GO_ISA_WALK in on
+        assert "UNION ALL" in on
+        assert "is_a" not in off
+        assert "UNION ALL" not in off
+
+    def test_gbm_go_transport_row_keys(self):
+        cypher, _ = self._gbm()
+        for key in (
+            "go_term_id", "go_term_name", "go_namespace", "go_evidence",
+            "go_sources", "go_term_depth", "go_axiom_term_id",
+            "go_axiom_term_name", "target_kind",
+        ):
+            assert f"AS {key}" in cypher or key in cypher
+        assert "AS target_kind" in cypher
+        assert "go_chebi_ids" not in cypher
+
+    def test_gbm_go_transport_verbose_adds_go_chebi_ids(self):
+        cypher, _ = self._gbm(verbose=True)
+        assert "t.go_chebi_ids AS go_chebi_ids" in cypher
+
+    def test_gbm_go_transport_order_by(self):
+        cypher, _ = self._gbm()
+        assert re.search(
+            r"ORDER BY go_term_depth, metabolite_id, CASE go_namespace", cypher
+        )
+        assert "go_term_id, locus_tag" in cypher
+
+    def test_gbm_go_transport_filters_params(self):
+        cypher, params = self._gbm(
+            exclude_metabolite_ids=["kegg.compound:C00002"],
+            metabolite_pathway_ids=["kegg.pathway:ko02010"],
+            gene_categories=["Transport"],
+            limit=5, offset=2,
+        )
+        assert "(NOT (m.id IN $exclude_metabolite_ids))" in cypher
+        assert "m.pathway_ids" in cypher
+        assert "g.gene_category IN $gene_categories" in cypher
+        assert "SKIP $offset" in cypher
+        assert "LIMIT $limit" in cypher
+        assert params["gene_categories"] == ["Transport"]
+        assert params["limit"] == 5
+
+    def test_gbm_go_transport_filters_apply_to_inherited_branch(self):
+        cypher, _ = self._gbm(
+            include_ancestors=True,
+            exclude_metabolite_ids=["kegg.compound:C00002"],
+        )
+        assert cypher.count("(NOT (m.id IN $exclude_metabolite_ids))") >= 2
+
+    def test_gbm_go_transport_rejects_arm_scoped_filters(self):
+        with pytest.raises(TypeError):
+            self._gbm(ec_numbers=["1.1.1.1"])
+        with pytest.raises(TypeError):
+            self._gbm(substrate_depth=["most_specific"])
+
+    def test_mbg_go_transport_builder_walks_both_edge_types(self):
+        cypher, _ = self._mbg()
+        assert _GO_TARGET_EDGES in cypher
+        assert "'go_transport' AS evidence_source" in cypher
+        assert "type(t)" in cypher
+        assert "labels(go)[0]" not in cypher
+
+    def test_mbg_go_transport_include_ancestors_adds_isa_walk(self):
+        on, _ = self._mbg(include_ancestors=True)
+        off, _ = self._mbg()
+        assert _GO_ISA_WALK in on
+        assert "is_a" not in off
+
+    def test_mbg_go_transport_takes_metabolite_ids_and_gene_categories(self):
+        cypher, params = self._mbg(
+            metabolite_ids=["kegg.compound:C00086"],
+            gene_categories=["Transport"],
+            metabolite_elements=["N"],
+        )
+        assert "m.id IN $metabolite_ids" in cypher
+        assert "g.gene_category IN $gene_categories" in cypher
+        assert (
+            "ALL(elem IN $metabolite_elements WHERE elem IN "
+            "coalesce(m.elements, []))" in cypher
+        )
+        assert params["metabolite_ids"] == ["kegg.compound:C00086"]
+
+    def test_mbg_go_transport_order_by_input_order(self):
+        cypher, _ = self._mbg()
+        assert (
+            "ORDER BY go_term_depth, "
+            "apoc.coll.indexOf($locus_tags, locus_tag), locus_tag" in cypher
+        )
+
+
+class TestBuildTransportArmRoleEdge:
+    """TCDB transport arms also walk Tcdb_family_transports_chemical_role."""
+
+    def test_gbm_transport_arm_walks_tcdb_role_edge(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_transport,
+        )
+        cypher, _ = build_genes_by_metabolite_transport(
+            metabolite_ids=["chebi.role:26672"], organism="Prochlorococcus MED4"
+        )
+        assert "Tcdb_family_transports_chemical_role" in cypher
+        assert "(m:Metabolite|ChemicalRole)" in cypher
+        assert "AS target_kind" in cypher
+        assert "null AS go_term_id" in cypher
+
+    def test_mbg_transport_arm_walks_tcdb_role_edge(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_transport,
+        )
+        cypher, _ = build_metabolites_by_gene_transport(
+            locus_tags=["PMM0097"], organism="Prochlorococcus MED4"
+        )
+        assert "Tcdb_family_transports_chemical_role" in cypher
+        assert "(m:Metabolite|ChemicalRole)" in cypher
+        assert "AS target_kind" in cypher
+
+    def test_metabolism_arms_carry_null_go_columns(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_metabolism,
+            build_metabolites_by_gene_metabolism,
+        )
+        c1, _ = build_genes_by_metabolite_metabolism(
+            metabolite_ids=["kegg.compound:C00086"],
+            organism="Prochlorococcus MED4",
+        )
+        c2, _ = build_metabolites_by_gene_metabolism(
+            locus_tags=["PMM0970"], organism="Prochlorococcus MED4"
+        )
+        for c in (c1, c2):
+            assert "null AS go_term_id" in c
+            assert "null AS go_term_depth" in c
+            assert "'metabolite' AS target_kind" in c
+
+
+class TestBuildGoTransportSummaries:
+    def test_gbm_summary_go_arm_and_depth_rollup(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_summary,
+        )
+        cypher, _ = build_genes_by_metabolite_summary(
+            metabolite_ids=["kegg.compound:C00086"],
+            organism="Prochlorococcus MED4",
+            arms=("metabolism", "transport", "go_transport"),
+            include_ancestors=True,
+        )
+        assert _GO_TARGET_EDGES in cypher
+        assert "'go_transport' AS es" in cypher
+        assert "rows_by_go_term_depth" in cypher
+        assert "go_transport_rows" in cypher
+        assert _GO_ISA_WALK in cypher
+        assert "Tcdb_family_transports_chemical_role" in cypher
+
+    def test_gbm_summary_without_go_arm_has_no_go_edges(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_summary,
+        )
+        cypher, _ = build_genes_by_metabolite_summary(
+            metabolite_ids=["kegg.compound:C00086"],
+            organism="Prochlorococcus MED4",
+        )
+        assert "Molecular_function_transports_metabolite" not in cypher
+        assert "rows_by_go_term_depth" in cypher
+
+    def test_mbg_summary_go_arm_and_depth_rollup(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_summary,
+        )
+        cypher, _ = build_metabolites_by_gene_summary(
+            locus_tags=["PMM0970"],
+            organism="Prochlorococcus MED4",
+            arms=("metabolism", "transport", "go_transport"),
+            include_ancestors=True,
+        )
+        assert _GO_TARGET_EDGES in cypher
+        assert "rows_by_go_term_depth" in cypher
+        assert "go_transport_rows" in cypher
+        assert _GO_ISA_WALK in cypher
+
+    def test_mbg_no_formula_count_accepts_go_arm(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_no_formula_count,
+        )
+        cypher, _ = build_metabolites_by_gene_no_formula_count(
+            locus_tags=["PMM0970"],
+            organism="Prochlorococcus MED4",
+            arms=("metabolism", "transport", "go_transport"),
+            include_ancestors=True,
+        )
+        assert _GO_TARGET_EDGES in cypher
+        assert _GO_ISA_WALK in cypher
+
+
+class TestBuildGeneOverviewGoTransport:
+    def test_gene_overview_evidence_sources_includes_go_transport(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM0970"])
+        assert "'go_transport'" in cypher
+        assert _GO_TARGET_EDGES in cypher
+        assert (
+            "Gene_enables_molecular_function|"
+            "Gene_involved_in_biological_process" in cypher
+        )
+
+    def test_gene_overview_has_chemistry_includes_go_route(self):
+        cypher, _ = build_gene_overview_summary(locus_tags=["PMM0970"])
+        assert "has_chemistry" in cypher
+        assert _GO_TARGET_EDGES in cypher
+
+
+class TestBuildListMetabolitesGoTransport:
+    def test_list_metabolites_organism_filter_unions_go_reach(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolites
+        cypher, params = build_list_metabolites(
+            organism_names=["Prochlorococcus MED4"]
+        )
+        assert "m.organism_names" in cypher
+        assert "m.go_transport_organism_names" in cypher
+        assert "organism_names_lc" in cypher
+
+    def test_list_metabolites_detail_returns_go_organism_fields(self):
+        from multiomics_explorer.kg.queries_lib import build_list_metabolites
+        cypher, _ = build_list_metabolites()
+        assert "m.go_transport_organism_names AS go_transport_organism_names" in cypher
+        assert "m.go_transport_organism_count AS go_transport_organism_count" in cypher
+
+    def test_list_metabolites_summary_top_organisms_union(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_metabolites_summary,
+        )
+        cypher, _ = build_list_metabolites_summary()
+        assert "m.go_transport_organism_names" in cypher
+        assert "apoc.coll.toSet" in cypher

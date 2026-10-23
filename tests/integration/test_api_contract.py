@@ -1961,3 +1961,98 @@ class TestMetabolitesByGeneNoFormulaContract:
         )
         assert "no_formula_excluded" not in r
         assert "no_formula_excluded_metabolites" not in r
+
+
+# ---------------------------------------------------------------------------
+# GO transport surface (RED) — docs/tool-specs/go-transport-surface.md §4.2
+# ---------------------------------------------------------------------------
+_GO_COMPACT_ROW_KEYS = {
+    "go_term_id", "go_term_name", "go_namespace", "go_evidence",
+    "go_sources", "go_term_depth", "go_axiom_term_id",
+    "go_axiom_term_name", "target_kind",
+}
+
+
+@pytest.mark.kg
+class TestGoTransportContract:
+    _ORG = "Prochlorococcus MED4"
+
+    def test_gbm_every_row_carries_the_nine_go_keys(self, conn):
+        """Cross-arm fields stay explicit None (Phase 3 Item 6.1): every
+        row of every arm carries all nine compact go_* / target_kind keys."""
+        r = api.genes_by_metabolite(
+            ["kegg.compound:C00086"], self._ORG, limit=100, conn=conn)
+        assert {x["evidence_source"] for x in r["results"]} == {
+            "metabolism", "transport", "go_transport"}
+        for row in r["results"]:
+            assert _GO_COMPACT_ROW_KEYS <= set(row), row["evidence_source"]
+            assert "go_chebi_ids" not in row  # verbose-only
+            if row["evidence_source"] == "go_transport":
+                assert row["go_term_depth"] == 0
+                assert row["target_kind"] == "metabolite"
+            else:
+                assert row["go_term_id"] is None
+                assert row["go_term_depth"] is None
+                assert row["go_namespace"] is None
+
+    def test_gbm_verbose_go_chebi_ids_only_on_go_rows(self, conn):
+        r = api.genes_by_metabolite(
+            ["kegg.compound:C00086"], self._ORG, limit=100, verbose=True,
+            conn=conn)
+        assert any(x["evidence_source"] == "go_transport" for x in r["results"])
+        for row in r["results"]:
+            if row["evidence_source"] == "go_transport":
+                assert row["go_chebi_ids"] == ["CHEBI:16199"]
+            else:
+                assert "go_chebi_ids" not in row  # sparse-stripped (D7)
+
+    def test_gbm_envelope_keys(self, conn):
+        r = api.genes_by_metabolite(
+            ["kegg.compound:C00086"], self._ORG, summary=True, conn=conn)
+        assert "rows_by_go_term_depth" in r
+        for entry in r["rows_by_go_term_depth"]:
+            assert set(entry) == {"go_term_depth", "count"}
+        for e in r["by_metabolite"]:
+            assert "go_transport_rows" in e
+        for g in r["top_genes"]:
+            assert "go_transport_rows" in g
+
+    def test_gbm_envelope_omits_depth_rollup_without_go_arm(self, conn):
+        r = api.genes_by_metabolite(
+            ["kegg.compound:C00086"], self._ORG, summary=True,
+            evidence_sources=["metabolism", "transport"], conn=conn)
+        assert "rows_by_go_term_depth" not in r
+
+    def test_mbg_every_row_carries_the_nine_go_keys(self, conn):
+        r = api.metabolites_by_gene(
+            ["PMM0970"], self._ORG, limit=50, conn=conn)
+        for row in r["results"]:
+            assert _GO_COMPACT_ROW_KEYS <= set(row)
+        assert "rows_by_go_term_depth" in r
+        for g in r["by_gene"]:
+            assert "go_transport_rows" in g
+        for m in r["top_metabolites"]:
+            assert "go_transport_rows" in m
+
+    def test_gbm_rejects_unknown_evidence_source(self, conn):
+        with pytest.raises(ValueError, match="go_transport"):
+            api.genes_by_metabolite(
+                ["kegg.compound:C00086"], self._ORG,
+                evidence_sources=["bogus"], conn=conn)
+
+    def test_list_metabolites_rows_have_go_organism_keys(self, conn):
+        r = api.list_metabolites(
+            metabolite_ids=["kegg.compound:C00086"], conn=conn)
+        row = r["results"][0]
+        assert "go_transport_organism_names" in row
+        assert "go_transport_organism_count" in row
+
+    def test_gene_overview_evidence_sources_value_set(self, conn):
+        r = api.gene_overview(["PMM0970"], conn=conn)
+        assert set(r["results"][0]["evidence_sources"]) <= {
+            "metabolism", "transport", "metabolomics", "go_transport"}
+        assert "go_transport" in r["results"][0]["evidence_sources"]
+
+    def test_kg_release_info_kg_block_has_excluded_targets(self, conn):
+        r = api.kg_release_info(conn)
+        assert isinstance(r["kg"]["go_transport_excluded_targets"], list)

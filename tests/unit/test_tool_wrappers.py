@@ -13441,3 +13441,215 @@ class TestDifferentialExpressionByOrthologControlTimingWrapper:
         row_model = typing.get_args(resp.model_fields["results"].annotation)[0]
         assert "control_timing" in row_model.model_fields
         assert "design_notes" not in row_model.model_fields
+
+
+# ---------------------------------------------------------------------------
+# GO transport surface (RED) — docs/tool-specs/go-transport-surface.md
+# ---------------------------------------------------------------------------
+
+_GO_ROW_FIELDS = (
+    "go_term_id", "go_term_name", "go_namespace", "go_evidence",
+    "go_sources", "go_term_depth", "go_axiom_term_id",
+    "go_axiom_term_name", "target_kind",
+)
+
+
+def _literal_values(tool_fns, tool, param):
+    import typing
+    hints = typing.get_type_hints(tool_fns[tool], include_extras=True)
+    hint = hints[param]
+    if typing.get_origin(hint) is typing.Annotated:
+        hint = typing.get_args(hint)[0]
+    found = set()
+
+    def walk(t):
+        if typing.get_origin(t) is typing.Literal:
+            found.update(typing.get_args(t))
+        for a in typing.get_args(t):
+            walk(a)
+    walk(hint)
+    return found
+
+
+class TestGoTransportWrappers:
+    def test_triplet_has_nine_go_fields_and_verbose_chebi_ids(self):
+        from multiomics_explorer.mcp_server.tools import (
+            GeneReactionMetaboliteTriplet,
+        )
+        fields = GeneReactionMetaboliteTriplet.model_fields
+        for f in _GO_ROW_FIELDS:
+            assert f in fields, f
+        assert "go_chebi_ids" in fields
+
+    def test_triplet_go_fields_default_none_and_kept_explicit(self):
+        from multiomics_explorer.mcp_server.tools import (
+            GeneReactionMetaboliteTriplet,
+        )
+        row = GeneReactionMetaboliteTriplet(
+            locus_tag="PMM0001", evidence_source="metabolism",
+            metabolite_id="kegg.compound:C00086", metabolite_name="Urea",
+            go_term_id=None, go_term_depth=None, target_kind="metabolite",
+        )
+        dumped = row.model_dump()
+        assert dumped["go_term_id"] is None
+        assert dumped["target_kind"] == "metabolite"
+
+    def test_triplet_go_row_roundtrip(self):
+        from multiomics_explorer.mcp_server.tools import (
+            GeneReactionMetaboliteTriplet,
+        )
+        row = GeneReactionMetaboliteTriplet(
+            locus_tag="PMM0970", evidence_source="go_transport",
+            metabolite_id="chebi.role:26672", metabolite_name="siderophore",
+            go_term_id="go:0015891", go_term_name="siderophore transport",
+            go_namespace="biological_process", go_evidence="curated",
+            go_sources=["ncbi"], go_term_depth=0,
+            go_axiom_term_id="go:0015891",
+            go_axiom_term_name="siderophore transport",
+            target_kind="chemical_role", go_chebi_ids=["CHEBI:26672"],
+        )
+        assert row.evidence_source == "go_transport"
+        assert row.target_kind == "chemical_role"
+        assert row.go_chebi_ids == ["CHEBI:26672"]
+
+    def test_triplet_rejects_bad_go_namespace_and_target_kind(self):
+        from multiomics_explorer.mcp_server.tools import (
+            GeneReactionMetaboliteTriplet,
+        )
+        base = dict(
+            locus_tag="PMM0970", evidence_source="go_transport",
+            metabolite_id="x:1", metabolite_name="n",
+        )
+        ok = GeneReactionMetaboliteTriplet(
+            **base, go_namespace="molecular_function",
+            target_kind="chemical_role")
+        assert ok.go_namespace == "molecular_function"
+        with pytest.raises(Exception):
+            GeneReactionMetaboliteTriplet(**base, go_namespace="cellular")
+        with pytest.raises(Exception):
+            GeneReactionMetaboliteTriplet(**base, target_kind="bogus")
+
+    @pytest.mark.parametrize("tool", ["genes_by_metabolite", "metabolites_by_gene"])
+    def test_go_include_ancestors_param(self, tool_fns, tool):
+        import inspect
+        sig = inspect.signature(tool_fns[tool])
+        assert "go_include_ancestors" in sig.parameters
+        assert sig.parameters["go_include_ancestors"].default is False
+
+    @pytest.mark.parametrize(
+        "tool", ["genes_by_metabolite", "metabolites_by_gene", "list_metabolites"])
+    def test_evidence_sources_literal_includes_go_transport(self, tool_fns, tool):
+        assert "go_transport" in _literal_values(
+            tool_fns, tool, "evidence_sources")
+
+    @pytest.mark.parametrize("tool", ["genes_by_metabolite", "metabolites_by_gene"])
+    def test_gene_anchored_evidence_sources_still_reject_metabolomics(
+            self, tool_fns, tool):
+        assert "metabolomics" not in _literal_values(
+            tool_fns, tool, "evidence_sources")
+
+    def test_metabolite_result_go_organism_fields(self):
+        from multiomics_explorer.mcp_server.tools import MetaboliteResult
+        fields = MetaboliteResult.model_fields
+        assert "go_transport_organism_names" in fields
+        assert "go_transport_organism_count" in fields
+
+    def test_envelopes_have_rows_by_go_term_depth(self):
+        from multiomics_explorer.mcp_server.tools import (
+            GenesByMetaboliteResponse, MetabolitesByGeneResponse,
+        )
+        for model in (GenesByMetaboliteResponse, MetabolitesByGeneResponse):
+            assert "rows_by_go_term_depth" in model.model_fields
+
+    @pytest.mark.asyncio
+    async def test_gbm_forwards_go_include_ancestors(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=_GBM_SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["genes_by_metabolite"](
+                mock_ctx, metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4", go_include_ancestors=True,
+            )
+        assert mock_api.call_args.kwargs["go_include_ancestors"] is True
+
+    @pytest.mark.asyncio
+    async def test_mbg_forwards_go_include_ancestors(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=_MBG_SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["metabolites_by_gene"](
+                mock_ctx, locus_tags=["PMM0261"],
+                organism="Prochlorococcus MED4", go_include_ancestors=True,
+            )
+        assert mock_api.call_args.kwargs["go_include_ancestors"] is True
+
+    @pytest.mark.asyncio
+    async def test_gbm_envelope_passes_rows_by_go_term_depth(
+            self, tool_fns, mock_ctx):
+        ret = {
+            **_GBM_SAMPLE_API_RETURN,
+            "rows_by_go_term_depth": [
+                {"go_term_depth": 0, "count": 11},
+                {"go_term_depth": 1, "count": 2},
+            ],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=ret,
+        ):
+            res = await tool_fns["genes_by_metabolite"](
+                mock_ctx, metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+        got = [
+            (e.go_term_depth, e.count) for e in res.rows_by_go_term_depth]
+        assert got == [(0, 11), (1, 2)]
+
+    @pytest.mark.asyncio
+    async def test_mbg_envelope_passes_rows_by_go_term_depth(
+            self, tool_fns, mock_ctx):
+        ret = {
+            **_MBG_SAMPLE_API_RETURN,
+            "rows_by_go_term_depth": [{"go_term_depth": 0, "count": 2}],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=ret,
+        ):
+            res = await tool_fns["metabolites_by_gene"](
+                mock_ctx, locus_tags=["PMM0970"],
+                organism="Prochlorococcus MED4",
+            )
+        assert [(e.go_term_depth, e.count)
+                for e in res.rows_by_go_term_depth] == [(0, 2)]
+
+    @pytest.mark.asyncio
+    async def test_list_metabolites_row_go_organism_fields(
+            self, tool_fns, mock_ctx):
+        row = {
+            **_LM_SAMPLE_RESULT,
+            "go_transport_organism_names": ["Prochlorococcus MED4"],
+            "go_transport_organism_count": 1,
+        }
+        ret = {**_LM_SAMPLE_API_RETURN, "results": [row]}
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolites",
+            return_value=ret,
+        ):
+            res = await tool_fns["list_metabolites"](mock_ctx)
+        r = res.results[0]
+        assert r.go_transport_organism_names == ["Prochlorococcus MED4"]
+        assert r.go_transport_organism_count == 1
+
+    def test_kg_release_info_model_has_excluded_targets(self):
+        from multiomics_explorer.mcp_server import tools as tools_mod
+        names = [
+            n for n in dir(tools_mod)
+            if n.startswith("KG") and hasattr(getattr(tools_mod, n), "model_fields")
+        ]
+        assert any(
+            "go_transport_excluded_targets" in getattr(tools_mod, n).model_fields
+            for n in names
+        ), names
