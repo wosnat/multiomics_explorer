@@ -12,11 +12,14 @@ import logging
 import os
 import re
 import statistics
+import weakref
 from functools import lru_cache
 from importlib.metadata import PackageNotFoundError
 from importlib.metadata import version as _pkg_version
+from pathlib import Path
 from typing import Literal
 
+import yaml
 from packaging.version import InvalidVersion, Version
 
 from CyVer import PropertiesValidator, SchemaValidator, SyntaxValidator
@@ -128,10 +131,12 @@ from multiomics_explorer.kg.queries_lib import (
     build_resolve_metabolite_curies,
     build_genes_by_metabolite_metabolism,
     build_genes_by_metabolite_transport,
+    build_genes_by_metabolite_go_transport,
     build_genes_by_metabolite_summary,
     build_metabolite_stereo_relatives,
     build_metabolites_by_gene_metabolism,
     build_metabolites_by_gene_transport,
+    build_metabolites_by_gene_go_transport,
     build_metabolites_by_gene_summary,
     build_metabolites_by_gene_no_formula_count,
     build_gene_clusters_by_gene,
@@ -1386,6 +1391,22 @@ def _strip_unowned_columns(rows: list[dict], ontology: str, verbose: bool) -> No
             r.pop(col, None)
 
 
+_EDGE_DESCRIPTIONS_PATH = (
+    Path(__file__).parent.parent / "config" / "edge_descriptions.yaml"
+)
+
+
+@lru_cache(maxsize=1)
+def _edge_descriptions() -> dict[str, str]:
+    """`{relationship_type: description}` from `config/edge_descriptions.yaml`
+    (hand-authored caveats; `{}` when the file is absent or empty)."""
+    try:
+        data = yaml.safe_load(_EDGE_DESCRIPTIONS_PATH.read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return {}
+    return {str(k): str(v) for k, v in (data or {}).items()}
+
+
 def kg_schema(
     labels: list[str] | None = None,
     relationship_types: list[str] | None = None,
@@ -1401,7 +1422,11 @@ def kg_schema(
 
     Returns dict with keys:
       nodes: {label: {properties: {name: type}}}
-      relationships: {type: {source_labels, target_labels, properties}}
+      relationships: {type: {source_labels, target_labels, properties,
+        description?}} — `description` (str) is present only on types that
+        carry a curated caveat (e.g. the four GO transport edges
+        `Molecular_function_transports_metabolite`, ...): read it before
+        querying that edge with run_cypher.
       not_found_labels: labels requested but absent from the KG
       not_found_relationship_types: relationship types requested but absent
     """
@@ -1428,6 +1453,11 @@ def kg_schema(
         section=section,
     )
     result = schema.to_dict()
+    descriptions = _edge_descriptions()
+    for rel_type, rel in (result.get("relationships") or {}).items():
+        desc = descriptions.get(rel_type)
+        if desc is not None and isinstance(rel, dict):
+            rel["description"] = desc
     result["not_found_labels"] = not_found_labels
     result["not_found_relationship_types"] = not_found_relationship_types
     return result
@@ -7943,7 +7973,8 @@ def _cluster_enrichment_params_dict(
     }
 
 
-_VALID_EVIDENCE_SOURCES = ("metabolism", "transport", "metabolomics")
+_VALID_EVIDENCE_SOURCES = (
+    "metabolism", "transport", "metabolomics", "go_transport")
 
 
 # ---------------------------------------------------------------------------
@@ -8056,6 +8087,7 @@ def _metabolite_id_shape_warnings(raw_ids: list[str] | None) -> list[str]:
 
 def _canonicalize_metabolite_ids(
     conn: GraphConnection, ids: list[str] | None,
+    *, roles_are_targets: bool = False,
 ) -> tuple[list[str] | None, dict[str, list[str]], list[str]]:
     """Resolve metabolite identifiers (any id form, incl. retired ids) to
     canonical `Metabolite.id` in ONE KG round-trip.
@@ -8079,6 +8111,12 @@ def _canonicalize_metabolite_ids(
         measurements), a removed stereo-specific id (names the
         stereo-unspecified node it was removed from), a chemical-role id
         (names the role), and the defensive multi-match expansion.
+
+    `roles_are_targets=True` (genes_by_metabolite / metabolites_by_gene,
+    where `ChemicalRole` nodes are valid TCDB / GO transport targets): a
+    chemical-role input is kept as its canonical `chebi.role:<n>` id (an
+    input that changed is reported in `resolved_aliases`) and gets no
+    "not a metabolite" warning.
     """
     if not ids:
         return ids, {}, []
@@ -8119,11 +8157,17 @@ def _canonicalize_metabolite_ids(
             for m in matches:
                 _push(m)
             continue
-        _push(raw)
         recurated = [t for t in (row.get("recurated_to") or []) if t.get("id")]
         stereo_from = [
             t for t in (row.get("stereo_removed_from") or []) if t.get("id")]
         roles = [r for r in (row.get("roles") or []) if r.get("id")]
+        if roles and roles_are_targets and not (recurated or stereo_from):
+            role_id = roles[0]["id"]
+            if role_id != raw:
+                resolved[raw] = [role_id]
+            _push(role_id)
+            continue
+        _push(raw)
         if recurated:
             targets = ", ".join(f"{t['id']} ({t.get('name')})" for t in recurated)
             _warn(
@@ -8154,12 +8198,17 @@ def _canonicalize_metabolite_id_params(
     conn: GraphConnection,
     metabolite_ids: list[str] | None,
     exclude_metabolite_ids: list[str] | None,
+    *,
+    roles_are_targets: bool = False,
 ) -> tuple[list[str] | None, list[str] | None, dict[str, list[str]], list[str]]:
     """Canonicalize `metabolite_ids` then `exclude_metabolite_ids`, merging
-    the alias maps and collision warnings into one of each."""
-    mids, aliases, warnings = _canonicalize_metabolite_ids(conn, metabolite_ids)
+    the alias maps and collision warnings into one of each.
+    `roles_are_targets` is passed to both `_canonicalize_metabolite_ids`
+    calls."""
+    mids, aliases, warnings = _canonicalize_metabolite_ids(
+        conn, metabolite_ids, roles_are_targets=roles_are_targets)
     xids, x_aliases, x_warnings = _canonicalize_metabolite_ids(
-        conn, exclude_metabolite_ids)
+        conn, exclude_metabolite_ids, roles_are_targets=roles_are_targets)
     merged = {**aliases, **x_aliases}
     merged_warnings = list(warnings)
     for w in x_warnings:
@@ -8392,10 +8441,19 @@ def list_metabolites(
     `elements` entry that isn't a recognized symbol or name, and
     no-formula metabolites excluded by the element filter).
 
+    GO transport route: `evidence_sources=['go_transport']` keeps
+    metabolites a GO term names as transported (any organism). Rows carry
+    `go_transport_organism_names` (list[str]) and
+    `go_transport_organism_count` (int): organisms with a gene directly
+    annotated to such a term. Absent = no directly annotated gene path, not
+    "no GO edge". `organism_names` matches an organism on either
+    `organism_names` or `go_transport_organism_names`, and `top_organisms`
+    counts that union once per metabolite.
+
     Raises:
         ValueError: if search_text is empty/whitespace, or evidence_sources
             contains values outside {"metabolism", "transport",
-            "metabolomics"}.
+            "metabolomics", "go_transport"}.
     """
     min_mass = deprecated_alias(
         old=mass_min, new=min_mass, old_name="mass_min", new_name="min_mass")
@@ -8649,8 +8707,42 @@ def list_metabolites(
 # metabolite-anchored `list_metabolites`). Gene-anchored tools have no
 # metabolomics path (DerivedMetric → Metabolite carries no Gene anchor), so
 # we reject `"metabolomics"` at the boundary instead of silently returning
-# zero rows.
-_VALID_EVIDENCE_SOURCES_GBM = ("metabolism", "transport")
+# zero rows. Canonical arm order; also the default arm set.
+_VALID_EVIDENCE_SOURCES_GBM = ("metabolism", "transport", "go_transport")
+
+# Exact warning copy (docs/tool-specs/go-transport-surface.md §8).
+_GO_EXCLUDED_TARGET_WARNING = (
+    "'{id}' is excluded from the GO transport route by curation (coupling "
+    "ion or upper-level class) — an empty GO answer is not biology; TCDB "
+    "rows still answer."
+)
+_NEUROTRANSMITTER_ROLE_ID = "chebi.role:25512"
+_NEUROTRANSMITTER_WARNING = (
+    "chebi.role:25512 (neurotransmitter) on the GO route is mostly "
+    "bacterial NSS amino-acid transporters, not neurotransmitter transport."
+)
+
+
+def _active_chemistry_arms(
+    evidence_sources: list[str] | None,
+) -> tuple[str, ...]:
+    """Arms to run, in canonical order; all three when `evidence_sources`
+    is None."""
+    if evidence_sources is None:
+        return _VALID_EVIDENCE_SOURCES_GBM
+    return tuple(
+        arm for arm in _VALID_EVIDENCE_SOURCES_GBM if arm in evidence_sources)
+
+
+def _rows_by_go_term_depth(raw_summary: dict) -> list[dict]:
+    """`[{go_term_depth, count}]` from the summary row, depth ascending."""
+    return sorted(
+        [
+            {"go_term_depth": e["go_term_depth"], "count": e["count"]}
+            for e in (raw_summary.get("rows_by_go_term_depth") or [])
+        ],
+        key=lambda r: r["go_term_depth"],
+    )
 
 
 # Sparse-strip: nullable result columns dropped when null. Per-arm-specific
@@ -8675,6 +8767,7 @@ _GBM_SPARSE_FIELDS = (
     "reaction_rhea_ids",
     "tcdb_level_kind",
     "tc_class_id",
+    "go_chebi_ids",
 )
 
 
@@ -8729,11 +8822,22 @@ def _substrate_depth_priority(row: dict) -> int:
     return 1 if row.get("substrate_depth") == "inherited" else 0
 
 
+_GO_NS_RANK = {"molecular_function": 0, "biological_process": 1}  # else 2
+_GO_EVIDENCE_RANK = {
+    "curated": 0, "family_inferred": 1, "domain_inferred": 2}  # else 3
+
+
 def _gbm_sort_key(row: dict) -> tuple:
     """Global sort key for genes_by_metabolite detail rows.
 
-    Sort by: (metabolite_id, evidence_source, substrate_depth_priority,
-              -tcdb_evidence_score, secondary_id, locus_tag).
+    GO transport rows sort after every metabolism / transport row, by
+    (go_term_depth, metabolite_id, namespace (MF before BP), go_evidence
+    (curated < family_inferred < domain_inferred), go_term_id, locus_tag)
+    — the restriction of this key to the GO arm is its builder's ORDER BY.
+
+    Metabolism / transport rows sort by: (metabolite_id, evidence_source,
+    substrate_depth_priority, -tcdb_evidence_score, secondary_id,
+    locus_tag).
 
     `substrate_depth_priority`:
       - 0 for `most_specific` OR None (metabolism rows)
@@ -8747,11 +8851,22 @@ def _gbm_sort_key(row: dict) -> tuple:
     transport rows. Acts as deterministic tiebreaker within each
     (metabolite, evidence_source, depth, score) group.
     """
+    if row.get("evidence_source") == "go_transport":
+        return (
+            1,
+            row.get("go_term_depth") or 0,
+            row.get("metabolite_id") or "",
+            _GO_NS_RANK.get(row.get("go_namespace"), 2),
+            _GO_EVIDENCE_RANK.get(row.get("go_evidence"), 3),
+            row.get("go_term_id") or "",
+            row.get("locus_tag") or "",
+        )
     if row.get("evidence_source") == "metabolism":
         secondary = row.get("reaction_id") or ""
     else:
         secondary = row.get("tcdb_family_id") or ""
     return (
+        0,
         row.get("metabolite_id") or "",
         row.get("evidence_source") or "",
         _substrate_depth_priority(row),
@@ -8782,13 +8897,19 @@ def _chemistry_input_probes(
     (no query dispatched) when its input is empty/None, mirroring each
     call site's pre-existing "only query when asked" discipline.
 
+    `metabolite_ids` match `Metabolite` or `ChemicalRole` nodes.
+
     Returns `{"not_found_metabolite_ids": [...], "not_found_pathway_ids":
     [...], "not_found_elements": [...]}`.
     """
     if metabolite_ids:
+        # ChemicalRole ids are valid transport targets (TCDB / GO role
+        # edges), so they count as found. Label-scoped UNION keeps both
+        # lookups on their id index.
         rows = conn.execute_query(
-            "MATCH (m:Metabolite) WHERE m.id IN $ids "
-            "RETURN collect(m.id) AS found",
+            "CALL { MATCH (m:Metabolite) WHERE m.id IN $ids RETURN m.id AS id "
+            "UNION MATCH (r:ChemicalRole) WHERE r.id IN $ids RETURN r.id AS id } "
+            "RETURN collect(id) AS found",
             ids=metabolite_ids,
         )
         found_metab = set(rows[0]["found"]) if rows else set()
@@ -8855,6 +8976,7 @@ def _stereo_relatives_in_organism(
     gbm_filters: dict | None,
     arms: tuple[str, ...],
     source_names: dict[str, str] | None = None,
+    include_ancestors: bool = False,
 ) -> dict[str, list[dict]]:
     """Organism-scoped generic ↔ specific stereo relatives of `metabolite_ids`.
 
@@ -8864,7 +8986,8 @@ def _stereo_relatives_in_organism(
     Returns `{source_id: [{metabolite_id, name, relation, reaction_count,
     transporter_count, gene_count}]}`. The counts are the relative's
     `by_metabolite` entry from `genes_by_metabolite` over the same organism,
-    `gbm_filters` and `arms`. Relatives with no rows in the organism are
+    `gbm_filters`, `arms` and `include_ancestors` (GO arm). Relatives with
+    no rows in the organism are
     dropped, and so are sources left with none. Relative order follows the
     builder (`relation`, then id).
 
@@ -8899,6 +9022,7 @@ def _stereo_relatives_in_organism(
         organism=organism,
         exclude_metabolite_ids=None,
         arms=tuple(arms),
+        include_ancestors=include_ancestors,
         **filters,
     )
     sum_rows = conn.execute_query(sum_cypher, **sum_params)
@@ -8970,6 +9094,7 @@ def genes_by_metabolite(
     substrate_depth: list[str] | None = None,
     evidence_sources: list[str] | None = None,
     include_stereo_forms: bool = False,
+    go_include_ancestors: bool = False,
     summary: bool = False,
     verbose: bool = False,
     limit: int = 10,
@@ -8978,16 +9103,53 @@ def genes_by_metabolite(
 ) -> dict:
     """Find genes connected to specified metabolites in one organism.
 
-    Two evidence arms (joined api-side, not via Cypher UNION):
+    Three evidence arms (joined api-side, not via Cypher UNION), each row
+    labelled by `evidence_source`, never blended:
       - metabolism: `Gene → Reaction → Metabolite`
-      - transport:  `Gene → TcdbFamily → Metabolite`, over each gene's
-        deepest TCDB attachments only (an attachment is superseded when the
-        same gene is also attached to a descendant family). Transport rows
-        are therefore projections of the same (gene, metabolite) set as the
-        KG's `transported_metabolite_count` / `transporter_gene_count`.
+      - transport:  `Gene → TcdbFamily → Metabolite | ChemicalRole`, over
+        each gene's deepest TCDB attachments only (an attachment is
+        superseded when the same gene is also attached to a descendant
+        family). Over `target_kind='metabolite'` rows these are projections
+        of the same (gene, metabolite) set as the KG's
+        `transported_metabolite_count` / `transporter_gene_count`.
+      - go_transport: `Gene → GO term → Metabolite | ChemicalRole`, where GO
+        defines the term as moving the target (`has primary input`).
+    `evidence_sources=None` runs all three.
 
-    Path-scoped filters narrow only their own arm; the other arm runs
-    unfiltered. Use `evidence_sources` to suppress an entire arm.
+    Path-scoped filters narrow only their own arm; the other arms run
+    unfiltered: `ec_numbers` / `mass_balance` (metabolism) and
+    `substrate_depth` (transport) never touch GO rows. Shared filters
+    (`exclude_metabolite_ids`, `metabolite_pathway_ids`, `gene_categories`)
+    apply to all three. Use `evidence_sources` to suppress an entire arm.
+
+    metabolite_ids may include ChEBI chemical-role ids (`chebi.role:26672`
+    siderophore); they reach TCDB and GO role edges. A role id with no rows
+    in the organism is in `not_matched`, not `not_found`.
+
+    GO transport rows (`evidence_source='go_transport'`) carry the gene's
+    own GO term and the gene→GO edge, all None on the other arms:
+      - `go_term_id` / `go_term_name`: the gene's own GO term. GO defines
+        the term as moving the target — a term definition, not a gene fact;
+        whether the gene deserves the term is `go_evidence` / `go_sources`.
+      - `go_namespace` (`molecular_function` | `biological_process`): BP
+        terms are broader (storage, regulation, accessory subunits), so a
+        BP row does not make the gene a transporter.
+      - `go_evidence` (`curated` | `family_inferred` | `domain_inferred`)
+        and `go_sources` (list[str]): the gene→GO edge.
+      - `go_term_depth` (int): 0 = the own term names the target; n = the
+        target is reached through an is_a ancestor n hops up
+        (`go_include_ancestors=True` only).
+      - `go_axiom_term_id` / `go_axiom_term_name`: the term whose axiom
+        names the target (= the own term at depth 0).
+      - verbose `go_chebi_ids` (list[str]): ChEBI ids as GO states them.
+    Every row of every arm carries `target_kind` (`metabolite` |
+    `chemical_role`). Role rows (TCDB or GO) have `metabolite_id` = the
+    role id, `metabolite_name` = the role name and no formula / mass.
+
+    go_include_ancestors: Also return GO rows that reach a target through
+        an is_a ancestor of the gene's own term (one row per gene × own term
+        × target at the fewest hops), only for (gene, target) pairs with no
+        direct GO path. Default False (direct rows only).
 
     Transport rows carry two TCDB facts (both None on metabolism rows):
       - `substrate_depth` (`most_specific` | `inherited`): the most specific
@@ -9021,8 +9183,25 @@ def genes_by_metabolite(
     a sparse `{key}_truncated=True` flag when capped; `summary=True` returns
     the full ranked list uncapped.
 
-    Detail sort: metabolism → `most_specific` → `inherited`; within a
-    transport tier `tcdb_evidence_score` desc, then family / locus_tag.
+    Detail sort: per metabolite, metabolism → `most_specific` →
+    `inherited` (within a transport tier `tcdb_evidence_score` desc, then
+    family / locus_tag); then every GO row, by `go_term_depth`,
+    metabolite_id, MF before BP, curated < family_inferred <
+    domain_inferred, go_term_id, locus_tag.
+
+    GO envelope (GO arm active only): `rows_by_go_term_depth` (list of
+    `{go_term_depth, count}`, depth ascending; `[]` when no GO rows);
+    `by_evidence_source` gains `go_transport`; `by_metabolite[]` and
+    `top_genes[]` entries carry `go_transport_rows` (int).
+
+    GO warnings (GO arm active only): one per requested id that the KG
+    curated out of the GO route (`kg_release_info`
+    `kg.go_transport_excluded_targets`: H+, Na+, upper-level ChEBI
+    classes) — `"'<id>' is excluded from the GO transport route by
+    curation (coupling ion or upper-level class) — an empty GO answer is
+    not biology; TCDB rows still answer."`; and, when `chebi.role:25512`
+    (neurotransmitter) is an input, a note that its GO rows are mostly
+    bacterial NSS amino-acid transporters.
 
     Auto-warning: when `inherited` rows outnumber `most_specific` rows on the
     transport arm and `substrate_depth` was not set explicitly.
@@ -9058,16 +9237,17 @@ def genes_by_metabolite(
         ChEBI (`CHEBI:17234`, `17234`), HMDB (`HMDB0000122`), MetaNetX
         (`MNXM1095050`), InChIKey — including secondary and retired ids;
         each resolves to the canonical `Metabolite.id` before the query
-        runs. `resolved_aliases` in the envelope maps each input that
-        changed to the canonical id(s) it became. A removed id whose paper
-        measurements moved to another metabolite, or a ChEBI chemical-role
-        id, stays in `not_found` with a warning naming where to go instead;
+        runs. A ChEBI chemical-role id is kept as `chebi.role:<n>` and
+        queried as a transport target. `resolved_aliases` in the envelope
+        maps each input that changed to the canonical id(s) it became. A
+        removed id whose paper measurements moved to another metabolite
+        stays in `not_found` with a warning naming where to go instead;
         anything else unresolved is kept verbatim so it surfaces in
         `not_found` in the form you passed.
 
     Envelope also carries `resolved_aliases` (dict, `{input: [canonical,
-    ...]}`, only inputs that changed; `{}` when none); removed / chemical-role
-    metabolite ids, a `gene_categories` value not in the live vocabulary, and
+    ...]}`, only inputs that changed; `{}` when none); removed metabolite
+    ids, a `gene_categories` value not in the live vocabulary, and
     a `metabolite_ids` / `exclude_metabolite_ids` entry matching no
     recognized id pattern at all (e.g. a metabolite NAME like
     'glutamate') — `"'<v>' is not a metabolite id — resolve names with
@@ -9075,8 +9255,8 @@ def genes_by_metabolite(
 
     Raises:
         ValueError: if `evidence_sources` contains values outside
-            ``("metabolism", "transport")``. Note this diverges from
-            `list_metabolites` — gene-anchored tools reject
+            ``("metabolism", "transport", "go_transport")``. Note this
+            diverges from `list_metabolites` — gene-anchored tools reject
             ``"metabolomics"``. Also on unknown `substrate_depth` values.
             Also if `organism` fuzzy-matches multiple organisms (be more
             specific); a word matching zero organisms does not raise — it
@@ -9095,6 +9275,10 @@ def genes_by_metabolite(
             )
     _validate_substrate_depth(substrate_depth)
 
+    # Arm selection driven solely by evidence_sources (canonical order).
+    active_arms = _active_chemistry_arms(evidence_sources)
+    go_active = "go_transport" in active_arms
+
     conn = _default_conn(conn)
 
     # 1b. Coerce bare / xref metabolite IDs to canonical Metabolite.id
@@ -9109,7 +9293,8 @@ def genes_by_metabolite(
     )
     metabolite_ids, exclude_metabolite_ids, resolved_aliases, _coerce_warnings = (
         _canonicalize_metabolite_id_params(
-            conn, metabolite_ids, exclude_metabolite_ids)
+            conn, metabolite_ids, exclude_metabolite_ids,
+            roles_are_targets=True)
     )
     alias_warnings += _coerce_warnings
 
@@ -9132,7 +9317,7 @@ def genes_by_metabolite(
             conn, metabolite_ids, metabolite_pathway_ids)
         not_found_metab = _probes["not_found_metabolite_ids"]
         not_found_paths = _probes["not_found_pathway_ids"]
-        return {
+        empty = {
             "total_matching": 0,
             "returned": 0,
             "offset": offset,
@@ -9161,17 +9346,10 @@ def genes_by_metabolite(
             "stereo_forms_added": {},
             "results": [],
         }
+        if go_active:
+            empty["rows_by_go_term_depth"] = []
+        return empty
     organism = organism_resolved
-
-    # 2. Arm selection driven solely by evidence_sources.
-    if evidence_sources is None:
-        active_arms = ("metabolism", "transport")
-    else:
-        # Preserve canonical order regardless of input ordering.
-        active_arms = tuple(
-            arm for arm in ("metabolism", "transport")
-            if arm in evidence_sources
-        )
 
     # 2b. Stereo forms. Relatives the caller already passed or excluded are
     # never hinted or added. In expansion mode the relative ids join the
@@ -9214,6 +9392,7 @@ def genes_by_metabolite(
         gene_categories=gene_categories,
         substrate_depth=substrate_depth,
         arms=active_arms,
+        include_ancestors=go_include_ancestors,
     )
     summary_rows = conn.execute_query(sum_cypher, **sum_params)
     raw_summary = summary_rows[0] if summary_rows else {}
@@ -9223,7 +9402,48 @@ def genes_by_metabolite(
     by_metabolite = raw_summary.get("by_metabolite", []) or []
 
     # 4. Detail collection — Mode 1 (single arm), Mode 2 (summary), or
-    # Mode 3 (both arms over-fetch + concat + sort + slice).
+    # Mode 3 (several arms: over-fetch + concat + global sort + slice).
+    # Each arm builder takes only the filters it owns: ec_numbers /
+    # mass_balance are metabolism-only, substrate_depth transport-only,
+    # include_ancestors GO-only.
+    def _arm_query(arm: str, arm_limit: int, arm_offset: int):
+        if arm == "metabolism":
+            return build_genes_by_metabolite_metabolism(
+                metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
+                organism=organism,
+                ec_numbers=ec_numbers,
+                mass_balance=mass_balance,
+                metabolite_pathway_ids=metabolite_pathway_ids,
+                gene_categories=gene_categories,
+                verbose=verbose,
+                limit=arm_limit,
+                offset=arm_offset,
+            )
+        if arm == "transport":
+            return build_genes_by_metabolite_transport(
+                metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
+                organism=organism,
+                metabolite_pathway_ids=metabolite_pathway_ids,
+                gene_categories=gene_categories,
+                substrate_depth=substrate_depth,
+                verbose=verbose,
+                limit=arm_limit,
+                offset=arm_offset,
+            )
+        return build_genes_by_metabolite_go_transport(
+            metabolite_ids=metabolite_ids,
+            organism=organism,
+            exclude_metabolite_ids=exclude_metabolite_ids,
+            metabolite_pathway_ids=metabolite_pathway_ids,
+            gene_categories=gene_categories,
+            include_ancestors=go_include_ancestors,
+            verbose=verbose,
+            limit=arm_limit,
+            offset=arm_offset,
+        )
+
     results: list[dict]
     if summary:
         results = []
@@ -9231,71 +9451,21 @@ def genes_by_metabolite(
         # Deep-paging guardrail: short-circuit; don't touch detail arms
         # but still run existence probes so not_found is populated.
         results = []
+    elif len(active_arms) == 1:
+        # Mode 1: pass limit + offset directly into the single arm.
+        cypher, params = _arm_query(active_arms[0], limit, offset)
+        results = list(conn.execute_query(cypher, **params))
     else:
-        single_arm_mode = len(active_arms) == 1
-        if single_arm_mode:
-            # Mode 1: pass limit + offset directly into the single arm.
-            arm = active_arms[0]
-            if arm == "metabolism":
-                cypher, params = build_genes_by_metabolite_metabolism(
-                    metabolite_ids=metabolite_ids,
-                    exclude_metabolite_ids=exclude_metabolite_ids,
-                    organism=organism,
-                    ec_numbers=ec_numbers,
-                    mass_balance=mass_balance,
-                    metabolite_pathway_ids=metabolite_pathway_ids,
-                    gene_categories=gene_categories,
-                    verbose=verbose,
-                    limit=limit,
-                    offset=offset,
-                )
-            else:
-                cypher, params = build_genes_by_metabolite_transport(
-                    metabolite_ids=metabolite_ids,
-                    exclude_metabolite_ids=exclude_metabolite_ids,
-                    organism=organism,
-                    metabolite_pathway_ids=metabolite_pathway_ids,
-                    gene_categories=gene_categories,
-                    substrate_depth=substrate_depth,
-                    verbose=verbose,
-                    limit=limit,
-                    offset=offset,
-                )
-            results = list(conn.execute_query(cypher, **params))
-        else:
-            # Mode 3: both arms; over-fetch limit+offset per arm,
-            # concat, global-sort, slice.
-            per_arm_fetch = limit + offset
-            combined: list[dict] = []
-            for arm in active_arms:
-                if arm == "metabolism":
-                    cypher, params = build_genes_by_metabolite_metabolism(
-                        metabolite_ids=metabolite_ids,
-                        exclude_metabolite_ids=exclude_metabolite_ids,
-                        organism=organism,
-                        ec_numbers=ec_numbers,
-                        mass_balance=mass_balance,
-                        metabolite_pathway_ids=metabolite_pathway_ids,
-                        gene_categories=gene_categories,
-                        verbose=verbose,
-                        limit=per_arm_fetch,
-                        offset=0,
-                    )
-                else:
-                    cypher, params = build_genes_by_metabolite_transport(
-                        metabolite_ids=metabolite_ids,
-                        exclude_metabolite_ids=exclude_metabolite_ids,
-                        organism=organism,
-                        metabolite_pathway_ids=metabolite_pathway_ids,
-                        gene_categories=gene_categories,
-                        substrate_depth=substrate_depth,
-                        verbose=verbose,
-                        limit=per_arm_fetch,
-                        offset=0,
-                    )
-                combined.extend(conn.execute_query(cypher, **params))
-            combined.sort(key=_gbm_sort_key)
-            results = combined[offset:offset + limit]
+        # Mode 3: over-fetch limit+offset per arm, concat, global-sort,
+        # slice. Each builder's ORDER BY is the restriction of
+        # _gbm_sort_key to its arm, so the slice is exact.
+        per_arm_fetch = limit + offset
+        combined: list[dict] = []
+        for arm in active_arms:
+            cypher, params = _arm_query(arm, per_arm_fetch, 0)
+            combined.extend(conn.execute_query(cypher, **params))
+        combined.sort(key=_gbm_sort_key)
+        results = combined[offset:offset + limit]
 
     # 5. Sparse-strip nullable result columns; tag rows reached through an
     # added stereo form (expansion mode only).
@@ -9387,6 +9557,7 @@ def genes_by_metabolite(
                 "substrate_depth": substrate_depth,
             },
             arms=active_arms,
+            include_ancestors=go_include_ancestors,
         )
         if stereo_relatives:
             by_metabolite = [
@@ -9469,6 +9640,15 @@ def genes_by_metabolite(
             "tier by `tcdb_evidence_score`. Per-gene trust lives in "
             "`top_genes[].transport_substrate_resolution`."
         )
+    # 11b. GO-route warnings (GO arm active only): one per requested id the
+    # KG curated out of the GO route, and the neurotransmitter-role caveat.
+    if go_active and caller_ids:
+        excluded_targets = _go_transport_excluded_targets(conn)
+        for mid in caller_ids:
+            if mid in excluded_targets:
+                warnings.append(_GO_EXCLUDED_TARGET_WARNING.format(id=mid))
+        if _NEUROTRANSMITTER_ROLE_ID in caller_ids:
+            warnings.append(_NEUROTRANSMITTER_WARNING)
     if stereo_relatives:
         source_names = {
             e.get("metabolite_id"): e.get("name") for e in by_metabolite
@@ -9510,6 +9690,8 @@ def genes_by_metabolite(
         "stereo_forms_added": stereo_forms_added,
         "results": results,
     }
+    if go_active:
+        envelope["rows_by_go_term_depth"] = _rows_by_go_term_depth(raw_summary)
     return _cap_breakdowns(
         envelope, ("top_genes", "top_reactions", "top_tcdb_families"),
         summary=summary,
@@ -9522,7 +9704,7 @@ def genes_by_metabolite(
 
 # Same evidence-source Literal as GBM (gene-anchored tools reject
 # 'metabolomics' — there is no gene anchor on metabolomics evidence).
-_VALID_EVIDENCE_SOURCES_MBG = ("metabolism", "transport")
+_VALID_EVIDENCE_SOURCES_MBG = _VALID_EVIDENCE_SOURCES_GBM
 
 
 # Sparse-strip set is identical to GBM's: only naturally-sparse fields
@@ -9537,7 +9719,8 @@ def _mbg_sort_key(row: dict, locus_index: dict[str, int]) -> tuple:
 
     Sort order:
       1. precision_tier: 0 = metabolism, 1 = transport `most_specific`,
-         2 = transport `inherited`
+         2 = transport `inherited`, 3 + go_term_depth = GO transport (so
+         direct GO rows precede inherited ones)
       2. tcdb_evidence_score desc (None → 0; metabolism rows all tie)
       3. input gene order via `apoc.coll.indexOf` equivalent
       4. locus_tag (deterministic tiebreaker)
@@ -9545,7 +9728,23 @@ def _mbg_sort_key(row: dict, locus_index: dict[str, int]) -> tuple:
       6. reaction_id (metabolism) / tcdb_family_id (transport) — makes the
          key unique per row so paging never overlaps (mirrors the builders'
          ORDER BY).
+
+    GO transport rows, within their tier: input gene order, locus_tag,
+    namespace (MF before BP), go_evidence (curated < family_inferred <
+    domain_inferred), go_term_id, metabolite_id.
     """
+    if row.get("evidence_source") == "go_transport":
+        lt = row.get("locus_tag") or ""
+        return (
+            3 + (row.get("go_term_depth") or 0),
+            0.0,
+            locus_index.get(lt, len(locus_index)),
+            lt,
+            _GO_NS_RANK.get(row.get("go_namespace"), 2),
+            _GO_EVIDENCE_RANK.get(row.get("go_evidence"), 3),
+            row.get("go_term_id") or "",
+            row.get("metabolite_id") or "",
+        )
     if row.get("evidence_source") == "metabolism":
         precision_tier = 0
     else:
@@ -9577,6 +9776,7 @@ def metabolites_by_gene(
     gene_categories: list[str] | None = None,
     substrate_depth: list[str] | None = None,
     evidence_sources: list[str] | None = None,
+    go_include_ancestors: bool = False,
     summary: bool = False,
     verbose: bool = False,
     limit: int = 10,
@@ -9585,16 +9785,53 @@ def metabolites_by_gene(
 ) -> dict:
     """Find metabolites the input gene set's chemistry reaches in one organism.
 
-    Two evidence arms (joined api-side, not via Cypher UNION):
+    Three evidence arms (joined api-side, not via Cypher UNION), each row
+    labelled by `evidence_source`, never blended:
       - metabolism: `Gene → Reaction → Metabolite`
-      - transport:  `Gene → TcdbFamily → Metabolite`, over each gene's
-        deepest TCDB attachments only (an attachment is superseded when the
-        same gene is also attached to a descendant family). Transport rows
-        are therefore projections of the same (gene, metabolite) set as the
-        KG's `transported_metabolite_count` on `gene_overview`.
+      - transport:  `Gene → TcdbFamily → Metabolite | ChemicalRole`, over
+        each gene's deepest TCDB attachments only (an attachment is
+        superseded when the same gene is also attached to a descendant
+        family). Distinct metabolites across `target_kind='metabolite'`
+        transport rows equal the KG's `transported_metabolite_count` on
+        `gene_overview`; role rows are extra targets, so
+        `metabolite_count_total` / `by_gene[].metabolite_count` count them
+        too.
+      - go_transport: `Gene → GO term → Metabolite | ChemicalRole`, where GO
+        defines the term as moving the target (`has primary input`).
+    `evidence_sources=None` runs all three.
 
-    Path-scoped filters narrow only their own arm; the other arm runs
-    unfiltered. Use `evidence_sources` to suppress an entire arm.
+    Path-scoped filters narrow only their own arm; the other arms run
+    unfiltered: `ec_numbers` / `mass_balance` (metabolism) and
+    `substrate_depth` (transport) never touch GO rows. Shared filters
+    (`metabolite_ids`, `exclude_metabolite_ids`, `metabolite_pathway_ids`,
+    `metabolite_elements`, `gene_categories`) apply to all three;
+    `metabolite_elements` drops role rows (no formula). Use
+    `evidence_sources` to suppress an entire arm.
+
+    GO transport rows (`evidence_source='go_transport'`) carry the gene's
+    own GO term and the gene→GO edge, all None on the other arms:
+      - `go_term_id` / `go_term_name`: the gene's own GO term. GO defines
+        the term as moving the target — a term definition, not a gene fact;
+        whether the gene deserves the term is `go_evidence` / `go_sources`.
+      - `go_namespace` (`molecular_function` | `biological_process`): BP
+        terms are broader (storage, regulation, accessory subunits), so a
+        BP row does not make the gene a transporter.
+      - `go_evidence` (`curated` | `family_inferred` | `domain_inferred`)
+        and `go_sources` (list[str]): the gene→GO edge.
+      - `go_term_depth` (int): 0 = the own term names the target; n = the
+        target is reached through an is_a ancestor n hops up
+        (`go_include_ancestors=True` only).
+      - `go_axiom_term_id` / `go_axiom_term_name`: the term whose axiom
+        names the target (= the own term at depth 0).
+      - verbose `go_chebi_ids` (list[str]): ChEBI ids as GO states them.
+    Every row of every arm carries `target_kind` (`metabolite` |
+    `chemical_role`). Role rows (TCDB or GO) have `metabolite_id` = the
+    role id, `metabolite_name` = the role name and no formula / mass.
+
+    go_include_ancestors: Also return GO rows that reach a target through
+        an is_a ancestor of the gene's own term (one row per gene × own term
+        × target at the fewest hops), only for (gene, target) pairs with no
+        direct GO path. Default False (direct rows only).
 
     Transport rows carry two TCDB facts (both None on metabolism rows):
       - `substrate_depth` (`most_specific` | `inherited`): the most specific
@@ -9627,9 +9864,19 @@ def metabolites_by_gene(
     entries with a sparse `{key}_truncated=True` flag when capped;
     `summary=True` returns the full list uncapped.
 
-    Detail sort: metabolism → `most_specific` → `inherited` globally (so a
-    single ABC-only gene can't eat `limit`); within a transport tier
-    `tcdb_evidence_score` desc, then input gene order.
+    Detail sort: metabolism → `most_specific` → `inherited` → GO depth 0
+    → GO depth 1 → … globally (so a single ABC-only gene can't eat
+    `limit`); within a transport tier `tcdb_evidence_score` desc, then
+    input gene order; within a GO tier input gene order, MF before BP,
+    curated < family_inferred < domain_inferred, go_term_id.
+
+    GO envelope (GO arm active only): `rows_by_go_term_depth` (list of
+    `{go_term_depth, count}`, depth ascending; `[]` when no GO rows);
+    `by_evidence_source` gains `go_transport`; `by_gene[]` and
+    `top_metabolites[]` entries carry `go_transport_rows` (int). GO
+    warning (GO arm active only): when a returned GO row targets
+    `chebi.role:25512` (neurotransmitter), a note that those rows are
+    mostly bacterial NSS amino-acid transporters.
 
     Auto-warning: per gene, when `by_gene[].transport_substrate_resolution`
     is `family_inferred` — that gene's substrate breadth is reachability,
@@ -9657,16 +9904,17 @@ def metabolites_by_gene(
         ChEBI (`CHEBI:17234`, `17234`), HMDB (`HMDB0000122`), MetaNetX
         (`MNXM1095050`), InChIKey — including secondary and retired ids;
         each resolves to the canonical `Metabolite.id` before the query
-        runs. `resolved_aliases` in the envelope maps each input that
-        changed to the canonical id(s) it became. A removed id whose paper
-        measurements moved to another metabolite, or a ChEBI chemical-role
-        id, stays in `not_found` with a warning naming where to go instead;
+        runs. A ChEBI chemical-role id is kept as `chebi.role:<n>` and
+        queried as a transport target. `resolved_aliases` in the envelope
+        maps each input that changed to the canonical id(s) it became. A
+        removed id whose paper measurements moved to another metabolite
+        stays in `not_found` with a warning naming where to go instead;
         anything else unresolved is kept verbatim so it surfaces in
         `not_found` in the form you passed.
 
     Envelope also carries `resolved_aliases` (dict, `{input: [canonical,
-    ...]}`, only inputs that changed; `{}` when none); removed / chemical-role
-    metabolite ids, a `gene_categories` value not in the live vocabulary, and a
+    ...]}`, only inputs that changed; `{}` when none); removed metabolite
+    ids, a `gene_categories` value not in the live vocabulary, and a
     `not_found.locus_tags` entry that differs only by case from a real
     Gene.locus_tag (locus_tags are never case-normalised) are appended to
     `warnings`.
@@ -9682,7 +9930,8 @@ def metabolites_by_gene(
 
     Raises:
         ValueError: if `evidence_sources` contains values outside
-            ``("metabolism", "transport")``. Mirrors `genes_by_metabolite`
+            ``("metabolism", "transport", "go_transport")``. Mirrors
+            `genes_by_metabolite`
             — gene-anchored tools reject ``"metabolomics"``. Also on
             unknown `substrate_depth` values. Also if `organism`
             fuzzy-matches multiple organisms (be more specific); a word
@@ -9702,13 +9951,18 @@ def metabolites_by_gene(
             )
     _validate_substrate_depth(substrate_depth)
 
+    # Arm selection driven solely by evidence_sources (canonical order).
+    active_arms = _active_chemistry_arms(evidence_sources)
+    go_active = "go_transport" in active_arms
+
     conn = _default_conn(conn)
 
     # 1b. Coerce bare / xref metabolite IDs to canonical Metabolite.id
     # before any other query and before the exclude-overlap set-difference.
     metabolite_ids, exclude_metabolite_ids, resolved_aliases, alias_warnings = (
         _canonicalize_metabolite_id_params(
-            conn, metabolite_ids, exclude_metabolite_ids)
+            conn, metabolite_ids, exclude_metabolite_ids,
+            roles_are_targets=True)
     )
 
     # 1c. Pre-validate & resolve organism to its canonical preferred_name.
@@ -9731,7 +9985,7 @@ def metabolites_by_gene(
         not_found_metab = _probes["not_found_metabolite_ids"]
         not_found_paths = _probes["not_found_pathway_ids"]
         not_found_elements = _probes["not_found_elements"]
-        return {
+        empty = {
             "total_matching": 0,
             "returned": 0,
             "offset": offset,
@@ -9763,17 +10017,10 @@ def metabolites_by_gene(
             "stereo_relatives": {},
             "results": [],
         }
+        if go_active:
+            empty["rows_by_go_term_depth"] = []
+        return empty
     organism = organism_resolved
-
-    # 2. Arm selection driven solely by evidence_sources.
-    if evidence_sources is None:
-        active_arms = ("metabolism", "transport")
-    else:
-        # Preserve canonical order regardless of input ordering.
-        active_arms = tuple(
-            arm for arm in ("metabolism", "transport")
-            if arm in evidence_sources
-        )
 
     # 3. Always run summary builder (envelope rollups even when summary=True).
     sum_cypher, sum_params = build_metabolites_by_gene_summary(
@@ -9788,6 +10035,7 @@ def metabolites_by_gene(
         gene_categories=gene_categories,
         substrate_depth=substrate_depth,
         arms=active_arms,
+        include_ancestors=go_include_ancestors,
     )
     summary_rows = conn.execute_query(sum_cypher, **sum_params)
     raw_summary = summary_rows[0] if summary_rows else {}
@@ -9811,6 +10059,7 @@ def metabolites_by_gene(
             gene_categories=gene_categories,
             substrate_depth=substrate_depth,
             arms=active_arms,
+            include_ancestors=go_include_ancestors,
         )
         nf_rows = conn.execute_query(nf_cypher, **nf_params)
         nf_row = nf_rows[0] if nf_rows else {}
@@ -9822,8 +10071,56 @@ def metabolites_by_gene(
     by_gene = raw_summary.get("by_gene", []) or []
 
     # 4. Detail collection — Mode 1 (single arm), Mode 2 (summary), or
-    # Mode 3 (both arms over-fetch + concat + global-sort + slice).
+    # Mode 3 (several arms: over-fetch + concat + global sort + slice).
+    # Each arm builder takes only the filters it owns: ec_numbers /
+    # mass_balance are metabolism-only, substrate_depth transport-only,
+    # include_ancestors GO-only.
     locus_index = {lt: idx for idx, lt in enumerate(locus_tags)}
+
+    def _arm_query(arm: str, arm_limit: int, arm_offset: int):
+        if arm == "metabolism":
+            return build_metabolites_by_gene_metabolism(
+                locus_tags=locus_tags,
+                organism=organism,
+                metabolite_elements=metabolite_elements,
+                metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
+                ec_numbers=ec_numbers,
+                mass_balance=mass_balance,
+                metabolite_pathway_ids=metabolite_pathway_ids,
+                gene_categories=gene_categories,
+                verbose=verbose,
+                limit=arm_limit,
+                offset=arm_offset,
+            )
+        if arm == "transport":
+            return build_metabolites_by_gene_transport(
+                locus_tags=locus_tags,
+                organism=organism,
+                metabolite_elements=metabolite_elements,
+                metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
+                metabolite_pathway_ids=metabolite_pathway_ids,
+                gene_categories=gene_categories,
+                substrate_depth=substrate_depth,
+                verbose=verbose,
+                limit=arm_limit,
+                offset=arm_offset,
+            )
+        return build_metabolites_by_gene_go_transport(
+            locus_tags=locus_tags,
+            organism=organism,
+            metabolite_ids=metabolite_ids,
+            exclude_metabolite_ids=exclude_metabolite_ids,
+            metabolite_pathway_ids=metabolite_pathway_ids,
+            metabolite_elements=metabolite_elements,
+            gene_categories=gene_categories,
+            include_ancestors=go_include_ancestors,
+            verbose=verbose,
+            limit=arm_limit,
+            offset=arm_offset,
+        )
+
     results: list[dict]
     if summary:
         results = []
@@ -9834,79 +10131,21 @@ def metabolites_by_gene(
         # total_matching=0 still dispatches the arms (cheap; preserves
         # symmetry with non-empty case for callers/mocks).
         results = []
+    elif len(active_arms) == 1:
+        # Mode 1: pass limit + offset directly into the single arm.
+        cypher, params = _arm_query(active_arms[0], limit, offset)
+        results = list(conn.execute_query(cypher, **params))
     else:
-        single_arm_mode = len(active_arms) == 1
-        if single_arm_mode:
-            # Mode 1: pass limit + offset directly into the single arm.
-            arm = active_arms[0]
-            if arm == "metabolism":
-                cypher, params = build_metabolites_by_gene_metabolism(
-                    locus_tags=locus_tags,
-                    organism=organism,
-                    metabolite_elements=metabolite_elements,
-                    metabolite_ids=metabolite_ids,
-                    exclude_metabolite_ids=exclude_metabolite_ids,
-                    ec_numbers=ec_numbers,
-                    mass_balance=mass_balance,
-                    metabolite_pathway_ids=metabolite_pathway_ids,
-                    gene_categories=gene_categories,
-                    verbose=verbose,
-                    limit=limit,
-                    offset=offset,
-                )
-            else:
-                cypher, params = build_metabolites_by_gene_transport(
-                    locus_tags=locus_tags,
-                    organism=organism,
-                    metabolite_elements=metabolite_elements,
-                    metabolite_ids=metabolite_ids,
-                    exclude_metabolite_ids=exclude_metabolite_ids,
-                    metabolite_pathway_ids=metabolite_pathway_ids,
-                    gene_categories=gene_categories,
-                    substrate_depth=substrate_depth,
-                    verbose=verbose,
-                    limit=limit,
-                    offset=offset,
-                )
-            results = list(conn.execute_query(cypher, **params))
-        else:
-            # Mode 3: both arms; over-fetch limit+offset per arm,
-            # concat, global-sort, slice.
-            per_arm_fetch = limit + offset
-            combined: list[dict] = []
-            for arm in active_arms:
-                if arm == "metabolism":
-                    cypher, params = build_metabolites_by_gene_metabolism(
-                        locus_tags=locus_tags,
-                        organism=organism,
-                        metabolite_elements=metabolite_elements,
-                        metabolite_ids=metabolite_ids,
-                        exclude_metabolite_ids=exclude_metabolite_ids,
-                        ec_numbers=ec_numbers,
-                        mass_balance=mass_balance,
-                        metabolite_pathway_ids=metabolite_pathway_ids,
-                        gene_categories=gene_categories,
-                        verbose=verbose,
-                        limit=per_arm_fetch,
-                        offset=0,
-                    )
-                else:
-                    cypher, params = build_metabolites_by_gene_transport(
-                        locus_tags=locus_tags,
-                        organism=organism,
-                        metabolite_elements=metabolite_elements,
-                        metabolite_ids=metabolite_ids,
-                        exclude_metabolite_ids=exclude_metabolite_ids,
-                        metabolite_pathway_ids=metabolite_pathway_ids,
-                        gene_categories=gene_categories,
-                        substrate_depth=substrate_depth,
-                        verbose=verbose,
-                        limit=per_arm_fetch,
-                        offset=0,
-                    )
-                combined.extend(conn.execute_query(cypher, **params))
-            combined.sort(key=lambda r: _mbg_sort_key(r, locus_index))
-            results = combined[offset:offset + limit]
+        # Mode 3: over-fetch limit+offset per arm, concat, global-sort,
+        # slice. Each builder's ORDER BY is the restriction of
+        # _mbg_sort_key to its arm, so the slice is exact.
+        per_arm_fetch = limit + offset
+        combined: list[dict] = []
+        for arm in active_arms:
+            cypher, params = _arm_query(arm, per_arm_fetch, 0)
+            combined.extend(conn.execute_query(cypher, **params))
+        combined.sort(key=lambda r: _mbg_sort_key(r, locus_index))
+        results = combined[offset:offset + limit]
 
     # 5. Sparse-strip nullable result columns.
     results = [
@@ -10095,6 +10334,12 @@ def metabolites_by_gene(
             "non-lumping attachment (not all) — resolved genes can still "
             "contribute `inherited` rows (read per-row `substrate_depth`)."
         )
+    if go_active and any(
+        r.get("evidence_source") == "go_transport"
+        and r.get("metabolite_id") == _NEUROTRANSMITTER_ROLE_ID
+        for r in results
+    ):
+        warnings.append(_NEUROTRANSMITTER_WARNING)
     if no_formula_metabolites:
         warnings.append(
             _no_formula_warning(no_formula_metabolites, "metabolite_elements"))
@@ -10146,6 +10391,8 @@ def metabolites_by_gene(
         "stereo_relatives": stereo_relatives,
         "results": results,
     }
+    if go_active:
+        envelope["rows_by_go_term_depth"] = _rows_by_go_term_depth(raw_summary)
     if no_formula_rows is not None:
         envelope["no_formula_excluded"] = no_formula_rows
         envelope["no_formula_excluded_metabolites"] = no_formula_metabolites
@@ -11569,8 +11816,55 @@ _KG_IDENTITY_FIELDS = (
     "gene_count", "experiment_count", "paper_count", "organism_count",
     "expression_edge_count", "release_notes_url",
     "release_highlights", "breaking_changes", "deployment_role",
-    "controlled_vocabularies_hash",
+    "controlled_vocabularies_hash", "go_transport_excluded_targets",
 )
+
+# `Schema_info.go_transport_excluded_targets`, read once per KG endpoint
+# (GraphConnection) or per connection object (fakes / custom conns).
+_GO_EXCLUDED_BY_ENDPOINT: dict[tuple, frozenset[str]] = {}
+_GO_EXCLUDED_BY_CONN: "weakref.WeakKeyDictionary" = weakref.WeakKeyDictionary()
+
+
+def _go_transport_excluded_targets(conn: GraphConnection) -> frozenset[str]:
+    """Metabolite ids curated out of the GO transport route.
+
+    Runs the `kg_release_info` query (`build_kg_release_info`) once and
+    reads `schema_info.go_transport_excluded_targets`; the result is cached
+    per process for each KG endpoint. Empty when the KG does not carry the
+    property or the query fails (the caller's warning is advisory).
+    """
+    settings = getattr(conn, "_settings", None)
+    endpoint = (
+        (settings.neo4j_uri, settings.neo4j_database)
+        if isinstance(conn, GraphConnection) and settings is not None
+        else None
+    )
+    if endpoint is not None and endpoint in _GO_EXCLUDED_BY_ENDPOINT:
+        return _GO_EXCLUDED_BY_ENDPOINT[endpoint]
+    if endpoint is None:
+        try:
+            if conn in _GO_EXCLUDED_BY_CONN:
+                return _GO_EXCLUDED_BY_CONN[conn]
+        except TypeError:
+            pass
+    try:
+        cypher, params = build_kg_release_info()
+        rows = conn.execute_query(cypher, **params) or []
+        schema_info = (rows[0].get("schema_info") if rows else None) or {}
+        excluded = frozenset(
+            schema_info.get("go_transport_excluded_targets") or [])
+    except Exception:  # noqa: BLE001 — advisory lookup, never fails a call
+        logger.debug("go_transport_excluded_targets lookup failed", exc_info=True)
+        return frozenset()
+    if endpoint is not None:
+        _GO_EXCLUDED_BY_ENDPOINT[endpoint] = excluded
+    else:
+        try:
+            _GO_EXCLUDED_BY_CONN[conn] = excluded
+        except TypeError:
+            pass
+    return excluded
+
 
 _VOCAB_HASH_KEY = "controlled_vocabularies_hash"
 _VOCAB_MISMATCH_SENTENCE = (
@@ -11674,7 +11968,11 @@ def kg_release_info(conn: GraphConnection) -> dict:
     against; that assert also carries `expected` / `actual`). A vocabulary
     mismatch — or a KG that predates the contract — yields `warn`, never
     worse: filters still validate live and `list_filter_values` reads live,
-    but baked docs may list stale values. `kg` carries the live hash.
+    but baked docs may list stale values. `kg` carries the live hash and
+    `go_transport_excluded_targets` (list[str] | None: metabolite ids the
+    KG curated out of the GO transport route — coupling ions such as H+ /
+    Na+ and upper-level ChEBI classes; an empty GO answer for them is
+    curation, not biology).
     """
     cypher, params = build_kg_release_info()
     rows = conn.execute_query(cypher, **params)

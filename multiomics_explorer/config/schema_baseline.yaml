@@ -927,6 +927,35 @@ schema:
       - GeneOntology
       - NamedThing
       properties: {}
+    Biological_process_transports_chemical_role:
+      source_labels:
+      - BiologicalEntity
+      - BiologicalProcess
+      - BiologicalProcessOrActivity
+      - Entity
+      - GeneOntology
+      - NamedThing
+      target_labels:
+      - Attribute
+      - ChemicalRole
+      - Entity
+      - NamedThing
+      properties:
+        go_chebi_ids: list
+    Biological_process_transports_metabolite:
+      source_labels:
+      - BiologicalEntity
+      - BiologicalProcess
+      - BiologicalProcessOrActivity
+      - Entity
+      - GeneOntology
+      - NamedThing
+      target_labels:
+      - Entity
+      - Metabolite
+      - NamedThing
+      properties:
+        go_chebi_ids: list
     Brite_category_is_a_brite_category:
       source_labels:
       - BriteCategory
@@ -1617,6 +1646,33 @@ schema:
       - MolecularFunction
       - NamedThing
       properties: {}
+    Molecular_function_transports_chemical_role:
+      source_labels:
+      - BiologicalEntity
+      - BiologicalProcessOrActivity
+      - Entity
+      - MolecularFunction
+      - NamedThing
+      target_labels:
+      - Attribute
+      - ChemicalRole
+      - Entity
+      - NamedThing
+      properties:
+        go_chebi_ids: list
+    Molecular_function_transports_metabolite:
+      source_labels:
+      - BiologicalEntity
+      - BiologicalProcessOrActivity
+      - Entity
+      - MolecularFunction
+      - NamedThing
+      target_labels:
+      - Entity
+      - Metabolite
+      - NamedThing
+      properties:
+        go_chebi_ids: list
     Ncbifam_family_in_interpro_entry:
       source_labels:
       - BiologicalEntity
@@ -1868,6 +1924,19 @@ schema:
       properties:
         curated_tcids: list
         id: string
+    Tcdb_family_transports_chemical_role:
+      source_labels:
+      - Entity
+      - NamedThing
+      - TcdbFamily
+      target_labels:
+      - Attribute
+      - ChemicalRole
+      - Entity
+      - NamedThing
+      properties:
+        id: string
+        substrate_depth: string
     Tcdb_family_transports_metabolite:
       source_labels:
       - Entity

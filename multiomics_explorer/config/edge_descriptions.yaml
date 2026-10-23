@@ -1,0 +1,37 @@
+# Relationship-type descriptions surfaced by `kg_schema` as
+# `relationships[<type>].description` (only for types listed here).
+# Format: {relationship_type: description}.
+# Source: multiomics_biocypher_kg/docs/kg-changes/go-transport-substrates.md
+# § "Caveat text" (copied verbatim).
+
+Molecular_function_transports_metabolite: >-
+  GO defines this molecular-function term as a transporter activity whose primary input
+  (RO:0004009) is this compound. Read it as close to "a gene product with this term moves X". It is
+  a term definition, not a gene fact: whether a gene deserves the term is the gene-to-GO edge's
+  `sources` / `evidence`. Only the term's own axiom is stated (no ancestor inheritance, no
+  propagation). Upper-level ChEBI classes (ion, monoatomic cation, chemical entity, ...), H+ and Na+
+  are deliberately not targets (list in `Schema_info.go_transport_excluded_targets`): an empty
+  answer for those is curation, not biology. `go_chebi_ids` holds the ChEBI id(s) as GO states them.
+
+Biological_process_transports_metabolite: >-
+  GO defines this biological-process term (for example "iron ion transport", GO:0006826) as
+  involving the movement of this compound. BP terms are broader than MF terms: they also cover
+  storage, regulation and accessory subunits, so a gene carrying one is not necessarily a
+  transporter (MED4 `ftn`, ferritin, reaches iron through "iron ion transport"). It is a term
+  definition, not a gene fact: whether a gene deserves the term is the gene-to-GO edge's `sources` /
+  `evidence`. Only the term's own axiom is stated. Filtered targets (H+, Na+, upper-level ion and
+  molecule classes) return empty by curation, not biology.
+
+Molecular_function_transports_chemical_role: >-
+  GO defines this transporter-activity term as moving something GO calls `<role>` (for example
+  siderophore, xenobiotic, drug, toxin, vitamin). The target is a `ChemicalRole`; roles are not
+  propagated to metabolites, so this does not say which compound is moved. A term definition, not a
+  gene fact: check the gene-to-GO edge's `sources` / `evidence`. The neurotransmitter role names a
+  eukaryote-centred class: in bacteria the matching terms (neurotransmitter:sodium symporter activity)
+  are mostly amino-acid transporters.
+
+Biological_process_transports_chemical_role: >-
+  GO defines this transport-process term as involving something GO calls `<role>` (siderophore,
+  xenobiotic, drug, toxin, vitamin, ...). The broader BP meaning applies (storage, regulation,
+  accessory subunits are admitted). Roles are not propagated to metabolites. A term definition, not a
+  gene fact: check the gene-to-GO edge's `sources` / `evidence`.
