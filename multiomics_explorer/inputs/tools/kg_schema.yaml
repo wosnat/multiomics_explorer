@@ -106,8 +106,16 @@ examples:
         "not_found_relationship_types": []
       }
 
+  - title: GO transport edges — scope to one relationship type and read its caveat
+    call: kg_schema(section='relationships', relationship_types=['Molecular_function_transports_metabolite'])
+    illustrative: false
+    note: "The edge description carries the reading rule: GO defines the term as a transporter activity whose primary input is the compound (a term definition, not a gene fact), only the term's own axiom is stated, and filtered targets return empty by curation. The four GO edge types and `Tcdb_family_transports_chemical_role` are listed together under `section='relationships'`."
+    response: |
+      {"relationships": {}}
+
 chaining:
   - "kg_schema → run_cypher"
+  - "kg_schema(relationship_types=['Biological_process_transports_metabolite', ...]) → run_cypher over Gene → GO term → Metabolite (examples: docs://analysis/transport)"
 
 mistakes:
   - "Calling kg_schema() with no arguments dumps every node label and relationship type in the KG (100+ KB) — pass labels / relationship_types / section to scope the call to what you actually need before validating a run_cypher query."
@@ -116,3 +124,11 @@ mistakes:
   - "Property types are Neo4j storage types (string / int / float / list / bool) — the meaning of each property lives on the tool pages (docs://tools/{tool}) and ontology pages (docs://ontologies/{key}), and vocabularies in list_filter_values."
   - wrong: "kg_schema() to discover valid organism or category filter values"
     right: "list_filter_values() for categorical filter options; list_organisms() for organism details"
+  - >-
+    The GO transport edges (`Molecular_function_transports_metabolite`,
+    `Biological_process_transports_metabolite` and the two `_chemical_role`
+    variants) connect a GO term to a Metabolite or ChemicalRole. Molecular-function
+    nodes do not carry the `GeneOntology` label biological-process nodes carry, so
+    derive the namespace from `type(edge)`, not from node labels. Read each edge
+    description for its caveat before querying; the tools `genes_by_metabolite` and
+    `metabolites_by_gene` already label these rows.

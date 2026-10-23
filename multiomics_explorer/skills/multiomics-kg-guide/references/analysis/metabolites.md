@@ -1,6 +1,6 @@
 # Working with metabolites
 
-LLM-facing decision-tree guide for metabolite questions. The KG models metabolites via three distinct source pipelines, each answering a different question class. **Read the disambiguation table first; pick the right row before drilling.**
+LLM-facing decision-tree guide for metabolite questions. The KG models metabolites via three distinct source pipelines (metabolism, transport, metabolomics), each answering a different question class; transport evidence has two routes, TCDB `transport` and GO `go_transport` (`docs://analysis/transport`). **Read the disambiguation table first; pick the right row before drilling.**
 
 Runnable companion: `docs://examples/metabolites.py` (7 scenarios).
 
@@ -21,7 +21,7 @@ The `metabolism` and `transport` rows share tools — the `evidence_source` fiel
 
 The `Metabolite.evidence_sources` list field on each Metabolite node already indicates which of the three pipelines contribute (e.g., `['metabolism', 'transport', 'metabolomics']`); read this to route quickly.
 
-A fourth value, `go_transport`, marks the 208 metabolites that a GO transport term names as its primary input (GO's `has primary input` axiom; edges `Molecular_function_transports_metabolite` / `Biological_process_transports_metabolite` from the GO term). It is a term definition, not a gene fact, and it is kept apart from `transport` (TCDB): `organism_count`, `transporter_gene_count` and `catalyst_gene_count` ignore it. The drill-down tools above do not walk this route yet — use `run_cypher` (Gene → GO term → Metabolite).
+A fourth value, `go_transport`, marks the 208 metabolites that a GO transport term names as its primary input (GO's `has primary input` axiom; edges `Molecular_function_transports_metabolite` / `Biological_process_transports_metabolite` from the GO term). It is a term definition, not a gene fact, and it is kept apart from `transport` (TCDB): `organism_count`, `transporter_gene_count` and `catalyst_gene_count` ignore it. It is surfaced in `genes_by_metabolite` and `metabolites_by_gene` (`evidence_sources` accepts `go_transport`; GO rows carry `go_term_id`, `go_namespace`, `go_evidence`, `go_term_depth`, `target_kind`), in `gene_overview` (`evidence_sources` tag) and in `list_metabolites` (`go_transport_organism_names`). How to read the three transport-relevant routes side by side, what an empty GO answer means, and the Cypher examples: `docs://analysis/transport`.
 
 **Metabolite ID forms.** Canonical `Metabolite.id` carries a namespace prefix: `kegg.compound:C00064`
 (KEGG-keyed, the large majority) or `chebi:17234` (ChEBI-only, mostly TCDB substrates). Each

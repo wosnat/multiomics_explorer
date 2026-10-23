@@ -30,7 +30,7 @@ tested-absent rows, summary/verbose modes, rankable-gated filters,
 | **Co-expression / clustering** | "I want gene modules from a published clustering" | `list_clustering_analyses` | `genes_in_cluster`, `gene_clusters_by_gene` |
 | **Enrichment** | "I have a gene set or DE result; what pathways / functional categories are enriched?" | `pathway_enrichment` (DE-driven), `cluster_enrichment` (clustering-driven) | Pre-flight: `ontology_landscape` (pick a defensible ontology + level). Methodology: `docs://analysis/enrichment` |
 | **Derived metrics** | "I want non-DE column-level evidence (rhythmicity, amplitudes, traits)" | `list_derived_metrics` | `gene_derived_metrics`, `genes_by_{numeric,boolean,categorical}_metric` |
-| **Chemistry / metabolomics** | "I have a metabolite, element, transport substrate, or measurement data" | `list_metabolites`, `list_metabolite_assays` | `genes_by_metabolite`, `metabolites_by_gene`, `metabolites_by_{quantifies,flags}_assay`, `assays_by_metabolite`. Methodology: `docs://analysis/metabolites` |
+| **Chemistry / metabolomics** | "I have a metabolite, element, transport substrate, or measurement data" | `list_metabolites`, `list_metabolite_assays` | `genes_by_metabolite`, `metabolites_by_gene`, `metabolites_by_{quantifies,flags}_assay`, `assays_by_metabolite`. See `docs://analysis/{metabolites,transport}` |
 | **Sequence & genomic context** | "I have a gene; I want its protein sequence, or what sits next to it on the genome" | `gene_aa_sequence`, `gene_neighbors` | — terminal export / positional lookup; chain neighbor locus_tags into the families above |
 
 Plus five orthogonal helpers:

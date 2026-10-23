@@ -883,6 +883,12 @@ examples:
     # `exclude_metabolite_ids` are passed, exclude wins on overlap (silent —
     # no warning). Empty list is a no-op (treated as None).
 
+  - title: GO transport route — metabolites a GO transport term names (evidence_sources=['go_transport'])
+    call: list_metabolites(evidence_sources=["go_transport"], organism_names=["Prochlorococcus MED4"], limit=5)
+    note: "Rows carry `go_transport_organism_names` / `go_transport_organism_count` (organisms with a gene annotated to a GO term that names this metabolite, direct annotations only). The `organism_names` filter matches either the KEGG/TCDB/assay organism list or the GO list, so GO-only metabolites appear for the organism too; `organism_count` and the gene counts still ignore the GO route. A metabolite with no `go_transport_organism_names` may still have a GO edge reached only through ancestor terms: absent means no directly annotated gene path."
+    response: |
+      {"total_matching": 0}
+
 verbose_fields:
   - inchikey
   - smiles
@@ -899,6 +905,7 @@ chaining:
   - "differential_expression_by_gene → metabolites_by_gene(metabolite_elements=['N']) → list_metabolites for chemistry context"
   - "list_metabolites (per-row `kegg_brite_classes`, top level only) → run_cypher over `MetaboliteClass` for the deeper KEGG compound classes (docs://analysis/metabolites)"
   - "list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(metabolite_ids=[...]) — reverse lookup of all measurement evidence (numeric + boolean) for the measured compounds (cross-organism by default)."
+  - "list_metabolites(evidence_sources=['go_transport'], organism_names=[...]) → genes_by_metabolite(metabolite_ids=[...], organism=..., evidence_sources=['go_transport']) for the genes carrying the GO term"
 
 mistakes:
   - "Direction-agnostic — KEGG equation order is unreliable upstream, so joins through Reaction_has_metabolite (catalysis) and Tcdb_family_transports_metabolite (transport) do NOT distinguish substrates from products. Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate. See docs://analysis/metabolites."
@@ -953,3 +960,11 @@ mistakes:
       the role. Other unresolved inputs stay verbatim in `not_found` in the form you
       passed. The xref filters (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`) normalise each value the same way and match any of the metabolite's identifiers, including secondary and retired ones; they are filters, so they add nothing to `resolved_aliases`.
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/concepts` for the chemistry layer overview."
+  - >-
+    `evidence_sources=['go_transport']` is a metabolite-level filter (a GO
+    transport term names this compound), independent of the organism filter; the
+    organism clause matches the union of `organism_names` and
+    `go_transport_organism_names`. `catalyst_gene_count`, `transporter_gene_count`
+    and `organism_count` stay KEGG / TCDB / assay only (no blending), so a
+    GO-only metabolite reads zero on all three. Drill the GO route with
+    `genes_by_metabolite`. See `docs://analysis/transport`.

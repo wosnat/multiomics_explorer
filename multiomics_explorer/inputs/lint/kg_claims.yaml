@@ -382,3 +382,15 @@
   note: >
     GO transport substrates (KG build 2026-10-18T18:40Z): 208 metabolites carry
     evidence_sources 'go_transport'. Fails ⇒ rewrite the "fourth value" paragraph.
+
+- id: go_transport_med4_genes
+  cypher: >
+    MATCH (g:Gene {organism_name: 'Prochlorococcus MED4'})-[:Gene_enables_molecular_function|Gene_involved_in_biological_process]->()-[:Molecular_function_transports_metabolite|Biological_process_transports_metabolite|Molecular_function_transports_chemical_role|Biological_process_transports_chemical_role]->()
+    RETURN count(DISTINCT g) AS med4_go_transport_genes
+  expect: {med4_go_transport_genes: 59}
+  tolerance: {rel: 0.05}
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/transport.md
+  note: >
+    MED4 genes that reach at least one GO transport target (KG build
+    2026-10-19T17:03Z). Fails => rewrite the "Scale" sentence in transport.md.

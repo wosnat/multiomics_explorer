@@ -501,6 +501,12 @@ examples:
         ]
       }
 
+  - title: GO-transport-only gene — evidence_sources reads ['go_transport'] with no TCDB or KEGG call
+    call: gene_overview(locus_tags=["PMM0533", "PMM0970"])
+    note: "PMM0533 (aar, long-chain fatty acyl-ACP reductase) carries a GO transport term and no TCDB or KEGG chemistry, so `evidence_sources=['go_transport']` is its only chemistry tag; PMM0970 (urtA) carries `transport` and `go_transport`. `has_chemistry` in the summary now counts GO-only genes. The tag only says a GO route exists: drill with `metabolites_by_gene`."
+    response: |
+      {"total_matching": 0}
+
 verbose_fields:
   - gene_summary
   - function_description
@@ -524,6 +530,7 @@ chaining:
   - "gene_overview (per-row `merops_classes` non-empty) → gene_ontology_terms(locus_tags=[...], ontology=['merops'], verbose=True) for the confidence_score / pfam_support detail behind the call, or genes_by_ontology(ontology='merops', call_class=['peptidase']) to find peers."
   - "`merops_classes` is a list (`[]` default) because a gene can carry both a `peptidase` and a `nonpeptidase_homolog` MEROPS call on different families — don't assume at most one value. `merops_evidence_score_max` is sparse and uncoalesced (null = no MEROPS call at all, the twin contract of `tcdb_evidence_score_max`) — rank by it, never filter by it."
   - "gene_overview (per-row derived_metric_count > 0) → gene_derived_metrics(locus_tags=[...], organism=...) for the gene's full DM profile across numeric, boolean and categorical kinds"
+  - "gene_overview → evidence_sources contains 'go_transport' → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['go_transport']) for the GO term and target behind the tag"
 
 mistakes:
   - "annotation_quality / min_quality semantics shifted in 2026-05 KG release. Existing notebooks using min_quality may select a different gene set than before. See docs://guide/conventions."
@@ -538,3 +545,11 @@ mistakes:
     right: "gene_overview(locus_tags=['PMM0845'])  # compact carries every routing count; verbose adds the text fields (gene_summary, function_description, all_identifiers), the per-gene discussed_in_publications list, per-kind DM counts (numeric/boolean/categorical_metric_count + *_metric_types_observed) and compartments_observed"
   - "`limit` defaults to every input gene (min 25) rather than a small page — pass an explicit number to page."
   - "The annotation-family columns (`merops_classes`, `tcdb_family_count`, `cazy_family_count`, `ncbifam_family_count`, `tcdb_evidence_score_max`, `merops_evidence_score_max`) belong to the annotation-trust surface — see docs://analysis/annotation_evidence for how to read them."
+  - >-
+    The `go_transport` tag in `evidence_sources` means the gene carries a GO
+    term that GO defines as moving some compound or role (a term definition, not
+    a measured transport activity). It is separate from `transport` (TCDB) and
+    does not change `transport_substrate_resolution`, `tcdb_*` counts or
+    `catalyzed_metabolite_count`. A biological-process term can tag a gene that is
+    not a transporter (MED4 `ftn` reaches iron through "iron ion transport").
+    Read `docs://analysis/transport` before combining the routes.

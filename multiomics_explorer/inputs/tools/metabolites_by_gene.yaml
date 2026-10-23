@@ -360,6 +360,18 @@ examples:
         "results": []
       }
 
+  - title: GO transport rows next to TCDB — PMM0970 (urtA) in MED4
+    call: metabolites_by_gene(locus_tags=["PMM0970"], organism="Prochlorococcus MED4")
+    note: "TCDB rows (urea, thiourea, hydroxyurea) come first; the two GO rows (a molecular-function and a biological-process term, both naming urea, `go_term_depth=0`) follow. `rows_by_evidence_source` carries `go_transport` alongside `transport`. A GO row is a term definition: read `go_evidence` and `go_sources` for how the gene came to carry the term."
+    response: |
+      {"total_matching": 0}
+
+  - title: Inherited target — murJ (PMM0261) reaches Lipid only through an ancestor GO term (go_include_ancestors=True)
+    call: metabolites_by_gene(locus_tags=["PMM0261"], organism="Prochlorococcus MED4", go_include_ancestors=True)
+    note: "Without the flag this gene has no GO rows (only TCDB). With it, the GO row names Lipid at `go_term_depth=1`: the gene's own term is lipid translocation, the ancestor that names the target is lipid transport (`go_axiom_term_id` / `go_axiom_term_name`). Inherited rows come after every direct row for the same gene set and widen toward broader targets, so treat them as recall."
+    response: |
+      {"total_matching": 0}
+
 verbose_fields:
   - gene_category
   - metabolite_inchikey
@@ -397,6 +409,8 @@ chaining:
 
   # downstream from not_matched (annotation-context drill-out)
   - "metabolites_by_gene → not_matched (locus_tags with no chemistry edges) → gene_overview(locus_tags=not_matched) for annotation context (most are richly-annotated non-chemistry genes — DNA gyrase, signaling, etc. — not annotation gaps)"
+  - "gene_overview(locus_tags=[...]) → evidence_sources contains 'go_transport' → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['go_transport']) for the GO term and target behind the tag"
+  - "metabolites_by_gene → go_transport rows with target_kind='chemical_role' → genes_by_metabolite(metabolite_ids=[role id], organism=...) for every gene that reaches the same role (siderophore, xenobiotic, drug, toxin, vitamin)"
 
 mistakes:
   - >-
@@ -579,3 +593,23 @@ mistakes:
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and the transport trust ladder, and `docs://guide/concepts` for the chemistry layer overview."
   - "`not_found.organism` is set when the `organism` name resolves to zero organisms — check it before reading an empty result as 'no chemistry here'."
   - "Long-tail genes (ABC-only annotations) can fill `limit` on their own: narrow with `substrate_depth=['most_specific']`, or page with `offset`."
+  - >-
+    `evidence_sources` accepts `go_transport` here (and on
+    `genes_by_metabolite`), alongside `metabolism` and `transport`. Default is all
+    three. A `go_transport` row is a GO term definition, not a gene fact; whether
+    the gene deserves the term is `go_sources` / `go_evidence`. Rows with
+    `target_kind='chemical_role'` name a class (siderophore, xenobiotic, drug,
+    toxin, vitamin), not a compound.
+  - >-
+    BP is not a transporter call: a biological-process term (for example "iron
+    ion transport") also covers storage and regulation, so a gene carrying it is
+    not necessarily a transporter (MED4 `ftn` reaches iron this way). Check
+    `go_namespace` and prefer molecular-function rows for "is this gene a
+    transporter".
+  - >-
+    An empty GO answer for H+, Na+ or an upper-level class is curation, not
+    biology (`Schema_info.go_transport_excluded_targets`). `metabolite_elements`
+    also drops role rows and formula-less classes from the GO arm, as it does
+    formula-less metabolites elsewhere. The GO and TCDB routes are correlated
+    (InterPro2GO and eggNOG share homology with the TCDB calls), so their
+    agreement is weaker evidence than it reads: `docs://analysis/transport`.

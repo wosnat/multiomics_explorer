@@ -13,6 +13,8 @@ code beyond what this guide covers):
   background semantics, `informative_only` rationale, custom TERM2GENE.
 - `docs://analysis/metabolites` — chemistry layer (3 source pipelines)
   with track-by-track decision tree.
+- `docs://analysis/transport` — the three transport routes (KEGG, TCDB, GO)
+  side by side: biases, agreement, what an empty answer means.
 - `docs://analysis/derived_metrics` — DerivedMetric family (numeric /
   boolean / categorical drill-downs, rankable / has_p_value gating).
 - `docs://analysis/expression` — the DE-family tools plus `response_matrix`
@@ -397,6 +399,7 @@ scenarios) see `docs://examples/metabolites.py`.
 - `docs://analysis/enrichment` — `EnrichmentResult` accessors, custom
   TERM2GENE, background semantics, `informative_only` rationale.
 - `docs://analysis/metabolites` — chemistry layer (3 source pipelines).
+- `docs://analysis/transport` — transport routes (KEGG, TCDB, GO) compared.
 - `docs://analysis/derived_metrics` — DerivedMetric family in Python.
 - `docs://analysis/expression` — DE-family tools, `response_matrix`,
   `gene_set_compare`.

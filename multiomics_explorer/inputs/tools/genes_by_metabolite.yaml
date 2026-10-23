@@ -932,6 +932,24 @@ examples:
               → Cysteine transporters + L-Cysteine catalysts in one result;
                 the L-Cysteine rows carry via_stereo_form_of
 
+  - title: GO transport route — urea in MED4 (the GO rows sit after the KEGG and TCDB rows, labelled)
+    call: genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochlorococcus MED4")
+    note: "Three routes in one call: metabolism, transport (TCDB) and go_transport rows, each tagged by `evidence_source`. A GO row is a GO TERM that GO defines as moving urea, carried by the gene (`go_term_id`, `go_term_name`, `go_namespace`, `go_evidence`, `go_sources`); it is not a TCDB call and never adds to `transporter_count_total`. The urtA gene PMM0970 appears with a molecular-function term (urea transmembrane transporter activity) and a biological-process term (urea transport). Read `rows_by_go_term_depth` (all depth 0 here), then `by_evidence_source`."
+    response: |
+      {"total_matching": 0}
+
+  - title: Role target — siderophore transporters in Alteromonas mediterranea AltDE1 (target_kind='chemical_role')
+    call: genes_by_metabolite(metabolite_ids=["chebi.role:26672"], organism="Alteromonas mediterranea AltDE1", evidence_sources=["go_transport"], limit=5)
+    note: "`chebi.role:<n>` ids are valid inputs. A role row is a class, not a compound: `target_kind='chemical_role'`, `metabolite_id` is the role id, formula and mass are absent, and roles are not propagated to metabolites. The same role id also reaches TCDB role edges when `evidence_sources` is left at its default. Use the exact strain `Alteromonas mediterranea AltDE1` (the shorter `AltDE` string also word-matches AltDE1 genes)."
+    response: |
+      {"total_matching": 0}
+
+  - title: Inherited rows are opt-in — go_include_ancestors=True adds is_a-ancestor rows, tagged with the term that names the target
+    call: genes_by_metabolite(metabolite_ids=["kegg.compound:C01356"], organism="Prochlorococcus MED4", evidence_sources=["go_transport"], go_include_ancestors=True)
+    note: "Direct rows (`go_term_depth=0`) first; inherited rows follow with `go_term_depth` = number of is_a hops, `go_axiom_term_id` / `go_axiom_term_name` naming the ancestor that carries the target, and `go_term_id` still the gene's own term. A (gene, target) already reached directly through GO is not repeated as an inherited row. Inherited rows are a recall expansion: they widen to broader targets than the gene's own term names. Compare against the default call before using them."
+    response: |
+      {"total_matching": 0}
+
 verbose_fields:
   - gene_category
   - metabolite_inchikey
@@ -961,6 +979,9 @@ chaining:
   - "genes_by_metabolite → top_reactions / top_genes → pathway_enrichment for KEGG-pathway context"
   - "genes_by_metabolite → stereo_relatives (or the stereo warning) → genes_by_metabolite(metabolite_ids=[same ids], organism=..., include_stereo_forms=True) to join generic-form transport with specific-form catalysis"
   - "metabolites_by_gene(transporter locus_tags) → stereo_relatives → genes_by_metabolite(metabolite_ids=[generic substrate], organism=..., include_stereo_forms=True) for transporters and catalysts of the same compound"
+  - "genes_by_metabolite → go_transport rows → gene_ontology_terms(locus_tags=[...], ontology='go_mf' or 'go_bp', organism=...) to see the gene's full GO annotation set around the term that names the target"
+  - "genes_by_metabolite → go_transport rows (go_evidence='family_inferred' or 'domain_inferred') → gene_overview(locus_tags=...) to see which other routes (TCDB, KEGG) corroborate the gene; read `docs://analysis/transport` before treating agreement as independent evidence"
+  - "list_metabolites(evidence_sources=['go_transport']) → per-row go_transport_organism_names → genes_by_metabolite(metabolite_ids=[...], organism=...) for the GO-route genes in one organism"
 
 mistakes:
   - >-
@@ -1111,3 +1132,37 @@ mistakes:
   - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and the transport trust ladder, and `docs://guide/concepts` for the chemistry layer overview."
   - "`not_found.organism` is set when the `organism` name resolves to zero organisms — check it before reading an empty result as 'no chemistry here'."
   - "`limit` defaults to covering p75 of typical (metabolite × organism) UNION row distributions; coenzyme-tail queries (ATP, water) should page with `offset`."
+  - >-
+    A `go_transport` row is a GO term definition, not a gene fact. GO defines
+    the term (for example "urea transmembrane transporter activity") as moving
+    the target; the gene carries the term. Whether the gene deserves the term is
+    the gene → GO edge's `go_sources` / `go_evidence` (`curated`,
+    `family_inferred`, `domain_inferred`). Rank by `go_evidence`, do not read
+    every row as a measured transporter. GO rows never feed `transporter_count_total`,
+    `top_tcdb_families` or the TCDB trust ladder; those stay TCDB-only.
+  - >-
+    Biological-process (BP) is not molecular-function (MF). A BP term such as
+    "iron ion transport" also covers storage, regulation and accessory subunits,
+    so a gene carrying one is not necessarily a transporter: MED4 `ftn`
+    (ferritin) reaches iron through that BP term. Read `go_namespace` and
+    prefer MF rows when the question is "which gene is the transporter";
+    BP rows answer "which genes the literature or annotation links to this
+    transport process".
+  - >-
+    An empty GO answer for H+, Na+ or an upper-level class (ion, monoatomic
+    cation, chemical entity, ...) is curation, not biology: those targets were
+    deliberately removed from the GO route. The list is
+    `Schema_info.go_transport_excluded_targets` (surfaced by `kg_release_info`);
+    a warning fires when you ask for one. TCDB and KEGG rows still answer them.
+  - >-
+    The three routes are correlated, not independent: GO terms often arrive
+    through InterPro2GO or eggNOG, which share homology with the TCDB calls.
+    Agreement between a `go_transport` row and a `transport` row is therefore
+    weaker evidence than it reads, and disagreement is often naming granularity
+    (a GO class target vs a TCDB specific compound). See `docs://analysis/transport`.
+  - >-
+    `go_include_ancestors=True` is the only way inherited GO rows appear; the
+    default is direct rows only. `evidence_source`-scoped filters `ec_numbers`,
+    `mass_balance` and `substrate_depth` do not apply to GO rows (documented
+    no-ops), while `exclude_metabolite_ids`, `metabolite_pathway_ids` and
+    `gene_categories` do.
