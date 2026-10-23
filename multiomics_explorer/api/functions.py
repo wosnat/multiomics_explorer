@@ -9891,7 +9891,10 @@ def metabolites_by_gene(
     [{metabolite_id, name, relation, reaction_count, transporter_count,
     gene_count}]}`; `{}` when none) covers every metabolite in the filtered
     slice with a generic ↔ specific relative that has genes anywhere in the
-    organism (counts are organism-wide, unfiltered, both arms). Rows on the
+    organism (counts are organism-wide and unfiltered: they equal a default
+    `genes_by_metabolite` call on the relative — metabolism, transport and
+    direct GO rows — whatever this call's `evidence_sources` /
+    `go_include_ancestors`). Rows on the
     page carry sparse `stereo_relative_ids`, and one warning, first in
     `warnings`, names up to 5 of them. To pull a relative's genes, call
     `genes_by_metabolite(metabolite_ids=[...], include_stereo_forms=True)`.
@@ -10156,7 +10159,10 @@ def metabolites_by_gene(
 
     # 5b. Stereo hint: organism-wide generic ↔ specific relatives of every
     # stereo-linked metabolite in the filtered slice — "where else does this
-    # compound have genes", so no exclude list, no filters, both arms.
+    # compound have genes", so no exclude list, no filters, and the DEFAULT
+    # genes_by_metabolite arms (all three, direct GO only) regardless of the
+    # call's evidence_sources / go_include_ancestors — counts equal a
+    # default genes_by_metabolite call on the relative.
     stereo_source_names: dict[str, str] = {}
     stereo_relatives = _stereo_relatives_in_organism(
         conn,
@@ -10164,8 +10170,9 @@ def metabolites_by_gene(
         organism,
         exclude_ids=[],
         gbm_filters=None,
-        arms=("metabolism", "transport"),
+        arms=_VALID_EVIDENCE_SOURCES_GBM,
         source_names=stereo_source_names,
+        include_ancestors=False,
     )
     # Most consequential first: the warning names only 5 sources.
     stereo_relatives = dict(sorted(

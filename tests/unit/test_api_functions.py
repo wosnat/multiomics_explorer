@@ -22342,3 +22342,34 @@ class TestKgSchemaEdgeDescriptions:
         desc = result["relationships"][
             "Molecular_function_transports_metabolite"]["description"]
         assert desc.startswith("GO defines this molecular-function term")
+
+
+class TestGoTransportMbgStereoArms:
+    """mbg stereo hint counts = a DEFAULT gbm call on the relative: all
+    three arms, direct GO only, whatever the mbg call's own arms."""
+
+    def _run(self, monkeypatch, **kw):
+        rec, seen = {}, []
+        _install_mbg_builders(monkeypatch, rec)
+
+        def _fake_stereo(conn, ids, organism, **kwargs):
+            seen.append(kwargs)
+            return {}
+        monkeypatch.setattr(api, "_stereo_relatives_in_organism", _fake_stereo)
+        conn = _GoConn(arm_rows={"go_transport": [_go_row()]},
+                       summary=_GO_SUMMARY)
+        api.metabolites_by_gene(
+            ["PMM0970"], "Prochlorococcus MED4", conn=conn, **kw)
+        return seen[0]
+
+    def test_mbg_stereo_default_uses_three_arms(self, monkeypatch):
+        kw = self._run(monkeypatch)
+        assert tuple(kw["arms"]) == _GO_ARMS
+        assert kw["include_ancestors"] is False
+
+    def test_mbg_stereo_ignores_evidence_sources_and_ancestors(
+            self, monkeypatch):
+        kw = self._run(monkeypatch, evidence_sources=["transport"],
+                       go_include_ancestors=True)
+        assert tuple(kw["arms"]) == _GO_ARMS
+        assert kw["include_ancestors"] is False
