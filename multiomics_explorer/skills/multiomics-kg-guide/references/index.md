@@ -42,7 +42,7 @@
 - `docs://tools/list_organisms` — ~937 tok
 - `docs://tools/list_publications` — ~1249 tok
 - `docs://tools/metabolites_by_flags_assay` — ~1553 tok
-- `docs://tools/metabolites_by_gene` — ~1600 tok
+- `docs://tools/metabolites_by_gene` — ~1595 tok
 - `docs://tools/metabolites_by_quantifies_assay` — ~1951 tok
 - `docs://tools/ontology_landscape` — ~1265 tok
 - `docs://tools/ontology_term_details` — ~1111 tok
@@ -89,7 +89,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/list_organisms/full` — ~12678 tok
 - `docs://tools/list_publications/full` — ~8817 tok
 - `docs://tools/metabolites_by_flags_assay/full` — ~4799 tok
-- `docs://tools/metabolites_by_gene/full` — ~15309 tok
+- `docs://tools/metabolites_by_gene/full` — ~15300 tok
 - `docs://tools/metabolites_by_quantifies_assay/full` — ~6456 tok
 - `docs://tools/ontology_landscape/full` — ~10796 tok
 - `docs://tools/ontology_term_details/full` — ~9180 tok

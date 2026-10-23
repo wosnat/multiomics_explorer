@@ -1551,7 +1551,7 @@ class MetabolitesByGeneResponse(BaseModel):
         default_factory=list,
         description="Input locus_tags that resolve to a Gene in the "
         "requested organism but produced zero chemistry rows (no "
-        "Gene_catalyzes_reaction AND no Gene_has_tcdb_family). Distinct "
+        "reaction, TCDB or GO transport path). Distinct "
         "from `not_found.locus_tags` (those don't resolve at all).")
     by_gene: list[MbgByGene] = Field(
         default_factory=list,
@@ -8611,8 +8611,7 @@ def register_tools(mcp: FastMCP):
             "subunits. `not_found.locus_tags` lists tags that don't "
             "resolve to any Gene in the requested organism; "
             "`not_matched` lists tags that DO resolve but have no "
-            "chemistry edges (no Gene_catalyzes_reaction AND no "
-            "Gene_has_tcdb_family).",
+            "chemistry path (no reaction, TCDB or GO transport row).",
             min_length=1,
         )],
         organism: Annotated[OrganismRequiredParam, Field(min_length=1)],

@@ -13,7 +13,7 @@ docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| locus_tags | list[string] | — | Gene locus tags to drill into (case-sensitive). E.g. ['PMM0963', 'PMM0964', 'PMM0965'] for urease α/β/γ subunits. `not_found.locus_tags` lists tags that don't resolve to any Gene in the requested organism; `not_matched` lists tags that DO resolve but have no chemistry edges (no Gene_catalyzes_reaction AND no Gene_has_tcdb_family). |
+| locus_tags | list[string] | — | Gene locus tags to drill into (case-sensitive). E.g. ['PMM0963', 'PMM0964', 'PMM0965'] for urease α/β/γ subunits. `not_found.locus_tags` lists tags that don't resolve to any Gene in the requested organism; `not_matched` lists tags that DO resolve but have no chemistry path (no reaction, TCDB or GO transport row). |
 | organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
 | metabolite_elements | list[string] \| None | None | Filter to rows where the metabolite contains ALL of the given element symbols (AND-of-presence). E.g. `['N']` keeps only N-bearing metabolites — the headline N-source workflow primitive. `['N', 'P']` requires both. Anchored on `Metabolite.elements` (KG-A3 Hill-parsed presence list); applies uniformly to all three arms. Never substring-match on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). `not_found.metabolite_elements` lists symbols that don't exist on any KG metabolite. |
 | metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds warn. `chebi.role:` ids reach TCDB / GO role edges. docs://analysis/transport. |
@@ -48,7 +48,7 @@ total_matching, returned, offset, truncated, warnings, stereo_relatives, resolve
 - **stereo_relatives** (object): Slice metabolite id -> its stereo forms with genes in this organism (whole organism, not just these genes), e.g. {'kegg.compound:C00736': [L-Cysteine entry]}. Counts never combine across forms.
 - **resolved_aliases** (object): Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.
 - **not_found** (MbgNotFound): Inputs that did not resolve to a KG node — see model.
-- **not_matched** (list[string]): Input locus_tags that resolve to a Gene in the requested organism but produced zero chemistry rows (no Gene_catalyzes_reaction AND no Gene_has_tcdb_family). Distinct from `not_found.locus_tags` (those don't resolve at all).
+- **not_matched** (list[string]): Input locus_tags that resolve to a Gene in the requested organism but produced zero chemistry rows (no reaction, TCDB or GO transport path). Distinct from `not_found.locus_tags` (those don't resolve at all).
 - **by_gene** (list[MbgByGene]): Per-gene rollup. One entry per input locus_tag that produced ≥1 row.
 - **by_evidence_source** (list[MbgByEvidenceSource]): Frequency over `evidence_source` values present in the slice (≤2 entries).
 - **by_substrate_depth** (list[MbgBySubstrateDepth]): Frequency over `substrate_depth` values across transport rows only (≤2 entries; metabolism rows are excluded).
