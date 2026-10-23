@@ -7423,11 +7423,13 @@ class TestBuildListMetabolites:
         assert params["mass_max"] == 1000.0
 
     def test_organism_names_filter(self):
+        # re-pinned: GO transport surface (spec §6.6) — union clause.
         """organism_names_lc filter uses ANY(... toLower(o) IN $organism_names_lc)."""
         cypher, params = self._build(
             organism_names_lc=["prochlorococcus med4"])
         assert (
-            "ANY(o IN coalesce(m.organism_names, []) "
+            "ANY(o IN coalesce(m.organism_names, [])"
+            " + coalesce(m.go_transport_organism_names, []) "
             "WHERE toLower(o) IN $organism_names_lc)"
             in cypher
         )
@@ -7590,12 +7592,14 @@ class TestBuildListMetabolitesSummary:
         assert params["elements"] == ["N"]
 
     def test_shares_where_clause(self):
+        # re-pinned: GO transport surface (spec §6.6) — union clause.
         """Same _list_metabolites_where() helper as detail builder —
         organism_names_lc filter renders identically."""
         cypher, params = self._build(
             organism_names_lc=["prochlorococcus med4"])
         assert (
-            "ANY(o IN coalesce(m.organism_names, []) "
+            "ANY(o IN coalesce(m.organism_names, [])"
+            " + coalesce(m.go_transport_organism_names, []) "
             "WHERE toLower(o) IN $organism_names_lc)"
             in cypher
         )
@@ -7680,9 +7684,12 @@ _DEEPEST_PREDICATE = _norm_ws(
     "WHERE (d)-[:Tcdb_family_is_a_tcdb_family*1..4]->(tf) }"
 )
 
+# re-pinned: GO transport surface (spec §6.3) — the transport arm also walks
+# the TCDB role edge and lands on ChemicalRole targets.
 _TRANSPORT_ARM_PATTERN = (
     "-[gt:Gene_has_tcdb_family]->(tf:TcdbFamily)"
-    "-[r:Tcdb_family_transports_metabolite]->(m:Metabolite)"
+    "-[r:Tcdb_family_transports_metabolite"
+    "|Tcdb_family_transports_chemical_role]->(m:Metabolite|ChemicalRole)"
 )
 
 
@@ -7850,6 +7857,7 @@ class TestBuildGenesByMetaboliteTransport:
         post-rollup). Both edges are bound: `gt` (evidence_score) and `r`
         (substrate_depth)."""
         cypher, _ = self._build()
+        # re-pinned: GO transport surface (spec §6.3)
         assert "(g:Gene)" + _TRANSPORT_ARM_PATTERN in cypher
 
     def test_deepest_attachment_predicate(self):
@@ -8347,6 +8355,7 @@ class TestBuildMetabolitesByGeneTransport:
         post-rollup). Both edges bound: `gt` (evidence_score) + `r`
         (substrate_depth). Mirrors GBM."""
         cypher, _ = self._build()
+        # re-pinned: GO transport surface (spec §6.3)
         assert "(g:Gene)" + _TRANSPORT_ARM_PATTERN in cypher
 
     def test_deepest_attachment_predicate(self):
@@ -14647,7 +14656,7 @@ class TestBuildListMetabolitesGoTransport:
     def test_list_metabolites_organism_filter_unions_go_reach(self):
         from multiomics_explorer.kg.queries_lib import build_list_metabolites
         cypher, params = build_list_metabolites(
-            organism_names=["Prochlorococcus MED4"]
+            organism_names_lc=["prochlorococcus med4"]
         )
         assert "m.organism_names" in cypher
         assert "m.go_transport_organism_names" in cypher

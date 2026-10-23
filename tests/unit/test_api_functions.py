@@ -29,6 +29,12 @@ _RESOLVER_MARK = "UNWIND $curies"
 # `_resolver_aware` and skipped by `_non_resolver_calls` so fixed-order
 # response lists stay aligned. Inert before the builder exists.
 _STEREO_RELATIVES_MARK = "AS relative_id"
+# GO transport surface: the default-on GO detail arm. Answered `[]` (no GO
+# rows) by `_resolver_aware` and skipped by `_non_resolver_calls`, exactly
+# like the resolver / stereo queries, so the pre-existing fixed-order
+# response lists (summary, metabolism arm, transport arm, probes) stay
+# aligned and each test keeps asserting what it asserted before.
+_GO_ARM_MARK = "'go_transport' AS evidence_source"
 _RESOLVER_IDENTITY_PREFIXES = (
     "kegg.compound", "chebi", "mnx", "hmdb", "inchikey",
 )
@@ -53,6 +59,8 @@ def _resolver_aware(responses):
     def _exec(cypher, *args, **params):
         if _RESOLVER_MARK in cypher:
             return _identity_resolver_rows(params.get("curies", []))
+        if _GO_ARM_MARK in cypher:
+            return []
         if _STEREO_RELATIVES_MARK in cypher:
             # metabolite stereo-form hint: no stereo relatives in these
             # fixtures (also skips the relative-summary query).
@@ -73,7 +81,8 @@ def _non_resolver_calls(conn):
     out = []
     for c in conn.execute_query.call_args_list:
         cypher = c.args[0] if c.args else c.kwargs.get("cypher", "")
-        if _RESOLVER_MARK not in cypher and _STEREO_RELATIVES_MARK not in cypher:
+        if (_RESOLVER_MARK not in cypher and _STEREO_RELATIVES_MARK not in cypher
+                and _GO_ARM_MARK not in cypher):
             out.append(c)
     return out
 
@@ -9601,9 +9610,13 @@ class TestGenesByMetabolite:
     def test_creates_conn_when_none(self):
         """When conn=None, default GraphConnection is created."""
         gbm = self._api()
+        # GraphConnection is a MagicMock here, so the cached Schema_info
+        # lookup's isinstance(conn, GraphConnection) cannot run: stub it.
         with patch(
             "multiomics_explorer.api.functions.GraphConnection",
-        ) as MockConn:
+        ) as MockConn, patch.object(
+            api, "_go_transport_excluded_targets", return_value=frozenset(),
+        ):
             mock_instance = MockConn.return_value
             mock_instance.execute_query.side_effect = _resolver_aware([
                 [self._SUMMARY_ROW_BOTH_ARMS],
@@ -10876,6 +10889,7 @@ class TestMetabolitesByGene:
                 [self._SUMMARY_ROW_BOTH_ARMS],
                 [self._METAB_ROW],
                 [self._TRANS_ROW_MS],
+                [],  # default-on GO transport arm: no GO rows
                 [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
                 [],
             ]
@@ -19676,6 +19690,8 @@ class TestMetabolitesByGeneNoFormula:
         def _dispatch(cypher, **params):
             if cypher == self._SENTINEL:
                 return [count_row]
+            if _GO_ARM_MARK in cypher:
+                return []  # default-on GO transport arm: no GO rows
             if not seq:
                 raise AssertionError(f"unexpected extra query: {cypher[:80]}")
             return seq.pop(0)

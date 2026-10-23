@@ -5531,11 +5531,13 @@ class TestGoTransportGenesByMetabolite:
             rel = {x["metabolite_id"]: x
                    for x in r["stereo_relatives"]["kegg.compound:C00025"]}
             assert "kegg.compound:C00302" in rel
-            re = api.genes_by_metabolite(
+            recall = api.genes_by_metabolite(
                 ["kegg.compound:C00302"], _GOT_MED4,
                 go_include_ancestors=anc, summary=True, conn=conn)
-            entry = re["by_metabolite"][0]
+            entry = recall["by_metabolite"][0]
             assert rel["kegg.compound:C00302"]["gene_count"] == entry["gene_count"]
+            if not anc:
+                assert entry["rows"] == 31
         base = api.genes_by_metabolite(
             ["kegg.compound:C00302"], _GOT_MED4, summary=True, conn=conn)
         e = base["by_metabolite"][0]
