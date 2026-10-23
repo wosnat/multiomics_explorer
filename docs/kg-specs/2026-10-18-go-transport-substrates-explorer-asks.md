@@ -381,3 +381,15 @@ released). Details and ready-to-copy caveat paragraphs per edge type:
   `Gene_located_in_cellular_component` 154,722 to 155,459.
 - **Joint release:** the KG release carrying slice 1 sets `mcp_min_version` to the explorer release that
   surfaces the GO arm (backlog 2c.13).
+
+## Explorer surfaced (2026-10-23)
+
+Branch `go-transport-surface` (not yet merged; ships in the next explorer MCP release). Surfaced:
+- `go_transport` as a default-on third arm on `genes_by_metabolite` / `metabolites_by_gene` (`go_*` row fields, `target_kind`, opt-in `go_include_ancestors`, `rows_by_go_term_depth`).
+- `chebi.role:` inputs reaching GO and TCDB role edges; filtered-target and neurotransmitter warnings.
+- `gene_overview` (`evidence_sources`, `has_chemistry`) and `list_metabolites` (organism union with `go_transport_organism_*`).
+- `kg_release_info.go_transport_excluded_targets`, `kg_schema` edge descriptions, `docs://analysis/transport`.
+
+The KG release carrying slice 1 should set `mcp_min_version` to that explorer release.
+
+Correction: the note above that adding `go_transport` "moves the hash" is wrong. The `controlled_vocabularies_hash` recipe does not hash descriptions and `Metabolite.evidence_sources` is an open vocabulary, so the hash did not move at 2026-10-18T18:40Z (recorded in the explorer CHANGELOG).
