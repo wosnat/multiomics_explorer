@@ -669,6 +669,7 @@ list_filter_values(filter_type='partner_role') → list_experiments(coculture_ro
 list_filter_values(filter_type='table_scope') → list_experiments(table_scope=[...]) to keep only experiments whose DE table reports every detected gene
 list_filter_values(filter_type='control_timing') → list_experiments(control_timing=[...]) to find experiments whose control was sampled at another time, then read their design_notes
 list_filter_values(filter_type='value_kind') → list_derived_metrics(value_kind=...) / list_metabolite_assays(value_kind=...) → the matching genes_by_{kind}_metric or metabolites_by_{quantifies,flags}_assay drill-down
+list_filter_values(filter_type='evidence_source') → pick 'go_transport' → list_metabolites(evidence_sources=['go_transport']) or genes_by_metabolite(evidence_sources=['go_transport'])
 ```
 
 ## Common mistakes
@@ -710,6 +711,8 @@ genes_by_ontology(ontology='go_bp', call_class=['peptidase'])  # go_bp has no ca
 ```correction
 list_filter_values(filter_type='trust_axes', ontology='go_bp')  # check axes first — go_bp supports sources/evidence/evidence_score only
 ```
+
+- `filter_type='evidence_source'` lists the values stored on `Metabolite.evidence_sources`, which include `go_transport` (a GO transport term names the compound). The tool-level `evidence_sources` parameter of `genes_by_metabolite` / `metabolites_by_gene` accepts `metabolism`, `transport` and `go_transport` (not `metabolomics`), while `list_metabolites` also accepts `metabolomics`. Read the tool page before reusing a value.
 
 ## Package import equivalent
 

@@ -154,7 +154,7 @@ examples:
     note: "TCDB names substrates generically, so this transporter reaches Cysteine (stereo form unspecified), not L-Cysteine. Envelope `stereo_relatives` is keyed by each result metabolite that has a stereo relative with MED4 genes; its counts cover the whole organism, not just PMM0065, and match `genes_by_metabolite` on the relative. Next step: `genes_by_metabolite(metabolite_ids=['kegg.compound:C00736'], organism='Prochlorococcus MED4', include_stereo_forms=True)`."
     response: |
       {
-        "total_matching": 38,
+        "total_matching": 40,
         "returned": 0,
         "offset": 0,
         "truncated": true,
@@ -187,19 +187,21 @@ examples:
             "locus_tag": "PMM0065",
             "gene_name": "mcyH",
             "product": "ABC transporter, ATPase component",
-            "rows": 38,
-            "metabolite_count": 37,
+            "rows": 40,
+            "metabolite_count": 38,
             "reaction_count": 0,
-            "transporter_count": 7,
+            "transporter_count": 8,
             "metabolism_rows": 0,
-            "transport_most_specific_rows": 32,
+            "transport_most_specific_rows": 34,
             "transport_inherited_rows": 6,
+            "go_transport_rows": 0,
             "transport_substrate_resolution": "resolved",
             "tcdb_evidence_score_max": 0.8
           }
         ],
-        "by_evidence_source": [{"evidence_source": "transport", "count": 38}],
-        "by_substrate_depth": [{"substrate_depth": "most_specific", "count": 32}, {"substrate_depth": "inherited", "count": 6}],
+        "by_evidence_source": [{"evidence_source": "transport", "count": 40}],
+        "by_substrate_depth": [{"substrate_depth": "most_specific", "count": 34}, {"substrate_depth": "inherited", "count": 6}],
+        "rows_by_go_term_depth": null,
         "by_element": [
           {"element": "C", "metabolite_count": 27},
           {"element": "H", "metabolite_count": 27},
@@ -211,6 +213,18 @@ examples:
         "by_element_truncated": null,
         "top_metabolites": [
           {
+            "metabolite_id": "chebi.role:23888",
+            "name": "drug",
+            "formula": null,
+            "gene_count": 1,
+            "reaction_count": 0,
+            "transporter_count": 2,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 2,
+            "transport_inherited_rows": 0,
+            "go_transport_rows": 0
+          },
+          {
             "metabolite_id": "chebi:135075",
             "name": "alphaprodine",
             "formula": "C16H23NO2",
@@ -219,7 +233,8 @@ examples:
             "transporter_count": 1,
             "metabolism_rows": 0,
             "transport_most_specific_rows": 1,
-            "transport_inherited_rows": 0
+            "transport_inherited_rows": 0,
+            "go_transport_rows": 0
           },
           {
             "metabolite_id": "chebi:138159",
@@ -230,7 +245,8 @@ examples:
             "transporter_count": 1,
             "metabolism_rows": 0,
             "transport_most_specific_rows": 1,
-            "transport_inherited_rows": 0
+            "transport_inherited_rows": 0,
+            "go_transport_rows": 0
           },
           {
             "metabolite_id": "chebi:25051",
@@ -241,7 +257,8 @@ examples:
             "transporter_count": 1,
             "metabolism_rows": 0,
             "transport_most_specific_rows": 1,
-            "transport_inherited_rows": 0
+            "transport_inherited_rows": 0,
+            "go_transport_rows": 0
           },
           {
             "metabolite_id": "chebi:36080",
@@ -252,18 +269,8 @@ examples:
             "transporter_count": 1,
             "metabolism_rows": 0,
             "transport_most_specific_rows": 1,
-            "transport_inherited_rows": 0
-          },
-          {
-            "metabolite_id": "chebi:42478",
-            "name": "ethidium",
-            "formula": "C21H20N3",
-            "gene_count": 1,
-            "reaction_count": 0,
-            "transporter_count": 1,
-            "metabolism_rows": 0,
-            "transport_most_specific_rows": 1,
-            "transport_inherited_rows": 0
+            "transport_inherited_rows": 0,
+            "go_transport_rows": 0
           },
           ...
         ],
@@ -275,7 +282,7 @@ examples:
             "level_kind": "tc_subfamily",
             "substrate_depth": "most_specific",
             "gene_count": 1,
-            "metabolite_count": 28
+            "metabolite_count": 29
           },
           {
             "tcdb_family_id": "tcdb:3.A.1.110",
@@ -302,9 +309,9 @@ examples:
             "metabolite_count": 3
           },
           {
-            "tcdb_family_id": "tcdb:3.A.1.203.11",
-            "tcdb_family_name": "Putative fatty acid exporter; homodimer.",
-            "level_kind": "tc_specificity",
+            "tcdb_family_id": "tcdb:3.A.1.117",
+            "tcdb_family_name": "The Drug Exporter-2 (DrugE2) Family",
+            "level_kind": "tc_subfamily",
             "substrate_depth": "most_specific",
             "gene_count": 1,
             "metabolite_count": 1
@@ -355,8 +362,8 @@ examples:
         "no_formula_excluded_metabolites": null,
         "gene_count_total": 1,
         "reaction_count_total": 0,
-        "transporter_count_total": 7,
-        "metabolite_count_total": 37,
+        "transporter_count_total": 8,
+        "metabolite_count_total": 38,
         "results": []
       }
 
@@ -364,13 +371,500 @@ examples:
     call: metabolites_by_gene(locus_tags=["PMM0970"], organism="Prochlorococcus MED4")
     note: "TCDB rows (urea, thiourea, hydroxyurea) come first; the two GO rows (a molecular-function and a biological-process term, both naming urea, `go_term_depth=0`) follow. `rows_by_evidence_source` carries `go_transport` alongside `transport`. A GO row is a term definition: read `go_evidence` and `go_sources` for how the gene came to carry the term."
     response: |
-      {"total_matching": 0}
+      {
+        "total_matching": 6,
+        "returned": 6,
+        "offset": 0,
+        "truncated": false,
+        "warnings": [],
+        "stereo_relatives": {},
+        "resolved_aliases": {},
+        "not_found": {
+          "locus_tags": [],
+          "organism": null,
+          "metabolite_ids": [],
+          "metabolite_pathway_ids": [],
+          "metabolite_elements": []
+        },
+        "not_matched": [],
+        "by_gene": [
+          {
+            "locus_tag": "PMM0970",
+            "gene_name": "urtA",
+            "product": "ABC-type urea transporter, substrate binding component",
+            "rows": 6,
+            "metabolite_count": 3,
+            "reaction_count": 0,
+            "transporter_count": 2,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 4,
+            "transport_inherited_rows": 0,
+            "go_transport_rows": 2,
+            "transport_substrate_resolution": "resolved",
+            "tcdb_evidence_score_max": 0.6
+          }
+        ],
+        "by_evidence_source": [{"evidence_source": "transport", "count": 4}, {"evidence_source": "go_transport", "count": 2}],
+        "by_substrate_depth": [{"substrate_depth": "most_specific", "count": 4}],
+        "rows_by_go_term_depth": [{"go_term_depth": 0, "count": 2}],
+        "by_element": [
+          {"element": "C", "metabolite_count": 3},
+          {"element": "H", "metabolite_count": 3},
+          {"element": "N", "metabolite_count": 3},
+          {"element": "O", "metabolite_count": 2}
+        ],
+        "by_element_truncated": null,
+        "top_metabolites": [
+          {
+            "metabolite_id": "kegg.compound:C00086",
+            "name": "Urea",
+            "formula": "CH4N2O",
+            "gene_count": 1,
+            "reaction_count": 0,
+            "transporter_count": 2,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 2,
+            "transport_inherited_rows": 0,
+            "go_transport_rows": 2
+          },
+          {
+            "metabolite_id": "kegg.compound:C07044",
+            "name": "Hydroxyurea",
+            "formula": "CH4N2O2",
+            "gene_count": 1,
+            "reaction_count": 0,
+            "transporter_count": 1,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 1,
+            "transport_inherited_rows": 0,
+            "go_transport_rows": 0
+          },
+          {
+            "metabolite_id": "kegg.compound:C14415",
+            "name": "Thiourea",
+            "formula": "CH4N2S",
+            "gene_count": 1,
+            "reaction_count": 0,
+            "transporter_count": 1,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 1,
+            "transport_inherited_rows": 0,
+            "go_transport_rows": 0
+          }
+        ],
+        "top_reactions": [],
+        "top_tcdb_families": [
+          {
+            "tcdb_family_id": "tcdb:3.A.1.4.4",
+            "tcdb_family_name": "The high-affinity (<1 μM) urea porter",
+            "level_kind": "tc_specificity",
+            "substrate_depth": "most_specific",
+            "gene_count": 1,
+            "metabolite_count": 1
+          },
+          {
+            "tcdb_family_id": "tcdb:3.A.1.4.5",
+            "tcdb_family_name": "The high affinity urea/thiourea/hydroxyurea porter",
+            "level_kind": "tc_specificity",
+            "substrate_depth": "most_specific",
+            "gene_count": 1,
+            "metabolite_count": 3
+          }
+        ],
+        "top_gene_categories": [{"category": "Stress response and adaptation", "gene_count": 1}],
+        "top_metabolite_pathways": [
+          {
+            "metabolite_pathway_id": "kegg.pathway:ko00780",
+            "metabolite_pathway_name": "Biotin metabolism",
+            "gene_count": 1,
+            "pathway_reaction_count": 18,
+            "pathway_metabolite_count": 23
+          },
+          {
+            "metabolite_pathway_id": "kegg.pathway:ko00220",
+            "metabolite_pathway_name": "Arginine biosynthesis",
+            "gene_count": 1,
+            "pathway_reaction_count": 26,
+            "pathway_metabolite_count": 24
+          },
+          {
+            "metabolite_pathway_id": "kegg.pathway:ko00998",
+            "metabolite_pathway_name": "Biosynthesis of various antibiotics",
+            "gene_count": 1,
+            "pathway_reaction_count": 5,
+            "pathway_metabolite_count": 40
+          },
+          {
+            "metabolite_pathway_id": "kegg.pathway:ko00240",
+            "metabolite_pathway_name": "Pyrimidine metabolism",
+            "gene_count": 1,
+            "pathway_reaction_count": 73,
+            "pathway_metabolite_count": 57
+          },
+          {
+            "metabolite_pathway_id": "kegg.pathway:ko00330",
+            "metabolite_pathway_name": "Arginine and proline metabolism",
+            "gene_count": 1,
+            "pathway_reaction_count": 61,
+            "pathway_metabolite_count": 60
+          },
+          ...
+        ],
+        "top_metabolite_pathways_truncated": null,
+        "no_formula_excluded": null,
+        "no_formula_excluded_metabolites": null,
+        "gene_count_total": 1,
+        "reaction_count_total": 0,
+        "transporter_count_total": 2,
+        "metabolite_count_total": 3,
+        "results": [
+          {
+            "locus_tag": "PMM0970",
+            "gene_name": "urtA",
+            "product": "ABC-type urea transporter, substrate binding component",
+            "evidence_source": "transport",
+            "substrate_depth": "most_specific",
+            "tcdb_evidence_score": 0.6,
+            "transport_substrate_resolution": "resolved",
+            "reaction_id": null,
+            "reaction_name": null,
+            "ec_numbers": null,
+            "mass_balance": null,
+            "tcdb_family_id": "tcdb:3.A.1.4.4",
+            "tcdb_family_name": "The high-affinity (<1 μM) urea porter",
+            "go_term_id": null,
+            "go_term_name": null,
+            "go_namespace": null,
+            "go_evidence": null,
+            "go_sources": null,
+            "go_term_depth": null,
+            "go_axiom_term_id": null,
+            "go_axiom_term_name": null,
+            "target_kind": "metabolite",
+            "metabolite_id": "kegg.compound:C00086",
+            "metabolite_name": "Urea",
+            "metabolite_formula": "CH4N2O",
+            "metabolite_mass": 60.056,
+            "metabolite_chebi_id": "16199"
+          },
+          {
+            "locus_tag": "PMM0970",
+            "gene_name": "urtA",
+            "product": "ABC-type urea transporter, substrate binding component",
+            "evidence_source": "transport",
+            "substrate_depth": "most_specific",
+            "tcdb_evidence_score": 0.6,
+            "transport_substrate_resolution": "resolved",
+            "reaction_id": null,
+            "reaction_name": null,
+            "ec_numbers": null,
+            "mass_balance": null,
+            "tcdb_family_id": "tcdb:3.A.1.4.5",
+            "tcdb_family_name": "The high affinity urea/thiourea/hydroxyurea porter",
+            "go_term_id": null,
+            "go_term_name": null,
+            "go_namespace": null,
+            "go_evidence": null,
+            "go_sources": null,
+            "go_term_depth": null,
+            "go_axiom_term_id": null,
+            "go_axiom_term_name": null,
+            "target_kind": "metabolite",
+            "metabolite_id": "kegg.compound:C00086",
+            "metabolite_name": "Urea",
+            "metabolite_formula": "CH4N2O",
+            "metabolite_mass": 60.056,
+            "metabolite_chebi_id": "16199"
+          },
+          {
+            "locus_tag": "PMM0970",
+            "gene_name": "urtA",
+            "product": "ABC-type urea transporter, substrate binding component",
+            "evidence_source": "transport",
+            "substrate_depth": "most_specific",
+            "tcdb_evidence_score": 0.6,
+            "transport_substrate_resolution": "resolved",
+            "reaction_id": null,
+            "reaction_name": null,
+            "ec_numbers": null,
+            "mass_balance": null,
+            "tcdb_family_id": "tcdb:3.A.1.4.5",
+            "tcdb_family_name": "The high affinity urea/thiourea/hydroxyurea porter",
+            "go_term_id": null,
+            "go_term_name": null,
+            "go_namespace": null,
+            "go_evidence": null,
+            "go_sources": null,
+            "go_term_depth": null,
+            "go_axiom_term_id": null,
+            "go_axiom_term_name": null,
+            "target_kind": "metabolite",
+            "metabolite_id": "kegg.compound:C07044",
+            "metabolite_name": "Hydroxyurea",
+            "metabolite_formula": "CH4N2O2",
+            "metabolite_mass": 76.055,
+            "metabolite_chebi_id": "44423"
+          },
+          ...
+        ]
+      }
 
   - title: Inherited target — murJ (PMM0261) reaches Lipid only through an ancestor GO term (go_include_ancestors=True)
     call: metabolites_by_gene(locus_tags=["PMM0261"], organism="Prochlorococcus MED4", go_include_ancestors=True)
     note: "Without the flag this gene has no GO rows (only TCDB). With it, the GO row names Lipid at `go_term_depth=1`: the gene's own term is lipid translocation, the ancestor that names the target is lipid transport (`go_axiom_term_id` / `go_axiom_term_name`). Inherited rows come after every direct row for the same gene set and widen toward broader targets, so treat them as recall."
     response: |
-      {"total_matching": 0}
+      {
+        "total_matching": 4,
+        "returned": 4,
+        "offset": 0,
+        "truncated": false,
+        "warnings": [
+          "Stereo forms hold more rows: D-Fructose 6-phosphate (kegg.compound:C00085) → beta-D-Fructose 6-phosphate (kegg.compou..."
+        ],
+        "stereo_relatives": {
+          "kegg.compound:C00085": [
+            {
+              "metabolite_id": "kegg.compound:C05345",
+              "name": "beta-D-Fructose 6-phosphate",
+              "relation": "specific_form",
+              "reaction_count": 8,
+              "transporter_count": 0,
+              "gene_count": 10
+            }
+          ]
+        },
+        "resolved_aliases": {},
+        "not_found": {
+          "locus_tags": [],
+          "organism": null,
+          "metabolite_ids": [],
+          "metabolite_pathway_ids": [],
+          "metabolite_elements": []
+        },
+        "not_matched": [],
+        "by_gene": [
+          {
+            "locus_tag": "PMM0261",
+            "gene_name": "murJ",
+            "product": "peptidoglycan lipid II flippase",
+            "rows": 4,
+            "metabolite_count": 4,
+            "reaction_count": 0,
+            "transporter_count": 1,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 3,
+            "transport_inherited_rows": 0,
+            "go_transport_rows": 1,
+            "transport_substrate_resolution": "resolved",
+            "tcdb_evidence_score_max": 0.8
+          }
+        ],
+        "by_evidence_source": [{"evidence_source": "transport", "count": 3}, {"evidence_source": "go_transport", "count": 1}],
+        "by_substrate_depth": [{"substrate_depth": "most_specific", "count": 3}],
+        "rows_by_go_term_depth": [{"go_term_depth": 1, "count": 1}],
+        "by_element": [
+          {"element": "C", "metabolite_count": 2},
+          {"element": "H", "metabolite_count": 2},
+          {"element": "O", "metabolite_count": 2}
+        ],
+        "by_element_truncated": null,
+        "top_metabolites": [
+          {
+            "metabolite_id": "chebi:61082",
+            "name": "lipid-linked peptidoglycan",
+            "formula": null,
+            "gene_count": 1,
+            "reaction_count": 0,
+            "transporter_count": 1,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 1,
+            "transport_inherited_rows": 0,
+            "go_transport_rows": 0
+          },
+          {
+            "metabolite_id": "kegg.compound:C00064",
+            "name": "L-Glutamine",
+            "formula": "C5H10N2O3",
+            "gene_count": 1,
+            "reaction_count": 0,
+            "transporter_count": 1,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 1,
+            "transport_inherited_rows": 0,
+            "go_transport_rows": 0
+          },
+          {
+            "metabolite_id": "kegg.compound:C00085",
+            "name": "D-Fructose 6-phosphate",
+            "formula": "C6H11O9P",
+            "gene_count": 1,
+            "reaction_count": 0,
+            "transporter_count": 1,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 1,
+            "transport_inherited_rows": 0,
+            "go_transport_rows": 0
+          },
+          {
+            "metabolite_id": "kegg.compound:C01356",
+            "name": "Lipid",
+            "formula": null,
+            "gene_count": 1,
+            "reaction_count": 0,
+            "transporter_count": 0,
+            "metabolism_rows": 0,
+            "transport_most_specific_rows": 0,
+            "transport_inherited_rows": 0,
+            "go_transport_rows": 1
+          }
+        ],
+        "top_reactions": [],
+        "top_tcdb_families": [
+          {
+            "tcdb_family_id": "tcdb:2.A.66.4",
+            "tcdb_family_name": "The Mouse Virulence Factor (MVF) Family",
+            "level_kind": "tc_subfamily",
+            "substrate_depth": "most_specific",
+            "gene_count": 1,
+            "metabolite_count": 3
+          }
+        ],
+        "top_gene_categories": [{"category": "Cell wall and membrane", "gene_count": 1}],
+        "top_metabolite_pathways": [
+          {
+            "metabolite_pathway_id": "kegg.pathway:ko00997",
+            "metabolite_pathway_name": "Biosynthesis of various other secondary metabolites",
+            "gene_count": 1,
+            "pathway_reaction_count": 3,
+            "pathway_metabolite_count": 18
+          },
+          {
+            "metabolite_pathway_id": "kegg.pathway:ko00750",
+            "metabolite_pathway_name": "Vitamin B6 metabolism",
+            "gene_count": 1,
+            "pathway_reaction_count": 15,
+            "pathway_metabolite_count": 18
+          },
+          {
+            "metabolite_pathway_id": "kegg.pathway:ko00910",
+            "metabolite_pathway_name": "Nitrogen metabolism",
+            "gene_count": 1,
+            "pathway_reaction_count": 24,
+            "pathway_metabolite_count": 18
+          },
+          {
+            "metabolite_pathway_id": "kegg.pathway:ko00710",
+            "metabolite_pathway_name": "Carbon fixation by Calvin cycle",
+            "gene_count": 1,
+            "pathway_reaction_count": 22,
+            "pathway_metabolite_count": 21
+          },
+          {
+            "metabolite_pathway_id": "kegg.pathway:ko00220",
+            "metabolite_pathway_name": "Arginine biosynthesis",
+            "gene_count": 1,
+            "pathway_reaction_count": 26,
+            "pathway_metabolite_count": 24
+          },
+          ...
+        ],
+        "top_metabolite_pathways_truncated": true,
+        "no_formula_excluded": null,
+        "no_formula_excluded_metabolites": null,
+        "gene_count_total": 1,
+        "reaction_count_total": 0,
+        "transporter_count_total": 1,
+        "metabolite_count_total": 4,
+        "results": [
+          {
+            "locus_tag": "PMM0261",
+            "gene_name": "murJ",
+            "product": "peptidoglycan lipid II flippase",
+            "evidence_source": "transport",
+            "substrate_depth": "most_specific",
+            "tcdb_evidence_score": 0.8,
+            "transport_substrate_resolution": "resolved",
+            "reaction_id": null,
+            "reaction_name": null,
+            "ec_numbers": null,
+            "mass_balance": null,
+            "tcdb_family_id": "tcdb:2.A.66.4",
+            "tcdb_family_name": "The Mouse Virulence Factor (MVF) Family",
+            "go_term_id": null,
+            "go_term_name": null,
+            "go_namespace": null,
+            "go_evidence": null,
+            "go_sources": null,
+            "go_term_depth": null,
+            "go_axiom_term_id": null,
+            "go_axiom_term_name": null,
+            "target_kind": "metabolite",
+            "metabolite_id": "chebi:61082",
+            "metabolite_name": "lipid-linked peptidoglycan",
+            "metabolite_chebi_id": "61082"
+          },
+          {
+            "locus_tag": "PMM0261",
+            "gene_name": "murJ",
+            "product": "peptidoglycan lipid II flippase",
+            "evidence_source": "transport",
+            "substrate_depth": "most_specific",
+            "tcdb_evidence_score": 0.8,
+            "transport_substrate_resolution": "resolved",
+            "reaction_id": null,
+            "reaction_name": null,
+            "ec_numbers": null,
+            "mass_balance": null,
+            "tcdb_family_id": "tcdb:2.A.66.4",
+            "tcdb_family_name": "The Mouse Virulence Factor (MVF) Family",
+            "go_term_id": null,
+            "go_term_name": null,
+            "go_namespace": null,
+            "go_evidence": null,
+            "go_sources": null,
+            "go_term_depth": null,
+            "go_axiom_term_id": null,
+            "go_axiom_term_name": null,
+            "target_kind": "metabolite",
+            "metabolite_id": "kegg.compound:C00064",
+            "metabolite_name": "L-Glutamine",
+            "metabolite_formula": "C5H10N2O3",
+            "metabolite_mass": 146.146,
+            "metabolite_chebi_id": "18050"
+          },
+          {
+            "locus_tag": "PMM0261",
+            "gene_name": "murJ",
+            "product": "peptidoglycan lipid II flippase",
+            "evidence_source": "transport",
+            "substrate_depth": "most_specific",
+            "tcdb_evidence_score": 0.8,
+            "transport_substrate_resolution": "resolved",
+            "reaction_id": null,
+            "reaction_name": null,
+            "ec_numbers": null,
+            "mass_balance": null,
+            "tcdb_family_id": "tcdb:2.A.66.4",
+            "tcdb_family_name": "The Mouse Virulence Factor (MVF) Family",
+            "go_term_id": null,
+            "go_term_name": null,
+            "go_namespace": null,
+            "go_evidence": null,
+            "go_sources": null,
+            "go_term_depth": null,
+            "go_axiom_term_id": null,
+            "go_axiom_term_name": null,
+            "target_kind": "metabolite",
+            "metabolite_id": "kegg.compound:C00085",
+            "metabolite_name": "D-Fructose 6-phosphate",
+            "metabolite_formula": "C6H11O9P",
+            "metabolite_mass": 258.119,
+            "metabolite_chebi_id": "15946",
+            "stereo_relative_ids": ["kegg.compound:C05345"]
+          },
+          ...
+        ]
+      }
 
 verbose_fields:
   - gene_category

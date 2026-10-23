@@ -25,7 +25,7 @@ docs://tools/list_metabolites; summary=True first.
 | max_mass | float \| None | None | Maximum monoisotopic mass (Da). E.g. 1000.0. |
 | organism_names | list[string] \| None | None | Restrict to metabolites reachable by these organisms (case-insensitive on `preferred_name`). UNION semantics — a metabolite reached by ANY listed organism qualifies. Joined via `Organism_has_metabolite` (catalysis OR transport). E.g. ['Prochlorococcus MED4']. `not_found.organism_names` lists any unknown names. |
 | pathway_ids | list[string] \| None | None | Filter by KEGG pathway membership (`KeggTerm.id`). E.g. ['kegg.pathway:ko00910'] for nitrogen metabolism. Joined via `Metabolite_in_pathway`. `not_found.pathway_ids` lists unknown IDs. |
-| evidence_sources | list[string ('metabolism', 'transport', 'metabolomics')] \| None | None | Filter by evidence path. Set-membership ANY semantics — ['transport'] returns transport-only AND dual. Valid values: 'metabolism' (catalysis-reachable), 'transport' (TCDB-curated substrate), 'metabolomics' (measured by a MetaboliteAssay). Other values raise at the MCP boundary. |
+| evidence_sources | list[string ('metabolism', 'transport', 'metabolomics', 'go_transport')] \| None | None | Filter by evidence path (ANY). Values: 'metabolism' (catalysis-reachable), 'transport' (TCDB substrate), 'metabolomics' (measured by a MetaboliteAssay), 'go_transport' (named by a GO transport term). Other values raise at the MCP boundary. |
 | structure_kind | list[string] \| None | None | Structure kind(s) (OR): 'defined' (one molecule), 'generic' (a compound class) or 'polymer'. E.g. ['defined'] drops generic substrates like 'amino acid'. Values: list_filter_values('structure_kind'). |
 | kegg_functional_categories | list[string] \| None | None | KEGG br08001 categories (OR). Hand-curated and partial: only ~10% of metabolites are listed, so a missing category means 'KEGG did not list it', not 'not in it' (fumarate is unclassified). Values: list_filter_values('kegg_functional_category'). |
 | kegg_brite_classes | list[string] \| None | None | Classes from 7 other KEGG compound BRITE trees, as 'Tree: Class' (OR), e.g. 'Lipids: Fatty acyls'. Curated and partial (~20% of metabolites): unlisted = 'KEGG did not list it', not 'not in it'. Values: list_filter_values('kegg_brite_class'). |
@@ -48,7 +48,7 @@ list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"], limit=
 total_entries, total_matching, top_organisms, top_metabolite_pathways, by_evidence_source, xref_coverage, mass_stats, by_measurement_coverage, by_structure_kind, by_kegg_functional_category, by_kegg_brite_class, score_max, score_median, returned, offset, truncated, not_found, resolved_aliases, warnings, results
 ```
 
-Result row: `metabolite_id, name, formula, elements, mass, catalyst_gene_count, organism_count, transporter_count, transporter_gene_count, evidence_sources, chebi_id, pathway_ids, …`
+Result row: `metabolite_id, name, formula, elements, mass, catalyst_gene_count, organism_count, transporter_count, transporter_gene_count, evidence_sources, go_transport_organism_names, go_transport_organism_count, …`
 
 ## Common mistakes
 
@@ -64,5 +64,6 @@ Result row: `metabolite_id, name, formula, elements, mass, catalyst_gene_count, 
 - differential_expression_by_gene → metabolites_by_gene(metabolite_elements=['N']) → list_metabolites for chemistry context
 - list_metabolites (per-row `kegg_brite_classes`, top level only) → run_cypher over `MetaboliteClass` for the deeper KEGG compound classes (docs://analysis/metabolites)
 - list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(metabolite_ids=[...]) — reverse lookup of all measurement evidence (numeric + boolean) for the measured compounds (cross-organism by default).
+- list_metabolites(evidence_sources=['go_transport'], organism_names=[...]) → genes_by_metabolite(metabolite_ids=[...], organism=..., evidence_sources=['go_transport']) for the genes carrying the GO term
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/list_metabolites/full`

@@ -639,6 +639,125 @@ gene_overview(locus_tags=["PMT2118", "PMT_1030"])
 }
 ```
 
+### Example 10: GO-transport-only gene — evidence_sources reads ['go_transport'] with no TCDB or KEGG call
+
+```example-call
+gene_overview(locus_tags=["PMM0533", "PMM0970"])
+```
+
+*PMM0533 (aar, long-chain fatty acyl-ACP reductase) carries a GO transport term and no TCDB or KEGG chemistry, so `evidence_sources=['go_transport']` is its only chemistry tag; PMM0970 (urtA) carries `transport` and `go_transport`. `has_chemistry` in the summary now counts GO-only genes. The tag only says a GO route exists: drill with `metabolites_by_gene`.*
+
+```example-response
+{
+  "total_matching": 2,
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 2}],
+  "by_category": [{"category": "Lipid metabolism", "count": 1}, {"category": "Stress response and adaptation", "count": 1}],
+  "by_annotation_type": [
+    {"annotation_type": "go_bp", "count": 2},
+    {"annotation_type": "go_mf", "count": 2},
+    {"annotation_type": "go_cc", "count": 2},
+    {"annotation_type": "pfam", "count": 2},
+    {"annotation_type": "cog_category", "count": 2},
+    ...
+  ],
+  "by_annotation_state": [{"annotation_state": "informative_multi", "count": 2}],
+  "has_expression": 2,
+  "has_significant_expression": 2,
+  "has_orthologs": 2,
+  "has_clusters": 2,
+  "has_derived_metrics": 2,
+  "has_chemistry": 2,
+  "has_discussed": 1,
+  "top_discussing_publications": [
+    {
+      "doi": "10.1038/ismej.2017.88",
+      "title": "Nitrogen cost minimization is promoted by structural changes in the transcriptome of N-deprived Prochlorococcus cells",
+      "n_genes": 1
+    },
+    {
+      "doi": "10.1038/msb4100087",
+      "title": "Global gene expression of Prochlorococcus ecotypes in response to changes in nitrogen availability",
+      "n_genes": 1
+    }
+  ],
+  "has_ncbifam": 2,
+  "has_tcdb": 1,
+  "has_cazy": 0,
+  "by_merops_class": [],
+  "returned": 2,
+  "offset": 0,
+  "truncated": false,
+  "not_found": [],
+  "warnings": [],
+  "results": [
+    {
+      "locus_tag": "PMM0533",
+      "gene_name": "aar",
+      "product": "long-chain fatty acyl-ACP reductase",
+      "gene_category": "Lipid metabolism",
+      "annotation_quality": 3,
+      "organism_name": "Prochlorococcus MED4",
+      "annotation_types": ["go_bp", "go_mf", "go_cc", "pfam", "cog_category", ...],
+      "annotation_state": "informative_multi",
+      "informative_annotation_types": ["go_bp", "go_mf", "go_cc", "pfam", "kegg", ...],
+      "expression_edge_count": 33,
+      "significant_up_count": 0,
+      "significant_down_count": 8,
+      "closest_ortholog_group_size": 23,
+      "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+      "cluster_membership_count": 2,
+      "cluster_types": ["decay_pattern", "diel"],
+      "derived_metric_count": 11,
+      "derived_metric_value_kinds": ["numeric", "boolean", "categorical"],
+      "reaction_count": 0,
+      "catalyzed_metabolite_count": 0,
+      "tcdb_evidence_score_max": null,
+      "transported_metabolite_count": 0,
+      "transport_substrate_resolution": null,
+      "evidence_sources": ["go_transport"],
+      "merops_classes": [],
+      "ncbifam_family_count": 1,
+      "tcdb_family_count": 0,
+      "cazy_family_count": 0,
+      "merops_evidence_score_max": null,
+      "discussed_in_publication_count": 0
+    },
+    {
+      "locus_tag": "PMM0970",
+      "gene_name": "urtA",
+      "product": "ABC-type urea transporter, substrate binding component",
+      "gene_category": "Stress response and adaptation",
+      "annotation_quality": 3,
+      "organism_name": "Prochlorococcus MED4",
+      "annotation_types": ["go_bp", "go_mf", "go_cc", "pfam", "cog_category", ...],
+      "annotation_state": "informative_multi",
+      "informative_annotation_types": ["go_bp", "go_mf", "go_cc", "pfam", "cog_category", ...],
+      "expression_edge_count": 53,
+      "significant_up_count": 17,
+      "significant_down_count": 10,
+      "closest_ortholog_group_size": 21,
+      "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+      "cluster_membership_count": 5,
+      "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
+      "derived_metric_count": 11,
+      "derived_metric_value_kinds": ["numeric", "boolean", "categorical"],
+      "reaction_count": 0,
+      "catalyzed_metabolite_count": 0,
+      "tcdb_evidence_score_max": 0.6,
+      "transported_metabolite_count": 3,
+      "transport_substrate_resolution": "resolved",
+      "evidence_sources": ["transport", "go_transport"],
+      "merops_classes": [],
+      "ncbifam_family_count": 1,
+      "tcdb_family_count": 2,
+      "cazy_family_count": 0,
+      "merops_evidence_score_max": null,
+      "discussed_in_publication_count": 2
+    }
+  ]
+}
+```
+
 ## Chaining patterns
 
 ```
@@ -658,6 +777,7 @@ gene_overview envelope `has_tcdb` / `has_cazy` = batch triage (how many input ge
 gene_overview (per-row `merops_classes` non-empty) → gene_ontology_terms(locus_tags=[...], ontology=['merops'], verbose=True) for the confidence_score / pfam_support detail behind the call, or genes_by_ontology(ontology='merops', call_class=['peptidase']) to find peers.
 `merops_classes` is a list (`[]` default) because a gene can carry both a `peptidase` and a `nonpeptidase_homolog` MEROPS call on different families — don't assume at most one value. `merops_evidence_score_max` is sparse and uncoalesced (null = no MEROPS call at all, the twin contract of `tcdb_evidence_score_max`) — rank by it, never filter by it.
 gene_overview (per-row derived_metric_count > 0) → gene_derived_metrics(locus_tags=[...], organism=...) for the gene's full DM profile across numeric, boolean and categorical kinds
+gene_overview → evidence_sources contains 'go_transport' → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['go_transport']) for the GO term and target behind the tag
 ```
 
 ## Common mistakes
@@ -689,6 +809,8 @@ gene_overview(locus_tags=['PMM0845'])  # compact carries every routing count; ve
 - `limit` defaults to every input gene (min 25) rather than a small page — pass an explicit number to page.
 
 - The annotation-family columns (`merops_classes`, `tcdb_family_count`, `cazy_family_count`, `ncbifam_family_count`, `tcdb_evidence_score_max`, `merops_evidence_score_max`) belong to the annotation-trust surface — see docs://analysis/annotation_evidence for how to read them.
+
+- The `go_transport` tag in `evidence_sources` means the gene carries a GO term that GO defines as moving some compound or role (a term definition, not a measured transport activity). It is separate from `transport` (TCDB) and does not change `transport_substrate_resolution`, `tcdb_*` counts or `catalyzed_metabolite_count`. A biological-process term can tag a gene that is not a transporter (MED4 `ftn` reaches iron through "iron ion transport"). Read `docs://analysis/transport` before combining the routes.
 
 ## Package import equivalent
 

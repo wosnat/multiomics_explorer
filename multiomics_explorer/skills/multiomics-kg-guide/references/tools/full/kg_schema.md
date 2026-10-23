@@ -26,7 +26,7 @@ nodes, relationships, not_found_labels, not_found_relationship_types
 ```
 
 - **nodes** (object): Node labels mapped to their property definitions. Each value is {'properties': {'prop_name': 'type_string', ...}}. Empty when `section='relationships'`.
-- **relationships** (object): Relationship types mapped to their definitions. Each value is {'source_labels': [...], 'target_labels': [...], 'properties': {'prop_name': 'type_string', ...}}. Empty when `section='nodes'`.
+- **relationships** (object): Relationship types mapped to their definitions. Each value is {'source_labels': [...], 'target_labels': [...], 'properties': {'prop_name': 'type_string', ...}, 'description': optional caveat text for edge types that carry one}. Empty when `section='nodes'`.
 - **not_found_labels** (list[string]): Requested `labels` values not present in the KG. Empty when `labels` was omitted or every value matched.
 - **not_found_relationship_types** (list[string]): Requested `relationship_types` values not present in the KG. Empty when `relationship_types` was omitted or every value matched.
 
@@ -143,10 +143,23 @@ kg_schema(section='relationships', relationship_types=['Changes_expression_of'])
 }
 ```
 
+### Example 3: GO transport edges — scope to one relationship type and read its caveat
+
+```example-call
+kg_schema(section='relationships', relationship_types=['Molecular_function_transports_metabolite'])
+```
+
+*The edge description carries the reading rule: GO defines the term as a transporter activity whose primary input is the compound (a term definition, not a gene fact), only the term's own axiom is stated, and filtered targets return empty by curation. The four GO edge types and `Tcdb_family_transports_chemical_role` are listed together under `section='relationships'`.*
+
+```example-response
+{"relationships": {}}
+```
+
 ## Chaining patterns
 
 ```
 kg_schema → run_cypher
+kg_schema(relationship_types=['Biological_process_transports_metabolite', ...]) → run_cypher over Gene → GO term → Metabolite (examples: docs://analysis/transport)
 ```
 
 ## Common mistakes
@@ -166,6 +179,8 @@ kg_schema() to discover valid organism or category filter values
 ```correction
 list_filter_values() for categorical filter options; list_organisms() for organism details
 ```
+
+- The GO transport edges (`Molecular_function_transports_metabolite`, `Biological_process_transports_metabolite` and the two `_chemical_role` variants) connect a GO term to a Metabolite or ChemicalRole. Molecular-function nodes do not carry the `GeneOntology` label biological-process nodes carry, so derive the namespace from `type(edge)`, not from node labels. Read each edge description for its caveat before querying; the tools `genes_by_metabolite` and `metabolites_by_gene` already label these rows.
 
 ## Package import equivalent
 

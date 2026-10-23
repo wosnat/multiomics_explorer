@@ -42,5 +42,6 @@ nodes, relationships, not_found_labels, not_found_relationship_types
 ## Chaining patterns
 
 - kg_schema → run_cypher
+- kg_schema(relationship_types=['Biological_process_transports_metabolite', ...]) → run_cypher over Gene → GO term → Metabolite (examples: docs://analysis/transport)
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/kg_schema/full`

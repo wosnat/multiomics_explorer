@@ -60,5 +60,6 @@ Result row: `value, count, tree_code, source, applies_to, description`
 - list_filter_values(filter_type='table_scope') → list_experiments(table_scope=[...]) to keep only experiments whose DE table reports every detected gene
 - list_filter_values(filter_type='control_timing') → list_experiments(control_timing=[...]) to find experiments whose control was sampled at another time, then read their design_notes
 - list_filter_values(filter_type='value_kind') → list_derived_metrics(value_kind=...) / list_metabolite_assays(value_kind=...) → the matching genes_by_{kind}_metric or metabolites_by_{quantifies,flags}_assay drill-down
+- list_filter_values(filter_type='evidence_source') → pick 'go_transport' → list_metabolites(evidence_sources=['go_transport']) or genes_by_metabolite(evidence_sources=['go_transport'])
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/list_filter_values/full`
