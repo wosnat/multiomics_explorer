@@ -1,12 +1,17 @@
 by_evidence_source:
 - count: 10
   evidence_source: transport
+by_evidence_source_combination:
+- evidence_sources:
+  - transport
+  pair_count: 5
 by_metabolite:
 - formula: CH4N2O
   gene_count: 5
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00086
+  multi_source_gene_count: 0
   name: Urea
   reaction_count: 0
   rows: 10
@@ -311,6 +316,7 @@ top_genes:
   locus_tag: PMM0970
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.6
   transport_inherited_rows: 0
@@ -322,6 +328,7 @@ top_genes:
   locus_tag: PMM0971
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.8
   transport_inherited_rows: 0
@@ -333,6 +340,7 @@ top_genes:
   locus_tag: PMM0972
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.8
   transport_inherited_rows: 0
@@ -344,6 +352,7 @@ top_genes:
   locus_tag: PMM0973
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.8
   transport_inherited_rows: 0
@@ -355,6 +364,7 @@ top_genes:
   locus_tag: PMM0974
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.8
   transport_inherited_rows: 0

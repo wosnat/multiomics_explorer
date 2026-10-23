@@ -1157,3 +1157,234 @@ class TestGoTransportCorrectnessKG:
             evidence_sources=["go_transport"], organism_names=[self._ORG],
             summary=True, conn=conn)
         assert r["total_matching"] >= n
+
+
+# ---------------------------------------------------------------------------
+# GO transport follow-ups (RED) — docs/tool-specs/go-transport-followups.md
+# Live numbers verified against built_at 2026-10-19T17:03:46Z (spec §3/§4).
+# limit=5000 rather than None: limit=None raises TypeError on gbm / mbg
+# today (backlog 3.18).
+# ---------------------------------------------------------------------------
+
+_UREA = "kegg.compound:C00086"
+_SIDEROPHORE_ROLE = "chebi.role:26672"
+_KT2440 = "Pseudomonas putida KT2440"
+
+
+def _combo_map(envelope):
+    return {
+        tuple(e["evidence_sources"]): e["pair_count"]
+        for e in envelope["by_evidence_source_combination"]
+    }
+
+
+def _pairs_by_sources(rows):
+    pairs: dict = {}
+    for x in rows:
+        pairs.setdefault((x["locus_tag"], x["metabolite_id"]), set()).add(
+            x["evidence_source"])
+    out: dict = {}
+    for srcs in pairs.values():
+        key = tuple(sorted(srcs))
+        out[key] = out.get(key, 0) + 1
+    return out
+
+
+def _go_row_key(x):
+    return (x["locus_tag"], x["metabolite_id"], x["go_term_id"],
+            x["go_axiom_term_id"], x["go_term_depth"])
+
+
+@pytest.mark.kg
+class TestGoTransportFollowupsKG:
+    _ORG = "Prochlorococcus MED4"
+
+    # --- 2c.17 route agreement -------------------------------------------
+
+    def test_gbm_urea_med4_combination(self, conn):
+        r = api.genes_by_metabolite([_UREA], self._ORG, summary=True, conn=conn)
+        assert _combo_map(r) == {
+            ("transport",): 20,
+            ("go_transport", "transport"): 5,
+            ("metabolism",): 4,
+        }
+        assert [e["pair_count"] for e in r["by_evidence_source_combination"]] \
+            == [20, 5, 4]
+
+    def test_gbm_urea_multi_source_gene_count(self, conn):
+        r = api.genes_by_metabolite([_UREA], self._ORG, summary=True, conn=conn)
+        urea = [e for e in r["by_metabolite"] if e["metabolite_id"] == _UREA]
+        assert urea[0]["multi_source_gene_count"] == 5
+
+    def test_gbm_urea_top_genes_multi_source(self, conn):
+        """urtA..urtE reach urea via TCDB + GO -> 1 multi-source metabolite."""
+        r = api.genes_by_metabolite([_UREA], self._ORG, summary=True, conn=conn)
+        multi = {g["locus_tag"] for g in r["top_genes"]
+                 if g["multi_source_metabolite_count"] == 1}
+        assert len(multi) == 5
+
+    def test_mbg_urt_genes_combination(self, conn):
+        r = api.metabolites_by_gene(
+            ["PMM0970", "PMM0971", "PMM0974"], self._ORG, summary=True,
+            conn=conn)
+        assert _combo_map(r) == {
+            ("transport",): 8,
+            ("go_transport", "transport"): 3,
+            ("go_transport",): 3,
+        }
+        for g in r["by_gene"]:
+            assert "multi_source_metabolite_count" in g
+        for m in r["top_metabolites"]:
+            assert "multi_source_gene_count" in m
+
+    @pytest.mark.parametrize("call", [
+        ("gbm", [_UREA], "Prochlorococcus MED4", {}),
+        ("gbm", [_SIDEROPHORE_ROLE], _KT2440, {}),
+        ("gbm", [_UREA], "Prochlorococcus MED4",
+         {"go_include_ancestors": True}),
+        ("mbg", ["PMM0970", "PMM0971", "PMM0974"], "Prochlorococcus MED4", {}),
+        ("mbg", ["PMM0261", "PMM0970"], "Prochlorococcus MED4",
+         {"go_include_ancestors": True}),
+    ])
+    def test_combination_equals_detail_pairs(self, conn, call):
+        tool, ids, org, kw = call
+        fn = api.genes_by_metabolite if tool == "gbm" else api.metabolites_by_gene
+        r = fn(ids, org, limit=5000, conn=conn, **kw)
+        assert not r["truncated"]
+        assert _combo_map(r) == _pairs_by_sources(r["results"])
+        n_pairs = len({(x["locus_tag"], x["metabolite_id"])
+                       for x in r["results"]})
+        assert sum(e["pair_count"]
+                   for e in r["by_evidence_source_combination"]) == n_pairs
+
+    def test_combination_unchanged_total_matching(self, conn):
+        r = api.genes_by_metabolite([_UREA], self._ORG, summary=True, conn=conn)
+        assert r["total_matching"] == 45
+
+    # --- 2c.15 GO-arm filters ---------------------------------------------
+
+    def test_gbm_urea_mf_curated_four_rows(self, conn):
+        r = api.genes_by_metabolite(
+            [_UREA], self._ORG, evidence_sources=["go_transport"],
+            go_namespace=["molecular_function"], go_evidence=["curated"],
+            limit=50, conn=conn)
+        assert r["total_matching"] == 4
+        assert len(r["results"]) == 4
+        for x in r["results"]:
+            assert x["go_namespace"] == "molecular_function"
+            assert x["go_evidence"] == "curated"
+
+    def test_gbm_urea_bp_curated_seven_rows(self, conn):
+        r = api.genes_by_metabolite(
+            [_UREA], self._ORG, evidence_sources=["go_transport"],
+            go_namespace=["biological_process"], go_evidence=["curated"],
+            summary=True, conn=conn)
+        assert r["total_matching"] == 7
+
+    def test_go_filters_leave_non_go_rows_untouched(self, conn):
+        base = api.genes_by_metabolite(
+            [_UREA], self._ORG, summary=True, conn=conn)
+        filt = api.genes_by_metabolite(
+            [_UREA], self._ORG, go_namespace=["molecular_function"],
+            summary=True, conn=conn)
+        b = {e["evidence_source"]: e["count"] for e in base["by_evidence_source"]}
+        f = {e["evidence_source"]: e["count"] for e in filt["by_evidence_source"]}
+        assert f["metabolism"] == b["metabolism"]
+        assert f["transport"] == b["transport"]
+        assert f["go_transport"] < b["go_transport"]
+
+    @pytest.mark.parametrize("call", [
+        ("gbm", [_UREA], "Prochlorococcus MED4", False),
+        ("gbm", [_SIDEROPHORE_ROLE], _KT2440, False),
+        ("gbm", [_SIDEROPHORE_ROLE], _KT2440, True),
+        ("mbg", ["PMM0261", "PMM0970"], "Prochlorococcus MED4", True),
+    ])
+    @pytest.mark.parametrize("filters", [
+        {"go_namespace": ["molecular_function"]},
+        {"go_namespace": ["biological_process"]},
+        {"go_evidence": ["curated"]},
+        {"go_namespace": ["biological_process"],
+         "go_evidence": ["family_inferred", "domain_inferred"]},
+    ])
+    def test_filtered_go_rows_subset_of_unfiltered(self, conn, call, filters):
+        tool, ids, org, anc = call
+        fn = api.genes_by_metabolite if tool == "gbm" else api.metabolites_by_gene
+        common = dict(evidence_sources=["go_transport"],
+                      go_include_ancestors=anc, limit=5000, conn=conn)
+        full = fn(ids, org, **common)
+        sub = fn(ids, org, **common, **filters)
+        assert not full["truncated"] and not sub["truncated"]
+        full_keys = {_go_row_key(x) for x in full["results"]}
+        sub_keys = {_go_row_key(x) for x in sub["results"]}
+        assert sub_keys <= full_keys
+        for x in sub["results"]:
+            if "go_namespace" in filters:
+                assert x["go_namespace"] in filters["go_namespace"]
+            if "go_evidence" in filters:
+                assert x["go_evidence"] in filters["go_evidence"]
+
+    def test_filtered_counts_match_summary(self, conn):
+        """Summary total_matching under GO filters equals the detail row
+        count (filters threaded to the summary builder)."""
+        kw = dict(evidence_sources=["go_transport"],
+                  go_namespace=["biological_process"], go_evidence=["curated"],
+                  go_include_ancestors=True)
+        s = api.genes_by_metabolite(
+            [_SIDEROPHORE_ROLE], _KT2440, summary=True, conn=conn, **kw)
+        d = api.genes_by_metabolite(
+            [_SIDEROPHORE_ROLE], _KT2440, limit=5000, conn=conn, **kw)
+        assert s["total_matching"] == len(d["results"])
+
+    def test_go_filter_arm_off_warns_no_raise(self, conn):
+        r = api.genes_by_metabolite(
+            [_UREA], self._ORG, evidence_sources=["metabolism", "transport"],
+            go_namespace=["molecular_function"], go_evidence=["curated"],
+            summary=True, conn=conn)
+        assert (
+            "go_namespace / go_evidence apply to the go_transport arm only, "
+            "which evidence_sources excluded — filter ignored."
+        ) in r["warnings"]
+
+    def test_unknown_go_evidence_raises_live(self, conn):
+        with pytest.raises(ValueError, match="curated"):
+            api.genes_by_metabolite(
+                [_UREA], self._ORG, go_evidence=["bogus"], conn=conn)
+
+    def test_unknown_go_namespace_raises_live(self, conn):
+        with pytest.raises(ValueError, match="molecular_function"):
+            api.metabolites_by_gene(
+                ["PMM0970"], self._ORG, go_namespace=["cellular_component"],
+                conn=conn)
+
+    # --- 2c.16 list_organisms GO count -------------------------------------
+
+    def test_list_organisms_med4_go_count(self, conn):
+        r = api.list_organisms(organism_names=[self._ORG], conn=conn)
+        assert r["results"][0]["go_transport_metabolite_count"] == 45
+
+    def test_list_organisms_capability_carries_go_count(self, conn):
+        r = api.list_organisms(
+            organism_names=[self._ORG], summary=True, conn=conn)
+        cap = {e["organism_name"]: e for e in r["top_metabolic_capability"]}
+        assert cap[self._ORG]["go_transport_metabolite_count"] == 45
+
+    def test_list_organisms_go_count_matches_live_walk(self, conn, kg_count):
+        """Count via Metabolite.go_transport_organism_names == live walk
+        Gene -> GO -> Metabolite (direct, metabolite targets)."""
+        walk = kg_count(
+            "MATCH (g:Gene {organism_name: $o})-[:Gene_enables_molecular_function"
+            "|Gene_involved_in_biological_process]->()-[:"
+            "Molecular_function_transports_metabolite|"
+            "Biological_process_transports_metabolite]->(m:Metabolite) "
+            "RETURN count(DISTINCT m)", o=_KT2440)
+        r = api.list_organisms(organism_names=[_KT2440], conn=conn)
+        assert r["results"][0]["go_transport_metabolite_count"] == walk == 144
+
+    # --- 2c.14 gene_overview GO count --------------------------------------
+
+    @pytest.mark.parametrize("locus_tag, expected", [
+        ("PMM0974", 3), ("PMM0970", 1), ("PMM0392", 0), ("PMM0001", 0),
+    ])
+    def test_gene_overview_go_count(self, conn, locus_tag, expected):
+        r = api.gene_overview(locus_tags=[locus_tag], conn=conn)
+        assert r["results"][0]["go_transport_metabolite_count"] == expected

@@ -2,11 +2,11 @@
 
 ## What it does
 
-Metabolites a gene batch reaches in ONE organism via KEGG reactions, TCDB and GO transport (GO rows: term definitions, not gene facts).
+Metabolites a gene batch reaches in ONE organism via KEGG, TCDB and GO transport (GO rows: term definitions, not gene facts).
 
 Use for gene → compounds; mirror `genes_by_metabolite`; docs://analysis/transport.
-Filters: locus_tags, organism, metabolite_elements, metabolite_ids (+exclude, `chebi.role:` ok), ec_numbers, evidence_sources, go_include_ancestors.
-Returns: by_gene, by_element, by_evidence_source, rows_by_go_term_depth, top_metabolites; row = gene × reaction|family|GO term × metabolite.
+Filters: locus_tags, organism, metabolite_elements, metabolite_ids (+exclude, `chebi.role:` ok), ec_numbers, evidence_sources, go_include_ancestors/namespace/evidence.
+Returns: by_gene, by_element, by_evidence_source(_combination), rows_by_go_term_depth, top_metabolites; row = gene × reaction|family|GO term × metabolite.
 docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
 
 ## Parameters
@@ -25,6 +25,8 @@ docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
 | substrate_depth | list[string ('most_specific', 'inherited')] \| None | None | Keep transport rows whose edge `substrate_depth` is in this list. 'most_specific' = most specific surviving transporter node for the substrate (gene-pruned hierarchy, not a curation level). Transport arm only; mutes ABC tails. |
 | evidence_sources | list[string ('metabolism', 'transport', 'go_transport')] \| None | None | Path selector — restricts which arms execute (metabolism, transport, go_transport). Default fires all three. `['metabolism']` skips transport rollup noise. 'metabolomics' is NOT valid here (no gene anchor); see `list_metabolites`. |
 | go_include_ancestors | bool | False | GO route only: also return inherited rows, where a gene's GO term reaches the target through is_a ancestors (go_term_depth > 0). Default False = directly annotated terms. |
+| go_namespace | list[string ('molecular_function', 'biological_process')] \| None | None | GO arm only: keep GO rows whose gene->GO edge is in these namespaces. TCDB / KEGG rows untouched. Filtered result is always a subset of the unfiltered one. |
+| go_evidence | list[string] \| None | None | GO arm only: keep GO rows whose gene->GO edge evidence is in this list (e.g. ['curated']; family_inferred, domain_inferred). Unknown values raise. TCDB / KEGG rows untouched; result is a subset of the unfiltered one. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | limit | int | 10 | Max rows returned (paging). |
@@ -43,7 +45,7 @@ metabolites_by_gene(locus_tags=["PMM0392"], organism="Prochlorococcus MED4", evi
 ## Response sketch
 
 ```expected-keys
-total_matching, returned, offset, truncated, warnings, stereo_relatives, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_substrate_depth, rows_by_go_term_depth, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+total_matching, returned, offset, truncated, warnings, stereo_relatives, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_evidence_source_combination, by_substrate_depth, rows_by_go_term_depth, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 Result row: `locus_tag, gene_name, product, evidence_source, substrate_depth, tcdb_evidence_score, transport_substrate_resolution, reaction_id, reaction_name, ec_numbers, mass_balance, tcdb_family_id, …`

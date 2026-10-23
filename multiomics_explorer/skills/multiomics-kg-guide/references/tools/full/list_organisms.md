@@ -73,6 +73,7 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 | reaction_count | int (optional) | Distinct reactions catalyzed by genes in this organism. When > 0, drill in via list_metabolites(organism_names=[organism_name]). |
 | catalyzed_metabolite_count | int (optional) | Distinct metabolites this organism's genes can catalyze reactions on (Gene → Reaction → Metabolite; catalysis arm only — transport-reach excluded). Does NOT mean measured. When > 0, drill in via list_metabolites(organism_names=[organism_name]). |
 | transported_metabolite_count | int (optional) | Distinct metabolites this organism's genes transport via their deepest TCDB attachments (precomputed OrganismTaxon.transported_metabolite_count). Pairs with catalyzed_metabolite_count; 0 when no TCDB calls. |
+| go_transport_metabolite_count | int (optional) | Distinct metabolites (not roles) this organism's genes reach via direct GO transport terms; same set as list_metabolites go_transport_organism_names. Term-definition count, not a gene fact. |
 | measured_metabolite_count | int (optional) | Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Different from catalyzed_metabolite_count (catalysis-arm chemistry capability). When > 0, drill in via list_metabolite_assays(organism=organism_name). |
 | peptidase_gene_count | int (optional) | Genes in this organism with a MEROPS 'peptidase' call (merops_classes). Precomputed OrganismTaxon.peptidase_gene_count; 0 when none. Drill in via genes_by_ontology(ontology='merops', call_class='peptidase'). |
 | nonpeptidase_homolog_gene_count | int (optional) | Genes with a MEROPS 'nonpeptidase_homolog' call (a gene can carry both classes). Precomputed OrganismTaxon.nonpeptidase_homolog_gene_count; 0 when none. |
@@ -1204,6 +1205,28 @@ list_organisms(summary=True)
 }
 ```
 
+### Example 10: GO-route reach per organism
+
+```example-call
+list_organisms(organism_names=["Prochlorococcus MED4", "Pseudomonas putida KT2440"])
+```
+
+*`go_transport_metabolite_count` = metabolites reached by the organism's genes through direct GO transport terms (the same set as `list_metabolites` `go_transport_organism_names`). It rides along in `top_metabolic_capability`, which still ranks by `catalyzed_metabolite_count`.*
+
+```example-response
+{
+  "top_metabolic_capability": [
+    {"organism_name": "Pseudomonas putida KT2440", "transported_metabolite_count": 1193, "go_transport_metabolite_count": 144},
+    {"organism_name": "Prochlorococcus MED4", "transported_metabolite_count": 1011, "go_transport_metabolite_count": 45}
+  ],
+  "results": [
+    {"organism_name": "Prochlorococcus MED4", "transported_metabolite_count": 1011, "go_transport_metabolite_count": 45},
+    {"organism_name": "Pseudomonas putida KT2440", "transported_metabolite_count": 1193, "go_transport_metabolite_count": 144}
+  ],
+  ...
+}
+```
+
 ## Chaining patterns
 
 ```
@@ -1245,6 +1268,8 @@ list_organisms → list_experiments(organism=...) to scope experiments to the ch
 - `organism_names=` uses the same word-based, case-insensitive match on preferred_name + name_synonyms as every other tool's organism param ('MED4' works); unknown names land in `not_found`.
 
 - `compartment` keeps organisms with at least one experiment in that compartment — it is not a per-organism property.
+
+- `go_transport_metabolite_count` counts metabolites reached through direct GO transport terms (chemical roles and is_a-inherited targets excluded). It is a separate route from `transported_metabolite_count` (TCDB); the two overlap and do not add up to a total transport reach.
 
 ## Package import equivalent
 

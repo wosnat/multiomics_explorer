@@ -26,6 +26,7 @@ rows:
   expression_edge_count: 41
   gene_category: Unknown
   gene_name: null
+  go_transport_metabolite_count: 0
   informative_annotation_types:
   - go_mf
   - pfam

@@ -76,6 +76,7 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 | catalyzed_metabolite_count | int (optional) | Distinct metabolites reachable via catalysis only (Gene_catalyzes_reaction → Reaction_has_metabolite). Transport-only genes read 0 — check transported_metabolite_count / 'transport' in evidence_sources (e.g. PMM0392: 0 here, 13 transported). |
 | tcdb_evidence_score_max | float \| None (optional) | Max KG 5-signal composite evidence_score over this gene's TCDB calls, in [0,1]. Rank with it, don't filter: 0 = uncorroborated DIAMOND hit, not absent. None = no TCDB call (never a sentinel). |
 | transported_metabolite_count | int (optional) | Distinct metabolites this gene transports via its deepest TCDB attachments (precomputed Gene.transported_metabolite_count). Pairs with catalyzed_metabolite_count. When > 0, drill via metabolites_by_gene(locus_tags=[...]). |
+| go_transport_metabolite_count | int (optional) | GO-route mirror of transported_metabolite_count: distinct metabolites (not roles) via the gene's direct GO terms; is_a-inherited not counted. A term-definition count, not a gene fact. Drill via metabolites_by_gene. |
 | transport_substrate_resolution | string \| None (optional) | 'resolved' = at least one deepest TCDB attachment is a non-lumping family (lumping = TcdbFamily.substrate_breadth='lumping'); 'family_inferred' = transported_metabolite_count is reachability, not capability. None = no TCDB call. |
 | evidence_sources | list[string] (optional) | Path provenance — values from {'metabolism', 'transport', 'metabolomics', 'go_transport'}. When non-empty, drill into metabolites_by_gene(locus_tags=[...]). Per-source definitions: see docs://guide/concepts. |
 | merops_classes | list[string] (optional) | Distinct MEROPS call_class values across this gene's MEROPS calls (e.g. ['peptidase']). Empty when no MEROPS annotation. Drill via gene_ontology_terms(ontology='merops'). |
@@ -758,6 +759,25 @@ gene_overview(locus_tags=["PMM0533", "PMM0970"])
 }
 ```
 
+### Example 11: GO-route metabolite count next to the TCDB count
+
+```example-call
+gene_overview(locus_tags=["PMM0392", "PMM0970", "PMM0974"])
+```
+
+*`go_transport_metabolite_count` mirrors `transported_metabolite_count` for the GO route: distinct metabolites named by the gene's own GO transport terms. urtE (PMM0974) reaches 3, urtA (PMM0970) 1, and cbiQ (PMM0392, 12 TCDB metabolites) none. Chemical roles and is_a-inherited GO targets are not counted; drill in with `metabolites_by_gene(..., evidence_sources=['go_transport'])`.*
+
+```example-response
+{
+  "results": [
+    {"locus_tag": "PMM0392", "gene_name": "cbiQ", "transported_metabolite_count": 12, "go_transport_metabolite_count": 0},
+    {"locus_tag": "PMM0970", "gene_name": "urtA", "transported_metabolite_count": 3, "go_transport_metabolite_count": 1},
+    {"locus_tag": "PMM0974", "gene_name": "urtE", "transported_metabolite_count": 5, "go_transport_metabolite_count": 3}
+  ],
+  ...
+}
+```
+
 ## Chaining patterns
 
 ```
@@ -811,6 +831,8 @@ gene_overview(locus_tags=['PMM0845'])  # compact carries every routing count; ve
 - The annotation-family columns (`merops_classes`, `tcdb_family_count`, `cazy_family_count`, `ncbifam_family_count`, `tcdb_evidence_score_max`, `merops_evidence_score_max`) belong to the annotation-trust surface — see docs://analysis/annotation_evidence for how to read them.
 
 - The `go_transport` tag in `evidence_sources` means the gene carries a GO term that GO defines as moving some compound or role (a term definition, not a measured transport activity). It is separate from `transport` (TCDB) and does not change `transport_substrate_resolution`, `tcdb_*` counts or `catalyzed_metabolite_count`. A biological-process term can tag a gene that is not a transporter (MED4 `ftn` reaches iron through "iron ion transport"). Read `docs://analysis/transport` before combining the routes.
+
+- `go_transport_metabolite_count` counts metabolites, not chemical roles, and direct GO terms only (no is_a-inherited targets). It is a count of what the gene's GO terms are defined to move, not a measured activity, and it does not add to `transported_metabolite_count` (TCDB) or `catalyzed_metabolite_count`. A gene can read 0 here and still carry `go_transport` in `evidence_sources` through a role target.
 
 ## Package import equivalent
 

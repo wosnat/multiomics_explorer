@@ -14675,3 +14675,417 @@ class TestBuildListMetabolitesGoTransport:
         cypher, _ = build_list_metabolites_summary()
         assert "m.go_transport_organism_names" in cypher
         assert "apoc.coll.toSet" in cypher
+
+
+# ---------------------------------------------------------------------------
+# GO transport follow-ups (RED) — docs/tool-specs/go-transport-followups.md
+# 2c.14 gene_overview GO count · 2c.16 list_organisms GO count ·
+# 2c.15 GO-arm filters (go_namespace / go_evidence) · 2c.17 route agreement
+# ---------------------------------------------------------------------------
+
+_GO_MET_ONLY_TARGET_EDGES = (
+    "Molecular_function_transports_metabolite|"
+    "Biological_process_transports_metabolite"
+)
+_GO_NS_COND = "type(r) IN $go_gene_edge_types"
+_GO_EV_COND = "r.evidence IN $go_evidence"
+
+
+def _count_segment(cypher: str, alias: str) -> str:
+    """Text of the COUNT { ... } expression that ends in `AS <alias>`."""
+    idx = cypher.index(f"AS {alias}")
+    start = cypher.rfind("COUNT", 0, idx)
+    assert start != -1, f"no COUNT {{...}} before AS {alias}"
+    return cypher[start:idx]
+
+
+class TestBuildGeneOverviewGoTransportMetaboliteCount:
+    """2c.14 — per-gene GO metabolite count (direct, Metabolite targets)."""
+
+    def test_returns_go_transport_metabolite_count(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM0974"])
+        assert "AS go_transport_metabolite_count" in cypher
+
+    def test_count_walks_gene_go_edges_and_metabolite_only_targets(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM0974"])
+        seg = _count_segment(cypher, "go_transport_metabolite_count")
+        assert (
+            "Gene_enables_molecular_function|"
+            "Gene_involved_in_biological_process" in seg
+        )
+        assert _GO_MET_ONLY_TARGET_EDGES in seg
+        assert "(m:Metabolite)" in seg
+
+    def test_count_excludes_roles_and_isa_ancestors(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM0974"])
+        seg = _count_segment(cypher, "go_transport_metabolite_count")
+        assert "chemical_role" not in seg
+        assert "ChemicalRole" not in seg
+        assert "is_a" not in seg
+
+    def test_count_is_distinct_metabolites(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM0974"])
+        seg = _count_segment(cypher, "go_transport_metabolite_count")
+        assert "DISTINCT m" in seg
+
+    def test_column_placed_after_transported_metabolite_count(self):
+        cypher, _ = build_gene_overview(locus_tags=["PMM0974"])
+        assert (
+            cypher.rfind("go_transport_metabolite_count")
+            > cypher.index("AS transported_metabolite_count")
+        )
+
+
+class TestBuildListOrganismsGoTransportMetaboliteCount:
+    """2c.16 — per-organism GO metabolite count via
+    Metabolite.go_transport_organism_names (detail + capability builders)."""
+
+    @pytest.mark.parametrize("verbose", [False, True])
+    def test_detail_builder_returns_count(self, verbose):
+        cypher, _ = build_list_organisms(verbose=verbose)
+        assert "AS go_transport_metabolite_count" in cypher
+        seg = _count_segment(cypher, "go_transport_metabolite_count")
+        assert ":Metabolite" in seg
+        assert "o.preferred_name" in seg
+        assert "m.go_transport_organism_names" in seg
+
+    def test_detail_column_after_transported_metabolite_count(self):
+        cypher, _ = build_list_organisms()
+        assert (
+            cypher.index("AS go_transport_metabolite_count")
+            > cypher.index("AS transported_metabolite_count")
+        )
+
+    def test_capability_builder_returns_count(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_organisms_capability,
+        )
+        cypher, _ = build_list_organisms_capability()
+        assert "AS go_transport_metabolite_count" in cypher
+        seg = _count_segment(cypher, "go_transport_metabolite_count")
+        assert "m.go_transport_organism_names" in seg
+        assert "o.preferred_name" in seg
+
+    def test_capability_builder_with_filters_keeps_count(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_list_organisms_capability,
+        )
+        cypher, _ = build_list_organisms_capability(
+            organism_names_lc=["prochlorococcus med4"],
+        )
+        assert "AS go_transport_metabolite_count" in cypher
+
+
+class TestGoTransportWhereGoFilters:
+    """2c.15 — GO where helpers take go_namespace / go_evidence; conditions
+    bind `r` (gene→GO edge); namespace mapped to edge types builder-side."""
+
+    def _gbm_where(self, **kw):
+        from multiomics_explorer.kg.queries_lib import (
+            _genes_by_metabolite_go_transport_where,
+        )
+        kw.setdefault("metabolite_ids", ["kegg.compound:C00086"])
+        kw.setdefault("organism", "Prochlorococcus MED4")
+        return _genes_by_metabolite_go_transport_where(**kw)
+
+    def _mbg_where(self, **kw):
+        from multiomics_explorer.kg.queries_lib import (
+            _metabolites_by_gene_go_transport_where,
+        )
+        kw.setdefault("locus_tags", ["PMM0970"])
+        kw.setdefault("organism", "Prochlorococcus MED4")
+        return _metabolites_by_gene_go_transport_where(**kw)
+
+    @pytest.mark.parametrize("helper", ["_gbm_where", "_mbg_where"])
+    def test_namespace_mf_maps_to_enables_edge(self, helper):
+        conds, params = getattr(self, helper)(
+            go_namespace=["molecular_function"])
+        assert _GO_NS_COND in conds
+        assert params["go_gene_edge_types"] == [
+            "Gene_enables_molecular_function"]
+        assert "go_namespace" not in params
+
+    @pytest.mark.parametrize("helper", ["_gbm_where", "_mbg_where"])
+    def test_namespace_bp_maps_to_involved_in_edge(self, helper):
+        conds, params = getattr(self, helper)(
+            go_namespace=["biological_process"])
+        assert _GO_NS_COND in conds
+        assert params["go_gene_edge_types"] == [
+            "Gene_involved_in_biological_process"]
+
+    @pytest.mark.parametrize("helper", ["_gbm_where", "_mbg_where"])
+    def test_namespace_both_maps_to_both_edges(self, helper):
+        _, params = getattr(self, helper)(
+            go_namespace=["biological_process", "molecular_function"])
+        assert set(params["go_gene_edge_types"]) == {
+            "Gene_enables_molecular_function",
+            "Gene_involved_in_biological_process",
+        }
+
+    @pytest.mark.parametrize("helper", ["_gbm_where", "_mbg_where"])
+    def test_evidence_condition_and_param(self, helper):
+        conds, params = getattr(self, helper)(go_evidence=["curated"])
+        assert _GO_EV_COND in conds
+        assert params["go_evidence"] == ["curated"]
+
+    @pytest.mark.parametrize("helper", ["_gbm_where", "_mbg_where"])
+    def test_filters_absent_when_not_set(self, helper):
+        conds, params = getattr(self, helper)(
+            go_namespace=None, go_evidence=None)
+        assert _GO_NS_COND not in conds
+        assert _GO_EV_COND not in conds
+        assert "go_gene_edge_types" not in params
+        assert "go_evidence" not in params
+
+
+def _not_exists_blocks(cypher: str) -> list[str]:
+    return re.findall(r"NOT EXISTS \{[^}]*\}", cypher)
+
+
+class TestBuildGoTransportDetailGoFilters:
+    """2c.15 — GO detail builders apply the filters in both branches; the
+    inherited-branch dedup NOT EXISTS stays unfiltered."""
+
+    def _gbm(self, **kw):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_go_transport,
+        )
+        kw.setdefault("metabolite_ids", ["kegg.compound:C00086"])
+        kw.setdefault("organism", "Prochlorococcus MED4")
+        return build_genes_by_metabolite_go_transport(**kw)
+
+    def _mbg(self, **kw):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_go_transport,
+        )
+        kw.setdefault("locus_tags", ["PMM0970"])
+        kw.setdefault("organism", "Prochlorococcus MED4")
+        return build_metabolites_by_gene_go_transport(**kw)
+
+    @pytest.mark.parametrize("builder", ["_gbm", "_mbg"])
+    def test_direct_only_has_filters_once(self, builder):
+        cypher, params = getattr(self, builder)(
+            go_namespace=["molecular_function"], go_evidence=["curated"])
+        assert cypher.count(_GO_NS_COND) == 1
+        assert cypher.count(_GO_EV_COND) == 1
+        assert params["go_gene_edge_types"] == [
+            "Gene_enables_molecular_function"]
+        assert params["go_evidence"] == ["curated"]
+
+    @pytest.mark.parametrize("builder", ["_gbm", "_mbg"])
+    def test_include_ancestors_filters_in_both_branches(self, builder):
+        cypher, _ = getattr(self, builder)(
+            include_ancestors=True,
+            go_namespace=["biological_process"], go_evidence=["curated"])
+        assert "UNION ALL" in cypher
+        direct, inherited = cypher.split("UNION ALL", 1)
+        assert _GO_NS_COND in direct and _GO_NS_COND in inherited
+        assert _GO_EV_COND in direct and _GO_EV_COND in inherited
+
+    @pytest.mark.parametrize("builder", ["_gbm", "_mbg"])
+    def test_ancestor_dedup_not_exists_stays_unfiltered(self, builder):
+        cypher, _ = getattr(self, builder)(
+            include_ancestors=True,
+            go_namespace=["molecular_function"], go_evidence=["curated"])
+        blocks = _not_exists_blocks(cypher)
+        assert blocks
+        for b in blocks:
+            assert "go_gene_edge_types" not in b
+            assert "go_evidence" not in b
+
+    @pytest.mark.parametrize("builder", ["_gbm", "_mbg"])
+    def test_absent_when_not_set(self, builder):
+        cypher, params = getattr(self, builder)(include_ancestors=True)
+        assert "go_gene_edge_types" not in cypher
+        assert "$go_evidence" not in cypher
+        assert "go_gene_edge_types" not in params
+        assert "go_evidence" not in params
+
+
+class TestBuildGoTransportSummaryGoFilters:
+    """2c.15 — both summaries + mbg no-formula count thread the GO filters
+    into the GO arm (both branches with include_ancestors)."""
+
+    _ARMS = ("metabolism", "transport", "go_transport")
+
+    def _gbm_summary(self, **kw):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_summary,
+        )
+        kw.setdefault("metabolite_ids", ["kegg.compound:C00086"])
+        kw.setdefault("organism", "Prochlorococcus MED4")
+        return build_genes_by_metabolite_summary(**kw)
+
+    def _mbg_summary(self, **kw):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_summary,
+        )
+        kw.setdefault("locus_tags", ["PMM0970"])
+        kw.setdefault("organism", "Prochlorococcus MED4")
+        return build_metabolites_by_gene_summary(**kw)
+
+    def _mbg_no_formula(self, **kw):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_no_formula_count,
+        )
+        kw.setdefault("locus_tags", ["PMM0970"])
+        kw.setdefault("organism", "Prochlorococcus MED4")
+        kw.setdefault("metabolite_elements", ["N"])
+        return build_metabolites_by_gene_no_formula_count(**kw)
+
+    @pytest.mark.parametrize(
+        "builder", ["_gbm_summary", "_mbg_summary", "_mbg_no_formula"])
+    def test_go_filters_in_go_arm(self, builder):
+        cypher, params = getattr(self, builder)(
+            arms=self._ARMS,
+            go_namespace=["molecular_function"], go_evidence=["curated"])
+        assert _GO_NS_COND in cypher
+        assert _GO_EV_COND in cypher
+        assert params["go_gene_edge_types"] == [
+            "Gene_enables_molecular_function"]
+        assert params["go_evidence"] == ["curated"]
+
+    @pytest.mark.parametrize(
+        "builder", ["_gbm_summary", "_mbg_summary", "_mbg_no_formula"])
+    def test_go_filters_in_both_branches_with_ancestors(self, builder):
+        cypher, _ = getattr(self, builder)(
+            arms=self._ARMS, include_ancestors=True,
+            go_namespace=["biological_process"], go_evidence=["curated"])
+        assert cypher.count(_GO_NS_COND) >= 2
+        assert cypher.count(_GO_EV_COND) >= 2
+        for b in _not_exists_blocks(cypher):
+            assert "go_gene_edge_types" not in b
+            assert "go_evidence" not in b
+
+    @pytest.mark.parametrize(
+        "builder", ["_gbm_summary", "_mbg_summary", "_mbg_no_formula"])
+    def test_go_filters_absent_when_not_set(self, builder):
+        cypher, params = getattr(self, builder)(
+            arms=self._ARMS, include_ancestors=True)
+        assert "go_gene_edge_types" not in cypher
+        assert "$go_evidence" not in cypher
+        assert "go_gene_edge_types" not in params
+        assert "go_evidence" not in params
+
+    @pytest.mark.parametrize(
+        "builder", ["_gbm_summary", "_mbg_summary", "_mbg_no_formula"])
+    def test_go_filters_not_emitted_without_go_arm(self, builder):
+        cypher, _ = getattr(self, builder)(
+            arms=("metabolism", "transport"),
+            go_namespace=["molecular_function"], go_evidence=["curated"])
+        assert _GO_NS_COND not in cypher
+        assert _GO_EV_COND not in cypher
+
+    @pytest.mark.parametrize(
+        "builder", ["_gbm_summary", "_mbg_summary", "_mbg_no_formula"])
+    def test_go_filters_do_not_touch_non_go_arms(self, builder):
+        cypher, _ = getattr(self, builder)(
+            arms=("metabolism", "transport", "go_transport"),
+            go_namespace=["molecular_function"], go_evidence=["curated"])
+        # Only the GO arm carries the gene->GO edge filters; the
+        # metabolism / TCDB arm blocks are separated by the UNION.
+        non_go_blocks = [
+            b for b in cypher.split("UNION\n")
+            if "Gene_catalyzes_reaction" in b or "Gene_has_tcdb_family" in b
+        ]
+        assert non_go_blocks
+        for b in non_go_blocks:
+            assert "Gene_enables_molecular_function" not in b
+            assert _GO_NS_COND not in b
+            assert _GO_EV_COND not in b
+
+
+class TestBuildChemistrySummaryRouteAgreement:
+    """2c.17 — pair-grouping pass + by_evidence_source_combination +
+    per-entity multi_source_* counts in both summary builders."""
+
+    def _gbm(self, **kw):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_metabolite_summary,
+        )
+        kw.setdefault("metabolite_ids", ["kegg.compound:C00086"])
+        kw.setdefault("organism", "Prochlorococcus MED4")
+        kw.setdefault("arms", ("metabolism", "transport", "go_transport"))
+        return build_genes_by_metabolite_summary(**kw)
+
+    def _mbg(self, **kw):
+        from multiomics_explorer.kg.queries_lib import (
+            build_metabolites_by_gene_summary,
+        )
+        kw.setdefault("locus_tags", ["PMM0970"])
+        kw.setdefault("organism", "Prochlorococcus MED4")
+        kw.setdefault("arms", ("metabolism", "transport", "go_transport"))
+        return build_metabolites_by_gene_summary(**kw)
+
+    @pytest.mark.parametrize("builder", ["_gbm", "_mbg"])
+    def test_pair_grouping_pass_groups_by_gene_and_metabolite(self, builder):
+        cypher, _ = getattr(self, builder)()
+        assert re.search(r"WITH g, m, collect\(", cypher)
+        assert "arm_rows" in cypher
+        assert "AS pair_sources" in cypher
+        assert "apoc.coll.sort(" in cypher
+
+    @pytest.mark.parametrize("builder", ["_gbm", "_mbg"])
+    def test_pair_sources_carried_into_rows_collect(self, builder):
+        cypher, _ = getattr(self, builder)()
+        assert "pair_sources: pair_sources" in cypher
+
+    @pytest.mark.parametrize("builder", ["_gbm", "_mbg"])
+    def test_returns_by_evidence_source_combination(self, builder):
+        cypher, _ = getattr(self, builder)()
+        assert "AS by_evidence_source_combination" in cypher
+        assert "pair_count" in cypher
+        tail = cypher[cypher.rindex("RETURN"):]
+        assert "by_evidence_source_combination" in tail
+
+    @pytest.mark.parametrize("builder", ["_gbm", "_mbg"])
+    def test_pair_count_counts_distinct_gene_metabolite_pairs(self, builder):
+        cypher, _ = getattr(self, builder)()
+        assert "row.locus_tag + '|' + row.metabolite_id" in cypher
+
+    @pytest.mark.parametrize("builder", ["_gbm", "_mbg"])
+    @pytest.mark.parametrize(
+        "arms", [("metabolism",), ("transport",), ("go_transport",),
+                 ("metabolism", "transport")])
+    def test_combination_present_for_any_arm_set(self, builder, arms):
+        cypher, _ = getattr(self, builder)(arms=arms)
+        assert "AS by_evidence_source_combination" in cypher
+        assert "pair_sources" in cypher
+
+    def test_gbm_by_metabolite_carries_multi_source_gene_count(self):
+        cypher, _ = self._gbm()
+        end = cypher.index("AS by_metabolite")
+        start = cypher.rfind("[mid IN", 0, end)
+        assert "multi_source_gene_count" in cypher[start:end]
+        assert "size(row.pair_sources) > 1" in cypher[start:end]
+
+    def test_gbm_top_genes_carry_multi_source_metabolite_count(self):
+        cypher, _ = self._gbm()
+        end = cypher.index("AS top_genes")
+        start = cypher.rfind("[lt IN", 0, end)
+        assert "multi_source_metabolite_count" in cypher[start:end]
+        assert "size(row.pair_sources) > 1" in cypher[start:end]
+
+    def test_mbg_by_gene_carries_multi_source_metabolite_count(self):
+        cypher, _ = self._mbg()
+        end = cypher.index("AS by_gene")
+        start = cypher.rfind("[lt IN", 0, end)
+        assert start != -1
+        assert "multi_source_metabolite_count" in cypher[start:end]
+        assert "size(row.pair_sources) > 1" in cypher[start:end]
+
+    def test_mbg_top_metabolites_carry_multi_source_gene_count(self):
+        cypher, _ = self._mbg()
+        end = cypher.index("AS top_metabolites")
+        start = cypher.rfind("[mid IN", 0, end)
+        assert start != -1
+        assert "multi_source_gene_count" in cypher[start:end]
+        assert "size(row.pair_sources) > 1" in cypher[start:end]
+
+    @pytest.mark.parametrize("builder", ["_gbm", "_mbg"])
+    def test_total_matching_still_counts_arm_rows(self, builder):
+        """Pair-grouping UNWINDs arm_rows back, so total_matching stays a
+        row count (verified unchanged live)."""
+        cypher, _ = getattr(self, builder)()
+        assert "UNWIND arm_rows AS x" in cypher
+        assert "count(*) AS total_matching" in cypher

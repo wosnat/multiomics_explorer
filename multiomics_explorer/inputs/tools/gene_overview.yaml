@@ -614,6 +614,19 @@ examples:
         ]
       }
 
+  - title: GO-route metabolite count next to the TCDB count
+    call: gene_overview(locus_tags=["PMM0392", "PMM0970", "PMM0974"])
+    note: "`go_transport_metabolite_count` mirrors `transported_metabolite_count` for the GO route: distinct metabolites named by the gene's own GO transport terms. urtE (PMM0974) reaches 3, urtA (PMM0970) 1, and cbiQ (PMM0392, 12 TCDB metabolites) none. Chemical roles and is_a-inherited GO targets are not counted; drill in with `metabolites_by_gene(..., evidence_sources=['go_transport'])`."
+    response: |
+      {
+        "results": [
+          {"locus_tag": "PMM0392", "gene_name": "cbiQ", "transported_metabolite_count": 12, "go_transport_metabolite_count": 0},
+          {"locus_tag": "PMM0970", "gene_name": "urtA", "transported_metabolite_count": 3, "go_transport_metabolite_count": 1},
+          {"locus_tag": "PMM0974", "gene_name": "urtE", "transported_metabolite_count": 5, "go_transport_metabolite_count": 3}
+        ],
+        ...
+      }
+
 verbose_fields:
   - gene_summary
   - function_description
@@ -660,3 +673,10 @@ mistakes:
     `catalyzed_metabolite_count`. A biological-process term can tag a gene that is
     not a transporter (MED4 `ftn` reaches iron through "iron ion transport").
     Read `docs://analysis/transport` before combining the routes.
+  - >-
+    `go_transport_metabolite_count` counts metabolites, not chemical roles, and
+    direct GO terms only (no is_a-inherited targets). It is a count of what the
+    gene's GO terms are defined to move, not a measured activity, and it does not
+    add to `transported_metabolite_count` (TCDB) or `catalyzed_metabolite_count`.
+    A gene can read 0 here and still carry `go_transport` in `evidence_sources`
+    through a role target.

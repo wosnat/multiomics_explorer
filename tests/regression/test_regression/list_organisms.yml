@@ -12,6 +12,7 @@ rows:
   experiment_count: 0
   gene_count: 0
   genus: Alteromonas
+  go_transport_metabolite_count: 0
   growth_phases: []
   interpro_gene_count: 0
   measured_metabolite_count: 0
@@ -44,6 +45,7 @@ rows:
   experiment_count: 60
   gene_count: 4305
   genus: Alteromonas
+  go_transport_metabolite_count: 72
   growth_phases:
   - darkness
   - exponential
@@ -81,6 +83,7 @@ rows:
   experiment_count: 6
   gene_count: 3929
   genus: Alteromonas
+  go_transport_metabolite_count: 82
   growth_phases: []
   interpro_gene_count: 3495
   measured_metabolite_count: 0
@@ -116,6 +119,7 @@ rows:
   experiment_count: 6
   gene_count: 3834
   genus: Alteromonas
+  go_transport_metabolite_count: 86
   growth_phases: []
   interpro_gene_count: 3456
   measured_metabolite_count: 0
@@ -151,6 +155,7 @@ rows:
   experiment_count: 6
   gene_count: 4063
   genus: Alteromonas
+  go_transport_metabolite_count: 93
   growth_phases: []
   interpro_gene_count: 3608
   measured_metabolite_count: 0
@@ -186,6 +191,7 @@ rows:
   experiment_count: 6
   gene_count: 3741
   genus: Alteromonas
+  go_transport_metabolite_count: 80
   growth_phases: []
   interpro_gene_count: 3349
   measured_metabolite_count: 0
@@ -223,6 +229,7 @@ rows:
   experiment_count: 16
   gene_count: 4136
   genus: Alteromonas
+  go_transport_metabolite_count: 98
   growth_phases:
   - acclimated_steady_state
   - exponential
@@ -266,6 +273,7 @@ rows:
   experiment_count: 21
   gene_count: 4028
   genus: Alteromonas
+  go_transport_metabolite_count: 85
   growth_phases:
   - death
   - exponential
@@ -313,6 +321,7 @@ rows:
   experiment_count: 14
   gene_count: 4028
   genus: Alteromonas
+  go_transport_metabolite_count: 88
   growth_phases:
   - darkness
   - diel
@@ -352,6 +361,7 @@ rows:
   experiment_count: 0
   gene_count: 3817
   genus: Alteromonas
+  go_transport_metabolite_count: 94
   growth_phases: []
   interpro_gene_count: 3363
   measured_metabolite_count: 0
@@ -381,6 +391,7 @@ rows:
   experiment_count: 0
   gene_count: 4238
   genus: Alteromonas
+  go_transport_metabolite_count: 87
   growth_phases: []
   interpro_gene_count: 3621
   measured_metabolite_count: 0
@@ -411,6 +422,7 @@ rows:
   experiment_count: 2
   gene_count: 0
   genus: Escherichia
+  go_transport_metabolite_count: 0
   growth_phases:
   - exponential
   interpro_gene_count: 0
@@ -447,6 +459,7 @@ rows:
   experiment_count: 60
   gene_count: 4240
   genus: Marinobacter
+  go_transport_metabolite_count: 103
   growth_phases:
   - darkness
   - exponential
@@ -482,6 +495,7 @@ rows:
   experiment_count: 1
   gene_count: 2884
   genus: Meiothermus
+  go_transport_metabolite_count: 64
   growth_phases: []
   interpro_gene_count: 2492
   measured_metabolite_count: 0
@@ -519,6 +533,7 @@ rows:
   experiment_count: 9
   gene_count: 0
   genus: null
+  go_transport_metabolite_count: 0
   growth_phases:
   - acute_stress
   - infected
@@ -557,6 +572,7 @@ rows:
   experiment_count: 1
   gene_count: 1945
   genus: Prochlorococcus
+  go_transport_metabolite_count: 41
   growth_phases:
   - acclimated_steady_state
   interpro_gene_count: 1547
@@ -605,6 +621,7 @@ rows:
   experiment_count: 118
   gene_count: 1973
   genus: Prochlorococcus
+  go_transport_metabolite_count: 45
   growth_phases:
   - acclimated_steady_state
   - acute_stress
@@ -664,6 +681,7 @@ rows:
   experiment_count: 3
   gene_count: 2111
   genus: Prochlorococcus
+  go_transport_metabolite_count: 34
   growth_phases:
   - acute_stress
   interpro_gene_count: 1600
@@ -698,6 +716,7 @@ rows:
   experiment_count: 6
   gene_count: 2330
   genus: Prochlorococcus
+  go_transport_metabolite_count: 37
   growth_phases: []
   interpro_gene_count: 1616
   measured_metabolite_count: 92
@@ -731,6 +750,7 @@ rows:
   experiment_count: 0
   gene_count: 1883
   genus: Prochlorococcus
+  go_transport_metabolite_count: 25
   growth_phases: []
   interpro_gene_count: 1541
   measured_metabolite_count: 0
@@ -760,6 +780,7 @@ rows:
   experiment_count: 0
   gene_count: 2452
   genus: Prochlorococcus
+  go_transport_metabolite_count: 43
   growth_phases: []
   interpro_gene_count: 1923
   measured_metabolite_count: 0
@@ -789,6 +810,7 @@ rows:
   experiment_count: 0
   gene_count: 2005
   genus: Prochlorococcus
+  go_transport_metabolite_count: 38
   growth_phases: []
   interpro_gene_count: 1529
   measured_metabolite_count: 0
@@ -818,6 +840,7 @@ rows:
   experiment_count: 0
   gene_count: 2022
   genus: Prochlorococcus
+  go_transport_metabolite_count: 41
   growth_phases: []
   interpro_gene_count: 1580
   measured_metabolite_count: 0
@@ -852,6 +875,7 @@ rows:
   experiment_count: 8
   gene_count: 1926
   genus: Prochlorococcus
+  go_transport_metabolite_count: 45
   growth_phases:
   - exponential
   interpro_gene_count: 1537
@@ -890,6 +914,7 @@ rows:
   experiment_count: 4
   gene_count: 3091
   genus: Prochlorococcus
+  go_transport_metabolite_count: 52
   growth_phases:
   - exponential
   interpro_gene_count: 2015
@@ -930,6 +955,7 @@ rows:
   experiment_count: 27
   gene_count: 1970
   genus: Prochlorococcus
+  go_transport_metabolite_count: 44
   growth_phases:
   - acclimated_steady_state
   - acute_stress
@@ -981,6 +1007,7 @@ rows:
   experiment_count: 39
   gene_count: 2906
   genus: Prochlorococcus
+  go_transport_metabolite_count: 53
   growth_phases:
   - acute_stress
   - exponential
@@ -1027,6 +1054,7 @@ rows:
   experiment_count: 0
   gene_count: 1945
   genus: Prochlorococcus
+  go_transport_metabolite_count: 40
   growth_phases: []
   interpro_gene_count: 1538
   measured_metabolite_count: 0
@@ -1059,6 +1087,7 @@ rows:
   experiment_count: 2
   gene_count: 2221
   genus: Prochlorococcus
+  go_transport_metabolite_count: 46
   growth_phases:
   - acclimated_steady_state
   interpro_gene_count: 1573
@@ -1101,6 +1130,7 @@ rows:
   experiment_count: 17
   gene_count: 2210
   genus: Prochlorococcus
+  go_transport_metabolite_count: 44
   growth_phases:
   - acute_stress
   - darkness
@@ -1146,6 +1176,7 @@ rows:
   experiment_count: 0
   gene_count: 2317
   genus: Prochlorococcus
+  go_transport_metabolite_count: 39
   growth_phases: []
   interpro_gene_count: 1563
   measured_metabolite_count: 0
@@ -1176,6 +1207,7 @@ rows:
   experiment_count: 0
   gene_count: 1870
   genus: Prochlorococcus
+  go_transport_metabolite_count: 29
   growth_phases: []
   interpro_gene_count: 1550
   measured_metabolite_count: 0
@@ -1205,6 +1237,7 @@ rows:
   experiment_count: 0
   gene_count: 1950
   genus: Prochlorococcus
+  go_transport_metabolite_count: 43
   growth_phases: []
   interpro_gene_count: 1525
   measured_metabolite_count: 0
@@ -1240,6 +1273,7 @@ rows:
   experiment_count: 64
   gene_count: 1959
   genus: Prochlorococcus
+  go_transport_metabolite_count: 37
   growth_phases:
   - acute_stress
   - darkness
@@ -1278,6 +1312,7 @@ rows:
   experiment_count: 4
   gene_count: 5487
   genus: Pseudomonas
+  go_transport_metabolite_count: 144
   growth_phases:
   - exponential
   interpro_gene_count: 4961
@@ -1315,6 +1350,7 @@ rows:
   experiment_count: 9
   gene_count: 4368
   genus: Ruegeria
+  go_transport_metabolite_count: 82
   growth_phases:
   - acclimated_steady_state
   - exponential
@@ -1352,6 +1388,7 @@ rows:
   experiment_count: 6
   gene_count: 4058
   genus: Shewanella
+  go_transport_metabolite_count: 106
   growth_phases:
   - acclimated_steady_state
   interpro_gene_count: 3636
@@ -1388,6 +1425,7 @@ rows:
   experiment_count: 11
   gene_count: 3038
   genus: Synechococcus
+  go_transport_metabolite_count: 38
   growth_phases:
   - exponential
   interpro_gene_count: 2152
@@ -1422,6 +1460,7 @@ rows:
   experiment_count: 6
   gene_count: 3207
   genus: Picosynechococcus
+  go_transport_metabolite_count: 47
   growth_phases:
   - acclimated_steady_state
   interpro_gene_count: 2721
@@ -1460,6 +1499,7 @@ rows:
   experiment_count: 73
   gene_count: 2590
   genus: Synechococcus
+  go_transport_metabolite_count: 29
   growth_phases:
   - acclimated_steady_state
   - darkness
@@ -1507,6 +1547,7 @@ rows:
   experiment_count: 77
   gene_count: 2830
   genus: Parasynechococcus
+  go_transport_metabolite_count: 61
   growth_phases:
   - darkness
   - exponential
@@ -1547,6 +1588,7 @@ rows:
   experiment_count: 3
   gene_count: 2681
   genus: Synechococcus
+  go_transport_metabolite_count: 37
   growth_phases:
   - infected
   interpro_gene_count: 1869
@@ -1580,6 +1622,7 @@ rows:
   experiment_count: 4
   gene_count: 2717
   genus: Synechococcus
+  go_transport_metabolite_count: 57
   growth_phases:
   - exponential
   interpro_gene_count: 2339
@@ -1614,6 +1657,7 @@ rows:
   experiment_count: 2
   gene_count: 2714
   genus: Synechococcus
+  go_transport_metabolite_count: 38
   growth_phases:
   - exponential
   interpro_gene_count: 2336
@@ -1650,6 +1694,7 @@ rows:
   experiment_count: 60
   gene_count: 2567
   genus: Synechococcus
+  go_transport_metabolite_count: 37
   growth_phases:
   - darkness
   - exponential
@@ -1685,6 +1730,7 @@ rows:
   experiment_count: 1
   gene_count: 2449
   genus: Thermosynechococcus
+  go_transport_metabolite_count: 56
   growth_phases: []
   interpro_gene_count: 2178
   measured_metabolite_count: 0
@@ -1718,6 +1764,7 @@ rows:
   experiment_count: 1
   gene_count: 0
   genus: Vibrio
+  go_transport_metabolite_count: 0
   growth_phases:
   - exponential
   interpro_gene_count: 0

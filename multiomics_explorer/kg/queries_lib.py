@@ -1128,6 +1128,60 @@ GO_TRANSPORT_EXISTS = (
     "  }"
 )
 
+# Metabolite-only GO target edges (no ChemicalRole targets) — used by the
+# per-gene / per-organism GO metabolite counts (go-transport-followups §4.1).
+GO_METABOLITE_TARGET_EDGES = (
+    "Molecular_function_transports_metabolite|"
+    "Biological_process_transports_metabolite"
+)
+# Distinct Metabolite targets reached through the gene's own GO terms
+# (direct only; roles and is_a-inherited targets not counted). Binds `g`.
+GO_TRANSPORT_METABOLITE_COUNT = (
+    "COUNT {\n"
+    f"    MATCH (g)-[:{GO_GENE_EDGES}]->()"
+    f"-[:{GO_METABOLITE_TARGET_EDGES}]->(m:Metabolite)\n"
+    "    RETURN DISTINCT m\n"
+    "  }"
+)
+
+# Metabolites reached by an organism's genes through GO transport terms
+# (direct, Metabolite targets) — read from the KG denorm
+# Metabolite.go_transport_organism_names (same set as list_metabolites'
+# go_transport_organism_names). Binds `o` (OrganismTaxon).
+GO_TRANSPORT_ORGANISM_METABOLITE_COUNT = (
+    "COUNT { MATCH (m:Metabolite)"
+    " WHERE o.preferred_name IN coalesce(m.go_transport_organism_names, []) }"
+)
+
+# GO namespace -> gene→GO edge type (the namespace is fixed by the edge
+# type; is_a never crosses namespace).
+GO_NAMESPACE_GENE_EDGE = {
+    "molecular_function": "Gene_enables_molecular_function",
+    "biological_process": "Gene_involved_in_biological_process",
+}
+
+
+def _go_gene_edge_filters(
+    go_namespace: list[str] | None,
+    go_evidence: list[str] | None,
+) -> tuple[list[str], dict]:
+    """GO-arm filter conditions on the gene→GO edge `r` (spec §4.3).
+
+    `go_namespace` is mapped to gene→GO edge types (`$go_gene_edge_types`);
+    `go_evidence` matches `r.evidence`. Validation is the api layer's job.
+    """
+    conditions: list[str] = []
+    params: dict = {}
+    if go_namespace:
+        conditions.append("type(r) IN $go_gene_edge_types")
+        params["go_gene_edge_types"] = [
+            GO_NAMESPACE_GENE_EDGE[ns] for ns in go_namespace
+        ]
+    if go_evidence:
+        conditions.append("r.evidence IN $go_evidence")
+        params["go_evidence"] = go_evidence
+    return conditions, params
+
 # Cross-arm null padding for metabolism / transport rows of
 # genes_by_metabolite / metabolites_by_gene (spec §4.2, §6.3).
 _GO_NULL_COLUMNS = (
@@ -1155,8 +1209,10 @@ def _go_transport_call(
     ancestors of the gene's own term: only (gene, target) pairs the gene does
     NOT reach directly through any own term (dedup, design §3.3); one row per
     (gene, own term, target) at the minimum hop count, ties → lowest
-    ``a.id`` (D4). ``conditions`` bind ``g`` / ``m`` only and apply to both
-    branches.
+    ``a.id`` (D4). ``conditions`` bind ``g`` / ``m`` / ``r`` (the gene→GO
+    edge, e.g. the ``go_namespace`` / ``go_evidence`` filters) and apply to
+    both branches; the inherited branch's ``NOT EXISTS`` dedup stays
+    unfiltered, so a filtered result is a subset of the unfiltered one.
     """
     where = " AND ".join(conditions)
     lines = [
@@ -1197,6 +1253,34 @@ def _go_transport_summary_block(
         "         null AS sdepth, null AS tscore,\n"
         "         go, go_term_depth AS gdepth"
     )
+
+
+# Route-agreement pair-grouping pass for the gbm / mbg summaries
+# (go-transport-followups §4.4): groups arm rows by (gene, target), tags
+# each row with the pair's sorted evidence-source set, then UNWINDs back so
+# row counts (total_matching etc.) are unchanged.
+_PAIR_GROUPING_PASS = (
+    "WITH g, m, collect({r: r, tf: tf, es: es, sdepth: sdepth,"
+    " tscore: tscore, go: go, gdepth: gdepth}) AS arm_rows\n"
+    "WITH g, m, arm_rows,"
+    " apoc.coll.sort(apoc.coll.toSet([x IN arm_rows | x.es]))"
+    " AS pair_sources\n"
+    "UNWIND arm_rows AS x\n"
+    "WITH g, x.r AS r, x.tf AS tf, m, x.es AS es, x.sdepth AS sdepth,"
+    " x.tscore AS tscore,\n"
+    "     x.go AS go, x.gdepth AS gdepth, pair_sources\n"
+)
+
+# [{evidence_sources, pair_count}] over the collected summary `rows`
+# (unsorted; the api layer sorts pair_count desc, then evidence_sources).
+_BY_EVIDENCE_SOURCE_COMBINATION = (
+    "[cc IN apoc.coll.toSet([row IN rows | row.pair_sources]) |\n"
+    "          {evidence_sources: cc,\n"
+    "           pair_count: size(apoc.coll.toSet("
+    "[row IN rows WHERE row.pair_sources = cc"
+    " | row.locus_tag + '|' + row.metabolite_id]))}]"
+    " AS by_evidence_source_combination"
+)
 
 
 def _go_transport_detail_return(verbose: bool) -> str:
@@ -1349,7 +1433,9 @@ def build_gene_overview(
     reaction_count, catalyzed_metabolite_count,
     tcdb_evidence_score_max (float | null — sparse KG prop, NOT coalesced:
     null = no TCDB call), transported_metabolite_count (deepest-attachment
-    substrate breadth), transport_substrate_resolution ('resolved' |
+    substrate breadth), go_transport_metabolite_count (int — distinct
+    Metabolite targets via the gene's own GO transport terms; direct only,
+    roles not counted), transport_substrate_resolution ('resolved' |
     'family_inferred' | null), discussed_in_publication_count,
     merops_classes (list, [] default — the protease call classes this gene
     carries), ncbifam_family_count (int, 0 default),
@@ -1449,6 +1535,9 @@ def build_gene_overview(
         # sparse KG prop surfaced uncoalesced — null means "no TCDB call".
         "       g.tcdb_evidence_score_max AS tcdb_evidence_score_max,\n"
         "       coalesce(g.transported_metabolite_count, 0) AS transported_metabolite_count,\n"
+        # GO-route mirror of transported_metabolite_count (direct own-term
+        # paths, Metabolite targets only; roles / is_a-inherited excluded).
+        f"       {GO_TRANSPORT_METABOLITE_COUNT} AS go_transport_metabolite_count,\n"
         "       g.transport_substrate_resolution AS transport_substrate_resolution,\n"
         "       coalesce(g.discussed_in_publication_count, 0) AS discussed_in_publication_count,\n"
         # Annotation-trust routing signals (spec §7.8). merops_classes and
@@ -2985,9 +3074,9 @@ def build_list_organisms(
     clustering_analysis_count, cluster_types, derived_metric_count,
     derived_metric_value_kinds, compartments, reaction_count,
     catalyzed_metabolite_count, transported_metabolite_count,
-    measured_metabolite_count, peptidase_gene_count,
-    nonpeptidase_homolog_gene_count, interpro_gene_count, ncbifam_gene_count,
-    reference_database, reference_proteome, growth_phases.
+    go_transport_metabolite_count, measured_metabolite_count,
+    peptidase_gene_count, nonpeptidase_homolog_gene_count,
+    interpro_gene_count, ncbifam_gene_count, reference_database, reference_proteome, growth_phases.
     RETURN keys (verbose): adds family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count, derived_metric_gene_count,
     derived_metric_types.
@@ -3041,6 +3130,8 @@ def build_list_organisms(
         "       coalesce(o.reaction_count, 0) AS reaction_count,\n"
         "       coalesce(o.catalyzed_metabolite_count, 0) AS catalyzed_metabolite_count,\n"
         "       coalesce(o.transported_metabolite_count, 0) AS transported_metabolite_count,\n"
+        f"       {GO_TRANSPORT_ORGANISM_METABOLITE_COUNT}"
+        " AS go_transport_metabolite_count,\n"
         "       coalesce(o.measured_metabolite_count, 0) AS measured_metabolite_count,\n"
         "       coalesce(o.peptidase_gene_count, 0) AS peptidase_gene_count,\n"
         "       coalesce(o.nonpeptidase_homolog_gene_count, 0) AS nonpeptidase_homolog_gene_count,\n"
@@ -3145,7 +3236,8 @@ def build_list_organisms_capability(
     so the matched set is identical.
 
     RETURN keys: organism_name, reaction_count, catalyzed_metabolite_count,
-    transported_metabolite_count, measured_metabolite_count,
+    transported_metabolite_count, go_transport_metabolite_count
+    (ride-along on top_metabolic_capability), measured_metabolite_count,
     peptidase_gene_count, nonpeptidase_homolog_gene_count, interpro_gene_count,
     ncbifam_gene_count (feeds top_annotation_capability api-side).
     """
@@ -3167,6 +3259,8 @@ def build_list_organisms_capability(
         "       coalesce(o.reaction_count, 0) AS reaction_count,\n"
         "       coalesce(o.catalyzed_metabolite_count, 0) AS catalyzed_metabolite_count,\n"
         "       coalesce(o.transported_metabolite_count, 0) AS transported_metabolite_count,\n"
+        f"       {GO_TRANSPORT_ORGANISM_METABOLITE_COUNT}"
+        " AS go_transport_metabolite_count,\n"
         "       coalesce(o.measured_metabolite_count, 0) AS measured_metabolite_count,\n"
         "       coalesce(o.peptidase_gene_count, 0) AS peptidase_gene_count,\n"
         "       coalesce(o.nonpeptidase_homolog_gene_count, 0) AS nonpeptidase_homolog_gene_count,\n"
@@ -9536,11 +9630,15 @@ def _genes_by_metabolite_go_transport_where(
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
+    go_namespace: list[str] | None = None,
+    go_evidence: list[str] | None = None,
 ) -> tuple[list[str], dict]:
     """WHERE conditions + params for the gbm GO transport arm.
 
-    Shared filters only (bind `g` / `m`); arm-scoped `ec_numbers`,
-    `mass_balance`, `substrate_depth` are not accepted.
+    Shared filters (bind `g` / `m`) plus the GO-arm-only `go_namespace`
+    (mapped to `$go_gene_edge_types`) / `go_evidence` filters on the
+    gene→GO edge `r`; arm-scoped `ec_numbers`, `mass_balance`,
+    `substrate_depth` are not accepted.
     """
     conditions: list[str] = [
         "m.id IN $metabolite_ids",
@@ -9563,6 +9661,9 @@ def _genes_by_metabolite_go_transport_where(
     if gene_categories:
         conditions.append("g.gene_category IN $gene_categories")
         params["gene_categories"] = gene_categories
+    go_conds, go_params = _go_gene_edge_filters(go_namespace, go_evidence)
+    conditions.extend(go_conds)
+    params.update(go_params)
     return conditions, params
 
 
@@ -9574,6 +9675,8 @@ def build_genes_by_metabolite_go_transport(
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
     include_ancestors: bool = False,
+    go_namespace: list[str] | None = None,
+    go_evidence: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -9583,6 +9686,8 @@ def build_genes_by_metabolite_go_transport(
     Gene -> own GO term (MF / BP) -> has-primary-input target
     (Metabolite | ChemicalRole). `include_ancestors=True` adds inherited
     rows via GO is_a ancestors (dedup + min-depth grain, spec §6.1).
+    `go_namespace` / `go_evidence` filter the gene→GO edge in both
+    branches (the inherited branch's dedup NOT EXISTS stays unfiltered).
 
     RETURN keys (compact): the 18 shared gbm columns (TCDB / reaction
     columns null; evidence_source 'go_transport'), then go_term_id,
@@ -9608,6 +9713,8 @@ def build_genes_by_metabolite_go_transport(
         exclude_metabolite_ids=exclude_metabolite_ids,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
+        go_namespace=go_namespace,
+        go_evidence=go_evidence,
     )
 
     if offset:
@@ -9645,6 +9752,8 @@ def build_genes_by_metabolite_summary(
     substrate_depth: list[str] | None = None,
     arms: tuple[str, ...] = ("metabolism", "transport"),
     include_ancestors: bool = False,
+    go_namespace: list[str] | None = None,
+    go_evidence: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build single-pass aggregation Cypher for genes_by_metabolite.
 
@@ -9676,6 +9785,16 @@ def build_genes_by_metabolite_summary(
     top_gene_categories, top_genes (entries carry the gene-level
        transport_substrate_resolution + tcdb_evidence_score_max, null on
        metabolism-only genes).
+
+    Route agreement (go-transport-followups §4.4): after the arm UNION a
+    pair-grouping pass tags every row with `pair_sources` (sorted distinct
+    evidence sources of its (gene, metabolite_id) pair) and UNWINDs back,
+    so row counts are unchanged. RETURN also carries
+    by_evidence_source_combination (`[{evidence_sources, pair_count}]`,
+    unsorted — api sorts; `[]` on an empty result); by_metabolite entries carry multi_source_gene_count and top_genes
+    entries multi_source_metabolite_count (≥2 sources).
+    `go_namespace` / `go_evidence` filter the GO arm only (both branches;
+    the inherited dedup NOT EXISTS stays unfiltered).
 
     The api/ layer post-processes some apoc.coll outputs into the
     documented top-N shape; the contract here is the RETURN keys and
@@ -9735,6 +9854,8 @@ def build_genes_by_metabolite_summary(
             exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
+            go_namespace=go_namespace,
+            go_evidence=go_evidence,
         )
         params.update(g_params)
         arm_blocks.append(_go_transport_summary_block(
@@ -9747,8 +9868,8 @@ def build_genes_by_metabolite_summary(
         "CALL {\n"
         f"{union_body}\n"
         "}\n"
-        "WITH g, r, tf, m, es, sdepth, tscore, go, gdepth\n"
-        "WITH count(*) AS total_matching,\n"
+        + _PAIR_GROUPING_PASS
+        +         "WITH count(*) AS total_matching,\n"
         "     count(DISTINCT g) AS gene_count_total,\n"
         "     count(DISTINCT r) AS reaction_count_total,\n"
         "     count(DISTINCT tf) AS transporter_count_total,\n"
@@ -9771,7 +9892,8 @@ def build_genes_by_metabolite_summary(
         "       es: es,\n"
         "       substrate_depth: sdepth,\n"
         "       tcdb_evidence_score: tscore,\n"
-        "       go_term_depth: gdepth\n"
+        "       go_term_depth: gdepth,\n"
+        "       pair_sources: pair_sources\n"
         "     }) AS rows\n"
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
         "     transporter_count_total, metabolite_count_total, rows,\n"
@@ -9815,7 +9937,10 @@ def build_genes_by_metabolite_summary(
         " AND row.substrate_depth = 'inherited']),\n"
         "         go_transport_rows: size("
         "[row IN rows WHERE row.metabolite_id = mid"
-        " AND row.es = 'go_transport'])}]"
+        " AND row.es = 'go_transport']),\n"
+        "         multi_source_gene_count: size(apoc.coll.toSet("
+        "[row IN rows WHERE row.metabolite_id = mid"
+        " AND size(row.pair_sources) > 1 | row.locus_tag]))}]"
         " AS by_metabolite\n"
         "// Top-N rollups: api/ layer trims to top 10 by gene_count\n"
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
@@ -9891,7 +10016,10 @@ def build_genes_by_metabolite_summary(
         " AND row.substrate_depth = 'inherited']),\n"
         "         go_transport_rows: size("
         "[row IN rows WHERE row.locus_tag = lt"
-        " AND row.es = 'go_transport'])}] AS top_genes\n"
+        " AND row.es = 'go_transport']),\n"
+        "         multi_source_metabolite_count: size(apoc.coll.toSet("
+        "[row IN rows WHERE row.locus_tag = lt"
+        " AND size(row.pair_sources) > 1 | row.metabolite_id]))}] AS top_genes\n"
         "RETURN total_matching, gene_count_total, reaction_count_total,\n"
         "       transporter_count_total, metabolite_count_total,\n"
         "       rows_by_evidence_source, rows_by_substrate_depth,\n"
@@ -9899,7 +10027,8 @@ def build_genes_by_metabolite_summary(
         "       top_gene_categories, top_genes,\n"
         "       [d IN apoc.coll.toSet([row IN rows WHERE row.es = 'go_transport' | row.go_term_depth]) |\n"
         "          {go_term_depth: d, count: size([row IN rows WHERE row.es = 'go_transport' AND row.go_term_depth = d])}]"
-        " AS rows_by_go_term_depth"
+        " AS rows_by_go_term_depth,\n"
+        "       " + _BY_EVIDENCE_SOURCE_COMBINATION
     )
     return cypher, params
 
@@ -10274,11 +10403,15 @@ def _metabolites_by_gene_go_transport_where(
     metabolite_elements: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
+    go_namespace: list[str] | None = None,
+    go_evidence: list[str] | None = None,
 ) -> tuple[list[str], dict]:
     """WHERE conditions + params for the mbg GO transport arm.
 
-    Shared filters only (bind `g` / `m`); arm-scoped `ec_numbers`,
-    `mass_balance`, `substrate_depth` are not accepted.
+    Shared filters (bind `g` / `m`) plus the GO-arm-only `go_namespace`
+    (mapped to `$go_gene_edge_types`) / `go_evidence` filters on the
+    gene→GO edge `r`; arm-scoped `ec_numbers`, `mass_balance`,
+    `substrate_depth` are not accepted.
     """
     conditions: list[str] = [
         "g.locus_tag IN $locus_tags",
@@ -10310,6 +10443,9 @@ def _metabolites_by_gene_go_transport_where(
     if gene_categories:
         conditions.append("g.gene_category IN $gene_categories")
         params["gene_categories"] = gene_categories
+    go_conds, go_params = _go_gene_edge_filters(go_namespace, go_evidence)
+    conditions.extend(go_conds)
+    params.update(go_params)
     return conditions, params
 
 
@@ -10323,6 +10459,8 @@ def build_metabolites_by_gene_go_transport(
     metabolite_elements: list[str] | None = None,
     gene_categories: list[str] | None = None,
     include_ancestors: bool = False,
+    go_namespace: list[str] | None = None,
+    go_evidence: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -10332,6 +10470,8 @@ def build_metabolites_by_gene_go_transport(
     Same body and RETURN keys as `build_genes_by_metabolite_go_transport`
     with the anchor flipped to locus_tags (spec §6.2).
     `metabolite_elements` drops role rows and formula-less targets.
+    `go_namespace` / `go_evidence` filter the gene→GO edge in both
+    branches (the inherited branch's dedup NOT EXISTS stays unfiltered).
 
     Sort: go_term_depth, input-gene order via
     apoc.coll.indexOf($locus_tags, locus_tag), locus_tag, MF before BP,
@@ -10349,6 +10489,8 @@ def build_metabolites_by_gene_go_transport(
         metabolite_elements=metabolite_elements,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
+        go_namespace=go_namespace,
+        go_evidence=go_evidence,
     )
 
     if offset:
@@ -10389,6 +10531,8 @@ def build_metabolites_by_gene_summary(
     substrate_depth: list[str] | None = None,
     arms: tuple[str, ...] = ("metabolism", "transport"),
     include_ancestors: bool = False,
+    go_namespace: list[str] | None = None,
+    go_evidence: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build single-pass aggregation Cypher for metabolites_by_gene.
 
@@ -10424,6 +10568,16 @@ def build_metabolites_by_gene_summary(
     rollup over m.elements), stereo_linked_metabolite_ids (distinct slice
     metabolite ids with a Metabolite_is_stereo_form_of edge in either
     direction — sources for the api-side stereo-form hint).
+
+    Route agreement (go-transport-followups §4.4): after the arm UNION a
+    pair-grouping pass tags every row with `pair_sources` (sorted distinct
+    evidence sources of its (gene, metabolite_id) pair) and UNWINDs back,
+    so row counts are unchanged. RETURN also carries
+    by_evidence_source_combination (`[{evidence_sources, pair_count}]`,
+    unsorted — api sorts; `[]` on an empty result); by_gene entries carry multi_source_metabolite_count and
+    top_metabolites entries multi_source_gene_count (≥2 sources).
+    `go_namespace` / `go_evidence` filter the GO arm only (both branches;
+    the inherited dedup NOT EXISTS stays unfiltered).
 
     The api/ layer post-processes some apoc.coll outputs into the
     documented top-N shape; the contract here is the RETURN keys and
@@ -10489,6 +10643,8 @@ def build_metabolites_by_gene_summary(
             metabolite_elements=metabolite_elements,
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
+            go_namespace=go_namespace,
+            go_evidence=go_evidence,
         )
         params.update(g_params)
         arm_blocks.append(_go_transport_summary_block(
@@ -10501,8 +10657,8 @@ def build_metabolites_by_gene_summary(
         "CALL {\n"
         f"{union_body}\n"
         "}\n"
-        "WITH g, r, tf, m, es, sdepth, tscore, go, gdepth\n"
-        "WITH count(*) AS total_matching,\n"
+        + _PAIR_GROUPING_PASS
+        +         "WITH count(*) AS total_matching,\n"
         "     count(DISTINCT g) AS gene_count_total,\n"
         "     count(DISTINCT r) AS reaction_count_total,\n"
         "     count(DISTINCT tf) AS transporter_count_total,\n"
@@ -10531,7 +10687,8 @@ def build_metabolites_by_gene_summary(
         "       es: es,\n"
         "       substrate_depth: sdepth,\n"
         "       tcdb_evidence_score: tscore,\n"
-        "       go_term_depth: gdepth\n"
+        "       go_term_depth: gdepth,\n"
+        "       pair_sources: pair_sources\n"
         "     }) AS rows\n"
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
         "     transporter_count_total, metabolite_count_total,"
@@ -10583,7 +10740,10 @@ def build_metabolites_by_gene_summary(
         " AND row.substrate_depth = 'inherited']),\n"
         "         go_transport_rows: size("
         "[row IN rows WHERE row.locus_tag = lt"
-        " AND row.es = 'go_transport'])}] AS by_gene\n"
+        " AND row.es = 'go_transport']),\n"
+        "         multi_source_metabolite_count: size(apoc.coll.toSet("
+        "[row IN rows WHERE row.locus_tag = lt"
+        " AND size(row.pair_sources) > 1 | row.metabolite_id]))}] AS by_gene\n"
         "// Top-N rollups: api/ layer trims to top 10 by gene_count\n"
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
         "     transporter_count_total, metabolite_count_total,"
@@ -10655,7 +10815,10 @@ def build_metabolites_by_gene_summary(
         " AND row.substrate_depth = 'inherited']),\n"
         "         go_transport_rows: size("
         "[row IN rows WHERE row.metabolite_id = mid"
-        " AND row.es = 'go_transport'])}]"
+        " AND row.es = 'go_transport']),\n"
+        "         multi_source_gene_count: size(apoc.coll.toSet("
+        "[row IN rows WHERE row.metabolite_id = mid"
+        " AND size(row.pair_sources) > 1 | row.locus_tag]))}]"
         " AS top_metabolites\n"
         "// by_element rollup: distinct metabolites that carry each element.\n"
         "// Uses m.elements (KG-A3 Hill-parsed presence list); empty\n"
@@ -10713,7 +10876,8 @@ def build_metabolites_by_gene_summary(
         "       top_metabolite_pathways, stereo_linked_metabolite_ids,\n"
         "       [d IN apoc.coll.toSet([row IN rows WHERE row.es = 'go_transport' | row.go_term_depth]) |\n"
         "          {go_term_depth: d, count: size([row IN rows WHERE row.es = 'go_transport' AND row.go_term_depth = d])}]"
-        " AS rows_by_go_term_depth"
+        " AS rows_by_go_term_depth,\n"
+        "       " + _BY_EVIDENCE_SOURCE_COMBINATION
     )
     return cypher, params
 
@@ -10735,6 +10899,8 @@ def build_metabolites_by_gene_no_formula_count(
     substrate_depth: list[str] | None = None,
     arms: tuple[str, ...] = ("metabolism", "transport"),
     include_ancestors: bool = False,
+    go_namespace: list[str] | None = None,
+    go_evidence: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Count rows / metabolites the `metabolite_elements` filter drops
     because the metabolite has no formula (empty `m.elements`).
@@ -10808,6 +10974,8 @@ def build_metabolites_by_gene_no_formula_count(
             exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
+            go_namespace=go_namespace,
+            go_evidence=go_evidence,
         )
         g_conditions.append(_EMPTY_METABOLITE_ELEMENTS_CONDITION)
         params.update(g_params)

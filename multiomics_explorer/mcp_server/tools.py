@@ -934,6 +934,11 @@ class GbmByMetabolite(SparseRow):
         default=0,
         description="GO route (go_transport) rows in the filtered slice. "
         "`rows` = metabolism + transport tiers + this.")
+    multi_source_gene_count: int = Field(
+        default=0,
+        description="Genes reaching this metabolite through >=2 evidence "
+        "sources (see by_evidence_source_combination). Correlated routes "
+        "(shared homology): raises confidence, does not prove.")
     stereo_relative_ids: list[str] | None = Field(
         default=None,
         description="Stereo forms of this metabolite that have rows in this "
@@ -1060,6 +1065,11 @@ class GbmTopGene(BaseModel):
         default=0,
         description="GO route (go_transport) rows in the filtered slice. "
         "`rows` = metabolism + transport tiers + this.")
+    multi_source_metabolite_count: int = Field(
+        default=0,
+        description="Metabolites this gene reaches through >=2 evidence "
+        "sources (see by_evidence_source_combination). Correlated routes "
+        "(shared homology): raises confidence, does not prove.")
     transport_substrate_resolution: str | None = Field(
         default=None,
         description="Gene-level `Gene.transport_substrate_resolution`: "
@@ -1083,6 +1093,20 @@ class RowsByGoTermDepth(BaseModel):
         "hops to the naming ancestor (inherited; go_include_ancestors=True).")
     count: int = Field(
         description="GO route rows at this depth in the filtered slice.")
+
+
+class EvidenceSourceCombination(BaseModel):
+    """Route-agreement rollup entry: (gene, metabolite_id) pairs grouped by
+    the set of evidence sources that reach them. Shared by
+    genes_by_metabolite and metabolites_by_gene.
+    """
+    evidence_sources: list[Literal["metabolism", "transport", "go_transport"]] = Field(
+        description="Sorted set of arms with >=1 row for the pair (e.g. "
+        "['go_transport', 'transport']). Transport counts once regardless "
+        "of substrate_depth.")
+    pair_count: int = Field(
+        description="Distinct (gene, metabolite_id) pairs reached by exactly "
+        "this set of sources in the filtered slice (e.g. 5).")
 
 
 class GbmNotFound(BaseModel):
@@ -1159,7 +1183,13 @@ class GenesByMetaboliteResponse(BaseModel):
     by_evidence_source: list[GbmByEvidenceSource] = Field(
         default_factory=list,
         description="Frequency over `evidence_source` values present in "
-        "the slice (≤2 entries).")
+        "the slice (≤3 entries).")
+    by_evidence_source_combination: list[EvidenceSourceCombination] = Field(
+        default_factory=list,
+        description="Gene x metabolite pairs per set of agreeing sources, "
+        "pair_count desc. Agreement = independent routes naming the same "
+        "pair; correlated (shared homology), so it raises confidence but "
+        "does not prove. [] on empty.")
     by_substrate_depth: list[GbmBySubstrateDepth] = Field(
         default_factory=list,
         description="Frequency over `substrate_depth` values across "
@@ -1254,6 +1284,11 @@ class MbgByGene(BaseModel):
         default=0,
         description="GO route (go_transport) rows in the filtered slice. "
         "`rows` = metabolism + transport tiers + this.")
+    multi_source_metabolite_count: int = Field(
+        default=0,
+        description="Metabolites this gene reaches through >=2 evidence "
+        "sources (see by_evidence_source_combination). Correlated routes "
+        "(shared homology): raises confidence, does not prove.")
     transport_substrate_resolution: str | None = Field(
         default=None,
         description="Gene-level `Gene.transport_substrate_resolution`: "
@@ -1368,6 +1403,11 @@ class MbgTopMetabolite(BaseModel):
         default=0,
         description="GO route (go_transport) rows in the filtered slice. "
         "`rows` = metabolism + transport tiers + this.")
+    multi_source_gene_count: int = Field(
+        default=0,
+        description="Input genes reaching this metabolite through >=2 "
+        "evidence sources (see by_evidence_source_combination). Correlated "
+        "routes (shared homology): raises confidence, does not prove.")
 
 
 class MbgTopReaction(BaseModel):
@@ -1560,7 +1600,13 @@ class MetabolitesByGeneResponse(BaseModel):
     by_evidence_source: list[MbgByEvidenceSource] = Field(
         default_factory=list,
         description="Frequency over `evidence_source` values present in "
-        "the slice (≤2 entries).")
+        "the slice (≤3 entries).")
+    by_evidence_source_combination: list[EvidenceSourceCombination] = Field(
+        default_factory=list,
+        description="Gene x metabolite pairs per set of agreeing sources, "
+        "pair_count desc. Agreement = independent routes naming the same "
+        "pair; correlated (shared homology), so it raises confidence but "
+        "does not prove. [] on empty.")
     by_substrate_depth: list[MbgBySubstrateDepth] = Field(
         default_factory=list,
         description="Frequency over `substrate_depth` values across "
@@ -2034,6 +2080,7 @@ def register_tools(mcp: FastMCP):
         reaction_count: int = Field(default=0, description="Distinct reactions catalyzed by genes in this organism. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
         catalyzed_metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes can catalyze reactions on (Gene → Reaction → Metabolite; catalysis arm only — transport-reach excluded). Does NOT mean measured. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
         transported_metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes transport via their deepest TCDB attachments (precomputed OrganismTaxon.transported_metabolite_count). Pairs with catalyzed_metabolite_count; 0 when no TCDB calls.")
+        go_transport_metabolite_count: int = Field(default=0, description="Distinct metabolites (not roles) this organism's genes reach via direct GO transport terms; same set as list_metabolites go_transport_organism_names. Term-definition count, not a gene fact.")
         # Metabolomics measurement rollup
         measured_metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Different from catalyzed_metabolite_count (catalysis-arm chemistry capability). When > 0, drill in via list_metabolite_assays(organism=organism_name).")
         # Annotation-capability rollups (precomputed OrganismTaxon props, coalesced to 0)
@@ -2073,6 +2120,7 @@ def register_tools(mcp: FastMCP):
         reaction_count: int = Field(description="Distinct reactions catalyzed by this organism's genes.")
         catalyzed_metabolite_count: int = Field(description="Distinct metabolites reachable via catalysis (Gene → Reaction → Metabolite). Same semantics as OrganismResult.catalyzed_metabolite_count.")
         transported_metabolite_count: int = Field(default=0, description="Distinct metabolites transported via deepest TCDB attachments. Same semantics as OrganismResult.transported_metabolite_count. Column only — ranking stays on catalyzed_metabolite_count.")
+        go_transport_metabolite_count: int = Field(default=0, description="Distinct metabolites (not roles) reached via direct GO transport terms. Same semantics as OrganismResult.go_transport_metabolite_count. Column only — ranking stays on catalysis.")
 
     class OrgAnnotationCapabilityBreakdown(BaseModel):
         preferred_name: str = Field(description="OrganismTaxon.preferred_name (tie-break sort key).")
@@ -2419,6 +2467,10 @@ def register_tools(mcp: FastMCP):
         transported_metabolite_count: int = Field(
             default=0,
             description="Distinct metabolites this gene transports via its deepest TCDB attachments (precomputed Gene.transported_metabolite_count). Pairs with catalyzed_metabolite_count. When > 0, drill via metabolites_by_gene(locus_tags=[...]).",
+        )
+        go_transport_metabolite_count: int = Field(
+            default=0,
+            description="GO-route mirror of transported_metabolite_count: distinct metabolites (not roles) via the gene's direct GO terms; is_a-inherited not counted. A term-definition count, not a gene fact. Drill via metabolites_by_gene.",
         )
         transport_substrate_resolution: str | None = Field(
             default=None,
@@ -8476,6 +8528,21 @@ def register_tools(mcp: FastMCP):
             "gene's GO term reaches the target through is_a ancestors "
             "(go_term_depth > 0). Default False = directly annotated terms.",
         )] = False,
+        go_namespace: Annotated[
+            list[Literal["molecular_function", "biological_process"]] | None,
+            Field(
+                description="GO arm only: keep GO rows whose gene->GO edge is "
+                "in these namespaces. TCDB / KEGG rows untouched. Filtered "
+                "result is always a subset of the unfiltered one.",
+            ),
+        ] = None,
+        go_evidence: Annotated[list[str] | None, Field(
+            description="GO arm only: keep GO rows whose gene->GO edge "
+            "evidence is in this list (e.g. ['curated']; "
+            "family_inferred, domain_inferred). Unknown values raise. "
+            "TCDB / KEGG rows untouched; result is a subset of the "
+            "unfiltered one.",
+        )] = None,
         include_stereo_forms: Annotated[bool, Field(
             description="Also query the generic <-> specific stereo forms of "
             "each metabolite_id (e.g. Cysteine <-> L-Cysteine; TCDB lists "
@@ -8487,11 +8554,11 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 10,
         offset: OffsetParam = 0,
     ) -> GenesByMetaboliteResponse:
-        """Metabolite / `chebi.role:` IDs to genes in ONE organism via KEGG reactions, TCDB and GO transport (GO rows: term definitions, not gene facts).
+        """Metabolite / `chebi.role:` IDs to genes in ONE organism via KEGG, TCDB and GO transport (GO rows: term definitions, not gene facts).
 
         Use for compound → genes; mirror `metabolites_by_gene`; docs://analysis/transport.
-        Filters: metabolite_ids (+exclude, +stereo), organism, ec_numbers, metabolite_pathway_ids, substrate_depth, evidence_sources, go_include_ancestors.
-        Returns: by_metabolite, by_evidence_source, rows_by_go_term_depth, top_genes, top_reactions, top_tcdb_families; row = gene × reaction|family|GO term × metabolite.
+        Filters: metabolite_ids (+exclude, +stereo), ec_numbers, metabolite_pathway_ids, substrate_depth, evidence_sources, go_include_ancestors/namespace/evidence.
+        Returns: by_metabolite, by_evidence_source(_combination), rows_by_go_term_depth, top_genes, top_reactions/tcdb_families; row = gene × reaction|family|GO term × metabolite.
         docs://tools/genes_by_metabolite; summary=True first.
         """
         await ctx.info(
@@ -8502,6 +8569,7 @@ def register_tools(mcp: FastMCP):
             f"substrate_depth={substrate_depth} "
             f"evidence_sources={evidence_sources} "
             f"go_include_ancestors={go_include_ancestors} "
+            f"go_namespace={go_namespace} go_evidence={go_evidence} "
             f"include_stereo_forms={include_stereo_forms} summary={summary} "
             f"verbose={verbose} limit={limit} offset={offset}"
         )
@@ -8518,6 +8586,8 @@ def register_tools(mcp: FastMCP):
                 substrate_depth=substrate_depth,
                 evidence_sources=evidence_sources,
                 go_include_ancestors=go_include_ancestors,
+                go_namespace=go_namespace,
+                go_evidence=go_evidence,
                 include_stereo_forms=include_stereo_forms,
                 summary=summary,
                 verbose=verbose,
@@ -8565,6 +8635,10 @@ def register_tools(mcp: FastMCP):
                 stereo_forms_added=result.get("stereo_forms_added") or {},
                 by_metabolite=by_metabolite,
                 by_evidence_source=by_evidence_source,
+                by_evidence_source_combination=[
+                    EvidenceSourceCombination(**b)
+                    for b in result.get("by_evidence_source_combination") or []
+                ],
                 by_substrate_depth=by_substrate_depth,
                 rows_by_go_term_depth=(
                     [RowsByGoTermDepth(**b)
@@ -8690,16 +8764,31 @@ def register_tools(mcp: FastMCP):
             "gene's GO term reaches the target through is_a ancestors "
             "(go_term_depth > 0). Default False = directly annotated terms.",
         )] = False,
+        go_namespace: Annotated[
+            list[Literal["molecular_function", "biological_process"]] | None,
+            Field(
+                description="GO arm only: keep GO rows whose gene->GO edge is "
+                "in these namespaces. TCDB / KEGG rows untouched. Filtered "
+                "result is always a subset of the unfiltered one.",
+            ),
+        ] = None,
+        go_evidence: Annotated[list[str] | None, Field(
+            description="GO arm only: keep GO rows whose gene->GO edge "
+            "evidence is in this list (e.g. ['curated']; "
+            "family_inferred, domain_inferred). Unknown values raise. "
+            "TCDB / KEGG rows untouched; result is a subset of the "
+            "unfiltered one.",
+        )] = None,
         summary: SummaryParam = False,
         verbose: VerboseParam = False,
         limit: LimitParam = 10,
         offset: OffsetParam = 0,
     ) -> MetabolitesByGeneResponse:
-        """Metabolites a gene batch reaches in ONE organism via KEGG reactions, TCDB and GO transport (GO rows: term definitions, not gene facts).
+        """Metabolites a gene batch reaches in ONE organism via KEGG, TCDB and GO transport (GO rows: term definitions, not gene facts).
 
         Use for gene → compounds; mirror `genes_by_metabolite`; docs://analysis/transport.
-        Filters: locus_tags, organism, metabolite_elements, metabolite_ids (+exclude, `chebi.role:` ok), ec_numbers, evidence_sources, go_include_ancestors.
-        Returns: by_gene, by_element, by_evidence_source, rows_by_go_term_depth, top_metabolites; row = gene × reaction|family|GO term × metabolite.
+        Filters: locus_tags, organism, metabolite_elements, metabolite_ids (+exclude, `chebi.role:` ok), ec_numbers, evidence_sources, go_include_ancestors/namespace/evidence.
+        Returns: by_gene, by_element, by_evidence_source(_combination), rows_by_go_term_depth, top_metabolites; row = gene × reaction|family|GO term × metabolite.
         docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
         """
         await ctx.info(
@@ -8712,7 +8801,9 @@ def register_tools(mcp: FastMCP):
             f"gene_categories={gene_categories} "
             f"substrate_depth={substrate_depth} "
             f"evidence_sources={evidence_sources} "
-            f"go_include_ancestors={go_include_ancestors} summary={summary} "
+            f"go_include_ancestors={go_include_ancestors} "
+            f"go_namespace={go_namespace} go_evidence={go_evidence} "
+            f"summary={summary} "
             f"verbose={verbose} limit={limit} offset={offset}"
         )
         try:
@@ -8730,6 +8821,8 @@ def register_tools(mcp: FastMCP):
                 substrate_depth=substrate_depth,
                 evidence_sources=evidence_sources,
                 go_include_ancestors=go_include_ancestors,
+                go_namespace=go_namespace,
+                go_evidence=go_evidence,
                 summary=summary,
                 verbose=verbose,
                 limit=limit,
@@ -8782,6 +8875,10 @@ def register_tools(mcp: FastMCP):
                 },
                 by_gene=by_gene,
                 by_evidence_source=by_evidence_source,
+                by_evidence_source_combination=[
+                    EvidenceSourceCombination(**b)
+                    for b in result.get("by_evidence_source_combination") or []
+                ],
                 by_substrate_depth=by_substrate_depth,
                 rows_by_go_term_depth=(
                     [RowsByGoTermDepth(**b)

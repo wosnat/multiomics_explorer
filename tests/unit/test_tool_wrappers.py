@@ -13653,3 +13653,235 @@ class TestGoTransportWrappers:
             "go_transport_excluded_targets" in getattr(tools_mod, n).model_fields
             for n in names
         ), names
+
+
+# ---------------------------------------------------------------------------
+# GO transport follow-ups (RED) — docs/tool-specs/go-transport-followups.md
+# 2c.14 / 2c.16 GO counts · 2c.15 GO-arm filters · 2c.17 route agreement
+# ---------------------------------------------------------------------------
+
+
+def _list_item_model(model, field):
+    import typing
+    ann = model.model_fields[field].annotation
+    args = typing.get_args(ann)
+    while args and typing.get_origin(args[0]) is not None:
+        args = typing.get_args(args[0])
+    return args[0]
+
+
+def _response_model(tool_fns, tool):
+    import typing
+    return typing.get_type_hints(tool_fns[tool])["return"]
+
+
+class TestGoTransportFollowupsWrappers:
+    _TOOLS = ["genes_by_metabolite", "metabolites_by_gene"]
+
+    @pytest.mark.parametrize("tool", _TOOLS)
+    def test_go_filter_params_exist_default_none(self, tool_fns, tool):
+        import inspect
+        params = inspect.signature(tool_fns[tool]).parameters
+        assert "go_namespace" in params and "go_evidence" in params
+        assert params["go_namespace"].default is None
+        assert params["go_evidence"].default is None
+
+    @pytest.mark.parametrize("tool", _TOOLS)
+    def test_go_filter_params_follow_go_include_ancestors(self, tool_fns, tool):
+        import inspect
+        names = list(inspect.signature(tool_fns[tool]).parameters)
+        i = names.index("go_include_ancestors")
+        assert names[i + 1:i + 3] == ["go_namespace", "go_evidence"]
+
+    @pytest.mark.parametrize("tool", _TOOLS)
+    def test_go_namespace_literal_values(self, tool_fns, tool):
+        assert _literal_values(tool_fns, tool, "go_namespace") == {
+            "molecular_function", "biological_process"}
+
+    @pytest.mark.asyncio
+    async def test_gbm_forwards_go_filters(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=_GBM_SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["genes_by_metabolite"](
+                mock_ctx, metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+                go_namespace=["molecular_function"], go_evidence=["curated"],
+            )
+        kw = mock_api.call_args.kwargs
+        assert kw["go_namespace"] == ["molecular_function"]
+        assert kw["go_evidence"] == ["curated"]
+
+    @pytest.mark.asyncio
+    async def test_mbg_forwards_go_filters(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=_MBG_SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["metabolites_by_gene"](
+                mock_ctx, locus_tags=["PMM0970"],
+                organism="Prochlorococcus MED4",
+                go_namespace=["biological_process"], go_evidence=["curated"],
+            )
+        kw = mock_api.call_args.kwargs
+        assert kw["go_namespace"] == ["biological_process"]
+        assert kw["go_evidence"] == ["curated"]
+
+    @pytest.mark.asyncio
+    async def test_gbm_value_error_becomes_tool_error(self, tool_fns, mock_ctx):
+        from fastmcp.exceptions import ToolError
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            side_effect=ValueError("go_evidence contains invalid value"),
+        ):
+            with pytest.raises(ToolError):
+                await tool_fns["genes_by_metabolite"](
+                    mock_ctx, metabolite_ids=["kegg.compound:C00086"],
+                    organism="Prochlorococcus MED4", go_evidence=["bogus"],
+                )
+
+    def test_responses_have_by_evidence_source_combination(self):
+        from multiomics_explorer.mcp_server.tools import (
+            GenesByMetaboliteResponse, MetabolitesByGeneResponse,
+        )
+        for model in (GenesByMetaboliteResponse, MetabolitesByGeneResponse):
+            assert "by_evidence_source_combination" in model.model_fields
+            entry = _list_item_model(model, "by_evidence_source_combination")
+            assert set(entry.model_fields) >= {"evidence_sources", "pair_count"}
+
+    def test_entity_models_carry_multi_source_counts(self):
+        from multiomics_explorer.mcp_server.tools import (
+            GbmByMetabolite, GbmTopGene, MbgByGene, MbgTopMetabolite,
+        )
+        assert "multi_source_gene_count" in GbmByMetabolite.model_fields
+        assert "multi_source_metabolite_count" in GbmTopGene.model_fields
+        assert "multi_source_metabolite_count" in MbgByGene.model_fields
+        assert "multi_source_gene_count" in MbgTopMetabolite.model_fields
+
+    @pytest.mark.asyncio
+    async def test_gbm_envelope_roundtrip(self, tool_fns, mock_ctx):
+        ret = {
+            **_GBM_SAMPLE_API_RETURN,
+            "by_evidence_source_combination": [
+                {"evidence_sources": ["transport"], "pair_count": 20},
+                {"evidence_sources": ["go_transport", "transport"],
+                 "pair_count": 5},
+                {"evidence_sources": ["metabolism"], "pair_count": 4},
+            ],
+            "by_metabolite": [{
+                **_GBM_SAMPLE_API_RETURN["by_metabolite"][0],
+                "multi_source_gene_count": 5,
+            }],
+            "top_genes": [{
+                **_GBM_SAMPLE_API_RETURN["top_genes"][0],
+                "multi_source_metabolite_count": 1,
+            }],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=ret,
+        ):
+            res = await tool_fns["genes_by_metabolite"](
+                mock_ctx, metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+        got = [(e.evidence_sources, e.pair_count)
+               for e in res.by_evidence_source_combination]
+        assert got == [(["transport"], 20),
+                       (["go_transport", "transport"], 5),
+                       (["metabolism"], 4)]
+        assert res.by_metabolite[0].multi_source_gene_count == 5
+        assert res.top_genes[0].multi_source_metabolite_count == 1
+
+    @pytest.mark.asyncio
+    async def test_mbg_envelope_roundtrip(self, tool_fns, mock_ctx):
+        ret = {
+            **_MBG_SAMPLE_API_RETURN,
+            "by_evidence_source_combination": [
+                {"evidence_sources": ["transport"], "pair_count": 8}],
+            "by_gene": [{
+                **_MBG_SAMPLE_API_RETURN["by_gene"][0],
+                "multi_source_metabolite_count": 1,
+            }],
+            "top_metabolites": [{
+                **_MBG_SAMPLE_API_RETURN["top_metabolites"][0],
+                "multi_source_gene_count": 2,
+            }],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=ret,
+        ):
+            res = await tool_fns["metabolites_by_gene"](
+                mock_ctx, locus_tags=["PMM0970"],
+                organism="Prochlorococcus MED4",
+            )
+        assert [(e.evidence_sources, e.pair_count)
+                for e in res.by_evidence_source_combination] == [
+            (["transport"], 8)]
+        assert res.by_gene[0].multi_source_metabolite_count == 1
+        assert res.top_metabolites[0].multi_source_gene_count == 2
+
+    def test_gene_overview_row_model_has_go_count(self, tool_fns):
+        resp = _response_model(tool_fns, "gene_overview")
+        row = _list_item_model(resp, "results")
+        f = row.model_fields["go_transport_metabolite_count"]
+        assert f.default == 0
+        names = list(row.model_fields)
+        assert (names.index("go_transport_metabolite_count")
+                > names.index("transported_metabolite_count"))
+
+    def test_list_organisms_row_model_has_go_count(self, tool_fns):
+        resp = _response_model(tool_fns, "list_organisms")
+        row = _list_item_model(resp, "results")
+        assert row.model_fields["go_transport_metabolite_count"].default == 0
+        names = list(row.model_fields)
+        assert (names.index("go_transport_metabolite_count")
+                > names.index("transported_metabolite_count"))
+
+    def test_list_organisms_capability_model_has_go_count(self, tool_fns):
+        resp = _response_model(tool_fns, "list_organisms")
+        cap = _list_item_model(resp, "top_metabolic_capability")
+        assert cap.model_fields["go_transport_metabolite_count"].default == 0
+
+    @pytest.mark.asyncio
+    async def test_list_organisms_roundtrip_go_count(self, tool_fns, mock_ctx):
+        sample = {
+            **TestListOrganismsWrapper._SAMPLE_ORG,
+            "transported_metabolite_count": 120,
+            "go_transport_metabolite_count": 45,
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value={
+                "total_entries": 1, "total_matching": 1, "returned": 1,
+                "truncated": False, "not_found": [], "results": [sample],
+                "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
+                "top_metabolic_capability": [{
+                    "organism_name": "Prochlorococcus MED4",
+                    "reaction_count": 943,
+                    "catalyzed_metabolite_count": 1039,
+                    "transported_metabolite_count": 120,
+                    "go_transport_metabolite_count": 45,
+                }],
+            },
+        ):
+            res = await tool_fns["list_organisms"](mock_ctx)
+        assert res.results[0].go_transport_metabolite_count == 45
+        assert res.top_metabolic_capability[0].go_transport_metabolite_count == 45
+
+    @pytest.mark.asyncio
+    async def test_gene_overview_roundtrip_go_count(self, tool_fns, mock_ctx):
+        api_return = TestGeneOverviewPhase1PlumbingWrapper()._api_return_with_chem(
+            "PMM0974", transported_metabolite_count=3,
+            go_transport_metabolite_count=3,
+            evidence_sources=["transport", "go_transport"],
+        )
+        with patch(
+            "multiomics_explorer.api.functions.gene_overview",
+            return_value=api_return,
+        ):
+            res = await tool_fns["gene_overview"](
+                mock_ctx, locus_tags=["PMM0974"])
+        assert res.results[0].go_transport_metabolite_count == 3

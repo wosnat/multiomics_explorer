@@ -465,3 +465,21 @@ def test_lint_catches_both_arms_on_three_arm_chemistry_pages(lint_mod, tmp_path)
     other = tmp_path / "assays_by_metabolite.md"
     other.write_text("Default None = both arms merged.\n")
     assert lint_mod.lint_about_content([other]) == []
+
+
+def test_lint_catches_two_entry_evidence_source_on_three_arm_pages(
+        lint_mod, tmp_path):
+    """go-transport follow-ups review: `by_evidence_source` has up to three
+    entries on genes_by_metabolite / metabolites_by_gene; "≤2 entries" there
+    is stale. The `by_substrate_depth` "≤2 entries" wording stays clean."""
+    for name in ("genes_by_metabolite.md", "metabolites_by_gene.md"):
+        sub = tmp_path / name.removesuffix(".md")
+        sub.mkdir()
+        md = sub / name
+        md.write_text(
+            "by_evidence_source: Frequency over `evidence_source` values "
+            "present in the slice (≤2 entries).\n"
+            "by_substrate_depth: transport rows only (≤2 entries; metabolism "
+            "rows are excluded).\n")
+        vs = lint_mod.lint_about_content([md])
+        assert [v[1] for v in vs] == [1], name

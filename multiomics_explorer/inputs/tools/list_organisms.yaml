@@ -1069,6 +1069,22 @@ examples:
         "results": []
       }
 
+  - title: GO-route reach per organism
+    call: list_organisms(organism_names=["Prochlorococcus MED4", "Pseudomonas putida KT2440"])
+    note: "`go_transport_metabolite_count` = metabolites reached by the organism's genes through direct GO transport terms (the same set as `list_metabolites` `go_transport_organism_names`). It rides along in `top_metabolic_capability`, which still ranks by `catalyzed_metabolite_count`."
+    response: |
+      {
+        "top_metabolic_capability": [
+          {"organism_name": "Pseudomonas putida KT2440", "transported_metabolite_count": 1193, "go_transport_metabolite_count": 144},
+          {"organism_name": "Prochlorococcus MED4", "transported_metabolite_count": 1011, "go_transport_metabolite_count": 45}
+        ],
+        "results": [
+          {"organism_name": "Prochlorococcus MED4", "transported_metabolite_count": 1011, "go_transport_metabolite_count": 45},
+          {"organism_name": "Pseudomonas putida KT2440", "transported_metabolite_count": 1193, "go_transport_metabolite_count": 144}
+        ],
+        ...
+      }
+
 chaining:
   - "list_organisms → genes_by_function"
   - "list_organisms → list_publications"
@@ -1105,3 +1121,4 @@ mistakes:
   - "`top_annotation_capability` ranks the matched set by `peptidase_gene_count` descending, then `preferred_name`; the other three counts are carried as columns, not sort keys. All-zero rows are excluded from the ranking but still appear in `results`. Detail calls cap the ranking to the first 10 (`top_annotation_capability_truncated=true` when capped); `summary=True` returns the full ranking uncapped. There is no min-count filter — read the ranking, then drill in with genes_by_ontology(ontology='merops', call_class=['peptidase'], organism=...)."
   - "`organism_names=` uses the same word-based, case-insensitive match on preferred_name + name_synonyms as every other tool's organism param ('MED4' works); unknown names land in `not_found`."
   - "`compartment` keeps organisms with at least one experiment in that compartment — it is not a per-organism property."
+  - "`go_transport_metabolite_count` counts metabolites reached through direct GO transport terms (chemical roles and is_a-inherited targets excluded). It is a separate route from `transported_metabolite_count` (TCDB); the two overlap and do not add up to a total transport reach."

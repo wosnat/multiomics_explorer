@@ -1118,6 +1118,38 @@ def go_transport_gbm_scenarios():
             dict(metabolite_ids=["chebi:23906"],
                  organism=fx.CONTROL_ORGANISM,
                  evidence_sources=["go_transport"])),
+        # GO transport follow-ups (docs/tool-specs/go-transport-followups.md
+        # §4.3). MED4 urea GO rows are all `curated` (BP 7 + MF 4, verified
+        # 2026-10-19) -> a domain_inferred filter empties the GO arm while
+        # the TCDB / KEGG arms still answer.
+        Scenario(
+            "gbm_go_filters_empty_go_arm",
+            dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
+                 go_namespace=["molecular_function"],
+                 go_evidence=["domain_inferred"])),
+        Scenario(
+            # GO-only call whose filters empty the whole result.
+            "gbm_go_filters_empty_go_only_call",
+            dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
+                 evidence_sources=["go_transport"],
+                 go_evidence=["domain_inferred"])),
+        Scenario(
+            # GO arm off: filters ignored with a warning, never a raise.
+            "gbm_go_filters_with_go_arm_off",
+            dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
+                 evidence_sources=["metabolism", "transport"],
+                 go_namespace=["biological_process"],
+                 go_evidence=["curated"])),
+        Scenario(
+            "gbm_unknown_go_namespace",
+            dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
+                 go_namespace=["cellular_component"]),
+            expects_error=ToolError),
+        Scenario(
+            "gbm_unknown_go_evidence",
+            dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
+                 go_evidence=["bogus"]),
+            expects_error=ToolError),
     ]
 
 
@@ -1128,6 +1160,23 @@ def go_transport_mbg_scenarios():
             "mbg_ancestors_gene_without_ancestors",
             dict(locus_tags=["PMM0085"], organism=fx.CONTROL_ORGANISM,
                  go_include_ancestors=True)),
+        # GO transport follow-ups (§4.3): urtA (PMM0970) GO rows are curated
+        # -> domain_inferred + ancestors empties the GO arm (both branches).
+        Scenario(
+            "mbg_go_filters_empty_go_arm",
+            dict(locus_tags=["PMM0970"], organism=fx.CONTROL_ORGANISM,
+                 go_include_ancestors=True,
+                 go_evidence=["domain_inferred"])),
+        Scenario(
+            "mbg_go_filters_with_go_arm_off",
+            dict(locus_tags=["PMM0970"], organism=fx.CONTROL_ORGANISM,
+                 evidence_sources=["transport"],
+                 go_namespace=["molecular_function"])),
+        Scenario(
+            "mbg_unknown_go_namespace",
+            dict(locus_tags=["PMM0970"], organism=fx.CONTROL_ORGANISM,
+                 go_namespace=["bogus"]),
+            expects_error=ToolError),
     ]
 
 

@@ -14,9 +14,9 @@ Use `genes_by_metabolite` (compound → genes) and `metabolites_by_gene` (genes 
 
 ## Reading a GO row
 
-- **MF vs BP.** `go_namespace='molecular_function'` terms are transporter activities ("urea transmembrane transporter activity"). `'biological_process'` terms are broader: they also cover storage, regulation and accessory subunits. A gene carrying "iron ion transport" is not necessarily a transporter (MED4 `ftn`, ferritin, reaches iron this way). Prefer MF rows for "is this gene a transporter"; BP rows add genes linked to the process. Most GO-route genes reach a substrate through both.
+- **MF vs BP.** `go_namespace='molecular_function'` terms are transporter activities ("urea transmembrane transporter activity"). `'biological_process'` terms are broader: they also cover storage, regulation and accessory subunits. A gene carrying "iron ion transport" is not necessarily a transporter (MED4 `ftn`, ferritin, reaches iron this way). Prefer MF rows for "is this gene a transporter"; BP rows add genes linked to the process. Most GO-route genes reach a substrate through both. `go_namespace=['molecular_function']` keeps only the MF rows.
 - **Row grain.** One row per gene × own GO term × target. A gene with an MF and a BP term for the same compound gives two rows; count genes with `gene_count_total`, not rows.
-- **Evidence.** `go_evidence` is a class label (`curated`, `family_inferred`, `domain_inferred`), not a numeric score, and this route has no score to threshold. Rank rows by it (`curated` first) rather than filtering them on it.
+- **Evidence.** `go_evidence` is a class label (`curated`, `family_inferred`, `domain_inferred`), not a numeric score, and this route has no score to threshold. Rank rows by it (`curated` first). `go_evidence=['curated']` keeps only curated rows when you want the strict set; the allowed values come from `list_filter_values`.
 - **Direct vs inherited.** Default rows are direct: the gene's own term names the target (`go_term_depth=0`). `go_include_ancestors=True` adds rows where an is_a ancestor of the gene's term names the target: `go_term_depth` counts hops, `go_axiom_term_id` / `go_axiom_term_name` name the ancestor, and a (gene, target) already reached directly is not repeated. Inherited rows widen to broader targets and are a recall expansion. `rows_by_go_term_depth` in the envelope shows the split, and appears only when the GO arm is active.
 - **Targets that are classes.** A `target_kind='chemical_role'` row names a role (siderophore, xenobiotic, drug, toxin, vitamin, neurotransmitter), not a compound; roles are not propagated to the compounds they cover. The role id is a valid input to both tools and also reaches TCDB role edges. The neurotransmitter role is eukaryote-centred: in bacteria the matching terms are mostly amino-acid transporters (a warning says so). Class-valued metabolite targets (Lipid, carbohydrate, peptide) are real `Metabolite` nodes with no formula.
 
@@ -27,11 +27,15 @@ Use `genes_by_metabolite` (compound → genes) and `metabolites_by_gene` (genes 
 3. A role id with no edges in the KG returns no rows and lands in `not_matched`.
 4. Metabolite-level organism properties (`go_transport_organism_names` on `list_metabolites`) count direct gene annotations only; absence there is not absence of a GO edge.
 
+`go_namespace` and `go_evidence` narrow the GO arm only (direct and inherited rows alike): KEGG and TCDB rows are untouched, and the filtered result is always a subset of the unfiltered one. Set while `evidence_sources` excludes `go_transport`, they are ignored with a warning.
+
 Scale, so you can judge a result: in MED4 59 genes reach at least one GO transport target (a small set next to the TCDB route).
 
 ## Reading agreement
 
 The routes are not independent. GO terms often arrive through InterPro2GO or eggNOG, which share homology with the TCDB calls. Agreement between a `go_transport` and a `transport` row is therefore weaker evidence than it reads. Disagreement is mostly naming granularity (a GO class target vs a specific TCDB compound). Where only one route speaks, say which; where two agree, treat it as one line of homology evidence, not two confirmations. None of the routes gives transport direction.
+
+Read agreement from the envelope rather than by regrouping rows. `by_evidence_source_combination` (both tools) counts (gene, metabolite) pairs by the set of routes that name them, for example `{evidence_sources: ['go_transport', 'transport'], pair_count: 5}` for urea in MED4 (urtA–E). Per entity, `multi_source_gene_count` (on `genes_by_metabolite` `by_metabolite[]` and `metabolites_by_gene` `top_metabolites[]`) and `multi_source_metabolite_count` (on `genes_by_metabolite` `top_genes[]` and `metabolites_by_gene` `by_gene[]`) count what two or more routes reach. `transport` is one route whatever its `substrate_depth`, so a superfamily-only TCDB row still counts; add `substrate_depth=['most_specific']` for the strict core. A multi-source pair is corroborated, not proven, and a single-source pair is not wrong.
 
 ## Class reach: two ways to widen "which compound"
 
@@ -62,8 +66,8 @@ The GO namespace comes from `type(t)` (the edge type), not from node labels: mol
 
 ## Recipes
 
-- **What moves X in organism Y?** `genes_by_metabolite(metabolite_ids=[X], organism=Y)`: read `by_evidence_source`, then rank within each route by its own signal (TCDB `tcdb_evidence_score`; GO MF before BP, `curated` first).
-- **What does gene Z move?** `gene_overview(locus_tags=[Z])` for which routes exist (`evidence_sources`), then `metabolites_by_gene(locus_tags=[Z], organism=...)`.
+- **What moves X in organism Y?** `genes_by_metabolite(metabolite_ids=[X], organism=Y)`: read `by_evidence_source` and `by_evidence_source_combination`, then rank within each route by its own signal (TCDB `tcdb_evidence_score`; GO MF before BP, `curated` first).
+- **What does gene Z move?** `gene_overview(locus_tags=[Z])` for which routes exist (`evidence_sources`, `transported_metabolite_count`, `go_transport_metabolite_count`), then `metabolites_by_gene(locus_tags=[Z], organism=...)`.
 - **A role question (siderophore, xenobiotic).** `genes_by_metabolite(metabolite_ids=['chebi.role:26672'], organism=...)`: GO and TCDB role rows come back together, labelled.
 - **Which compounds does the GO route cover?** `list_metabolites(evidence_sources=['go_transport'], organism_names=[...])`.
 

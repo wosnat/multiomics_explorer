@@ -1679,6 +1679,11 @@ def gene_overview(
     transport_substrate_resolution ('resolved' | 'family_inferred' | None;
     'resolved' means at least one non-lumping attachment, 'family_inferred'
     means breadth is reachability, not capability).
+    go_transport_metabolite_count (int, 0 default) mirrors
+    transported_metabolite_count for the GO route: distinct Metabolite
+    targets reached through the gene's own GO terms. It counts term
+    definitions, not gene facts; ChemicalRole targets and is_a-inherited
+    targets are not counted. Drill in with metabolites_by_gene.
     Rows also carry the protease / family-domain routing trio:
     merops_classes (list — 'peptidase' vs 'nonpeptidase_homolog', the
     catalytically-dead homologs), ncbifam_family_count (int, 0 default) and
@@ -2361,7 +2366,10 @@ def list_organisms(
     cluster_types, derived_metric_count, derived_metric_value_kinds, compartments,
     reaction_count, catalyzed_metabolite_count, transported_metabolite_count
     (distinct substrates reached via the organism's genes' deepest TCDB
-    attachments), measured_metabolite_count, peptidase_gene_count,
+    attachments), go_transport_metabolite_count (int, 0 default — distinct
+    metabolites reached by the organism's genes through GO transport terms;
+    direct terms, Metabolite targets only; same set as list_metabolites
+    go_transport_organism_names), measured_metabolite_count, peptidase_gene_count,
     nonpeptidase_homolog_gene_count, interpro_gene_count, ncbifam_gene_count
     (annotation-coverage counts of genes carrying a MEROPS peptidase call,
     a MEROPS non-peptidase-homolog call, at least one InterPro term, at
@@ -2374,8 +2382,8 @@ def list_organisms(
     catalyzed_metabolite_count, sorted desc; excludes zero-chemistry
     organisms. Ranks on the catalysis arm only (metabolites reached via
     Gene -> Reaction); each entry also carries transported_metabolite_count
-    as a column, so a transport-heavy organism is visible without changing
-    the ranking. For per-gene transport trust, read tcdb_evidence_score_max
+    and go_transport_metabolite_count as columns, so a transport-heavy
+    organism is visible without changing the ranking. For per-gene transport trust, read tcdb_evidence_score_max
     / transport_substrate_resolution via gene_overview.
     by_measurement_capability: binary 2-bucket count
     {has_metabolomics: N, no_metabolomics: M} where has_metabolomics counts
@@ -2480,7 +2488,8 @@ def list_organisms(
 
     # top_metabolic_capability: organisms ranked by catalyzed_metabolite_count
     # in the matched set; excludes zero-chemistry rows. transported_metabolite_count
-    # rides along as a column (ranking unchanged — catalysis arm). Capped to
+    # and go_transport_metabolite_count ride along as columns (ranking
+    # unchanged — catalysis arm). Capped to
     # top 10 on detail calls by _cap_breakdowns below.
     chemistry_capable = [
         {
@@ -2489,6 +2498,8 @@ def list_organisms(
             "catalyzed_metabolite_count": r.get("catalyzed_metabolite_count", 0),
             "transported_metabolite_count": r.get(
                 "transported_metabolite_count", 0) or 0,
+            "go_transport_metabolite_count": r.get(
+                "go_transport_metabolite_count", 0) or 0,
         }
         for r in capability_rows
         if r.get("catalyzed_metabolite_count", 0) > 0
@@ -8805,6 +8816,92 @@ def _validate_substrate_depth(substrate_depth: list[str] | None) -> None:
         )
 
 
+# GO-arm filters (go_namespace / go_evidence) on genes_by_metabolite and
+# metabolites_by_gene. The namespace pair is structural (fixed by the
+# gene→GO edge type); the evidence values live on the two gene→GO edges'
+# ControlledVocabulary nodes (unioned; pivot fallback + warning).
+_VALID_GO_NAMESPACES = ("molecular_function", "biological_process")
+_GO_GENE_EVIDENCE_RELS = (
+    "Gene_enables_molecular_function", "Gene_involved_in_biological_process",
+)
+
+
+def _validate_go_namespace(go_namespace: list[str] | None) -> None:
+    """Raise ValueError on `go_namespace` values outside the GO pair."""
+    if go_namespace is None:
+        return
+    invalid = [v for v in go_namespace if v not in _VALID_GO_NAMESPACES]
+    if invalid:
+        raise ValueError(
+            f"go_namespace contains invalid value(s) {invalid}; "
+            f"allowed: {list(_VALID_GO_NAMESPACES)}."
+        )
+
+
+def _validate_go_evidence(conn, go_evidence: list[str] | None) -> list[str]:
+    """Validate `go_evidence` against the union of the two gene→GO edge
+    `evidence` vocabularies.
+
+    Raises ValueError (naming the allowed list) on unknown values. Returns
+    the vocabulary warnings (pivot fallback when a ControlledVocabulary node
+    is missing) — never raises for a missing node. An empty allowed set
+    (neither node nor pivot yields values) skips the check.
+    """
+    if go_evidence is None:
+        return []
+    allowed: list[str] = []
+    warnings: list[str] = []
+    for rel in _GO_GENE_EVIDENCE_RELS:
+        read = _read_vocab_values(conn, rel, "evidence", "edge")
+        allowed.extend(v for v in read["values"] if v not in allowed)
+        if read.get("warning"):
+            warnings.append(read["warning"])
+    if allowed:
+        invalid = [v for v in go_evidence if v not in allowed]
+        if invalid:
+            raise ValueError(
+                f"go_evidence contains invalid value(s) {invalid}; "
+                f"allowed: {allowed}."
+            )
+    return warnings
+
+
+def _go_arm_off_warning(
+    go_namespace: list[str] | None, go_evidence: list[str] | None,
+) -> str | None:
+    """Warning for GO-arm filters set while `evidence_sources` excluded the
+    GO arm; names only the param(s) actually set (non-empty). None when
+    neither is set."""
+    names = [
+        n for n, v in (("go_namespace", go_namespace),
+                       ("go_evidence", go_evidence))
+        if v
+    ]
+    if not names:
+        return None
+    verb = "apply" if len(names) > 1 else "applies"
+    return (
+        f"{' / '.join(names)} {verb} to the go_transport arm only, which "
+        "evidence_sources excluded — filter ignored."
+    )
+
+
+def _sorted_evidence_source_combinations(raw: list[dict] | None) -> list[dict]:
+    """`by_evidence_source_combination` rollup: `{evidence_sources,
+    pair_count}` entries sorted pair_count desc, then evidence_sources
+    (deterministic across APOC's unordered sets). `[]` when absent."""
+    return sorted(
+        [
+            {
+                "evidence_sources": sorted(e.get("evidence_sources") or []),
+                "pair_count": e.get("pair_count") or 0,
+            }
+            for e in (raw or [])
+        ],
+        key=lambda r: (-r["pair_count"], r["evidence_sources"]),
+    )
+
+
 def _sorted_by_substrate_depth(rows_by_sd: list[dict]) -> list[dict]:
     """`by_substrate_depth` rollup: `{substrate_depth, count}` entries sorted
     count desc, then value asc (deterministic across APOC's unordered sets)."""
@@ -8961,7 +9058,7 @@ def _chemistry_input_probes(
 # the caller's own by_metabolite entries.
 _GBM_STEREO_FILTER_KEYS = (
     "ec_numbers", "mass_balance", "metabolite_pathway_ids",
-    "gene_categories", "substrate_depth",
+    "gene_categories", "substrate_depth", "go_namespace", "go_evidence",
 )
 
 _STEREO_WARNING_MAX_SOURCES = 5
@@ -9095,6 +9192,8 @@ def genes_by_metabolite(
     evidence_sources: list[str] | None = None,
     include_stereo_forms: bool = False,
     go_include_ancestors: bool = False,
+    go_namespace: list[str] | None = None,
+    go_evidence: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int = 10,
@@ -9150,6 +9249,23 @@ def genes_by_metabolite(
         an is_a ancestor of the gene's own term (one row per gene × own term
         × target at the fewest hops), only for (gene, target) pairs with no
         direct GO path. Default False (direct rows only).
+    go_namespace: GO-arm filter, list of `molecular_function` /
+        `biological_process` (the gene→GO edge type fixes the namespace).
+        Unknown values raise ValueError naming the allowed pair.
+    go_evidence: GO-arm filter on the gene→GO edge `evidence`, validated
+        against the union of the `Gene_enables_molecular_function.evidence`
+        / `Gene_involved_in_biological_process.evidence` ControlledVocabulary
+        nodes (pivot fallback + warning when a node is missing). Unknown
+        values raise ValueError listing the allowed values.
+    Both GO filters narrow only `go_transport` rows (metabolism / transport
+    rows untouched), apply to direct and inherited GO rows, and reach every
+    GO-emitting query (detail, summary, stereo-relative counts). The
+    inherited branch's "no direct GO path for the pair" check stays
+    unfiltered, so a filtered result is always a subset of the unfiltered
+    one. When `evidence_sources` excludes `go_transport` the filters are
+    ignored and a warning is appended: `"go_namespace / go_evidence apply
+    to the go_transport arm only, which evidence_sources excluded — filter
+    ignored."` (naming only the param(s) set).
 
     Transport rows carry two TCDB facts (both None on metabolism rows):
       - `substrate_depth` (`most_specific` | `inherited`): the most specific
@@ -9193,6 +9309,20 @@ def genes_by_metabolite(
     `{go_term_depth, count}`, depth ascending; `[]` when no GO rows);
     `by_evidence_source` gains `go_transport`; `by_metabolite[]` and
     `top_genes[]` entries carry `go_transport_rows` (int).
+
+    Route agreement (always present): a pair is (gene, metabolite_id) after
+    all filters; its evidence sources are the sorted arms with ≥1 row for
+    it (`transport` is one route regardless of `substrate_depth`; role ids
+    are their own target). Envelope `by_evidence_source_combination`
+    (list of `{evidence_sources: list[str], pair_count: int}`, sorted
+    pair_count desc then evidence_sources; `[]` on an empty result).
+    `by_metabolite[]` entries carry `multi_source_gene_count` (genes
+    reaching that metabolite through ≥2 sources); `top_genes[]` entries
+    carry `multi_source_metabolite_count`. Agreement = independent routes
+    naming the same pair; the routes are correlated (InterPro2GO and eggNOG
+    share homology), so it raises confidence without proving it, and a
+    single-source pair is not wrong. Add `substrate_depth=['most_specific']`
+    for the strict core.
 
     GO warnings (GO arm active only): one per requested id that the KG
     curated out of the GO route (`kg_release_info`
@@ -9257,10 +9387,12 @@ def genes_by_metabolite(
         ValueError: if `evidence_sources` contains values outside
             ``("metabolism", "transport", "go_transport")``. Note this
             diverges from `list_metabolites` — gene-anchored tools reject
-            ``"metabolomics"``. Also on unknown `substrate_depth` values.
-            Also if `organism` fuzzy-matches multiple organisms (be more
-            specific); a word matching zero organisms does not raise — it
-            returns an empty envelope with `not_found.organism` set.
+            ``"metabolomics"``. Also on unknown `substrate_depth`,
+            `go_namespace` or `go_evidence` values (raised even when the
+            GO arm is off). Also if `organism` fuzzy-matches multiple
+            organisms (be more specific); a word matching zero organisms
+            does not raise — it returns an empty envelope with
+            `not_found.organism` set.
     """
     # 1. Defense-in-depth validators (before any Cypher executes).
     if evidence_sources is not None:
@@ -9274,12 +9406,22 @@ def genes_by_metabolite(
                 f"allowed: {list(_VALID_EVIDENCE_SOURCES_GBM)}."
             )
     _validate_substrate_depth(substrate_depth)
+    _validate_go_namespace(go_namespace)
 
     # Arm selection driven solely by evidence_sources (canonical order).
     active_arms = _active_chemistry_arms(evidence_sources)
     go_active = "go_transport" in active_arms
 
     conn = _default_conn(conn)
+    go_filter_warnings = _validate_go_evidence(conn, go_evidence)
+    # GO-arm filters apply to the GO arm only; with the arm off they are
+    # ignored (None to every builder) and a warning names the set param(s).
+    if not go_active:
+        _off = _go_arm_off_warning(go_namespace, go_evidence)
+        if _off:
+            go_filter_warnings.append(_off)
+        go_namespace = None
+        go_evidence = None
 
     # 1b. Coerce bare / xref metabolite IDs to canonical Metabolite.id
     # before any other query and before the exclude-overlap set-difference.
@@ -9296,7 +9438,7 @@ def genes_by_metabolite(
             conn, metabolite_ids, exclude_metabolite_ids,
             roles_are_targets=True)
     )
-    alias_warnings += _coerce_warnings
+    alias_warnings += _coerce_warnings + go_filter_warnings
 
     # 1c. Pre-validate & resolve organism to its canonical preferred_name.
     # Both the builders' organism filter and the existence probe (step 6
@@ -9333,6 +9475,7 @@ def genes_by_metabolite(
             "not_matched": [],
             "by_metabolite": [],
             "by_evidence_source": [],
+            "by_evidence_source_combination": [],
             "by_substrate_depth": [],
             "top_reactions": [],
             "top_tcdb_families": [],
@@ -9393,6 +9536,8 @@ def genes_by_metabolite(
         substrate_depth=substrate_depth,
         arms=active_arms,
         include_ancestors=go_include_ancestors,
+        go_namespace=go_namespace,
+        go_evidence=go_evidence,
     )
     summary_rows = conn.execute_query(sum_cypher, **sum_params)
     raw_summary = summary_rows[0] if summary_rows else {}
@@ -9439,6 +9584,8 @@ def genes_by_metabolite(
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
             include_ancestors=go_include_ancestors,
+            go_namespace=go_namespace,
+            go_evidence=go_evidence,
             verbose=verbose,
             limit=arm_limit,
             offset=arm_offset,
@@ -9555,6 +9702,8 @@ def genes_by_metabolite(
                 "metabolite_pathway_ids": metabolite_pathway_ids,
                 "gene_categories": gene_categories,
                 "substrate_depth": substrate_depth,
+                "go_namespace": go_namespace,
+                "go_evidence": go_evidence,
             },
             arms=active_arms,
             include_ancestors=go_include_ancestors,
@@ -9681,6 +9830,8 @@ def genes_by_metabolite(
         "not_matched": not_matched,
         "by_metabolite": by_metabolite,
         "by_evidence_source": by_evidence_source,
+        "by_evidence_source_combination": _sorted_evidence_source_combinations(
+            raw_summary.get("by_evidence_source_combination")),
         "by_substrate_depth": by_substrate_depth,
         "top_reactions": top_reactions,
         "top_tcdb_families": top_tcdb_families,
@@ -9781,6 +9932,8 @@ def metabolites_by_gene(
     substrate_depth: list[str] | None = None,
     evidence_sources: list[str] | None = None,
     go_include_ancestors: bool = False,
+    go_namespace: list[str] | None = None,
+    go_evidence: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
     limit: int = 10,
@@ -9836,6 +9989,24 @@ def metabolites_by_gene(
         an is_a ancestor of the gene's own term (one row per gene × own term
         × target at the fewest hops), only for (gene, target) pairs with no
         direct GO path. Default False (direct rows only).
+    go_namespace: GO-arm filter, list of `molecular_function` /
+        `biological_process` (the gene→GO edge type fixes the namespace).
+        Unknown values raise ValueError naming the allowed pair.
+    go_evidence: GO-arm filter on the gene→GO edge `evidence`, validated
+        against the union of the `Gene_enables_molecular_function.evidence`
+        / `Gene_involved_in_biological_process.evidence` ControlledVocabulary
+        nodes (pivot fallback + warning when a node is missing). Unknown
+        values raise ValueError listing the allowed values.
+    Both GO filters narrow only `go_transport` rows (metabolism / transport
+    rows untouched), apply to direct and inherited GO rows, and reach every
+    GO-emitting query (detail, summary, no-formula count). The inherited
+    branch's "no direct GO path for the pair" check stays unfiltered, so a
+    filtered result is always a subset of the unfiltered one. The stereo
+    hint ignores them (see Stereo forms). When `evidence_sources` excludes
+    `go_transport` the filters are ignored and a warning is appended:
+    `"go_namespace / go_evidence apply to the go_transport arm only, which
+    evidence_sources excluded — filter ignored."` (naming only the
+    param(s) set).
 
     Transport rows carry two TCDB facts (both None on metabolism rows):
       - `substrate_depth` (`most_specific` | `inherited`): the most specific
@@ -9882,6 +10053,20 @@ def metabolites_by_gene(
     `chebi.role:25512` (neurotransmitter), a note that those rows are
     mostly bacterial NSS amino-acid transporters.
 
+    Route agreement (always present): a pair is (gene, metabolite_id) after
+    all filters; its evidence sources are the sorted arms with ≥1 row for
+    it (`transport` is one route regardless of `substrate_depth`; role ids
+    are their own target). Envelope `by_evidence_source_combination`
+    (list of `{evidence_sources: list[str], pair_count: int}`, sorted
+    pair_count desc then evidence_sources; `[]` on an empty result).
+    `top_metabolites[]` entries carry `multi_source_gene_count` (genes
+    reaching that metabolite through ≥2 sources); `by_gene[]` entries carry
+    `multi_source_metabolite_count`. Agreement = independent routes naming
+    the same pair; the routes are correlated (InterPro2GO and eggNOG share
+    homology), so it raises confidence without proving it, and a
+    single-source pair is not wrong. Add `substrate_depth=['most_specific']`
+    for the strict core.
+
     Auto-warning: per gene, when `by_gene[].transport_substrate_resolution`
     is `family_inferred` — that gene's substrate breadth is reachability,
     not capability. Such a gene still emits `most_specific` rows (substrates
@@ -9898,7 +10083,7 @@ def metabolites_by_gene(
     organism (counts are organism-wide and unfiltered: they equal a default
     `genes_by_metabolite` call on the relative — metabolism, transport and
     direct GO rows — whatever this call's `evidence_sources` /
-    `go_include_ancestors`). Rows on the
+    `go_include_ancestors` / `go_namespace` / `go_evidence`). Rows on the
     page carry sparse `stereo_relative_ids`, and one warning, first in
     `warnings`, names up to 5 of them. To pull a relative's genes, call
     `genes_by_metabolite(metabolite_ids=[...], include_stereo_forms=True)`.
@@ -9940,7 +10125,8 @@ def metabolites_by_gene(
             ``("metabolism", "transport", "go_transport")``. Mirrors
             `genes_by_metabolite`
             — gene-anchored tools reject ``"metabolomics"``. Also on
-            unknown `substrate_depth` values. Also if `organism`
+            unknown `substrate_depth`, `go_namespace` or `go_evidence`
+            values (raised even when the GO arm is off). Also if `organism`
             fuzzy-matches multiple organisms (be more specific); a word
             matching zero organisms does not raise — it returns an empty
             envelope with `not_found.organism` set.
@@ -9957,12 +10143,22 @@ def metabolites_by_gene(
                 f"allowed: {list(_VALID_EVIDENCE_SOURCES_MBG)}."
             )
     _validate_substrate_depth(substrate_depth)
+    _validate_go_namespace(go_namespace)
 
     # Arm selection driven solely by evidence_sources (canonical order).
     active_arms = _active_chemistry_arms(evidence_sources)
     go_active = "go_transport" in active_arms
 
     conn = _default_conn(conn)
+    go_filter_warnings = _validate_go_evidence(conn, go_evidence)
+    # GO-arm filters apply to the GO arm only; with the arm off they are
+    # ignored (None to every builder) and a warning names the set param(s).
+    if not go_active:
+        _off = _go_arm_off_warning(go_namespace, go_evidence)
+        if _off:
+            go_filter_warnings.append(_off)
+        go_namespace = None
+        go_evidence = None
 
     # 1b. Coerce bare / xref metabolite IDs to canonical Metabolite.id
     # before any other query and before the exclude-overlap set-difference.
@@ -9971,6 +10167,7 @@ def metabolites_by_gene(
             conn, metabolite_ids, exclude_metabolite_ids,
             roles_are_targets=True)
     )
+    alias_warnings = list(alias_warnings) + go_filter_warnings
 
     # 1c. Pre-validate & resolve organism to its canonical preferred_name.
     # The existence probe below (step 6) requires an EXACT match on
@@ -10010,6 +10207,7 @@ def metabolites_by_gene(
             "not_matched": [],
             "by_gene": [],
             "by_evidence_source": [],
+            "by_evidence_source_combination": [],
             "by_substrate_depth": [],
             "by_element": [],
             "top_metabolites": [],
@@ -10043,6 +10241,8 @@ def metabolites_by_gene(
         substrate_depth=substrate_depth,
         arms=active_arms,
         include_ancestors=go_include_ancestors,
+        go_namespace=go_namespace,
+        go_evidence=go_evidence,
     )
     summary_rows = conn.execute_query(sum_cypher, **sum_params)
     raw_summary = summary_rows[0] if summary_rows else {}
@@ -10067,6 +10267,8 @@ def metabolites_by_gene(
             substrate_depth=substrate_depth,
             arms=active_arms,
             include_ancestors=go_include_ancestors,
+            go_namespace=go_namespace,
+            go_evidence=go_evidence,
         )
         nf_rows = conn.execute_query(nf_cypher, **nf_params)
         nf_row = nf_rows[0] if nf_rows else {}
@@ -10123,6 +10325,8 @@ def metabolites_by_gene(
             metabolite_elements=metabolite_elements,
             gene_categories=gene_categories,
             include_ancestors=go_include_ancestors,
+            go_namespace=go_namespace,
+            go_evidence=go_evidence,
             verbose=verbose,
             limit=arm_limit,
             offset=arm_offset,
@@ -10398,6 +10602,8 @@ def metabolites_by_gene(
         "not_matched": not_matched,
         "by_gene": by_gene,
         "by_evidence_source": by_evidence_source,
+        "by_evidence_source_combination": _sorted_evidence_source_combinations(
+            raw_summary.get("by_evidence_source_combination")),
         "by_substrate_depth": by_substrate_depth,
         "by_element": by_element,
         "top_metabolites": top_metabolites,

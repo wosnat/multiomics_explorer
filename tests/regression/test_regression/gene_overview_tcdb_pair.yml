@@ -87,6 +87,7 @@ results:
   expression_edge_count: 37
   gene_category: Replication and repair
   gene_name: dnaN
+  go_transport_metabolite_count: 0
   informative_annotation_types:
   - brite
   - cog_category
@@ -147,6 +148,7 @@ results:
   expression_edge_count: 30
   gene_category: Transport
   gene_name: cbiQ
+  go_transport_metabolite_count: 0
   informative_annotation_types:
   - brite
   - cog_category

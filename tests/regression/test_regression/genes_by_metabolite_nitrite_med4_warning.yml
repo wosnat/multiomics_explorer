@@ -1,12 +1,17 @@
 by_evidence_source:
 - count: 29
   evidence_source: transport
+by_evidence_source_combination:
+- evidence_sources:
+  - transport
+  pair_count: 27
 by_metabolite:
 - formula: NO2
   gene_count: 27
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00088
+  multi_source_gene_count: 0
   name: Nitrite
   reaction_count: 0
   rows: 29
@@ -197,6 +202,7 @@ top_genes:
   locus_tag: PMM0370
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.6
   transport_inherited_rows: 0
@@ -208,6 +214,7 @@ top_genes:
   locus_tag: PMM0371
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.8
   transport_inherited_rows: 0
@@ -219,6 +226,7 @@ top_genes:
   locus_tag: PMM0072
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.4
   transport_inherited_rows: 1
@@ -230,6 +238,7 @@ top_genes:
   locus_tag: PMM0089
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.4
   transport_inherited_rows: 1
@@ -241,6 +250,7 @@ top_genes:
   locus_tag: PMM0097
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.4
   transport_inherited_rows: 1
@@ -252,6 +262,7 @@ top_genes:
   locus_tag: PMM0218
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.0
   transport_inherited_rows: 1
@@ -263,6 +274,7 @@ top_genes:
   locus_tag: PMM0321
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.2
   transport_inherited_rows: 1
@@ -274,6 +286,7 @@ top_genes:
   locus_tag: PMM0372
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.8
   transport_inherited_rows: 0
@@ -285,6 +298,7 @@ top_genes:
   locus_tag: PMM0402
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.8
   transport_inherited_rows: 1
@@ -296,6 +310,7 @@ top_genes:
   locus_tag: PMM0434
   metabolism_rows: 0
   metabolite_count: 1
+  multi_source_metabolite_count: 0
   reaction_count: 0
   tcdb_evidence_score_max: 0.8
   transport_inherited_rows: 1

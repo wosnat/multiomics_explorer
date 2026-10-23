@@ -1694,6 +1694,48 @@ examples:
         ]
       }
 
+  - title: Where the routes agree — urea in MED4, read by_evidence_source_combination
+    call: genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochlorococcus MED4", summary=True)
+    note: "One entry per set of routes that name the same (gene, metabolite) pair. 20 pairs come from TCDB alone (mostly ABC-superfamily `inherited` rows), 4 from KEGG alone (the urease subunits), and 5 from TCDB and GO together: urtA–E, also counted as `multi_source_gene_count=5` on the urea `by_metabolite` entry. Agreement narrows the list to the confident core, but TCDB and GO share homology, so it raises confidence and does not prove transport. Add `substrate_depth=['most_specific']` to drop the superfamily-only TCDB pairs."
+    response: |
+      {
+        "total_matching": 45,
+        "by_metabolite": [
+          {
+            "metabolite_id": "kegg.compound:C00086",
+            "name": "Urea",
+            "gene_count": 29,
+            "go_transport_rows": 11,
+            "multi_source_gene_count": 5
+          }
+        ],
+        "by_evidence_source_combination": [
+          {"evidence_sources": ["transport"], "pair_count": 20},
+          {"evidence_sources": ["go_transport", "transport"], "pair_count": 5},
+          {"evidence_sources": ["metabolism"], "pair_count": 4}
+        ],
+        ...
+      }
+
+  - title: Narrow the GO arm — molecular-function terms with curated gene evidence only
+    call: genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochlorococcus MED4", go_namespace=["molecular_function"], go_evidence=["curated"], summary=True)
+    note: "Keeps 4 of the 11 urea GO rows (the biological-process rows drop out). The KEGG and TCDB rows are untouched, so `total_matching` falls from 45 to 38 only by the GO rows removed. Allowed `go_evidence` values: `list_filter_values`."
+    response: |
+      {
+        "total_matching": 38,
+        "by_metabolite": [
+          {
+            "metabolite_id": "kegg.compound:C00086",
+            "metabolism_rows": 4,
+            "transport_most_specific_rows": 10,
+            "transport_inherited_rows": 20,
+            "go_transport_rows": 4
+          }
+        ],
+        "rows_by_go_term_depth": [{"go_term_depth": 0, "count": 4}],
+        ...
+      }
+
 verbose_fields:
   - gene_category
   - metabolite_inchikey
@@ -1911,3 +1953,17 @@ mistakes:
     `mass_balance` and `substrate_depth` do not apply to GO rows (documented
     no-ops), while `exclude_metabolite_ids`, `metabolite_pathway_ids` and
     `gene_categories` do.
+  - >-
+    A multi-source pair is corroborated, not proven. `by_evidence_source_combination`
+    and `multi_source_gene_count` / `multi_source_metabolite_count` count the
+    (gene, metabolite) pairs that two or more routes name, but the routes share
+    homology (InterPro2GO and eggNOG vs the TCDB calls), so agreement raises
+    confidence without being independent confirmation. A single-source pair is not
+    wrong. `transport` counts as one route whatever its `substrate_depth`; add
+    `substrate_depth=['most_specific']` for the strict core.
+  - >-
+    `go_namespace` and `go_evidence` narrow the GO arm only; KEGG and TCDB rows are
+    untouched (as `substrate_depth` narrows only TCDB rows). Set while
+    `evidence_sources` excludes `go_transport`, they are ignored with a warning.
+    The inherited-row dedup ignores them, so a filtered result is always a subset of
+    the unfiltered one.

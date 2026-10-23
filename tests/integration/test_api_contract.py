@@ -124,6 +124,7 @@ class TestGeneOverviewContract:
             # TCDB substrate_depth migration (2026-08): gene-level TCDB surface
             # replaces transporter_count.
             "tcdb_evidence_score_max", "transported_metabolite_count",
+            "go_transport_metabolite_count",
             "transport_substrate_resolution",
             # Literature "discusses" arm (Extension 1): always-present compact count.
             "discussed_in_publication_count",

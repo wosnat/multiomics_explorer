@@ -18,6 +18,7 @@ rows:
   expression_edge_count: 0
   gene_category: Unknown
   gene_name: null
+  go_transport_metabolite_count: 0
   informative_annotation_types: []
   locus_tag: EZ55_00275
   merops_classes: []

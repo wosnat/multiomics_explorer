@@ -28,6 +28,7 @@ rows:
   experiment_count: 118
   gene_count: 1973
   genus: Prochlorococcus
+  go_transport_metabolite_count: 45
   growth_phases:
   - acclimated_steady_state
   - acute_stress
@@ -91,6 +92,7 @@ rows:
   experiment_count: 8
   gene_count: 1926
   genus: Prochlorococcus
+  go_transport_metabolite_count: 45
   growth_phases:
   - exponential
   interpro_gene_count: 1537

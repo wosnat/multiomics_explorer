@@ -23,12 +23,17 @@ by_element_truncated: true
 by_evidence_source:
 - count: 242
   evidence_source: transport
+by_evidence_source_combination:
+- evidence_sources:
+  - transport
+  pair_count: 242
 by_gene:
 - gene_name: salY
   go_transport_rows: 0
   locus_tag: PMM0913
   metabolism_rows: 0
   metabolite_count: 242
+  multi_source_metabolite_count: 0
   product: putative ABC efflux system
   reaction_count: 0
   rows: 242
@@ -358,6 +363,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi.role:22153
+  multi_source_gene_count: 0
   name: acaricide
   reaction_count: 0
   transport_inherited_rows: 0
@@ -368,6 +374,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi.role:22587
+  multi_source_gene_count: 0
   name: antiviral agent
   reaction_count: 0
   transport_inherited_rows: 0
@@ -378,6 +385,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi.role:22676
+  multi_source_gene_count: 0
   name: auxin
   reaction_count: 0
   transport_inherited_rows: 0
@@ -388,6 +396,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi.role:23530
+  multi_source_gene_count: 0
   name: cytokinin
   reaction_count: 0
   transport_inherited_rows: 0
@@ -398,6 +407,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi.role:24127
+  multi_source_gene_count: 0
   name: fungicide
   reaction_count: 0
   transport_inherited_rows: 0
@@ -408,6 +418,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi.role:24527
+  multi_source_gene_count: 0
   name: herbicide
   reaction_count: 0
   transport_inherited_rows: 0
@@ -418,6 +429,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi.role:25212
+  multi_source_gene_count: 0
   name: metabolite
   reaction_count: 0
   transport_inherited_rows: 0
@@ -428,6 +440,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi.role:25435
+  multi_source_gene_count: 0
   name: mutagen
   reaction_count: 0
   transport_inherited_rows: 0
@@ -438,6 +451,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi.role:26115
+  multi_source_gene_count: 0
   name: phytoalexin
   reaction_count: 0
   transport_inherited_rows: 0
@@ -448,6 +462,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi.role:26130
+  multi_source_gene_count: 0
   name: biological pigment
   reaction_count: 0
   transport_inherited_rows: 0

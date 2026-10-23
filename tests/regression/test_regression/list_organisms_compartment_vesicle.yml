@@ -16,6 +16,7 @@ rows:
   experiment_count: 6
   gene_count: 3929
   genus: Alteromonas
+  go_transport_metabolite_count: 82
   growth_phases: []
   interpro_gene_count: 3495
   measured_metabolite_count: 0
@@ -51,6 +52,7 @@ rows:
   experiment_count: 6
   gene_count: 3834
   genus: Alteromonas
+  go_transport_metabolite_count: 86
   growth_phases: []
   interpro_gene_count: 3456
   measured_metabolite_count: 0
@@ -86,6 +88,7 @@ rows:
   experiment_count: 6
   gene_count: 4063
   genus: Alteromonas
+  go_transport_metabolite_count: 93
   growth_phases: []
   interpro_gene_count: 3608
   measured_metabolite_count: 0
@@ -121,6 +124,7 @@ rows:
   experiment_count: 6
   gene_count: 3741
   genus: Alteromonas
+  go_transport_metabolite_count: 80
   growth_phases: []
   interpro_gene_count: 3349
   measured_metabolite_count: 0
@@ -158,6 +162,7 @@ rows:
   experiment_count: 21
   gene_count: 4028
   genus: Alteromonas
+  go_transport_metabolite_count: 85
   growth_phases:
   - death
   - exponential
@@ -205,6 +210,7 @@ rows:
   experiment_count: 14
   gene_count: 4028
   genus: Alteromonas
+  go_transport_metabolite_count: 88
   growth_phases:
   - darkness
   - diel
@@ -260,6 +266,7 @@ rows:
   experiment_count: 118
   gene_count: 1973
   genus: Prochlorococcus
+  go_transport_metabolite_count: 45
   growth_phases:
   - acclimated_steady_state
   - acute_stress
@@ -325,6 +332,7 @@ rows:
   experiment_count: 27
   gene_count: 1970
   genus: Prochlorococcus
+  go_transport_metabolite_count: 44
   growth_phases:
   - acclimated_steady_state
   - acute_stress
@@ -376,6 +384,7 @@ rows:
   experiment_count: 39
   gene_count: 2906
   genus: Prochlorococcus
+  go_transport_metabolite_count: 53
   growth_phases:
   - acute_stress
   - exponential

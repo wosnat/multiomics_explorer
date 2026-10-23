@@ -2,11 +2,11 @@
 
 ## What it does
 
-Metabolite / `chebi.role:` IDs to genes in ONE organism via KEGG reactions, TCDB and GO transport (GO rows: term definitions, not gene facts).
+Metabolite / `chebi.role:` IDs to genes in ONE organism via KEGG, TCDB and GO transport (GO rows: term definitions, not gene facts).
 
 Use for compound → genes; mirror `metabolites_by_gene`; docs://analysis/transport.
-Filters: metabolite_ids (+exclude, +stereo), organism, ec_numbers, metabolite_pathway_ids, substrate_depth, evidence_sources, go_include_ancestors.
-Returns: by_metabolite, by_evidence_source, rows_by_go_term_depth, top_genes, top_reactions, top_tcdb_families; row = gene × reaction|family|GO term × metabolite.
+Filters: metabolite_ids (+exclude, +stereo), ec_numbers, metabolite_pathway_ids, substrate_depth, evidence_sources, go_include_ancestors/namespace/evidence.
+Returns: by_metabolite, by_evidence_source(_combination), rows_by_go_term_depth, top_genes, top_reactions/tcdb_families; row = gene × reaction|family|GO term × metabolite.
 docs://tools/genes_by_metabolite; summary=True first.
 
 ## Parameters
@@ -23,6 +23,8 @@ docs://tools/genes_by_metabolite; summary=True first.
 | substrate_depth | list[string ('most_specific', 'inherited')] \| None | None | Keep transport rows whose edge `substrate_depth` is in this list. 'most_specific' = most specific surviving transporter node for the substrate (gene-pruned hierarchy, not a curation level). Transport arm only. |
 | evidence_sources | list[string ('metabolism', 'transport', 'go_transport')] \| None | None | Path selector — restricts which arms execute (metabolism, transport, go_transport). Default fires all three. `['metabolism']` skips transport rollup noise. 'metabolomics' is NOT valid here (no gene anchor); see `list_metabolites`. |
 | go_include_ancestors | bool | False | GO route only: also return inherited rows, where a gene's GO term reaches the target through is_a ancestors (go_term_depth > 0). Default False = directly annotated terms. |
+| go_namespace | list[string ('molecular_function', 'biological_process')] \| None | None | GO arm only: keep GO rows whose gene->GO edge is in these namespaces. TCDB / KEGG rows untouched. Filtered result is always a subset of the unfiltered one. |
+| go_evidence | list[string] \| None | None | GO arm only: keep GO rows whose gene->GO edge evidence is in this list (e.g. ['curated']; family_inferred, domain_inferred). Unknown values raise. TCDB / KEGG rows untouched; result is a subset of the unfiltered one. |
 | include_stereo_forms | bool | False | Also query the generic <-> specific stereo forms of each metabolite_id (e.g. Cysteine <-> L-Cysteine; TCDB lists generic names, KEGG reactions use specific forms). Added rows carry via_stereo_form_of. Enantiomers are never added. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
@@ -36,7 +38,7 @@ docs://tools/genes_by_metabolite; summary=True first.
 ### Envelope
 
 ```expected-keys
-total_matching, returned, offset, truncated, warnings, stereo_relatives, stereo_forms_added, resolved_aliases, not_found, not_matched, by_metabolite, by_evidence_source, by_substrate_depth, rows_by_go_term_depth, top_reactions, top_tcdb_families, top_gene_categories, top_genes, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+total_matching, returned, offset, truncated, warnings, stereo_relatives, stereo_forms_added, resolved_aliases, not_found, not_matched, by_metabolite, by_evidence_source, by_evidence_source_combination, by_substrate_depth, rows_by_go_term_depth, top_reactions, top_tcdb_families, top_gene_categories, top_genes, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 - **total_matching** (int): Total row count after all filters, across all arms.
@@ -50,7 +52,8 @@ total_matching, returned, offset, truncated, warnings, stereo_relatives, stereo_
 - **not_found** (GbmNotFound): Inputs that did not resolve to a KG node — see model.
 - **not_matched** (list[string]): Input metabolite_ids that exist as Metabolite nodes but produced zero rows in this organism slice (under the active filters). Distinct from `not_found.metabolite_ids` (those don't exist at all).
 - **by_metabolite** (list[GbmByMetabolite]): Per-metabolite rollup. One entry per input metabolite_id that produced ≥1 row.
-- **by_evidence_source** (list[GbmByEvidenceSource]): Frequency over `evidence_source` values present in the slice (≤2 entries).
+- **by_evidence_source** (list[GbmByEvidenceSource]): Frequency over `evidence_source` values present in the slice (≤3 entries).
+- **by_evidence_source_combination** (list[EvidenceSourceCombination]): Gene x metabolite pairs per set of agreeing sources, pair_count desc. Agreement = independent routes naming the same pair; correlated (shared homology), so it raises confidence but does not prove. [] on empty.
 - **by_substrate_depth** (list[GbmBySubstrateDepth]): Frequency over `substrate_depth` values across transport rows only (≤2 entries; metabolism rows are excluded).
 - **rows_by_go_term_depth** (list[RowsByGoTermDepth] | None): GO route rows per `go_term_depth`, sorted by depth asc. Null unless the go_transport arm is active; depth > 0 rows need go_include_ancestors=True.
 - **top_reactions** (list[GbmTopReaction]): Top 10 reactions by gene_count in the metabolism arm. summary=True returns the full ranked list.
@@ -1835,6 +1838,60 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C01356"], organism="Prochloro
 }
 ```
 
+### Example 14: Where the routes agree — urea in MED4, read by_evidence_source_combination
+
+```example-call
+genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochlorococcus MED4", summary=True)
+```
+
+*One entry per set of routes that name the same (gene, metabolite) pair. 20 pairs come from TCDB alone (mostly ABC-superfamily `inherited` rows), 4 from KEGG alone (the urease subunits), and 5 from TCDB and GO together: urtA–E, also counted as `multi_source_gene_count=5` on the urea `by_metabolite` entry. Agreement narrows the list to the confident core, but TCDB and GO share homology, so it raises confidence and does not prove transport. Add `substrate_depth=['most_specific']` to drop the superfamily-only TCDB pairs.*
+
+```example-response
+{
+  "total_matching": 45,
+  "by_metabolite": [
+    {
+      "metabolite_id": "kegg.compound:C00086",
+      "name": "Urea",
+      "gene_count": 29,
+      "go_transport_rows": 11,
+      "multi_source_gene_count": 5
+    }
+  ],
+  "by_evidence_source_combination": [
+    {"evidence_sources": ["transport"], "pair_count": 20},
+    {"evidence_sources": ["go_transport", "transport"], "pair_count": 5},
+    {"evidence_sources": ["metabolism"], "pair_count": 4}
+  ],
+  ...
+}
+```
+
+### Example 15: Narrow the GO arm — molecular-function terms with curated gene evidence only
+
+```example-call
+genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochlorococcus MED4", go_namespace=["molecular_function"], go_evidence=["curated"], summary=True)
+```
+
+*Keeps 4 of the 11 urea GO rows (the biological-process rows drop out). The KEGG and TCDB rows are untouched, so `total_matching` falls from 45 to 38 only by the GO rows removed. Allowed `go_evidence` values: `list_filter_values`.*
+
+```example-response
+{
+  "total_matching": 38,
+  "by_metabolite": [
+    {
+      "metabolite_id": "kegg.compound:C00086",
+      "metabolism_rows": 4,
+      "transport_most_specific_rows": 10,
+      "transport_inherited_rows": 20,
+      "go_transport_rows": 4
+    }
+  ],
+  "rows_by_go_term_depth": [{"go_term_depth": 0, "count": 4}],
+  ...
+}
+```
+
 ## Chaining patterns
 
 ```
@@ -1933,13 +1990,17 @@ passed. Exclude-wins-on-overlap is computed on the canonical IDs, so `metabolite
 
 - `go_include_ancestors=True` is the only way inherited GO rows appear; the default is direct rows only. `evidence_source`-scoped filters `ec_numbers`, `mass_balance` and `substrate_depth` do not apply to GO rows (documented no-ops), while `exclude_metabolite_ids`, `metabolite_pathway_ids` and `gene_categories` do.
 
+- A multi-source pair is corroborated, not proven. `by_evidence_source_combination` and `multi_source_gene_count` / `multi_source_metabolite_count` count the (gene, metabolite) pairs that two or more routes name, but the routes share homology (InterPro2GO and eggNOG vs the TCDB calls), so agreement raises confidence without being independent confirmation. A single-source pair is not wrong. `transport` counts as one route whatever its `substrate_depth`; add `substrate_depth=['most_specific']` for the strict core.
+
+- `go_namespace` and `go_evidence` narrow the GO arm only; KEGG and TCDB rows are untouched (as `substrate_depth` narrows only TCDB rows). Set while `evidence_sources` excludes `go_transport`, they are ignored with a warning. The inherited-row dedup ignores them, so a filtered result is always a subset of the unfiltered one.
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import genes_by_metabolite
 
 result = genes_by_metabolite(metabolite_ids=..., organism=...)
-# returns dict with keys: total_matching, returned, offset, truncated, warnings, stereo_relatives, stereo_forms_added, resolved_aliases, not_found, not_matched, by_metabolite, by_evidence_source, by_substrate_depth, rows_by_go_term_depth, top_reactions, top_reactions_truncated, top_tcdb_families, top_tcdb_families_truncated, top_gene_categories, top_genes, top_genes_truncated, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+# returns dict with keys: total_matching, returned, offset, truncated, warnings, stereo_relatives, stereo_forms_added, resolved_aliases, not_found, not_matched, by_metabolite, by_evidence_source, by_evidence_source_combination, by_substrate_depth, rows_by_go_term_depth, top_reactions, top_reactions_truncated, top_tcdb_families, top_tcdb_families_truncated, top_gene_categories, top_genes, top_genes_truncated, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
 Use package import for bulk data extraction in scripts.

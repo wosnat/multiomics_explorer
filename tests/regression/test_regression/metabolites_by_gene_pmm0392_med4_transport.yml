@@ -14,12 +14,17 @@ by_element:
 by_evidence_source:
 - count: 13
   evidence_source: transport
+by_evidence_source_combination:
+- evidence_sources:
+  - transport
+  pair_count: 13
 by_gene:
 - gene_name: cbiQ
   go_transport_rows: 0
   locus_tag: PMM0392
   metabolism_rows: 0
   metabolite_count: 13
+  multi_source_metabolite_count: 0
   product: transmembrane component of ECF transporter energizing module
   reaction_count: 0
   rows: 13
@@ -454,6 +459,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi.role:33229
+  multi_source_gene_count: 0
   name: vitamin (role)
   reaction_count: 0
   transport_inherited_rows: 0
@@ -464,6 +470,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi:30411
+  multi_source_gene_count: 0
   name: cobalamin
   reaction_count: 0
   transport_inherited_rows: 0
@@ -474,6 +481,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: chebi:64299
+  multi_source_gene_count: 0
   name: queuosine residue
   reaction_count: 0
   transport_inherited_rows: 0
@@ -484,6 +492,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00016
+  multi_source_gene_count: 0
   name: FAD
   reaction_count: 0
   transport_inherited_rows: 0
@@ -494,6 +503,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00061
+  multi_source_gene_count: 0
   name: FMN
   reaction_count: 0
   transport_inherited_rows: 0
@@ -504,6 +514,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00120
+  multi_source_gene_count: 0
   name: Biotin
   reaction_count: 0
   transport_inherited_rows: 0
@@ -514,6 +525,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00170
+  multi_source_gene_count: 0
   name: 5^-Methylthioadenosine
   reaction_count: 0
   transport_inherited_rows: 0
@@ -524,6 +536,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00175
+  multi_source_gene_count: 0
   name: Cobalt ion
   reaction_count: 0
   transport_inherited_rows: 0
@@ -534,6 +547,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00255
+  multi_source_gene_count: 0
   name: Riboflavin
   reaction_count: 0
   transport_inherited_rows: 0
@@ -544,6 +558,7 @@ top_metabolites:
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00305
+  multi_source_gene_count: 0
   name: Magnesium cation
   reaction_count: 0
   transport_inherited_rows: 0

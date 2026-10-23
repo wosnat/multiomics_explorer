@@ -66,7 +66,13 @@ LINT_PATTERN = re.compile(
 # after the GO transport route made them three-armed (go-transport final
 # review finding 7); assays_by_metabolite's numeric + boolean "both arms"
 # stays legitimate.
-_THREE_ARM_CHEMISTRY = re.compile(r"\bboth arms\b|\beither arm\b")
+# `by_evidence_source` on the three-arm chemistry pages had "≤2 entries"
+# left over from the two-arm era (go-transport follow-ups review); the
+# `by_substrate_depth` "≤2 entries" stays legitimate.
+_THREE_ARM_CHEMISTRY = re.compile(
+    r"\bboth arms\b|\beither arm\b"
+    r"|values present in\s+the slice \(≤2 entries\)"
+)
 SCOPED_LINT_PATTERNS: dict[str, re.Pattern[str]] = {
     "genes_by_metabolite.md": _THREE_ARM_CHEMISTRY,
     "metabolites_by_gene.md": _THREE_ARM_CHEMISTRY,

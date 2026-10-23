@@ -1408,7 +1408,7 @@ class TestListOrganisms:
         assert cap[1]["transported_metabolite_count"] == 120
         assert set(cap[0]) == {
             "organism_name", "reaction_count", "catalyzed_metabolite_count",
-            "transported_metabolite_count",
+            "transported_metabolite_count", "go_transport_metabolite_count",
         }
 
     def test_top_metabolic_capability_excludes_zero_chemistry(self, mock_conn):
@@ -22431,3 +22431,471 @@ class TestGoTransportMbgNeurotransmitterSummary:
             ["PMM0970"], "Prochlorococcus MED4", summary=True,
             conn=_GoConn(summary=summary))
         assert _NEUROTRANSMITTER_WARNING not in out["warnings"]
+
+
+# ---------------------------------------------------------------------------
+# GO transport follow-ups (RED) — docs/tool-specs/go-transport-followups.md
+# 2c.15 GO-arm filters · 2c.17 route agreement · 2c.14 / 2c.16 GO counts
+# ---------------------------------------------------------------------------
+
+_GO_EVIDENCE_VOCAB = ["curated", "family_inferred", "domain_inferred"]
+_GO_GENE_EDGE_RELS = (
+    "Gene_enables_molecular_function", "Gene_involved_in_biological_process")
+_GO_ARM_OFF_WARNING_BOTH = (
+    "go_namespace / go_evidence apply to the go_transport arm only, which "
+    "evidence_sources excluded — filter ignored."
+)
+
+
+class _GoFilterConn(_GoConn):
+    """_GoConn + ControlledVocabulary answers for the two gene→GO edge
+    `evidence` vocabularies (or a pivot fallback when `cv_missing`), and
+    optional stereo-relative rows."""
+
+    def __init__(self, *args, cv_missing=False, relatives=None, **kw):
+        super().__init__(*args, **kw)
+        self.cv_missing = cv_missing
+        self.relatives = list(relatives or [])
+        self.vocab_calls = []
+
+    def execute_query(self, cypher, **params):
+        if "ControlledVocabulary" in cypher:
+            self.vocab_calls.append(
+                (params.get("applies_to"), params.get("prop")))
+            if (not self.cv_missing
+                    and params.get("applies_to") in _GO_GENE_EDGE_RELS
+                    and params.get("prop") == "evidence"):
+                return [{"values": list(_GO_EVIDENCE_VOCAB),
+                         "value_descriptions": [], "description": None}]
+            return []
+        if any(f"[r:{rel}]" in cypher for rel in _GO_GENE_EDGE_RELS):
+            # pivot fallback read over the gene→GO edge
+            return [{"value": v} for v in _GO_EVIDENCE_VOCAB]
+        if "AS relative_id" in cypher and self.relatives:
+            return list(self.relatives)
+        return super().execute_query(cypher, **params)
+
+
+def _go_filter_conn(**kw):
+    kw.setdefault("arm_rows", {
+        "metabolism": [_non_go_row("metabolism", None)],
+        "transport": [_non_go_row()],
+        "go_transport": [_go_row()],
+    })
+    kw.setdefault("summary", _GO_SUMMARY)
+    return _GoFilterConn(**kw)
+
+
+_COMBO_RAW = [
+    {"evidence_sources": ["metabolism"], "pair_count": 4},
+    {"evidence_sources": ["go_transport", "transport"], "pair_count": 5},
+    {"evidence_sources": ["transport"], "pair_count": 20},
+    {"evidence_sources": ["go_transport"], "pair_count": 5},
+]
+_COMBO_SORTED = [
+    {"evidence_sources": ["transport"], "pair_count": 20},
+    {"evidence_sources": ["go_transport"], "pair_count": 5},
+    {"evidence_sources": ["go_transport", "transport"], "pair_count": 5},
+    {"evidence_sources": ["metabolism"], "pair_count": 4},
+]
+
+
+class TestGoTransportFiltersApiGbm:
+    _METS = ["kegg.compound:C00086"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _run(self, monkeypatch, conn=None, **kw):
+        rec = {}
+        _install_gbm_builders(monkeypatch, rec)
+        conn = conn or _go_filter_conn()
+        metabolite_ids = kw.pop("metabolite_ids", self._METS)
+        out = api.genes_by_metabolite(metabolite_ids, self._ORG, conn=conn, **kw)
+        return out, rec, conn
+
+    def test_gbm_signature_has_go_filters_after_ancestors(self):
+        import inspect
+        params = list(inspect.signature(api.genes_by_metabolite).parameters)
+        assert "go_namespace" in params and "go_evidence" in params
+        i = params.index("go_include_ancestors")
+        assert params[i + 1:i + 3] == ["go_namespace", "go_evidence"]
+        sig = inspect.signature(api.genes_by_metabolite).parameters
+        assert sig["go_namespace"].default is None
+        assert sig["go_evidence"].default is None
+
+    def test_gbm_unknown_namespace_raises(self, monkeypatch):
+        with pytest.raises(ValueError) as ei:
+            self._run(monkeypatch, go_namespace=["cellular_component"])
+        msg = str(ei.value)
+        assert "molecular_function" in msg and "biological_process" in msg
+
+    def test_gbm_unknown_evidence_raises_with_allowed_list(self, monkeypatch):
+        with pytest.raises(ValueError) as ei:
+            self._run(monkeypatch, go_evidence=["signature"])
+        msg = str(ei.value)
+        for v in _GO_EVIDENCE_VOCAB:
+            assert v in msg
+
+    def test_gbm_evidence_validated_against_go_vocab(self, monkeypatch):
+        conn = _go_filter_conn()
+        self._run(monkeypatch, conn=conn, go_evidence=["curated"])
+        rels = {a for a, p in conn.vocab_calls if p == "evidence"}
+        assert rels & set(_GO_GENE_EDGE_RELS)
+
+    def test_gbm_evidence_pivot_fallback_does_not_raise(self, monkeypatch):
+        conn = _go_filter_conn(cv_missing=True)
+        out, rec, _ = self._run(monkeypatch, conn=conn, go_evidence=["curated"])
+        assert rec["go_transport"][0]["go_evidence"] == ["curated"]
+        assert any("ControlledVocabulary" in w for w in out["warnings"])
+
+    def test_gbm_filters_threaded_to_go_detail_and_summary(self, monkeypatch):
+        _, rec, _ = self._run(
+            monkeypatch, go_namespace=["molecular_function"],
+            go_evidence=["curated"])
+        for kw in (rec["go_transport"][0], rec["summary"][0]):
+            assert kw["go_namespace"] == ["molecular_function"]
+            assert kw["go_evidence"] == ["curated"]
+
+    def test_gbm_filters_not_passed_to_non_go_arms(self, monkeypatch):
+        _, rec, _ = self._run(
+            monkeypatch, go_namespace=["molecular_function"],
+            go_evidence=["curated"])
+        for arm in ("metabolism", "transport"):
+            assert "go_namespace" not in rec[arm][0]
+            assert "go_evidence" not in rec[arm][0]
+
+    def test_gbm_filters_default_none_to_builders(self, monkeypatch):
+        _, rec, _ = self._run(monkeypatch)
+        for kw in (rec["go_transport"][0], rec["summary"][0]):
+            assert kw.get("go_namespace") is None
+            assert kw.get("go_evidence") is None
+
+    def test_gbm_filters_threaded_to_stereo_relative_counts(self, monkeypatch):
+        conn = _go_filter_conn(relatives=[{
+            "metabolite_id": "kegg.compound:C00086", "metabolite_name": "Urea",
+            "relative_id": "kegg.compound:C99999", "relative_name": "Rel",
+            "relation": "generic_of",
+        }])
+        _, rec, _ = self._run(
+            monkeypatch, conn=conn, go_namespace=["biological_process"],
+            go_evidence=["curated"])
+        assert len(rec["summary"]) == 2
+        stereo_kw = rec["summary"][1]
+        assert stereo_kw["metabolite_ids"] == ["kegg.compound:C99999"]
+        assert stereo_kw["go_namespace"] == ["biological_process"]
+        assert stereo_kw["go_evidence"] == ["curated"]
+
+    def test_gbm_arm_off_warns_and_ignores_both(self, monkeypatch):
+        out, rec, _ = self._run(
+            monkeypatch, evidence_sources=["metabolism", "transport"],
+            go_namespace=["molecular_function"], go_evidence=["curated"])
+        assert _GO_ARM_OFF_WARNING_BOTH in out["warnings"]
+        assert "go_transport" not in rec
+        assert rec["summary"][0].get("go_namespace") is None
+        assert rec["summary"][0].get("go_evidence") is None
+
+    def test_gbm_arm_off_warning_names_only_set_param(self, monkeypatch):
+        out, _, _ = self._run(
+            monkeypatch, evidence_sources=["transport"],
+            go_namespace=["molecular_function"])
+        hits = [w for w in out["warnings"]
+                if "to the go_transport arm only" in w]
+        assert len(hits) == 1
+        assert "go_namespace" in hits[0]
+        assert "go_evidence" not in hits[0]
+        assert "filter ignored" in hits[0]
+
+    def test_gbm_arm_off_single_param_grammar(self, monkeypatch):
+        out, _, _ = self._run(
+            monkeypatch, evidence_sources=["transport"],
+            go_namespace=["molecular_function"])
+        assert any(w.startswith("go_namespace applies to the go_transport")
+                   for w in out["warnings"])
+
+    def test_gbm_arm_off_empty_list_no_warning(self, monkeypatch):
+        out, _, _ = self._run(
+            monkeypatch, evidence_sources=["transport"], go_evidence=[])
+        assert not [w for w in out["warnings"]
+                    if "to the go_transport arm only" in w]
+
+    def test_gbm_arm_off_evidence_only_warning(self, monkeypatch):
+        out, _, _ = self._run(
+            monkeypatch, evidence_sources=["metabolism"],
+            go_evidence=["curated"])
+        hits = [w for w in out["warnings"]
+                if "to the go_transport arm only" in w]
+        assert len(hits) == 1
+        assert "go_evidence" in hits[0]
+        assert "go_namespace" not in hits[0]
+
+    def test_gbm_no_arm_off_warning_when_go_arm_active(self, monkeypatch):
+        out, _, _ = self._run(
+            monkeypatch, go_namespace=["molecular_function"])
+        assert not any("go_transport arm only" in w for w in out["warnings"])
+
+    def test_gbm_no_arm_off_warning_when_filters_unset(self, monkeypatch):
+        out, _, _ = self._run(monkeypatch, evidence_sources=["transport"])
+        assert not any("go_transport arm only" in w for w in out["warnings"])
+
+
+class TestGoTransportFiltersApiMbg:
+    _LOCI = ["PMM0970", "PMM0974"]
+    _ORG = "Prochlorococcus MED4"
+
+    def _run(self, monkeypatch, conn=None, **kw):
+        rec = {}
+        _install_mbg_builders(monkeypatch, rec)
+
+        def _nf(**k):
+            rec.setdefault("no_formula", []).append(k)
+            return "NOFORMULA", {}
+        monkeypatch.setattr(
+            api, "build_metabolites_by_gene_no_formula_count", _nf)
+        conn = conn or _go_filter_conn()
+        locus_tags = kw.pop("locus_tags", self._LOCI)
+        out = api.metabolites_by_gene(locus_tags, self._ORG, conn=conn, **kw)
+        return out, rec, conn
+
+    def test_mbg_signature_has_go_filters_after_ancestors(self):
+        import inspect
+        params = list(inspect.signature(api.metabolites_by_gene).parameters)
+        i = params.index("go_include_ancestors")
+        assert params[i + 1:i + 3] == ["go_namespace", "go_evidence"]
+
+    def test_mbg_unknown_namespace_raises(self, monkeypatch):
+        with pytest.raises(ValueError) as ei:
+            self._run(monkeypatch, go_namespace=["bogus"])
+        msg = str(ei.value)
+        assert "molecular_function" in msg and "biological_process" in msg
+
+    def test_mbg_unknown_evidence_raises(self, monkeypatch):
+        with pytest.raises(ValueError) as ei:
+            self._run(monkeypatch, go_evidence=["bogus"])
+        assert "curated" in str(ei.value)
+
+    def test_mbg_filters_threaded_to_go_detail_summary_no_formula(
+            self, monkeypatch):
+        _, rec, _ = self._run(
+            monkeypatch, metabolite_elements=["N"],
+            go_namespace=["biological_process"], go_evidence=["curated"])
+        assert rec["no_formula"], "no-formula count not called"
+        for kw in (rec["go_transport"][0], rec["summary"][0],
+                   rec["no_formula"][0]):
+            assert kw["go_namespace"] == ["biological_process"]
+            assert kw["go_evidence"] == ["curated"]
+
+    def test_mbg_filters_not_passed_to_non_go_arms(self, monkeypatch):
+        _, rec, _ = self._run(
+            monkeypatch, go_namespace=["molecular_function"])
+        for arm in ("metabolism", "transport"):
+            assert "go_namespace" not in rec[arm][0]
+
+    def test_mbg_arm_off_warns_and_ignores(self, monkeypatch):
+        out, rec, _ = self._run(
+            monkeypatch, evidence_sources=["metabolism", "transport"],
+            go_namespace=["molecular_function"], go_evidence=["curated"])
+        assert _GO_ARM_OFF_WARNING_BOTH in out["warnings"]
+        assert "go_transport" not in rec
+        assert rec["summary"][0].get("go_namespace") is None
+
+    def test_mbg_arm_off_warning_names_only_set_param(self, monkeypatch):
+        out, _, _ = self._run(
+            monkeypatch, evidence_sources=["transport"],
+            go_evidence=["curated"])
+        hits = [w for w in out["warnings"]
+                if "to the go_transport arm only" in w]
+        assert len(hits) == 1
+        assert "go_evidence" in hits[0]
+        assert "go_namespace" not in hits[0]
+
+
+class TestRouteAgreementApi:
+    """2c.17 — by_evidence_source_combination + per-entity multi_source_*."""
+
+    _ORG = "Prochlorococcus MED4"
+
+    def _gbm(self, monkeypatch, summary_extra=None, **kw):
+        rec = {}
+        _install_gbm_builders(monkeypatch, rec)
+        conn = _go_filter_conn(summary={**_GO_SUMMARY, **(summary_extra or {})})
+        return api.genes_by_metabolite(
+            ["kegg.compound:C00086"], self._ORG, conn=conn, **kw)
+
+    def _mbg(self, monkeypatch, summary_extra=None, **kw):
+        rec = {}
+        _install_mbg_builders(monkeypatch, rec)
+        conn = _go_filter_conn(summary={**_GO_SUMMARY, **(summary_extra or {})})
+        return api.metabolites_by_gene(
+            ["PMM0970"], self._ORG, conn=conn, **kw)
+
+    @pytest.mark.parametrize("tool", ["_gbm", "_mbg"])
+    def test_combination_sorted_pair_count_desc_then_sources(
+            self, monkeypatch, tool):
+        out = getattr(self, tool)(
+            monkeypatch,
+            summary_extra={"by_evidence_source_combination": list(_COMBO_RAW)})
+        assert out["by_evidence_source_combination"] == _COMBO_SORTED
+
+    @pytest.mark.parametrize("tool", ["_gbm", "_mbg"])
+    def test_combination_present_in_summary_mode(self, monkeypatch, tool):
+        out = getattr(self, tool)(
+            monkeypatch, summary=True,
+            summary_extra={"by_evidence_source_combination": list(_COMBO_RAW)})
+        assert out["by_evidence_source_combination"] == _COMBO_SORTED
+
+    @pytest.mark.parametrize("tool", ["_gbm", "_mbg"])
+    def test_combination_empty_list_when_summary_lacks_it(
+            self, monkeypatch, tool):
+        out = getattr(self, tool)(monkeypatch)
+        assert out["by_evidence_source_combination"] == []
+
+    @pytest.mark.parametrize("tool", ["_gbm", "_mbg"])
+    def test_combination_present_without_go_arm(self, monkeypatch, tool):
+        out = getattr(self, tool)(
+            monkeypatch, evidence_sources=["metabolism", "transport"],
+            summary_extra={"by_evidence_source_combination": [
+                {"evidence_sources": ["metabolism", "transport"],
+                 "pair_count": 2}]})
+        assert out["by_evidence_source_combination"] == [
+            {"evidence_sources": ["metabolism", "transport"], "pair_count": 2}]
+
+    def test_gbm_combination_empty_on_unresolved_organism(self, monkeypatch):
+        rec = {}
+        _install_gbm_builders(monkeypatch, rec)
+
+        def _raise(organism, locus_tags, experiment_ids, conn):
+            raise ValueError(f"no organism matching '{organism}'")
+        monkeypatch.setattr(api, "_validate_organism_inputs", _raise)
+        out = api.genes_by_metabolite(
+            ["kegg.compound:C00086"], "Nonexistent", conn=_go_filter_conn())
+        assert out["by_evidence_source_combination"] == []
+
+    def test_mbg_combination_empty_on_unresolved_organism(self, monkeypatch):
+        rec = {}
+        _install_mbg_builders(monkeypatch, rec)
+
+        def _raise(organism, locus_tags, experiment_ids, conn):
+            raise ValueError(f"no organism matching '{organism}'")
+        monkeypatch.setattr(api, "_validate_organism_inputs", _raise)
+        out = api.metabolites_by_gene(
+            ["PMM0970"], "Nonexistent", conn=_go_filter_conn())
+        assert out["by_evidence_source_combination"] == []
+
+    def test_gbm_by_metabolite_multi_source_gene_count_passes(
+            self, monkeypatch):
+        out = self._gbm(monkeypatch, summary_extra={"by_metabolite": [{
+            "metabolite_id": "kegg.compound:C00086", "name": "Urea",
+            "formula": "CH4N2O", "rows": 40, "gene_count": 29,
+            "reaction_count": 2, "transporter_count": 3,
+            "metabolism_rows": 4, "transport_most_specific_rows": 25,
+            "transport_inherited_rows": 0, "go_transport_rows": 11,
+            "multi_source_gene_count": 5,
+        }]})
+        assert out["by_metabolite"][0]["multi_source_gene_count"] == 5
+
+    def test_gbm_top_genes_multi_source_metabolite_count_passes(
+            self, monkeypatch):
+        out = self._gbm(monkeypatch, summary_extra={"top_genes": [{
+            "locus_tag": "PMM0970", "gene_name": "urtA",
+            "reaction_count": 0, "transporter_count": 1,
+            "metabolite_count": 1, "go_transport_rows": 2,
+            "multi_source_metabolite_count": 1,
+        }]})
+        assert out["top_genes"][0]["multi_source_metabolite_count"] == 1
+
+    def test_mbg_by_gene_multi_source_metabolite_count_passes(
+            self, monkeypatch):
+        out = self._mbg(monkeypatch, summary_extra={"by_gene": [{
+            "locus_tag": "PMM0970", "gene_name": "urtA", "rows": 3,
+            "metabolite_count": 1, "reaction_count": 0,
+            "transporter_count": 1, "go_transport_rows": 2,
+            "multi_source_metabolite_count": 1,
+        }]})
+        assert out["by_gene"][0]["multi_source_metabolite_count"] == 1
+
+    def test_mbg_top_metabolites_multi_source_gene_count_passes(
+            self, monkeypatch):
+        out = self._mbg(monkeypatch, summary_extra={"top_metabolites": [{
+            "metabolite_id": "kegg.compound:C00086", "name": "Urea",
+            "gene_count": 1, "go_transport_rows": 2,
+            "multi_source_gene_count": 1,
+        }]})
+        assert out["top_metabolites"][0]["multi_source_gene_count"] == 1
+
+
+class TestGoTransportMetaboliteCountApi:
+    """2c.14 / 2c.16 — new row column passes through; list_organisms
+    top_metabolic_capability entries carry it as a ride-along column."""
+
+    def test_gene_overview_row_passes_go_transport_metabolite_count(
+            self, mock_conn):
+        summary = [{
+            "total_matching": 1,
+            "by_organism": [{"item": "Prochlorococcus MED4", "count": 1}],
+            "by_category": [], "by_annotation_type": [],
+            "by_annotation_state": [], "has_expression": 0,
+            "has_significant_expression": 0, "has_orthologs": 0,
+            "has_clusters": 0, "has_derived_metrics": 0,
+            "has_chemistry": 1, "not_found": [],
+        }]
+        detail = [{
+            "locus_tag": "PMM0974", "organism_name": "Prochlorococcus MED4",
+            "transported_metabolite_count": 3,
+            "go_transport_metabolite_count": 3,
+            "evidence_sources": ["transport", "go_transport"],
+        }]
+        _trust_dispatch(mock_conn, [("not_found", summary)], default=detail)
+        out = api.gene_overview(locus_tags=["PMM0974"], conn=mock_conn)
+        assert out["results"][0]["go_transport_metabolite_count"] == 3
+
+    _ROWS = [
+        {**dict(TestListOrganisms._ROWS[0]),
+         "reaction_count": 943, "catalyzed_metabolite_count": 1039,
+         "transported_metabolite_count": 120,
+         "go_transport_metabolite_count": 45},
+        {**dict(TestListOrganisms._ROWS[1]),
+         "reaction_count": 1348, "catalyzed_metabolite_count": 1428,
+         "transported_metabolite_count": 95,
+         "go_transport_metabolite_count": 94},
+    ]
+
+    def test_list_organisms_row_passes_count(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [TestListOrganisms._SUMMARY_ROW], self._ROWS]
+        out = api.list_organisms(conn=mock_conn)
+        assert out["results"][0]["go_transport_metabolite_count"] == 45
+
+    def test_top_metabolic_capability_carries_count_detail_mode(
+            self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [TestListOrganisms._SUMMARY_ROW], self._ROWS]
+        out = api.list_organisms(conn=mock_conn)
+        cap = out["top_metabolic_capability"]
+        # ranking unchanged: catalysis (EZ55 first)
+        assert cap[0]["organism_name"] == "Alteromonas macleodii EZ55"
+        assert cap[0]["go_transport_metabolite_count"] == 94
+        assert cap[1]["go_transport_metabolite_count"] == 45
+
+    def test_top_metabolic_capability_carries_count_summary_mode(
+            self, mock_conn):
+        capability_rows = [
+            {k: r[k] for k in (
+                "organism_name", "reaction_count",
+                "catalyzed_metabolite_count", "transported_metabolite_count",
+                "go_transport_metabolite_count")}
+            for r in self._ROWS
+        ]
+        mock_conn.execute_query.side_effect = [
+            [TestListOrganisms._SUMMARY_ROW], capability_rows]
+        out = api.list_organisms(summary=True, conn=mock_conn)
+        cap = out["top_metabolic_capability"]
+        assert cap[0]["go_transport_metabolite_count"] == 94
+        assert cap[1]["go_transport_metabolite_count"] == 45
+
+    def test_top_metabolic_capability_count_defaults_zero(self, mock_conn):
+        rows = [{k: v for k, v in r.items()
+                 if k != "go_transport_metabolite_count"} for r in self._ROWS]
+        mock_conn.execute_query.side_effect = [
+            [TestListOrganisms._SUMMARY_ROW], rows]
+        out = api.list_organisms(conn=mock_conn)
+        for e in out["top_metabolic_capability"]:
+            assert e["go_transport_metabolite_count"] == 0

@@ -23,6 +23,7 @@ rows:
   expression_edge_count: 9
   gene_category: Transcription
   gene_name: null
+  go_transport_metabolite_count: 0
   informative_annotation_types:
   - cog_category
   - go_bp

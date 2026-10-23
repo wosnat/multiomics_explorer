@@ -866,6 +866,24 @@ examples:
         ]
       }
 
+  - title: Route agreement per gene — urtA, urtB, urtE in MED4
+    call: metabolites_by_gene(locus_tags=["PMM0970", "PMM0971", "PMM0974"], organism="Prochlorococcus MED4", summary=True)
+    note: "`by_evidence_source_combination` counts (gene, metabolite) pairs by the set of routes that name them: 8 pairs TCDB only, 3 TCDB and GO (urea, once per gene), 3 GO only. Per gene, `by_gene[].multi_source_metabolite_count` says how many of its metabolites two routes reach; per metabolite, `top_metabolites[].multi_source_gene_count` says how many genes. A GO-only pair is not wrong, and a TCDB + GO pair is corroborated, not proven (the two routes share homology)."
+    response: |
+      {
+        "by_evidence_source_combination": [
+          {"evidence_sources": ["transport"], "pair_count": 8},
+          {"evidence_sources": ["go_transport"], "pair_count": 3},
+          {"evidence_sources": ["go_transport", "transport"], "pair_count": 3}
+        ],
+        "by_gene": [
+          {"locus_tag": "PMM0970", "multi_source_metabolite_count": 1},
+          {"locus_tag": "PMM0971", "multi_source_metabolite_count": 1},
+          {"locus_tag": "PMM0974", "multi_source_metabolite_count": 1}
+        ],
+        ...
+      }
+
 verbose_fields:
   - gene_category
   - metabolite_inchikey
@@ -1108,3 +1126,15 @@ mistakes:
     formula-less metabolites elsewhere. The GO and TCDB routes are correlated
     (InterPro2GO and eggNOG share homology with the TCDB calls), so their
     agreement is weaker evidence than it reads: `docs://analysis/transport`.
+  - >-
+    A multi-source pair is corroborated, not proven. `by_evidence_source_combination`,
+    `by_gene[].multi_source_metabolite_count` and
+    `top_metabolites[].multi_source_gene_count` count the (gene, metabolite) pairs
+    that two or more routes name, but the routes share homology (InterPro2GO and
+    eggNOG vs the TCDB calls), so agreement raises confidence without being
+    independent confirmation. A single-source pair is not wrong.
+  - >-
+    `go_namespace` and `go_evidence` narrow the GO arm only; KEGG and TCDB rows are
+    untouched. Set while `evidence_sources` excludes `go_transport`, they are
+    ignored with a warning. Use `go_namespace=['molecular_function']` for "is this
+    gene a transporter".
