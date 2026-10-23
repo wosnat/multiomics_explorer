@@ -2090,7 +2090,8 @@
       "items": {
        "enum": [
         "metabolism",
-        "transport"
+        "transport",
+        "go_transport"
        ],
        "type": "string"
       },
@@ -2132,6 +2133,12 @@
       "type": "null"
      }
     ]
+   }
+  },
+  "go_include_ancestors": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
    }
   },
   "limit": {
@@ -3828,7 +3835,8 @@
        "enum": [
         "metabolism",
         "transport",
-        "metabolomics"
+        "metabolomics",
+        "go_transport"
        ],
        "type": "string"
       },
@@ -4424,7 +4432,8 @@
       "items": {
        "enum": [
         "metabolism",
-        "transport"
+        "transport",
+        "go_transport"
        ],
        "type": "string"
       },
@@ -4466,6 +4475,12 @@
       "type": "null"
      }
     ]
+   }
+  },
+  "go_include_ancestors": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
    }
   },
   "limit": {
