@@ -43,7 +43,7 @@ walking `Tcdb_family_transports_chemical_role`. No backward compatibility with a
 | Direct GO rows incl. role targets (corpus) | 13,839 rows · 8,449 pairs · 5,438 genes · 204 targets |
 | Direct GO rows, MED4 | 126 rows · 77 pairs · 59 genes · 45 targets (no direct role rows in MED4) |
 | Organisms with genes but no GO-route gene | **none** (every organism with genes has ≥1) |
-| Organism resolver caveat | `Alteromonas mediterranea AltDE` cannot be resolved by the API (every string that matches it also substring-matches `…AltDE1`; pre-existing, see §10 Q1) |
+| Organism resolver caveat | `Alteromonas mediterranea AltDE` cannot be resolved by the API (every string that matches it also substring-matches `…AltDE1`; pre-existing, see Decision D12) |
 
 ## 4. Interfaces (names every later task uses)
 
@@ -61,15 +61,18 @@ def build_genes_by_metabolite_go_transport(
 
 def build_metabolites_by_gene_go_transport(
     *, locus_tags: list[str], organism: str,
-    metabolite_ids: list[str] | None = None,          # added vs. brief — Decision D1
+    metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     metabolite_elements: list[str] | None = None,
-    gene_categories: list[str] | None = None,          # added vs. brief — Decision D1
+    gene_categories: list[str] | None = None,
     include_ancestors: bool = False,
     verbose: bool = False, limit: int | None = None, offset: int = 0,
 ) -> tuple[str, dict]
 ```
+
+**Note:** these §4.1 signatures supersede the task brief's interface block. The mbg GO builder
+adds `metabolite_ids` and `gene_categories`, which the brief omitted (Decision D1).
 
 - `build_genes_by_metabolite_summary` / `build_metabolites_by_gene_summary` gain
   `include_ancestors: bool = False`; `arms` accepts `"go_transport"` (default stays the caller's
@@ -251,6 +254,8 @@ Inherited-branch semantics (design §3.3, measured §7.2):
   (depth 0, any own term). TCDB / KEGG are never consulted.
 - **Grain** — one row per (gene, own term, target) at the minimum is_a hop count; among equal-depth
   ancestors the lowest `a.id` is the axiom term (deterministic; Decision D4).
+- **Min-depth pick** — relies on `ORDER BY d, a.id` followed by `collect(...)[0]`. Implementers may
+  use an explicit `min(d)` form instead if it reproduces the verified counts in §7.2 / §7.7.
 - Shared filters bind `g` / `m` only, so they apply identically to the direct check and the
   inherited rows.
 
@@ -404,6 +409,10 @@ Including role targets: corpus 4,292 pairs / 6,210 rows / 1,922 genes (role pair
 pairs / 74 rows / 29 genes. "379" is the metabolite-only measure (genes with no direct path to any
 target incl. roles: 105).
 
+**Test expectation:** tests assert **379** only. It counts genes that reach a *Metabolite* only by
+inheritance (no direct GO path to any Metabolite). The roles-included figure, 105, is for reference
+and no test asserts it.
+
 murJ: `metabolites_by_gene(["PMM0261"], "Prochlorococcus MED4", go_include_ancestors=True)` →
 one GO row `kegg.compound:C01356` Lipid, `go_term_id go:0034204` "lipid translocation",
 `go_term_depth 1`, `go_axiom_term_id go:0006869`, `go_axiom_term_name "lipid transport"`
@@ -413,9 +422,9 @@ one GO row `kegg.compound:C01356` Lipid, `go_term_id go:0034204` "lipid transloc
 
 | Call (builder level) | GO | TCDB | total |
 |---|---|---|---|
-| `chebi.role:26672`, organism string `Alteromonas mediterranea AltDE` | 60 (= 28 AltDE + 32 AltDE1, word-match leak) incl. **MADE_1013240** `go:0015891` "siderophore transport" BP curated `['ncbi']` | 188 (92 + 96) | 248 |
+| `chebi.role:26672`, organism string `Alteromonas mediterranea AltDE` — **do not use as a test input** (Decision D12) | 60 (= 28 AltDE + 32 AltDE1, word-match leak) incl. **MADE_1013240** `go:0015891` "siderophore transport" BP curated `['ncbi']` | 188 (92 + 96) | 248 |
 | same, AltDE genes only (`g.organism_name =`) | **28 rows / 24 genes** | **92 rows / 85 genes** | 120 |
-| `chebi.role:26672`, `Alteromonas mediterranea AltDE1` (API-resolvable) | **32** | **96** | 128 · genes 112 · `transporter_count_total` 6 |
+| `chebi.role:26672`, `Alteromonas mediterranea AltDE1` (API-resolvable; **the test input**, D12) | **32** (incl. `amad1_16875` `go:0015891` BP curated `['ncbi']`) | **96** | 128 · genes 112 · `transporter_count_total` 6 |
 | `chebi.role:26672`, `Prochlorococcus MED4` | **0** (empty-GO case) | **25 rows / 23 genes**, all `inherited` | 25 |
 | `chebi.role:25512` (neurotransmitter), `Pseudomonas putida KT2440` | 5 | 65 | 70 |
 
@@ -488,7 +497,7 @@ mbg input: the 59 MED4 GO-route genes + PMM0261 (60 tags). gbm input: `["kegg.co
 accept them — `TypeError`, same rule as today's per-arm scope), so they are documented no-ops on GO
 rows.
 
-### 7.8 Paging (Review Focus 1)
+### 7.8 Paging (three-arm Mode-3 continuity, §5.2)
 
 Mode-3 simulation with the §5.2 keys (per-arm builders with `LIMIT limit+offset`, concat, sort,
 slice): gbm urea MED4, `limit=10` → pages concatenate to exactly the full sorted 45 rows; first GO
@@ -502,13 +511,13 @@ row at index 34, last non-GO at 33. mbg `["PMM0970","PMM0261"]`, `go_include_anc
 | excluded target with node | `C00080` (H⁺) MED4 | GO 0 · metabolism 250 · transport 131 → 381; warning fires |
 | excluded target with node | `C01330` (Na⁺) MED4 | GO 0 · transport 71; warning fires |
 | excluded target, no node | `chebi:23906` MED4 | `not_found.metabolite_ids` + warning (no node exists — confirmed) |
-| empty GO arm, organism-level | none possible (every organism has GO-route genes) — use `chebi.role:26672` in MED4 (GO 0, TCDB 25) or PMM0261 default mbg (GO 0) |
+| empty GO arm (Decision D13) | `chebi.role:26672` in MED4 (no organism lacks GO-route genes) | GO 0 · TCDB 25; envelope keys present. Also: PMM0261 default mbg (GO 0) |
 | role id with no edges | e.g. `chebi.role:23357` (54 such roles) | 0 rows; `not_matched` (Decision D8) |
 | ancestors on a gene with none to add | `PMM0085` (ktrA) MED4 | identical rows with/without `go_include_ancestors` (32 of 59 MED4 GO genes behave so) |
 | stereo relative counts | `kegg.compound:C00025` → relative `C00302` (Glutamate) MED4 | by_metabolite rows 30 → 31 (`go_transport_rows` 1), gene_count 30 = re-call |
 | performance | gbm 4 broad targets KT2440 ancestors (625 rows); mbg 2,000 KT2440 genes ancestors (832 GO rows) | ~1.8 s wall each incl. Python start-up |
 
-## 8. Warnings (exact copy; plan Task 4b)
+## 8. Warnings (exact copy; api layer, plan Task 4b)
 
 - Excluded target (gbm only; GO arm active; requested canonical id ∈
   `Schema_info.go_transport_excluded_targets`), one per id:
@@ -524,7 +533,7 @@ the 7 ids with no node, alongside `not_found`.
 - **D1** mbg GO builder takes `metabolite_ids` and `gene_categories` in addition to the brief's
   signature. The existing mbg arms take both; without them a `metabolite_ids` / `gene_categories`
   call would leak unfiltered GO rows. Both verified to narrow (§7.7). Brief vs. design: the design
-  lists `gene_categories` as a shared filter, so the design wins.
+  lists `gene_categories` as a shared filter, so the design wins. Accepted at task review.
 - **D2** One builder per tool, inherited rows inside the same builder as a `UNION ALL` branch of an
   inner `CALL` (not a separate builder); emitted only when `include_ancestors=True`, so the default
   query has no is_a walk.
@@ -549,21 +558,20 @@ the 7 ids with no node, alongside `not_found`.
   role targets too (they are distinct targets). The old mbg docstring claim "distinct metabolites
   across transport rows equal `transported_metabolite_count`" now holds only over
   `target_kind='metabolite'` rows — update the docstring.
+- **D12** (controller ruling; replaces Q1) Integration tests that need an Alteromonas strain use
+  the exact strain `Alteromonas mediterranea AltDE1`: 32 GO siderophore rows, plus the mixed batch
+  203 and the role-excluded batch 75 (§7.3). `Alteromonas mediterranea AltDE` is ambiguous with AltDE1
+  in the existing organism resolver, and the builders' word match leaks AltDE1 genes. This is pre-existing
+  and not GO-specific. The resolver fix goes to the backlog and is not part of this change. MADE_1013240
+  stays a spec observation (§7.3) and is not a test input.
+- **D13** (controller ruling; replaces Q2) No organism lacks GO-route genes. The empty-GO-arm edge
+  scenario (`gbm_go_arm_empty_organism`) uses siderophore `chebi.role:26672` in
+  `Prochlorococcus MED4`: 0 GO rows, 25 TCDB rows, envelope keys present.
 
 ## 10. Open questions for the user
 
-- **Q1 (blocks two named tests)** `Alteromonas mediterranea AltDE` is unreachable through every
-  organism-taking API: the resolver's word-CONTAINS match makes any AltDE string also match AltDE1
-  (`ValueError … matches multiple organisms`), and the builders' word-match then leaks AltDE1 genes
-  (§7.3: 60 GO rows = 28 + 32). Pre-existing, not GO-specific. The plan's
-  `test_gbm_mixed_role_and_metabolite_batch` (`organism="AltDE"`) and the "AltDE siderophore
-  includes MADE_1013240" assertion cannot pass via the API. Options: (a) retarget those tests to
-  `Alteromonas mediterranea AltDE1` (32 GO rows; numbers in §7.3) and keep MADE_1013240 as a
-  builder-level assertion only; (b) fix the resolver (exact `preferred_name` match wins) as a small
-  separate change before Task 3. Recommendation: (a) now, (b) as a backlog item.
-- **Q2** Review Focus 3 asks for "an organism with no GO-route genes" — none exists. Proposed
-  scenario `gbm_go_arm_empty_organism` → "empty GO arm" with `chebi.role:26672` in MED4 (GO 0,
-  TCDB 25), envelope keys present.
+Q1 and Q2 were resolved by D12 and D13.
+
 - **Q3** `has_chemistry` / gene_overview `transport` tag still test only TCDB→Metabolite. 29 corpus
   genes have a deepest TCDB **role** edge and no other chemistry; mbg will now return rows for them
   while `has_chemistry` stays false. Design §3.4 widens only to the GO route. Widen the TCDB
