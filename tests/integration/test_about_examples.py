@@ -184,6 +184,12 @@ def test_example_has_expected_keys(conn, tool_name, example):
 
     # 'returned' and 'truncated' are added by MCP wrapper, not API
     mcp_only_keys = {"returned", "truncated"}
+    # GO transport surface Decision D10: the api emits rows_by_go_term_depth
+    # only when the go_transport arm is active (the MCP envelope carries null).
+    call = example["call"]
+    if (tool_name in ("genes_by_metabolite", "metabolites_by_gene")
+            and "evidence_sources=" in call and "go_transport" not in call):
+        mcp_only_keys = mcp_only_keys | {"rows_by_go_term_depth"}
     for key in example["tool_expected_keys"]:
         if key in mcp_only_keys:
             continue

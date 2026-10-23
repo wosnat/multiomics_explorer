@@ -2761,8 +2761,14 @@ class TestGenesByMetabolite:
             conn=conn,
         )
         model = GenesByMetaboliteResponse(**result)
-        assert model.total_matching == 34
+        # moved: GO transport surface (default-on go_transport arm adds the
+        # 11 urtA-E GO rows; 34 -> 45). Gene union unchanged (urtA-E are
+        # already transport genes).
+        assert model.total_matching == 45
         assert model.gene_count_total == 29
+        assert {r.evidence_source: r.count for r in model.by_evidence_source} == {
+            "metabolism": 4, "transport": 30, "go_transport": 11,
+        }
         urea_row = next(
             r for r in model.by_metabolite
             if r.metabolite_id == "kegg.compound:C00086"
@@ -2781,8 +2787,9 @@ class TestGenesByMetabolite:
         tiers = [
             (r.evidence_source, r.substrate_depth) for r in rows
         ]
+        # moved: GO transport surface — GO rows sort after every TCDB tier.
         tier_rank = {("metabolism", None): 0, ("transport", "most_specific"): 1,
-                     ("transport", "inherited"): 2}
+                     ("transport", "inherited"): 2, ("go_transport", None): 3}
         ranks = [tier_rank[t] for t in tiers]
         assert ranks == sorted(ranks)
         ms_scores = [r.tcdb_evidence_score for r in rows
@@ -2796,6 +2803,11 @@ class TestGenesByMetabolite:
             if r.evidence_source == "metabolism":
                 assert r.substrate_depth is None
                 assert r.tcdb_evidence_score is None
+            elif r.evidence_source == "go_transport":
+                # GO rows are not TCDB calls: TCDB fields stay null.
+                assert r.substrate_depth is None
+                assert r.tcdb_evidence_score is None
+                assert r.tcdb_family_id is None
             else:
                 assert r.tcdb_evidence_score is not None
         # top_genes carry the gene-level TCDB facts
@@ -2816,7 +2828,11 @@ class TestGenesByMetabolite:
             limit=50,
             conn=conn,
         )
-        assert result["total_matching"] == 14
+        # moved: GO transport surface (substrate_depth is a documented no-op
+        # on the default-on GO arm, spec §7.7: 4 + 10 + 11 GO rows; 14 -> 25).
+        assert result["total_matching"] == 25
+        go_rows = [r for r in result["results"] if r["evidence_source"] == "go_transport"]
+        assert len(go_rows) == 11
         transport = [r for r in result["results"] if r["evidence_source"] == "transport"]
         assert len(transport) == 10
         assert {r["substrate_depth"] for r in transport} == {"most_specific"}
@@ -2942,12 +2958,19 @@ class TestTcdbSubstrateDepthCrossToolAgreement:
             limit=1000, conn=conn,
         )
         assert not mbg["truncated"]
-        mets = {r["metabolite_id"] for r in mbg["results"]}
+        # moved: GO transport surface (TCDB role rows, Decision D11): the
+        # overview invariant holds over target_kind='metabolite' rows; the
+        # role target chebi.role:33229 (vitamin) is a distinct extra target.
+        mets = {r["metabolite_id"] for r in mbg["results"]
+                if r["target_kind"] == "metabolite"}
         assert len(mets) == 12
+        roles = {r["metabolite_id"] for r in mbg["results"]
+                 if r["target_kind"] == "chemical_role"}
+        assert roles == {"chebi.role:33229"}
         ov = api.gene_overview(["PMM0392"], conn=conn)["results"][0]
         assert len(mets) == ov["transported_metabolite_count"] == 12
         by_gene = next(g for g in mbg["by_gene"] if g["locus_tag"] == "PMM0392")
-        assert by_gene["metabolite_count"] == 12
+        assert by_gene["metabolite_count"] == 13
         assert by_gene["transport_substrate_resolution"] == "resolved"
         assert by_gene["tcdb_evidence_score_max"] == 0.8
         # decision 5 caveat: resolved genes do not trigger the gene-anchored
@@ -4602,13 +4625,16 @@ class TestTransportSubstrateResolutionRowsLive:
         assert rows
         for row in rows:
             assert "transport_substrate_resolution" in row, row["locus_tag"]
-            if row["evidence_source"] == "metabolism":
+            # moved: GO transport surface — default-on GO rows are not TCDB
+            # calls, so they carry None like metabolism rows (spec §4.2).
+            if row["evidence_source"] in ("metabolism", "go_transport"):
                 assert row["transport_substrate_resolution"] is None
             else:
                 assert row["transport_substrate_resolution"] in (
                     "resolved", "family_inferred"), row
         assert any(r["evidence_source"] == "metabolism" for r in rows)
         assert any(r["evidence_source"] == "transport" for r in rows)
+        assert any(r["evidence_source"] == "go_transport" for r in rows)
 
     def test_row_value_is_the_genes_value(self, conn):
         """Row-level = the GENE's KG-authoritative resolution, repeated on
