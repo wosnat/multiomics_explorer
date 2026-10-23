@@ -1012,13 +1012,14 @@ mistakes:
     transport-classified genes only. Don't use it as the primary anchor.
   - >-
     `ec_numbers` and `mass_balance` are metabolism-arm-only filters — they
-    DO NOT suppress transport rows. Transport rows pass through unchanged.
-    To restrict to metabolism alone, combine with
+    DO NOT suppress TCDB or GO transport rows, which pass through
+    unchanged. To restrict to metabolism alone, combine with
     `evidence_sources=['metabolism']`. Symmetrically, `substrate_depth`
-    narrows transport rows only and metabolism rows are unaffected. Per-arm
-    filter scope is predictable + composable; it is NOT soft-exclude.
-    `metabolite_elements`, `metabolite_ids`, `metabolite_pathway_ids`, and
-    `gene_categories` are the only filters that narrow both arms uniformly.
+    narrows TCDB transport rows only and `go_include_ancestors` the GO
+    route only. Per-arm filter scope is predictable + composable; it is
+    NOT soft-exclude. `metabolite_elements`, `metabolite_ids`,
+    `metabolite_pathway_ids`, and `gene_categories` are the only filters
+    that narrow all three arms uniformly.
   - >-
     `top_metabolite_pathways` here means *KEGG pathways the gene set's
     chemistry reaches* (via `Reaction_in_kegg_pathway` +

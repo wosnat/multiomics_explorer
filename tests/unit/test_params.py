@@ -41,7 +41,10 @@ _SHARED = {
     "treatment_type": ["TreatmentTypeParam"], "background_factors": ["BackgroundFactorsParam"],
     "growth_phases": ["GrowthPhasesParam"], "omics_type": ["OmicsTypeParam"],
     "publication_dois": ["PublicationDoisParam", "PublicationDoisRequiredParam"],
-    "metabolite_ids": ["MetaboliteIdsParam", "MetaboliteIdsRequiredParam"],
+    "metabolite_ids": [
+        "MetaboliteIdsParam", "MetaboliteIdsRequiredParam",
+        "MetaboliteIdsChemistryParam", "MetaboliteIdsChemistryRequiredParam",
+    ],
     "exclude_metabolite_ids": ["ExcludeMetaboliteIdsParam"],
     "informative_only": ["InformativeOnlyParam"],
     "sources": ["SourcesParam"], "evidence": ["EvidenceParam"], "max_tier": ["MaxTierParam"],
@@ -58,6 +61,11 @@ def test_shared_params_have_one_description_each():
             # three matching contracts; OrganismSingleParam and
             # OrganismRequiredParam share the single-organism text.
             assert len(descs) == 3, f"{pname}: expected 3 contract texts, got: {descs}"
+        elif pname == "metabolite_ids":
+            # two contracts: chemical roles warn everywhere except
+            # genes_by_metabolite / metabolites_by_gene, where they are a
+            # valid TCDB / GO target (go-transport final review).
+            assert len(descs) == 2, f"{pname}: expected 2 contract texts, got: {descs}"
         else:
             assert len(descs) == 1, f"{pname}: variant types disagree on text: {descs}"
         texts = {n: s["properties"][pname].get("description") for n, s in schemas.items() if pname in s["properties"]}

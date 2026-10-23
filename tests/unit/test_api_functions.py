@@ -22106,6 +22106,20 @@ class TestGoTransportApiGbm:
         assert "chebi:23906" in out["not_found"]["metabolite_ids"]
         assert _GO_EXCLUDED_WARNING.format(id="chebi:23906") in out["warnings"]
 
+    @pytest.mark.parametrize("spelling", ["CHEBI:23906", "23906"])
+    def test_gbm_excluded_target_non_canonical_spelling_warns(
+            self, monkeypatch, spelling):
+        """go-transport final review finding 3: an excluded id with no node
+        is not rewritten by alias resolution, so the membership check must
+        normalise the caller's spelling first."""
+        conn = _GoConn(
+            summary=_GO_SUMMARY, excluded=["chebi:23906"],
+            missing_ids=["chebi:23906", spelling],
+        )
+        out, _, _ = self._run(
+            monkeypatch, conn=conn, metabolite_ids=[spelling])
+        assert _GO_EXCLUDED_WARNING.format(id="chebi:23906") in out["warnings"]
+
     def test_gbm_excluded_warning_requires_go_arm(self, monkeypatch):
         conn = _GoConn(
             summary=_GO_SUMMARY, excluded=["kegg.compound:C00080"])

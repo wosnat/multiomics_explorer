@@ -9644,9 +9644,13 @@ def genes_by_metabolite(
     # KG curated out of the GO route, and the neurotransmitter-role caveat.
     if go_active and caller_ids:
         excluded_targets = _go_transport_excluded_targets(conn)
+        # Normalise first: an excluded id with no Metabolite node passes
+        # alias resolution unchanged, so `CHEBI:23906` / bare `23906`
+        # would otherwise miss the canonical `chebi:23906` entry.
         for mid in caller_ids:
-            if mid in excluded_targets:
-                warnings.append(_GO_EXCLUDED_TARGET_WARNING.format(id=mid))
+            canon = _normalize_metabolite_curie(mid)
+            if canon in excluded_targets:
+                warnings.append(_GO_EXCLUDED_TARGET_WARNING.format(id=canon))
         if _NEUROTRANSMITTER_ROLE_ID in caller_ids:
             warnings.append(_NEUROTRANSMITTER_WARNING)
     if stereo_relatives:

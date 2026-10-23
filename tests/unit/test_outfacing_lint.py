@@ -447,3 +447,21 @@ def test_lint_skips_example_response_fences(lint_mod, tmp_path):
     )
     vs = lint_mod.lint_about_content([md])
     assert [v[1] for v in vs] == [5]
+
+
+def test_lint_catches_both_arms_on_three_arm_chemistry_pages(lint_mod, tmp_path):
+    """go-transport final review finding 7: genes_by_metabolite /
+    metabolites_by_gene have three arms (KEGG reactions, TCDB, GO transport),
+    so 'both arms' / 'either arm' on their tool pages is stale. Scoped by
+    file name: assays_by_metabolite's numeric + boolean 'both arms' is fine."""
+    line = "gene_count_total: distinct genes across both arms.\n"
+    for name in ("genes_by_metabolite.md", "metabolites_by_gene.md"):
+        sub = tmp_path / name.removesuffix(".md")
+        sub.mkdir()
+        md = sub / name
+        md.write_text(line + "metabolite_count: reached via either arm.\n")
+        vs = lint_mod.lint_about_content([md])
+        assert [v[3] for v in vs] == ["both arms", "either arm"], name
+    other = tmp_path / "assays_by_metabolite.md"
+    other.write_text("Default None = both arms merged.\n")
+    assert lint_mod.lint_about_content([other]) == []

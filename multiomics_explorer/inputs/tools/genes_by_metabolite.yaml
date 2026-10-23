@@ -1806,12 +1806,13 @@ mistakes:
   - >-
     Filtering by `ec_numbers` does NOT restrict to metabolism only.
     Per-arm filter scope: `ec_numbers` and `mass_balance` narrow the
-    metabolism arm WHERE; transport rows are returned UNCHANGED (no
-    soft-exclude). Symmetrically, `substrate_depth` narrows transport
-    only and metabolism rows are unaffected. To restrict to one arm, set
-    `evidence_sources=['metabolism']` (or `['transport']`) explicitly.
+    metabolism arm WHERE; TCDB and GO transport rows are returned
+    UNCHANGED (no soft-exclude). Symmetrically, `substrate_depth` narrows
+    TCDB transport only and `go_include_ancestors` the GO route only. To
+    restrict to one arm, set `evidence_sources=['metabolism']` (or
+    `['transport']` / `['go_transport']`) explicitly.
     `metabolite_pathway_ids` and `gene_categories` are the only filters
-    that narrow both arms uniformly.
+    that narrow all three arms uniformly.
   - >-
     Single-organism enforced (mirrors `differential_expression_by_gene`).
     There is no `organisms` list. For cross-organism / cross-feeding work,

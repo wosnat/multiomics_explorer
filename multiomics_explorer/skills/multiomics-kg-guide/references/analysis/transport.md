@@ -16,7 +16,7 @@ Use `genes_by_metabolite` (compound → genes) and `metabolites_by_gene` (genes 
 
 - **MF vs BP.** `go_namespace='molecular_function'` terms are transporter activities ("urea transmembrane transporter activity"). `'biological_process'` terms are broader: they also cover storage, regulation and accessory subunits. A gene carrying "iron ion transport" is not necessarily a transporter (MED4 `ftn`, ferritin, reaches iron this way). Prefer MF rows for "is this gene a transporter"; BP rows add genes linked to the process. Most GO-route genes reach a substrate through both.
 - **Row grain.** One row per gene × own GO term × target. A gene with an MF and a BP term for the same compound gives two rows; count genes with `gene_count_total`, not rows.
-- **Evidence.** Sort or rank by `go_evidence` (`curated` first). Do not filter transport trust on it; there is no numeric score on this route.
+- **Evidence.** `go_evidence` is a class label (`curated`, `family_inferred`, `domain_inferred`), not a numeric score, and this route has no score to threshold. Rank rows by it (`curated` first) rather than filtering them on it.
 - **Direct vs inherited.** Default rows are direct: the gene's own term names the target (`go_term_depth=0`). `go_include_ancestors=True` adds rows where an is_a ancestor of the gene's term names the target: `go_term_depth` counts hops, `go_axiom_term_id` / `go_axiom_term_name` name the ancestor, and a (gene, target) already reached directly is not repeated. Inherited rows widen to broader targets and are a recall expansion. `rows_by_go_term_depth` in the envelope shows the split, and appears only when the GO arm is active.
 - **Targets that are classes.** A `target_kind='chemical_role'` row names a role (siderophore, xenobiotic, drug, toxin, vitamin, neurotransmitter), not a compound; roles are not propagated to the compounds they cover. The role id is a valid input to both tools and also reaches TCDB role edges. The neurotransmitter role is eukaryote-centred: in bacteria the matching terms are mostly amino-acid transporters (a warning says so). Class-valued metabolite targets (Lipid, carbohydrate, peptide) are real `Metabolite` nodes with no formula.
 
@@ -36,7 +36,7 @@ The routes are not independent. GO terms often arrive through InterPro2GO or egg
 ## Class reach: two ways to widen "which compound"
 
 - **Walk GO is_a (term side).** `go_include_ancestors=True` on the tools, or in Cypher, as below. A term inherits from its ancestors' target.
-- **Walk the compound class (target side).** `Metabolite_in_metabolite_class` (coverage is partial). Use `list_metabolites(kegg_brite_classes=...)` or Cypher to expand a class to its member compounds, then call `genes_by_metabolite` on them.
+- **Expand the compound class (target side).** Two separate mechanisms over the curated KEGG BRITE classes, both with partial coverage. `list_metabolites(kegg_brite_classes=...)` filters on the top-level class stored on each compound row. A Cypher walk (`run_cypher`) of `Metabolite_in_metabolite_class` plus the `MetaboliteClass` hierarchy reaches deeper subclasses (example in `docs://analysis/metabolites`). Either way, call `genes_by_metabolite` on the resulting compounds.
 
 The two answer different questions; do not expect them to match.
 

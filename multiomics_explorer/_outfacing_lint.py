@@ -57,6 +57,21 @@ LINT_PATTERN = re.compile(
     r"|\b(?:successor|replacement)s? (?:of|for|to) the (?:removed|retired|old)\b"
 )
 
+# Path-scoped stale-language patterns: keyed by file name, applied only to
+# that file (on top of LINT_PATTERN). For phrases that are legitimate on
+# some tool pages and stale on others. The lint scans rendered pages, so a
+# tools.py parameter / response description is caught on the generated
+# brief + full tool pages that render it.
+# Source violation: "both arms" on genes_by_metabolite / metabolites_by_gene
+# after the GO transport route made them three-armed (go-transport final
+# review finding 7); assays_by_metabolite's numeric + boolean "both arms"
+# stays legitimate.
+_THREE_ARM_CHEMISTRY = re.compile(r"\bboth arms\b|\beither arm\b")
+SCOPED_LINT_PATTERNS: dict[str, re.Pattern[str]] = {
+    "genes_by_metabolite.md": _THREE_ARM_CHEMISTRY,
+    "metabolites_by_gene.md": _THREE_ARM_CHEMISTRY,
+}
+
 # Drift-marker carveout. The [AQ] (annotation_quality redefinition) and
 # [ENR] (informative_only=True default flip) markers stay as 1-line inline
 # notes on affected tools.
@@ -123,6 +138,7 @@ def lint_lines(paths: list[Path]) -> list[Violation]:
             print(f"  SKIP {path}: {e}", file=sys.stderr)
             continue
         in_example_block = False
+        scoped = SCOPED_LINT_PATTERNS.get(path.name)
         for i, line in enumerate(text.splitlines(), 1):
             # ```example-response fences hold live KG payloads (term
             # descriptions, product names) — data, not prose; skip them.
@@ -136,7 +152,7 @@ def lint_lines(paths: list[Path]) -> list[Violation]:
                 continue
             if CARVEOUT_PATTERN.search(line):
                 continue
-            m = LINT_PATTERN.search(line)
+            m = LINT_PATTERN.search(line) or (scoped and scoped.search(line))
             if m:
                 violations.append((path, i, line, m.group(0)))
         violations.extend(_dangling_refs(path, text))

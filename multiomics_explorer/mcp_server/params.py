@@ -132,6 +132,14 @@ MetaboliteIdsParam = Annotated[list[str] | None, Field(description=_METABOLITE_I
 
 MetaboliteIdsRequiredParam = Annotated[list[str], Field(description=_METABOLITE_IDS_DESC)]
 
+# genes_by_metabolite / metabolites_by_gene: chemical-role ids are a valid
+# target there (TCDB / GO role edges), so they do not warn.
+_METABOLITE_IDS_CHEMISTRY_DESC = "Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds warn. `chebi.role:` ids reach TCDB / GO role edges. docs://analysis/transport."
+
+MetaboliteIdsChemistryParam = Annotated[list[str] | None, Field(description=_METABOLITE_IDS_CHEMISTRY_DESC)]
+
+MetaboliteIdsChemistryRequiredParam = Annotated[list[str], Field(description=_METABOLITE_IDS_CHEMISTRY_DESC)]
+
 ExcludeMetaboliteIdsParam = Annotated[list[str] | None, Field(
     description="Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap.",
 )]

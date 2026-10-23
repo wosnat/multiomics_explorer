@@ -2,24 +2,24 @@
 
 ## What it does
 
-Metabolite IDs to gene catalysts (via Reaction) and transporters (via TcdbFamily, deepest attachment) in ONE organism.
+Metabolite / `chebi.role:` IDs to genes in ONE organism via KEGG reactions, TCDB and GO transport (GO rows: term definitions, not gene facts).
 
-Use for compound → genes; mirror `metabolites_by_gene`, family-level TCDB `genes_by_ontology`.
-Filters: metabolite_ids (+exclude, +stereo forms), organism, ec_numbers, metabolite_pathway_ids, gene_categories, substrate_depth, evidence_sources.
-Returns: by_metabolite, by_evidence_source, by_substrate_depth, top_genes, top_reactions, top_tcdb_families, not_matched; one row = gene × metabolite.
+Use for compound → genes; mirror `metabolites_by_gene`; docs://analysis/transport.
+Filters: metabolite_ids (+exclude, +stereo), organism, ec_numbers, metabolite_pathway_ids, substrate_depth, evidence_sources, go_include_ancestors.
+Returns: by_metabolite, by_evidence_source, rows_by_go_term_depth, top_genes, top_reactions, top_tcdb_families; row = gene × reaction|family|GO term × metabolite.
 docs://tools/genes_by_metabolite; summary=True first.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| metabolite_ids | list[string] | — | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolites. |
+| metabolite_ids | list[string] | — | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds warn. `chebi.role:` ids reach TCDB / GO role edges. docs://analysis/transport. |
 | organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
 | exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
-| ec_numbers | list[string] \| None | None | Narrow metabolism rows to those whose Reaction carries any of these EC numbers. **Metabolism arm only — does not affect transport rows**, which are returned unchanged. To restrict to metabolism rows alone, combine with `evidence_sources=['metabolism']`. E.g. ['6.3.1.2'] for glutamine synthetase. |
-| metabolite_pathway_ids | list[string] \| None | None | Filter to rows where the **metabolite** is in any of these KEGG pathways (`KeggTerm.id`, e.g. ['kegg.pathway:ko00910'] for nitrogen metabolism). Anchored on `Metabolite.pathway_ids` (transport-extended), so applies uniformly to both arms. **Not gene-anchored** — for filtering by genes' KEGG-pathway annotations, route through `genes_by_ontology(ontology="kegg", term_ids=[pathway_id], organism=...)` first to obtain locus_tags. `not_found.metabolite_pathway_ids` lists IDs that don't exist as a KeggTerm. |
-| mass_balance | string ('balanced', 'unbalanced') \| None | None | Narrow metabolism rows to those whose Reaction has this mass balance status. **Metabolism arm only — does not affect transport rows**. Combine with `evidence_sources=['metabolism']` to restrict to metabolism rows alone. |
-| gene_categories | list[string] \| None | None | Filter on `Gene.gene_category` (exact match, applies to both arms uniformly). Use `list_filter_values(filter_type="gene_category")` to discover valid values. |
+| ec_numbers | list[string] \| None | None | Narrow metabolism rows to those whose Reaction carries any of these EC numbers. **Metabolism arm only — does not affect TCDB or GO transport rows**, which are returned unchanged. To restrict to metabolism rows alone, combine with `evidence_sources=['metabolism']`. E.g. ['6.3.1.2'] for glutamine synthetase. |
+| metabolite_pathway_ids | list[string] \| None | None | Filter to rows where the **metabolite** is in any of these KEGG pathways (`KeggTerm.id`, e.g. ['kegg.pathway:ko00910'] for nitrogen metabolism). Anchored on `Metabolite.pathway_ids` (transport-extended), so applies uniformly to all three arms. **Not gene-anchored** — for filtering by genes' KEGG-pathway annotations, route through `genes_by_ontology(ontology="kegg", term_ids=[pathway_id], organism=...)` first to obtain locus_tags. `not_found.metabolite_pathway_ids` lists IDs that don't exist as a KeggTerm. |
+| mass_balance | string ('balanced', 'unbalanced') \| None | None | Narrow metabolism rows to those whose Reaction has this mass balance status. **Metabolism arm only — does not affect TCDB or GO transport rows**. Combine with `evidence_sources=['metabolism']` to restrict to metabolism rows alone. |
+| gene_categories | list[string] \| None | None | Filter on `Gene.gene_category` (exact match, applies to all three arms uniformly). Use `list_filter_values(filter_type="gene_category")` to discover valid values. |
 | substrate_depth | list[string ('most_specific', 'inherited')] \| None | None | Keep transport rows whose edge `substrate_depth` is in this list. 'most_specific' = most specific surviving transporter node for the substrate (gene-pruned hierarchy, not a curation level). Transport arm only. |
 | evidence_sources | list[string ('metabolism', 'transport', 'go_transport')] \| None | None | Path selector — restricts which arms execute (metabolism, transport, go_transport). Default fires all three. `['metabolism']` skips transport rollup noise. 'metabolomics' is NOT valid here (no gene anchor); see `list_metabolites`. |
 | go_include_ancestors | bool | False | GO route only: also return inherited rows, where a gene's GO term reaches the target through is_a ancestors (go_term_depth > 0). Default False = directly annotated terms. |
@@ -57,10 +57,10 @@ total_matching, returned, offset, truncated, warnings, stereo_relatives, stereo_
 - **top_reactions_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **top_tcdb_families** (list[GbmTopTcdbFamily]): Top 10 TCDB families by gene_count in the transport arm. summary=True returns the full ranked list.
 - **top_tcdb_families_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
-- **top_gene_categories** (list[GbmTopGeneCategory]): Top 10 gene categories by gene_count across both arms.
-- **top_genes** (list[GbmTopGene]): Top 10 genes by combined reaction + transporter breadth across both arms. summary=True returns the full ranked list.
+- **top_gene_categories** (list[GbmTopGeneCategory]): Top 10 gene categories by gene_count across all arms.
+- **top_genes** (list[GbmTopGene]): Top 10 genes by combined reaction + transporter breadth (GO rows in go_transport_rows). summary=True returns the full ranked list.
 - **top_genes_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
-- **gene_count_total** (int): Distinct genes in the filtered slice (across both arms).
+- **gene_count_total** (int): Distinct genes in the filtered slice (across all arms).
 - **reaction_count_total** (int): Distinct reactions in the filtered metabolism arm.
 - **transporter_count_total** (int): Distinct TcdbFamily nodes in the filtered transport arm.
 - **metabolite_count_total** (int): Distinct metabolite_ids that produced ≥1 row.
@@ -1875,7 +1875,7 @@ list_metabolites(evidence_sources=['go_transport']) → per-row go_transport_org
 
 - Reaction-arm rows are NOT directional — KG reactions carry neither a substrate-vs-product role on `Reaction_has_metabolite` nor an `is_reversible` flag. Read `evidence_source='metabolism'` rows as 'gene catalyses a reaction *involving* this metabolite,' never as 'produces X' / 'consumes Y' / 'reversibly interconverts'. The KG limitation is permanent (KEGG lacks both upstream).
 
-- Filtering by `ec_numbers` does NOT restrict to metabolism only. Per-arm filter scope: `ec_numbers` and `mass_balance` narrow the metabolism arm WHERE; transport rows are returned UNCHANGED (no soft-exclude). Symmetrically, `substrate_depth` narrows transport only and metabolism rows are unaffected. To restrict to one arm, set `evidence_sources=['metabolism']` (or `['transport']`) explicitly. `metabolite_pathway_ids` and `gene_categories` are the only filters that narrow both arms uniformly.
+- Filtering by `ec_numbers` does NOT restrict to metabolism only. Per-arm filter scope: `ec_numbers` and `mass_balance` narrow the metabolism arm WHERE; TCDB and GO transport rows are returned UNCHANGED (no soft-exclude). Symmetrically, `substrate_depth` narrows TCDB transport only and `go_include_ancestors` the GO route only. To restrict to one arm, set `evidence_sources=['metabolism']` (or `['transport']` / `['go_transport']`) explicitly. `metabolite_pathway_ids` and `gene_categories` are the only filters that narrow all three arms uniformly.
 
 - Single-organism enforced (mirrors `differential_expression_by_gene`). There is no `organisms` list. For cross-organism / cross-feeding work, call once per organism with the same metabolite_ids and combine locus_tag result sets client-side (Workflow B).
 
