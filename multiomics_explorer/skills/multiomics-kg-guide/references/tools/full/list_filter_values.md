@@ -13,7 +13,7 @@ docs://tools/list_filter_values.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment', 'omics_type', 'evidence_source', 'evidence', 'sources', 'call_class', 'interpro_type', 'ncbifam_family_type', 'merops_catalytic_type', 'merops_family_class', 'best_hit_kind', 'pfam_support', 'attachment_depth', 'trust_axes', 'link_kinds', 'cluster_type', 'treatment_type', 'background_factors', 'table_scope', 'detection_status', 'expression_status', 'partner_role', 'structure_kind', 'kegg_functional_category', 'kegg_brite_class', 'stereo_assignment', 'control_timing') | gene_category | Which filter to enumerate: gene/expression (incl. cluster_type), DerivedMetric, chemistry (detection_status, structure_kind, kegg_functional_category, kegg_brite_class, stereo_assignment), experiment (partner_role, control_timing) or trust. |
+| filter_type | string ('gene_category', 'brite_tree', 'growth_phase', 'metric_type', 'value_kind', 'compartment', 'omics_type', 'evidence_source', 'evidence', 'sources', 'call_class', 'interpro_type', 'ncbifam_family_type', 'merops_catalytic_type', 'merops_family_class', 'best_hit_kind', 'pfam_support', 'tcdb_call', 'tcdb_gate', 'direction', 'trust_axes', 'link_kinds', 'cluster_type', 'treatment_type', 'background_factors', 'table_scope', 'detection_status', 'expression_status', 'partner_role', 'structure_kind', 'kegg_functional_category', 'kegg_brite_class', 'stereo_assignment', 'control_timing') | gene_category | Which filter to enumerate: gene/expression (incl. cluster_type), DerivedMetric, chemistry (detection_status, structure_kind, kegg_functional_category, kegg_brite_class, stereo_assignment), experiment (partner_role, control_timing) or trust. |
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') \| None | None | Scope a trust filter_type (e.g. 'trust_axes') to one ontology key. Ignored on non-trust filter types. |
 
 ## Response format
@@ -66,8 +66,9 @@ Coculture: `partner_role` (`Tests_coculture_with` edge; feeds
 `list_experiments(coculture_role=...)`).
 Annotation-trust: `evidence`, `sources`, `call_class`,
 `interpro_type`, `ncbifam_family_type`, `merops_catalytic_type`,
-`merops_family_class`, `best_hit_kind`, `pfam_support`,
-`attachment_depth` read ControlledVocabulary (pivot fallback + warning
+`merops_family_class`, `best_hit_kind`, `pfam_support` (MEROPS),
+`tcdb_call`, `tcdb_gate` (`Gene_has_tcdb_family` edge) and `direction`
+(TcdbFamily) read ControlledVocabulary (pivot fallback + warning
 when the node is missing); `trust_axes` / `link_kinds` are
 config-derived and accept `ontology=` to scope. `treatment_type` and
 `background_factors` span four labels (Experiment, DerivedMetric,
@@ -277,7 +278,7 @@ list_filter_values(filter_type="evidence_source")
   "warnings": [],
   "results": [
     {"value": "metabolism", "count": 2221},
-    {"value": "transport", "count": 1382},
+    {"value": "transport", "count": 1285},
     {"value": "go_transport", "count": 208},
     ...
   ]
@@ -400,7 +401,7 @@ list_filter_values(filter_type="stereo_assignment")
       "value": "dominant_form_assumed",
       "source": "vocabulary",
       "applies_to": ["Assay_flags_metabolite", "Assay_quantifies_metabolite"],
-      "description": "the paper gave no stereo; the row was placed on one form of a stereo family (usually the one with the most catalysing..."
+      "description": "the name in the paper gives no stereo form, but the metabolite node is one specific stereo form, chosen either as the..."
     }
   ]
 }
@@ -469,12 +470,14 @@ list_filter_values(filter_type="evidence")
 list_filter_values(filter_type="trust_axes", ontology="tcdb")
 ```
 
+*TCDB's trust axes are `sources`, `evidence` and `tier`; it has no evidence score, so `min_evidence_score` raises on tcdb. The call-kind filter `tcdb_call` is listed under its own filter_type.*
+
 ```example-response
 {
   "filter_type": "trust_axes",
   "description": null,
-  "total_entries": 4,
-  "returned": 4,
+  "total_entries": 3,
+  "returned": 3,
   "truncated": false,
   "warnings": [],
   "results": [
@@ -491,12 +494,11 @@ list_filter_values(filter_type="trust_axes", ontology="tcdb")
       "description": "Strength ladder: curated > signature > homology > family_inferred > domain_inferred."
     },
     {
-      "value": "evidence_score",
+      "value": "tier",
       "source": "config",
       "applies_to": ["tcdb"],
-      "description": "Composite trust score in 0..1 — the only numeric cutoff (min_evidence_score) and the within-ontology sort key."
-    },
-    ...
+      "description": "Diamond-truncation depth 1..3; null means the edge was never truncated (for TCDB, an eggNOG call)."
+    }
   ]
 }
 ```
@@ -694,7 +696,7 @@ list_filter_values(filter_type='gene_category')  # then pass value to genes_by_f
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
 
-- Trust-related filter_type values (`evidence`, `sources`, `call_class`, `interpro_type`, `ncbifam_family_type`, `merops_catalytic_type`, `merops_family_class`, `best_hit_kind`, `pfam_support`, `attachment_depth`) are read from the KG's ControlledVocabulary nodes (or a live pivot-query fallback, flagged via `source: "pivot"` and a warning, if that node is missing). They are never hard-coded — a KG rebuild that adds a new value shows up here automatically.
+- Trust-related filter_type values (`evidence`, `sources`, `call_class`, `interpro_type`, `ncbifam_family_type`, `merops_catalytic_type`, `merops_family_class`, `best_hit_kind`, `pfam_support`, `tcdb_call`, `tcdb_gate`, `direction`) are read from the KG's ControlledVocabulary nodes (or a live pivot-query fallback, flagged via `source: "pivot"` and a warning, if that node is missing). They are never hard-coded — a KG rebuild that adds a new value shows up here automatically.
 
 - `cluster_type` follows the same vocabulary-or-pivot rule (ControlledVocabulary for ClusteringAnalysis.cluster_type; six values). The value lists quoted in the `cluster_type` parameter descriptions of list_clustering_analyses / gene_clusters_by_gene are documentation only — this call is the live source, and a `warn` from kg_release_info on the vocabulary hash is the cue to prefer it over any quoted list.
 

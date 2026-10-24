@@ -82,13 +82,6 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="brite")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
-
-- `BriteCategory.level_kind`: `brite_class`, `brite_subclass`, `brite_family`, `brite_subfamily`
-- `BriteCategory.tree`: `enzymes`, `transporters`, `peptidases`, `transcription_factors`, `secretion`, `two_component`, `defense`, `chaperones`, `ribosome`, `translation_factors`, `trna_biogenesis`, `dna_replication`
-- `Gene_has_kegg_ko.evidence`: `family_inferred`
-- `Gene_has_kegg_ko.sources`: `eggnog`
-
 ## Interpretation
 
 Always pick a tree first. `tree='transporters'` at level 1-2 gives the

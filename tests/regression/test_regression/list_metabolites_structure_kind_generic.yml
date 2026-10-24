@@ -1,14 +1,14 @@
 by_evidence_source:
 - count: 332
   evidence_source: metabolism
-- count: 330
+- count: 305
   evidence_source: transport
 - count: 77
   evidence_source: go_transport
 by_kegg_brite_class:
 - count: 34
   kegg_brite_class: 'Lipids: Fatty acyls'
-- count: 26
+- count: 24
   kegg_brite_class: 'Lipids: Glycerophospholipids'
 - count: 9
   kegg_brite_class: 'Lipids: Glycerolipids'
@@ -16,22 +16,22 @@ by_kegg_brite_class:
   kegg_brite_class: 'Lipids: Sphingolipids'
 - count: 1
   kegg_brite_class: 'Lipids: Sterol lipids'
-- count: 576
+- count: 559
   kegg_brite_class: not classified
 by_kegg_functional_category:
 - count: 19
   kegg_functional_category: Lipids
 - count: 2
   kegg_functional_category: Antibiotics
-- count: 628
+- count: 609
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment: []
   by_paper_count:
-  - count: 649
+  - count: 630
     paper_count: 0
 by_structure_kind:
-- count: 649
+- count: 630
   structure_kind: generic
 case_id: list_metabolites_structure_kind_generic
 mass_stats:
@@ -51,7 +51,7 @@ row_count: 0
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 147
+- count: 145
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
 - count: 42
@@ -82,31 +82,31 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko00785
   metabolite_pathway_name: Lipoic acid metabolism
 top_organisms:
-- count: 537
-  organism_name: Alteromonas macleodii EZ55
-- count: 536
-  organism_name: Alteromonas macleodii MIT1002
-- count: 535
-  organism_name: Alteromonas macleodii HOT1A3
-- count: 534
-  organism_name: Alteromonas macleodii BGP6
-- count: 533
-  organism_name: Alteromonas mediterranea AltDE1
-- count: 532
-  organism_name: Alteromonas mediterranea AltDE
-- count: 530
-  organism_name: Alteromonas macleodii ATCC27126
-- count: 527
-  organism_name: Alteromonas macleodii AD45
-- count: 527
+- count: 329
   organism_name: Pseudomonas putida KT2440
-- count: 525
-  organism_name: Shewanella sp. W3-18-1
-total_entries: 3243
-total_matching: 649
+- count: 321
+  organism_name: Alteromonas macleodii EZ55
+- count: 319
+  organism_name: Alteromonas macleodii MIT1002
+- count: 318
+  organism_name: Alteromonas macleodii BGP6
+- count: 316
+  organism_name: Alteromonas macleodii HOT1A3
+- count: 316
+  organism_name: Alteromonas mediterranea AltDE1
+- count: 315
+  organism_name: Alteromonas macleodii ATCC27126
+- count: 310
+  organism_name: Alteromonas macleodii AD45
+- count: 309
+  organism_name: Alteromonas mediterranea AltDE
+- count: 307
+  organism_name: Alteromonas macleodii BS11
+total_entries: 3178
+total_matching: 630
 truncated: true
 warnings: []
 xref_coverage:
-  with_chebi: 566
+  with_chebi: 547
   with_hmdb: 2
-  with_mnxm: 647
+  with_mnxm: 628

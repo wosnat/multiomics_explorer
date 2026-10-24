@@ -89,7 +89,7 @@ results:
   reference_proteome: UP000262181
   species: null
   strain: Alt_MarRef
-  transported_metabolite_count: 1200
+  transported_metabolite_count: 136
   treatment_types:
   - carbon
 - background_factors:
@@ -188,7 +188,7 @@ results:
   reaction_count: 943
   species: Prochlorococcus marinus
   strain: MED4
-  transported_metabolite_count: 1011
+  transported_metabolite_count: 43
   treatment_types:
   - carbon
   - coculture
@@ -224,12 +224,12 @@ top_metabolic_capability:
   go_transport_metabolite_count: 72
   organism_name: Alteromonas (MarRef v6)
   reaction_count: 1263
-  transported_metabolite_count: 1200
+  transported_metabolite_count: 136
 - catalyzed_metabolite_count: 1039
   go_transport_metabolite_count: 45
   organism_name: Prochlorococcus MED4
   reaction_count: 943
-  transported_metabolite_count: 1011
+  transported_metabolite_count: 43
 total_entries: 47
 total_matching: 3
 truncated: false

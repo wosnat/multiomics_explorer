@@ -8,7 +8,7 @@ lives (compact row / verbose row / filter param), and how to use it without
 misreading a categorical for a curation grade.
 
 Runnable companion: `docs://examples/annotation_evidence.py` (5 scenarios:
-`merops_call_class`, `tcdb_attachment_depth`, `interpro_enrichment`,
+`merops_call_class`, `tcdb_gate`, `interpro_enrichment`,
 `trust_filtered_tcdb`, `organism_rollups`).
 
 > **Counts in this doc are an illustrative snapshot** and drift with each KG
@@ -31,7 +31,7 @@ Facts with the *same meaning* wherever they occur:
 - `sources[]` — which pipeline made the call (`eggnog`, `interproscan`,
   `uniprot`, `cyanorak`, ...).
 - `evidence` — the five-rung ladder, see "The evidence ladder" below.
-- `evidence_score` — a `[0, 1]` composite; TCDB, MEROPS, GO×3, EC, Pfam, CAZy.
+- `evidence_score` — a `[0, 1]` composite; MEROPS, GO×3, EC, Pfam, CAZy (not TCDB).
 - `tier` — 1–3, diamond-truncation depth of the ortholog call; TCDB / MEROPS.
 
 Where they live: `evidence` is compact on every row of the 15 functional-edge
@@ -48,8 +48,9 @@ Ontology-specific scalars that must **never** be compared across ontologies —
 scale and direction differ (e-value lower-is-better; bit score, confidence,
 probability higher-is-better):
 
-- TCDB: `confidence_score`, `source_agreement`, `pfam_support`, `go_support`,
-  `identity`, `qcov`, `evalue`, `consensus_n`, `attachment_depth`.
+- TCDB: `identity`, `qcov`, `evalue` (DIAMOND; `identity` and `qcov` in
+  percent), `tcdb_scov`, `tcdb_best_hit_rank`, `tcdb_bitscore`,
+  `tcdb_bitscore_ratio` (best-hit edges only).
 - MEROPS: `confidence_score`, `pfam_support`, `best_hit_kind`, `identity`,
   `qcov`, `evalue`, `consensus_n`, `best_hit_id`.
 - InterPro: `libraries`, `evalue_library`, `evalue`, `match_count`, `start`, `end`.
@@ -74,11 +75,16 @@ confidence:
 - InterPro `interpro_type` — the 8-way FAMILY / DOMAIN / ... split. Same
   "compact always" treatment, though it is a term-character fact rather than an
   edge fact.
+- TCDB `tcdb_call` / `tcdb_gate` / `tcdb_calls` — which pipeline made the
+  row's call (`diamond_best_hit`, `diamond_tier`, `eggnog`), which KG gate it
+  passed (`direct` onto a system, `annotated`, or `below_gate` for weak hits),
+  and every call kind on the row's lineage. Compact always; `tcdb_call` is
+  filterable and rolled up (`by_tcdb_call`). See scenario `tcdb_gate`.
 
 Why one compact column and not four: rollups already carry the distribution
 (`by_evidence`, `by_tier`, `by_sources`), so the per-row payload only needs
 the one axis an agent can read on **every** functional-edge row —
-`evidence`. `evidence_score` is null on most of the 15 (only TCDB, MEROPS,
+`evidence`. `evidence_score` is null on most of the 15 (only MEROPS,
 GO×3, EC, Pfam, CAZy carry it), so it moved to verbose and kept its role as
 the within-ontology sort key and the *only* numeric cutoff in the whole
 surface (`min_evidence_score`).
@@ -129,7 +135,7 @@ you are on. The per-ontology pages
 | `cyanorak_role` | sources, evidence | — | — | — | — |
 | `pfam` | sources, evidence, evidence_score | — | — | — | — |
 | `brite` | (inherits kegg's — the gene edge is `Gene_has_kegg_ko`) | — | — | — | `tree` |
-| `tcdb` | sources, evidence, evidence_score, tier | evidence_score | — | confidence_score, source_agreement, pfam_support, go_support, identity, qcov, evalue, consensus_n, attachment_depth | — |
+| `tcdb` | sources, evidence, tier | `tcdb_call` (best hit → tier → eggNOG), then identity | `tcdb_call`, `tcdb_gate`, `tcdb_calls` | identity, qcov, evalue, tcdb_scov, tcdb_best_hit_rank, tcdb_bitscore, tcdb_bitscore_ratio | — |
 | `cazy` | sources, evidence, evidence_score | — | — | — | — |
 | `subcellular_localization` (PSORTb) | *none* | — | — | localization_score | — |
 | `signal_peptide_type` (SignalP) | *none* | — | — | signal_peptide_probability, signal_peptide_cleavage_site, signal_peptide_cleavage_probability | — |
@@ -139,8 +145,9 @@ you are on. The per-ontology pages
 
 `rank_prop` is what a hierarchical rollup ranks a gene's edges by when
 picking the one edge whose trust columns populate an ancestor-term row (see
-"One edge per (gene, term)" below). Ontologies without a `rank_prop` are
-either flat or don't carry `evidence_score`/`confidence_score` at all.
+"One edge per (gene, term)" below). TCDB ranks by call kind in a fixed order,
+then by identity. Ontologies without a `rank_prop` are either flat or don't
+carry a score at all.
 
 `brite` shares `kegg`'s axes because BRITE gene membership is carried by the
 same `Gene_has_kegg_ko` edge KEGG uses — there is no separate BRITE gene
@@ -160,9 +167,9 @@ Every gene × term row is still exactly one row. The row's identity columns
 trust columns (`evidence`, `sources`, `evidence_score`, `tier`, plus
 `call_class` and the native detail) are read off **one** of those
 annotations: the gene's best edge under that term, chosen by the ontology's
-`rank_prop` — `evidence_score` for TCDB, `confidence_score` for MEROPS, and
-the depth of the attachment itself when the ontology declares neither.
-Highest wins.
+ranking key — call kind then identity for TCDB, `confidence_score` (its
+`rank_prop`) for MEROPS, and the depth of the attachment itself when the
+ontology declares neither. Highest wins.
 
 Three consequences worth holding on to:
 
@@ -176,8 +183,9 @@ Three consequences worth holding on to:
   gene simply drops out if nothing under that term survives.
 - **Leaf mode does not need any of this.** In `gene_ontology_terms(mode=
   'leaf')` the term IS the attachment, so the row's trust columns are that
-  edge's own facts. TCDB narrows further to the deepest surviving
-  attachment — see the leaf-mode recipe below.
+  edge's own facts. TCDB narrows further: leaf rows are the gene's
+  gate-passing targets minus any that is an ancestor of another, one row per
+  (gene, term) — see scenario `tcdb_gate` below.
 
 To see the individual annotations rather than the best one, drop to leaf
 mode (`gene_ontology_terms`), where each attachment is its own row.
@@ -189,24 +197,22 @@ mode (`gene_ontology_terms`), where each attachment is its own row.
 Every numeric trust field in this surface falls into exactly one of two
 buckets, and mixing them up is the most common mistake:
 
-- **Rank by it.** `evidence_score` (row) and the gene-level rollups
-  `tcdb_evidence_score_max` / `merops_evidence_score_max` (on `gene_overview`)
-  are meant to be sorted on, not thresholded — except through the one
-  sanctioned cutoff below. `0` is a real, uncorroborated hit, not an absence
-  signal; absence is `null` (no call at all on that gene/edge). This mirrors
-  substrate resolution / depth in `docs://analysis/metabolites` — the phrase
-  "rank by it, never filter by it" describes the *gene-level max* rollups
-  specifically.
+- **Rank by it.** `evidence_score` (row), the gene-level rollup
+  `merops_evidence_score_max` and TCDB's `tcdb_best_hit_identity` (both on
+  `gene_overview`) are meant to be sorted on, not thresholded — except
+  through the one sanctioned cutoff below. `0` is a real, uncorroborated hit,
+  not an absence signal; absence is `null` (no call at all on that
+  gene/edge). The phrase "rank by it, never filter by it" describes the
+  *gene-level* rollups specifically.
 - **Filter by it — but only through `min_evidence_score`.** The edge-level
   `evidence_score` *does* have exactly one sanctioned cutoff:
   `min_evidence_score=` on `genes_by_ontology`, `gene_ontology_terms`,
   `pathway_enrichment`, `cluster_enrichment`. On `genes_by_ontology` and
   `gene_ontology_terms`, setting it adds `evidence_score_signals` to the
   envelope — the `ControlledVocabulary`-backed list of composite inputs that
-  feed the score for that edge type, keyed by edge type (live: TCDB
-  `Gene_has_tcdb_family` → `eggnog_called`, `source_agreement`, `tier_le_2`,
-  `pfam_support`, `go_support`; GO-BP → `multi_source`,
-  `high_trust_assertion`, `not_domain_inferred`), so you can see what the
+  feed the score for that edge type, keyed by edge type (live: GO-BP →
+  `multi_source`, `high_trust_assertion`, `not_domain_inferred`), so you can
+  see what the
   number is actually made of before trusting a threshold. `identity` / `qcov`
   are native detail, not signals. `pathway_enrichment`
   / `cluster_enrichment` apply the same cutoff to shape the TERM2GENE mapping
@@ -215,6 +221,7 @@ buckets, and mixing them up is the most common mistake:
   the signal breakdown.
 - **Never filter native detail.** No cutoff exists — or should be
   hand-rolled via `run_cypher` — on `evalue`, `bit_score`, `confidence_score`,
+  `tcdb_bitscore`,
   `identity`, `qcov`, or any other native scalar. Different ontologies'
   native scalars aren't just differently scaled, some go the *opposite
   direction* (lower e-value is better; higher bit score is better), so even
@@ -223,9 +230,11 @@ buckets, and mixing them up is the most common mistake:
   pipelines to justify a universal default.
 
 Defaults never filter: every trust param (`sources`, `evidence`, `max_tier`,
-`min_evidence_score`, `call_class`) is `None` by default, so a call with no
-trust filters returns the same rows it always did — the trust surface is
-purely additive until you opt in.
+`min_evidence_score`, `call_class`, `tcdb_call`) is `None` by default, so a
+call with no trust filters returns the same rows it always did — the trust
+surface is purely additive until you opt in. TCDB is the one exception at
+the edge level: its rows are gated by the KG (`tcdb_gate`), and weak hits
+appear only with `include_weak_tcdb_hits=True`.
 
 Passing an axis an ontology doesn't carry raises `ValueError` naming that
 ontology's supported axes — check first via
@@ -244,8 +253,7 @@ convention: result rows are serialized sparsely — a key that is absent means
 "not applicable to this row" (a verbose-only column on a compact call, an
 axis this ontology does not carry), a key that is `null` means "applicable,
 but this record has no value" (a gene with no MEROPS call carries
-`merops_evidence_score_max: null`). A compact `tcdb` row from
-`genes_by_ontology` is ~9 keys, a verbose one ~22. Three tools keep a
+`merops_evidence_score_max: null`). Three tools keep a
 deliberately None-padded union shape instead, so their rows always carry
 every column: `genes_by_metabolite` / `metabolites_by_gene` (cross-arm
 fields, see `docs://analysis/metabolites`) and `assays_by_metabolite` /
@@ -267,8 +275,8 @@ is not in the list at all.
 
 ## Envelope rollups are full-match
 
-`by_evidence`, `by_tier`, `by_sources`, `by_call_class` and
-`evidence_score_stats` describe every matching row, not the page you are
+`by_evidence`, `by_tier`, `by_sources`, `by_call_class`, `by_tcdb_call` and
+`evidence_score_stats` (null for TCDB) describe every matching row, not the page you are
 reading, and they are populated in compact mode — where `tier`, `sources`
 and `evidence_score` are not on the row at all, the envelope is the only
 place to read their distribution. On `gene_ontology_terms` they are empty
@@ -425,34 +433,70 @@ Read `by_call_class` on either call to see the split without a second query.
 
 ---
 
-## Scenario `tcdb_attachment_depth` — TCDB leaf mode: most-specific vs superseded
+## Scenario `tcdb_gate` — TCDB leaf rows: the gate, the call kinds, the weak hits
 
-**When:** "what's this gene's actual TCDB call, not every ancestor it also
-technically belongs to?"
+**When:** "what is this gene's TCDB call, and how much should I trust it?"
+
+TCDB is the one ontology where each source keeps its own gene → term edge:
+`tcdb_call` is `diamond_best_hit` (the DIAMOND top hit, on a system),
+`diamond_tier` (the DIAMOND consensus call, truncated by tier to system,
+subfamily or family) or `eggnog`. The KG stamps every edge with an ordered
+`tcdb_gate`:
+
+| `tcdb_gate` | Calls | Used for |
+|---|---|---|
+| `direct` | rank-1 best hit at ≥ 40% identity, tier-1 DIAMOND call, eggNOG call onto a system | transport rows (`docs://analysis/transport`) and everything below |
+| `annotated` | other eggNOG calls, tier-2 DIAMOND calls | ontology rows, `tcdb_assignment_count`, `TcdbFamily.gene_count`, enrichment TERM2GENE |
+| `below_gate` | tier-3 calls, near-tie best hits, best hits under 40% identity | nothing by default (`include_weak_tcdb_hits=True`) |
+
+Never re-derive the gate from `tier`, `identity` or the call kind; read
+`tcdb_gate`.
 
 ```python
-leaf_only = gene_ontology_terms(
-    locus_tags=["PMM0392"], organism="MED4",
-    ontology=["tcdb"], mode="leaf",
+genes = ["PMM0372", "PMM0710", "PMM0125", "PMM0024"]   # cynD, pstS, ecfA1, thiL
+gated = gene_ontology_terms(
+    locus_tags=genes, organism="MED4", ontology=["tcdb"], mode="leaf",
 )
-# Default: attachment_depth='most_specific' only — PMM0392: 7 rows.
-# Genome-wide MED4: 670 raw tcdb edges collapse to 597 rows under this
-# predicate.
+# Leaf rows = gate-passing targets minus any that is an ancestor of another,
+# one row per (gene, term). Per gene the count equals tcdb_assignment_count:
+#   cynD 2 (two sibling systems, tcdb:3.A.1.16.1 eggNOG / 3.A.1.16.2 best hit),
+#   pstS 1 (tcdb:3.A.1.7.6), ecfA1 7 (eggNOG subfamilies tcdb:3.A.1.25 … 3.A.1.33),
+#   thiL 0.
+# pstS's row reads tcdb_calls=['diamond_best_hit', 'diamond_tier', 'eggnog']:
+# the best hit sits on the system, the tier-2 and eggNOG calls on its family
+# tcdb:3.A.1.7, and tcdb_calls collects every call kind on the row's lineage.
 
-with_superseded = gene_ontology_terms(
-    locus_tags=["PMM0392"], organism="MED4",
-    ontology=["tcdb"], mode="leaf", include_superseded=True, verbose=True,
+with_weak = gene_ontology_terms(
+    locus_tags=genes, organism="MED4", ontology=["tcdb"], mode="leaf",
+    include_weak_tcdb_hits=True,
 )
-# Adds back the 73 (genome-wide) rows most_specific drops, each labelled
-# attachment_depth='superseded' — less specific, not wrong. PMM0392: 8 rows
-# (7 most_specific + 1 superseded). PMM0392's
-# superseded row is the tcdb:3.A.1 ABC-superfamily ancestor of its actual
-# (deeper) subfamily attachment. `attachment_depth` is TCDB native detail,
-# so the label itself needs verbose=True; the row set widens either way.
+# Only adds rows, tagged tcdb_gate='below_gate'; the default rows are unchanged.
+#   thiL gains its one edge: a 28.5% tier-3 hit on tcdb:8.A.159 (thiL is a
+#   thiamine-monophosphate kinase — what weak hits on non-transporters look like).
+#   ecfA1 gains 3 best-hit systems at 33-35% identity.
+#   cynD gains nothing: its weak tier-3 call on tcdb:3.A.1 sits above its
+#   direct systems and adds no information.
 ```
 
-`include_superseded` is a leaf-mode-only switch; it has no effect outside
-`mode="leaf"`.
+Reading the columns:
+
+- **`tcdb_calls` is the agreement signal.** `diamond_best_hit` and
+  `diamond_tier` come from one DIAMOND run, so only eggNOG plus a DIAMOND
+  kind is independent agreement. Nothing about agreement is stored as a score.
+- **`evidence`** stays the comparable rung: `homology` for DIAMOND calls,
+  `family_inferred` for eggNOG.
+- **`tier`** (verbose) means different things per call kind: the consensus
+  tier on `diamond_tier`, an identity band on `diamond_best_hit`, null on
+  eggNOG. Do not compare tiers across kinds.
+- **`identity` / `qcov`** (verbose) are percent, from the row's
+  representative edge (best hit first, then tier, then eggNOG; highest
+  identity breaks ties).
+- **`evidence_score` is not a TCDB axis.** `min_evidence_score` with
+  `ontology='tcdb'` raises.
+
+`include_weak_tcdb_hits` is TCDB-only; for other ontologies it is a no-op.
+In MED4, 159 genes have only `below_gate` TCDB edges, so they have no TCDB
+row by default and `tcdb_assignment_count = 0`.
 
 ---
 
@@ -486,36 +530,42 @@ that stratum.
 
 ## Scenario `trust_filtered_tcdb` — Trust-filtered TCDB gene set before enrichment
 
-**When:** "restrict a TCDB-based gene set to homology calls with a
-corroborated score before testing it" — tightening a noisy hierarchical
-ontology the same way `substrate_depth=['most_specific']` tightens transport
-chemistry rows (see `docs://analysis/metabolites`).
+**When:** "restrict a TCDB-based gene set to DIAMOND homology calls before
+testing it."
+
+The TCDB TERM2GENE is already gated: it uses `direct` and `annotated` edges,
+so its gene sets equal `TcdbFamily.gene_count`. The trust filters narrow it
+further.
 
 ```python
 # Discover the axis set first (skip if already known).
 axes = list_filter_values(filter_type="trust_axes", ontology="tcdb")
-# ['sources', 'evidence', 'evidence_score', 'tier']
+# ['sources', 'evidence', 'tier'] — no evidence_score on TCDB.
 
 filtered = genes_by_ontology(
     ontology="tcdb", organism="MED4", level=2,
-    evidence=["homology"], min_evidence_score=0.6,
+    evidence=["homology"], max_tier=2,
 )
-# MED4 tcdb, genome-wide: 670 raw gene x family edges narrow to 98 under
-# evidence=['homology'] AND evidence_score>=0.6; rolled up to level 2 those
-# 98 edges collapse to 44 (gene x term) rows (total_matching). Read
-# filtered["evidence_score_signals"] to see which composite inputs back
-# the 0.6 threshold for this edge type.
+# Keeps (gene, term) rows backed by a DIAMOND call at tier <= 2.
+
+best_hits = genes_by_ontology(
+    ontology="tcdb", organism="MED4", level=2,
+    tcdb_call=["diamond_best_hit"],
+)
+# tcdb_call scopes to one pipeline; read best_hits["by_tcdb_call"].
 
 enrichment = pathway_enrichment(
     organism="MED4", experiment_ids=[...],
     ontology="tcdb", level=2,
-    evidence=["homology"], min_evidence_score=0.6,
+    evidence=["homology"], max_tier=2,
 )
 # The same filters shape the enrichment TERM2GENE mapping AND the
-# background identically (both traverse the same gene->leaf match stage),
-# so gene set and background stay apples-to-apples —
+# background identically, so gene set and background stay apples-to-apples —
 # envelope["background_filtered"] confirms this.
 ```
+
+`include_weak_tcdb_hits` is not offered on the enrichment tools: weak hits
+never enter a TERM2GENE.
 
 ---
 
@@ -541,12 +591,12 @@ orgs["top_annotation_capability"][:3]
 Question involves "how confident / which pipeline / what type" on an
 annotation
 ├─ "Compare trust across ontologies" → evidence (compact, every functional edge)
-├─ "Rank within one ontology by corroboration" → evidence_score (verbose; TCDB/MEROPS/GO×3/EC/Pfam/CAZy only)
-├─ "One hard cutoff on corroboration" → min_evidence_score (the only numeric filter; check evidence_score_signals)
+├─ "Rank within one ontology by corroboration" → evidence_score (verbose; MEROPS/GO×3/EC/Pfam/CAZy only; TCDB: tcdb_calls + identity)
+├─ "One hard cutoff on corroboration" → min_evidence_score (the only numeric filter; not on TCDB; check evidence_score_signals)
 ├─ "Diamond-truncation depth of the ortholog call" → tier (TCDB/MEROPS only; max_tier keeps tier-null rows)
 ├─ "Is this actually a peptidase, not just homologous to one" → call_class (MEROPS only, compact always)
 ├─ "Which InterPro structural type" → interpro_type (compact always; REQUIRED on interpro enrichment)
 ├─ "Native e-value / bit score / identity / confidence_score" → verbose-only, per-ontology name, never a filter
-├─ "Most-specific vs redundant ancestor attachment" → attachment_depth (TCDB; mode='leaf' + include_superseded)
+├─ "Which TCDB pipeline made this call / is it a weak hit" → tcdb_call, tcdb_gate, tcdb_calls (compact; include_weak_tcdb_hits for below_gate)
 └─ "What does term X compose from / belong to / route to" → ontology_term_details links_out (forward-only; reverse via run_cypher)
 ```

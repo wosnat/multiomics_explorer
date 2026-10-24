@@ -129,7 +129,8 @@ EXPECTED_TRUST_AXES = {
     "tigr_role": ["sources", "evidence"],
     # BRITE binds `r` on the Gene_has_kegg_ko edge, so it carries KEGG's axes.
     "brite": ["sources", "evidence"],
-    "tcdb": ["sources", "evidence", "evidence_score", "tier"],
+    # TCDB cleanup (3a): no evidence_score on the per-source edges.
+    "tcdb": ["sources", "evidence", "tier"],
     "merops": ["sources", "evidence", "evidence_score", "tier"],
     "interpro": ["sources", "evidence"],
     "ncbifam": ["sources", "evidence"],
@@ -150,8 +151,44 @@ class TestTrustAxes:
         assert "rank_prop" not in ontology_trust_axes("tcdb")
         assert "rank_prop" not in ontology_trust_axes("merops")
 
-    def test_tcdb_rank_prop_is_evidence_score(self):
-        assert ONTOLOGY_CONFIG["tcdb"]["trust"]["rank_prop"] == "evidence_score"
+    def test_tcdb_declares_no_rank_prop(self):
+        """TCDB cleanup G3: the evidence_score rank_prop is retired."""
+        assert "rank_prop" not in (ONTOLOGY_CONFIG["tcdb"].get("trust") or {})
+
+    def test_tcdb_rank_order_is_ordered_categorical_on_tcdb_call(self):
+        """TCDB cleanup: representative edge = call-kind precedence, then identity."""
+        cfg = ONTOLOGY_CONFIG["tcdb"]
+        rank_order = cfg.get("rank_order") or (cfg.get("trust") or {}).get(
+            "rank_order")
+        assert rank_order == {
+            "prop": "tcdb_call",
+            "order": ["diamond_best_hit", "diamond_tier", "eggnog"],
+            "then": "identity",
+        }
+
+    @pytest.mark.parametrize("key", ALL_17)
+    def test_lineage_calls_column_requires_rank_order_and_gate(self, key):
+        """TCDB cleanup G2: a lineage `*_calls` column is computed over the
+        gate-passing edges of the row's lineage and is paired with the
+        representative edge chosen by `rank_order` — so any ontology that
+        declares `lineage_calls_column` must declare both, with the
+        rank_order prop also gated (no silent all-edges lineage)."""
+        cfg = ONTOLOGY_CONFIG[key]
+        if not cfg.get("lineage_calls_column"):
+            pytest.skip(f"{key} declares no lineage_calls_column")
+        rank_order = cfg.get("rank_order")
+        gate = cfg.get("gate")
+        assert rank_order, f"{key}: lineage_calls_column without rank_order"
+        assert gate, f"{key}: lineage_calls_column without gate"
+        assert {"prop", "order"} <= set(rank_order), rank_order
+        assert rank_order["order"], rank_order
+        assert {"prop", "pass", "override_param"} <= set(gate), gate
+        assert gate["pass"], gate
+
+    def test_lineage_calls_column_is_declared_by_tcdb_only(self):
+        owners = [k for k in ALL_17
+                  if ONTOLOGY_CONFIG[k].get("lineage_calls_column")]
+        assert owners == ["tcdb"]
 
     def test_merops_rank_prop_is_confidence_score(self):
         assert ONTOLOGY_CONFIG["merops"]["trust"]["rank_prop"] == "confidence_score"
@@ -187,8 +224,16 @@ class TestCompactEdgeAndFacet:
         assert entry["prop"] == "call_class"
         assert "nonpeptidase_homolog" in entry["warn_values"]
 
-    @pytest.mark.parametrize("key", [k for k in ALL_17 if k != "merops"])
-    def test_only_merops_declares_compact_edge(self, key):
+    def test_tcdb_compact_edge_is_tcdb_call_then_tcdb_gate(self):
+        """TCDB cleanup: tcdb_call (filterable) + tcdb_gate compact columns."""
+        cfg = ONTOLOGY_CONFIG["tcdb"]
+        assert list(cfg["compact_edge"]) == ["tcdb_call", "tcdb_gate"]
+        assert cfg["compact_edge"]["tcdb_call"]["prop"] == "tcdb_call"
+        assert cfg["compact_edge"]["tcdb_gate"]["prop"] == "tcdb_gate"
+
+    @pytest.mark.parametrize(
+        "key", [k for k in ALL_17 if k not in ("merops", "tcdb")])
+    def test_only_merops_and_tcdb_declare_compact_edge(self, key):
         assert ONTOLOGY_CONFIG[key].get("compact_edge") in (None, {})
 
     def test_brite_facet_is_tree(self):
@@ -208,8 +253,8 @@ class TestCompactEdgeAndFacet:
 # --- verbose_edge (native detail) -------------------------------------------
 
 EXPECTED_VERBOSE_EDGE_PROPS = {
-    "tcdb": ["confidence_score", "source_agreement", "pfam_support", "go_support",
-             "identity", "qcov", "evalue", "consensus_n", "attachment_depth"],
+    "tcdb": ["identity", "qcov", "evalue", "scov", "rank", "bitscore",
+             "bitscore_ratio"],
     "merops": ["confidence_score", "pfam_support", "best_hit_kind", "identity",
                "qcov", "evalue", "consensus_n", "best_hit_id"],
     "interpro": ["libraries", "evalue_library", "evalue", "match_count",
@@ -221,6 +266,18 @@ EXPECTED_VERBOSE_EDGE_PROPS = {
 
 
 class TestVerboseEdge:
+    def test_tcdb_verbose_edge_output_columns(self):
+        """TCDB cleanup: TCDB-only columns carry `tcdb`; shared ones keep names."""
+        assert _verbose_edge_pairs(ONTOLOGY_CONFIG["tcdb"]) == [
+            ("identity", "identity"),
+            ("qcov", "qcov"),
+            ("evalue", "evalue"),
+            ("scov", "tcdb_scov"),
+            ("rank", "tcdb_best_hit_rank"),
+            ("bitscore", "tcdb_bitscore"),
+            ("bitscore_ratio", "tcdb_bitscore_ratio"),
+        ]
+
     @pytest.mark.parametrize("key", sorted(EXPECTED_VERBOSE_EDGE_PROPS))
     def test_verbose_edge_props_match_spec_table(self, key):
         props = [p for p, _ in _verbose_edge_pairs(ONTOLOGY_CONFIG[key])]
@@ -235,7 +292,7 @@ class TestVerboseEdge:
 # --- term side --------------------------------------------------------------
 
 EXPECTED_TERM_VERBOSE = {
-    "tcdb": ["superfamily", "metabolite_count"],
+    "tcdb": ["superfamily", "tcdb_substrate_count", "direction"],
     "merops": ["family_class", "catalytic_type", "peptidase_gene_count"],
     "ncbifam": ["family_type", "gene_symbol"],
 }
@@ -271,6 +328,14 @@ class TestTermSide:
             cfg["term_compact"])
         assert not missing, (
             f"{key}: term_details_compact misses {sorted(missing)}")
+
+    def test_tcdb_term_details_compact_matches_spec(self):
+        """TCDB cleanup: metabolite_count -> tcdb_substrate_count + direction."""
+        assert ONTOLOGY_CONFIG["tcdb"]["term_details_compact"] == [
+            "tcdb_id", "tc_class_id", "direct_gene_count", "member_count",
+            "superfamily", "tcdb_substrate_count", "direction",
+            "direction_basis",
+        ]
 
     def test_merops_term_details_compact_matches_spec(self):
         assert ONTOLOGY_CONFIG["merops"]["term_details_compact"] == [
@@ -456,3 +521,28 @@ class TestSupersededRegistryKeysRemoved:
     def test_api_edge_prop_cols_constant_deleted(self):
         from multiomics_explorer.api import functions as api
         assert not hasattr(api, "_EDGE_PROP_COLS")
+
+
+# --- TCDB cleanup surface (docs/tool-specs/tcdb-cleanup-surface.md) --------
+
+
+class TestTcdbGateEntry:
+    """G1 / G4: the gate replaces the leaf_attachment predicate."""
+
+    def test_tcdb_gate_entry(self):
+        assert ONTOLOGY_CONFIG["tcdb"]["gate"] == {
+            "prop": "tcdb_gate",
+            "pass": ["direct", "annotated"],
+            "override_param": "include_weak_tcdb_hits",
+        }
+
+    def test_tcdb_leaf_attachment_removed(self):
+        assert "leaf_attachment" not in ONTOLOGY_CONFIG["tcdb"]
+
+    @pytest.mark.parametrize("key", [k for k in ALL_17 if k != "tcdb"])
+    def test_only_tcdb_declares_a_gate(self, key):
+        assert ONTOLOGY_CONFIG[key].get("gate") is None
+        assert "leaf_attachment" not in ONTOLOGY_CONFIG[key]
+
+    def test_no_tc_specificity_anywhere_in_tcdb_row(self):
+        assert "tc_specificity" not in repr(ONTOLOGY_CONFIG["tcdb"])

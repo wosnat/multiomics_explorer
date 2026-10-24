@@ -352,6 +352,22 @@
     "type": "boolean"
    }
   },
+  "tcdb_call": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
   "term_ids": {
    "required": false,
    "type_sig": {
@@ -1212,7 +1228,7 @@
     ]
    }
   },
-  "include_superseded": {
+  "include_weak_tcdb_hits": {
    "required": false,
    "type_sig": {
     "type": "boolean"
@@ -1400,6 +1416,22 @@
    "required": false,
    "type_sig": {
     "type": "boolean"
+   }
+  },
+  "tcdb_call": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
    }
   },
   "tree": {
@@ -2141,6 +2173,12 @@
     "type": "boolean"
    }
   },
+  "include_tcdb_family_substrates": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
   "limit": {
    "required": false,
    "type_sig": {
@@ -2199,26 +2237,6 @@
    "required": true,
    "type_sig": {
     "type": "string"
-   }
-  },
-  "substrate_depth": {
-   "required": false,
-   "type_sig": {
-    "anyOf": [
-     {
-      "items": {
-       "enum": [
-        "most_specific",
-        "inherited"
-       ],
-       "type": "string"
-      },
-      "type": "array"
-     },
-     {
-      "type": "null"
-     }
-    ]
    }
   },
   "summary": {
@@ -2558,6 +2576,12 @@
     ]
    }
   },
+  "include_weak_tcdb_hits": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
   "informative_only": {
    "required": false,
    "type_sig": {
@@ -2701,6 +2725,22 @@
    "required": false,
    "type_sig": {
     "type": "boolean"
+   }
+  },
+  "tcdb_call": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
    }
   },
   "term_ids": {
@@ -3502,7 +3542,9 @@
      "merops_family_class",
      "best_hit_kind",
      "pfam_support",
-     "attachment_depth",
+     "tcdb_call",
+     "tcdb_gate",
+     "direction",
      "trust_axes",
      "link_kinds",
      "cluster_type",
@@ -4483,6 +4525,12 @@
     "type": "boolean"
    }
   },
+  "include_tcdb_family_substrates": {
+   "required": false,
+   "type_sig": {
+    "type": "boolean"
+   }
+  },
   "limit": {
    "required": false,
    "type_sig": {
@@ -4573,26 +4621,6 @@
    "required": true,
    "type_sig": {
     "type": "string"
-   }
-  },
-  "substrate_depth": {
-   "required": false,
-   "type_sig": {
-    "anyOf": [
-     {
-      "items": {
-       "enum": [
-        "most_specific",
-        "inherited"
-       ],
-       "type": "string"
-      },
-      "type": "array"
-     },
-     {
-      "type": "null"
-     }
-    ]
    }
   },
   "summary": {
@@ -5061,6 +5089,22 @@
     "type": "boolean"
    }
   },
+  "tcdb_call": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
+   }
+  },
   "tree": {
    "required": false,
    "type_sig": {
@@ -5402,6 +5446,22 @@
    "required": false,
    "type_sig": {
     "type": "boolean"
+   }
+  },
+  "tcdb_call": {
+   "required": false,
+   "type_sig": {
+    "anyOf": [
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
    }
   },
   "term_ids": {

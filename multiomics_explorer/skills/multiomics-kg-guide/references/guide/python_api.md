@@ -36,7 +36,7 @@ code beyond what this guide covers):
 - `docs://guide/start_here` — tool-selection map (which tool for which question).
 - `docs://guide/concepts` — node and edge meanings, evidence layers, cross-cutting axes.
 - `docs://guide/conventions` — `not_found`, tested-absent rows, filter
-  semantics, pagination, the transport trust ladder (`substrate_depth`),
+  semantics, pagination, TCDB direct vs family transport rows,
   AQ / informative_only defaults.
 - `docs://analysis/annotation_evidence` — annotation-trust surface
   (per-ontology trust profile, rank-vs-filter rule).

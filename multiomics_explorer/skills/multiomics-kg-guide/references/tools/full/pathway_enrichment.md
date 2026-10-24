@@ -34,9 +34,10 @@ docs://tools/pathway_enrichment; summary=True first.
 | informative_only | bool | True | True drops terms the KG flags uninformative (roots, catch-alls). |
 | sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See list_filter_values('sources'). |
 | evidence | list[string] \| None | None | Keep rows whose compact evidence-ladder value is in this list. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See docs://analysis/annotation_evidence. |
-| max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (diamond truncation depth, 1-3; null tier always kept). Valid on tcdb, merops only. |
-| min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, tcdb, merops. |
+| max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (1-3; null always kept, e.g. TCDB eggnog). tcdb, merops only. TCDB tier is consensus tier on diamond_tier, identity band on diamond_best_hit; never compare across kinds or ontologies. |
+| min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, merops; TCDB carries no evidence_score (raises). |
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
+| tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked. Leaf mode still drops ancestors via all edges, so a call kind only on an ancestor term yields no row. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
 
 **Discovery:** use `list_organisms` for valid organism names.
@@ -73,7 +74,7 @@ organism_name, ontology, level, total_matching, returned, truncated, offset, n_s
 - **clusters_skipped** (list[PathwayEnrichmentClusterSkipped]): Clusters that produced no rows, with reason
 - **enrichment_params** (object | None): ORA parameters used for this call. See docs://analysis/enrichment.
 - **filters_applied** (object): Echo of the trust filters actually set on this call. See docs://analysis/annotation_evidence.
-- **trust_axes** (object): Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','evidence_score','tier']}.
+- **trust_axes** (object): Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','tier']} (TCDB has no evidence_score).
 - **background_filtered** (bool): True when a trust filter narrowed the background.
 - **interpro_type** (string | None): Echo of the interpro_type stratum used (sparse: only when ontology='interpro').
 
@@ -520,22 +521,24 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
 }
 ```
 
-### Example 10: Trust-filtered TCDB enrichment (sources + evidence + min_evidence_score)
+### Example 10: Trust-filtered TCDB enrichment (evidence + max_tier; TCDB gene sets are gated)
 
 ```example-call
-pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="tcdb", level=2, evidence=["homology"], min_evidence_score=0.6)
+pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="tcdb", level=2, evidence=["homology"], max_tier=2)
 ```
+
+*TCDB TERM2GENE uses gated edges only (`tcdb_gate` direct or annotated), so each family's gene set matches its `gene_count`; weak below-gate DIAMOND hits never enter enrichment. The trust filters shape the gene sets and the background identically: here DIAMOND calls at tier 1-2. TCDB has no evidence score, so `min_evidence_score` raises; `tcdb_call=[...]` restricts by call kind.*
 
 ```example-response
 {
   "organism_name": "Prochlorococcus MED4",
   "ontology": "tcdb",
   "level": 2,
-  "total_matching": 1,
-  "returned": 1,
+  "total_matching": 4,
+  "returned": 4,
   "truncated": false,
   "offset": 0,
-  "n_significant": 1,
+  "n_significant": 4,
   "by_experiment": [
     {
       "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
@@ -545,25 +548,25 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "treatment_type": ["nitrogen"],
       "background_factors": ["axenic", "light"],
       "is_time_course": false,
-      "n_tests": 4,
-      "n_significant": 1,
+      "n_tests": 16,
+      "n_significant": 4,
       "n_clusters": 2
     }
   ],
   "by_experiment_truncated": null,
   "by_direction": [
-    {"direction": "down", "n_tests": 2, "n_significant": 1},
-    {"direction": "up", "n_tests": 2, "n_significant": 0}
+    {"direction": "down", "n_tests": 8, "n_significant": 3},
+    {"direction": "up", "n_tests": 8, "n_significant": 1}
   ],
-  "by_omics_type": [{"omics_type": "RNASEQ", "n_tests": 4, "n_significant": 1}],
+  "by_omics_type": [{"omics_type": "RNASEQ", "n_tests": 16, "n_significant": 4}],
   "cluster_summary": {
     "n_clusters": 2,
-    "n_tests_min": 2,
-    "n_tests_median": 2.0,
-    "n_tests_max": 2,
-    "n_significant_min": 0,
-    "n_significant_median": 0.5,
-    "n_significant_max": 1,
+    "n_tests_min": 8,
+    "n_tests_median": 8.0,
+    "n_tests_max": 8,
+    "n_significant_min": 1,
+    "n_significant_median": 2.0,
+    "n_significant_max": 3,
     "universe_size_min": 1849,
     "universe_size_median": 1849.0,
     "universe_size_max": 1849
@@ -582,10 +585,10 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "treatment_type": ["nitrogen"],
       "background_factors": ["axenic", "light"],
       "is_time_course": false,
-      "n_tests": 2,
-      "n_significant": 1,
+      "n_tests": 8,
+      "n_significant": 3,
       "universe_size": 1849,
-      "min_padj": 0.00013664450124670934
+      "min_padj": 0.0005465780049868374
     },
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|up",
@@ -600,10 +603,10 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "treatment_type": ["nitrogen"],
       "background_factors": ["axenic", "light"],
       "is_time_course": false,
-      "n_tests": 2,
-      "n_significant": 0,
+      "n_tests": 8,
+      "n_significant": 1,
       "universe_size": 1849,
-      "min_padj": 0.3339623274028087
+      "min_padj": 0.038137553774065545
     }
   ],
   "top_pathways_by_padj": [
@@ -611,30 +614,38 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
       "term_id": "tcdb:5.B.4",
       "term_name": "The Plant Photosystem I Supercomplex (PSI) Family",
-      "p_adjust": 0.00013664450124670934,
-      "signed_score": -3.8644078401971567
-    },
-    {
-      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|up",
-      "term_id": "tcdb:3.A.1",
-      "term_name": "The ATP-binding Cassette (ABC) Superfamily",
-      "p_adjust": 0.3339623274028087,
-      "signed_score": 0.4763025209843794
+      "p_adjust": 0.0005465780049868374,
+      "signed_score": -3.2623478488691946
     },
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
-      "term_id": "tcdb:3.A.1",
-      "term_name": "The ATP-binding Cassette (ABC) Superfamily",
-      "p_adjust": 0.9984403185332892,
-      "signed_score": -0.0006778898381549934
+      "term_id": "tcdb:3.E.2",
+      "term_name": "The Photosynthetic Reaction Center (PRC) Family",
+      "p_adjust": 0.00057264398830115,
+      "signed_score": -3.2421152942070224
+    },
+    {
+      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
+      "term_id": "tcdb:3.A.2",
+      "term_name": "The H+- or Na+-translocating F-type, V-type and A-type ATPase (F-ATPase) Superfamily",
+      "p_adjust": 0.0007205602740992426,
+      "signed_score": -3.1423296850597833
     },
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|up",
-      "term_id": "tcdb:5.B.4",
-      "term_name": "The Plant Photosystem I Supercomplex (PSI) Family",
-      "p_adjust": 1.0,
-      "signed_score": -0.0
-    }
+      "term_id": "tcdb:3.D.1",
+      "term_name": "The H+ or Na+-translocating NADH Dehydrogenase (NDH) Family",
+      "p_adjust": 0.038137553774065545,
+      "signed_score": 1.4186471669925789
+    },
+    {
+      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
+      "term_id": "tcdb:3.D.3",
+      "term_name": "The Proton-translocating Quinol:Cytochrome c Reductase (QCR) Superfamily",
+      "p_adjust": 0.0590300149954393,
+      "signed_score": -1.2289271064546359
+    },
+    ...
   ],
   "not_found": [],
   "not_matched": [],
@@ -663,16 +674,16 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
     "n_clusters_input": 2,
     "n_clusters_tested": 2,
     "n_clusters_skipped": 0,
-    "term2gene_row_count": 98,
-    "n_unique_terms": 35,
+    "term2gene_row_count": 159,
+    "n_unique_terms": 55,
     "multitest_method": "fdr_bh",
-    "filters_applied": {"evidence": ["homology"], "min_evidence_score": 0.6},
-    "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},
+    "filters_applied": {"evidence": ["homology"], "max_tier": 2},
+    "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
     "background_filtered": true,
     "interpro_type": null
   },
-  "filters_applied": {"evidence": ["homology"], "min_evidence_score": 0.6},
-  "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},
+  "filters_applied": {"evidence": ["homology"], "max_tier": 2},
+  "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
   "background_filtered": true,
   "interpro_type": null,
   "results": [
@@ -701,11 +712,72 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "rich_factor": 1.0,
       "fold_enrichment": 3.9173728813559325,
       "pvalue": 6.832225062335467e-05,
-      "p_adjust": 0.00013664450124670934,
+      "p_adjust": 0.0005465780049868374,
       "count": 7,
       "bg_count": 7,
-      "signed_score": -3.8644078401971567
-    }
+      "signed_score": -3.2623478488691946
+    },
+    {
+      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
+      "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
+      "name": "MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
+      "timepoint": "day 14",
+      "timepoint_hours": 336.0,
+      "timepoint_order": 1,
+      "direction": "down",
+      "omics_type": "RNASEQ",
+      "table_scope": "all_detected_genes",
+      "treatment_type": ["nitrogen"],
+      "background_factors": ["axenic", "light"],
+      "is_time_course": false,
+      "growth_phase": "death",
+      "term_id": "tcdb:3.E.2",
+      "term_name": "The Photosynthetic Reaction Center (PRC) Family",
+      "level": 2,
+      "is_informative": true,
+      "gene_ratio": "9/472",
+      "gene_ratio_numeric": 0.019067796610169493,
+      "bg_ratio": "11/1849",
+      "bg_ratio_numeric": 0.005949161709031909,
+      "rich_factor": 0.8181818181818182,
+      "fold_enrichment": 3.2051232665639446,
+      "pvalue": 0.0001431609970752875,
+      "p_adjust": 0.00057264398830115,
+      "count": 9,
+      "bg_count": 11,
+      "signed_score": -3.2421152942070224
+    },
+    {
+      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
+      "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
+      "name": "MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
+      "timepoint": "day 14",
+      "timepoint_hours": 336.0,
+      "timepoint_order": 1,
+      "direction": "down",
+      "omics_type": "RNASEQ",
+      "table_scope": "all_detected_genes",
+      "treatment_type": ["nitrogen"],
+      "background_factors": ["axenic", "light"],
+      "is_time_course": false,
+      "growth_phase": "death",
+      "term_id": "tcdb:3.A.2",
+      "term_name": "The H+- or Na+-translocating F-type, V-type and A-type ATPase (F-ATPase) Superfamily",
+      "level": 2,
+      "is_informative": true,
+      "gene_ratio": "6/472",
+      "gene_ratio_numeric": 0.012711864406779662,
+      "bg_ratio": "6/1849",
+      "bg_ratio_numeric": 0.003244997295835587,
+      "rich_factor": 1.0,
+      "fold_enrichment": 3.9173728813559325,
+      "pvalue": 0.00027021010278721597,
+      "p_adjust": 0.0007205602740992426,
+      "count": 6,
+      "bg_count": 6,
+      "signed_score": -3.1423296850597833
+    },
+    ...
   ]
 }
 ```

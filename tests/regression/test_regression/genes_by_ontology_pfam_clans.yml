@@ -69,6 +69,7 @@ by_sources:
   source: cyanorak
 - count: 651
   source: uniprot
+by_tcdb_call: []
 by_tier: []
 case_id: genes_by_ontology_pfam_clans
 evidence_score_stats:

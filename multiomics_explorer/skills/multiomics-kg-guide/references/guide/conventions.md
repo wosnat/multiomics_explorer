@@ -50,17 +50,11 @@ on most tools) and `offset`.
 `by_*` / `top_*` envelope lists longer than a handful of entries are
 capped to the **first 10** (desc by ranking count) on a detail call
 (`summary=False`, default). A capped list gets a sparse sibling key
-`<key>_truncated: true`; otherwise absent in Python / `null` over MCP
-(Pydantic declares every `Optional` field, so FastMCP always fills the
-key). `summary=True` always returns the **full, uncapped** list — read it
+`<key>_truncated: true`; otherwise absent in Python / `null` over MCP. `summary=True` always returns the **full, uncapped** list — read it
 first for a whole ranking (on `resolve_gene` the `by_organism` counts
 then sum exactly to `total_matching`; on `list_publications` a
-multi-organism paper counts once per organism). Affects rollups on the list/discovery and
-drill-down tools (`list_experiments`, `list_organisms`,
-`genes_by_function`, `genes_by_metabolite`, `metabolites_by_gene`,
-`differential_expression_by_{gene,ortholog}`, `pathway_enrichment`,
-`resolve_gene`, `list_publications` — check a specific tool's docs for
-which keys). Exception: `pathway_enrichment.top_pathways_by_padj` is a
+multi-organism paper counts once per organism). Each tool's docs name
+its capped keys. Exception: `pathway_enrichment.top_pathways_by_padj` is a
 genuine top-10 in both modes, no `_truncated` companion key.
 
 ### `summary=True` mode
@@ -357,9 +351,11 @@ exclusions in `excluded_assays`).
 
 ## Chemistry conventions
 
-Chemistry / metabolomics tools share four conventions: a transport trust
-ladder (`tcdb_evidence_score` → `transport_substrate_resolution` →
-`substrate_depth`); undirected KEGG reaction joins; id resolution on
+Chemistry / metabolomics tools share four conventions: TCDB transport rows
+are direct by default (`tcdb_route='direct'`, a `tcdb_gate='direct'` call
+onto a system; `tcdb_route='family'` rows only with
+`include_tcdb_family_substrates=True`), ranked by `tcdb_identity` then
+`tcdb_calls`; undirected KEGG reaction joins; id resolution on
 `metabolite_ids` via `Metabolite.all_identifiers` (CURIEs such as
 `chebi:14654`; `Gene.all_identifiers` is bare), so retired ids resolve
 into `resolved_aliases` and removed or role ids warn; and **stereo forms
@@ -456,11 +452,12 @@ The choice of background matters more than the choice of ontology.
 `subcellular_localization` (PSORTb) / `signal_peptide_type` (SignalP).
 Every gene→term row on the other 15 carries a compact `evidence` column
 (five-rung ladder) plus verbose `sources[]` / `evidence_score` / `tier`;
-native scalars (TCDB's `confidence_score`, MEROPS's `pfam_support`,
-InterPro's `evalue`, ...) are verbose-only and never filterable — scale
-and direction differ across ontologies, so no cross-ontology threshold is
-safe. Rank by `evidence_score` (filter only via `min_evidence_score`); use
-`evidence=` / `sources=` / `max_tier=` to narrow the *kind* of evidence;
+native scalars (TCDB's `tcdb_bitscore`, MEROPS's `pfam_support`,
+InterPro's `evalue`, ...) are verbose-only and never filterable (scales
+differ across ontologies). Rank by `evidence_score` (filter only via `min_evidence_score`); use
+`evidence=` / `sources=` / `max_tier=` to narrow the *kind* of evidence
+(TCDB: `tcdb_call=`, no `evidence_score`; rows are pre-gated by
+`tcdb_gate`, weak hits only via `include_weak_tcdb_hits`);
 pass `interpro_type=` whenever enriching on InterPro (it raises
 otherwise). Full per-ontology trust profile, the rank-vs-filter rule, the
 sparse-row convention, MEROPS `call_class`, and why InterPro enrichment

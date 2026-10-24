@@ -2,8 +2,8 @@
 
 These are the assertions a mocked unit test cannot make: they pin what the
 KG's precomputed counts *mean*, what "leaf" selects, and that the two ways of
-asking for the deepest attachment agree. A rebuild that quietly changes
-`attachment_depth` semantics or re-scopes `gene_count` would otherwise pass
+asking for the gated TCDB leaf set agree. A rebuild that quietly changes
+`tcdb_gate` semantics or re-scopes `gene_count` would otherwise pass
 every other gate.
 
 All tests are `-m kg`: they read the live build.
@@ -71,8 +71,10 @@ class TestMeropsPeptidaseCounts:
 
 
 # ---------------------------------------------------------------------------
-# TCDB leaf mode: `attachment_depth = 'most_specific'` and the generic
-# transitive NOT EXISTS predicate select the same rows.
+# TCDB leaf mode (KG 3a, spec tcdb-cleanup-surface G1/G2): gate-passing edges
+# (`tcdb_gate IN ['direct','annotated']`) minus any target that is an
+# ancestor of another gate-passing target — exactly what the KG counts in
+# `Gene.tcdb_assignment_count`.
 # ---------------------------------------------------------------------------
 
 
@@ -83,31 +85,30 @@ class TestTcdbLeafEquivalence:
         rows = conn.execute_query(cypher, org=MED4)
         return {(r["locus_tag"], r["term_id"]) for r in rows}
 
-    ATTACHMENT = (
+    GATED_LEAF = (
         "MATCH (g:Gene {organism_name: $org})-[r:Gene_has_tcdb_family]->"
         "(t:TcdbFamily)\n"
-        "WHERE r.attachment_depth = 'most_specific'\n"
-        "RETURN g.locus_tag AS locus_tag, t.id AS term_id"
-    )
-    NOT_EXISTS = (
-        "MATCH (g:Gene {organism_name: $org})-[r:Gene_has_tcdb_family]->"
-        "(t:TcdbFamily)\n"
-        "WHERE NOT EXISTS {\n"
-        "  MATCH (g)-[:Gene_has_tcdb_family]->(c:TcdbFamily)"
-        "-[:Tcdb_family_is_a_tcdb_family*1..]->(t)\n"
-        "}\n"
-        "RETURN g.locus_tag AS locus_tag, t.id AS term_id"
+        "WHERE r.tcdb_gate IN ['direct','annotated']\n"
+        "  AND NOT EXISTS {\n"
+        "    MATCH (g)-[r2:Gene_has_tcdb_family]->(d:TcdbFamily)\n"
+        "    WHERE r2.tcdb_gate IN ['direct','annotated']\n"
+        "      AND (d)-[:Tcdb_family_is_a_tcdb_family*1..4]->(t)\n"
+        "  }\n"
+        "RETURN DISTINCT g.locus_tag AS locus_tag, t.id AS term_id"
     )
 
-    def test_the_two_leaf_predicates_select_the_same_rows(self, conn):
-        by_attachment = self._pairs(conn, self.ATTACHMENT)
-        by_not_exists = self._pairs(conn, self.NOT_EXISTS)
-        assert by_attachment == by_not_exists, (
-            f"MED4 TCDB leaf sets diverge: "
-            f"{len(by_attachment)} by attachment_depth vs "
-            f"{len(by_not_exists)} by the transitive predicate. "
-            f"`include_superseded` semantics depend on them being equal."
-        )
+    def test_gated_leaf_set_reproduces_tcdb_assignment_count(self, conn):
+        """KG-side invariant the explorer leaf mode relies on (0 mismatches
+        on the target build)."""
+        leaf = self._pairs(conn, self.GATED_LEAF)
+        per_gene: dict[str, int] = {}
+        for lt, _ in leaf:
+            per_gene[lt] = per_gene.get(lt, 0) + 1
+        declared = {r["l"]: r["n"] for r in conn.execute_query(
+            "MATCH (g:Gene {organism_name: $org}) "
+            "WHERE g.tcdb_assignment_count > 0 "
+            "RETURN g.locus_tag AS l, g.tcdb_assignment_count AS n", org=MED4)}
+        assert per_gene == declared
 
     def test_leaf_is_a_strict_subset_of_every_attachment(self, conn):
         total = conn.execute_query(
@@ -115,32 +116,47 @@ class TestTcdbLeafEquivalence:
             " RETURN count(r) AS n",
             org=MED4,
         )[0]["n"]
-        assert 0 < len(self._pairs(conn, self.ATTACHMENT)) < total
+        assert 0 < len(self._pairs(conn, self.GATED_LEAF)) < total
 
-    def test_gene_ontology_terms_leaf_mode_returns_only_most_specific(
-        self, conn,
-    ):
+    def test_gene_ontology_terms_leaf_rows_equal_the_gated_leaf_set(self, conn):
+        lts = sorted({lt for lt, _ in self._pairs(conn, self.GATED_LEAF)})
         result = api.gene_ontology_terms(
-            locus_tags=["PMM0392"], organism="MED4", ontology="tcdb",
+            locus_tags=lts, organism="MED4", ontology="tcdb",
             mode="leaf", verbose=True, limit=None, conn=conn,
         )
-        depths = {r.get("attachment_depth") for r in result["results"]}
-        assert depths == {"most_specific"}, depths
+        rows = result["results"]
+        assert {(r["locus_tag"], r["term_id"]) for r in rows} == self._pairs(
+            conn, self.GATED_LEAF)
+        assert {r["tcdb_gate"] for r in rows} <= {"direct", "annotated"}
+        for retired in ("attachment_depth", "evidence_score",
+                        "confidence_score", "consensus_n"):
+            assert not any(retired in r for r in rows), retired
 
-    def test_include_superseded_widens_rows_and_counts_together(self, conn):
+    @pytest.mark.parametrize("locus,narrow_n,wide_n", [
+        # ecfA1: 7 eggNOG subfamily rows + 3 below_gate best-hit systems
+        # (33-35% identity) — spec G4 example.
+        ("PMM0125", 7, 10),
+    ])
+    def test_include_weak_tcdb_hits_widens_rows_and_counts_together(
+        self, conn, locus, narrow_n, wide_n,
+    ):
         """The envelope counts must move with the rows — a summary query
         that ignores the flag under-reports the batch size."""
         narrow = api.gene_ontology_terms(
-            locus_tags=["PMM0392"], organism="MED4", ontology="tcdb",
+            locus_tags=[locus], organism="MED4", ontology="tcdb",
             mode="leaf", limit=None, conn=conn,
         )
         wide = api.gene_ontology_terms(
-            locus_tags=["PMM0392"], organism="MED4", ontology="tcdb",
-            mode="leaf", include_superseded=True, limit=None, conn=conn,
+            locus_tags=[locus], organism="MED4", ontology="tcdb",
+            mode="leaf", include_weak_tcdb_hits=True, limit=None, conn=conn,
         )
-        assert wide["returned"] > narrow["returned"]
+        assert narrow["returned"] == narrow_n
+        assert wide["returned"] == wide_n
         assert wide["total_matching"] == wide["returned"]
         assert wide["total_terms"] == wide["returned"]
+        added = [r for r in wide["results"] if r not in narrow["results"]]
+        assert len(added) == wide_n - narrow_n
+        assert {r["tcdb_gate"] for r in added} == {"below_gate"}
 
 
 # ---------------------------------------------------------------------------
@@ -194,25 +210,35 @@ class TestTermGeneCountSemantics:
 
 @pytest.mark.kg
 class TestEvidenceScoreSignals:
+    """TCDB lost evidence_score in KG 3a (spec G3); MEROPS keeps it, so the
+    signal passthrough is pinned there."""
+
     def test_signal_names_match_the_vocabulary(self, conn):
         result = api.genes_by_ontology(
-            ontology="tcdb", organism="MED4", level=2,
+            ontology="merops", organism="MIT1002", level=0,
             min_evidence_score=0.6, limit=1, conn=conn,
         )
         signals = result["evidence_score_signals"]
-        assert "Gene_has_tcdb_family" in signals
+        assert "Gene_has_merops_family" in signals
         declared = conn.execute_query(
             "MATCH (v:ControlledVocabulary {applies_to: $rel, "
             "property: 'evidence_score'}) RETURN v.signals AS signals",
-            rel="Gene_has_tcdb_family",
+            rel="Gene_has_merops_family",
         )[0]["signals"]
-        assert signals["Gene_has_tcdb_family"] == list(declared)
+        assert signals["Gene_has_merops_family"] == list(declared)
 
     def test_signals_absent_without_the_numeric_cutoff(self, conn):
         result = api.genes_by_ontology(
-            ontology="tcdb", organism="MED4", level=2, limit=1, conn=conn,
+            ontology="merops", organism="MIT1002", level=0, limit=1, conn=conn,
         )
         assert "evidence_score_signals" not in result
+
+    def test_min_evidence_score_on_tcdb_is_an_unsupported_axis(self, conn):
+        with pytest.raises(ValueError, match="min_evidence_score"):
+            api.genes_by_ontology(
+                ontology="tcdb", organism="MED4", level=2,
+                min_evidence_score=0.6, limit=1, conn=conn,
+            )
 
 
 # ---------------------------------------------------------------------------
@@ -244,12 +270,16 @@ class TestCompactModeTrustEnvelope:
             result["warnings"]
         )
 
-    def test_by_sources_and_score_stats_populated_in_compact_mode(self, conn):
+    def test_by_sources_and_by_tcdb_call_populated_in_compact_mode(self, conn):
+        """TCDB carries no evidence_score (KG 3a), so its score stats are
+        null; by_tcdb_call (twin of by_call_class) covers the full match."""
         result = api.genes_by_ontology(
             ontology="tcdb", organism="MED4", level=2, limit=5, conn=conn,
         )
         assert result["by_sources"]
-        assert result["evidence_score_stats"]["max"] is not None
+        assert result["evidence_score_stats"] is None
+        assert sum(e["count"] for e in result["by_tcdb_call"]) == (
+            result["total_matching"])
 
     def test_rollups_describe_the_full_match_not_the_page(self, conn):
         page = api.genes_by_ontology(
@@ -395,10 +425,10 @@ class TestOrganismAnnotationRollups:
 
 
 # ---------------------------------------------------------------------------
-# gene_overview family counts (backlog 3.4): tcdb_family_count counts
-# attachment_depth='most_specific' edges only (the KG precompute
-# Gene.tcdb_family_count counts superseded ancestors too — PMM0392 8 vs 7);
-# cazy_family_count is the precompute verbatim.
+# gene_overview family counts: tcdb_assignment_count is the KG's gated
+# precompute (distinct gate-passing targets minus ancestors; renamed from
+# tcdb_family_count in KG 3a, no alias); cazy_family_count is the precompute
+# verbatim.
 # ---------------------------------------------------------------------------
 
 
@@ -414,38 +444,40 @@ class TestGeneOverviewFamilyCounts:
     def _rows(result):
         return {r["locus_tag"]: r for r in result["results"]}
 
-    def test_tcdb_family_count_is_the_most_specific_edge_count(self, conn, result):
+    def test_tcdb_assignment_count_is_the_kg_precompute(self, conn, result):
         live = {
             r["lt"]: r["n"] for r in conn.execute_query(
                 "UNWIND $lts AS lt\n"
                 "MATCH (g:Gene {locus_tag: lt})\n"
-                "OPTIONAL MATCH (g)-[r:Gene_has_tcdb_family]->(:TcdbFamily)\n"
-                "WHERE r.attachment_depth = 'most_specific'\n"
-                "RETURN lt, count(r) AS n",
+                "RETURN lt, coalesce(g.tcdb_assignment_count, 0) AS n",
                 lts=self.BATCH)
         }
         rows = self._rows(result)
         assert set(rows) == set(self.BATCH)
         for lt, row in rows.items():
-            assert row["tcdb_family_count"] == live[lt], (
-                f"{lt}: api tcdb_family_count={row['tcdb_family_count']} "
-                f"but live most_specific edge count={live[lt]}")
+            assert "tcdb_family_count" not in row
+            assert row["tcdb_assignment_count"] == live[lt], lt
 
-    def test_pmm0392_reads_seven_not_eight(self, result):
+    def test_pmm0392_reads_seven(self, result):
+        """cbiQ: 7 gated eggNOG subfamily calls 3.A.1.{25,28..33}."""
         row = self._rows(result)["PMM0392"]
-        assert row["tcdb_family_count"] == 7
+        assert row["tcdb_assignment_count"] == 7
         assert row["cazy_family_count"] == 0
 
     def test_hp15_1897_reads_four_cazy_families(self, result):
         row = self._rows(result)["HP15_1897"]
         assert row["cazy_family_count"] == 4
-        assert row["tcdb_family_count"] == 0
+        assert row["tcdb_assignment_count"] == 0
 
-    def test_tcdb_family_count_iff_transport_substrate_resolution(self, result):
+    def test_tcdb_assignment_count_iff_tcdb_annotation_type(self, result):
         for lt, row in self._rows(result).items():
-            assert (row["tcdb_family_count"] > 0) == (
-                row["transport_substrate_resolution"] is not None), lt
+            assert "transport_substrate_resolution" not in row
+            assert (row["tcdb_assignment_count"] > 0) == (
+                "tcdb" in (row.get("annotation_types") or [])), lt
 
     def test_envelope_has_tcdb_has_cazy(self, result):
-        assert result["has_tcdb"] == 2
-        assert result["has_cazy"] == 2
+        rows = self._rows(result).values()
+        assert result["has_tcdb"] == sum(
+            1 for r in rows if r["tcdb_assignment_count"] > 0)
+        assert result["has_cazy"] == sum(
+            1 for r in rows if r["cazy_family_count"] > 0) == 2

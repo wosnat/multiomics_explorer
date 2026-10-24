@@ -834,7 +834,7 @@ def test_ontology_page_lists_applicable_filter_types():
     assert applicable_filter_types("ncbifam") == [
         "evidence", "sources", "ncbifam_family_type", "link_kinds"]
     assert applicable_filter_types("tcdb") == [
-        "evidence", "sources", "attachment_depth", "link_kinds"]
+        "evidence", "sources", "tcdb_call", "tcdb_gate", "direction", "link_kinds"]
     assert applicable_filter_types("brite") == ["evidence", "sources", "brite_tree"]
     assert applicable_filter_types("subcellular_localization") == []
 

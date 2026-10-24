@@ -8,6 +8,27 @@ from fastmcp.exceptions import ToolError
 from tests.integration.edge_cases import fixtures as fx
 
 
+# TCDB cleanup surface exemplars (docs/tool-specs/tcdb-cleanup-surface.md),
+# verified on the target build (KG feat/post-3a-fixes) 2026-10-24:
+#   MATCH (g:Gene {organism_name:'Prochlorococcus MED4'})-[r:Gene_has_tcdb_family
+#     {tcdb_gate:'annotated'}]->(a:TcdbFamily)
+#   WHERE a.level_kind IN ['tc_family','tc_subfamily'] AND NOT EXISTS {
+#     MATCH (g)-[:Gene_has_tcdb_family {tcdb_gate:'annotated'}]->(d)
+#     WHERE (d)-[:Tcdb_family_is_a_tcdb_family*1..4]->(a) }
+#   WITH g, collect(DISTINCT a.id) AS starts WHERE starts = ['tcdb:3.A.1']
+#     AND NOT EXISTS { MATCH (g)-[:Gene_has_tcdb_family {tcdb_gate:'direct'}]->() }
+#   RETURN g.locus_tag  -> PMM0449 ccmA, PMM0450, PMM0913, PMM0977.
+# TODO(absorb): re-check these four pins with the fixture guards when the
+# rebuild is absorbed (they are KG-state, not code).
+_ORTHOPHOSPHATE_ID = "kegg.compound:C00009"   # 0 direct MED4 genes; hint > 0
+_PSTS_LOCUS = "PMM0710"                       # direct 3.A.1.7.6 under 3.A.1.7 -> no walk (rule 3)
+_URTA_LOCUS = "PMM0970"                       # direct 3.A.1.4.4/.5 under 3.A.1.4 -> no walk (rule 3)
+_PHND_LOCUS = "PMM0673"                       # family-only: walks tcdb:3.A.1.9 -> orthophosphate
+_ABC_ONLY_WALK_START_LOCUS = "PMM0449"        # only walk start = tcdb:3.A.1 (capped)
+_BELOW_GATE_ONLY_LOCUS = "PMM0024"            # thiL: one below_gate tier-3 edge
+_WEAK_ON_TOP_LOCUS = "PMM0125"                # ecfA1: 8 annotated + 4 below_gate edges
+
+
 @dataclass
 class Scenario:
     label: str
@@ -70,9 +91,34 @@ def genes_by_ontology_scenarios():
             dict(ontology="interpro", organism=fx.GENOME_ONLY_ORGANISM,
                  level=0, interpro_type="PTM")),
         Scenario(
-            "min_evidence_score_above_every_edge",
+            # TCDB cleanup G3: TCDB no longer carries evidence_score, so the
+            # filter is an unsupported axis (documented raise).
+            "min_evidence_score_on_tcdb_unsupported",
             dict(ontology="tcdb", organism=fx.CONTROL_ORGANISM, level=2,
-                 min_evidence_score=1.1)),
+                 min_evidence_score=0.5),
+            expects_error=ToolError),
+        Scenario(
+            "include_weak_tcdb_hits",
+            dict(ontology="tcdb", organism=fx.CONTROL_ORGANISM, level=2,
+                 include_weak_tcdb_hits=True)),
+        Scenario(
+            # The switch is a documented no-op off TCDB.
+            "include_weak_tcdb_hits_non_tcdb_noop",
+            dict(ontology="cyanorak_role", organism=fx.CONTROL_ORGANISM,
+                 level=1, include_weak_tcdb_hits=True)),
+        Scenario(
+            # tcdb:8.A.159 carries only below_gate diamond_tier edges in MED4
+            # (verified 2026-10-24), so an eggnog filter matches nothing ->
+            # empty envelope, never a raise.
+            "tcdb_call_matches_nothing",
+            dict(ontology="tcdb", organism=fx.CONTROL_ORGANISM,
+                 term_ids=["tcdb:8.A.159"], tcdb_call=["eggnog"],
+                 min_gene_set_size=0)),
+        Scenario(
+            "tcdb_call_on_non_tcdb_ontology",
+            dict(ontology="kegg", organism=fx.CONTROL_ORGANISM, level=1,
+                 tcdb_call=["eggnog"]),
+            expects_error=ToolError),
         Scenario(
             "ncbifam_genome_only_organism",
             dict(ontology="ncbifam", organism=fx.GENOME_ONLY_ORGANISM,
@@ -237,12 +283,38 @@ def gene_ontology_terms_scenarios():
             dict(locus_tags=["PMM0001"], organism=fx.CONTROL_ORGANISM,
                  ontology=["not_an_ontology"]),
             expects_error=ToolError),
+        # --- TCDB cleanup surface (include_superseded retired, no alias) ---
         Scenario(
-            # PMM0392 has superseded TCDB attachments; the leaf rows must be
-            # most-specific-only by default and gain the labelled rows here.
-            "include_superseded_tcdb_leaf",
-            dict(locus_tags=["PMM0392"], organism=fx.CONTROL_ORGANISM,
-                 ontology=["tcdb"], mode="leaf", include_superseded=True)),
+            # PMM0125 ecfA1: 7 gated eggNOG subfamily rows by default; the
+            # switch only ADDS its 3 below_gate best-hit system rows.
+            "include_weak_tcdb_hits_tcdb_leaf",
+            dict(locus_tags=[_WEAK_ON_TOP_LOCUS], organism=fx.CONTROL_ORGANISM,
+                 ontology=["tcdb"], mode="leaf", include_weak_tcdb_hits=True)),
+        Scenario(
+            # Only below_gate edges (PMM0024 thiL, one 28.5% tier-3 hit):
+            # default leaf mode returns no TCDB rows (tcdb_assignment_count=0).
+            "below_gate_only_gene_default",
+            dict(locus_tags=[_BELOW_GATE_ONLY_LOCUS],
+                 organism=fx.CONTROL_ORGANISM, ontology=["tcdb"])),
+        Scenario(
+            "below_gate_only_gene_with_weak_hits",
+            dict(locus_tags=[_BELOW_GATE_ONLY_LOCUS],
+                 organism=fx.CONTROL_ORGANISM, ontology=["tcdb"],
+                 include_weak_tcdb_hits=True)),
+        Scenario(
+            # thiL's only TCDB edge is diamond_tier, so an eggnog filter
+            # matches nothing -> empty envelope, never a raise.
+            "tcdb_call_matches_nothing",
+            dict(locus_tags=[_BELOW_GATE_ONLY_LOCUS],
+                 organism=fx.CONTROL_ORGANISM, ontology=["tcdb"],
+                 tcdb_call=["eggnog"], include_weak_tcdb_hits=True)),
+        Scenario(
+            # G5 mirrors call_class: tcdb_call on a single non-TCDB ontology
+            # raises.
+            "tcdb_call_on_non_tcdb_ontology",
+            dict(locus_tags=["PMM0001"], organism=fx.CONTROL_ORGANISM,
+                 ontology=["kegg"], tcdb_call=["eggnog"]),
+            expects_error=ToolError),
         Scenario(
             "merops_call_class_zero_rows",
             dict(locus_tags=["PMM0001"], organism=fx.CONTROL_ORGANISM,
@@ -911,7 +983,15 @@ def list_filter_values_scenarios():
         Scenario("sources", dict(filter_type="sources")),
         Scenario("call_class", dict(filter_type="call_class")),
         Scenario("interpro_type", dict(filter_type="interpro_type")),
-        Scenario("attachment_depth", dict(filter_type="attachment_depth")),
+        # TCDB cleanup surface: `attachment_depth` is no longer a filter
+        # type (retired with the TCDB scored edge props); the gate and call
+        # kind vocabularies replace it.
+        Scenario("tcdb_gate", dict(filter_type="tcdb_gate")),
+        Scenario("tcdb_call", dict(filter_type="tcdb_call")),
+        Scenario("tcdb_direction", dict(filter_type="direction")),
+        Scenario("retired_attachment_depth",
+                 dict(filter_type="attachment_depth"),
+                 expects_error=ToolError),
         Scenario("trust_axes_scoped",
                  dict(filter_type="trust_axes", ontology="kegg")),
         Scenario("link_kinds", dict(filter_type="link_kinds")),
@@ -1036,30 +1116,38 @@ def genes_by_metabolite_scenarios():
             "offset_past_end",
             dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
                  offset=fx.OFFSET_PAST_END)),
-        # TCDB substrate_depth migration (spec 2026-08-20): the retired
-        # `transport_confidence` value strings are a DOCUMENTED raise with a
-        # rename pointer (api ValueError -> ToolError), as is any unknown value.
+        # TCDB cleanup surface (docs/tool-specs/tcdb-cleanup-surface.md):
+        # `substrate_depth` is retired with no alias (the wrapper rejects the
+        # kwarg; no scenario needed). The opt-in family walk replaces it.
         Scenario(
-            "old_transport_confidence_value_substrate_confirmed",
-            dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
-                 substrate_depth=["substrate_confirmed"]),
-            expects_error=ToolError),
+            # Orthophosphate in MED4: 0 direct-route genes (pstS reaches only
+            # 3.A.1.7.6, curated with triphosphate), so the default envelope
+            # carries a non-zero tcdb_family_substrates_not_shown hint:
+            # {genes: 4, metabolites: 1, rows: 4} (phnC/D/E, PMM0717) on the
+            # target build. pstA/B/C/S are excluded by start rule 3 (direct
+            # system under 3.A.1.7 -> no walk above it).
+            "orthophosphate_no_direct_genes_hint",
+            dict(metabolite_ids=[_ORTHOPHOSPHATE_ID],
+                 organism=fx.CONTROL_ORGANISM)),
         Scenario(
-            "old_transport_confidence_value_family_inferred",
-            dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
-                 substrate_depth=["family_inferred"]),
-            expects_error=ToolError),
+            # Walk on: family rows added (tcdb_route='family'), hint null.
+            "include_tcdb_family_substrates",
+            dict(metabolite_ids=[_ORTHOPHOSPHATE_ID],
+                 organism=fx.CONTROL_ORGANISM,
+                 include_tcdb_family_substrates=True)),
         Scenario(
-            "unknown_substrate_depth_value",
+            # Walk on with the TCDB arm excluded: switch ignored + warning,
+            # never a raise.
+            "include_tcdb_family_substrates_transport_excluded",
             dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
-                 substrate_depth=["bogus"]),
-            expects_error=ToolError),
+                 evidence_sources=["metabolism"],
+                 include_tcdb_family_substrates=True)),
         Scenario(
-            # Valid filter narrowing the transport arm on a real slice -> must
-            # stay a well-formed (possibly empty) envelope, never a raise.
-            "substrate_depth_most_specific_filter",
-            dict(metabolite_ids=[_UREA_ID], organism=fx.CONTROL_ORGANISM,
-                 substrate_depth=["most_specific"])),
+            # Walk on the genome-only strain (empty non-chemistry layers).
+            "include_tcdb_family_substrates_genome_only_organism",
+            dict(metabolite_ids=[_ORTHOPHOSPHATE_ID],
+                 organism=fx.GENOME_ONLY_ORGANISM,
+                 include_tcdb_family_substrates=True)),
         Scenario(
             # backlog 3.2: bare urea C-number resolves to _UREA_ID (same rows).
             "bare_metabolite_id",
@@ -1198,27 +1286,48 @@ def metabolites_by_gene_scenarios():
             "offset_past_end",
             dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,
                  offset=fx.OFFSET_PAST_END)),
-        # TCDB substrate_depth migration (mirrors GBM): retired value strings
-        # + unknown values are a documented raise; the valid filter is not.
+        # TCDB cleanup surface: `substrate_depth` retired (no alias); the
+        # family walk and the breadth cap replace it.
         Scenario(
-            "old_transport_confidence_value_substrate_confirmed",
-            dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,
-                 substrate_depth=["substrate_confirmed"]),
-            expects_error=ToolError),
+            # PMM0673 phnD: family-only call; the walk from tcdb:3.A.1.9 adds
+            # orthophosphate as tcdb_route='family' rows.
+            "include_tcdb_family_substrates",
+            dict(locus_tags=[_PHND_LOCUS], organism=fx.CONTROL_ORGANISM,
+                 include_tcdb_family_substrates=True)),
         Scenario(
-            "old_transport_confidence_value_family_inferred",
-            dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,
-                 substrate_depth=["family_inferred"]),
-            expects_error=ToolError),
+            # Start rule 3 (no walk above a direct system): PMM0710 pstS has
+            # direct 3.A.1.7.6 under its annotated 3.A.1.7 start -> no
+            # tcdb_route='family' rows, only its direct rows.
+            "include_tcdb_family_substrates_direct_below_pstS",
+            dict(locus_tags=[_PSTS_LOCUS], organism=fx.CONTROL_ORGANISM,
+                 include_tcdb_family_substrates=True)),
         Scenario(
-            "unknown_substrate_depth_value",
-            dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,
-                 substrate_depth=["bogus"]),
-            expects_error=ToolError),
+            # Start rule 3: PMM0970 urtA has direct 3.A.1.4.4 / 3.A.1.4.5 under
+            # its annotated 3.A.1.4 start -> no tcdb_route='family' rows (the
+            # 22 sibling-system amino / keto acids never appear).
+            "include_tcdb_family_substrates_direct_below_urtA",
+            dict(locus_tags=[_URTA_LOCUS], organism=fx.CONTROL_ORGANISM,
+                 include_tcdb_family_substrates=True)),
         Scenario(
-            "substrate_depth_inherited_filter",
-            dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,
-                 substrate_depth=["inherited"])),
+            # A gene whose only walk start is ABC tcdb:3.A.1 (551 substrates >
+            # cap 200): no walk rows, tcdb_family_substrates_skipped names
+            # it, and the breadth-cap ("superfamily-level, substrate
+            # unknown") warning fires. Walk on and off must both be valid.
+            "abc_superfamily_only_walk_start_capped",
+            dict(locus_tags=[_ABC_ONLY_WALK_START_LOCUS],
+                 organism=fx.CONTROL_ORGANISM,
+                 include_tcdb_family_substrates=True)),
+        Scenario(
+            "abc_superfamily_only_walk_start_default",
+            dict(locus_tags=[_ABC_ONLY_WALK_START_LOCUS],
+                 organism=fx.CONTROL_ORGANISM)),
+        Scenario(
+            # Only below_gate TCDB edges: no transport rows, no walk start,
+            # not reported in the hint -> empty-but-valid transport arm.
+            "below_gate_only_gene",
+            dict(locus_tags=[_BELOW_GATE_ONLY_LOCUS],
+                 organism=fx.CONTROL_ORGANISM,
+                 include_tcdb_family_substrates=True)),
         Scenario(
             # backlog 3.2: bare metabolite id as a filter is coerced first.
             "bare_metabolite_id_filter",

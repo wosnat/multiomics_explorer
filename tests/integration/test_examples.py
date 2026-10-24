@@ -87,9 +87,9 @@ ANNOTATION_EVIDENCE_SCRIPT = REPO_ROOT / "examples" / "annotation_evidence.py"
 # key still exits 0 and prints `[None, None, None, None]`.
 ANNOTATION_EVIDENCE_SCENARIOS = [
     ("merops_call_class", "peptidase"),
-    ("tcdb_attachment_depth", "attachment_depth=most_specific"),
+    ("tcdb_gate", "tcdb_gate=below_gate"),
     ("interpro_enrichment", "HOMOLOGOUS_SUPERFAMILY"),
-    ("trust_filtered_tcdb", "evidence_score"),
+    ("trust_filtered_tcdb", "max_tier=2"),
 ]
 
 

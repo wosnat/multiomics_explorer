@@ -129,14 +129,15 @@
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/python_api.md
   note: "registered @mcp.tool count — '42 tools'"
 
-- id: pmm0392_transported_metabolite_count
-  cypher: "MATCH (g:Gene {locus_tag: 'PMM0392'}) RETURN g.transported_metabolite_count AS n"
-  expect: {n: 12}
+- id: cynd_tcdb_worked_example
+  cypher: >
+    MATCH (g:Gene {locus_tag: 'PMM0372'})
+    RETURN g.transported_metabolite_count AS transported, g.tcdb_assignment_count AS assignments
+  expect: {transported: 3, assignments: 2}
   used_in:
-    - CLAUDE.md
     - multiomics_explorer/inputs/tools/metabolites_by_gene.yaml
-    - multiomics_explorer/inputs/tools/gene_ontology_terms.yaml
-  note: "worked example: PMM0392 transported_metabolite_count == distinct metabolites in its transport rows"
+    - multiomics_explorer/inputs/tools/gene_overview.yaml
+  note: "worked example: cynD (PMM0372) has 2 direct sibling systems and reaches 3 metabolites (= distinct Metabolite targets in its direct transport rows)"
 
 - id: alteromonas_marref_peptidase_count
   cypher: >
@@ -150,19 +151,79 @@
     - multiomics_explorer/inputs/tools/list_organisms.yaml
   note: "top_annotation_capability leader: 'Alteromonas (MarRef v6) leads at 148'"
 
-- id: med4_tcdb_edges
+- id: tcdb_gate_edge_counts
   cypher: >
-    MATCH (g:Gene)-[e:Gene_has_tcdb_family]->()
-    WHERE g.locus_tag STARTS WITH 'PMM'
-    RETURN count(e) AS edges,
-           sum(CASE WHEN e.attachment_depth = 'most_specific' THEN 1 ELSE 0 END) AS most_specific
-  expect: {edges: 670, most_specific: 597}
+    MATCH ()-[e:Gene_has_tcdb_family]->()
+    RETURN sum(CASE WHEN e.tcdb_gate = 'direct' THEN 1 ELSE 0 END) AS direct,
+           sum(CASE WHEN e.tcdb_gate = 'annotated' THEN 1 ELSE 0 END) AS annotated,
+           sum(CASE WHEN e.tcdb_gate = 'below_gate' THEN 1 ELSE 0 END) AS below_gate
+  expect: {direct: 11158, annotated: 19866, below_gate: 44799}
+  used_in:
+    - multiomics_explorer/inputs/ontologies/tcdb.yaml
+  note: "KG-wide Gene_has_tcdb_family edges per tcdb_gate (TCDB cleanup build 2026-10-24)"
+
+- id: med4_tcdb_gene_scale
+  cypher: >
+    MATCH (g:Gene {organism_name: 'Prochlorococcus MED4'})
+    WITH g, coalesce(g.tcdb_assignment_count, 0) > 0 AS gated,
+         coalesce(g.transported_metabolite_count, 0) > 0 AS reaches,
+         EXISTS { MATCH (g)-[:Gene_has_tcdb_family {tcdb_gate: 'direct'}]->() } AS has_direct
+    RETURN sum(CASE WHEN gated THEN 1 ELSE 0 END) AS gated_genes,
+           sum(CASE WHEN reaches THEN 1 ELSE 0 END) AS direct_substrate_genes,
+           sum(CASE WHEN gated AND NOT has_direct THEN 1 ELSE 0 END) AS gated_no_direct
+  expect: {gated_genes: 203, direct_substrate_genes: 89, gated_no_direct: 98}
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/transport.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
+  note: "MED4: 203 genes with a gated TCDB call, 89 reach a substrate directly, 98 gated but no direct edge"
+
+- id: med4_tcdb_weak_only_genes
+  cypher: >
+    MATCH (g:Gene {organism_name: 'Prochlorococcus MED4'})-[:Gene_has_tcdb_family]->()
+    WHERE coalesce(g.tcdb_assignment_count, 0) = 0
+    RETURN count(DISTINCT g) AS weak_only_genes
+  expect: {weak_only_genes: 159}
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/annotation_evidence.md
+  note: "MED4 genes whose only TCDB edges are below_gate"
+
+- id: thil_weak_tcdb_hit
+  cypher: >
+    MATCH (:Gene {locus_tag: 'PMM0024'})-[r:Gene_has_tcdb_family]->(:TcdbFamily {id: 'tcdb:8.A.159'})
+    RETURN r.identity AS identity, r.tcdb_gate AS gate
+  expect: {identity: 28.5, gate: below_gate}
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/annotation_evidence.md
     - multiomics_explorer/inputs/tools/gene_ontology_terms.yaml
-    - multiomics_explorer/inputs/tools/genes_by_ontology.yaml
-    - multiomics_explorer/inputs/tools/pathway_enrichment.yaml
-  note: "MED4 Gene_has_tcdb_family: 670 edges, 597 most_specific"
+  note: "thiL (PMM0024): its only TCDB edge is a 28.5% tier-3 hit on tcdb:8.A.159"
+
+- id: tcdb_superfamily_substrate_counts
+  cypher: >
+    MATCH (a:TcdbFamily {id: 'tcdb:3.A.1'}), (m:TcdbFamily {id: 'tcdb:2.A.1'})
+    RETURN a.tcdb_substrate_count AS abc, m.tcdb_substrate_count AS mfs
+  expect: {abc: 551, mfs: 471}
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/transport.md
+    - multiomics_explorer/inputs/ontologies/tcdb.yaml
+    - multiomics_explorer/inputs/tools/metabolites_by_gene.yaml
+    - multiomics_explorer/inputs/tools/ontology_term_details.yaml
+  note: "family-walk breadth cap (200): ABC tcdb:3.A.1 = 551 substrates, MFS tcdb:2.A.1 = 471"
+
+- id: tcdb_abc_med4_and_children
+  cypher: >
+    MATCH (a:TcdbFamily {id: 'tcdb:3.A.1'})
+    OPTIONAL MATCH (c:TcdbFamily)-[:Tcdb_family_is_a_tcdb_family]->(a)
+    WITH a, count(c) AS children
+    OPTIONAL MATCH (g:Gene {organism_name: 'Prochlorococcus MED4'})-[r:Gene_has_tcdb_family]->(t:TcdbFamily)
+    WHERE r.tcdb_gate IN ['direct', 'annotated']
+      AND (t = a OR (t)-[:Tcdb_family_is_a_tcdb_family*1..4]->(a))
+    RETURN children, count(DISTINCT g) AS med4_gated_genes
+  expect: {children: 98, med4_gated_genes: 52}
+  used_in:
+    - multiomics_explorer/inputs/ontologies/tcdb.yaml
+    - multiomics_explorer/inputs/tools/search_ontology.yaml
+    - multiomics_explorer/inputs/tools/ontology_term_details.yaml
+  note: "ABC superfamily tcdb:3.A.1: 98 children; MED4 organism_gene_count 52 (gated edges)"
 
 - id: ipr027417_med4_gene_count
   cypher: >

@@ -1,28 +1,28 @@
 by_evidence_source:
 - count: 2221
   evidence_source: metabolism
-- count: 1382
+- count: 1285
   evidence_source: transport
 - count: 208
   evidence_source: go_transport
 - count: 135
   evidence_source: metabolomics
 by_kegg_brite_class:
-- count: 254
+- count: 249
   kegg_brite_class: 'Lipids: Fatty acyls'
-- count: 137
+- count: 134
   kegg_brite_class: 'Lipids: Prenol lipids'
-- count: 57
+- count: 54
   kegg_brite_class: 'Phytochemical compounds: Terpenoids'
-- count: 38
+- count: 36
   kegg_brite_class: 'Lipids: Sterol lipids'
-- count: 37
-  kegg_brite_class: 'Phytochemical compounds: Alkaloids'
 - count: 34
   kegg_brite_class: 'Lipids: Polyketides'
-- count: 30
+- count: 34
+  kegg_brite_class: 'Phytochemical compounds: Alkaloids'
+- count: 29
   kegg_brite_class: 'Pesticides: Pesticides'
-- count: 27
+- count: 25
   kegg_brite_class: 'Lipids: Glycerophospholipids'
 - count: 22
   kegg_brite_class: 'Glycosides: N-glycosides'
@@ -30,21 +30,21 @@ by_kegg_brite_class:
   kegg_brite_class: 'Phytochemical compounds: Phenylpropanoids'
 - count: 18
   kegg_brite_class: 'Lipids: Saccharolipids'
-- count: 15
+- count: 14
   kegg_brite_class: 'Glycosides: O-glycosides'
 - count: 11
-  kegg_brite_class: 'Natural toxins: Phytotoxins'
-- count: 11
   kegg_brite_class: 'Phytochemical compounds: Flavonoids'
+- count: 10
+  kegg_brite_class: 'Natural toxins: Phytotoxins'
 - count: 9
   kegg_brite_class: 'Lipids: Glycerolipids'
 - count: 9
   kegg_brite_class: 'Phytochemical compounds: Fatty acids related compounds'
 - count: 8
-  kegg_brite_class: 'Lipids: Sphingolipids'
-- count: 8
   kegg_brite_class: 'Phytochemical compounds: Amino acid related compounds'
-- count: 6
+- count: 7
+  kegg_brite_class: 'Lipids: Sphingolipids'
+- count: 5
   kegg_brite_class: 'Endocrine disrupting compounds: Pesticides and herbicides'
 - count: 5
   kegg_brite_class: 'Pesticides: Obsolete pesticides'
@@ -59,34 +59,32 @@ by_kegg_brite_class:
 - count: 1
   kegg_brite_class: 'Bioactive peptides: Cardiovascular peptides'
 - count: 1
-  kegg_brite_class: 'Bioactive peptides: Neuropeptides'
-- count: 1
   kegg_brite_class: 'Natural toxins: Marine biotoxins'
 - count: 1
   kegg_brite_class: 'Phytochemical compounds: Shikimate / acetate-malonate pathway
     derived compounds'
-- count: 2591
+- count: 2544
   kegg_brite_class: not classified
 by_kegg_functional_category:
 - count: 65
   kegg_functional_category: Carbohydrates
-- count: 61
+- count: 59
   kegg_functional_category: Peptides
 - count: 47
   kegg_functional_category: Nucleic acids
-- count: 41
-  kegg_functional_category: Vitamins and cofactors
 - count: 40
+  kegg_functional_category: Vitamins and cofactors
+- count: 37
   kegg_functional_category: Lipids
-- count: 35
+- count: 31
   kegg_functional_category: Organic acids
 - count: 28
   kegg_functional_category: Antibiotics
-- count: 24
+- count: 23
   kegg_functional_category: Hormones and transmitters
-- count: 15
+- count: 14
   kegg_functional_category: Steroids
-- count: 2908
+- count: 2855
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment:
@@ -97,7 +95,7 @@ by_measurement_coverage:
   - compartment: whole_cell
     count: 135
   by_paper_count:
-  - count: 3108
+  - count: 3043
     paper_count: 0
   - count: 93
     paper_count: 1
@@ -106,16 +104,16 @@ by_measurement_coverage:
   - count: 5
     paper_count: 3
 by_structure_kind:
-- count: 2568
+- count: 2523
   structure_kind: defined
-- count: 649
+- count: 630
   structure_kind: generic
-- count: 26
+- count: 25
   structure_kind: polymer
 case_id: list_metabolites_all
 mass_stats:
   mass_max: 5227.103
-  mass_median: 246.194
+  mass_median: 245.876
   mass_min: 1.00794
 not_found:
   elements: []
@@ -150,28 +148,15 @@ results:
   metabolite_id: kegg.compound:C00001
   name: H2O
   organism_count: 43
-  pathway_count: 17
+  pathway_count: 4
   pathway_ids:
   - kegg.pathway:ko00190
   - kegg.pathway:ko00195
   - kegg.pathway:ko00710
   - kegg.pathway:ko01100
-  - kegg.pathway:ko04918
-  - kegg.pathway:ko04924
-  - kegg.pathway:ko04962
-  - kegg.pathway:ko04964
-  - kegg.pathway:ko04966
-  - kegg.pathway:ko04970
-  - kegg.pathway:ko04971
-  - kegg.pathway:ko04972
-  - kegg.pathway:ko04976
-  - kegg.pathway:ko05014
-  - kegg.pathway:ko05022
-  - kegg.pathway:ko05208
-  - kegg.pathway:ko05415
   structure_kind: defined
-  transporter_count: 15
-  transporter_gene_count: 1900
+  transporter_count: 3
+  transporter_gene_count: 10
 - catalyst_gene_count: 6041
   chebi_id: '15422'
   elements:
@@ -199,7 +184,7 @@ results:
   metabolite_id: kegg.compound:C00002
   name: ATP
   organism_count: 43
-  pathway_count: 33
+  pathway_count: 18
   pathway_ids:
   - kegg.pathway:ko00190
   - kegg.pathway:ko00195
@@ -219,24 +204,9 @@ results:
   - kegg.pathway:ko04142
   - kegg.pathway:ko04148
   - kegg.pathway:ko04217
-  - kegg.pathway:ko04611
-  - kegg.pathway:ko04621
-  - kegg.pathway:ko04714
-  - kegg.pathway:ko04721
-  - kegg.pathway:ko04742
-  - kegg.pathway:ko04750
-  - kegg.pathway:ko04911
-  - kegg.pathway:ko04917
-  - kegg.pathway:ko04924
-  - kegg.pathway:ko04930
-  - kegg.pathway:ko05012
-  - kegg.pathway:ko05022
-  - kegg.pathway:ko05133
-  - kegg.pathway:ko05410
-  - kegg.pathway:ko05415
   structure_kind: defined
-  transporter_count: 15
-  transporter_gene_count: 2195
+  transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 5776
   chebi_id: '15378'
   elements:
@@ -255,38 +225,17 @@ results:
   metabolite_id: kegg.compound:C00080
   name: H+
   organism_count: 43
-  pathway_count: 27
+  pathway_count: 6
   pathway_ids:
   - kegg.pathway:ko00190
   - kegg.pathway:ko00195
   - kegg.pathway:ko01100
   - kegg.pathway:ko04024
   - kegg.pathway:ko04075
-  - kegg.pathway:ko04260
-  - kegg.pathway:ko04261
   - kegg.pathway:ko04371
-  - kegg.pathway:ko04714
-  - kegg.pathway:ko04721
-  - kegg.pathway:ko04742
-  - kegg.pathway:ko04750
-  - kegg.pathway:ko04919
-  - kegg.pathway:ko04964
-  - kegg.pathway:ko04966
-  - kegg.pathway:ko04970
-  - kegg.pathway:ko04971
-  - kegg.pathway:ko04972
-  - kegg.pathway:ko04974
-  - kegg.pathway:ko04976
-  - kegg.pathway:ko04977
-  - kegg.pathway:ko04978
-  - kegg.pathway:ko04981
-  - kegg.pathway:ko05110
-  - kegg.pathway:ko05120
-  - kegg.pathway:ko05164
-  - kegg.pathway:ko05323
   structure_kind: defined
-  transporter_count: 123
-  transporter_gene_count: 8017
+  transporter_count: 88
+  transporter_gene_count: 1883
 - catalyst_gene_count: 4325
   chebi_id: '29888'
   elements:
@@ -307,14 +256,12 @@ results:
   metabolite_id: kegg.compound:C00013
   name: Diphosphate
   organism_count: 43
-  pathway_count: 3
+  pathway_count: 1
   pathway_ids:
   - kegg.pathway:ko00190
-  - kegg.pathway:ko05012
-  - kegg.pathway:ko05022
   structure_kind: defined
-  transporter_count: 3
-  transporter_gene_count: 99
+  transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 4069
   chebi_id: '26078'
   elements:
@@ -379,7 +326,7 @@ results:
   metabolite_id: kegg.compound:C00009
   name: Orthophosphate
   organism_count: 43
-  pathway_count: 10
+  pathway_count: 6
   pathway_ids:
   - kegg.pathway:ko00190
   - kegg.pathway:ko00195
@@ -387,31 +334,27 @@ results:
   - kegg.pathway:ko02020
   - kegg.pathway:ko02024
   - kegg.pathway:ko04111
-  - kegg.pathway:ko04928
-  - kegg.pathway:ko04978
-  - kegg.pathway:ko05012
-  - kegg.pathway:ko05022
   structure_kind: defined
-  transporter_count: 15
-  transporter_gene_count: 2867
+  transporter_count: 14
+  transporter_gene_count: 52
 returned: 5
 row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 1627
+- count: 1608
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 618
+- count: 614
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
-- count: 593
+- count: 589
   metabolite_pathway_id: kegg.pathway:ko01120
   metabolite_pathway_name: Microbial metabolism in diverse environments
-- count: 286
+- count: 284
   metabolite_pathway_id: kegg.pathway:ko01240
   metabolite_pathway_name: Biosynthesis of cofactors
-- count: 146
+- count: 145
   metabolite_pathway_id: kegg.pathway:ko01220
   metabolite_pathway_name: Degradation of aromatic compounds
 - count: 125
@@ -430,31 +373,31 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko00860
   metabolite_pathway_name: Porphyrin metabolism
 top_organisms:
-- count: 2447
+- count: 1725
   organism_name: Pseudomonas putida KT2440
-- count: 2387
-  organism_name: Alteromonas macleodii EZ55
-- count: 2378
+- count: 1601
   organism_name: Ruegeria pomeroyi DSS-3
-- count: 2321
+- count: 1568
+  organism_name: Alteromonas macleodii EZ55
+- count: 1490
   organism_name: Alteromonas macleodii MIT1002
-- count: 2319
-  organism_name: Alteromonas (MarRef v6)
-- count: 2308
-  organism_name: Alteromonas macleodii BGP6
-- count: 2306
-  organism_name: Alteromonas macleodii HOT1A3
-- count: 2297
-  organism_name: Alteromonas macleodii AD45
-- count: 2297
+- count: 1486
   organism_name: Marinobacter (MarRef v6)
-- count: 2287
+- count: 1480
   organism_name: Shewanella sp. W3-18-1
-total_entries: 3243
-total_matching: 3243
+- count: 1478
+  organism_name: Alteromonas macleodii BGP6
+- count: 1478
+  organism_name: Alteromonas (MarRef v6)
+- count: 1468
+  organism_name: Alteromonas macleodii HOT1A3
+- count: 1467
+  organism_name: Alteromonas mediterranea AltDE1
+total_entries: 3178
+total_matching: 3178
 truncated: true
 warnings: []
 xref_coverage:
-  with_chebi: 3118
-  with_hmdb: 1495
-  with_mnxm: 3232
+  with_chebi: 3053
+  with_hmdb: 1469
+  with_mnxm: 3167

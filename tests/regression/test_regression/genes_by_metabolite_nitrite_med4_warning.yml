@@ -1,30 +1,28 @@
 by_evidence_source:
-- count: 29
+- count: 6
   evidence_source: transport
 by_evidence_source_combination:
 - evidence_sources:
   - transport
-  pair_count: 27
+  pair_count: 3
 by_metabolite:
 - formula: NO2
-  gene_count: 27
+  gene_count: 3
   go_transport_rows: 0
   metabolism_rows: 0
   metabolite_id: kegg.compound:C00088
   multi_source_gene_count: 0
   name: Nitrite
   reaction_count: 0
-  rows: 29
-  transport_inherited_rows: 23
-  transport_most_specific_rows: 6
-  transporter_count: 5
-by_substrate_depth:
-- count: 23
-  substrate_depth: inherited
+  rows: 6
+  tcdb_direct_rows: 6
+  tcdb_family_rows: 0
+  transporter_count: 2
+by_tcdb_route:
 - count: 6
-  substrate_depth: most_specific
+  tcdb_route: direct
 case_id: genes_by_metabolite_nitrite_med4_warning
-gene_count_total: 27
+gene_count_total: 3
 metabolite_count_total: 1
 not_found:
   metabolite_ids: []
@@ -35,7 +33,8 @@ offset: 0
 reaction_count_total: 0
 resolved_aliases: {}
 results:
-- ec_numbers: null
+- attached_tcdb_id: tcdb:3.A.1.16.2
+  ec_numbers: null
   evidence_source: transport
   gene_name: cynA
   go_axiom_term_id: null
@@ -56,13 +55,19 @@ results:
   product: cyanate ABC transporter, substrate-binding protein
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.6
-  tcdb_family_id: tcdb:3.A.1.16.1
-  tcdb_family_name: Four component nitrate/nitrite porter.
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_calls:
+  - diamond_best_hit
+  - diamond_tier
+  - eggnog
+  tcdb_direction: uptake
+  tcdb_family_id: tcdb:3.A.1.16.2
+  tcdb_family_name: Bispecific cyanate/nitrite transporter.
+  tcdb_identity: 69.9
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
+- attached_tcdb_id: tcdb:3.A.1.16.1
+  ec_numbers: null
   evidence_source: transport
   gene_name: cynA
   go_axiom_term_id: null
@@ -83,40 +88,18 @@ results:
   product: cyanate ABC transporter, substrate-binding protein
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.6
-  tcdb_family_id: tcdb:3.A.1.16.2
-  tcdb_family_name: Bispecific cyanate/nitrite transporter.
-  transport_substrate_resolution: resolved
-- ec_numbers: null
-  evidence_source: transport
-  gene_name: cynB
-  go_axiom_term_id: null
-  go_axiom_term_name: null
-  go_evidence: null
-  go_namespace: null
-  go_sources: null
-  go_term_depth: null
-  go_term_id: null
-  go_term_name: null
-  locus_tag: PMM0371
-  mass_balance: null
-  metabolite_chebi_id: '25567'
-  metabolite_formula: NO2
-  metabolite_id: kegg.compound:C00088
-  metabolite_mass: 46.005
-  metabolite_name: Nitrite
-  product: cyanate ABC transporter, permease protein
-  reaction_id: null
-  reaction_name: null
-  substrate_depth: most_specific
-  target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - diamond_tier
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.16.1
   tcdb_family_name: Four component nitrate/nitrite porter.
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
+- attached_tcdb_id: tcdb:3.A.1.16.2
+  ec_numbers: null
   evidence_source: transport
   gene_name: cynB
   go_axiom_term_id: null
@@ -137,13 +120,49 @@ results:
   product: cyanate ABC transporter, permease protein
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - diamond_best_hit
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.16.2
   tcdb_family_name: Bispecific cyanate/nitrite transporter.
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: 70.9
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
+- attached_tcdb_id: tcdb:3.A.1.16.1
+  ec_numbers: null
+  evidence_source: transport
+  gene_name: cynB
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
+  locus_tag: PMM0371
+  mass_balance: null
+  metabolite_chebi_id: '25567'
+  metabolite_formula: NO2
+  metabolite_id: kegg.compound:C00088
+  metabolite_mass: 46.005
+  metabolite_name: Nitrite
+  product: cyanate ABC transporter, permease protein
+  reaction_id: null
+  reaction_name: null
+  target_kind: metabolite
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
+  tcdb_family_id: tcdb:3.A.1.16.1
+  tcdb_family_name: Four component nitrate/nitrite porter.
+  tcdb_identity: null
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
+- attached_tcdb_id: tcdb:3.A.1.16.2
+  ec_numbers: null
   evidence_source: transport
   gene_name: cynD
   go_axiom_term_id: null
@@ -164,38 +183,40 @@ results:
   product: cyanate ABC transporter ATP-binding protein
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
-  tcdb_family_id: tcdb:3.A.1.16.1
-  tcdb_family_name: Four component nitrate/nitrite porter.
-  transport_substrate_resolution: resolved
+  tcdb_calls:
+  - diamond_best_hit
+  tcdb_direction: uptake
+  tcdb_family_id: tcdb:3.A.1.16.2
+  tcdb_family_name: Bispecific cyanate/nitrite transporter.
+  tcdb_identity: 59.2
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
 returned: 5
 row_count: 5
 rows_by_go_term_depth: []
 stereo_forms_added: {}
 stereo_relatives: {}
+tcdb_family_substrates_not_shown:
+  genes: 0
+  metabolites: 0
+  rows: 0
+tcdb_family_substrates_skipped:
+- locus_tag: PMM0449
+  tcdb_id: tcdb:3.A.1
+  tcdb_substrate_count: 551
+- locus_tag: PMM0450
+  tcdb_id: tcdb:3.A.1
+  tcdb_substrate_count: 551
+- locus_tag: PMM0913
+  tcdb_id: tcdb:3.A.1
+  tcdb_substrate_count: 551
+- locus_tag: PMM0977
+  tcdb_id: tcdb:3.A.1
+  tcdb_substrate_count: 551
 top_gene_categories:
-- category: Transport
-  gene_count: 10
-- category: Stress response and adaptation
-  gene_count: 5
 - category: Central intermediary metabolism
   gene_count: 3
-- category: Amino acid metabolism
-  gene_count: 1
-- category: Carbohydrate metabolism
-  gene_count: 1
-- category: Cell cycle and division
-  gene_count: 1
-- category: Cellular processes
-  gene_count: 1
-- category: Coenzyme metabolism
-  gene_count: 1
-- category: Lipid metabolism
-  gene_count: 1
-- category: Post-translational modification
-  gene_count: 1
 top_genes:
 - gene_name: cynA
   go_transport_rows: 0
@@ -204,10 +225,9 @@ top_genes:
   metabolite_count: 1
   multi_source_metabolite_count: 0
   reaction_count: 0
-  tcdb_evidence_score_max: 0.6
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 2
-  transport_substrate_resolution: resolved
+  tcdb_assignment_count: 4
+  tcdb_direct_rows: 2
+  tcdb_family_rows: 0
   transporter_count: 2
 - gene_name: cynB
   go_transport_rows: 0
@@ -216,71 +236,10 @@ top_genes:
   metabolite_count: 1
   multi_source_metabolite_count: 0
   reaction_count: 0
-  tcdb_evidence_score_max: 0.8
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 2
-  transport_substrate_resolution: resolved
+  tcdb_assignment_count: 2
+  tcdb_direct_rows: 2
+  tcdb_family_rows: 0
   transporter_count: 2
-- gene_name: sufC
-  go_transport_rows: 0
-  locus_tag: PMM0072
-  metabolism_rows: 0
-  metabolite_count: 1
-  multi_source_metabolite_count: 0
-  reaction_count: 0
-  tcdb_evidence_score_max: 0.4
-  transport_inherited_rows: 1
-  transport_most_specific_rows: 0
-  transport_substrate_resolution: resolved
-  transporter_count: 1
-- gene_name: null
-  go_transport_rows: 0
-  locus_tag: PMM0089
-  metabolism_rows: 0
-  metabolite_count: 1
-  multi_source_metabolite_count: 0
-  reaction_count: 0
-  tcdb_evidence_score_max: 0.4
-  transport_inherited_rows: 1
-  transport_most_specific_rows: 0
-  transport_substrate_resolution: resolved
-  transporter_count: 1
-- gene_name: tolC
-  go_transport_rows: 0
-  locus_tag: PMM0097
-  metabolism_rows: 0
-  metabolite_count: 1
-  multi_source_metabolite_count: 0
-  reaction_count: 0
-  tcdb_evidence_score_max: 0.4
-  transport_inherited_rows: 1
-  transport_most_specific_rows: 0
-  transport_substrate_resolution: resolved
-  transporter_count: 1
-- gene_name: cgtA
-  go_transport_rows: 0
-  locus_tag: PMM0218
-  metabolism_rows: 0
-  metabolite_count: 1
-  multi_source_metabolite_count: 0
-  reaction_count: 0
-  tcdb_evidence_score_max: 0.0
-  transport_inherited_rows: 1
-  transport_most_specific_rows: 0
-  transport_substrate_resolution: resolved
-  transporter_count: 1
-- gene_name: minD
-  go_transport_rows: 0
-  locus_tag: PMM0321
-  metabolism_rows: 0
-  metabolite_count: 1
-  multi_source_metabolite_count: 0
-  reaction_count: 0
-  tcdb_evidence_score_max: 0.2
-  transport_inherited_rows: 1
-  transport_most_specific_rows: 0
-  transport_substrate_resolution: resolved
-  transporter_count: 1
 - gene_name: cynD
   go_transport_rows: 0
   locus_tag: PMM0372
@@ -288,74 +247,27 @@ top_genes:
   metabolite_count: 1
   multi_source_metabolite_count: 0
   reaction_count: 0
-  tcdb_evidence_score_max: 0.8
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
-  transport_substrate_resolution: resolved
-  transporter_count: 1
-- gene_name: fadD
-  go_transport_rows: 0
-  locus_tag: PMM0402
-  metabolism_rows: 0
-  metabolite_count: 1
-  multi_source_metabolite_count: 0
-  reaction_count: 0
-  tcdb_evidence_score_max: 0.8
-  transport_inherited_rows: 1
-  transport_most_specific_rows: 0
-  transport_substrate_resolution: resolved
-  transporter_count: 1
-- gene_name: ftsE
-  go_transport_rows: 0
-  locus_tag: PMM0434
-  metabolism_rows: 0
-  metabolite_count: 1
-  multi_source_metabolite_count: 0
-  reaction_count: 0
-  tcdb_evidence_score_max: 0.8
-  transport_inherited_rows: 1
-  transport_most_specific_rows: 0
-  transport_substrate_resolution: family_inferred
-  transporter_count: 1
-top_genes_truncated: true
+  tcdb_assignment_count: 2
+  tcdb_direct_rows: 2
+  tcdb_family_rows: 0
+  transporter_count: 2
 top_reactions: []
 top_tcdb_families:
-- gene_count: 20
-  level_kind: tc_family
+- direction: uptake
+  gene_count: 3
+  level_kind: tc_system
   metabolite_count: 1
-  substrate_depth: inherited
-  tcdb_family_id: tcdb:3.A.1
-  tcdb_family_name: The ATP-binding Cassette (ABC) Superfamily
-- gene_count: 3
-  level_kind: tc_family
-  metabolite_count: 1
-  substrate_depth: inherited
-  tcdb_family_id: tcdb:2.A.1
-  tcdb_family_name: The Major Facilitator Superfamily (MFS)
-- gene_count: 3
-  level_kind: tc_specificity
-  metabolite_count: 1
-  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.16.1
   tcdb_family_name: Four component nitrate/nitrite porter.
-- gene_count: 2
-  level_kind: tc_specificity
+  tcdb_route: direct
+- direction: uptake
+  gene_count: 3
+  level_kind: tc_system
   metabolite_count: 1
-  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.16.2
   tcdb_family_name: Bispecific cyanate/nitrite transporter.
-- gene_count: 1
-  level_kind: tc_family
-  metabolite_count: 1
-  substrate_depth: most_specific
-  tcdb_family_id: tcdb:2.A.16
-  tcdb_family_name: The Telurite-resistance/Dicarboxylate Transporter (TDT) Family
-total_matching: 29
-transporter_count_total: 5
+  tcdb_route: direct
+total_matching: 6
+transporter_count_total: 2
 truncated: true
-warnings:
-- Most transport rows are `inherited` (23 of 29) — the substrate is reached through
-  a broader family's substrate list, not the gene's most specific surviving node.
-  Use substrate_depth=['most_specific'] for conservative-cast questions (e.g. cross-organism
-  inference); keep `inherited` rows for broad-screen candidate enumeration, and rank
-  within a tier by `tcdb_evidence_score`. Per-gene trust lives in `top_genes[].transport_substrate_resolution`.
+warnings: []

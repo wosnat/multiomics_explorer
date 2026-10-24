@@ -134,7 +134,5 @@ rows:
   start: 302742
   strand: +
   subcellular_localization: CytoplasmicMembrane
-  tcdb_evidence_score_max: 0.2
-  tcdb_family_count: 3
-  transport_substrate_resolution: resolved
-  transported_metabolite_count: 2
+  tcdb_assignment_count: 2
+  transported_metabolite_count: 0

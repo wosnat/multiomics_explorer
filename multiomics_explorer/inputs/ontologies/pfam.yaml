@@ -65,8 +65,8 @@ pitfalls: |
   - TCDB and MEROPS families bridge *to* Pfam (composition) — those links
     are read from the `tcdb` / `merops` term, not from the Pfam term.
   - Pfam evidence tells you a domain is present, not that the protein is
-    active — combine with MEROPS `call_class` or TCDB `attachment_depth`
-    for functional calls.
+    active — combine with MEROPS `call_class` or the TCDB `tcdb_gate`
+    (a `direct` system call) for functional calls.
 
 typical_questions:
   - "Which Pfam domains are enriched among genes up in the vesicle proteome?"

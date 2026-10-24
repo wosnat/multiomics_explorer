@@ -118,7 +118,7 @@ class TestFisherOra:
         t2g = self._term2gene_simple().assign(
             gene_category="Transport", evidence="curated", tier=1,
             sources=[["tcdb"]] * 9, evidence_score=1.0,
-            call_class="peptidase", attachment_depth="most_specific",
+            call_class="peptidase", tcdb_gate="direct", tcdb_calls=[["eggnog"]] * 9,
             localization_score=9.9, interpro_type="DOMAIN",
         )
         inputs = EnrichmentInputs(
@@ -129,7 +129,8 @@ class TestFisherOra:
         )
         df = fisher_ora(inputs, t2g).results
         for col in ("evidence", "sources", "evidence_score", "tier",
-                    "call_class", "attachment_depth", "localization_score"):
+                    "call_class", "tcdb_gate", "tcdb_calls",
+                    "localization_score"):
             assert col not in df.columns, col
         # Term-side context still flows: gene_category is the documented
         # passthrough, and interpro_type is a property of the term itself.

@@ -267,18 +267,21 @@ FEW_SHOT_EXAMPLES = [
         ),
     },
     {
-        "question": "Which TCDB families transport siderophores?",
+        "question": "Which TCDB systems transport siderophores?",
         "cypher": (
             "CALL db.index.fulltext.queryNodes('chemicalRoleFullText', 'siderophore')\n"
             "YIELD node AS role, score\n"
             "WITH role ORDER BY score DESC LIMIT 1\n"
             "MATCH (sub:ChemicalRole)-[:Chemical_role_is_a_chemical_role*0..]->(role)\n"
-            "MATCH (f:TcdbFamily)-[:Tcdb_family_transports_chemical_role]->(sub)\n"
-            "WHERE f.substrate_breadth <> 'not_assessed'\n"
+            "MATCH (s:TcdbFamily {level_kind: 'tc_system'})"
+            "-[:Tcdb_family_transports_chemical_role]->(sub)\n"
+            "OPTIONAL MATCH (s)-[:Tcdb_family_is_a_tcdb_family*1..4]->"
+            "(f:TcdbFamily {level_kind: 'tc_family'})\n"
             "RETURN role.id AS role_id, f.id AS tcdb_family_id, f.name AS tcdb_family_name,\n"
-            "       f.substrate_breadth AS substrate_breadth,\n"
+            "       s.id AS tcdb_system_id, s.name AS tcdb_system_name,\n"
+            "       s.direction AS direction, s.gene_count AS gene_count,\n"
             "       collect(DISTINCT sub.name) AS via_roles\n"
-            "ORDER BY tcdb_family_id"
+            "ORDER BY tcdb_family_id, tcdb_system_id"
         ),
         "explanation": (
             "Siderophore, vitamin, antibiotic and similar terms are ChemicalRole nodes "
@@ -286,9 +289,10 @@ FEW_SHOT_EXAMPLES = [
             "them. Find the role by name with the chemicalRoleFullText index, expand to its "
             "narrower roles with Chemical_role_is_a_chemical_role*0.. (child → parent), then "
             "follow Tcdb_family_transports_chemical_role (TcdbFamily → ChemicalRole). "
-            "substrate_breadth = 'lumping' marks broad superfamilies whose substrate list is "
-            "reachability, not capability; 'not_assessed' marks TCDB class / subclass nodes. "
-            "Feed tcdb_family_id to genes_by_ontology(ontology='tcdb', term_ids=[...])."
+            "Substrate edges leave tc_system nodes only (the deepest TCDB level), so walk "
+            "Tcdb_family_is_a_tcdb_family*1..4 up from each system to name its family. "
+            "gene_count counts gate-passing gene edges. Feed tcdb_system_id / "
+            "tcdb_family_id to genes_by_ontology(ontology='tcdb', term_ids=[...])."
         ),
     },
     {

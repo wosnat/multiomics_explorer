@@ -60,7 +60,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MED4
-  transported_metabolite_count: 1011
+  transported_metabolite_count: 43
   treatment_types:
   - carbon
   - coculture
@@ -112,7 +112,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9301
-  transported_metabolite_count: 1005
+  transported_metabolite_count: 40
   treatment_types:
   - growth_phase
   - phosphorus

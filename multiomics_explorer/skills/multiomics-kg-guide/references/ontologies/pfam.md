@@ -82,11 +82,6 @@ Parent label `PfamClan`: `gene_count`, `id`, `level`, `name`, `organism_count`, 
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="pfam")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
-
-- `Gene_has_pfam.evidence`: `curated`, `signature`, `family_inferred`
-- `Gene_has_pfam.sources`: `cyanorak`, `eggnog`, `interproscan`, `uniprot`
-
 ## Interpretation
 
 The right axis for "what is this protein built from" and for
@@ -117,8 +112,8 @@ enrichment; use `max_gene_set_size` or `min_gene_count` to manage them.
 - TCDB and MEROPS families bridge *to* Pfam (composition) — those links
   are read from the `tcdb` / `merops` term, not from the Pfam term.
 - Pfam evidence tells you a domain is present, not that the protein is
-  active — combine with MEROPS `call_class` or TCDB `attachment_depth`
-  for functional calls.
+  active — combine with MEROPS `call_class` or the TCDB `tcdb_gate`
+  (a `direct` system call) for functional calls.
 
 ## Typical questions
 

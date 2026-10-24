@@ -26,7 +26,12 @@ from multiomics_explorer.kg.constants import two_state
 #   facet        — term-side facet ({prop, param}) bound on `t` after the walk.
 #   term_compact / term_verbose         — search_ontology term columns.
 #   term_details_compact / _verbose     — ontology_term_details (PR 3b).
-#   leaf_attachment — leaf-mode most-specific-attachment predicate (TCDB).
+#   rank_order   — ordered-categorical representative-edge key (TCDB):
+#                  {prop, order, then}; replaces `rank_prop` there.
+#   lineage_calls_column — computed per-row column listing the call kinds on
+#                  the row's lineage (TCDB `tcdb_calls`).
+#   gate         — gene-edge gate ({prop, pass, override_param}, TCDB): every
+#                  annotation traversal keeps `pass` edges by default.
 #   bridges_out  — forward-only (rel, target_ontology, link_kind) triples.
 #
 # The registry declares SHAPE only. Values / descriptions / ranges / signals
@@ -180,27 +185,42 @@ ONTOLOGY_CONFIG = {
         "gene_rel": "Gene_has_tcdb_family",
         "hierarchy_rels": ["Tcdb_family_is_a_tcdb_family"],
         "fulltext_index": "tcdbFamilyFullText",
-        "trust": {
-            "sources": "sources", "evidence": "evidence",
-            "evidence_score": "evidence_score", "tier": "tier",
-            "rank_prop": "evidence_score",
+        # KG 3a: one edge per (gene, node, tcdb_call); no evidence_score.
+        "trust": {"sources": "sources", "evidence": "evidence", "tier": "tier"},
+        # Representative edge of a (gene, node) pair (G2): ordered
+        # categorical on `prop`, then `then` DESC.
+        "rank_order": {
+            "prop": "tcdb_call",
+            "order": ["diamond_best_hit", "diamond_tier", "eggnog"],
+            "then": "identity",
+        },
+        # Per-row call kinds on the row's lineage (node, ancestors,
+        # descendants) — computed, not an edge prop (G2).
+        "lineage_calls_column": "tcdb_calls",
+        "compact_edge": {
+            "tcdb_call": {"prop": "tcdb_call"},
+            "tcdb_gate": {"prop": "tcdb_gate"},
         },
         "verbose_edge": [
-            "confidence_score", "source_agreement", "pfam_support", "go_support",
-            "identity", "qcov", "evalue", "consensus_n", "attachment_depth",
+            "identity", "qcov", "evalue",
+            ("scov", "tcdb_scov"),
+            ("rank", "tcdb_best_hit_rank"),
+            ("bitscore", "tcdb_bitscore"),
+            ("bitscore_ratio", "tcdb_bitscore_ratio"),
         ],
-        # Leaf mode: the deepest surviving attachment. `include_superseded`
-        # drops the predicate (spec §7.3).
-        "leaf_attachment": {
-            "prop": "attachment_depth",
-            "value": "most_specific",
-            "override_param": "include_superseded",
+        # G1 gate: every gene -> TCDB annotation traversal keeps `pass`
+        # edges; `override_param` (G4) adds the below-gate rows.
+        "gate": {
+            "prop": "tcdb_gate",
+            "pass": ["direct", "annotated"],
+            "override_param": "include_weak_tcdb_hits",
         },
         "term_compact": ["gene_count", "organism_count"],
-        "term_verbose": ["superfamily", "metabolite_count"],
+        "term_verbose": ["superfamily", "tcdb_substrate_count", "direction"],
         "term_details_compact": [
             "tcdb_id", "tc_class_id", "direct_gene_count", "member_count",
-            "superfamily", "metabolite_count",
+            "superfamily", "tcdb_substrate_count", "direction",
+            "direction_basis",
         ],
         "term_details_verbose": "*",
         "bridges_out": [
@@ -434,6 +454,8 @@ def ontology_row_columns(
     if facet and facet["prop"] not in _STANDARD_TERM_ROW_COLUMNS:
         columns.append(facet["prop"])
     columns.extend(cfg.get("compact_edge") or {})
+    if cfg.get("lineage_calls_column"):
+        columns.append(cfg["lineage_calls_column"])
     if not verbose and not force_trust_axes:
         return columns
 
@@ -459,6 +481,8 @@ def ontology_edge_row_columns() -> frozenset[str]:
         columns.update(cfg.get("trust") or {})
         columns.update(cfg.get("compact_edge") or {})
         columns.update(column for _prop, column in _verbose_edge_pairs(cfg))
+        if cfg.get("lineage_calls_column"):
+            columns.add(cfg["lineage_calls_column"])
     columns.discard("rank_prop")
     return frozenset(columns)
 
@@ -471,6 +495,7 @@ def build_trust_filter_clause(
     max_tier: int | None = None,
     min_evidence_score: float | None = None,
     call_class: list[str] | None = None,
+    tcdb_call: list[str] | None = None,
     rel_var: str = "r",
 ) -> tuple[str, dict]:
     """Build the trust WHERE fragment bound on the gene→leaf rel var.
@@ -487,6 +512,7 @@ def build_trust_filter_clause(
                          tier-null bucket (TCDB eggNOG-only edges)
       min_evidence_score r.evidence_score >= $min_evidence_score
       call_class         r.call_class IN $call_class
+      tcdb_call          r.tcdb_call IN $tcdb_call   (TCDB compact_edge)
 
     Raises ValueError naming the ontology's axes when an axis the ontology does
     not carry is filtered on.
@@ -540,7 +566,83 @@ def build_trust_filter_clause(
         parts.append(f"{rel_var}.{prop} IN $call_class")
         params["call_class"] = call_class
 
+    if tcdb_call is not None:
+        if "tcdb_call" not in compact_edge:
+            raise _unsupported("tcdb_call")
+        prop = _safe_identifier(
+            compact_edge["tcdb_call"]["prop"], "compact_edge property"
+        )
+        parts.append(f"{rel_var}.{prop} IN $tcdb_call")
+        params["tcdb_call"] = tcdb_call
+
     return " AND ".join(parts), params
+
+
+def ontology_gate_clause(
+    ontology: str, *, rel_var: str = "r", include_weak: bool = False,
+) -> str:
+    """Gate predicate on the gene→term edge, or "" (G1).
+
+    TCDB declares `gate`: every annotation / ontology traversal keeps the
+    `pass` edges (`tcdb_gate IN ['direct','annotated']`). `include_weak`
+    (the gate's `override_param`, G4) drops the predicate. Ontologies with no
+    gate return "" whatever `include_weak` says (documented no-op).
+    """
+    gate = _ontology_cfg(ontology).get("gate")
+    if not gate or include_weak:
+        return ""
+    return _gate_pass_predicate(gate, rel_var)
+
+
+def _gate_pass_predicate(gate: dict, rel_var: str) -> str:
+    prop = _safe_identifier(gate["prop"], "gate property")
+    values = ", ".join(f"'{v}'" for v in gate["pass"])
+    return f"{rel_var}.{prop} IN [{values}]"
+
+
+def _and_join(*parts: str) -> str:
+    return " AND ".join(p for p in parts if p)
+
+
+def _rank_order_case(rank_order: dict, rel_var: str) -> str:
+    """`CASE r.<prop> WHEN v0 THEN n-1 ... ELSE -1 END` (higher = better)."""
+    prop = _safe_identifier(rank_order["prop"], "rank_order property")
+    order = rank_order["order"]
+    whens = " ".join(
+        f"WHEN '{v}' THEN {len(order) - 1 - i}" for i, v in enumerate(order)
+    )
+    return f"CASE {rel_var}.{prop} {whens} ELSE -1 END"
+
+
+def _lineage_calls_cypher(
+    cfg: dict, *, g: str = "g", t: str = "t", weak_expr: str | None = None,
+) -> str:
+    """`tcdb_calls` expression for a (gene, node) row (G2).
+
+    The call kinds on the gene's gate-passing edges to the row's node, its
+    ancestors or its descendants, in precedence order. `weak_expr` (a boolean
+    Cypher expression, true on a row only `include_weak_tcdb_hits` adds) lets
+    below-gate calls count on those rows.
+    """
+    rank_order = cfg["rank_order"]
+    prop = _safe_identifier(rank_order["prop"], "rank_order property")
+    hier = "|".join(cfg["hierarchy_rels"])
+    gate = cfg.get("gate")
+    gate_pred = _gate_pass_predicate(gate, "rl") if gate else ""
+    if gate_pred and weak_expr:
+        gate_pred = f"({gate_pred} OR {weak_expr})"
+    # ancestors: (t)-[:is_a*]->(l); descendants: (t)<-[:is_a*]-(l)
+    lineage = (
+        f"(l = {t} OR ({t})-[:{hier}*1..4]->(l)"
+        f" OR ({t})<-[:{hier}*1..4]-(l))"
+    )
+    where = _and_join(gate_pred, lineage)
+    order = ", ".join(f"'{v}'" for v in rank_order["order"])
+    return (
+        f"[k IN [{order}] WHERE k IN "
+        f"[({g})-[rl:{cfg['gene_rel']}]->(l:{cfg['label']}) WHERE {where}"
+        f" | rl.{prop}]]"
+    )
 
 
 def _resolve_facet(
@@ -571,7 +673,7 @@ def _resolve_facet(
 
 def _ontology_row_return_cypher(
     ontology: str, verbose: bool, *, rel_var: str = "r",
-    force_trust_axes: bool = False,
+    force_trust_axes: bool = False, include_weak: bool = False,
 ) -> str:
     """Comma-prefixed RETURN fragment projecting `ontology_row_columns`.
 
@@ -594,10 +696,21 @@ def _ontology_row_return_cypher(
     compact_edge = cfg.get("compact_edge") or {}
     verbose_props = {column: prop for prop, column in _verbose_edge_pairs(cfg)}
 
+    lineage_col = cfg.get("lineage_calls_column")
+    gate = cfg.get("gate")
+    weak_expr = (
+        f"NOT ({_gate_pass_predicate(gate, rel_var)})"
+        if gate and include_weak else None
+    )
+
     parts: list[str] = []
     for column in columns:
         if column == facet_prop:
             parts.append(f"t.{column} AS {column}")
+        elif lineage_col and column == lineage_col:
+            parts.append(
+                f"{_lineage_calls_cypher(cfg, weak_expr=weak_expr)} AS {column}"
+            )
         elif column in trust:
             parts.append(f"{rel_var}.{trust[column]} AS {column}")
         elif column in compact_edge:
@@ -618,11 +731,12 @@ def _ontology_row_edge_props(
     facet = cfg.get("facet")
     facet_prop = facet["prop"] if facet else None
 
+    lineage_col = cfg.get("lineage_calls_column")
     props: list[str] = []
     for column in ontology_row_columns(
         ontology, verbose, force_trust_axes=force_trust_axes,
     ):
-        if column == facet_prop:
+        if column == facet_prop or column == lineage_col:
             continue
         if column in trust:
             props.append(trust[column])
@@ -633,15 +747,18 @@ def _ontology_row_edge_props(
     return props
 
 
-def _best_edge_rank_key(cfg: dict) -> str:
+def _best_edge_rank_key(cfg: dict) -> str | dict:
     """Sort key for the one-edge-per-(gene, term) rebind.
 
-    `rank_prop` when the ontology declares one (TCDB `evidence_score`, MEROPS
-    `confidence_score`); else `evidence_score` when the edge carries it; else
-    the attachment's own level, i.e. spec §3.1's "most specific attachment"
-    tiebreak. Never an e-value or bit score — those are native scalars whose
-    direction differs (design §1).
+    `rank_order` (TCDB: an ordered categorical on `tcdb_call`, then
+    `identity` DESC — returned as the config dict); else `rank_prop` when the
+    ontology declares one (MEROPS `confidence_score`); else `evidence_score`
+    when the edge carries it; else the attachment's own level, i.e. spec
+    §3.1's "most specific attachment" tiebreak. Never an e-value or bit score
+    — those are native scalars whose direction differs (design §1).
     """
+    if cfg.get("rank_order"):
+        return cfg["rank_order"]
     trust = cfg.get("trust") or {}
     if trust.get("rank_prop"):
         return trust["rank_prop"]
@@ -673,6 +790,7 @@ def _best_edge_rebind_cypher(
     trust_frag: str = "",
     distinct_head: str = "WITH DISTINCT t, g",
     force_trust_axes: bool = False,
+    include_weak: bool = False,
 ) -> str:
     """Cypher for the one-edge-per-(gene, term) rebind (spec §7.2).
 
@@ -684,11 +802,18 @@ def _best_edge_rebind_cypher(
     `trust_frag` is the same trust conjunction the gene→leaf MATCH carries,
     rebuilt on `r2`: an edge the filter removed must not come back as the
     row's "best" one (a `max_tier=2` row may never report `tier=3`).
+
+    A gated ontology (TCDB) also gates `r2` unless `include_weak`; with it,
+    gate-passing edges still sort first so a row the default call returns
+    keeps its default representative edge (G4: the switch only adds rows).
+    An ordered-categorical `rank_order` sorts by the category rank, then the
+    `then` prop DESC (G2).
     """
     cfg = _ontology_cfg(ontology)
     label = cfg["label"]
     gene_rel = cfg["gene_rel"]
     rank_key = _best_edge_rank_key(cfg)
+    gate = cfg.get("gate")
 
     bridge = cfg.get("bridge")
     if bridge:
@@ -707,26 +832,42 @@ def _best_edge_rebind_cypher(
         ontology, verbose, force_trust_axes=force_trust_axes,
     )
     entries = [f"{prop}: r2.{prop}" for prop in row_props]
-    if rank_key != "attachment_level" and rank_key not in row_props:
-        entries.append(f"{rank_key}: r2.{rank_key}")
+    sort_keys: list[str] = []
+    if gate and include_weak:
+        entries.append(
+            f"gate_rank: CASE WHEN {_gate_pass_predicate(gate, 'r2')}"
+            " THEN 1 ELSE 0 END"
+        )
+        sort_keys.append("gate_rank")
+    if isinstance(rank_key, dict):
+        then = _safe_identifier(rank_key["then"], "rank_order property")
+        entries.append(f"call_rank: {_rank_order_case(rank_key, 'r2')}")
+        entries.append(f"then_rank: coalesce(r2.{then}, -1.0)")
+        sort_keys.extend(["call_rank", "then_rank"])
+    elif rank_key != "attachment_level":
+        if rank_key not in row_props:
+            entries.append(f"{rank_key}: r2.{rank_key}")
+        sort_keys.append(rank_key)
     # Secondary key (backlog 2.1): equal primary scores pick the deepest
     # attachment (higher `level` = more specific), so a rollup row never
     # reports a `superseded` ancestor edge over a most-specific descendant
     # with the same score. Levels are always in the map.
     entries.append("attachment_level: l2.level")
+    sort_keys.append("attachment_level")
     edge_map = "{" + ", ".join(entries) + "}"
-    trust_where = f"            WHERE {trust_frag}\n" if trust_frag else ""
-    sort_keys = (
-        "['attachment_level']" if rank_key == "attachment_level"
-        else f"['{rank_key}', 'attachment_level']"
+    edge_where = _and_join(
+        "" if include_weak or not gate else _gate_pass_predicate(gate, "r2"),
+        trust_frag,
     )
+    trust_where = f"            WHERE {edge_where}\n" if edge_where else ""
+    sort_list = "[" + ", ".join(f"'{k}'" for k in sort_keys) + "]"
 
     return (
         f"{distinct_head}\n"
         f"WITH t, g, [{edge_pattern}{walk_pattern}\n"
         f"{trust_where}"
         f"            | {edge_map}] AS edges\n"
-        f"WITH t, g, head(apoc.coll.sortMulti(edges, {sort_keys})) AS r\n"
+        f"WITH t, g, head(apoc.coll.sortMulti(edges, {sort_list})) AS r\n"
     )
 
 
@@ -1092,17 +1233,223 @@ def build_genes_by_function(
     return cypher, params
 
 
-# Deepest-attachment predicate (TCDB substrate-depth migration, decision 4).
-# An attachment of gene `g` to TcdbFamily `tf` is superseded when `g` is also
-# attached to a descendant of `tf`; every transport-arm traversal (rows,
-# envelope counts, evidence_sources / has_chemistry) walks deepest
-# attachments only so all TCDB surfaces project one (gene, metabolite) set —
-# the same set the KG's precomputed transport counts are built over.
-# Requires `g` and `tf` to be bound in the enclosing MATCH.
-TCDB_DEEPEST_ATTACHMENT_PREDICATE = (
-    "NOT EXISTS { MATCH (g)-[:Gene_has_tcdb_family]->(d:TcdbFamily)"
-    " WHERE (d)-[:Tcdb_family_is_a_tcdb_family*1..4]->(tf) }"
+# TCDB transport arm (spec docs/tool-specs/tcdb-cleanup-surface.md, G1).
+# Every transport-arm traversal (rows, envelope counts, evidence_sources /
+# has_chemistry) walks `tcdb_gate = 'direct'` edges only — a direct edge
+# always points at a `tc_system` — so all TCDB transport surfaces project the
+# one (gene, system, metabolite) set the KG's transport precomputes
+# (`Gene.transported_metabolite_count`, `Metabolite.transporter_gene_count`)
+# are built over. Binds the gene→TCDB edge as `gt`. Never re-derive the gate
+# from tcdb_call / tier / rank (KG note).
+TCDB_DIRECT_GATE_PREDICATE = "gt.tcdb_gate = 'direct'"
+
+# Opt-in family substrate walk (include_tcdb_family_substrates): a start node
+# with more curated substrates than this is skipped and reported instead —
+# a superfamily call says nothing about substrate (start rule 4). Removes
+# exactly ABC 3.A.1 (551) and MFS 2.A.1 (471); the next-broadest start is
+# DHA1 2.A.1.2 at 125. A constant, not a param.
+TCDB_FAMILY_WALK_MAX_SUBSTRATES = 200
+
+_TCDB_SUBSTRATE_RELS = (
+    "Tcdb_family_transports_metabolite|Tcdb_family_transports_chemical_role"
 )
+_TCDB_ISA = "Tcdb_family_is_a_tcdb_family"
+_TCDB_TRANSPORT_MATCH = (
+    "MATCH (g:Gene)-[gt:Gene_has_tcdb_family]->"
+    f"(tf:TcdbFamily)-[r:{_TCDB_SUBSTRATE_RELS}]->(m:Metabolite|ChemicalRole)"
+)
+
+
+def _tcdb_walk_start_where(*, cap_op: str = "<=") -> str:
+    """Start rules 1-4 for the family walk, binding `g`, `gt`, `a` (G1).
+
+    1. family / subfamily nodes only (never class / subclass);
+    2. the deepest `annotated` node per lineage (skip `a` when the gene also
+       has an annotated call on a node below it);
+    3. no walk above a direct system (skip `a` when the gene has a `direct`
+       edge to a system under it);
+    4. the breadth cap on `tcdb_substrate_count` (`cap_op` `<=` keeps the
+       walkable starts, `>` selects the capped ones the hint reports); a
+       walkable start also needs `tcdb_substrate_count > 0` (a node with no
+       curated substrate below it yields no rows, so it is not a start).
+    `below_gate` edges never start a walk: only `annotated` edges do.
+    """
+    cap = TCDB_FAMILY_WALK_MAX_SUBSTRATES
+    nonempty = "a.tcdb_substrate_count > 0 AND " if cap_op == "<=" else ""
+    return (
+        "gt.tcdb_gate = 'annotated'\n"
+        "  AND a.level_kind IN ['tc_family', 'tc_subfamily']\n"
+        f"  AND {nonempty}a.tcdb_substrate_count {cap_op} {cap}\n"
+        "  AND NOT EXISTS { MATCH (g)-[ga:Gene_has_tcdb_family]->"
+        "(d:TcdbFamily) WHERE ga.tcdb_gate = 'annotated'"
+        f" AND (d)-[:{_TCDB_ISA}*1..4]->(a) }}\n"
+        "  AND NOT EXISTS { MATCH (g)-[gd:Gene_has_tcdb_family]->"
+        "(ds:TcdbFamily) WHERE gd.tcdb_gate = 'direct'"
+        f" AND (ds)-[:{_TCDB_ISA}*1..4]->(a) }}"
+    )
+
+
+# Dedupe vs direct rows: a family row is dropped when the same (gene,
+# metabolite) already has a direct row. Binds `g`, `m`.
+_TCDB_NOT_DIRECT_TARGET = (
+    "NOT EXISTS { MATCH (g)-[gx:Gene_has_tcdb_family]->(:TcdbFamily)"
+    f"-[:{_TCDB_SUBSTRATE_RELS}]->(m) WHERE gx.tcdb_gate = 'direct' }}"
+)
+
+
+def _split_gene_metabolite_conditions(
+    conditions: list[str],
+) -> tuple[list[str], list[str]]:
+    """Split shared filters into those binding only `g` and those on `m`."""
+    m_conds = [c for c in conditions if re.search(r"\bm\.", c)]
+    g_conds = [c for c in conditions if c not in m_conds]
+    return g_conds, m_conds
+
+
+def _tcdb_walk_match(
+    conditions: list[str], *, anchor: Literal["gene", "metabolite"],
+    indent: str = "", cap_op: str = "<=", dedupe: bool = True,
+) -> str:
+    """Family-walk MATCH (start rules 1-4 + walk + dedupe), binding
+    `g`, `gt`, `a` (the attached start node), `m` (a substrate of one of its
+    descendant systems) and `nsys` (how many of `a`'s descendant systems are
+    curated with `m` — a property of (a, m) only). `conditions` are the
+    shared filters on `g` / `m`.
+
+    `anchor` picks the planning start — the input genes (mbg) or the input
+    metabolites (gbm); a `WITH` between the two halves keeps the planner from
+    scanning every metabolite / gene first. `cap_op='>'` selects the starts
+    the breadth cap removes (the hint's skipped list).
+    """
+    g_conds, m_conds = _split_gene_metabolite_conditions(conditions)
+    start = _tcdb_walk_start_where(cap_op=cap_op)
+    tail = [_TCDB_NOT_DIRECT_TARGET] if dedupe else []
+    gene_match = "MATCH (g:Gene)-[gt:Gene_has_tcdb_family]->(a:TcdbFamily)"
+    sub_match = (
+        f"MATCH (s:TcdbFamily {{level_kind: 'tc_system'}})"
+        f"-[:{_TCDB_SUBSTRATE_RELS}]->(m:Metabolite|ChemicalRole)"
+    )
+    if anchor == "gene":
+        lines = [
+            gene_match,
+            "WHERE " + " AND ".join(g_conds + [start]),
+            "WITH DISTINCT g, gt, a",
+            f"MATCH (s:TcdbFamily {{level_kind: 'tc_system'}})"
+            f"-[:{_TCDB_ISA}*1..4]->(a)",
+            f"MATCH (s)-[:{_TCDB_SUBSTRATE_RELS}]->(m:Metabolite|ChemicalRole)",
+        ]
+        last = m_conds + tail
+        if last:
+            lines.append("WHERE " + " AND ".join(last))
+        lines.append("WITH g, gt, a, m, count(DISTINCT s) AS nsys")
+    else:
+        cap = TCDB_FAMILY_WALK_MAX_SUBSTRATES
+        lines = [sub_match]
+        if m_conds:
+            lines.append("WHERE " + " AND ".join(m_conds))
+        lines += [
+            f"MATCH (s)-[:{_TCDB_ISA}*1..4]->(a:TcdbFamily)",
+            "WHERE a.level_kind IN ['tc_family', 'tc_subfamily']"
+            + (" AND a.tcdb_substrate_count > 0" if cap_op == "<=" else "")
+            + f" AND a.tcdb_substrate_count {cap_op} {cap}",
+            "WITH m, a, count(DISTINCT s) AS nsys",
+            gene_match.replace("(a:TcdbFamily)", "(a)"),
+            "WHERE " + " AND ".join(g_conds + [start] + tail),
+        ]
+    text = "\n".join(lines)
+    return "\n".join(indent + line for line in text.split("\n")) + "\n"
+
+
+def _tcdb_rep_edge(edges: str) -> str:
+    """G2 representative edge of a collected edge list: call-kind precedence
+    (best hit, tier, eggNOG), then identity DESC. Returns a map with
+    `identity` / `tcdb_call` / `tcdb_gate`."""
+    rank_order = ONTOLOGY_CONFIG["tcdb"]["rank_order"]
+    return (
+        "head(apoc.coll.sortMulti("
+        f"[e IN {edges} | {{identity: e.identity, tcdb_call: e.tcdb_call,"
+        f" tcdb_gate: e.tcdb_gate, call_rank: {_rank_order_case(rank_order, 'e')},"
+        " then_rank: coalesce(e.identity, -1.0)}],"
+        " ['call_rank', 'then_rank']))"
+    )
+
+
+def _tcdb_transport_return(
+    *, route: str, verbose: bool, system_count: str = "null",
+) -> str:
+    """RETURN column list (no ORDER BY) for both TCDB transport arms.
+
+    Binds `g`, `tf` (the row's TCDB node: the system on direct rows, the
+    attached start node on family rows), `m`, `rep` (G2 representative
+    edge map) and, on family rows, the descendant-system count.
+    """
+    calls = _lineage_calls_cypher(ONTOLOGY_CONFIG["tcdb"], g="g", t="tf")
+    verbose_cols = (
+        ",\n       g.gene_category AS gene_category"
+        ",\n       m.inchikey AS metabolite_inchikey"
+        ",\n       m.smiles AS metabolite_smiles"
+        ",\n       m.mnxm_id AS metabolite_mnxm_id"
+        ",\n       m.hmdb_id AS metabolite_hmdb_id"
+        ",\n       null AS reaction_mnxr_id"
+        ",\n       null AS reaction_rhea_ids"
+        ",\n       tf.level_kind AS tcdb_level_kind"
+        ",\n       tf.tc_class_id AS tc_class_id"
+        ",\n       null AS go_chebi_ids"
+        if verbose else ""
+    )
+    return (
+        "RETURN g.locus_tag AS locus_tag,\n"
+        "       g.gene_name AS gene_name,\n"
+        "       g.product AS product,\n"
+        "       'transport' AS evidence_source,\n"
+        f"       '{route}' AS tcdb_route,\n"
+        "       null AS reaction_id,\n"
+        "       null AS reaction_name,\n"
+        "       null AS ec_numbers,\n"
+        "       null AS mass_balance,\n"
+        "       tf.id AS tcdb_family_id,\n"
+        "       tf.name AS tcdb_family_name,\n"
+        "       tf.id AS attached_tcdb_id,\n"
+        "       tf.direction AS tcdb_direction,\n"
+        "       rep.identity AS tcdb_identity,\n"
+        f"       {calls} AS tcdb_calls,\n"
+        f"       {system_count} AS tcdb_substrate_system_count,\n"
+        "       m.id AS metabolite_id,\n"
+        "       m.name AS metabolite_name,\n"
+        "       m.formula AS metabolite_formula,\n"
+        "       m.mass AS metabolite_mass,\n"
+        "       m.chebi_id AS metabolite_chebi_id,\n"
+        f"{_GO_NULL_COLUMNS},\n"
+        "       CASE WHEN m:ChemicalRole THEN 'chemical_role'"
+        " ELSE 'metabolite' END AS target_kind"
+        f"{verbose_cols}\n"
+    )
+
+
+# Cross-arm null padding for metabolism / GO rows (polymorphic row shape).
+_TCDB_NULL_COLUMNS = (
+    "       null AS tcdb_route,\n"
+    "       null AS attached_tcdb_id, null AS tcdb_direction,"
+    " null AS tcdb_identity,\n"
+    "       null AS tcdb_calls, null AS tcdb_substrate_system_count,\n"
+)
+
+# Identity DESC with nulls (eggNOG representative edges) last.
+_TCDB_IDENTITY_ORDER = (
+    "CASE WHEN tcdb_identity IS NULL THEN 1 ELSE 0 END, tcdb_identity DESC"
+)
+
+
+def _tcdb_paging(params: dict, limit: int | None, offset: int) -> str:
+    out = ""
+    if offset:
+        out += "\nSKIP $offset"
+        params["offset"] = offset
+    if limit is not None:
+        out += "\nLIMIT $limit"
+        params["limit"] = limit
+    return out
+
 
 # GO transport route (spec docs/tool-specs/go-transport-surface.md).
 # Gene -> GO term (MF / BP) -> has-primary-input target (Metabolite or
@@ -1250,7 +1597,7 @@ def _go_transport_summary_block(
             conditions, include_ancestors=include_ancestors, indent="  ",
         )
         + "\n  RETURN g, null AS r, null AS tf, m, 'go_transport' AS es,\n"
-        "         null AS sdepth, null AS tscore,\n"
+        "         null AS troute,\n"
         "         go, go_term_depth AS gdepth"
     )
 
@@ -1260,14 +1607,13 @@ def _go_transport_summary_block(
 # each row with the pair's sorted evidence-source set, then UNWINDs back so
 # row counts (total_matching etc.) are unchanged.
 _PAIR_GROUPING_PASS = (
-    "WITH g, m, collect({r: r, tf: tf, es: es, sdepth: sdepth,"
-    " tscore: tscore, go: go, gdepth: gdepth}) AS arm_rows\n"
+    "WITH g, m, collect({r: r, tf: tf, es: es, troute: troute,"
+    " go: go, gdepth: gdepth}) AS arm_rows\n"
     "WITH g, m, arm_rows,"
     " apoc.coll.sort(apoc.coll.toSet([x IN arm_rows | x.es]))"
     " AS pair_sources\n"
     "UNWIND arm_rows AS x\n"
-    "WITH g, x.r AS r, x.tf AS tf, m, x.es AS es, x.sdepth AS sdepth,"
-    " x.tscore AS tscore,\n"
+    "WITH g, x.r AS r, x.tf AS tf, m, x.es AS es, x.troute AS troute,\n"
     "     x.go AS go, x.gdepth AS gdepth, pair_sources\n"
 )
 
@@ -1303,9 +1649,7 @@ def _go_transport_detail_return(verbose: bool) -> str:
         "       g.gene_name AS gene_name,\n"
         "       g.product AS product,\n"
         "       'go_transport' AS evidence_source,\n"
-        "       null AS substrate_depth,\n"
-        "       null AS tcdb_evidence_score,\n"
-        "       null AS transport_substrate_resolution,\n"
+        f"{_TCDB_NULL_COLUMNS}"
         "       null AS reaction_id,\n"
         "       null AS reaction_name,\n"
         "       null AS ec_numbers,\n"
@@ -1381,15 +1725,15 @@ def build_gene_overview_summary(
         "           coalesce(g.numeric_metric_count, 0)\n"
         "         + coalesce(g.boolean_metric_count, 0)\n"
         "         + coalesce(g.categorical_metric_count, 0) > 0]) AS has_derived_metrics,\n"
-        # has_chemistry: metabolism arm OR deepest-attachment transport arm
-        # (decision 4 — same predicate as the detail evidence_sources traversal).
+        # has_chemistry: metabolism arm OR direct-gate transport arm (G1 —
+        # same predicate as the detail evidence_sources traversal).
         "       size([g IN found WHERE EXISTS {\n"
         "         MATCH (g)-[:Gene_catalyzes_reaction]->(:Reaction)"
         "-[:Reaction_has_metabolite]->(:Metabolite)\n"
         "       } OR EXISTS {\n"
-        "         MATCH (g)-[:Gene_has_tcdb_family]->(tf:TcdbFamily)"
+        "         MATCH (g)-[gt:Gene_has_tcdb_family]->(tf:TcdbFamily)"
         "-[:Tcdb_family_transports_metabolite]->(:Metabolite)\n"
-        f"         WHERE {TCDB_DEEPEST_ATTACHMENT_PREDICATE}\n"
+        f"         WHERE {TCDB_DIRECT_GATE_PREDICATE}\n"
         # GO transport route (go-transport-surface §6.5).
         "       } OR EXISTS {\n"
         f"         MATCH (g)-[:{GO_GENE_EDGES}]->()-[:{GO_TARGET_EDGES}]->()\n"
@@ -1406,8 +1750,9 @@ def build_gene_overview_summary(
         "       size([g IN found WHERE\n"
         "           coalesce(g.ncbifam_family_count, 0) > 0]) AS has_ncbifam,\n"
         # Family-count rollups (backlog 3.4): both read the KG precomputes
-        # (tcdb_family_count = deepest-attachment edges only; cazy is flat).
-        "       size([g IN found WHERE coalesce(g.tcdb_family_count, 0) > 0]) AS has_tcdb,\n"
+        # (tcdb_assignment_count = distinct gated TCDB targets minus
+        # ancestors of another; cazy is flat).
+        "       size([g IN found WHERE coalesce(g.tcdb_assignment_count, 0) > 0]) AS has_tcdb,\n"
         "       size([g IN found WHERE coalesce(g.cazy_family_count, 0) > 0]) AS has_cazy,\n"
         "       not_found"
     )
@@ -1431,20 +1776,20 @@ def build_gene_overview(
     cluster_membership_count, cluster_types,
     numeric_metric_count, boolean_metric_count, categorical_metric_count,
     reaction_count, catalyzed_metabolite_count,
-    tcdb_evidence_score_max (float | null — sparse KG prop, NOT coalesced:
-    null = no TCDB call), transported_metabolite_count (deepest-attachment
-    substrate breadth), go_transport_metabolite_count (int — distinct
-    Metabolite targets via the gene's own GO transport terms; direct only,
-    roles not counted), transport_substrate_resolution ('resolved' |
-    'family_inferred' | null), discussed_in_publication_count,
+    transported_metabolite_count (KG precompute over direct-gate systems),
+    go_transport_metabolite_count (int — distinct Metabolite targets via the
+    gene's own GO transport terms; direct only, roles not counted),
+    tcdb_best_hit_identity (float | null — `identity` of the gene's rank-1
+    `diamond_best_hit` edge, read live and NOT gated: a below-gate best hit
+    is still reported; null = no best hit), discussed_in_publication_count,
     merops_classes (list, [] default — the protease call classes this gene
     carries), ncbifam_family_count (int, 0 default),
-    tcdb_family_count (int, live count of attachment_depth='most_specific'
-    Gene_has_tcdb_family edges — NOT the KG precompute, which counts
-    superseded ancestors), cazy_family_count (int, 0 default),
+    tcdb_assignment_count (int, 0 default — KG precompute: distinct gated
+    TCDB targets minus any that is an ancestor of another),
+    cazy_family_count (int, 0 default),
     merops_evidence_score_max (float | null — sparse KG prop, NOT coalesced:
-    null = no MEROPS call, the twin of tcdb_evidence_score_max),
-    evidence_sources.
+    null = no MEROPS call), evidence_sources ('transport' follows the
+    direct-gate set).
     RETURN keys (verbose): adds gene_summary, function_description,
     all_identifiers, numeric_metric_types_observed,
     boolean_metric_types_observed, categorical_metric_types_observed,
@@ -1482,7 +1827,7 @@ def build_gene_overview(
     # Phase 1 plumbing (spec §6.1): per-row chemistry counts +
     # path-existence-derived evidence_sources. The CASE/EXISTS form
     # avoids the false-positive 'metabolism' tag that a metabolite-level
-    # rollup would produce on transport-only genes (e.g. PMM0392).
+    # rollup would produce on transport-only genes (e.g. cynD PMM0372).
     chemistry_with = (
         "WITH g,\n"
         "  CASE WHEN EXISTS {\n"
@@ -1490,19 +1835,19 @@ def build_gene_overview(
         "-[:Reaction_has_metabolite]->(:Metabolite)\n"
         "  } THEN ['metabolism'] ELSE [] END +\n"
         "  CASE WHEN EXISTS {\n"
-        "    MATCH (g)-[:Gene_has_tcdb_family]->(tf:TcdbFamily)"
+        "    MATCH (g)-[gt:Gene_has_tcdb_family]->(tf:TcdbFamily)"
         "-[:Tcdb_family_transports_metabolite]->(:Metabolite)\n"
-        f"    WHERE {TCDB_DEEPEST_ATTACHMENT_PREDICATE}\n"
+        f"    WHERE {TCDB_DIRECT_GATE_PREDICATE}\n"
         "  } THEN ['transport'] ELSE [] END +\n"
         "  CASE WHEN EXISTS {\n"
         "    MATCH (g)-[:Gene_catalyzes_reaction]->(:Reaction)"
         "-[:Reaction_has_metabolite]->(m:Metabolite)\n"
         "    WHERE coalesce(m.measured_assay_count, 0) > 0\n"
         "  } OR EXISTS {\n"
-        "    MATCH (g)-[:Gene_has_tcdb_family]->(tf:TcdbFamily)"
+        "    MATCH (g)-[gt:Gene_has_tcdb_family]->(tf:TcdbFamily)"
         "-[:Tcdb_family_transports_metabolite]->(m:Metabolite)\n"
         "    WHERE coalesce(m.measured_assay_count, 0) > 0\n"
-        f"      AND {TCDB_DEEPEST_ATTACHMENT_PREDICATE}\n"
+        f"      AND {TCDB_DIRECT_GATE_PREDICATE}\n"
         "  } THEN ['metabolomics'] ELSE [] END +\n"
         f"  CASE WHEN {GO_TRANSPORT_EXISTS}"
         " THEN ['go_transport'] ELSE [] END AS evidence_sources\n"
@@ -1531,27 +1876,26 @@ def build_gene_overview(
         "       coalesce(g.categorical_metric_count, 0) AS categorical_metric_count,\n"
         "       coalesce(g.reaction_count, 0) AS reaction_count,\n"
         "       coalesce(g.catalyzed_metabolite_count, 0) AS catalyzed_metabolite_count,\n"
-        # TCDB gene-level surface (substrate-depth migration). Score is a
-        # sparse KG prop surfaced uncoalesced — null means "no TCDB call".
-        "       g.tcdb_evidence_score_max AS tcdb_evidence_score_max,\n"
         "       coalesce(g.transported_metabolite_count, 0) AS transported_metabolite_count,\n"
         # GO-route mirror of transported_metabolite_count (direct own-term
         # paths, Metabolite targets only; roles / is_a-inherited excluded).
         f"       {GO_TRANSPORT_METABOLITE_COUNT} AS go_transport_metabolite_count,\n"
-        "       g.transport_substrate_resolution AS transport_substrate_resolution,\n"
+        # Nearest characterised system: the rank-1 best hit's identity, read
+        # live and deliberately NOT gated (rank, don't filter).
+        "       head([(g)-[bh:Gene_has_tcdb_family"
+        " {tcdb_call: 'diamond_best_hit', rank: 1}]->() | bh.identity])"
+        " AS tcdb_best_hit_identity,\n"
         "       coalesce(g.discussed_in_publication_count, 0) AS discussed_in_publication_count,\n"
         # Annotation-trust routing signals (spec §7.8). merops_classes and
         # ncbifam_family_count are safe to default; merops_evidence_score_max
-        # is surfaced uncoalesced (twin of tcdb_evidence_score_max) — null
+        # is surfaced uncoalesced — null
         # means "no MEROPS call", which is not the same as a weak one.
         "       coalesce(g.merops_classes, []) AS merops_classes,\n"
         "       coalesce(g.ncbifam_family_count, 0) AS ncbifam_family_count,\n"
-        # TCDB family count at the deepest attachment only (backlog 3.4).
-        # Gene.tcdb_family_count is a KG precompute over the
-        # attachment_depth='most_specific' edges (aligned in the 2026-08-29
-        # rebuild; test_trust_invariants guards it against the live edge
-        # count). CAZy is flat, so its precompute is exact by construction.
-        "       coalesce(g.tcdb_family_count, 0) AS tcdb_family_count,\n"
+        # Distinct gated TCDB targets minus any ancestor of another (KG
+        # precompute, renamed from tcdb_family_count in 3a; test
+        # invariants guard it against the gated leaf rows).
+        "       coalesce(g.tcdb_assignment_count, 0) AS tcdb_assignment_count,\n"
         "       coalesce(g.cazy_family_count, 0) AS cazy_family_count,\n"
         "       g.merops_evidence_score_max AS merops_evidence_score_max,\n"
         f"       evidence_sources{verbose_cols}\n"
@@ -3688,6 +4032,15 @@ def _search_ontology_org_scope(cfg: dict, *, indent: str) -> str:
     bridge = cfg.get("bridge")
     org_gene = "(g:Gene {organism_name: $organism})"
     hier = cfg.get("hierarchy_rels") or []
+    # G1: a gated ontology (TCDB) counts gate-passing edges only, the same
+    # set its precomputed `gene_count` is built over.
+    gate = cfg.get("gate")
+    if gate and not bridge and not cfg.get("parent_label"):
+        gate_where = f"\n{indent}WHERE {_gate_pass_predicate(gate, 'og')}"
+        gene_edge = f"<-[og:{gene_rel}]-"
+    else:
+        gate_where = ""
+        gene_edge = f"<-[:{gene_rel}]-"
     if bridge:
         walk = f"<-[:{'|'.join(hier)}*0..]-(:{cfg['label']})" if hier else ""
         pattern = (
@@ -3703,11 +4056,11 @@ def _search_ontology_org_scope(cfg: dict, *, indent: str) -> str:
     elif hier:
         pattern = (
             f"(t)<-[:{'|'.join(hier)}*0..]-(:{cfg['label']})"
-            f"<-[:{gene_rel}]-{org_gene}"
+            f"{gene_edge}{org_gene}"
         )
     else:
-        pattern = f"(t)<-[:{gene_rel}]-{org_gene}"
-    return f"{indent}OPTIONAL MATCH {pattern}\n"
+        pattern = f"(t){gene_edge}{org_gene}"
+    return f"{indent}OPTIONAL MATCH {pattern}{gate_where}\n"
 
 
 def _search_ontology_predicates(
@@ -4140,7 +4493,9 @@ def _genes_by_ontology_match_stage(
     max_tier: int | None = None,
     min_evidence_score: float | None = None,
     call_class: list[str] | None = None,
+    tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    include_weak_tcdb_hits: bool = False,
 ) -> tuple[str, dict]:
     """Shared MATCH + size-filter-WITH for detail/per_term/per_gene builders.
 
@@ -4160,13 +4515,22 @@ def _genes_by_ontology_match_stage(
     term_ids mode (where the facet narrows the caller's own list rather than
     the walk). Enrichment reaches the same filters through this stage.
 
+    A gated ontology (TCDB, G1) folds its gate predicate
+    (`r.tcdb_gate IN ['direct','annotated']`) into the same gene→leaf WHERE,
+    so TERM2GENE sizes equal the KG's gated `gene_count`;
+    `include_weak_tcdb_hits` drops it (G4, no-op elsewhere).
+
     Consumers are responsible for adding $min_gene_set_size / $max_gene_set_size
     into params, and for appending their own UNWIND/RETURN tail.
     """
     facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
     trust_frag, trust_params = build_trust_filter_clause(
         ontology, sources=sources, evidence=evidence, max_tier=max_tier,
-        min_evidence_score=min_evidence_score, call_class=call_class,
+        min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
+    )
+    trust_frag = _and_join(
+        ontology_gate_clause(ontology, include_weak=include_weak_tcdb_hits),
+        trust_frag,
     )
 
     params: dict = {"org": organism}
@@ -4263,8 +4627,15 @@ def _genes_by_ontology_match_stage(
 
     # Term-level informative filter: must apply BEFORE size collapse so
     # per-term gene counts reflect informative-only terms.
+    # G4 "only adds rows": with the gate dropped (include_weak_tcdb_hits on a
+    # gated ontology) a term is still SIZED on its gate-passing genes when it
+    # has any, so the size bounds keep exactly the default terms; only a
+    # weak-only term is sized on its weak gene count.
+    gate = _ontology_cfg(ontology).get("gate")
+    weak_sizing = bool(gate) and include_weak_tcdb_hits
+    carry = ", r" if weak_sizing else ""
     informative_filter = (
-        "WITH t, g WHERE coalesce(t.is_uninformative, '') <> 'true'\n"
+        f"WITH t, g{carry} WHERE coalesce(t.is_uninformative, '') <> 'true'\n"
         if informative_only else ""
     )
 
@@ -4273,12 +4644,26 @@ def _genes_by_ontology_match_stage(
     # Collect DISTINCT g (not records) so multi-edge ontologies don't
     # inflate term-size counts — r is re-bound via OPTIONAL MATCH in
     # the detail builder when needed.
-    size_filter = (
-        "WITH t, collect(DISTINCT g) AS term_genes\n"
-        "WHERE size(term_genes) >= $min_gene_set_size\n"
-        "  AND ($max_gene_set_size IS NULL OR "
-        "size(term_genes) <= $max_gene_set_size)"
-    )
+    if weak_sizing:
+        gated = _gate_pass_predicate(gate, "r")
+        size_filter = (
+            "WITH t, collect(DISTINCT g) AS term_genes,\n"
+            f"     collect(DISTINCT CASE WHEN {gated} THEN g END)"
+            " AS gated_genes\n"
+            "WITH t, term_genes, CASE WHEN size(gated_genes) > 0"
+            " THEN size(gated_genes) ELSE size(term_genes) END AS set_size\n"
+            "WHERE set_size >= $min_gene_set_size\n"
+            "  AND ($max_gene_set_size IS NULL OR "
+            "set_size <= $max_gene_set_size)\n"
+            "WITH t, term_genes"
+        )
+    else:
+        size_filter = (
+            "WITH t, collect(DISTINCT g) AS term_genes\n"
+            "WHERE size(term_genes) >= $min_gene_set_size\n"
+            "  AND ($max_gene_set_size IS NULL OR "
+            "size(term_genes) <= $max_gene_set_size)"
+        )
     return f"{cypher_head}\n{informative_filter}{size_filter}", params
 
 
@@ -4300,7 +4685,9 @@ def build_genes_by_ontology_detail(
     max_tier: int | None = None,
     min_evidence_score: float | None = None,
     call_class: list[str] | None = None,
+    tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    include_weak_tcdb_hits: bool = False,
 ) -> tuple[str, dict]:
     """Build (gene × term) detail query. Dispatches on (level, term_ids).
 
@@ -4346,8 +4733,9 @@ def build_genes_by_ontology_detail(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
         tree=tree, informative_only=informative_only,
         sources=sources, evidence=evidence, max_tier=max_tier,
-        min_evidence_score=min_evidence_score, call_class=call_class,
+        min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
         interpro_type=interpro_type,
+        include_weak_tcdb_hits=include_weak_tcdb_hits,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -4360,6 +4748,7 @@ def build_genes_by_ontology_detail(
     )
     edge_prop_cols = _ontology_row_return_cypher(
         ontology, verbose, force_trust_axes=True,
+        include_weak=include_weak_tcdb_hits,
     )
     return_block = (
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
@@ -4392,11 +4781,12 @@ def build_genes_by_ontology_detail(
     if _uses_best_edge_rebind(ontology, verbose, force_trust_axes=True):
         rebind_trust, _ = build_trust_filter_clause(
             ontology, sources=sources, evidence=evidence, max_tier=max_tier,
-            min_evidence_score=min_evidence_score, call_class=call_class,
+            min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
             rel_var="r2",
         )
         edge_rebind = _best_edge_rebind_cypher(
             ontology, verbose, trust_frag=rebind_trust, force_trust_axes=True,
+            include_weak=include_weak_tcdb_hits,
         )
     elif ontology_row_columns(ontology, verbose, force_trust_axes=True):
         edge_rebind = f"OPTIONAL MATCH (g)-[r:{cfg['gene_rel']}]->(t)\n"
@@ -4550,9 +4940,20 @@ def build_ontology_term_details(
             gene_node = "(g:Gene {organism_name: $organism})"
         else:
             gene_node = "(g:Gene)"
+        # G1: gated ontologies (TCDB) count gate-passing edges only — the
+        # live counts match the KG's gated precomputes.
+        gate_parts = [
+            f"(type(gr) <> '{cfg['gene_rel']}'"
+            f" OR {_gate_pass_predicate(cfg['gate'], 'gr')})"
+            for cfg in ONTOLOGY_CONFIG.values() if cfg.get("gate")
+        ]
+        gate_where = (
+            "WHERE " + " AND ".join(gate_parts) + "\n" if gate_parts else ""
+        )
         gene_block = (
             f"OPTIONAL MATCH (t)<-[:{walk_union}*0..]-(d)"
-            f"<-[:{gene_union}]-{gene_node}\n"
+            f"<-[gr:{gene_union}]-{gene_node}\n"
+            f"{gate_where}"
             "WITH tid, t, parents, children_total, children, links_total, links_out,\n"
             "     g.organism_name AS organism_name, count(DISTINCT g) AS n_genes\n"
             "ORDER BY n_genes DESC, organism_name\n"
@@ -4625,7 +5026,9 @@ def build_genes_by_ontology_trust_rollups(
     max_tier: int | None = None,
     min_evidence_score: float | None = None,
     call_class: list[str] | None = None,
+    tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    include_weak_tcdb_hits: bool = False,
 ) -> tuple[str, dict]:
     """Aggregate-only full-match trust projection for genes_by_ontology.
 
@@ -4645,7 +5048,7 @@ def build_genes_by_ontology_trust_rollups(
     the full (gene, term) row count the per-row warnings are phrased against.
 
     RETURN keys: total_rows, by_evidence, by_tier, by_sources,
-    by_call_class, evidence_score_stats.
+    by_call_class, by_tcdb_call (TCDB; `[]` elsewhere), evidence_score_stats.
     """
     if level is None and not term_ids:
         raise ValueError(
@@ -4660,8 +5063,9 @@ def build_genes_by_ontology_trust_rollups(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
         tree=tree, informative_only=informative_only,
         sources=sources, evidence=evidence, max_tier=max_tier,
-        min_evidence_score=min_evidence_score, call_class=call_class,
+        min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
         interpro_type=interpro_type,
+        include_weak_tcdb_hits=include_weak_tcdb_hits,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -4676,11 +5080,12 @@ def build_genes_by_ontology_trust_rollups(
     if _uses_best_edge_rebind(ontology, False, force_trust_axes=True):
         rebind_trust, _ = build_trust_filter_clause(
             ontology, sources=sources, evidence=evidence, max_tier=max_tier,
-            min_evidence_score=min_evidence_score, call_class=call_class,
+            min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
             rel_var="r2",
         )
         edge_rebind = _best_edge_rebind_cypher(
             ontology, False, trust_frag=rebind_trust, force_trust_axes=True,
+            include_weak=include_weak_tcdb_hits,
         )
     elif has_edge_cols:
         edge_rebind = f"OPTIONAL MATCH (g)-[r:{cfg['gene_rel']}]->(t)\n"
@@ -4733,7 +5138,22 @@ def build_genes_by_ontology_trust_rollups(
     else:
         ret_parts.append("[] AS by_call_class")
 
-    if "evidence_score" in trust:
+    if "tcdb_call" in compact_edge:
+        prop = _safe_identifier(
+            compact_edge["tcdb_call"]["prop"], "compact_edge property"
+        )
+        agg_parts.append(f"collect(r.{prop}) AS tcdb_call_values")
+        ret_parts.append(
+            _freq("tcdb_call_values", "tcdb_call") + " AS by_tcdb_call"
+        )
+    else:
+        ret_parts.append("[] AS by_tcdb_call")
+
+    if cfg.get("gate") and "evidence_score" not in trust:
+        # TCDB retired its evidence_score axis (G3): no stats key at all —
+        # the api reads the absent key as `evidence_score_stats = None`.
+        pass
+    elif "evidence_score" in trust:
         prop = _safe_identifier(trust["evidence_score"], "trust property")
         agg_parts.extend([
             f"min(r.{prop}) AS score_min",
@@ -4776,7 +5196,9 @@ def build_genes_by_ontology_per_term(
     max_tier: int | None = None,
     min_evidence_score: float | None = None,
     call_class: list[str] | None = None,
+    tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    include_weak_tcdb_hits: bool = False,
 ) -> tuple[str, dict]:
     """Per-term aggregate. One row per surviving term.
 
@@ -4798,8 +5220,9 @@ def build_genes_by_ontology_per_term(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
         tree=tree, informative_only=informative_only,
         sources=sources, evidence=evidence, max_tier=max_tier,
-        min_evidence_score=min_evidence_score, call_class=call_class,
+        min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
         interpro_type=interpro_type,
+        include_weak_tcdb_hits=include_weak_tcdb_hits,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -4835,7 +5258,9 @@ def build_genes_by_ontology_per_gene(
     max_tier: int | None = None,
     min_evidence_score: float | None = None,
     call_class: list[str] | None = None,
+    tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    include_weak_tcdb_hits: bool = False,
 ) -> tuple[str, dict]:
     """Per-gene aggregate. One row per surviving gene.
 
@@ -4853,8 +5278,9 @@ def build_genes_by_ontology_per_gene(
         ontology=ontology, level=level, term_ids=term_ids, organism=organism,
         tree=tree, informative_only=informative_only,
         sources=sources, evidence=evidence, max_tier=max_tier,
-        min_evidence_score=min_evidence_score, call_class=call_class,
+        min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
         interpro_type=interpro_type,
+        include_weak_tcdb_hits=include_weak_tcdb_hits,
     )
     params["min_gene_set_size"] = min_gene_set_size
     params["max_gene_set_size"] = max_gene_set_size
@@ -4872,61 +5298,98 @@ def build_genes_by_ontology_per_gene(
 
 
 def _gene_ontology_terms_leaf_filter(
-    cfg: dict, *, include_superseded: bool = False,
+    cfg: dict, *, include_weak_tcdb_hits: bool = False,
 ) -> str:
     """Return a WHERE clause pinning leaf mode to most-specific rows, or "".
 
-    Two predicates, both spec §7.3:
+    The *transitive* leaf filter (spec §7.3) — `NOT EXISTS { (g)-[:gene_rel]->
+    (child)-[:is_a*1..]->(t) }`. `*1..` (was a single hop) so an annotation two
+    or more levels below `t` also supersedes it. Meaningful only when genes
+    can be annotated to both a child and its ancestor within the same label,
+    so skipped for flat ontologies (cog_category, ncbifam, psortb),
+    cross-label hierarchies (pfam: Pfam→PfamClan) and bridges (brite).
 
-    1. The *transitive* leaf filter — `NOT EXISTS { (g)-[:gene_rel]->(child)
-       -[:is_a*1..]->(t) }`. `*1..` (was a single hop) so an annotation two or
-       more levels below `t` also supersedes it. Meaningful only when genes can
-       be annotated to both a child and its ancestor within the same label, so
-       skipped for flat ontologies (cog_category, ncbifam, psortb),
-       cross-label hierarchies (pfam: Pfam→PfamClan) and bridges (brite).
-
-    2. `leaf_attachment` — TCDB stamps the deepest surviving attachment on the
-       edge itself (`attachment_depth='most_specific'`), which selects exactly
-       the same rows as (1) and is cheaper (spec §7.3: verified identical on
-       MED4, 670 → 597 either way).
-
-    Because the two are equivalent, `include_superseded=True` must drop BOTH on
-    an ontology that declares `leaf_attachment` — dropping only the
-    `attachment_depth` predicate would leave the flag a no-op. The superseded
-    rows then come back labelled by the `attachment_depth` verbose column.
+    A gated ontology (TCDB, G1) gates the descendant probe: a leaf is a
+    gate-passing target minus any ancestor of another gate-passing target of
+    the same gene — the set `Gene.tcdb_assignment_count` counts. With
+    `include_weak_tcdb_hits` (G4) the default branch stays and a second
+    branch adds below-gate targets that are neither a gate-passing target
+    nor an ancestor of one (a weak call above a gated row adds nothing).
+    The caller binds `r` (the gene→term edge) for the weak branch.
 
     For KEGG, gene→KeggTerm edges only terminate at ko leaves (enforced by
     graph structure), so the NOT EXISTS clause is a no-op but still emitted
     — the query optimizer handles it cheaply.
     """
-    parts: list[str] = []
-
-    attachment = cfg.get("leaf_attachment")
-    superseded_opt_out = bool(attachment) and include_superseded
-
     hierarchy_rels = cfg["hierarchy_rels"]
     if (
-        hierarchy_rels
-        and not cfg.get("parent_label")
-        and not cfg.get("bridge")
-        and not superseded_opt_out
+        not hierarchy_rels
+        or cfg.get("parent_label")
+        or cfg.get("bridge")
     ):
-        gene_rel = cfg["gene_rel"]
-        label = cfg["label"]
-        hierarchy = "|".join(hierarchy_rels)
-        parts.append(
-            "NOT EXISTS {\n"
+        return ""
+    gene_rel = cfg["gene_rel"]
+    label = cfg["label"]
+    hierarchy = "|".join(hierarchy_rels)
+    gate = cfg.get("gate")
+    if not gate:
+        return (
+            "WHERE NOT EXISTS {\n"
             f"  MATCH (g)-[:{gene_rel}]->(child:{label})\n"
             f"        -[:{hierarchy}*1..]->(t)\n"
-            "}"
+            "}\n"
         )
+    child_gate = _gate_pass_predicate(gate, "r2")
+    gated_branch = (
+        "NOT EXISTS {\n"
+        f"  MATCH (g)-[r2:{gene_rel}]->(child:{label})\n"
+        f"        -[:{hierarchy}*1..]->(t)\n"
+        f"  WHERE {child_gate}\n"
+        "}"
+    )
+    if not include_weak_tcdb_hits:
+        return f"WHERE {gated_branch}\n"
+    row_gate = _gate_pass_predicate(gate, "r")
+    weak_branch = (
+        "NOT EXISTS {\n"
+        f"  MATCH (g)-[r2:{gene_rel}]->(child:{label})\n"
+        f"  WHERE {child_gate}\n"
+        f"    AND (child = t OR (child)-[:{hierarchy}*1..]->(t))\n"
+        "}"
+    )
+    return (
+        f"WHERE (({row_gate} AND {gated_branch})\n"
+        f"   OR (NOT ({row_gate}) AND {weak_branch}))\n"
+    )
 
-    if attachment and not include_superseded:
-        parts.append(f"r.{attachment['prop']} = '{attachment['value']}'")
 
-    if not parts:
+def _gene_ontology_terms_leaf_collapse(
+    cfg: dict, *, include_weak_tcdb_hits: bool = False,
+) -> str:
+    """One row per (gene, term) in leaf mode for a `rank_order` ontology.
+
+    TCDB carries one edge per (gene, node, tcdb_call), so a leaf (gene, term)
+    pair can hold up to three edges; the G2 representative edge (call-kind
+    precedence, then `then` DESC) is rebound as `r`. With the weak switch,
+    gate-passing edges sort first so default rows keep their edge. "" for
+    every other ontology.
+    """
+    rank_order = cfg.get("rank_order")
+    if not rank_order:
         return ""
-    return "WHERE " + "\n  AND ".join(parts) + "\n"
+    then = _safe_identifier(rank_order["then"], "rank_order property")
+    keys: list[str] = []
+    gate = cfg.get("gate")
+    if gate and include_weak_tcdb_hits:
+        keys.append(
+            f"CASE WHEN {_gate_pass_predicate(gate, 'r')} THEN 1 ELSE 0 END DESC"
+        )
+    keys.append(f"{_rank_order_case(rank_order, 'r')} DESC")
+    keys.append(f"coalesce(r.{then}, -1.0) DESC")
+    return (
+        "WITH g, t, r ORDER BY " + ", ".join(keys) + "\n"
+        "WITH g, t, head(collect(r)) AS r\n"
+    )
 
 
 def build_gene_ontology_terms_summary(
@@ -4943,8 +5406,9 @@ def build_gene_ontology_terms_summary(
     max_tier: int | None = None,
     min_evidence_score: float | None = None,
     call_class: list[str] | None = None,
+    tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
-    include_superseded: bool = False,
+    include_weak_tcdb_hits: bool = False,
 ) -> tuple[str, dict]:
     """Build summary for gene_ontology_terms for ONE ontology.
 
@@ -4954,7 +5418,10 @@ def build_gene_ontology_terms_summary(
     Trust filters bind on the gene→leaf relationship `r` before the hierarchy
     walk, so the summary counts and the detail rows describe the same filtered
     edge set (spec §7.1). Leaf mode honours the most-specific-attachment
-    predicate unless `include_superseded` (spec §7.3).
+    predicate (spec §7.3). TCDB is gated (G1) in both modes unless
+    `include_weak_tcdb_hits` (G4; no-op for other ontologies), and its leaf
+    terms are collected DISTINCT so a (gene, term) pair with several
+    per-source edges counts once.
 
     RETURN keys: gene_count, term_count, by_term, gene_term_counts.
     gene_term_counts is [{locus_tag, term_count}] — has per-gene identity
@@ -4967,7 +5434,7 @@ def build_gene_ontology_terms_summary(
     facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
     trust_frag, trust_params = build_trust_filter_clause(
         ontology, sources=sources, evidence=evidence, max_tier=max_tier,
-        min_evidence_score=min_evidence_score, call_class=call_class,
+        min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
     )
     cfg = ONTOLOGY_CONFIG[ontology]
     gene_rel = cfg["gene_rel"]
@@ -4975,6 +5442,10 @@ def build_gene_ontology_terms_summary(
 
     params: dict = {"locus_tags": locus_tags, "org": organism_name}
     params.update(trust_params)
+    trust_frag = _and_join(
+        ontology_gate_clause(ontology, include_weak=include_weak_tcdb_hits),
+        trust_frag,
+    )
     trust_and = f" AND {trust_frag}" if trust_frag else ""
 
     bridge = cfg.get("bridge")
@@ -5056,7 +5527,7 @@ def build_gene_ontology_terms_summary(
     else:
         # --- leaf mode ---
         leaf_filter = _gene_ontology_terms_leaf_filter(
-            cfg, include_superseded=include_superseded,
+            cfg, include_weak_tcdb_hits=include_weak_tcdb_hits,
         )
 
         if bridge:
@@ -5089,6 +5560,7 @@ def build_gene_ontology_terms_summary(
             "AND coalesce(t.is_uninformative, '') <> 'true'\n"
             if informative_only else ""
         )
+        leaf_distinct = "DISTINCT " if cfg.get("rank_order") else ""
 
         cypher = (
             f"{match_line}"
@@ -5096,7 +5568,7 @@ def build_gene_ontology_terms_summary(
             f"{level_filter}"
             f"{facet_filter}"
             f"{informative_filter}"
-            "WITH g.locus_tag AS lt, collect({id: t.id, name: t.name, level: t.level, tree: t.tree, tree_code: t.tree_code}) AS terms\n"
+            f"WITH g.locus_tag AS lt, collect({leaf_distinct}{{id: t.id, name: t.name, level: t.level, tree: t.tree, tree_code: t.tree_code}}) AS terms\n"
             "WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes\n"
             "WITH genes,\n"
             "     apoc.coll.flatten([g IN genes | g.terms]) AS all_terms,\n"
@@ -5130,8 +5602,9 @@ def build_gene_ontology_terms(
     max_tier: int | None = None,
     min_evidence_score: float | None = None,
     call_class: list[str] | None = None,
+    tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
-    include_superseded: bool = False,
+    include_weak_tcdb_hits: bool = False,
 ) -> tuple[str, dict]:
     """Build detail Cypher for gene_ontology_terms for ONE ontology.
 
@@ -5140,8 +5613,15 @@ def build_gene_ontology_terms(
     `interpro_type`) bind on `t`. In rollup mode a hierarchical ontology takes
     the one-edge-per-(gene, term) rebind (spec §7.2) so the trust columns come
     from the gene's best edge under `t` and no (gene, term) pair repeats. Leaf
-    mode pins rows to the most specific attachment unless `include_superseded`
-    (spec §7.3) — the superseded rows then carry `attachment_depth` in verbose.
+    mode pins rows to the most specific attachment (spec §7.3).
+
+    TCDB (G1-G4): every traversal keeps gate-passing edges
+    (`tcdb_gate IN ['direct','annotated']`); leaf mode drops a gated target
+    that is an ancestor of another gated target and collapses a (gene, term)
+    pair's per-source edges onto the G2 representative edge; rows carry
+    `tcdb_call`, `tcdb_gate` and `tcdb_calls` (lineage call kinds).
+    `include_weak_tcdb_hits=True` only adds below-gate rows (no-op for other
+    ontologies).
 
     RETURN keys (compact): locus_tag, term_id, term_name, level, tree,
     tree_code, is_informative, plus the ontology's compact trust columns —
@@ -5163,7 +5643,7 @@ def build_gene_ontology_terms(
     facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
     trust_frag, trust_params = build_trust_filter_clause(
         ontology, sources=sources, evidence=evidence, max_tier=max_tier,
-        min_evidence_score=min_evidence_score, call_class=call_class,
+        min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
     )
     cfg = ONTOLOGY_CONFIG[ontology]
     gene_rel = cfg["gene_rel"]
@@ -5171,6 +5651,10 @@ def build_gene_ontology_terms(
 
     params: dict = {"locus_tags": locus_tags, "org": organism_name}
     params.update(trust_params)
+    trust_frag = _and_join(
+        ontology_gate_clause(ontology, include_weak=include_weak_tcdb_hits),
+        trust_frag,
+    )
     trust_and = f" AND {trust_frag}" if trust_frag else ""
 
     verbose_cols = (
@@ -5179,6 +5663,7 @@ def build_gene_ontology_terms(
     )
     edge_prop_cols = _ontology_row_return_cypher(
         ontology, verbose, force_trust_axes=True,
+        include_weak=include_weak_tcdb_hits,
     )
 
     if offset:
@@ -5256,11 +5741,11 @@ def build_gene_ontology_terms(
             rebind_trust, _ = build_trust_filter_clause(
                 ontology, sources=sources, evidence=evidence,
                 max_tier=max_tier, min_evidence_score=min_evidence_score,
-                call_class=call_class, rel_var="r2",
+                call_class=call_class, tcdb_call=tcdb_call, rel_var="r2",
             )
             rebind = _best_edge_rebind_cypher(
                 ontology, verbose, trust_frag=rebind_trust,
-                force_trust_axes=True,
+                force_trust_axes=True, include_weak=include_weak_tcdb_hits,
             )
             row_head = "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
         else:
@@ -5282,7 +5767,10 @@ def build_gene_ontology_terms(
     else:
         # --- leaf mode ---
         leaf_filter = _gene_ontology_terms_leaf_filter(
-            cfg, include_superseded=include_superseded,
+            cfg, include_weak_tcdb_hits=include_weak_tcdb_hits,
+        )
+        leaf_collapse = _gene_ontology_terms_leaf_collapse(
+            cfg, include_weak_tcdb_hits=include_weak_tcdb_hits,
         )
 
         if bridge:
@@ -5322,6 +5810,7 @@ def build_gene_ontology_terms(
             f"{level_filter}"
             f"{facet_filter}"
             f"{informative_filter}"
+            f"{leaf_collapse}"
             "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
             f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
             f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}{edge_prop_cols}\n"
@@ -7771,6 +8260,7 @@ def build_ontology_landscape(
     max_tier: int | None = None,
     min_evidence_score: float | None = None,
     call_class: list[str] | None = None,
+    tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
 ) -> tuple[str, dict]:
     """Per-(ontology, level[, facet]) aggregated landscape stats for one ontology.
@@ -7802,8 +8292,11 @@ def build_ontology_landscape(
     facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
     trust_frag, trust_params = build_trust_filter_clause(
         ontology, sources=sources, evidence=evidence, max_tier=max_tier,
-        min_evidence_score=min_evidence_score, call_class=call_class,
+        min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
     )
+    # G1: TCDB term sizes / coverage count gate-passing edges only, so the
+    # landscape describes the gene sets enrichment tests.
+    trust_frag = _and_join(ontology_gate_clause(ontology), trust_frag)
 
     # Unified hierarchy walk via _hierarchy_walk helper.
     # This corrects the previous flat-Pfam treatment: Pfam is actually 2-level
@@ -7951,6 +8444,10 @@ def build_ontology_expcov(
         f"expcov prefix-stripping needs update. Got: {frag['bind_up']!r}"
     )
     bind_tail = frag["bind_up"][len(prefix):]
+    # G1: TCDB coverage counts gate-passing edges only.
+    gate = ontology_gate_clause(ontology)
+    if gate:
+        bind_tail += f"\nWHERE {gate}"
     walk = frag["walk_up"] + "\n" if frag["walk_up"] else ""
 
     # Facet column in the stratum key — see docstring. `null` keeps the
@@ -9339,12 +9836,7 @@ def _genes_by_metabolite_metabolism_where(
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
 ) -> tuple[list[str], dict]:
-    """Build WHERE conditions + params for the metabolism arm.
-
-    `substrate_depth` is not accepted here — it is a transport-arm
-    filter and the metabolism arm is unaffected by it (per the per-arm
-    filter scope rule in 'Special handling').
-    """
+    """Build WHERE conditions + params for the metabolism arm."""
     conditions: list[str] = [
         "m.id IN $metabolite_ids",
         "ALL(word IN split(toLower($organism), ' ')"
@@ -9377,30 +9869,19 @@ def _genes_by_metabolite_metabolism_where(
     return conditions, params
 
 
-def _genes_by_metabolite_transport_where(
+def _genes_by_metabolite_shared_where(
     *,
     metabolite_ids: list[str],
     organism: str,
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
-    substrate_depth: list[str] | None = None,
 ) -> tuple[list[str], dict]:
-    """Build WHERE conditions + params for the transport arm.
-
-    Always carries the deepest-attachment predicate (decision 4) so the
-    arm walks only the gene's deepest TCDB attachments.
-
-    `ec_numbers` / `mass_balance` are not accepted here — they are
-    metabolism-arm filters and the transport arm is unaffected by them.
-    `substrate_depth` (list of 'most_specific' / 'inherited') adds
-    `r.substrate_depth IN $substrate_depth` on the transport edge.
-    """
+    """Shared gbm filters on `g` / `m` (both TCDB routes take exactly these)."""
     conditions: list[str] = [
         "m.id IN $metabolite_ids",
         "ALL(word IN split(toLower($organism), ' ')"
         " WHERE toLower(g.organism_name) CONTAINS word)",
-        TCDB_DEEPEST_ATTACHMENT_PREDICATE,
     ]
     params: dict = {
         "metabolite_ids": metabolite_ids,
@@ -9418,9 +9899,31 @@ def _genes_by_metabolite_transport_where(
     if gene_categories:
         conditions.append("g.gene_category IN $gene_categories")
         params["gene_categories"] = gene_categories
-    if substrate_depth:
-        conditions.append("r.substrate_depth IN $substrate_depth")
-        params["substrate_depth"] = substrate_depth
+    return conditions, params
+
+
+def _genes_by_metabolite_transport_where(
+    *,
+    metabolite_ids: list[str],
+    organism: str,
+    exclude_metabolite_ids: list[str] | None = None,
+    metabolite_pathway_ids: list[str] | None = None,
+    gene_categories: list[str] | None = None,
+) -> tuple[list[str], dict]:
+    """Build WHERE conditions + params for the transport arm (direct rows).
+
+    Always carries the direct gate (`gt.tcdb_gate = 'direct'`, G1).
+
+    `ec_numbers` / `mass_balance` are not accepted here — they are
+    metabolism-arm filters and the transport arm is unaffected by them.
+    """
+    conditions, params = _genes_by_metabolite_shared_where(
+        metabolite_ids=metabolite_ids, organism=organism,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        metabolite_pathway_ids=metabolite_pathway_ids,
+        gene_categories=gene_categories,
+    )
+    conditions.insert(2, TCDB_DIRECT_GATE_PREDICATE)
     return conditions, params
 
 
@@ -9441,8 +9944,9 @@ def build_genes_by_metabolite_metabolism(
 
     RETURN keys (compact, 13 + 2 null-padding columns to align with the
     transport arm): locus_tag, gene_name, product, evidence_source
-    ('metabolism'), substrate_depth (always null), tcdb_evidence_score
-    (always null), reaction_id,
+    ('metabolism'), the TCDB columns tcdb_route / attached_tcdb_id /
+    tcdb_direction / tcdb_identity / tcdb_calls /
+    tcdb_substrate_system_count (all null), reaction_id,
     reaction_name, ec_numbers, mass_balance, tcdb_family_id (null),
     tcdb_family_name (null), metabolite_id, metabolite_name,
     metabolite_formula, metabolite_mass, metabolite_chebi_id.
@@ -9495,9 +9999,7 @@ def build_genes_by_metabolite_metabolism(
         "       g.gene_name AS gene_name,\n"
         "       g.product AS product,\n"
         "       'metabolism' AS evidence_source,\n"
-        "       null AS substrate_depth,\n"
-        "       null AS tcdb_evidence_score,\n"
-        "       null AS transport_substrate_resolution,\n"
+        f"{_TCDB_NULL_COLUMNS}"
         "       r.id AS reaction_id,\n"
         "       r.name AS reaction_name,\n"
         "       coalesce(r.ec_numbers, []) AS ec_numbers,\n"
@@ -9525,26 +10027,29 @@ def build_genes_by_metabolite_transport(
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
-    substrate_depth: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
 ) -> tuple[str, dict]:
-    """Build Cypher for the transport arm of genes_by_metabolite.
+    """Build Cypher for the transport arm (direct rows) of genes_by_metabolite.
 
-    Walks deepest TCDB attachments only (decision 4 predicate).
+    `tcdb_gate = 'direct'` edges only (G1) — the gene's edge points at a
+    `tc_system` curated with the metabolite. One row per (gene, system,
+    metabolite): a pair carrying two direct edges (eggNOG + best hit, tier +
+    best hit) collapses onto the G2 representative edge.
 
     RETURN keys (compact): locus_tag, gene_name, product,
-    evidence_source ('transport'), substrate_depth (edge
-    `r.substrate_depth`: 'most_specific' | 'inherited'),
-    tcdb_evidence_score (edge `gt.evidence_score`, float [0,1]),
-    reaction_id (null), reaction_name (null), ec_numbers (null),
-    mass_balance (null), tcdb_family_id, tcdb_family_name,
-    metabolite_id, metabolite_name, metabolite_formula,
-    metabolite_mass, metabolite_chebi_id.
+    evidence_source ('transport'), tcdb_route ('direct'), reaction_id
+    (null), reaction_name (null), ec_numbers (null), mass_balance (null),
+    tcdb_family_id (the system), tcdb_family_name, attached_tcdb_id (=
+    tcdb_family_id), tcdb_direction (system `direction`), tcdb_identity
+    (representative edge `identity`; null on eggNOG), tcdb_calls (lineage
+    call kinds, precedence order), tcdb_substrate_system_count (null),
+    metabolite_id, metabolite_name, metabolite_formula, metabolite_mass,
+    metabolite_chebi_id, the GO null columns, target_kind.
 
-    Sort: metabolite_id, depth tier (most_specific before inherited),
-    tcdb_evidence_score DESC within the tier, tcdb_family_id, locus_tag.
+    Sort: metabolite_id, tcdb_identity DESC (nulls last), tcdb_family_id,
+    locus_tag.
 
     Verbose adds: gene_category, metabolite_inchikey, metabolite_smiles,
     metabolite_mnxm_id, metabolite_hmdb_id, reaction_mnxr_id (null),
@@ -9559,66 +10064,132 @@ def build_genes_by_metabolite_transport(
         exclude_metabolite_ids=exclude_metabolite_ids,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
-        substrate_depth=substrate_depth,
     )
-    where_block = "WHERE " + " AND ".join(conditions) + "\n"
-
-    verbose_cols = (
-        ",\n       g.gene_category AS gene_category"
-        ",\n       m.inchikey AS metabolite_inchikey"
-        ",\n       m.smiles AS metabolite_smiles"
-        ",\n       m.mnxm_id AS metabolite_mnxm_id"
-        ",\n       m.hmdb_id AS metabolite_hmdb_id"
-        ",\n       null AS reaction_mnxr_id"
-        ",\n       null AS reaction_rhea_ids"
-        ",\n       tf.level_kind AS tcdb_level_kind"
-        ",\n       tf.tc_class_id AS tc_class_id"
-        ",\n       null AS go_chebi_ids"
-        if verbose else ""
-    )
-
-    if offset:
-        skip_clause = "\nSKIP $offset"
-        params["offset"] = offset
-    else:
-        skip_clause = ""
-    if limit is not None:
-        limit_clause = "\nLIMIT $limit"
-        params["limit"] = limit
-    else:
-        limit_clause = ""
-
+    paging = _tcdb_paging(params, limit, offset)
     cypher = (
-        "MATCH (g:Gene)-[gt:Gene_has_tcdb_family]->"
-        "(tf:TcdbFamily)-[r:Tcdb_family_transports_metabolite|Tcdb_family_transports_chemical_role]->(m:Metabolite|ChemicalRole)\n"
-        f"{where_block}"
-        "RETURN g.locus_tag AS locus_tag,\n"
-        "       g.gene_name AS gene_name,\n"
-        "       g.product AS product,\n"
-        "       'transport' AS evidence_source,\n"
-        "       r.substrate_depth AS substrate_depth,\n"
-        "       gt.evidence_score AS tcdb_evidence_score,\n"
-        "       g.transport_substrate_resolution AS transport_substrate_resolution,\n"
-        "       null AS reaction_id,\n"
-        "       null AS reaction_name,\n"
-        "       null AS ec_numbers,\n"
-        "       null AS mass_balance,\n"
-        "       tf.id AS tcdb_family_id,\n"
-        "       tf.name AS tcdb_family_name,\n"
-        "       m.id AS metabolite_id,\n"
-        "       m.name AS metabolite_name,\n"
-        "       m.formula AS metabolite_formula,\n"
-        "       m.mass AS metabolite_mass,\n"
-        "       m.chebi_id AS metabolite_chebi_id,\n"
-        f"{_GO_NULL_COLUMNS},\n"
-        "       CASE WHEN m:ChemicalRole THEN 'chemical_role'"
-        " ELSE 'metabolite' END AS target_kind"
-        f"{verbose_cols}\n"
-        "ORDER BY metabolite_id,"
-        " CASE WHEN r.substrate_depth = 'most_specific' THEN 0 ELSE 1 END,"
-        " tcdb_evidence_score DESC,"
+        f"{_TCDB_TRANSPORT_MATCH}\n"
+        "WHERE " + " AND ".join(conditions) + "\n"
+        "WITH g, tf, m, collect(gt) AS gts\n"
+        f"WITH g, tf, m, {_tcdb_rep_edge('gts')} AS rep\n"
+        + _tcdb_transport_return(route="direct", verbose=verbose)
+        + f"ORDER BY metabolite_id, {_TCDB_IDENTITY_ORDER},"
         " tcdb_family_id, locus_tag"
-        f"{skip_clause}{limit_clause}"
+        f"{paging}"
+    )
+    return cypher, params
+
+
+def build_genes_by_metabolite_tcdb_family(
+    *,
+    metabolite_ids: list[str],
+    organism: str,
+    exclude_metabolite_ids: list[str] | None = None,
+    metabolite_pathway_ids: list[str] | None = None,
+    gene_categories: list[str] | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Family-walk rows of genes_by_metabolite (include_tcdb_family_substrates).
+
+    A fallback for genes TCDB could not place in a system: starts from the
+    gene's `tcdb_gate = 'annotated'` edges onto a family / subfamily node
+    that passes start rules 1-4 (`_tcdb_walk_start_where`), walks
+    `Tcdb_family_is_a_tcdb_family*1..4` down to descendant `tc_system`
+    nodes and on to their substrates (both substrate edge types). A row
+    whose (gene, metabolite) already has a direct row is dropped.
+
+    Grain: one row per (gene, attached node, metabolite). RETURN keys are
+    the direct arm's, with tcdb_route 'family', tcdb_family_id =
+    attached_tcdb_id = the attached node, tcdb_direction = the attached
+    node's direction, tcdb_identity from the gene's edge to it, and
+    tcdb_substrate_system_count = the number of descendant systems curated
+    with the metabolite. Sort as the direct arm.
+
+    Arm-scoped filters (`ec_numbers`, `mass_balance`) are not accepted.
+    """
+    conditions, params = _genes_by_metabolite_shared_where(
+        metabolite_ids=metabolite_ids, organism=organism,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        metabolite_pathway_ids=metabolite_pathway_ids,
+        gene_categories=gene_categories,
+    )
+    paging = _tcdb_paging(params, limit, offset)
+    cypher = (
+        _tcdb_walk_match(conditions, anchor="metabolite")
+        + "WITH g, a AS tf, m, max(nsys) AS nsys,"
+        " collect(DISTINCT gt) AS gts\n"
+        f"WITH g, tf, m, nsys, {_tcdb_rep_edge('gts')} AS rep\n"
+        + _tcdb_transport_return(
+            route="family", verbose=verbose, system_count="nsys",
+        )
+        + f"ORDER BY metabolite_id, {_TCDB_IDENTITY_ORDER},"
+        " tcdb_family_id, locus_tag"
+        f"{paging}"
+    )
+    return cypher, params
+
+
+def _tcdb_family_hint_cypher(
+    *, walk_conditions: list[str], skipped_block: str,
+    anchor: Literal["gene", "metabolite"],
+    extra_calls: str = "", extra_return: str = "",
+) -> str:
+    """Shared one-row hint: what the walk would add + the capped starts."""
+    return (
+        "CALL {\n"
+        + _tcdb_walk_match(walk_conditions, anchor=anchor, indent="  ")
+        + "  RETURN count(DISTINCT g) AS hint_genes,"
+        " count(DISTINCT m) AS hint_metabolites,\n"
+        "         count(DISTINCT [g.locus_tag, a.id, m.id]) AS hint_rows,\n"
+        "         collect(DISTINCT coalesce(g.gene_name, g.locus_tag))[0..8]"
+        " AS example_genes\n"
+        "}\n"
+        "CALL {\n"
+        + skipped_block
+        + "  WITH DISTINCT g, a\n"
+        "  ORDER BY g.locus_tag, a.id\n"
+        "  RETURN collect({locus_tag: g.locus_tag, tcdb_id: a.id,"
+        " tcdb_substrate_count: a.tcdb_substrate_count}) AS skipped\n"
+        "}\n"
+        + extra_calls
+        + "RETURN {genes: hint_genes, metabolites: hint_metabolites,"
+        " rows: hint_rows} AS tcdb_family_substrates_not_shown,\n"
+        "       skipped AS tcdb_family_substrates_skipped,\n"
+        f"       example_genes{extra_return}"
+    )
+
+
+def build_genes_by_metabolite_tcdb_family_hint(
+    *,
+    metabolite_ids: list[str],
+    organism: str,
+    exclude_metabolite_ids: list[str] | None = None,
+    metabolite_pathway_ids: list[str] | None = None,
+    gene_categories: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Family-substrates hint for genes_by_metabolite (always one row).
+
+    `tcdb_family_substrates_not_shown` {genes, metabolites, rows}: what
+    `include_tcdb_family_substrates=True` would add (start rules 1-4, the
+    cap and the dedupe vs direct rows applied). `tcdb_family_substrates_skipped`
+    [{locus_tag, tcdb_id, tcdb_substrate_count}]: genes whose walk start
+    (rules 1-3) is over the breadth cap but whose start node's systems carry
+    a requested metabolite the gene has no direct row for — the
+    "superfamily call, substrate unknown" genes for this query.
+    """
+    conditions, params = _genes_by_metabolite_shared_where(
+        metabolite_ids=metabolite_ids, organism=organism,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        metabolite_pathway_ids=metabolite_pathway_ids,
+        gene_categories=gene_categories,
+    )
+    skipped_block = _tcdb_walk_match(
+        conditions, anchor="metabolite", indent="  ", cap_op=">",
+    )
+    cypher = _tcdb_family_hint_cypher(
+        walk_conditions=conditions, skipped_block=skipped_block,
+        anchor="metabolite",
     )
     return cypher, params
 
@@ -9637,8 +10208,8 @@ def _genes_by_metabolite_go_transport_where(
 
     Shared filters (bind `g` / `m`) plus the GO-arm-only `go_namespace`
     (mapped to `$go_gene_edge_types`) / `go_evidence` filters on the
-    gene→GO edge `r`; arm-scoped `ec_numbers`, `mass_balance`,
-    `substrate_depth` are not accepted.
+    gene→GO edge `r`; arm-scoped `ec_numbers` / `mass_balance` are not
+    accepted.
     """
     conditions: list[str] = [
         "m.id IN $metabolite_ids",
@@ -9704,8 +10275,8 @@ def build_genes_by_metabolite_go_transport(
     Sort: go_term_depth, metabolite_id, MF before BP, evidence
     (curated < family_inferred < domain_inferred), go_term_id, locus_tag.
 
-    `ec_numbers` / `mass_balance` / `substrate_depth` are not accepted
-    (per-arm filter scope rule); passing them raises `TypeError`.
+    `ec_numbers` / `mass_balance` are not accepted (per-arm filter scope
+    rule); passing them raises `TypeError`.
     """
     conditions, params = _genes_by_metabolite_go_transport_where(
         metabolite_ids=metabolite_ids,
@@ -9740,6 +10311,36 @@ def build_genes_by_metabolite_go_transport(
     return cypher, params
 
 
+def _tcdb_direct_summary_block(conditions: list[str]) -> str:
+    """Direct transport arm body for the gbm / mbg summary UNION.
+
+    The arm row carries no per-edge value; `RETURN DISTINCT` collapses a
+    (gene, system, metabolite) triple's several direct edges into one row
+    (G2 grain) even when this arm is alone (no UNION to dedupe).
+    """
+    return (
+        f"  {_TCDB_TRANSPORT_MATCH}\n"
+        "  WHERE " + " AND ".join(conditions) + "\n"
+        "  RETURN DISTINCT g, null AS r, tf, m, 'transport' AS es,\n"
+        "         'direct' AS troute, null AS go, null AS gdepth"
+    )
+
+
+def _tcdb_family_summary_block(
+    conditions: list[str], *, anchor: Literal["gene", "metabolite"],
+) -> str:
+    """Family-walk arm body for the gbm / mbg summary UNION (opt-in).
+
+    `tf` is the attached start node; `RETURN DISTINCT` collapses to the walk
+    grain (gene, attached node, metabolite) even without a UNION.
+    """
+    return (
+        _tcdb_walk_match(conditions, anchor=anchor, indent="  ")
+        + "  RETURN DISTINCT g, null AS r, a AS tf, m, 'transport' AS es,\n"
+        "         'family' AS troute, null AS go, null AS gdepth"
+    )
+
+
 def build_genes_by_metabolite_summary(
     *,
     metabolite_ids: list[str],
@@ -9749,19 +10350,23 @@ def build_genes_by_metabolite_summary(
     mass_balance: str | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
-    substrate_depth: list[str] | None = None,
     arms: tuple[str, ...] = ("metabolism", "transport"),
     include_ancestors: bool = False,
     go_namespace: list[str] | None = None,
     go_evidence: list[str] | None = None,
+    include_tcdb_family_substrates: bool = False,
 ) -> tuple[str, dict]:
     """Build single-pass aggregation Cypher for genes_by_metabolite.
 
     Per-arm filter scope (matches detail builders): `ec_numbers` and
     `mass_balance` apply only to the metabolism arm of the UNION;
-    `substrate_depth` applies only to the transport arm (which always
-    walks deepest TCDB attachments only — decision 4);
-    `metabolite_pathway_ids` and `gene_categories` apply to both arms.
+    `metabolite_pathway_ids` and `gene_categories` apply to every arm. The
+    transport arm walks `tcdb_gate = 'direct'` edges only (G1);
+    `include_tcdb_family_substrates=True` adds the family-walk arm (rows
+    tagged `tcdb_route = 'family'`, grain gene × attached node ×
+    metabolite) to the UNION — ignored when the transport arm is not
+    selected. The family-substrates hint is its own query
+    (`build_genes_by_metabolite_tcdb_family_hint`).
 
     `arms` selects which arm bodies are emitted in the inner CALL{...}
     subquery ("metabolism", "transport", "go_transport"; the GO arm takes
@@ -9775,16 +10380,14 @@ def build_genes_by_metabolite_summary(
     RETURN keys: total_matching, gene_count_total, reaction_count_total,
     transporter_count_total, metabolite_count_total,
     rows_by_evidence_source (long-format list of {evidence_source, count}),
-    rows_by_substrate_depth (long-format list of {substrate_depth, count},
+    rows_by_tcdb_route (long-format list of {tcdb_route, count},
        transport rows only),
     by_metabolite (per-metabolite rollup with metabolism_rows /
-       transport_most_specific_rows / transport_inherited_rows),
-    top_reactions, top_tcdb_families (entries carry level_kind +
-       substrate_depth, the latter 'most_specific' when any collected row
-       for the family is most_specific, else 'inherited'),
-    top_gene_categories, top_genes (entries carry the gene-level
-       transport_substrate_resolution + tcdb_evidence_score_max, null on
-       metabolism-only genes).
+       tcdb_direct_rows / tcdb_family_rows),
+    top_reactions, top_tcdb_families (entries carry level_kind, tcdb_route
+       and the node's direction),
+    top_gene_categories, top_genes (entries carry tcdb_direct_rows,
+       tcdb_family_rows and the KG precompute tcdb_assignment_count).
 
     Route agreement (go-transport-followups §4.4): after the arm UNION a
     pair-grouping pass tags every row with `pair_sources` (sorted distinct
@@ -9824,7 +10427,7 @@ def build_genes_by_metabolite_summary(
             "(r:Reaction)-[:Reaction_has_metabolite]->(m:Metabolite)\n"
             f"{m_where}"
             "  RETURN g, r, null AS tf, m, 'metabolism' AS es,"
-            " null AS sdepth, null AS tscore, null AS go, null AS gdepth"
+            " null AS troute, null AS go, null AS gdepth"
         )
 
     if "transport" in arms:
@@ -9834,18 +10437,19 @@ def build_genes_by_metabolite_summary(
             exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
-            substrate_depth=substrate_depth,
         )
         params.update(t_params)
-        t_where = "  WHERE " + " AND ".join(t_conditions) + "\n"
-        arm_blocks.append(
-            "  MATCH (g:Gene)-[gt:Gene_has_tcdb_family]->"
-            "(tf:TcdbFamily)-[r:Tcdb_family_transports_metabolite|Tcdb_family_transports_chemical_role]->(m:Metabolite|ChemicalRole)\n"
-            f"{t_where}"
-            "  RETURN g, null AS r, tf, m, 'transport' AS es,\n"
-            "         r.substrate_depth AS sdepth,"
-            " gt.evidence_score AS tscore, null AS go, null AS gdepth"
-        )
+        arm_blocks.append(_tcdb_direct_summary_block(t_conditions))
+        if include_tcdb_family_substrates:
+            w_conditions, _ = _genes_by_metabolite_shared_where(
+                metabolite_ids=metabolite_ids,
+                organism=organism,
+                exclude_metabolite_ids=exclude_metabolite_ids,
+                metabolite_pathway_ids=metabolite_pathway_ids,
+                gene_categories=gene_categories,
+            )
+            arm_blocks.append(_tcdb_family_summary_block(
+                w_conditions, anchor="metabolite"))
 
     if "go_transport" in arms:
         g_conditions, g_params = _genes_by_metabolite_go_transport_where(
@@ -9878,20 +10482,19 @@ def build_genes_by_metabolite_summary(
         "       locus_tag: g.locus_tag,\n"
         "       gene_name: g.gene_name,\n"
         "       gene_category: g.gene_category,\n"
-        "       transport_substrate_resolution: g.transport_substrate_resolution,\n"
-        "       tcdb_evidence_score_max: g.tcdb_evidence_score_max,\n"
+        "       tcdb_assignment_count: coalesce(g.tcdb_assignment_count, 0),\n"
         "       reaction_id: r.id,\n"
         "       reaction_name: r.name,\n"
         "       reaction_ec_numbers: coalesce(r.ec_numbers, []),\n"
         "       tcdb_family_id: tf.id,\n"
         "       tcdb_family_name: tf.name,\n"
         "       tcdb_family_level_kind: tf.level_kind,\n"
+        "       tcdb_family_direction: tf.direction,\n"
         "       metabolite_id: m.id,\n"
         "       metabolite_name: m.name,\n"
         "       metabolite_formula: m.formula,\n"
         "       es: es,\n"
-        "       substrate_depth: sdepth,\n"
-        "       tcdb_evidence_score: tscore,\n"
+        "       tcdb_route: troute,\n"
         "       go_term_depth: gdepth,\n"
         "       pair_sources: pair_sources\n"
         "     }) AS rows\n"
@@ -9901,16 +10504,16 @@ def build_genes_by_metabolite_summary(
         "        {evidence_source: es,\n"
         "         count: size([row IN rows WHERE row.es = es])}]"
         " AS rows_by_evidence_source,\n"
-        "     [sd IN apoc.coll.toSet("
-        "[row IN rows WHERE row.substrate_depth IS NOT NULL"
-        " | row.substrate_depth]) |\n"
-        "        {substrate_depth: sd,\n"
-        "         count: size([row IN rows WHERE row.substrate_depth = sd])}]"
-        " AS rows_by_substrate_depth\n"
+        "     [tr IN apoc.coll.toSet("
+        "[row IN rows WHERE row.tcdb_route IS NOT NULL"
+        " | row.tcdb_route]) |\n"
+        "        {tcdb_route: tr,\n"
+        "         count: size([row IN rows WHERE row.tcdb_route = tr])}]"
+        " AS rows_by_tcdb_route\n"
         "// Per-metabolite rollup with per-evidence row breakdowns\n"
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
         "     transporter_count_total, metabolite_count_total, rows,\n"
-        "     rows_by_evidence_source, rows_by_substrate_depth,\n"
+        "     rows_by_evidence_source, rows_by_tcdb_route,\n"
         "     [mid IN apoc.coll.toSet([row IN rows | row.metabolite_id]) |\n"
         "        {metabolite_id: mid,\n"
         "         name: head([row IN rows WHERE row.metabolite_id = mid"
@@ -9929,12 +10532,12 @@ def build_genes_by_metabolite_summary(
         "         metabolism_rows: size("
         "[row IN rows WHERE row.metabolite_id = mid"
         " AND row.es = 'metabolism']),\n"
-        "         transport_most_specific_rows: size("
+        "         tcdb_direct_rows: size("
         "[row IN rows WHERE row.metabolite_id = mid"
-        " AND row.substrate_depth = 'most_specific']),\n"
-        "         transport_inherited_rows: size("
+        " AND row.tcdb_route = 'direct']),\n"
+        "         tcdb_family_rows: size("
         "[row IN rows WHERE row.metabolite_id = mid"
-        " AND row.substrate_depth = 'inherited']),\n"
+        " AND row.tcdb_route = 'family']),\n"
         "         go_transport_rows: size("
         "[row IN rows WHERE row.metabolite_id = mid"
         " AND row.es = 'go_transport']),\n"
@@ -9945,7 +10548,7 @@ def build_genes_by_metabolite_summary(
         "// Top-N rollups: api/ layer trims to top 10 by gene_count\n"
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
         "     transporter_count_total, metabolite_count_total,\n"
-        "     rows_by_evidence_source, rows_by_substrate_depth,\n"
+        "     rows_by_evidence_source, rows_by_tcdb_route,\n"
         "     by_metabolite, rows,\n"
         "     [rid IN apoc.coll.toSet("
         "[row IN rows WHERE row.reaction_id IS NOT NULL | row.reaction_id]) |\n"
@@ -9970,10 +10573,12 @@ def build_genes_by_metabolite_summary(
         "         level_kind: head("
         "[row IN rows WHERE row.tcdb_family_id = tfid"
         " | row.tcdb_family_level_kind]),\n"
-        "         substrate_depth: CASE WHEN 'most_specific' IN "
+        "         tcdb_route: head("
         "[row IN rows WHERE row.tcdb_family_id = tfid"
-        " | row.substrate_depth]"
-        " THEN 'most_specific' ELSE 'inherited' END,\n"
+        " | row.tcdb_route]),\n"
+        "         direction: head("
+        "[row IN rows WHERE row.tcdb_family_id = tfid"
+        " | row.tcdb_family_direction]),\n"
         "         gene_count: size(apoc.coll.toSet("
         "[row IN rows WHERE row.tcdb_family_id = tfid | row.locus_tag])),\n"
         "         metabolite_count: size(apoc.coll.toSet("
@@ -9991,12 +10596,9 @@ def build_genes_by_metabolite_summary(
         "        {locus_tag: lt,\n"
         "         gene_name: head("
         "[row IN rows WHERE row.locus_tag = lt | row.gene_name]),\n"
-        "         transport_substrate_resolution: head("
+        "         tcdb_assignment_count: head("
         "[row IN rows WHERE row.locus_tag = lt"
-        " | row.transport_substrate_resolution]),\n"
-        "         tcdb_evidence_score_max: head("
-        "[row IN rows WHERE row.locus_tag = lt"
-        " | row.tcdb_evidence_score_max]),\n"
+        " | row.tcdb_assignment_count]),\n"
         "         reaction_count: size(apoc.coll.toSet("
         "[row IN rows WHERE row.locus_tag = lt AND row.reaction_id"
         " IS NOT NULL | row.reaction_id])),\n"
@@ -10008,12 +10610,12 @@ def build_genes_by_metabolite_summary(
         "         metabolism_rows: size("
         "[row IN rows WHERE row.locus_tag = lt"
         " AND row.es = 'metabolism']),\n"
-        "         transport_most_specific_rows: size("
+        "         tcdb_direct_rows: size("
         "[row IN rows WHERE row.locus_tag = lt"
-        " AND row.substrate_depth = 'most_specific']),\n"
-        "         transport_inherited_rows: size("
+        " AND row.tcdb_route = 'direct']),\n"
+        "         tcdb_family_rows: size("
         "[row IN rows WHERE row.locus_tag = lt"
-        " AND row.substrate_depth = 'inherited']),\n"
+        " AND row.tcdb_route = 'family']),\n"
         "         go_transport_rows: size("
         "[row IN rows WHERE row.locus_tag = lt"
         " AND row.es = 'go_transport']),\n"
@@ -10022,7 +10624,7 @@ def build_genes_by_metabolite_summary(
         " AND size(row.pair_sources) > 1 | row.metabolite_id]))}] AS top_genes\n"
         "RETURN total_matching, gene_count_total, reaction_count_total,\n"
         "       transporter_count_total, metabolite_count_total,\n"
-        "       rows_by_evidence_source, rows_by_substrate_depth,\n"
+        "       rows_by_evidence_source, rows_by_tcdb_route,\n"
         "       by_metabolite, top_reactions, top_tcdb_families,\n"
         "       top_gene_categories, top_genes,\n"
         "       [d IN apoc.coll.toSet([row IN rows WHERE row.es = 'go_transport' | row.go_term_depth]) |\n"
@@ -10040,11 +10642,10 @@ def build_genes_by_metabolite_summary(
 #   - anchor flips to locus_tags + organism (single-organism enforced)
 #   - new metabolite_elements filter (uniform across both arms)
 #   - per-arm filter scope identical to GBM (ec_numbers / mass_balance →
-#     metabolism only; substrate_depth → transport only;
+#     metabolism only; include_tcdb_family_substrates → transport only;
 #     metabolite_pathway_ids / gene_categories / metabolite_ids /
 #     metabolite_elements → uniform)
-#   - sort uses **global precision-tier** (metabolism → most_specific →
-#     inherited; tcdb_evidence_score desc within a transport tier) then
+#   - transport sort: tcdb_identity desc (nulls last) then
 #     input-gene order via
 #     apoc.coll.indexOf($locus_tags, locus_tag), then locus_tag, then
 #     metabolite_id
@@ -10067,12 +10668,7 @@ def _metabolites_by_gene_metabolism_where(
     mass_balance: str | None = None,
     gene_categories: list[str] | None = None,
 ) -> tuple[list[str], dict]:
-    """Build WHERE conditions + params for the MBG metabolism arm.
-
-    `substrate_depth` is not accepted here — it is a transport-arm
-    filter and the metabolism arm is unaffected by it (per-arm filter
-    scope rule).
-    """
+    """Build WHERE conditions + params for the MBG metabolism arm."""
     conditions: list[str] = [
         "g.locus_tag IN $locus_tags",
         "ALL(word IN split(toLower($organism), ' ')"
@@ -10114,7 +10710,7 @@ def _metabolites_by_gene_metabolism_where(
     return conditions, params
 
 
-def _metabolites_by_gene_transport_where(
+def _metabolites_by_gene_shared_where(
     *,
     locus_tags: list[str],
     organism: str,
@@ -10123,23 +10719,12 @@ def _metabolites_by_gene_transport_where(
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
-    substrate_depth: list[str] | None = None,
 ) -> tuple[list[str], dict]:
-    """Build WHERE conditions + params for the MBG transport arm.
-
-    Always carries the deepest-attachment predicate (decision 4) so the
-    arm walks only the gene's deepest TCDB attachments.
-
-    `ec_numbers` / `mass_balance` are not accepted here — they are
-    metabolism-arm filters and the transport arm is unaffected by them.
-    `substrate_depth` (list of 'most_specific' / 'inherited') adds
-    `r.substrate_depth IN $substrate_depth` on the transport edge.
-    """
+    """Shared mbg filters on `g` / `m` (both TCDB routes take exactly these)."""
     conditions: list[str] = [
         "g.locus_tag IN $locus_tags",
         "ALL(word IN split(toLower($organism), ' ')"
         " WHERE toLower(g.organism_name) CONTAINS word)",
-        TCDB_DEEPEST_ATTACHMENT_PREDICATE,
     ]
     params: dict = {
         "locus_tags": locus_tags,
@@ -10166,9 +10751,35 @@ def _metabolites_by_gene_transport_where(
     if gene_categories:
         conditions.append("g.gene_category IN $gene_categories")
         params["gene_categories"] = gene_categories
-    if substrate_depth:
-        conditions.append("r.substrate_depth IN $substrate_depth")
-        params["substrate_depth"] = substrate_depth
+    return conditions, params
+
+
+def _metabolites_by_gene_transport_where(
+    *,
+    locus_tags: list[str],
+    organism: str,
+    metabolite_elements: list[str] | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    metabolite_pathway_ids: list[str] | None = None,
+    gene_categories: list[str] | None = None,
+) -> tuple[list[str], dict]:
+    """Build WHERE conditions + params for the MBG transport arm (direct).
+
+    Always carries the direct gate (`gt.tcdb_gate = 'direct'`, G1).
+
+    `ec_numbers` / `mass_balance` are not accepted here — they are
+    metabolism-arm filters and the transport arm is unaffected by them.
+    """
+    conditions, params = _metabolites_by_gene_shared_where(
+        locus_tags=locus_tags, organism=organism,
+        metabolite_elements=metabolite_elements,
+        metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        metabolite_pathway_ids=metabolite_pathway_ids,
+        gene_categories=gene_categories,
+    )
+    conditions.insert(2, TCDB_DIRECT_GATE_PREDICATE)
     return conditions, params
 
 
@@ -10191,8 +10802,7 @@ def build_metabolites_by_gene_metabolism(
 
     RETURN keys (compact, 16 columns aligned with the transport arm):
     locus_tag, gene_name, product, evidence_source ('metabolism'),
-    substrate_depth (always null), tcdb_evidence_score (always null),
-    reaction_id, reaction_name,
+    the TCDB transport columns (all null), reaction_id, reaction_name,
     ec_numbers, mass_balance, tcdb_family_id (null), tcdb_family_name
     (null), metabolite_id, metabolite_name, metabolite_formula,
     metabolite_mass, metabolite_chebi_id.
@@ -10201,8 +10811,8 @@ def build_metabolites_by_gene_metabolism(
     metabolite_mnxm_id, metabolite_hmdb_id, reaction_mnxr_id,
     reaction_rhea_ids, tcdb_level_kind (null), tc_class_id (null).
 
-    `substrate_depth` is not accepted (per-arm filter scope rule);
-    passing it raises `TypeError`.
+    Transport-only switches (`include_tcdb_family_substrates`) are not
+    accepted (per-arm filter scope rule).
 
     Sort: precision_tier (constant 0 for metabolism), then input-gene
     order via apoc.coll.indexOf($locus_tags, locus_tag), then locus_tag,
@@ -10255,9 +10865,7 @@ def build_metabolites_by_gene_metabolism(
         "       g.gene_name AS gene_name,\n"
         "       g.product AS product,\n"
         "       'metabolism' AS evidence_source,\n"
-        "       null AS substrate_depth,\n"
-        "       null AS tcdb_evidence_score,\n"
-        "       null AS transport_substrate_resolution,\n"
+        f"{_TCDB_NULL_COLUMNS}"
         "       r.id AS reaction_id,\n"
         "       r.name AS reaction_name,\n"
         "       coalesce(r.ec_numbers, []) AS ec_numbers,\n"
@@ -10289,37 +10897,28 @@ def build_metabolites_by_gene_transport(
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
-    substrate_depth: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
 ) -> tuple[str, dict]:
-    """Build Cypher for the transport arm of metabolites_by_gene.
+    """Build Cypher for the transport arm (direct rows) of metabolites_by_gene.
 
-    Walks deepest TCDB attachments only (decision 4 predicate), so the
-    distinct metabolites across rows equal the gene's precomputed
+    `tcdb_gate = 'direct'` edges only (G1), one row per (gene, system,
+    metabolite) on the G2 representative edge, so the distinct Metabolite
+    targets per gene equal the gene's precomputed
     `transported_metabolite_count`.
 
-    RETURN keys (compact): locus_tag, gene_name, product,
-    evidence_source ('transport'), substrate_depth (edge
-    `r.substrate_depth`: 'most_specific' | 'inherited'),
-    tcdb_evidence_score (edge `gt.evidence_score`, float [0,1]),
-    reaction_id (null), reaction_name (null),
-    ec_numbers (null), mass_balance (null), tcdb_family_id,
-    tcdb_family_name, metabolite_id, metabolite_name,
-    metabolite_formula, metabolite_mass, metabolite_chebi_id.
-
-    Verbose adds: gene_category, metabolite_inchikey, metabolite_smiles,
-    metabolite_mnxm_id, metabolite_hmdb_id, reaction_mnxr_id (null),
-    reaction_rhea_ids (null), tcdb_level_kind, tc_class_id.
+    RETURN keys: as `build_genes_by_metabolite_transport` (tcdb_route
+    'direct', tcdb_family_id = attached_tcdb_id = the system,
+    tcdb_direction, tcdb_identity, tcdb_calls,
+    tcdb_substrate_system_count null).
 
     `ec_numbers` / `mass_balance` are not accepted (per-arm filter
     scope rule); passing them raises `TypeError`.
 
-    Sort: depth tier (most_specific = 0, inherited = 1) via CASE on
-    r.substrate_depth, then tcdb_evidence_score DESC within the tier,
-    then input-gene order via apoc.coll.indexOf($locus_tags, locus_tag),
-    then locus_tag, then metabolite_id.
+    Sort: tcdb_identity DESC (nulls last), then input-gene order via
+    apoc.coll.indexOf($locus_tags, locus_tag), then locus_tag,
+    metabolite_id, tcdb_family_id.
     """
     conditions, params = _metabolites_by_gene_transport_where(
         locus_tags=locus_tags,
@@ -10329,67 +10928,127 @@ def build_metabolites_by_gene_transport(
         exclude_metabolite_ids=exclude_metabolite_ids,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
-        substrate_depth=substrate_depth,
     )
-    where_block = "WHERE " + " AND ".join(conditions) + "\n"
-
-    verbose_cols = (
-        ",\n       g.gene_category AS gene_category"
-        ",\n       m.inchikey AS metabolite_inchikey"
-        ",\n       m.smiles AS metabolite_smiles"
-        ",\n       m.mnxm_id AS metabolite_mnxm_id"
-        ",\n       m.hmdb_id AS metabolite_hmdb_id"
-        ",\n       null AS reaction_mnxr_id"
-        ",\n       null AS reaction_rhea_ids"
-        ",\n       tf.level_kind AS tcdb_level_kind"
-        ",\n       tf.tc_class_id AS tc_class_id"
-        ",\n       null AS go_chebi_ids"
-        if verbose else ""
-    )
-
-    if offset:
-        skip_clause = "\nSKIP $offset"
-        params["offset"] = offset
-    else:
-        skip_clause = ""
-    if limit is not None:
-        limit_clause = "\nLIMIT $limit"
-        params["limit"] = limit
-    else:
-        limit_clause = ""
-
+    paging = _tcdb_paging(params, limit, offset)
     cypher = (
-        "MATCH (g:Gene)-[gt:Gene_has_tcdb_family]->"
-        "(tf:TcdbFamily)-[r:Tcdb_family_transports_metabolite|Tcdb_family_transports_chemical_role]->(m:Metabolite|ChemicalRole)\n"
-        f"{where_block}"
-        "RETURN g.locus_tag AS locus_tag,\n"
-        "       g.gene_name AS gene_name,\n"
-        "       g.product AS product,\n"
-        "       'transport' AS evidence_source,\n"
-        "       r.substrate_depth AS substrate_depth,\n"
-        "       gt.evidence_score AS tcdb_evidence_score,\n"
-        "       g.transport_substrate_resolution AS transport_substrate_resolution,\n"
-        "       null AS reaction_id,\n"
-        "       null AS reaction_name,\n"
-        "       null AS ec_numbers,\n"
-        "       null AS mass_balance,\n"
-        "       tf.id AS tcdb_family_id,\n"
-        "       tf.name AS tcdb_family_name,\n"
-        "       m.id AS metabolite_id,\n"
-        "       m.name AS metabolite_name,\n"
-        "       m.formula AS metabolite_formula,\n"
-        "       m.mass AS metabolite_mass,\n"
-        "       m.chebi_id AS metabolite_chebi_id,\n"
-        f"{_GO_NULL_COLUMNS},\n"
-        "       CASE WHEN m:ChemicalRole THEN 'chemical_role'"
-        " ELSE 'metabolite' END AS target_kind"
-        f"{verbose_cols}\n"
-        "ORDER BY"
-        " CASE WHEN r.substrate_depth = 'most_specific' THEN 0 ELSE 1 END,"
-        " tcdb_evidence_score DESC,"
+        f"{_TCDB_TRANSPORT_MATCH}\n"
+        "WHERE " + " AND ".join(conditions) + "\n"
+        "WITH g, tf, m, collect(gt) AS gts\n"
+        f"WITH g, tf, m, {_tcdb_rep_edge('gts')} AS rep\n"
+        + _tcdb_transport_return(route="direct", verbose=verbose)
+        + f"ORDER BY {_TCDB_IDENTITY_ORDER},"
         " apoc.coll.indexOf($locus_tags, locus_tag),"
         " locus_tag, metabolite_id, tcdb_family_id"
-        f"{skip_clause}{limit_clause}"
+        f"{paging}"
+    )
+    return cypher, params
+
+
+def build_metabolites_by_gene_tcdb_family(
+    *,
+    locus_tags: list[str],
+    organism: str,
+    metabolite_elements: list[str] | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    metabolite_pathway_ids: list[str] | None = None,
+    gene_categories: list[str] | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Family-walk rows of metabolites_by_gene (include_tcdb_family_substrates).
+
+    Same walk, start rules, grain, dedupe and RETURN keys as
+    `build_genes_by_metabolite_tcdb_family`, anchored on the input genes.
+    Sort as the mbg direct arm.
+    """
+    conditions, params = _metabolites_by_gene_shared_where(
+        locus_tags=locus_tags, organism=organism,
+        metabolite_elements=metabolite_elements,
+        metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        metabolite_pathway_ids=metabolite_pathway_ids,
+        gene_categories=gene_categories,
+    )
+    paging = _tcdb_paging(params, limit, offset)
+    cypher = (
+        _tcdb_walk_match(conditions, anchor="gene")
+        + "WITH g, a AS tf, m, max(nsys) AS nsys,"
+        " collect(DISTINCT gt) AS gts\n"
+        f"WITH g, tf, m, nsys, {_tcdb_rep_edge('gts')} AS rep\n"
+        + _tcdb_transport_return(
+            route="family", verbose=verbose, system_count="nsys",
+        )
+        + f"ORDER BY {_TCDB_IDENTITY_ORDER},"
+        " apoc.coll.indexOf($locus_tags, locus_tag),"
+        " locus_tag, metabolite_id, tcdb_family_id"
+        f"{paging}"
+    )
+    return cypher, params
+
+
+def build_metabolites_by_gene_tcdb_family_hint(
+    *,
+    locus_tags: list[str],
+    organism: str,
+    metabolite_elements: list[str] | None = None,
+    metabolite_ids: list[str] | None = None,
+    exclude_metabolite_ids: list[str] | None = None,
+    metabolite_pathway_ids: list[str] | None = None,
+    gene_categories: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Family-substrates hint for metabolites_by_gene (always one row).
+
+    `tcdb_family_substrates_not_shown` {genes, metabolites, rows}: what
+    `include_tcdb_family_substrates=True` would add for the input genes
+    (shared metabolite filters, start rules 1-4, dedupe vs direct).
+    `tcdb_family_substrates_skipped` [{locus_tag, tcdb_id,
+    tcdb_substrate_count}]: input genes' walk starts (rules 1-3) over the
+    breadth cap. `tcdb_no_direct_genes` [{locus_tag, walkable}] (input
+    order): input genes with gate-passing TCDB edges but no direct edge;
+    `walkable` is false when no start survives the cap (a superfamily-level
+    call, substrate unknown).
+    """
+    conditions, params = _metabolites_by_gene_shared_where(
+        locus_tags=locus_tags, organism=organism,
+        metabolite_elements=metabolite_elements,
+        metabolite_ids=metabolite_ids,
+        exclude_metabolite_ids=exclude_metabolite_ids,
+        metabolite_pathway_ids=metabolite_pathway_ids,
+        gene_categories=gene_categories,
+    )
+    gene_conditions, _ = _split_gene_metabolite_conditions(conditions)
+    gene_where = " AND ".join(gene_conditions)
+    capped = _tcdb_walk_start_where(cap_op=">").replace("\n", "\n  ")
+    skipped_block = (
+        "  MATCH (g:Gene)-[gt:Gene_has_tcdb_family]->(a:TcdbFamily)\n"
+        f"  WHERE {gene_where}\n"
+        f"    AND {capped}\n"
+    )
+    walkable = _tcdb_walk_start_where().replace("\n", "\n    ")
+    gate_pass = _gate_pass_predicate(ONTOLOGY_CONFIG["tcdb"]["gate"], "gp")
+    extra_calls = (
+        "CALL {\n"
+        "  MATCH (g:Gene)\n"
+        f"  WHERE {gene_where}\n"
+        "    AND EXISTS { MATCH (g)-[gp:Gene_has_tcdb_family]->()"
+        f" WHERE {gate_pass} }}\n"
+        "    AND NOT EXISTS { MATCH (g)-[gn:Gene_has_tcdb_family]->()"
+        " WHERE gn.tcdb_gate = 'direct' }\n"
+        "  WITH g, EXISTS {\n"
+        "    MATCH (g)-[gt:Gene_has_tcdb_family]->(a:TcdbFamily)\n"
+        f"    WHERE {walkable}\n"
+        "  } AS walkable\n"
+        "  ORDER BY apoc.coll.indexOf($locus_tags, g.locus_tag)\n"
+        "  RETURN collect({locus_tag: g.locus_tag, walkable: walkable})"
+        " AS no_direct\n"
+        "}\n"
+    )
+    cypher = _tcdb_family_hint_cypher(
+        walk_conditions=conditions, skipped_block=skipped_block,
+        anchor="gene", extra_calls=extra_calls,
+        extra_return=",\n       no_direct AS tcdb_no_direct_genes",
     )
     return cypher, params
 
@@ -10410,8 +11069,8 @@ def _metabolites_by_gene_go_transport_where(
 
     Shared filters (bind `g` / `m`) plus the GO-arm-only `go_namespace`
     (mapped to `$go_gene_edge_types`) / `go_evidence` filters on the
-    gene→GO edge `r`; arm-scoped `ec_numbers`, `mass_balance`,
-    `substrate_depth` are not accepted.
+    gene→GO edge `r`; arm-scoped `ec_numbers` / `mass_balance` are not
+    accepted.
     """
     conditions: list[str] = [
         "g.locus_tag IN $locus_tags",
@@ -10478,8 +11137,8 @@ def build_metabolites_by_gene_go_transport(
     evidence (curated < family_inferred < domain_inferred), go_term_id,
     metabolite_id.
 
-    `ec_numbers` / `mass_balance` / `substrate_depth` are not accepted
-    (per-arm filter scope rule); passing them raises `TypeError`.
+    `ec_numbers` / `mass_balance` are not accepted (per-arm filter scope
+    rule); passing them raises `TypeError`.
     """
     conditions, params = _metabolites_by_gene_go_transport_where(
         locus_tags=locus_tags,
@@ -10528,20 +11187,23 @@ def build_metabolites_by_gene_summary(
     metabolite_pathway_ids: list[str] | None = None,
     mass_balance: str | None = None,
     gene_categories: list[str] | None = None,
-    substrate_depth: list[str] | None = None,
     arms: tuple[str, ...] = ("metabolism", "transport"),
     include_ancestors: bool = False,
     go_namespace: list[str] | None = None,
     go_evidence: list[str] | None = None,
+    include_tcdb_family_substrates: bool = False,
 ) -> tuple[str, dict]:
     """Build single-pass aggregation Cypher for metabolites_by_gene.
 
     Per-arm filter scope (matches detail builders): `ec_numbers` and
     `mass_balance` apply only to the metabolism arm of the UNION;
-    `substrate_depth` applies only to the transport arm (which always
-    walks deepest TCDB attachments only — decision 4);
     `metabolite_pathway_ids`, `gene_categories`, `metabolite_ids`, and
-    `metabolite_elements` apply to both arms uniformly.
+    `metabolite_elements` apply to every arm uniformly. The transport arm
+    walks `tcdb_gate = 'direct'` edges only (G1);
+    `include_tcdb_family_substrates=True` adds the family-walk arm
+    (`tcdb_route = 'family'` rows) — ignored without the transport arm.
+    The family-substrates hint is its own query
+    (`build_metabolites_by_gene_tcdb_family_hint`).
 
     `arms` selects which arm bodies are emitted in the inner CALL{...}
     subquery ("metabolism", "transport", "go_transport"; the GO arm takes
@@ -10555,13 +11217,11 @@ def build_metabolites_by_gene_summary(
     RETURN keys: total_matching, gene_count_total, reaction_count_total,
     transporter_count_total, metabolite_count_total,
     rows_by_evidence_source (long-format list of {evidence_source, count}),
-    rows_by_substrate_depth (long-format list of {substrate_depth, count},
+    rows_by_tcdb_route (long-format list of {tcdb_route, count},
        transport rows only),
     by_gene (per-input-gene rollup with metabolism_rows /
-       transport_most_specific_rows / transport_inherited_rows, plus the
-       gene-level transport_substrate_resolution + tcdb_evidence_score_max
-       — null on metabolism-only genes — which drive the gene-anchored
-       auto-warning),
+       tcdb_direct_rows / tcdb_family_rows, plus the KG precompute
+       tcdb_assignment_count),
     top_metabolites, top_reactions, top_tcdb_families,
     top_gene_categories, top_metabolite_pathways (NEW — chemistry-filtered
     to p.reaction_count >= 3), by_element (NEW — periodic-table-bounded
@@ -10609,7 +11269,7 @@ def build_metabolites_by_gene_summary(
             "(r:Reaction)-[:Reaction_has_metabolite]->(m:Metabolite)\n"
             f"{m_where}"
             "  RETURN g, r, null AS tf, m, 'metabolism' AS es,"
-            " null AS sdepth, null AS tscore, null AS go, null AS gdepth"
+            " null AS troute, null AS go, null AS gdepth"
         )
 
     if "transport" in arms:
@@ -10621,18 +11281,21 @@ def build_metabolites_by_gene_summary(
             exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
-            substrate_depth=substrate_depth,
         )
         params.update(t_params)
-        t_where = "  WHERE " + " AND ".join(t_conditions) + "\n"
-        arm_blocks.append(
-            "  MATCH (g:Gene)-[gt:Gene_has_tcdb_family]->"
-            "(tf:TcdbFamily)-[r:Tcdb_family_transports_metabolite|Tcdb_family_transports_chemical_role]->(m:Metabolite|ChemicalRole)\n"
-            f"{t_where}"
-            "  RETURN g, null AS r, tf, m, 'transport' AS es,\n"
-            "         r.substrate_depth AS sdepth,"
-            " gt.evidence_score AS tscore, null AS go, null AS gdepth"
-        )
+        arm_blocks.append(_tcdb_direct_summary_block(t_conditions))
+        if include_tcdb_family_substrates:
+            w_conditions, _ = _metabolites_by_gene_shared_where(
+                locus_tags=locus_tags,
+                organism=organism,
+                metabolite_elements=metabolite_elements,
+                metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
+                metabolite_pathway_ids=metabolite_pathway_ids,
+                gene_categories=gene_categories,
+            )
+            arm_blocks.append(_tcdb_family_summary_block(
+                w_conditions, anchor="gene"))
 
     if "go_transport" in arms:
         g_conditions, g_params = _metabolites_by_gene_go_transport_where(
@@ -10671,22 +11334,21 @@ def build_metabolites_by_gene_summary(
         "       gene_name: g.gene_name,\n"
         "       product: g.product,\n"
         "       gene_category: g.gene_category,\n"
-        "       transport_substrate_resolution: g.transport_substrate_resolution,\n"
-        "       tcdb_evidence_score_max: g.tcdb_evidence_score_max,\n"
+        "       tcdb_assignment_count: coalesce(g.tcdb_assignment_count, 0),\n"
         "       reaction_id: r.id,\n"
         "       reaction_name: r.name,\n"
         "       reaction_ec_numbers: coalesce(r.ec_numbers, []),\n"
         "       tcdb_family_id: tf.id,\n"
         "       tcdb_family_name: tf.name,\n"
         "       tcdb_family_level_kind: tf.level_kind,\n"
+        "       tcdb_family_direction: tf.direction,\n"
         "       metabolite_id: m.id,\n"
         "       metabolite_name: m.name,\n"
         "       metabolite_formula: m.formula,\n"
         "       metabolite_elements: coalesce(m.elements, []),\n"
         "       metabolite_pathway_ids: coalesce(m.pathway_ids, []),\n"
         "       es: es,\n"
-        "       substrate_depth: sdepth,\n"
-        "       tcdb_evidence_score: tscore,\n"
+        "       tcdb_route: troute,\n"
         "       go_term_depth: gdepth,\n"
         "       pair_sources: pair_sources\n"
         "     }) AS rows\n"
@@ -10697,29 +11359,26 @@ def build_metabolites_by_gene_summary(
         "        {evidence_source: es,\n"
         "         count: size([row IN rows WHERE row.es = es])}]"
         " AS rows_by_evidence_source,\n"
-        "     [sd IN apoc.coll.toSet("
-        "[row IN rows WHERE row.substrate_depth IS NOT NULL"
-        " | row.substrate_depth]) |\n"
-        "        {substrate_depth: sd,\n"
-        "         count: size([row IN rows WHERE row.substrate_depth = sd])}]"
-        " AS rows_by_substrate_depth\n"
+        "     [tr IN apoc.coll.toSet("
+        "[row IN rows WHERE row.tcdb_route IS NOT NULL"
+        " | row.tcdb_route]) |\n"
+        "        {tcdb_route: tr,\n"
+        "         count: size([row IN rows WHERE row.tcdb_route = tr])}]"
+        " AS rows_by_tcdb_route\n"
         "// Per-input-gene rollup (the gene-anchored mirror of GBM by_metabolite)\n"
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
         "     transporter_count_total, metabolite_count_total,"
         " stereo_linked_metabolite_ids, rows,\n"
-        "     rows_by_evidence_source, rows_by_substrate_depth,\n"
+        "     rows_by_evidence_source, rows_by_tcdb_route,\n"
         "     [lt IN apoc.coll.toSet([row IN rows | row.locus_tag]) |\n"
         "        {locus_tag: lt,\n"
         "         gene_name: head([row IN rows WHERE row.locus_tag = lt"
         " | row.gene_name]),\n"
         "         product: head([row IN rows WHERE row.locus_tag = lt"
         " | row.product]),\n"
-        "         transport_substrate_resolution: head("
+        "         tcdb_assignment_count: head("
         "[row IN rows WHERE row.locus_tag = lt"
-        " | row.transport_substrate_resolution]),\n"
-        "         tcdb_evidence_score_max: head("
-        "[row IN rows WHERE row.locus_tag = lt"
-        " | row.tcdb_evidence_score_max]),\n"
+        " | row.tcdb_assignment_count]),\n"
         "         rows: size([row IN rows WHERE row.locus_tag = lt]),\n"
         "         metabolite_count: size(apoc.coll.toSet("
         "[row IN rows WHERE row.locus_tag = lt | row.metabolite_id])),\n"
@@ -10732,12 +11391,12 @@ def build_metabolites_by_gene_summary(
         "         metabolism_rows: size("
         "[row IN rows WHERE row.locus_tag = lt"
         " AND row.es = 'metabolism']),\n"
-        "         transport_most_specific_rows: size("
+        "         tcdb_direct_rows: size("
         "[row IN rows WHERE row.locus_tag = lt"
-        " AND row.substrate_depth = 'most_specific']),\n"
-        "         transport_inherited_rows: size("
+        " AND row.tcdb_route = 'direct']),\n"
+        "         tcdb_family_rows: size("
         "[row IN rows WHERE row.locus_tag = lt"
-        " AND row.substrate_depth = 'inherited']),\n"
+        " AND row.tcdb_route = 'family']),\n"
         "         go_transport_rows: size("
         "[row IN rows WHERE row.locus_tag = lt"
         " AND row.es = 'go_transport']),\n"
@@ -10748,7 +11407,7 @@ def build_metabolites_by_gene_summary(
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
         "     transporter_count_total, metabolite_count_total,"
         " stereo_linked_metabolite_ids,\n"
-        "     rows_by_evidence_source, rows_by_substrate_depth,\n"
+        "     rows_by_evidence_source, rows_by_tcdb_route,\n"
         "     by_gene, rows,\n"
         "     [rid IN apoc.coll.toSet("
         "[row IN rows WHERE row.reaction_id IS NOT NULL | row.reaction_id]) |\n"
@@ -10773,10 +11432,12 @@ def build_metabolites_by_gene_summary(
         "         level_kind: head("
         "[row IN rows WHERE row.tcdb_family_id = tfid"
         " | row.tcdb_family_level_kind]),\n"
-        "         substrate_depth: CASE WHEN 'most_specific' IN "
+        "         tcdb_route: head("
         "[row IN rows WHERE row.tcdb_family_id = tfid"
-        " | row.substrate_depth]"
-        " THEN 'most_specific' ELSE 'inherited' END,\n"
+        " | row.tcdb_route]),\n"
+        "         direction: head("
+        "[row IN rows WHERE row.tcdb_family_id = tfid"
+        " | row.tcdb_family_direction]),\n"
         "         gene_count: size(apoc.coll.toSet("
         "[row IN rows WHERE row.tcdb_family_id = tfid | row.locus_tag])),\n"
         "         metabolite_count: size(apoc.coll.toSet("
@@ -10807,12 +11468,12 @@ def build_metabolites_by_gene_summary(
         "         metabolism_rows: size("
         "[row IN rows WHERE row.metabolite_id = mid"
         " AND row.es = 'metabolism']),\n"
-        "         transport_most_specific_rows: size("
+        "         tcdb_direct_rows: size("
         "[row IN rows WHERE row.metabolite_id = mid"
-        " AND row.substrate_depth = 'most_specific']),\n"
-        "         transport_inherited_rows: size("
+        " AND row.tcdb_route = 'direct']),\n"
+        "         tcdb_family_rows: size("
         "[row IN rows WHERE row.metabolite_id = mid"
-        " AND row.substrate_depth = 'inherited']),\n"
+        " AND row.tcdb_route = 'family']),\n"
         "         go_transport_rows: size("
         "[row IN rows WHERE row.metabolite_id = mid"
         " AND row.es = 'go_transport']),\n"
@@ -10826,7 +11487,7 @@ def build_metabolites_by_gene_summary(
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
         "     transporter_count_total, metabolite_count_total,"
         " stereo_linked_metabolite_ids,\n"
-        "     rows_by_evidence_source, rows_by_substrate_depth,\n"
+        "     rows_by_evidence_source, rows_by_tcdb_route,\n"
         "     by_gene, top_reactions, top_tcdb_families,\n"
         "     top_gene_categories, top_metabolites, rows,\n"
         "     apoc.coll.toSet([row IN rows | row.metabolite_id])"
@@ -10847,7 +11508,7 @@ def build_metabolites_by_gene_summary(
         "WITH total_matching, gene_count_total, reaction_count_total,\n"
         "     transporter_count_total, metabolite_count_total,"
         " stereo_linked_metabolite_ids,\n"
-        "     rows_by_evidence_source, rows_by_substrate_depth,\n"
+        "     rows_by_evidence_source, rows_by_tcdb_route,\n"
         "     by_gene, top_reactions, top_tcdb_families,\n"
         "     top_gene_categories, top_metabolites, by_element, rows,\n"
         "     apoc.coll.toSet("
@@ -10870,7 +11531,7 @@ def build_metabolites_by_gene_summary(
         "}\n"
         "RETURN total_matching, gene_count_total, reaction_count_total,\n"
         "       transporter_count_total, metabolite_count_total,\n"
-        "       rows_by_evidence_source, rows_by_substrate_depth,\n"
+        "       rows_by_evidence_source, rows_by_tcdb_route,\n"
         "       by_gene, top_reactions, top_tcdb_families,\n"
         "       top_gene_categories, top_metabolites, by_element,\n"
         "       top_metabolite_pathways, stereo_linked_metabolite_ids,\n"
@@ -10896,19 +11557,20 @@ def build_metabolites_by_gene_no_formula_count(
     metabolite_pathway_ids: list[str] | None = None,
     mass_balance: str | None = None,
     gene_categories: list[str] | None = None,
-    substrate_depth: list[str] | None = None,
     arms: tuple[str, ...] = ("metabolism", "transport"),
     include_ancestors: bool = False,
     go_namespace: list[str] | None = None,
     go_evidence: list[str] | None = None,
+    include_tcdb_family_substrates: bool = False,
 ) -> tuple[str, dict]:
     """Count rows / metabolites the `metabolite_elements` filter drops
     because the metabolite has no formula (empty `m.elements`).
 
     Same signature and per-arm filter scoping as
     `build_metabolites_by_gene_summary` (`ec_numbers` / `mass_balance`
-    metabolism-only; `substrate_depth` transport-only; transport arm always
-    deepest-attachment). `metabolite_elements` is accepted for signature
+    metabolism-only; transport arm on `tcdb_gate = 'direct'` edges, plus
+    the family-walk arm when `include_tcdb_family_substrates`).
+    `metabolite_elements` is accepted for signature
     parity but ignored: the element condition is swapped for
     `size(coalesce(m.elements, [])) = 0` in every emitted arm.
 
@@ -10942,7 +11604,7 @@ def build_metabolites_by_gene_no_formula_count(
             "(r:Reaction)-[:Reaction_has_metabolite]->(m:Metabolite)\n"
             "  WHERE " + " AND ".join(m_conditions) + "\n"
             "  RETURN g, r, null AS tf, m, 'metabolism' AS es,"
-            " null AS sdepth, null AS tscore, null AS go, null AS gdepth"
+            " null AS troute, null AS go, null AS gdepth"
         )
 
     if "transport" in arms:
@@ -10953,18 +11615,22 @@ def build_metabolites_by_gene_no_formula_count(
             exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
-            substrate_depth=substrate_depth,
         )
         t_conditions.append(_EMPTY_METABOLITE_ELEMENTS_CONDITION)
         params.update(t_params)
-        arm_blocks.append(
-            "  MATCH (g:Gene)-[gt:Gene_has_tcdb_family]->"
-            "(tf:TcdbFamily)-[r:Tcdb_family_transports_metabolite|Tcdb_family_transports_chemical_role]->(m:Metabolite|ChemicalRole)\n"
-            "  WHERE " + " AND ".join(t_conditions) + "\n"
-            "  RETURN g, null AS r, tf, m, 'transport' AS es,\n"
-            "         r.substrate_depth AS sdepth,"
-            " gt.evidence_score AS tscore, null AS go, null AS gdepth"
-        )
+        arm_blocks.append(_tcdb_direct_summary_block(t_conditions))
+        if include_tcdb_family_substrates:
+            w_conditions, _ = _metabolites_by_gene_shared_where(
+                locus_tags=locus_tags,
+                organism=organism,
+                metabolite_ids=metabolite_ids,
+                exclude_metabolite_ids=exclude_metabolite_ids,
+                metabolite_pathway_ids=metabolite_pathway_ids,
+                gene_categories=gene_categories,
+            )
+            w_conditions.append(_EMPTY_METABOLITE_ELEMENTS_CONDITION)
+            arm_blocks.append(_tcdb_family_summary_block(
+                w_conditions, anchor="gene"))
 
     if "go_transport" in arms:
         g_conditions, g_params = _metabolites_by_gene_go_transport_where(

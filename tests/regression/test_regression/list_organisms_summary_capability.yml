@@ -410,217 +410,217 @@ top_metabolic_capability:
   go_transport_metabolite_count: 144
   organism_name: Pseudomonas putida KT2440
   reaction_count: 1449
-  transported_metabolite_count: 1193
+  transported_metabolite_count: 285
 - catalyzed_metabolite_count: 1466
   go_transport_metabolite_count: 82
   organism_name: Ruegeria pomeroyi DSS-3
   reaction_count: 1377
-  transported_metabolite_count: 1146
+  transported_metabolite_count: 160
 - catalyzed_metabolite_count: 1426
   go_transport_metabolite_count: 98
   organism_name: Alteromonas macleodii EZ55
   reaction_count: 1348
-  transported_metabolite_count: 1201
+  transported_metabolite_count: 155
 - catalyzed_metabolite_count: 1356
   go_transport_metabolite_count: 72
   organism_name: Alteromonas (MarRef v6)
   reaction_count: 1263
-  transported_metabolite_count: 1200
+  transported_metabolite_count: 136
 - catalyzed_metabolite_count: 1352
   go_transport_metabolite_count: 88
   organism_name: Alteromonas macleodii MIT1002
   reaction_count: 1288
-  transported_metabolite_count: 1202
+  transported_metabolite_count: 151
 - catalyzed_metabolite_count: 1345
   go_transport_metabolite_count: 103
   organism_name: Marinobacter (MarRef v6)
   reaction_count: 1278
-  transported_metabolite_count: 1167
+  transported_metabolite_count: 166
 - catalyzed_metabolite_count: 1339
   go_transport_metabolite_count: 93
   organism_name: Alteromonas macleodii BGP6
   reaction_count: 1275
-  transported_metabolite_count: 1204
+  transported_metabolite_count: 159
 - catalyzed_metabolite_count: 1334
   go_transport_metabolite_count: 85
   organism_name: Alteromonas macleodii HOT1A3
   reaction_count: 1266
-  transported_metabolite_count: 1204
+  transported_metabolite_count: 151
 - catalyzed_metabolite_count: 1326
   go_transport_metabolite_count: 82
   organism_name: Alteromonas macleodii AD45
   reaction_count: 1259
-  transported_metabolite_count: 1202
+  transported_metabolite_count: 152
 - catalyzed_metabolite_count: 1324
   go_transport_metabolite_count: 87
   organism_name: Alteromonas mediterranea AltDE1
   reaction_count: 1249
-  transported_metabolite_count: 1192
+  transported_metabolite_count: 157
 - catalyzed_metabolite_count: 1307
   go_transport_metabolite_count: 86
   organism_name: Alteromonas macleodii ATCC27126
   reaction_count: 1251
-  transported_metabolite_count: 1202
+  transported_metabolite_count: 161
 - catalyzed_metabolite_count: 1305
   go_transport_metabolite_count: 106
   organism_name: Shewanella sp. W3-18-1
   reaction_count: 1260
-  transported_metabolite_count: 1196
+  transported_metabolite_count: 203
 - catalyzed_metabolite_count: 1304
   go_transport_metabolite_count: 94
   organism_name: Alteromonas mediterranea AltDE
   reaction_count: 1206
-  transported_metabolite_count: 1190
+  transported_metabolite_count: 148
 - catalyzed_metabolite_count: 1280
   go_transport_metabolite_count: 80
   organism_name: Alteromonas macleodii BS11
   reaction_count: 1228
-  transported_metabolite_count: 1200
+  transported_metabolite_count: 156
 - catalyzed_metabolite_count: 1214
   go_transport_metabolite_count: 64
   organism_name: Meiothermus ruber
   reaction_count: 1138
-  transported_metabolite_count: 1136
+  transported_metabolite_count: 122
 - catalyzed_metabolite_count: 1174
   go_transport_metabolite_count: 38
   organism_name: Synechococcus elongatus UTEX 2973
   reaction_count: 1058
-  transported_metabolite_count: 1138
+  transported_metabolite_count: 88
 - catalyzed_metabolite_count: 1169
   go_transport_metabolite_count: 57
   organism_name: Synechococcus elongatus PCC 7942
   reaction_count: 1033
-  transported_metabolite_count: 1138
+  transported_metabolite_count: 88
 - catalyzed_metabolite_count: 1145
   go_transport_metabolite_count: 29
   organism_name: Synechococcus WH7803
   reaction_count: 1045
-  transported_metabolite_count: 1075
+  transported_metabolite_count: 84
 - catalyzed_metabolite_count: 1135
   go_transport_metabolite_count: 52
   organism_name: Prochlorococcus MIT9303
   reaction_count: 993
-  transported_metabolite_count: 1106
+  transported_metabolite_count: 81
 - catalyzed_metabolite_count: 1128
   go_transport_metabolite_count: 38
   organism_name: Synechococcus CC9311
   reaction_count: 1039
-  transported_metabolite_count: 1117
+  transported_metabolite_count: 87
 - catalyzed_metabolite_count: 1119
   go_transport_metabolite_count: 61
   organism_name: Synechococcus WH8102
   reaction_count: 1027
-  transported_metabolite_count: 1113
+  transported_metabolite_count: 82
 - catalyzed_metabolite_count: 1104
   go_transport_metabolite_count: 47
   organism_name: Synechococcus PCC 7002
   reaction_count: 977
-  transported_metabolite_count: 1155
+  transported_metabolite_count: 98
 - catalyzed_metabolite_count: 1084
   go_transport_metabolite_count: 43
   organism_name: Prochlorococcus MIT1327
   reaction_count: 956
-  transported_metabolite_count: 1041
+  transported_metabolite_count: 81
 - catalyzed_metabolite_count: 1081
   go_transport_metabolite_count: 53
   organism_name: Prochlorococcus MIT9313
   reaction_count: 953
-  transported_metabolite_count: 1096
+  transported_metabolite_count: 77
 - catalyzed_metabolite_count: 1076
   go_transport_metabolite_count: 39
   organism_name: Prochlorococcus PAC1
   reaction_count: 959
-  transported_metabolite_count: 1048
+  transported_metabolite_count: 49
 - catalyzed_metabolite_count: 1067
   go_transport_metabolite_count: 37
   organism_name: Synechococcus sp. BL107
   reaction_count: 989
-  transported_metabolite_count: 1083
+  transported_metabolite_count: 66
 - catalyzed_metabolite_count: 1058
   go_transport_metabolite_count: 37
   organism_name: Synechococcus WH8109
   reaction_count: 983
-  transported_metabolite_count: 1090
+  transported_metabolite_count: 73
 - catalyzed_metabolite_count: 1052
   go_transport_metabolite_count: 45
   organism_name: Prochlorococcus MIT9301
   reaction_count: 945
-  transported_metabolite_count: 1005
+  transported_metabolite_count: 40
 - catalyzed_metabolite_count: 1048
   go_transport_metabolite_count: 41
   organism_name: Prochlorococcus MIT9215
   reaction_count: 950
-  transported_metabolite_count: 1011
+  transported_metabolite_count: 39
 - catalyzed_metabolite_count: 1047
   go_transport_metabolite_count: 44
   organism_name: Prochlorococcus MIT9312
   reaction_count: 943
-  transported_metabolite_count: 1006
+  transported_metabolite_count: 46
 - catalyzed_metabolite_count: 1046
   go_transport_metabolite_count: 37
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   reaction_count: 919
-  transported_metabolite_count: 1023
+  transported_metabolite_count: 48
 - catalyzed_metabolite_count: 1043
   go_transport_metabolite_count: 29
   organism_name: Prochlorococcus RSP50
   reaction_count: 948
-  transported_metabolite_count: 1027
+  transported_metabolite_count: 45
 - catalyzed_metabolite_count: 1039
   go_transport_metabolite_count: 45
   organism_name: Prochlorococcus MED4
   reaction_count: 943
-  transported_metabolite_count: 1011
+  transported_metabolite_count: 43
 - catalyzed_metabolite_count: 1039
   go_transport_metabolite_count: 46
   organism_name: Prochlorococcus NATL1A
   reaction_count: 935
-  transported_metabolite_count: 1051
+  transported_metabolite_count: 49
 - catalyzed_metabolite_count: 1036
   go_transport_metabolite_count: 37
   organism_name: Prochlorococcus MIT0801
   reaction_count: 934
-  transported_metabolite_count: 1018
+  transported_metabolite_count: 49
 - catalyzed_metabolite_count: 1029
   go_transport_metabolite_count: 44
   organism_name: Prochlorococcus NATL2A
   reaction_count: 927
-  transported_metabolite_count: 1019
+  transported_metabolite_count: 49
 - catalyzed_metabolite_count: 1027
   go_transport_metabolite_count: 25
   organism_name: Prochlorococcus MIT1314
   reaction_count: 928
-  transported_metabolite_count: 1002
+  transported_metabolite_count: 39
 - catalyzed_metabolite_count: 1025
   go_transport_metabolite_count: 43
   organism_name: Prochlorococcus SB
   reaction_count: 931
-  transported_metabolite_count: 1003
+  transported_metabolite_count: 43
 - catalyzed_metabolite_count: 1022
   go_transport_metabolite_count: 34
   organism_name: Prochlorococcus MIT0604
   reaction_count: 930
-  transported_metabolite_count: 1002
+  transported_metabolite_count: 40
 - catalyzed_metabolite_count: 1018
   go_transport_metabolite_count: 40
   organism_name: Prochlorococcus MIT9515
   reaction_count: 926
-  transported_metabolite_count: 1044
+  transported_metabolite_count: 45
 - catalyzed_metabolite_count: 1017
   go_transport_metabolite_count: 41
   organism_name: Prochlorococcus AS9601
   reaction_count: 924
-  transported_metabolite_count: 1004
+  transported_metabolite_count: 39
 - catalyzed_metabolite_count: 1014
   go_transport_metabolite_count: 38
   organism_name: Prochlorococcus MIT9202
   reaction_count: 921
-  transported_metabolite_count: 1010
+  transported_metabolite_count: 38
 - catalyzed_metabolite_count: 1003
   go_transport_metabolite_count: 56
   organism_name: Thermosynechococcus vestitus BP-1
   reaction_count: 894
-  transported_metabolite_count: 1091
+  transported_metabolite_count: 87
 total_entries: 47
 total_matching: 47
 truncated: true

@@ -5822,6 +5822,13 @@ _GBM_METAB_ROW = {
     "gene_name": "ureC",
     "product": "urease",
     "evidence_source": "metabolism",
+    # TCDB cleanup: transport-arm fields explicit None on other arms
+    "tcdb_route": None,
+    "tcdb_calls": None,
+    "tcdb_identity": None,
+    "tcdb_direction": None,
+    "attached_tcdb_id": None,
+    "tcdb_substrate_system_count": None,
     # Sparse-stripped at api/ — surface as None by Pydantic default
     "reaction_id": "kegg.reaction:R00131",
     "reaction_name": "Urea + 2H2O => CO2 + 2NH3",
@@ -5839,8 +5846,13 @@ _GBM_TRANS_ROW = {
     "gene_name": "urtE",
     "product": "ABC-type urea transporter",
     "evidence_source": "transport",
-    "substrate_depth": "most_specific",
-    "tcdb_evidence_score": 0.8,
+    # TCDB cleanup surface: direct-route row (gene -> tc_system, gate 'direct')
+    "tcdb_route": "direct",
+    "tcdb_calls": ["diamond_best_hit", "eggnog"],
+    "tcdb_identity": 71.3,
+    "tcdb_direction": "uptake",
+    "attached_tcdb_id": "tcdb:3.A.1.4.5",
+    "tcdb_substrate_system_count": None,
     "tcdb_family_id": "tcdb:3.A.1.4.5",
     "tcdb_family_name": "tcdb:3.A.1.4.5",
     "metabolite_id": "kegg.compound:C00086",
@@ -5872,17 +5884,22 @@ _GBM_SAMPLE_API_RETURN = {
             "reaction_count": 4,
             "transporter_count": 14,
             "metabolism_rows": 4,
-            "transport_most_specific_rows": 10,
-            "transport_inherited_rows": 9,
+            "tcdb_direct_rows": 19,
+            "tcdb_family_rows": 0,
         },
     ],
     "by_evidence_source": [
         {"evidence_source": "metabolism", "count": 4},
         {"evidence_source": "transport", "count": 19},
     ],
-    "by_substrate_depth": [
-        {"substrate_depth": "most_specific", "count": 10},
-        {"substrate_depth": "inherited", "count": 9},
+    "by_tcdb_route": [
+        {"tcdb_route": "direct", "count": 19},
+    ],
+    # Default call (walk off): what include_tcdb_family_substrates=True adds.
+    "tcdb_family_substrates_not_shown": {"genes": 2, "metabolites": 1, "rows": 2},
+    "tcdb_family_substrates_skipped": [
+        {"locus_tag": "PMM0234", "tcdb_id": "tcdb:3.A.1",
+         "tcdb_substrate_count": 551},
     ],
     "top_reactions": [
         {
@@ -5897,8 +5914,9 @@ _GBM_SAMPLE_API_RETURN = {
         {
             "tcdb_family_id": "tcdb:3.A.1.4.5",
             "tcdb_family_name": "tcdb:3.A.1.4.5",
-            "level_kind": "tc_specificity",
-            "substrate_depth": "most_specific",
+            "level_kind": "tc_system",
+            "tcdb_route": "direct",
+            "direction": "uptake",
             "gene_count": 5,
             "metabolite_count": 1,
         },
@@ -5914,10 +5932,9 @@ _GBM_SAMPLE_API_RETURN = {
             "transporter_count": 1,
             "metabolite_count": 1,
             "metabolism_rows": 0,
-            "transport_most_specific_rows": 2,
-            "transport_inherited_rows": 0,
-            "transport_substrate_resolution": "resolved",
-            "tcdb_evidence_score_max": 0.8,
+            "tcdb_direct_rows": 2,
+            "tcdb_family_rows": 0,
+            "tcdb_assignment_count": 1,
         },
     ],
     "gene_count_total": 18,
@@ -5974,13 +5991,17 @@ class TestGenesByMetaboliteWrapper:
         # Sparse: per-arm-specific fields on the OTHER arm are None
         assert metab.tcdb_family_id is None
         assert metab.tcdb_family_name is None
-        assert metab.substrate_depth is None
-        assert metab.tcdb_evidence_score is None
-        assert not hasattr(metab, "transport_confidence")
+        # TCDB cleanup: the new transport-arm fields are None on metabolism rows
+        for f in ("tcdb_route", "tcdb_calls", "tcdb_identity", "tcdb_direction",
+                  "attached_tcdb_id", "tcdb_substrate_system_count"):
+            assert getattr(metab, f) is None, f
+        for retired in ("substrate_depth", "tcdb_evidence_score",
+                        "transport_substrate_resolution", "transport_confidence"):
+            assert not hasattr(metab, retired), retired
 
     @pytest.mark.asyncio
     async def test_compact_transport_row_fields(self, tool_fns, mock_ctx):
-        """Transport row populates tcdb_*, substrate_depth; metabolism
+        """Transport row populates tcdb_* (direct route); metabolism
         per-arm-specific fields are None."""
         with patch(
             "multiomics_explorer.api.functions.genes_by_metabolite",
@@ -5996,8 +6017,15 @@ class TestGenesByMetaboliteWrapper:
         )
         assert trans.locus_tag == "PMM0974"
         assert trans.tcdb_family_id == "tcdb:3.A.1.4.5"
-        assert trans.substrate_depth == "most_specific"
-        assert trans.tcdb_evidence_score == 0.8
+        # TCDB cleanup: direct-route row fields
+        assert trans.tcdb_route == "direct"
+        assert trans.tcdb_calls == ["diamond_best_hit", "eggnog"]
+        assert trans.tcdb_identity == 71.3
+        assert trans.tcdb_direction == "uptake"
+        assert trans.attached_tcdb_id == trans.tcdb_family_id
+        assert trans.tcdb_substrate_system_count is None
+        assert not hasattr(trans, "substrate_depth")
+        assert not hasattr(trans, "tcdb_evidence_score")
         # Sparse: metabolism-specific fields are None on transport rows
         assert trans.reaction_id is None
         assert trans.reaction_name is None
@@ -6024,7 +6052,7 @@ class TestGenesByMetaboliteWrapper:
             "metabolite_smiles": "NC(N)=O",
             "metabolite_mnxm_id": "MNXM731",
             "metabolite_hmdb_id": "HMDB0000294",
-            "tcdb_level_kind": "tc_specificity",
+            "tcdb_level_kind": "tc_system",
             "tc_class_id": "tcdb:3",
         }
         api_return = {
@@ -6057,7 +6085,7 @@ class TestGenesByMetaboliteWrapper:
         assert m.tc_class_id is None
 
         assert t.gene_category == "Transport"
-        assert t.tcdb_level_kind == "tc_specificity"
+        assert t.tcdb_level_kind == "tc_system"
         assert t.tc_class_id == "tcdb:3"
         # Sparse: reaction verbose fields stay None on transport row
         assert t.reaction_mnxr_id is None
@@ -6151,19 +6179,24 @@ class TestGenesByMetaboliteWrapper:
         assert len(result.by_metabolite) == 1
         assert result.by_metabolite[0].metabolite_id == "kegg.compound:C00086"
         assert result.by_metabolite[0].metabolism_rows == 4
-        assert result.by_metabolite[0].transport_most_specific_rows == 10
-        assert result.by_metabolite[0].transport_inherited_rows == 9
-        assert not hasattr(result.by_metabolite[0], "transport_substrate_confirmed_rows")
+        assert result.by_metabolite[0].tcdb_direct_rows == 19
+        assert result.by_metabolite[0].tcdb_family_rows == 0
+        for retired in ("transport_most_specific_rows", "transport_inherited_rows",
+                        "transport_substrate_confirmed_rows"):
+            assert not hasattr(result.by_metabolite[0], retired), retired
 
         assert len(result.by_evidence_source) == 2
         es_set = {e.evidence_source for e in result.by_evidence_source}
         assert es_set == {"metabolism", "transport"}
 
-        assert len(result.by_substrate_depth) == 2
-        tc_set = {
-            e.substrate_depth for e in result.by_substrate_depth
-        }
-        assert tc_set == {"most_specific", "inherited"}
+        assert [(e.tcdb_route, e.count) for e in result.by_tcdb_route] == [
+            ("direct", 19)]
+        assert not hasattr(result, "by_substrate_depth")
+        hint = result.tcdb_family_substrates_not_shown
+        assert (hint.genes, hint.metabolites, hint.rows) == (2, 1, 2)
+        skipped = result.tcdb_family_substrates_skipped
+        assert [(s.locus_tag, s.tcdb_id, s.tcdb_substrate_count)
+                for s in skipped] == [("PMM0234", "tcdb:3.A.1", 551)]
 
         assert len(result.top_reactions) == 1
         assert result.top_reactions[0].reaction_id == "kegg.reaction:R00131"
@@ -6172,18 +6205,23 @@ class TestGenesByMetaboliteWrapper:
         assert (
             result.top_tcdb_families[0].tcdb_family_id == "tcdb:3.A.1.4.5"
         )
-        assert (
-            result.top_tcdb_families[0].substrate_depth
-            == "most_specific"
-        )
+        fam = result.top_tcdb_families[0]
+        assert fam.level_kind == "tc_system"
+        assert fam.tcdb_route == "direct"
+        assert fam.direction == "uptake"
+        assert not hasattr(fam, "substrate_depth")
 
         assert len(result.top_gene_categories) == 1
         assert result.top_gene_categories[0].category == "Transport"
 
         assert len(result.top_genes) == 1
-        assert result.top_genes[0].locus_tag == "PMM0974"
-        assert result.top_genes[0].transport_substrate_resolution == "resolved"
-        assert result.top_genes[0].tcdb_evidence_score_max == 0.8
+        tg = result.top_genes[0]
+        assert tg.locus_tag == "PMM0974"
+        assert (tg.tcdb_direct_rows, tg.tcdb_family_rows) == (2, 0)
+        assert tg.tcdb_assignment_count == 1
+        for retired in ("transport_substrate_resolution",
+                        "tcdb_evidence_score_max"):
+            assert not hasattr(tg, retired), retired
 
     @pytest.mark.asyncio
     async def test_total_count_fields(self, tool_fns, mock_ctx):
@@ -6217,15 +6255,15 @@ class TestGenesByMetaboliteWrapper:
         assert result.warnings == []
 
     @pytest.mark.asyncio
-    async def test_warnings_field_carries_inherited_string(
+    async def test_warnings_field_carries_family_substrates_string(
         self, tool_fns, mock_ctx,
     ):
         api_return = {
             **self._SAMPLE_API_RETURN,
             "warnings": [
-                "Most transport rows are `inherited` (23 of 29) — rolled up "
-                "from family-level transport potential. Use "
-                "substrate_depth=['most_specific'] to narrow."
+                "2 more genes reach these metabolites only through a family "
+                "or subfamily call (e.g. phnC, phnD); pass "
+                "include_tcdb_family_substrates=True"
             ],
         }
         with patch(
@@ -6237,12 +6275,31 @@ class TestGenesByMetaboliteWrapper:
                 metabolite_ids=["kegg.compound:C00088"],
                 organism="Prochlorococcus MED4",
             )
-        assert any("inherited" in w for w in result.warnings)
+        assert any("include_tcdb_family_substrates=True" in w
+                   for w in result.warnings)
 
-    # ---- substrate_depth migration (spec 2026-08-20) ----
+    # ---- TCDB cleanup surface: substrate_depth retired, family walk opt-in ----
 
     @pytest.mark.asyncio
-    async def test_substrate_depth_forwarded_as_list(self, tool_fns, mock_ctx):
+    async def test_include_tcdb_family_substrates_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["genes_by_metabolite"](
+                mock_ctx,
+                metabolite_ids=["kegg.compound:C00009"],
+                organism="Prochlorococcus MED4",
+                include_tcdb_family_substrates=True,
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["include_tcdb_family_substrates"] is True
+        assert "substrate_depth" not in kwargs
+
+    @pytest.mark.asyncio
+    async def test_include_tcdb_family_substrates_defaults_false_on_the_call(
+        self, tool_fns, mock_ctx,
+    ):
         with patch(
             "multiomics_explorer.api.functions.genes_by_metabolite",
             return_value=self._SAMPLE_API_RETURN,
@@ -6251,39 +6308,13 @@ class TestGenesByMetaboliteWrapper:
                 mock_ctx,
                 metabolite_ids=["kegg.compound:C00086"],
                 organism="Prochlorococcus MED4",
-                substrate_depth=["most_specific", "inherited"],
             )
-        kwargs = mock_api.call_args.kwargs
-        assert kwargs["substrate_depth"] == ["most_specific", "inherited"]
-        assert "transport_confidence" not in kwargs
+        assert mock_api.call_args.kwargs["include_tcdb_family_substrates"] is False
 
     @pytest.mark.asyncio
-    @pytest.mark.parametrize("old_value", ["substrate_confirmed", "family_inferred"])
-    async def test_substrate_depth_old_value_strings_raise_tool_error(
-        self, tool_fns, mock_ctx, old_value,
-    ):
-        """Retired `transport_confidence` value strings surface as ToolError
-        with a rename pointer (api ValueError → ToolError)."""
-        pointer = {"substrate_confirmed": "most_specific",
-                   "family_inferred": "inherited"}[old_value]
-        with patch(
-            "multiomics_explorer.api.functions.genes_by_metabolite",
-            side_effect=ValueError(
-                f"substrate_depth value {old_value!r} was renamed to "
-                f"{pointer!r}; valid values: ['most_specific', 'inherited']"
-            ),
-        ):
-            with pytest.raises(ToolError, match=pointer):
-                await tool_fns["genes_by_metabolite"](
-                    mock_ctx,
-                    metabolite_ids=["kegg.compound:C00086"],
-                    organism="Prochlorococcus MED4",
-                    substrate_depth=[old_value],
-                )
-
-    @pytest.mark.asyncio
-    async def test_transport_confidence_kwarg_rejected(self, tool_fns, mock_ctx):
-        """The old parameter name is gone from the wrapper signature."""
+    @pytest.mark.parametrize("retired", ["substrate_depth", "transport_confidence"])
+    async def test_retired_kwargs_rejected(self, tool_fns, mock_ctx, retired):
+        """No alias: the retired params are gone from the wrapper signature."""
         with patch(
             "multiomics_explorer.api.functions.genes_by_metabolite",
             return_value=self._SAMPLE_API_RETURN,
@@ -6293,83 +6324,134 @@ class TestGenesByMetaboliteWrapper:
                     mock_ctx,
                     metabolite_ids=["kegg.compound:C00086"],
                     organism="Prochlorococcus MED4",
-                    transport_confidence="substrate_confirmed",
+                    **{retired: ["most_specific"]},
                 )
 
-    def test_substrate_depth_param_literal(self, tool_fns):
-        """Wrapper param is `list[Literal['most_specific','inherited']] | None`."""
+    def test_signature_params(self, tool_fns):
         import inspect
-        import typing
         sig = inspect.signature(tool_fns["genes_by_metabolite"])
+        assert "substrate_depth" not in sig.parameters
         assert "transport_confidence" not in sig.parameters
-        ann = sig.parameters["substrate_depth"].annotation
-        # Annotated[list[Literal[...]] | None, Field(...)] → unwrap
-        inner = typing.get_args(ann)[0] if typing.get_origin(ann) is typing.Annotated else ann
-        assert "most_specific" in repr(inner) and "inherited" in repr(inner)
-        assert "substrate_confirmed" not in repr(inner)
-        assert sig.parameters["substrate_depth"].default is None
+        assert sig.parameters["include_tcdb_family_substrates"].default is False
+
+    @pytest.mark.asyncio
+    async def test_walk_on_envelope_hint_is_null(self, tool_fns, mock_ctx):
+        """With the walk on, family rows are in `results`, so the hint is
+        None; family rows validate as `tcdb_route='family'` rows."""
+        family_row = {
+            **_GBM_TRANS_ROW,
+            "locus_tag": "PMM0673", "gene_name": "phnD",
+            "metabolite_id": "kegg.compound:C00009",
+            "metabolite_name": "Orthophosphate",
+            "tcdb_route": "family",
+            "tcdb_family_id": "tcdb:3.A.1.9",
+            "tcdb_family_name": "The Phosphonate Uptake Transporter (PhnCDE) Family",
+            "attached_tcdb_id": "tcdb:3.A.1.9",
+            "tcdb_substrate_system_count": 5,
+            "tcdb_calls": ["diamond_best_hit", "diamond_tier", "eggnog"],
+            "tcdb_identity": None,
+        }
+        ret = {
+            **self._SAMPLE_API_RETURN,
+            "by_tcdb_route": [{"tcdb_route": "direct", "count": 19},
+                              {"tcdb_route": "family", "count": 1}],
+            "tcdb_family_substrates_not_shown": None,
+            "results": [family_row],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=ret,
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx, metabolite_ids=["kegg.compound:C00009"],
+                organism="Prochlorococcus MED4",
+                include_tcdb_family_substrates=True,
+            )
+        assert result.tcdb_family_substrates_not_shown is None
+        assert [b.tcdb_route for b in result.by_tcdb_route] == ["direct", "family"]
+        row = result.results[0]
+        assert row.evidence_source == "transport"
+        assert row.tcdb_route == "family"
+        assert row.tcdb_family_id == row.attached_tcdb_id == "tcdb:3.A.1.9"
+        assert row.tcdb_substrate_system_count == 5
+        assert row.tcdb_identity is None
 
     def test_row_model_fields(self):
-        """GeneReactionMetaboliteTriplet: `transport_confidence` gone;
-        `substrate_depth` (Literal | None) + `tcdb_evidence_score`
-        (float | None) present, both defaulting to None (metabolism rows)."""
+        """GeneReactionMetaboliteTriplet: substrate_depth / tcdb_evidence_score
+        / transport_substrate_resolution gone; the six TCDB-cleanup fields
+        present, defaulting to None (metabolism rows)."""
         from multiomics_explorer.mcp_server.tools import (
             GeneReactionMetaboliteTriplet,
         )
         fields = GeneReactionMetaboliteTriplet.model_fields
-        assert "transport_confidence" not in fields
-        assert "substrate_depth" in fields
-        assert "tcdb_evidence_score" in fields
-        # Mirrors real Cypher output: the metabolism-arm builder always
-        # RETURNs `null AS substrate_depth` / `null AS tcdb_evidence_score`
-        # explicitly (SparseRow keeps a key iff the constructor received
-        # it, even as None — see docstring on SparseRow).
+        for retired in ("transport_confidence", "substrate_depth",
+                        "tcdb_evidence_score", "transport_substrate_resolution"):
+            assert retired not in fields, retired
+        for new in ("tcdb_route", "tcdb_calls", "tcdb_identity",
+                    "tcdb_direction", "attached_tcdb_id",
+                    "tcdb_substrate_system_count"):
+            assert new in fields, new
+            assert fields[new].default is None, new
+            assert fields[new].description, new
         row = GeneReactionMetaboliteTriplet(
             locus_tag="PMM0001", evidence_source="metabolism",
             metabolite_id="kegg.compound:C00086", metabolite_name="Urea",
-            substrate_depth=None, tcdb_evidence_score=None,
+            tcdb_route=None, tcdb_identity=None,
         )
-        assert row.substrate_depth is None
-        assert row.tcdb_evidence_score is None
-        assert "substrate_depth" in row.model_dump()
-        assert "tcdb_evidence_score" in row.model_dump()
-        with pytest.raises(Exception):
+        assert "tcdb_route" in row.model_dump()
+        assert row.model_dump()["tcdb_route"] is None
+
+    @pytest.mark.parametrize("route", ["direct", "family"])
+    def test_tcdb_route_literal_accepts(self, route):
+        from multiomics_explorer.mcp_server.tools import (
+            GeneReactionMetaboliteTriplet,
+        )
+        row = GeneReactionMetaboliteTriplet(
+            locus_tag="PMM0001", evidence_source="transport",
+            metabolite_id="kegg.compound:C00086", metabolite_name="Urea",
+            tcdb_route=route,
+        )
+        assert row.tcdb_route == route
+
+    @pytest.mark.parametrize("bad", ["most_specific", "inherited", "bogus"])
+    def test_tcdb_route_literal_rejects(self, bad):
+        from pydantic import ValidationError
+        from multiomics_explorer.mcp_server.tools import (
+            GeneReactionMetaboliteTriplet,
+        )
+        with pytest.raises(ValidationError):
             GeneReactionMetaboliteTriplet(
                 locus_tag="PMM0001", evidence_source="transport",
                 metabolite_id="kegg.compound:C00086", metabolite_name="Urea",
-                substrate_depth="substrate_confirmed",
+                tcdb_route=bad,
             )
 
     def test_gbm_envelope_models(self):
-        """GbmBySubstrateDepth (key `substrate_depth`) replaces
-        GbmByTransportConfidence; GbmByMetabolite / GbmTopGene carry the
-        renamed counters; GbmTopGene gains the gene-level TCDB facts;
-        GbmTopTcdbFamily derives `substrate_depth`, not transport_confidence."""
+        """GbmByTcdbRoute replaces GbmBySubstrateDepth; GbmByMetabolite /
+        GbmTopGene carry tcdb_direct_rows / tcdb_family_rows; GbmTopGene
+        carries tcdb_assignment_count and drops the resolution / score;
+        GbmTopTcdbFamily carries tcdb_route + direction."""
         import multiomics_explorer.mcp_server.tools as tools_mod
         assert not hasattr(tools_mod, "GbmByTransportConfidence")
-        depth_fields = tools_mod.GbmBySubstrateDepth.model_fields
-        assert set(depth_fields) == {"substrate_depth", "count"}
-        assert "by_substrate_depth" in tools_mod.GenesByMetaboliteResponse.model_fields
-        assert "by_transport_confidence" not in tools_mod.GenesByMetaboliteResponse.model_fields
+        assert not hasattr(tools_mod, "GbmBySubstrateDepth")
+        assert set(tools_mod.GbmByTcdbRoute.model_fields) == {"tcdb_route", "count"}
+        resp = tools_mod.GenesByMetaboliteResponse.model_fields
+        for f in ("by_tcdb_route", "tcdb_family_substrates_not_shown",
+                  "tcdb_family_substrates_skipped"):
+            assert f in resp, f
+        assert "by_substrate_depth" not in resp
         for model in (tools_mod.GbmByMetabolite, tools_mod.GbmTopGene):
             f = model.model_fields
-            assert "transport_most_specific_rows" in f
-            assert "transport_inherited_rows" in f
-            assert "transport_substrate_confirmed_rows" not in f
-            assert "transport_family_inferred_rows" not in f
+            assert "tcdb_direct_rows" in f and "tcdb_family_rows" in f
+            assert "transport_most_specific_rows" not in f
+            assert "transport_inherited_rows" not in f
         tg = tools_mod.GbmTopGene.model_fields
-        assert "transport_substrate_resolution" in tg
-        assert "tcdb_evidence_score_max" in tg
-        entry = tools_mod.GbmTopGene(
-            locus_tag="PMM0001", reaction_count=1, transporter_count=0,
-            metabolite_count=1, metabolism_rows=1,
-            transport_most_specific_rows=0, transport_inherited_rows=0,
-        )
-        assert entry.transport_substrate_resolution is None
-        assert entry.tcdb_evidence_score_max is None
+        assert "tcdb_assignment_count" in tg
+        assert "transport_substrate_resolution" not in tg
+        assert "tcdb_evidence_score_max" not in tg
         tf = tools_mod.GbmTopTcdbFamily.model_fields
-        assert "substrate_depth" in tf
-        assert "transport_confidence" not in tf
+        assert "tcdb_route" in tf and "direction" in tf
+        assert "substrate_depth" not in tf
 
     @pytest.mark.asyncio
     async def test_params_forwarded(self, tool_fns, mock_ctx):
@@ -6386,7 +6468,7 @@ class TestGenesByMetaboliteWrapper:
                 metabolite_pathway_ids=["kegg.pathway:ko00910"],
                 mass_balance="balanced",
                 gene_categories=["Transport"],
-                substrate_depth=["most_specific"],
+                include_tcdb_family_substrates=True,
                 evidence_sources=["transport"],
                 summary=False,
                 verbose=True,
@@ -6403,7 +6485,8 @@ class TestGenesByMetaboliteWrapper:
         )
         assert kwargs["mass_balance"] == "balanced"
         assert kwargs["gene_categories"] == ["Transport"]
-        assert kwargs["substrate_depth"] == ["most_specific"]
+        assert kwargs["include_tcdb_family_substrates"] is True
+        assert "substrate_depth" not in kwargs
         assert kwargs["evidence_sources"] == ["transport"]
         assert kwargs["verbose"] is True
         assert kwargs["limit"] == 10
@@ -6463,7 +6546,9 @@ class TestGenesByMetaboliteWrapper:
             "not_matched": [],
             "by_metabolite": [],
             "by_evidence_source": [],
-            "by_substrate_depth": [],
+            "by_tcdb_route": [],
+            "tcdb_family_substrates_not_shown": {"genes": 0, "metabolites": 0, "rows": 0},
+            "tcdb_family_substrates_skipped": [],
             "top_reactions": [],
             "top_tcdb_families": [],
             "top_gene_categories": [],
@@ -6476,8 +6561,8 @@ class TestGenesByMetaboliteWrapper:
                 {
                     "locus_tag": "PMM0001",
                     "evidence_source": "metabolism",
-                    "substrate_depth": None,    # None preserved
-                    "tcdb_evidence_score": None,  # None preserved
+                    "tcdb_route": None,      # None preserved
+                    "tcdb_identity": None,   # None preserved
                     "reaction_id": "kegg.reaction:R00131",
                     "reaction_name": "test reaction",
                     "ec_numbers": ["3.5.1.5"],
@@ -6490,14 +6575,14 @@ class TestGenesByMetaboliteWrapper:
                 {
                     "locus_tag": "PMM0392",
                     "evidence_source": "transport",
-                    "substrate_depth": "inherited",
-                    "tcdb_evidence_score": 0.2,
+                    "tcdb_route": "direct",
+                    "tcdb_identity": 45.0,
                     "reaction_id": None,                # None preserved
                     "reaction_name": None,               # None preserved
                     "ec_numbers": None,                   # None preserved
                     "mass_balance": None,                  # None preserved
-                    "tcdb_family_id": "tcdb:3.A.1",
-                    "tcdb_family_name": "ABC superfamily",
+                    "tcdb_family_id": "tcdb:3.A.1.4.5",
+                    "tcdb_family_name": "urea porter",
                     "metabolite_id": "kegg.compound:C00086",
                     "metabolite_name": "Urea",
                 },
@@ -6524,10 +6609,11 @@ class TestGenesByMetaboliteWrapper:
         )
 
         # Cross-arm None values must be present, not stripped
-        assert "substrate_depth" in metab_row
-        assert metab_row["substrate_depth"] is None
-        assert "tcdb_evidence_score" in metab_row
-        assert metab_row["tcdb_evidence_score"] is None
+        assert "tcdb_route" in metab_row
+        assert metab_row["tcdb_route"] is None
+        assert "tcdb_identity" in metab_row
+        assert metab_row["tcdb_identity"] is None
+        assert "substrate_depth" not in metab_row
         assert "transport_confidence" not in metab_row
         assert "tcdb_family_id" in metab_row
         assert metab_row["tcdb_family_id"] is None
@@ -6561,6 +6647,13 @@ _MBG_METAB_ROW = {
     "gene_name": "ureA",
     "product": "urease gamma subunit",
     "evidence_source": "metabolism",
+    # TCDB cleanup: transport-arm fields explicit None on other arms
+    "tcdb_route": None,
+    "tcdb_calls": None,
+    "tcdb_identity": None,
+    "tcdb_direction": None,
+    "attached_tcdb_id": None,
+    "tcdb_substrate_system_count": None,
     "reaction_id": "kegg.reaction:R00131",
     "reaction_name": "Urea + 2H2O => CO2 + 2NH3",
     "ec_numbers": ["3.5.1.5"],
@@ -6577,8 +6670,13 @@ _MBG_TRANS_ROW = {
     "gene_name": "urtE",
     "product": "ABC-type urea transporter",
     "evidence_source": "transport",
-    "substrate_depth": "most_specific",
-    "tcdb_evidence_score": 0.8,
+    # TCDB cleanup surface: direct-route row (gene -> tc_system, gate 'direct')
+    "tcdb_route": "direct",
+    "tcdb_calls": ["diamond_best_hit", "eggnog"],
+    "tcdb_identity": 71.3,
+    "tcdb_direction": "uptake",
+    "attached_tcdb_id": "tcdb:3.A.1.4.5",
+    "tcdb_substrate_system_count": None,
     "tcdb_family_id": "tcdb:3.A.1.4.5",
     "tcdb_family_name": "tcdb:3.A.1.4.5",
     "metabolite_id": "kegg.compound:C00086",
@@ -6612,20 +6710,20 @@ _MBG_SAMPLE_API_RETURN = {
             "reaction_count": 1,
             "transporter_count": 1,
             "metabolism_rows": 4,
-            "transport_most_specific_rows": 1,
-            "transport_inherited_rows": 0,
-            "transport_substrate_resolution": "resolved",
-            "tcdb_evidence_score_max": 0.8,
+            "tcdb_direct_rows": 1,
+            "tcdb_family_rows": 0,
+            "tcdb_assignment_count": 1,
         },
     ],
     "by_evidence_source": [
         {"evidence_source": "metabolism", "count": 12},
         {"evidence_source": "transport", "count": 3},
     ],
-    "by_substrate_depth": [
-        {"substrate_depth": "most_specific", "count": 2},
-        {"substrate_depth": "inherited", "count": 1},
+    "by_tcdb_route": [
+        {"tcdb_route": "direct", "count": 3},
     ],
+    "tcdb_family_substrates_not_shown": {"genes": 1, "metabolites": 2, "rows": 2},
+    "tcdb_family_substrates_skipped": [],
     "by_element": [
         {"element": "H", "metabolite_count": 3},
         {"element": "O", "metabolite_count": 3},
@@ -6641,8 +6739,8 @@ _MBG_SAMPLE_API_RETURN = {
             "reaction_count": 1,
             "transporter_count": 1,
             "metabolism_rows": 12,
-            "transport_most_specific_rows": 2,
-            "transport_inherited_rows": 1,
+            "tcdb_direct_rows": 3,
+            "tcdb_family_rows": 0,
         },
     ],
     "top_reactions": [
@@ -6658,8 +6756,9 @@ _MBG_SAMPLE_API_RETURN = {
         {
             "tcdb_family_id": "tcdb:3.A.1.4.5",
             "tcdb_family_name": "tcdb:3.A.1.4.5",
-            "level_kind": "tc_specificity",
-            "substrate_depth": "most_specific",
+            "level_kind": "tc_system",
+            "tcdb_route": "direct",
+            "direction": "uptake",
             "gene_count": 1,
             "metabolite_count": 1,
         },
@@ -6733,9 +6832,13 @@ class TestMetabolitesByGeneWrapper:
         # Sparse: per-arm-specific transport fields are None
         assert metab.tcdb_family_id is None
         assert metab.tcdb_family_name is None
-        assert metab.substrate_depth is None
-        assert metab.tcdb_evidence_score is None
-        assert not hasattr(metab, "transport_confidence")
+        # TCDB cleanup: the new transport-arm fields are None on metabolism rows
+        for f in ("tcdb_route", "tcdb_calls", "tcdb_identity", "tcdb_direction",
+                  "attached_tcdb_id", "tcdb_substrate_system_count"):
+            assert getattr(metab, f) is None, f
+        for retired in ("substrate_depth", "tcdb_evidence_score",
+                        "transport_substrate_resolution", "transport_confidence"):
+            assert not hasattr(metab, retired), retired
 
     @pytest.mark.asyncio
     async def test_compact_transport_row_fields(self, tool_fns, mock_ctx):
@@ -6753,8 +6856,15 @@ class TestMetabolitesByGeneWrapper:
         )
         assert trans.locus_tag == "PMM0974"
         assert trans.tcdb_family_id == "tcdb:3.A.1.4.5"
-        assert trans.substrate_depth == "most_specific"
-        assert trans.tcdb_evidence_score == 0.8
+        # TCDB cleanup: direct-route row fields
+        assert trans.tcdb_route == "direct"
+        assert trans.tcdb_calls == ["diamond_best_hit", "eggnog"]
+        assert trans.tcdb_identity == 71.3
+        assert trans.tcdb_direction == "uptake"
+        assert trans.attached_tcdb_id == trans.tcdb_family_id
+        assert trans.tcdb_substrate_system_count is None
+        assert not hasattr(trans, "substrate_depth")
+        assert not hasattr(trans, "tcdb_evidence_score")
         # Sparse: metabolism-specific fields are None on transport rows
         assert trans.reaction_id is None
         assert trans.reaction_name is None
@@ -6780,7 +6890,7 @@ class TestMetabolitesByGeneWrapper:
             "metabolite_smiles": "NC(N)=O",
             "metabolite_mnxm_id": "MNXM731",
             "metabolite_hmdb_id": "HMDB0000294",
-            "tcdb_level_kind": "tc_specificity",
+            "tcdb_level_kind": "tc_system",
             "tc_class_id": "tcdb:3",
         }
         api_return = {
@@ -6811,7 +6921,7 @@ class TestMetabolitesByGeneWrapper:
         assert m.tc_class_id is None
 
         assert t.gene_category == "Transport"
-        assert t.tcdb_level_kind == "tc_specificity"
+        assert t.tcdb_level_kind == "tc_system"
         assert t.tc_class_id == "tcdb:3"
         # Sparse: reaction verbose fields stay None on transport row
         assert t.reaction_mnxr_id is None
@@ -6911,20 +7021,24 @@ class TestMetabolitesByGeneWrapper:
         # by_gene — input-bounded gene rollup
         assert len(result.by_gene) == 1
         assert result.by_gene[0].locus_tag == "PMM0963"
-        assert result.by_gene[0].metabolism_rows == 4
-        assert result.by_gene[0].transport_most_specific_rows == 1
-        assert result.by_gene[0].transport_substrate_resolution == "resolved"
-        assert result.by_gene[0].tcdb_evidence_score_max == 0.8
+        bg = result.by_gene[0]
+        assert bg.metabolism_rows == 4
+        assert (bg.tcdb_direct_rows, bg.tcdb_family_rows) == (1, 0)
+        assert bg.tcdb_assignment_count == 1
+        for retired in ("transport_most_specific_rows", "transport_inherited_rows",
+                        "transport_substrate_resolution", "tcdb_evidence_score_max"):
+            assert not hasattr(bg, retired), retired
 
         assert len(result.by_evidence_source) == 2
         es_set = {e.evidence_source for e in result.by_evidence_source}
         assert es_set == {"metabolism", "transport"}
 
-        assert len(result.by_substrate_depth) == 2
-        tc_set = {
-            e.substrate_depth for e in result.by_substrate_depth
-        }
-        assert tc_set == {"most_specific", "inherited"}
+        assert [(e.tcdb_route, e.count) for e in result.by_tcdb_route] == [
+            ("direct", 3)]
+        assert not hasattr(result, "by_substrate_depth")
+        hint = result.tcdb_family_substrates_not_shown
+        assert (hint.genes, hint.metabolites, hint.rows) == (1, 2, 2)
+        assert result.tcdb_family_substrates_skipped == []
 
         # NEW MBG: by_element rollup
         assert len(result.by_element) == 4
@@ -6938,6 +7052,8 @@ class TestMetabolitesByGeneWrapper:
             == "kegg.compound:C00086"
         )
         assert result.top_metabolites[0].gene_count == 3
+        assert result.top_metabolites[0].tcdb_direct_rows == 3
+        assert result.top_metabolites[0].tcdb_family_rows == 0
 
         assert len(result.top_reactions) == 1
         assert result.top_reactions[0].reaction_id == "kegg.reaction:R00131"
@@ -6946,10 +7062,11 @@ class TestMetabolitesByGeneWrapper:
         assert (
             result.top_tcdb_families[0].tcdb_family_id == "tcdb:3.A.1.4.5"
         )
-        assert (
-            result.top_tcdb_families[0].substrate_depth
-            == "most_specific"
-        )
+        fam = result.top_tcdb_families[0]
+        assert fam.level_kind == "tc_system"
+        assert fam.tcdb_route == "direct"
+        assert fam.direction == "uptake"
+        assert not hasattr(fam, "substrate_depth")
 
         assert len(result.top_gene_categories) == 1
         assert result.top_gene_categories[0].category == "Amino acid metabolism"
@@ -6994,16 +7111,15 @@ class TestMetabolitesByGeneWrapper:
         assert result.warnings == []
 
     @pytest.mark.asyncio
-    async def test_warnings_field_carries_inherited_string(
+    async def test_warnings_field_carries_family_substrates_string(
         self, tool_fns, mock_ctx,
     ):
         api_return = {
             **self._SAMPLE_API_RETURN,
             "warnings": [
-                "1 gene (PMM0913) carries transport_substrate_resolution="
-                "'family_inferred' — substrate breadth is reachability, not "
-                "capability for these genes (resolved means at least one "
-                "non-lumping attachment)."
+                "PMM0913: transport arm empty (no direct TCDB system); "
+                "pass include_tcdb_family_substrates=True to see its "
+                "family's substrates."
             ],
         }
         with patch(
@@ -7015,12 +7131,31 @@ class TestMetabolitesByGeneWrapper:
                 locus_tags=["PMM0913"],
                 organism="Prochlorococcus MED4",
             )
-        assert any("family_inferred" in w for w in result.warnings)
+        assert any("include_tcdb_family_substrates=True" in w
+                   for w in result.warnings)
 
-    # ---- substrate_depth migration (spec 2026-08-20; mirrors GBM) ----
+    # ---- TCDB cleanup surface: substrate_depth retired, family walk opt-in ----
 
     @pytest.mark.asyncio
-    async def test_substrate_depth_forwarded_as_list(self, tool_fns, mock_ctx):
+    async def test_include_tcdb_family_substrates_forwarded(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=self._SAMPLE_API_RETURN,
+        ) as mock_api:
+            await tool_fns["metabolites_by_gene"](
+                mock_ctx,
+                locus_tags=["PMM0710"],
+                organism="Prochlorococcus MED4",
+                include_tcdb_family_substrates=True,
+            )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["include_tcdb_family_substrates"] is True
+        assert "substrate_depth" not in kwargs
+
+    @pytest.mark.asyncio
+    async def test_include_tcdb_family_substrates_defaults_false_on_the_call(
+        self, tool_fns, mock_ctx,
+    ):
         with patch(
             "multiomics_explorer.api.functions.metabolites_by_gene",
             return_value=self._SAMPLE_API_RETURN,
@@ -7029,36 +7164,13 @@ class TestMetabolitesByGeneWrapper:
                 mock_ctx,
                 locus_tags=["PMM0963"],
                 organism="Prochlorococcus MED4",
-                substrate_depth=["inherited"],
             )
-        kwargs = mock_api.call_args.kwargs
-        assert kwargs["substrate_depth"] == ["inherited"]
-        assert "transport_confidence" not in kwargs
+        assert mock_api.call_args.kwargs["include_tcdb_family_substrates"] is False
 
     @pytest.mark.asyncio
-    @pytest.mark.parametrize("old_value", ["substrate_confirmed", "family_inferred"])
-    async def test_substrate_depth_old_value_strings_raise_tool_error(
-        self, tool_fns, mock_ctx, old_value,
-    ):
-        pointer = {"substrate_confirmed": "most_specific",
-                   "family_inferred": "inherited"}[old_value]
-        with patch(
-            "multiomics_explorer.api.functions.metabolites_by_gene",
-            side_effect=ValueError(
-                f"substrate_depth value {old_value!r} was renamed to "
-                f"{pointer!r}; valid values: ['most_specific', 'inherited']"
-            ),
-        ):
-            with pytest.raises(ToolError, match=pointer):
-                await tool_fns["metabolites_by_gene"](
-                    mock_ctx,
-                    locus_tags=["PMM0963"],
-                    organism="Prochlorococcus MED4",
-                    substrate_depth=[old_value],
-                )
-
-    @pytest.mark.asyncio
-    async def test_transport_confidence_kwarg_rejected(self, tool_fns, mock_ctx):
+    @pytest.mark.parametrize("retired", ["substrate_depth", "transport_confidence"])
+    async def test_retired_kwargs_rejected(self, tool_fns, mock_ctx, retired):
+        """No alias: the retired params are gone from the wrapper signature."""
         with patch(
             "multiomics_explorer.api.functions.metabolites_by_gene",
             return_value=self._SAMPLE_API_RETURN,
@@ -7068,49 +7180,84 @@ class TestMetabolitesByGeneWrapper:
                     mock_ctx,
                     locus_tags=["PMM0963"],
                     organism="Prochlorococcus MED4",
-                    transport_confidence="substrate_confirmed",
+                    **{retired: ["most_specific"]},
                 )
 
-    def test_substrate_depth_param_literal(self, tool_fns):
+    def test_signature_params(self, tool_fns):
         import inspect
-        import typing
         sig = inspect.signature(tool_fns["metabolites_by_gene"])
+        assert "substrate_depth" not in sig.parameters
         assert "transport_confidence" not in sig.parameters
-        ann = sig.parameters["substrate_depth"].annotation
-        inner = typing.get_args(ann)[0] if typing.get_origin(ann) is typing.Annotated else ann
-        assert "most_specific" in repr(inner) and "inherited" in repr(inner)
-        assert "substrate_confirmed" not in repr(inner)
-        assert sig.parameters["substrate_depth"].default is None
+        assert sig.parameters["include_tcdb_family_substrates"].default is False
+
+    @pytest.mark.asyncio
+    async def test_walk_on_envelope_hint_is_null(self, tool_fns, mock_ctx):
+        """With the walk on, family rows are in `results`, so the hint is
+        None; family rows validate as `tcdb_route='family'` rows."""
+        family_row = {
+            **_MBG_TRANS_ROW,
+            "locus_tag": "PMM0673", "gene_name": "phnD",
+            "metabolite_id": "kegg.compound:C00009",
+            "metabolite_name": "Orthophosphate",
+            "tcdb_route": "family",
+            "tcdb_family_id": "tcdb:3.A.1.9",
+            "tcdb_family_name": "The Phosphonate Uptake Transporter (PhnCDE) Family",
+            "attached_tcdb_id": "tcdb:3.A.1.9",
+            "tcdb_substrate_system_count": 5,
+            "tcdb_calls": ["diamond_best_hit", "diamond_tier", "eggnog"],
+            "tcdb_identity": None,
+        }
+        ret = {
+            **self._SAMPLE_API_RETURN,
+            "by_tcdb_route": [{"tcdb_route": "direct", "count": 19},
+                              {"tcdb_route": "family", "count": 1}],
+            "tcdb_family_substrates_not_shown": None,
+            "results": [family_row],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=ret,
+        ):
+            result = await tool_fns["metabolites_by_gene"](
+                mock_ctx, locus_tags=["PMM0673"],
+                organism="Prochlorococcus MED4",
+                include_tcdb_family_substrates=True,
+            )
+        assert result.tcdb_family_substrates_not_shown is None
+        assert [b.tcdb_route for b in result.by_tcdb_route] == ["direct", "family"]
+        row = result.results[0]
+        assert row.evidence_source == "transport"
+        assert row.tcdb_route == "family"
+        assert row.tcdb_family_id == row.attached_tcdb_id == "tcdb:3.A.1.9"
+        assert row.tcdb_substrate_system_count == 5
+        assert row.tcdb_identity is None
 
     def test_mbg_envelope_models(self):
-        """MbgBySubstrateDepth (key `substrate_depth`) replaces
-        MbgByTransportConfidence; MbgByGene / MbgTopMetabolite carry the
-        renamed counters; MbgByGene gains the gene-level TCDB facts;
-        MbgTopTcdbFamily derives `substrate_depth`."""
+        """MbgByTcdbRoute replaces MbgBySubstrateDepth; MbgByGene carries
+        tcdb_direct_rows / tcdb_family_rows / tcdb_assignment_count and drops
+        the resolution / score; MbgTopMetabolite carries the route counters;
+        MbgTopTcdbFamily carries tcdb_route + direction."""
         import multiomics_explorer.mcp_server.tools as tools_mod
         assert not hasattr(tools_mod, "MbgByTransportConfidence")
-        assert set(tools_mod.MbgBySubstrateDepth.model_fields) == {
-            "substrate_depth", "count",
-        }
+        assert not hasattr(tools_mod, "MbgBySubstrateDepth")
+        assert set(tools_mod.MbgByTcdbRoute.model_fields) == {"tcdb_route", "count"}
         resp = tools_mod.MetabolitesByGeneResponse.model_fields
-        assert "by_substrate_depth" in resp
-        assert "by_transport_confidence" not in resp
+        for f in ("by_tcdb_route", "tcdb_family_substrates_not_shown",
+                  "tcdb_family_substrates_skipped"):
+            assert f in resp, f
+        assert "by_substrate_depth" not in resp
         for model in (tools_mod.MbgByGene, tools_mod.MbgTopMetabolite):
             f = model.model_fields
-            assert "transport_most_specific_rows" in f
-            assert "transport_inherited_rows" in f
-            assert "transport_substrate_confirmed_rows" not in f
-            assert "transport_family_inferred_rows" not in f
-        entry = tools_mod.MbgByGene(
-            locus_tag="PMM0001", rows=1, metabolite_count=1, reaction_count=1,
-            transporter_count=0, metabolism_rows=1,
-            transport_most_specific_rows=0, transport_inherited_rows=0,
-        )
-        assert entry.transport_substrate_resolution is None
-        assert entry.tcdb_evidence_score_max is None
+            assert "tcdb_direct_rows" in f and "tcdb_family_rows" in f
+            assert "transport_most_specific_rows" not in f
+            assert "transport_inherited_rows" not in f
+        bg = tools_mod.MbgByGene.model_fields
+        assert "tcdb_assignment_count" in bg
+        assert "transport_substrate_resolution" not in bg
+        assert "tcdb_evidence_score_max" not in bg
         tf = tools_mod.MbgTopTcdbFamily.model_fields
-        assert "substrate_depth" in tf
-        assert "transport_confidence" not in tf
+        assert "tcdb_route" in tf and "direction" in tf
+        assert "substrate_depth" not in tf
 
     @pytest.mark.asyncio
     async def test_params_forwarded(self, tool_fns, mock_ctx):
@@ -7129,7 +7276,7 @@ class TestMetabolitesByGeneWrapper:
                 metabolite_pathway_ids=["kegg.pathway:ko00910"],
                 mass_balance="balanced",
                 gene_categories=["Amino acid metabolism"],
-                substrate_depth=["most_specific"],
+                include_tcdb_family_substrates=True,
                 evidence_sources=["transport"],
                 summary=False,
                 verbose=True,
@@ -7148,7 +7295,8 @@ class TestMetabolitesByGeneWrapper:
         )
         assert kwargs["mass_balance"] == "balanced"
         assert kwargs["gene_categories"] == ["Amino acid metabolism"]
-        assert kwargs["substrate_depth"] == ["most_specific"]
+        assert kwargs["include_tcdb_family_substrates"] is True
+        assert "substrate_depth" not in kwargs
         assert kwargs["evidence_sources"] == ["transport"]
         assert kwargs["verbose"] is True
         assert kwargs["limit"] == 10
@@ -7186,7 +7334,9 @@ class TestMetabolitesByGeneWrapper:
         for required in [
             "total_matching", "returned", "offset", "truncated",
             "warnings", "not_found", "not_matched",
-            "by_gene", "by_evidence_source", "by_substrate_depth",
+            "by_gene", "by_evidence_source", "by_tcdb_route",
+            "tcdb_family_substrates_not_shown",
+            "tcdb_family_substrates_skipped",
             "by_element",          # NEW vs GBM
             "top_metabolites", "top_reactions", "top_tcdb_families",
             "top_gene_categories",
@@ -7204,7 +7354,7 @@ class TestMetabolitesByGeneWrapper:
         for name in [
             "MbgByGene",
             "MbgByEvidenceSource",
-            "MbgBySubstrateDepth",
+            "MbgByTcdbRoute",
             "MbgByElement",            # NEW vs GBM
             "MbgTopMetabolite",
             "MbgTopReaction",
@@ -7245,15 +7395,18 @@ class TestMetabolitesByGeneWrapper:
             "locus_tag", "gene_name", "product",
             "rows", "metabolite_count", "reaction_count",
             "transporter_count", "metabolism_rows",
-            "transport_most_specific_rows",
-            "transport_inherited_rows",
-            "transport_substrate_resolution",
-            "tcdb_evidence_score_max",
+            "tcdb_direct_rows",
+            "tcdb_family_rows",
+            "tcdb_assignment_count",
         ]:
             assert required in fields, f"missing MbgByGene field: {required}"
         for retired in [
             "transport_substrate_confirmed_rows",
             "transport_family_inferred_rows",
+            "transport_most_specific_rows",
+            "transport_inherited_rows",
+            "transport_substrate_resolution",
+            "tcdb_evidence_score_max",
         ]:
             assert retired not in fields, f"retired MbgByGene field: {retired}"
 
@@ -7323,7 +7476,9 @@ class TestMetabolitesByGeneWrapper:
             "not_matched": [],
             "by_gene": [],
             "by_evidence_source": [],
-            "by_substrate_depth": [],
+            "by_tcdb_route": [],
+            "tcdb_family_substrates_not_shown": {"genes": 0, "metabolites": 0, "rows": 0},
+            "tcdb_family_substrates_skipped": [],
             "by_element": [],
             "top_metabolites": [],
             "top_reactions": [],
@@ -7338,8 +7493,8 @@ class TestMetabolitesByGeneWrapper:
                 {
                     "locus_tag": "PMM0963",
                     "evidence_source": "metabolism",
-                    "substrate_depth": None,    # None preserved
-                    "tcdb_evidence_score": None,  # None preserved
+                    "tcdb_route": None,      # None preserved
+                    "tcdb_identity": None,   # None preserved
                     "reaction_id": "kegg.reaction:R00131",
                     "reaction_name": "test reaction",
                     "ec_numbers": ["3.5.1.5"],
@@ -7352,14 +7507,14 @@ class TestMetabolitesByGeneWrapper:
                 {
                     "locus_tag": "PMM0913",
                     "evidence_source": "transport",
-                    "substrate_depth": "inherited",
-                    "tcdb_evidence_score": 0.2,
+                    "tcdb_route": "direct",
+                    "tcdb_identity": 45.0,
                     "reaction_id": None,                # None preserved
                     "reaction_name": None,               # None preserved
                     "ec_numbers": None,                   # None preserved
                     "mass_balance": None,                  # None preserved
-                    "tcdb_family_id": "tcdb:3.A.1",
-                    "tcdb_family_name": "ABC superfamily",
+                    "tcdb_family_id": "tcdb:3.A.1.4.5",
+                    "tcdb_family_name": "urea porter",
                     "metabolite_id": "kegg.compound:C00086",
                     "metabolite_name": "Urea",
                 },
@@ -7386,10 +7541,11 @@ class TestMetabolitesByGeneWrapper:
         )
 
         # Cross-arm None values must be present, not stripped
-        assert "substrate_depth" in metab_row
-        assert metab_row["substrate_depth"] is None
-        assert "tcdb_evidence_score" in metab_row
-        assert metab_row["tcdb_evidence_score"] is None
+        assert "tcdb_route" in metab_row
+        assert metab_row["tcdb_route"] is None
+        assert "tcdb_identity" in metab_row
+        assert metab_row["tcdb_identity"] is None
+        assert "substrate_depth" not in metab_row
         assert "transport_confidence" not in metab_row
         assert "tcdb_family_id" in metab_row
         assert metab_row["tcdb_family_id"] is None
@@ -8166,20 +8322,19 @@ class TestExpectedToolsUnchangedForPhase1Plumbing:
 
 class TestGeneOverviewPhase1PlumbingWrapper:
     """Pydantic GeneOverviewResult adds reaction_count,
-    catalyzed_metabolite_count, evidence_sources, and (substrate_depth
-    migration 2026-08) tcdb_evidence_score_max / transported_metabolite_count /
-    transport_substrate_resolution in place of transporter_count.
+    catalyzed_metabolite_count, evidence_sources, transported_metabolite_count
+    and (TCDB cleanup surface) tcdb_best_hit_identity — the retired
+    tcdb_evidence_score_max / transport_substrate_resolution are gone.
     GeneOverviewResponse adds has_chemistry envelope key (spec §6.1).
     Catalysis-arm rename (KG-SYNC-001): metabolite_count →
     catalyzed_metabolite_count — catalysis-only count; transport-only
-    genes carry 0 (discriminate via tcdb_evidence_score_max / evidence_sources)."""
+    genes carry 0 (discriminate via transported_metabolite_count / evidence_sources)."""
 
     def _api_return_with_chem(self, locus_tag, **chem):
         defaults = {
             "reaction_count": 0, "catalyzed_metabolite_count": 0,
-            "tcdb_evidence_score_max": None,
+            "tcdb_best_hit_identity": None,
             "transported_metabolite_count": 0,
-            "transport_substrate_resolution": None,
             "evidence_sources": [],
         }
         defaults.update(chem)
@@ -8218,15 +8373,14 @@ class TestGeneOverviewPhase1PlumbingWrapper:
 
     @pytest.mark.asyncio
     async def test_pmm0392_transport_metabolomics_validates(self, tool_fns, mock_ctx):
-        """PMM0392 → 0 / 0 catalyzed / tcdb_evidence_score_max 0.8 /
-        transported_metabolite_count 13 / 'resolved' /
-        [transport, metabolomics] (live-verified 2026-08-26)."""
+        """PMM0392 → 0 / 0 catalyzed / tcdb_best_hit_identity /
+        transported_metabolite_count / [transport, metabolomics]
+        (values illustrative — mocked)."""
         api_return = self._api_return_with_chem(
             "PMM0392",
             reaction_count=0, catalyzed_metabolite_count=0,
-            tcdb_evidence_score_max=0.8,
+            tcdb_best_hit_identity=64.2,
             transported_metabolite_count=13,
-            transport_substrate_resolution="resolved",
             evidence_sources=["transport", "metabolomics"],
         )
         with patch(
@@ -8240,9 +8394,10 @@ class TestGeneOverviewPhase1PlumbingWrapper:
         assert r.reaction_count == 0
         assert r.catalyzed_metabolite_count == 0
         assert not hasattr(r, "transporter_count")
-        assert r.tcdb_evidence_score_max == 0.8
+        assert r.tcdb_best_hit_identity == 64.2
         assert r.transported_metabolite_count == 13
-        assert r.transport_substrate_resolution == "resolved"
+        assert not hasattr(r, "tcdb_evidence_score_max")
+        assert not hasattr(r, "transport_substrate_resolution")
         assert r.evidence_sources == ["transport", "metabolomics"]
 
     @pytest.mark.asyncio
@@ -8260,9 +8415,8 @@ class TestGeneOverviewPhase1PlumbingWrapper:
         assert r.reaction_count == 0
         assert r.catalyzed_metabolite_count == 0
         assert not hasattr(r, "transporter_count")
-        assert r.tcdb_evidence_score_max is None
+        assert r.tcdb_best_hit_identity is None
         assert r.transported_metabolite_count == 0
-        assert r.transport_substrate_resolution is None
         assert r.evidence_sources == []
 
     @pytest.mark.asyncio
@@ -8284,11 +8438,10 @@ class TestGeneOverviewPhase1PlumbingWrapper:
         r = result.results[0]
         assert r.reaction_count == 4
         assert r.catalyzed_metabolite_count == 6
-        # no TCDB call: null score / 0 transported / null resolution
+        # no TCDB call: null best-hit identity / 0 transported
         assert not hasattr(r, "transporter_count")
-        assert r.tcdb_evidence_score_max is None
+        assert r.tcdb_best_hit_identity is None
         assert r.transported_metabolite_count == 0
-        assert r.transport_substrate_resolution is None
         assert r.evidence_sources == ["metabolism"]
 
     @pytest.mark.asyncio
@@ -8308,9 +8461,9 @@ class TestGeneOverviewPhase1PlumbingWrapper:
 
     @pytest.mark.asyncio
     async def test_gene_overview_result_model_fields(self, tool_fns, mock_ctx):
-        """GeneOverviewResult (nested in register_tools): transporter_count
-        removed; the three gene-level TCDB fields present with
-        null-means-no-call defaults (score/resolution nullable, count int)."""
+        """GeneOverviewResult (nested in register_tools): transporter_count,
+        tcdb_evidence_score_max and transport_substrate_resolution removed;
+        tcdb_best_hit_identity (nullable) + transported_metabolite_count."""
         api_return = self._api_return_with_chem("PMM0001")
         with patch(
             "multiomics_explorer.api.functions.gene_overview",
@@ -8321,15 +8474,16 @@ class TestGeneOverviewPhase1PlumbingWrapper:
             )
         row = result.results[0]
         fields = type(row).model_fields
-        assert "transporter_count" not in fields
-        for name in ("tcdb_evidence_score_max", "transported_metabolite_count",
-                     "transport_substrate_resolution"):
+        for retired in ("transporter_count", "tcdb_evidence_score_max",
+                        "transport_substrate_resolution", "tcdb_family_count"):
+            assert retired not in fields, retired
+        for name in ("tcdb_best_hit_identity", "transported_metabolite_count",
+                     "tcdb_assignment_count"):
             assert name in fields, f"missing GeneOverviewResult field: {name}"
         dumped = row.model_dump()
         assert "transporter_count" not in dumped
-        assert dumped["tcdb_evidence_score_max"] is None
+        assert dumped["tcdb_best_hit_identity"] is None
         assert dumped["transported_metabolite_count"] == 0
-        assert dumped["transport_substrate_resolution"] is None
 
 
 class TestListPublicationsPhase1PlumbingWrapper:
@@ -10516,10 +10670,12 @@ class TestTrustFilterParamsOnWrappers:
         sig = inspect.signature(tool_fns["ontology_landscape"])
         assert param in sig.parameters
 
-    def test_gene_ontology_terms_has_include_superseded(self, tool_fns):
+    @pytest.mark.parametrize("tool_name", ["gene_ontology_terms", "genes_by_ontology"])
+    def test_has_include_weak_tcdb_hits(self, tool_fns, tool_name):
         import inspect
-        sig = inspect.signature(tool_fns["gene_ontology_terms"])
-        assert sig.parameters["include_superseded"].default is False
+        sig = inspect.signature(tool_fns[tool_name])
+        assert "include_superseded" not in sig.parameters
+        assert sig.parameters["include_weak_tcdb_hits"].default is False
 
     def test_search_ontology_has_interpro_type(self, tool_fns):
         import inspect
@@ -10642,8 +10798,9 @@ class TestTrustFieldsOnRowModels:
         assert f"{field}:" in section
 
     @pytest.mark.parametrize("field", [
-        "attachment_depth", "confidence_score", "pfam_support",
+        "confidence_score", "pfam_support",
         "best_hit_kind", "libraries", "bit_score",
+        "tcdb_scov", "tcdb_best_hit_rank", "tcdb_bitscore", "tcdb_bitscore_ratio",
     ])
     def test_native_detail_fields_on_the_gene_term_row(self, field):
         section = self._model_section(
@@ -10683,7 +10840,8 @@ class TestTrustEnvelopeFieldsOnResponses:
 
 
 class TestGeneOverviewWrapperFamilyCounts:
-    """Backlog 3.4: GeneOverviewResult declares tcdb_family_count /
+    """Backlog 3.4 + TCDB cleanup: GeneOverviewResult declares
+    tcdb_assignment_count (renamed from tcdb_family_count, no alias) /
     cazy_family_count (int, default 0); GeneOverviewResponse declares
     has_tcdb / has_cazy; the wrapper forwards the api values verbatim."""
 
@@ -10695,7 +10853,7 @@ class TestGeneOverviewWrapperFamilyCounts:
         idx = src.index(f"class {class_name}(")
         return src[idx:idx + 8000]
 
-    @pytest.mark.parametrize("field", ["tcdb_family_count", "cazy_family_count"])
+    @pytest.mark.parametrize("field", ["tcdb_assignment_count", "cazy_family_count"])
     def test_row_declares_family_count_with_zero_default(self, field):
         import re as _re
         src = self._src("GeneOverviewResult")
@@ -10722,7 +10880,7 @@ class TestGeneOverviewWrapperFamilyCounts:
             "derived_metric_count": 0, "derived_metric_value_kinds": [],
             "discussed_in_publication_count": 0,
             "ncbifam_family_count": 0, "merops_classes": [],
-            "tcdb_family_count": 7, "cazy_family_count": 4,
+            "tcdb_assignment_count": 7, "cazy_family_count": 4,
         }
         return {
             "total_matching": 1,
@@ -10747,7 +10905,7 @@ class TestGeneOverviewWrapperFamilyCounts:
             result = await tool_fns["gene_overview"](
                 mock_ctx, locus_tags=["PMM0392"],
             )
-        assert result.results[0].tcdb_family_count == 7
+        assert result.results[0].tcdb_assignment_count == 7
         assert result.results[0].cazy_family_count == 4
         assert result.has_tcdb == 1
         assert result.has_cazy == 1
@@ -10755,7 +10913,7 @@ class TestGeneOverviewWrapperFamilyCounts:
     @pytest.mark.asyncio
     async def test_wrapper_defaults_family_counts_to_zero(self, tool_fns, mock_ctx):
         ret = self._api_return()
-        for k in ("tcdb_family_count", "cazy_family_count"):
+        for k in ("tcdb_assignment_count", "cazy_family_count"):
             del ret["results"][0][k]
         for k in ("has_tcdb", "has_cazy"):
             del ret[k]
@@ -10766,7 +10924,7 @@ class TestGeneOverviewWrapperFamilyCounts:
             result = await tool_fns["gene_overview"](
                 mock_ctx, locus_tags=["PMM0392"],
             )
-        assert result.results[0].tcdb_family_count == 0
+        assert result.results[0].tcdb_assignment_count == 0
         assert result.results[0].cazy_family_count == 0
         assert result.has_tcdb == 0
         assert result.has_cazy == 0
@@ -10778,13 +10936,18 @@ class TestListFilterValuesTrustTypes:
     NEW_FILTER_TYPES = [
         "evidence", "sources", "call_class", "interpro_type",
         "ncbifam_family_type", "merops_catalytic_type", "merops_family_class",
-        "best_hit_kind", "pfam_support", "attachment_depth",
+        "best_hit_kind", "pfam_support",
+        "tcdb_call", "tcdb_gate", "direction",
         "trust_axes", "link_kinds",
     ]
 
     @pytest.mark.parametrize("value", NEW_FILTER_TYPES)
     def test_literal_includes_new_filter_type(self, tool_fns, value):
         assert f"'{value}'" in _hint_str(
+            tool_fns, "list_filter_values", "filter_type")
+
+    def test_attachment_depth_filter_type_retired(self, tool_fns):
+        assert "'attachment_depth'" not in _hint_str(
             tool_fns, "list_filter_values", "filter_type")
 
     def test_ontology_scope_param_present(self, tool_fns):
@@ -10917,7 +11080,8 @@ _OTD_API_RETURN = {
             "level_kind": "tc_family", "is_informative": True,
             "gene_count": 900, "organism_count": 45, "direct_gene_count": 120,
             "tcdb_id": "3.A.1", "tc_class_id": "3.A", "member_count": 55,
-            "superfamily": "ABC", "metabolite_count": 40,
+            "superfamily": "ABC", "tcdb_substrate_count": 551,
+            "direction": "unknown",
             "parents": [{"id": "tcdb:3.A", "name": "P-P-bond", "level": 1}],
             "children": [{"id": "tcdb:3.A.1.1", "name": "fam", "level": 3}],
             "children_total": 55, "children_truncated": True,
@@ -11207,7 +11371,8 @@ class TestSearchOntologyWrapper3b:
 
     @pytest.mark.parametrize("field", [
         "ontology_type", "description", "level_kind", "direct_gene_count",
-        "superfamily", "metabolite_count", "family_type", "gene_symbol",
+        "superfamily", "tcdb_substrate_count", "direction",
+        "family_type", "gene_symbol",
         "family_class", "catalytic_type", "peptidase_gene_count",
         "interpro_type", "organism_gene_count",
     ])
@@ -11484,92 +11649,106 @@ def _param_literal_values(tool_fns, tool_name, param):
     return set(typing.get_args(inner))
 
 
-class TestGeneReactionMetaboliteTripletSubstrateResolution:
-    """Spec §3.2 / §6: `GeneReactionMetaboliteTriplet` gains
-    `transport_substrate_resolution: Literal['resolved','family_inferred']
-    | None`, compact, right after `tcdb_evidence_score`, explicit None on
-    metabolism rows (union padding — the model is NOT a SparseRow)."""
+class TestGeneReactionMetaboliteTripletTcdbFields:
+    """TCDB cleanup surface (replaces the transport_substrate_resolution
+    triplet class): the shared gbm/mbg row model carries tcdb_route /
+    tcdb_calls / tcdb_identity / tcdb_direction / attached_tcdb_id /
+    tcdb_substrate_system_count, explicit None on non-transport rows
+    (union padding survives serialization)."""
 
     _BASE = {
         "locus_tag": "PMM0974", "gene_name": "urtE",
         "product": "ABC-type urea transporter, ATPase component",
-        "evidence_source": "transport", "substrate_depth": "most_specific",
-        "tcdb_evidence_score": 0.8,
-        "tcdb_family_id": "tcdb:3.A.1.4.5", "tcdb_family_name": "tcdb:3.A.1.4.5",
+        "evidence_source": "transport",
+        "tcdb_family_id": "tcdb:3.A.1.4.5", "tcdb_family_name": "urea porter",
         "metabolite_id": "kegg.compound:C00086", "metabolite_name": "Urea",
     }
 
-    def test_field_exists_and_is_optional_literal(self):
-        import types
+    _NEW_FIELDS = ("tcdb_route", "tcdb_calls", "tcdb_identity",
+                   "tcdb_direction", "attached_tcdb_id",
+                   "tcdb_substrate_system_count")
+
+    def test_retired_fields_gone(self):
+        from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
+        fields = GeneReactionMetaboliteTriplet.model_fields
+        for retired in ("substrate_depth", "tcdb_evidence_score",
+                        "transport_substrate_resolution"):
+            assert retired not in fields, retired
+
+    @pytest.mark.parametrize("field", _NEW_FIELDS)
+    def test_new_field_description_present_and_bounded(self, field):
+        from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
+        f = GeneReactionMetaboliteTriplet.model_fields[field]
+        assert f.description, field
+        assert len(f.description) <= 250, field
+
+    def test_field_types(self):
         import typing
         from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
         fields = GeneReactionMetaboliteTriplet.model_fields
-        assert "transport_substrate_resolution" in fields
-        ann = fields["transport_substrate_resolution"].annotation
-        assert typing.get_origin(ann) in {types.UnionType, typing.Union}
-        args = typing.get_args(ann)
-        assert type(None) in args
-        literal = next(a for a in args if typing.get_origin(a) is typing.Literal)
-        assert set(typing.get_args(literal)) == {"resolved", "family_inferred"}
+        assert "list[str]" in str(fields["tcdb_calls"].annotation)
+        assert "float" in str(fields["tcdb_identity"].annotation)
+        assert "int" in str(fields["tcdb_substrate_system_count"].annotation)
+        route = str(fields["tcdb_route"].annotation)
+        assert "'direct'" in route and "'family'" in route
 
-    def test_field_description_present_and_bounded(self):
+    @pytest.mark.parametrize("direction", ["uptake", "export", "unknown"])
+    def test_direction_values_accepted(self, direction):
         from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
-        field = GeneReactionMetaboliteTriplet.model_fields["transport_substrate_resolution"]
-        assert field.description
-        assert len(field.description) <= 250
-        # It is the GENE's resolution, repeated on the row — say so.
-        assert "gene" in field.description.lower()
+        row = GeneReactionMetaboliteTriplet(**self._BASE, tcdb_direction=direction)
+        assert row.tcdb_direction == direction
 
-    def test_position_right_after_tcdb_evidence_score(self):
-        from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
-        names = list(GeneReactionMetaboliteTriplet.model_fields)
-        assert names.index("transport_substrate_resolution") == (
-            names.index("tcdb_evidence_score") + 1)
-
-    def test_transport_row_accepts_both_values(self):
-        from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
-        for v in ("resolved", "family_inferred"):
-            row = GeneReactionMetaboliteTriplet(
-                **self._BASE, transport_substrate_resolution=v)
-            assert row.transport_substrate_resolution == v
-
-    def test_rejects_retired_or_unknown_value(self):
+    def test_tcdb_level_kind_literal_has_tc_system(self):
         from pydantic import ValidationError
         from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
-        for bad in ("substrate_confirmed", "most_specific", "bogus"):
-            with pytest.raises(ValidationError):
-                GeneReactionMetaboliteTriplet(
-                    **self._BASE, transport_substrate_resolution=bad)
+        row = GeneReactionMetaboliteTriplet(**self._BASE, tcdb_level_kind="tc_system")
+        assert row.tcdb_level_kind == "tc_system"
+        with pytest.raises(ValidationError):
+            GeneReactionMetaboliteTriplet(
+                **self._BASE, tcdb_level_kind="tc_specificity")
 
     def test_metabolism_row_explicit_none_is_kept_on_the_wire(self):
-        """Union padding: an explicit None must survive serialization
-        (the model is not a SparseRow — every row carries identical keys)."""
         from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
         row = GeneReactionMetaboliteTriplet(
             locus_tag="PMM0944", gene_name="ureC", product="urease",
-            evidence_source="metabolism", substrate_depth=None,
-            tcdb_evidence_score=None, transport_substrate_resolution=None,
+            evidence_source="metabolism",
             reaction_id="kegg.reaction:R00131",
             metabolite_id="kegg.compound:C00086", metabolite_name="Urea",
+            **{f: None for f in self._NEW_FIELDS},
         )
         dumped = row.model_dump()
-        assert "transport_substrate_resolution" in dumped
-        assert dumped["transport_substrate_resolution"] is None
+        for f in self._NEW_FIELDS:
+            assert f in dumped and dumped[f] is None, f
+
+    def test_descriptions_carry_no_retired_vocabulary(self):
+        """Row-field prose must not point at removed TCDB concepts."""
+        from multiomics_explorer.mcp_server.tools import GeneReactionMetaboliteTriplet
+        joined = " ".join(
+            (f.description or "")
+            for f in GeneReactionMetaboliteTriplet.model_fields.values())
+        joined += " " + (GeneReactionMetaboliteTriplet.__doc__ or "")
+        for stale in ("substrate_depth", "tcdb_evidence_score",
+                      "substrate_breadth", "tc_specificity",
+                      "deepest TCDB attachment"):
+            assert stale not in joined, stale
 
     @pytest.mark.asyncio
-    async def test_gbm_wrapper_surfaces_the_column(self, tool_fns, mock_ctx):
+    async def test_gbm_wrapper_surfaces_the_columns(self, tool_fns, mock_ctx):
         payload = {
             **_GBM_SAMPLE_API_RETURN,
             "results": [
-                {**self._BASE, "transport_substrate_resolution": "resolved"},
+                {**self._BASE, "tcdb_route": "direct",
+                 "tcdb_calls": ["diamond_best_hit", "eggnog"],
+                 "tcdb_identity": 71.3, "tcdb_direction": "uptake",
+                 "attached_tcdb_id": "tcdb:3.A.1.4.5",
+                 "tcdb_substrate_system_count": None},
                 {
                     "locus_tag": "PMM0944", "gene_name": "ureC",
                     "product": "urease", "evidence_source": "metabolism",
-                    "substrate_depth": None, "tcdb_evidence_score": None,
-                    "transport_substrate_resolution": None,
                     "reaction_id": "kegg.reaction:R00131",
                     "metabolite_id": "kegg.compound:C00086",
                     "metabolite_name": "Urea",
+                    **{f: None for f in self._NEW_FIELDS},
                 },
             ],
         }
@@ -11579,25 +11758,36 @@ class TestGeneReactionMetaboliteTripletSubstrateResolution:
                 mock_ctx, metabolite_ids=["kegg.compound:C00086"],
                 organism="Prochlorococcus MED4")
         by_src = {r.evidence_source: r for r in result.results}
-        assert by_src["transport"].transport_substrate_resolution == "resolved"
-        assert by_src["metabolism"].transport_substrate_resolution is None
+        assert by_src["transport"].tcdb_calls == ["diamond_best_hit", "eggnog"]
+        assert by_src["transport"].tcdb_identity == 71.3
+        assert by_src["metabolism"].tcdb_route is None
 
     @pytest.mark.asyncio
-    async def test_mbg_wrapper_surfaces_the_column(self, tool_fns, mock_ctx):
+    async def test_mbg_wrapper_surfaces_family_rows(self, tool_fns, mock_ctx):
         payload = {
             **_MBG_SAMPLE_API_RETURN,
+            "tcdb_family_substrates_not_shown": None,
             "results": [
-                {**self._BASE, "locus_tag": "PMM0234",
-                 "substrate_depth": "inherited", "tcdb_evidence_score": 0.4,
-                 "transport_substrate_resolution": "family_inferred"},
+                {**self._BASE, "locus_tag": "PMM0673", "gene_name": "phnD",
+                 "tcdb_route": "family", "tcdb_family_id": "tcdb:3.A.1.9",
+                 "attached_tcdb_id": "tcdb:3.A.1.9",
+                 "tcdb_substrate_system_count": 5,
+                 "tcdb_calls": ["diamond_best_hit", "diamond_tier", "eggnog"],
+                 "tcdb_identity": None, "tcdb_direction": "uptake",
+                 "metabolite_id": "kegg.compound:C00009",
+                 "metabolite_name": "Orthophosphate"},
             ],
         }
         with patch("multiomics_explorer.api.functions.metabolites_by_gene",
                    return_value=payload):
             result = await tool_fns["metabolites_by_gene"](
-                mock_ctx, locus_tags=["PMM0234"],
-                organism="Prochlorococcus MED4")
-        assert result.results[0].transport_substrate_resolution == "family_inferred"
+                mock_ctx, locus_tags=["PMM0673"],
+                organism="Prochlorococcus MED4",
+                include_tcdb_family_substrates=True)
+        row = result.results[0]
+        assert row.tcdb_route == "family"
+        assert row.tcdb_substrate_system_count == 5
+        assert result.tcdb_family_substrates_not_shown is None
 
 
 class TestListOrganismsAnnotationCapabilityWrapper:
@@ -13885,3 +14075,499 @@ class TestGoTransportFollowupsWrappers:
             res = await tool_fns["gene_overview"](
                 mock_ctx, locus_tags=["PMM0974"])
         assert res.results[0].go_transport_metabolite_count == 3
+
+
+# ---------------------------------------------------------------------------
+# TCDB cleanup surface (docs/tool-specs/tcdb-cleanup-surface.md) — Stage 1 RED
+# ---------------------------------------------------------------------------
+
+def _tcdb_resp_model(tool_fns, tool):
+    import typing
+    return typing.get_type_hints(tool_fns[tool])["return"]
+
+
+def _tcdb_item_model(model, field):
+    import typing
+    ann = model.model_fields[field].annotation
+    found = []
+
+    def walk(t):
+        if isinstance(t, type) and hasattr(t, "model_fields"):
+            found.append(t)
+            return
+        for a in typing.get_args(t):
+            walk(a)
+    walk(ann)
+    assert found, f"{model.__name__}.{field} carries no model"
+    return found[0]
+
+
+def _tcdb_all_models(tool_fns):
+    """Every Pydantic model reachable from any tool's response annotation."""
+    import typing
+    seen: dict[str, type] = {}
+
+    def walk(t):
+        if isinstance(t, type) and hasattr(t, "model_fields"):
+            if t.__qualname__ in seen:
+                return
+            seen[t.__qualname__] = t
+            for f in t.model_fields.values():
+                walk(f.annotation)
+            return
+        for a in typing.get_args(t):
+            walk(a)
+    for name in tool_fns:
+        walk(_tcdb_resp_model(tool_fns, name))
+    return seen
+
+
+_TCDB_ONTOLOGY_TOOL_ARGS = {
+    "gene_ontology_terms": dict(locus_tags=["PMM0710"], organism="MED4",
+                                ontology="tcdb"),
+    "genes_by_ontology": dict(ontology="tcdb", organism="MED4", level=2),
+    "ontology_landscape": dict(organism="MED4", ontology=["tcdb"]),
+    "pathway_enrichment": dict(organism="MED4", experiment_ids=["EXP1"],
+                               ontology="tcdb", level=2),
+    "cluster_enrichment": dict(analysis_id="A1", organism="MED4",
+                               ontology="tcdb", level=2),
+}
+
+# Retired TCDB vocabulary that must not appear in any outfacing text (G3/G6).
+_TCDB_RETIRED_TERMS = (
+    "substrate_depth", "include_superseded", "transport_substrate_resolution",
+    "tcdb_evidence_score", "attachment_depth", "tc_specificity",
+    "substrate_breadth", "tcdb_family_count", "transport_most_specific_rows",
+    "transport_inherited_rows",
+)
+
+
+class TestTcdbCleanupOntologyParams:
+    """G4 / G5: include_weak_tcdb_hits on gene_ontology_terms /
+    genes_by_ontology (not enrichment); tcdb_call on the five tools that
+    take call_class. Both forwarded to api; ValueError -> ToolError."""
+
+    @pytest.mark.parametrize("tool_name", sorted(_TCDB_ONTOLOGY_TOOL_ARGS))
+    def test_tcdb_call_param_defaults_to_none(self, tool_fns, tool_name):
+        import inspect
+        sig = inspect.signature(tool_fns[tool_name])
+        assert "call_class" in sig.parameters  # the twin it mirrors
+        assert sig.parameters["tcdb_call"].default is None
+
+    @pytest.mark.parametrize("tool_name", sorted(_TCDB_ONTOLOGY_TOOL_ARGS))
+    def test_tcdb_call_field_description(self, tool_fns, tool_name):
+        descs = [d for d in _field_descriptions(tool_fns, tool_name, "tcdb_call") if d]
+        assert descs, f"{tool_name}.tcdb_call has no Field description"
+        for d in descs:
+            assert len(d) <= 250
+        joined = " ".join(descs)
+        assert "tcdb" in joined.lower()
+
+    @pytest.mark.parametrize("tool_name", sorted(_TCDB_ONTOLOGY_TOOL_ARGS))
+    def test_tcdb_call_is_a_string_list(self, tool_fns, tool_name):
+        assert "list[" in _hint_str(tool_fns, tool_name, "tcdb_call")
+
+    @pytest.mark.parametrize("tool_name", ["pathway_enrichment", "cluster_enrichment",
+                                           "ontology_landscape"])
+    def test_no_include_weak_tcdb_hits_off_the_gene_set_tools(self, tool_fns, tool_name):
+        import inspect
+        params = inspect.signature(tool_fns[tool_name]).parameters
+        assert "include_weak_tcdb_hits" not in params
+        assert "include_superseded" not in params
+
+    @pytest.mark.parametrize("tool_name", ["gene_ontology_terms", "genes_by_ontology"])
+    def test_include_weak_tcdb_hits_description(self, tool_fns, tool_name):
+        descs = [d for d in _field_descriptions(
+            tool_fns, tool_name, "include_weak_tcdb_hits") if d]
+        assert descs
+        joined = " ".join(descs)
+        assert len(joined) <= 250
+        assert "below_gate" in joined or "weak" in joined.lower()
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("tool_name", sorted(_TCDB_ONTOLOGY_TOOL_ARGS))
+    async def test_tcdb_call_forwarded_and_value_error_is_tool_error(
+        self, tool_fns, mock_ctx, tool_name,
+    ):
+        with patch(
+            f"multiomics_explorer.api.functions.{tool_name}",
+            side_effect=ValueError(
+                "Filter 'tcdb_call' is not supported for ontology 'go_bp'."),
+        ) as mock_api:
+            with pytest.raises(ToolError, match="tcdb_call"):
+                await tool_fns[tool_name](
+                    mock_ctx, **_TCDB_ONTOLOGY_TOOL_ARGS[tool_name],
+                    tcdb_call=["eggnog"],
+                )
+        assert mock_api.call_args.kwargs["tcdb_call"] == ["eggnog"]
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("tool_name", ["gene_ontology_terms", "genes_by_ontology"])
+    async def test_include_weak_tcdb_hits_forwarded(self, tool_fns, mock_ctx, tool_name):
+        with patch(
+            f"multiomics_explorer.api.functions.{tool_name}",
+            side_effect=ValueError("stop"),
+        ) as mock_api:
+            with pytest.raises(ToolError):
+                await tool_fns[tool_name](
+                    mock_ctx, **_TCDB_ONTOLOGY_TOOL_ARGS[tool_name],
+                    include_weak_tcdb_hits=True,
+                )
+        kwargs = mock_api.call_args.kwargs
+        assert kwargs["include_weak_tcdb_hits"] is True
+        assert "include_superseded" not in kwargs
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("tool_name", ["pathway_enrichment", "cluster_enrichment"])
+    async def test_enrichment_does_not_forward_weak_hits(self, tool_fns, mock_ctx, tool_name):
+        with patch(
+            f"multiomics_explorer.api.functions.{tool_name}",
+            side_effect=ValueError("stop"),
+        ) as mock_api:
+            with pytest.raises(ToolError):
+                await tool_fns[tool_name](
+                    mock_ctx, **_TCDB_ONTOLOGY_TOOL_ARGS[tool_name])
+        assert "include_weak_tcdb_hits" not in mock_api.call_args.kwargs
+        assert mock_api.call_args.kwargs.get("tcdb_call") is None
+
+    @pytest.mark.asyncio
+    async def test_min_evidence_score_on_tcdb_raises_tool_error(self, tool_fns, mock_ctx):
+        """G3: TCDB no longer carries the evidence_score axis."""
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            side_effect=ValueError(
+                "Filter 'min_evidence_score' is not supported for ontology "
+                "'tcdb'. tcdb carries: sources, evidence, tier, tcdb_call, tcdb_gate."),
+        ):
+            with pytest.raises(ToolError, match="min_evidence_score"):
+                await tool_fns["genes_by_ontology"](
+                    mock_ctx, ontology="tcdb", organism="MED4", level=2,
+                    min_evidence_score=0.5,
+                )
+
+
+class TestTcdbCleanupOntologyRowModels:
+    """TCDB rows in genes_by_ontology / gene_ontology_terms: compact
+    tcdb_call / tcdb_gate / tcdb_calls; verbose tcdb_scov /
+    tcdb_best_hit_rank / tcdb_bitscore / tcdb_bitscore_ratio; TCDB-only
+    attachment_depth / source_agreement / go_support gone; shared MEROPS
+    fields stay; shared qcov says percent."""
+
+    _NEW = ("tcdb_call", "tcdb_gate", "tcdb_calls", "tcdb_scov",
+            "tcdb_best_hit_rank", "tcdb_bitscore", "tcdb_bitscore_ratio")
+    _GONE = ("attachment_depth", "source_agreement", "go_support")
+    _SHARED = ("confidence_score", "pfam_support", "consensus_n",
+               "identity", "qcov", "evalue", "tier", "sources")
+
+    @pytest.mark.parametrize("tool_name", ["genes_by_ontology", "gene_ontology_terms"])
+    @pytest.mark.parametrize("field", _NEW)
+    def test_new_tcdb_fields_present(self, tool_fns, tool_name, field):
+        row = _row_model(tool_fns, tool_name)
+        assert field in row.model_fields, f"{row.__name__}.{field}"
+        f = row.model_fields[field]
+        assert f.default is None
+        assert f.description and len(f.description) <= 250
+
+    @pytest.mark.parametrize("tool_name", ["genes_by_ontology", "gene_ontology_terms"])
+    @pytest.mark.parametrize("field", _GONE)
+    def test_tcdb_only_retired_fields_gone(self, tool_fns, tool_name, field):
+        assert field not in _row_model(tool_fns, tool_name).model_fields
+
+    @pytest.mark.parametrize("tool_name", ["genes_by_ontology", "gene_ontology_terms"])
+    @pytest.mark.parametrize("field", _SHARED)
+    def test_shared_fields_stay(self, tool_fns, tool_name, field):
+        assert field in _row_model(tool_fns, tool_name).model_fields
+
+    @pytest.mark.parametrize("tool_name", ["genes_by_ontology", "gene_ontology_terms"])
+    def test_tcdb_calls_is_a_string_list(self, tool_fns, tool_name):
+        ann = str(_row_model(tool_fns, tool_name).model_fields["tcdb_calls"].annotation)
+        assert "list[str]" in ann
+
+    @pytest.mark.parametrize("tool_name", ["genes_by_ontology", "gene_ontology_terms"])
+    def test_qcov_description_says_percent(self, tool_fns, tool_name):
+        desc = _row_model(tool_fns, tool_name).model_fields["qcov"].description or ""
+        assert "percent" in desc.lower()
+        assert "fraction" not in desc.lower()
+
+    @pytest.mark.parametrize("tool_name", ["genes_by_ontology", "gene_ontology_terms"])
+    @pytest.mark.parametrize("field", ["confidence_score", "pfam_support", "consensus_n"])
+    def test_shared_scores_no_longer_claim_tcdb(self, tool_fns, tool_name, field):
+        """These stay for MEROPS only; their sparse note must not list tcdb."""
+        desc = _row_model(tool_fns, tool_name).model_fields[field].description or ""
+        assert "tcdb" not in desc.lower(), desc
+
+    @pytest.mark.parametrize("tool_name", ["genes_by_ontology", "gene_ontology_terms"])
+    def test_evidence_score_description_drops_tcdb(self, tool_fns, tool_name):
+        row = _row_model(tool_fns, tool_name)
+        desc = row.model_fields["evidence_score"].description or ""
+        assert "tcdb" not in desc.lower(), desc
+
+    @pytest.mark.parametrize("tool_name", ["genes_by_ontology", "gene_ontology_terms"])
+    def test_row_accepts_a_tcdb_row(self, tool_fns, tool_name):
+        row = _row_model(tool_fns, tool_name)
+        payload = {
+            "locus_tag": "PMM0710", "term_id": "tcdb:3.A.1.7.6",
+            "term_name": "PstSCAB", "level": 4, "is_informative": True,
+            "evidence": "homology",
+            "tcdb_call": "diamond_best_hit", "tcdb_gate": "direct",
+            "tcdb_calls": ["diamond_best_hit", "diamond_tier", "eggnog"],
+            "tcdb_best_hit_rank": 1, "tcdb_scov": 88.0, "identity": 61.0,
+            "qcov": 97.0,
+        }
+        required = {n for n, f in row.model_fields.items() if f.is_required()}
+        missing = required - payload.keys()
+        assert missing <= {"organism_name", "gene_name", "product",
+                           "ontology_type", "term_name"}, missing
+        payload.update({n: "x" for n in missing})
+        inst = row(**payload)
+        assert inst.tcdb_calls == ["diamond_best_hit", "diamond_tier", "eggnog"]
+        assert inst.tcdb_gate == "direct"
+
+
+class TestTcdbCleanupOntologyEnvelopes:
+    @pytest.mark.parametrize("tool_name", ["genes_by_ontology", "gene_ontology_terms"])
+    def test_by_tcdb_call_declared(self, tool_fns, tool_name):
+        resp = _tcdb_resp_model(tool_fns, tool_name)
+        assert "by_tcdb_call" in resp.model_fields
+        assert "by_call_class" in resp.model_fields  # its twin
+
+    def test_search_ontology_row_tcdb_term_columns(self, tool_fns):
+        row = _row_model(tool_fns, "search_ontology")
+        for f in ("superfamily", "tcdb_substrate_count", "direction"):
+            assert f in row.model_fields, f
+        # TcdbFamily.metabolite_count is gone; the column was TCDB-only here.
+        assert "metabolite_count" not in row.model_fields
+
+    def test_ontology_term_details_row_tcdb_columns(self, tool_fns):
+        row = _row_model(tool_fns, "ontology_term_details")
+        for f in ("tcdb_id", "tc_class_id", "superfamily",
+                  "tcdb_substrate_count", "direction", "direction_basis"):
+            assert f in row.model_fields, f
+        # KEGG pathway terms keep metabolite_count; its prose must drop TCDB.
+        desc = row.model_fields["metabolite_count"].description or ""
+        assert "tcdb" not in desc.lower(), desc
+
+    @pytest.mark.asyncio
+    async def test_ontology_term_details_roundtrip_tcdb_columns(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.ontology_term_details",
+            return_value=_OTD_API_RETURN,
+        ):
+            result = await tool_fns["ontology_term_details"](
+                mock_ctx, term_ids=["tcdb:3.A.1", "go:0006979", "bogus:xyz"])
+        tcdb_row = next(r for r in result.results if r.ontology == "tcdb")
+        assert tcdb_row.tcdb_substrate_count == 551
+        assert tcdb_row.direction == "unknown"
+
+
+class TestTcdbCleanupChemistryModels:
+    """gbm / mbg envelope models for the route rollup and the
+    family-substrates hint."""
+
+    @pytest.mark.parametrize("name", ["GbmByTcdbRoute", "MbgByTcdbRoute"])
+    def test_route_model_literal(self, name):
+        from pydantic import ValidationError
+        import multiomics_explorer.mcp_server.tools as tools_mod
+        model = getattr(tools_mod, name)
+        for ok in ("direct", "family"):
+            assert model(tcdb_route=ok, count=1).tcdb_route == ok
+        for bad in ("most_specific", "inherited"):
+            with pytest.raises(ValidationError):
+                model(tcdb_route=bad, count=1)
+
+    @pytest.mark.parametrize("tool", ["genes_by_metabolite", "metabolites_by_gene"])
+    def test_not_shown_is_nullable_counts(self, tool_fns, tool):
+        resp = _tcdb_resp_model(tool_fns, tool)
+        field = resp.model_fields["tcdb_family_substrates_not_shown"]
+        assert "None" in str(field.annotation)
+        assert field.description and len(field.description) <= 250
+        hint_model = _tcdb_item_model(resp, "tcdb_family_substrates_not_shown")
+        assert set(hint_model.model_fields) == {"genes", "metabolites", "rows"}
+
+    @pytest.mark.parametrize("tool", ["genes_by_metabolite", "metabolites_by_gene"])
+    def test_skipped_entry_fields(self, tool_fns, tool):
+        resp = _tcdb_resp_model(tool_fns, tool)
+        field = resp.model_fields["tcdb_family_substrates_skipped"]
+        assert field.description and len(field.description) <= 250
+        entry = _tcdb_item_model(resp, "tcdb_family_substrates_skipped")
+        assert set(entry.model_fields) >= {
+            "locus_tag", "tcdb_id", "tcdb_substrate_count"}
+
+    @pytest.mark.parametrize("tool", ["genes_by_metabolite", "metabolites_by_gene"])
+    def test_include_tcdb_family_substrates_description(self, tool_fns, tool):
+        descs = [d for d in _field_descriptions(
+            tool_fns, tool, "include_tcdb_family_substrates") if d]
+        assert descs
+        joined = " ".join(descs)
+        assert len(joined) <= 250
+        assert "family" in joined.lower()
+
+    @pytest.mark.parametrize("name", ["GbmTopTcdbFamily", "MbgTopTcdbFamily"])
+    def test_top_tcdb_family_level_kind_prose(self, name):
+        import multiomics_explorer.mcp_server.tools as tools_mod
+        model = getattr(tools_mod, name)
+        desc = model.model_fields["level_kind"].description or ""
+        assert "tc_system" in desc
+        assert "tc_specificity" not in desc
+        entry = model(tcdb_family_id="tcdb:3.A.1.7", tcdb_family_name="PhoT",
+                      level_kind="tc_subfamily", tcdb_route="family",
+                      direction="uptake", gene_count=1, metabolite_count=2)
+        assert entry.tcdb_route == "family"
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("tool,anchor", [
+        ("genes_by_metabolite", {"metabolite_ids": ["kegg.compound:C00009"]}),
+        ("metabolites_by_gene", {"locus_tags": ["PMM0710"]}),
+    ])
+    async def test_hint_absent_keys_default(self, tool_fns, mock_ctx, tool, anchor):
+        """Older api dicts without the hint keys still validate: skipped
+        defaults to [] (the hint itself is always set by the api)."""
+        base = _GBM_SAMPLE_API_RETURN if tool == "genes_by_metabolite" \
+            else _MBG_SAMPLE_API_RETURN
+        ret = {k: v for k, v in base.items() if k != "tcdb_family_substrates_skipped"}
+        with patch(f"multiomics_explorer.api.functions.{tool}", return_value=ret):
+            result = await tool_fns[tool](
+                mock_ctx, organism="Prochlorococcus MED4", **anchor)
+        assert result.tcdb_family_substrates_skipped == []
+
+
+class TestTcdbCleanupGeneOverviewModel:
+    def test_row_fields(self, tool_fns):
+        row = _row_model(tool_fns, "gene_overview")
+        f = row.model_fields
+        assert f["tcdb_assignment_count"].default == 0
+        assert "None" in str(f["tcdb_best_hit_identity"].annotation)
+        assert f["tcdb_best_hit_identity"].default is None
+        for retired in ("tcdb_family_count", "tcdb_evidence_score_max",
+                        "transport_substrate_resolution"):
+            assert retired not in f, retired
+
+    def test_descriptions(self, tool_fns):
+        f = _row_model(tool_fns, "gene_overview").model_fields
+        ident = f["tcdb_best_hit_identity"].description or ""
+        assert "rank" in ident.lower() or "best hit" in ident.lower()
+        assert len(ident) <= 250
+        assign = f["tcdb_assignment_count"].description or ""
+        assert "deepest" not in assign.lower()
+        assert assign
+
+    def test_has_tcdb_description_reads_assignment_count(self, tool_fns):
+        resp = _tcdb_resp_model(tool_fns, "gene_overview")
+        desc = resp.model_fields["has_tcdb"].description or ""
+        assert "tcdb_assignment_count" in desc
+        assert "deepest" not in desc.lower()
+
+    @pytest.mark.asyncio
+    async def test_best_hit_identity_roundtrip(self, tool_fns, mock_ctx):
+        api_return = TestGeneOverviewPhase1PlumbingWrapper()._api_return_with_chem(
+            "PMM0125", tcdb_best_hit_identity=34.8, tcdb_assignment_count=0,
+        )
+        with patch("multiomics_explorer.api.functions.gene_overview",
+                   return_value=api_return):
+            res = await tool_fns["gene_overview"](mock_ctx, locus_tags=["PMM0125"])
+        r = res.results[0]
+        # Not gated: a below_gate (< 40%) best hit is still reported.
+        assert r.tcdb_best_hit_identity == 34.8
+        assert r.tcdb_assignment_count == 0
+
+
+class TestTcdbCleanupProse:
+    """G3 / G6: retired TCDB vocabulary is gone from every outfacing
+    surface — tool docstrings, param Field descriptions, response-model
+    field descriptions — and list_metabolites.transporter_count is
+    reworded (direct systems, no substrate_depth)."""
+
+    def test_no_retired_terms_in_tool_docstrings(self, tool_fns):
+        import inspect
+        hits = [
+            (name, term) for name, fn in tool_fns.items()
+            for term in _TCDB_RETIRED_TERMS
+            if term in (inspect.getdoc(fn) or "")
+        ]
+        assert not hits, hits
+
+    def test_no_retired_terms_in_param_descriptions(self, tool_fns):
+        import inspect
+        hits = []
+        for name, fn in tool_fns.items():
+            for param in inspect.signature(fn).parameters:
+                if param == "ctx":
+                    continue
+                try:
+                    descs = _field_descriptions(tool_fns, name, param)
+                except AssertionError:
+                    continue
+                text = " ".join(d for d in descs if d)
+                hits += [(name, param, t) for t in _TCDB_RETIRED_TERMS if t in text]
+        assert not hits, hits
+
+    def test_no_retired_terms_in_response_model_descriptions(self, tool_fns):
+        hits = []
+        for qual, model in _tcdb_all_models(tool_fns).items():
+            texts = [model.__doc__ or ""] + [
+                (f.description or "") for f in model.model_fields.values()]
+            for term in _TCDB_RETIRED_TERMS:
+                if any(term in t for t in texts):
+                    hits.append((qual, term))
+        assert not hits, hits
+
+    @pytest.mark.parametrize("term", ["tcdb_evidence_score", "tcdb_family_count",
+                                      "transport_substrate_resolution",
+                                      "substrate_depth", "tc_specificity"])
+    def test_no_retired_field_names_in_models(self, tool_fns, term):
+        names = [
+            (qual, f) for qual, model in _tcdb_all_models(tool_fns).items()
+            for f in model.model_fields if f.startswith(term)
+        ]
+        assert not names, names
+
+    def test_list_metabolites_transporter_count_description(self, tool_fns):
+        row = _row_model(tool_fns, "list_metabolites")
+        desc = row.model_fields["transporter_count"].description or ""
+        assert "substrate_depth" not in desc
+        assert "direct" in desc.lower()
+
+    def test_list_filter_values_literal_tcdb_values(self, tool_fns):
+        hint = _hint_str(tool_fns, "list_filter_values", "filter_type")
+        for v in ("tcdb_call", "tcdb_gate", "direction"):
+            assert f"'{v}'" in hint, v
+        assert "'attachment_depth'" not in hint
+
+
+class TestTcdbCleanupReviewFixes:
+    """Stage-3 review fixes: TCDB trust_axes examples drop evidence_score,
+    evidence_score_stats says None for TCDB, tcdb_call describes edge-level
+    gating, and tier prose names both TCDB derivations."""
+
+    @pytest.mark.parametrize("tool_name", [
+        "pathway_enrichment", "cluster_enrichment", "genes_by_ontology",
+    ])
+    def test_trust_axes_example_has_no_tcdb_evidence_score(self, tool_fns, tool_name):
+        resp = _response_model(tool_fns, tool_name)
+        desc = resp.model_fields["trust_axes"].description or ""
+        assert "'tcdb'" in desc, desc
+        assert "'evidence_score'" not in desc, desc
+
+    @pytest.mark.parametrize("tool_name", ["genes_by_ontology", "gene_ontology_terms"])
+    def test_evidence_score_stats_none_for_tcdb(self, tool_fns, tool_name):
+        desc = _response_model(tool_fns, tool_name).model_fields[
+            "evidence_score_stats"].description or ""
+        assert "None for TCDB" in desc, desc
+
+    @pytest.mark.parametrize("tool_name", ["genes_by_ontology", "gene_ontology_terms"])
+    def test_tcdb_call_describes_edge_gating(self, tool_fns, tool_name):
+        desc = _param_description(tool_fns, tool_name, "tcdb_call")
+        assert "representative tcdb_call is in" not in desc, desc
+        assert "edges" in desc and "before the representative" in desc, desc
+        assert "ancestor" in desc, desc
+        assert len(desc) <= 250, len(desc)
+
+    def test_tier_prose_names_both_tcdb_derivations(self, tool_fns):
+        desc = _param_description(tool_fns, "genes_by_ontology", "max_tier")
+        assert "truncation depth" not in desc, desc
+        for s in ("diamond_tier", "diamond_best_hit", "identity band"):
+            assert s in desc, s
+        for tool_name in ("genes_by_ontology", "gene_ontology_terms"):
+            row = _row_model(tool_fns, tool_name)
+            tdesc = row.model_fields["tier"].description or ""
+            assert "identity band" in tdesc and "eggnog" in tdesc, tdesc

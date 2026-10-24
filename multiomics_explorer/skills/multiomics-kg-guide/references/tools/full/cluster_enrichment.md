@@ -32,9 +32,10 @@ docs://tools/cluster_enrichment; summary=True first.
 | informative_only | bool | True | True drops terms the KG flags uninformative (roots, catch-alls). |
 | sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See list_filter_values('sources'). |
 | evidence | list[string] \| None | None | Keep rows whose compact evidence-ladder value is in this list. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See docs://analysis/annotation_evidence. |
-| max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (diamond truncation depth, 1-3; null tier always kept). Valid on tcdb, merops only. |
-| min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, tcdb, merops. |
+| max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (1-3; null always kept, e.g. TCDB eggnog). tcdb, merops only. TCDB tier is consensus tier on diamond_tier, identity band on diamond_best_hit; never compare across kinds or ontologies. |
+| min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, merops; TCDB carries no evidence_score (raises). |
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
+| tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked. Leaf mode still drops ancestors via all edges, so a call kind only on an ancestor term yields no row. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
 
 **Discovery:** use `list_organisms` for valid organism names.
@@ -75,7 +76,7 @@ analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_t
 - **term_validation** (PathwayEnrichmentTermValidation): Namespaced passthrough of term_id validation from genes_by_ontology
 - **enrichment_params** (object | None): ORA parameters used for this call. See docs://analysis/enrichment.
 - **filters_applied** (object): Echo of the trust filters actually set on this call. See docs://analysis/annotation_evidence.
-- **trust_axes** (object): Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','evidence_score','tier']}.
+- **trust_axes** (object): Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','tier']} (TCDB has no evidence_score).
 - **background_filtered** (bool): True when a trust filter narrowed the background.
 - **interpro_type** (string | None): Echo of the interpro_type stratum used (sparse: only when ontology='interpro').
 

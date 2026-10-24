@@ -1,7 +1,7 @@
 by_evidence_source: []
 by_evidence_source_combination: []
 by_metabolite: []
-by_substrate_depth: []
+by_tcdb_route: []
 case_id: genes_by_metabolite_alcohol_alteromonas_not_matched
 gene_count_total: 0
 metabolite_count_total: 0
@@ -20,6 +20,11 @@ row_count: 0
 rows_by_go_term_depth: []
 stereo_forms_added: {}
 stereo_relatives: {}
+tcdb_family_substrates_not_shown:
+  genes: 0
+  metabolites: 0
+  rows: 0
+tcdb_family_substrates_skipped: []
 top_gene_categories: []
 top_genes: []
 top_reactions: []

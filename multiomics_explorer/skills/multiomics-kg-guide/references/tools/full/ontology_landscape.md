@@ -25,6 +25,7 @@ docs://tools/ontology_landscape; summary=True first.
 | max_gene_set_size | int | 500 | Exclude terms with more genes than this (default 500). |
 | informative_only | bool | True | True drops terms the KG flags uninformative (roots, catch-alls). |
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
+| tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked. Leaf mode still drops ancestors via all edges, so a call kind only on an ancestor term yields no row. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
 
 **Discovery:** use `list_organisms` for valid organism names.
@@ -169,8 +170,8 @@ ontology_landscape(organism="MED4")
     },
     "kegg": {
       "best_level": 1,
-      "best_genome_coverage": 0.3867207298530157,
-      "best_relevance_rank": 14,
+      "best_genome_coverage": 0.3841865179929042,
+      "best_relevance_rank": 15,
       "n_levels": 3,
       "tree": null,
       "tree_code": null,
@@ -205,8 +206,8 @@ ontology_landscape(organism="MED4")
     },
     "tcdb": {
       "best_level": 0,
-      "best_genome_coverage": 0.1804358844399392,
-      "best_relevance_rank": 28,
+      "best_genome_coverage": 0.10288900152052712,
+      "best_relevance_rank": 36,
       "n_levels": 5,
       "tree": null,
       "tree_code": null,
@@ -224,7 +225,7 @@ ontology_landscape(organism="MED4")
     "brite:transporters": {
       "best_level": 0,
       "best_genome_coverage": 0.04308160162189559,
-      "best_relevance_rank": 44,
+      "best_relevance_rank": 45,
       "n_levels": 3,
       "tree": "transporters",
       "tree_code": "ko02000",
@@ -233,7 +234,7 @@ ontology_landscape(organism="MED4")
     "brite:trna_biogenesis": {
       "best_level": 0,
       "best_genome_coverage": 0.03294475418144957,
-      "best_relevance_rank": 47,
+      "best_relevance_rank": 48,
       "n_levels": 3,
       "tree": "trna_biogenesis",
       "tree_code": "ko03016",
@@ -260,7 +261,7 @@ ontology_landscape(organism="MED4")
     "merops": {
       "best_level": 0,
       "best_genome_coverage": 0.017232640648758235,
-      "best_relevance_rank": 59,
+      "best_relevance_rank": 60,
       "n_levels": 2,
       "tree": null,
       "tree_code": null,
@@ -269,7 +270,7 @@ ontology_landscape(organism="MED4")
     "cazy": {
       "best_level": 0,
       "best_genome_coverage": 0.016218955904713634,
-      "best_relevance_rank": 61,
+      "best_relevance_rank": 62,
       "n_levels": 2,
       "tree": null,
       "tree_code": null,
@@ -278,7 +279,7 @@ ontology_landscape(organism="MED4")
     "brite:chaperones": {
       "best_level": 0,
       "best_genome_coverage": 0.012164216928535226,
-      "best_relevance_rank": 63,
+      "best_relevance_rank": 64,
       "n_levels": 1,
       "tree": "chaperones",
       "tree_code": "ko03110",
@@ -287,7 +288,7 @@ ontology_landscape(organism="MED4")
     "brite:dna_replication": {
       "best_level": 0,
       "best_genome_coverage": 0.011150532184490624,
-      "best_relevance_rank": 64,
+      "best_relevance_rank": 65,
       "n_levels": 4,
       "tree": "dna_replication",
       "tree_code": "ko03032",
@@ -296,7 +297,7 @@ ontology_landscape(organism="MED4")
     "brite:translation_factors": {
       "best_level": 0,
       "best_genome_coverage": 0.008109477952356817,
-      "best_relevance_rank": 66,
+      "best_relevance_rank": 67,
       "n_levels": 2,
       "tree": "translation_factors",
       "tree_code": "ko03012",
@@ -305,7 +306,7 @@ ontology_landscape(organism="MED4")
     "ncbifam": {
       "best_level": 0,
       "best_genome_coverage": 0.008109477952356817,
-      "best_relevance_rank": 67,
+      "best_relevance_rank": 68,
       "n_levels": 1,
       "tree": null,
       "tree_code": null,
@@ -314,7 +315,7 @@ ontology_landscape(organism="MED4")
     "brite:transcription_factors": {
       "best_level": 0,
       "best_genome_coverage": 0.00506842372022301,
-      "best_relevance_rank": 72,
+      "best_relevance_rank": 73,
       "n_levels": 2,
       "tree": "transcription_factors",
       "tree_code": "ko03000",
@@ -323,7 +324,7 @@ ontology_landscape(organism="MED4")
     "brite:secretion": {
       "best_level": 0,
       "best_genome_coverage": 0.00456158134820071,
-      "best_relevance_rank": 73,
+      "best_relevance_rank": 74,
       "n_levels": 2,
       "tree": "secretion",
       "tree_code": "ko02044",
@@ -332,7 +333,7 @@ ontology_landscape(organism="MED4")
     "brite:two_component": {
       "best_level": 0,
       "best_genome_coverage": 0.0030410542321338066,
-      "best_relevance_rank": 78,
+      "best_relevance_rank": 79,
       "n_levels": 1,
       "tree": "two_component",
       "tree_code": "ko02022",
@@ -502,7 +503,7 @@ ontology_landscape(organism="MED4", ontology="brite", tree="transporters")
 ontology_landscape(organism="MED4", ontology=["tcdb", "cazy"])
 ```
 
-*TCDB has 5 levels (`tc_class` … `tc_specificity`), CAZy 2 (class, family); rows carry only `level`, not a level-kind label — see docs://ontologies/tcdb and docs://ontologies/cazy for what each level means. Both are small and thinly annotated in Prochlorococcus, so few levels pass the default size filter.*
+*TCDB has 5 levels (`tc_class` … `tc_system`), CAZy 2 (class, family); rows carry only `level`, not a level-kind label — see docs://ontologies/tcdb and docs://ontologies/cazy for what each level means. Both are small and thinly annotated in Prochlorococcus, so few levels pass the default size filter.*
 
 ```example-response
 {
@@ -512,7 +513,7 @@ ontology_landscape(organism="MED4", ontology=["tcdb", "cazy"])
   "by_ontology": {
     "tcdb": {
       "best_level": 0,
-      "best_genome_coverage": 0.1804358844399392,
+      "best_genome_coverage": 0.10288900152052712,
       "best_relevance_rank": 1,
       "n_levels": 5,
       "tree": null,
@@ -522,7 +523,7 @@ ontology_landscape(organism="MED4", ontology=["tcdb", "cazy"])
     "cazy": {
       "best_level": 0,
       "best_genome_coverage": 0.016218955904713634,
-      "best_relevance_rank": 5,
+      "best_relevance_rank": 6,
       "n_levels": 2,
       "tree": null,
       "tree_code": null,
@@ -541,13 +542,13 @@ ontology_landscape(organism="MED4", ontology=["tcdb", "cazy"])
       "level": 0,
       "relevance_rank": 1,
       "n_terms_with_genes": 7,
-      "n_genes_at_level": 356,
-      "genome_coverage": 0.1804358844399392,
-      "min_genes_per_term": 14,
-      "q1_genes_per_term": 21.5,
-      "median_genes_per_term": 43.0,
-      "q3_genes_per_term": 71.0,
-      "max_genes_per_term": 188,
+      "n_genes_at_level": 203,
+      "genome_coverage": 0.10288900152052712,
+      "min_genes_per_term": 5,
+      "q1_genes_per_term": 7.0,
+      "median_genes_per_term": 14.0,
+      "q3_genes_per_term": 26.5,
+      "max_genes_per_term": 130,
       "n_levels_in_ontology": 5,
       "best_effort_share": null
     },
@@ -555,14 +556,14 @@ ontology_landscape(organism="MED4", ontology=["tcdb", "cazy"])
       "ontology_type": "tcdb",
       "level": 1,
       "relevance_rank": 2,
-      "n_terms_with_genes": 11,
-      "n_genes_at_level": 342,
-      "genome_coverage": 0.17334009123162697,
-      "min_genes_per_term": 8,
-      "q1_genes_per_term": 15.0,
-      "median_genes_per_term": 26.0,
-      "q3_genes_per_term": 49.0,
-      "max_genes_per_term": 133,
+      "n_terms_with_genes": 10,
+      "n_genes_at_level": 192,
+      "genome_coverage": 0.09731373542828181,
+      "min_genes_per_term": 5,
+      "q1_genes_per_term": 7.25,
+      "median_genes_per_term": 9.5,
+      "q3_genes_per_term": 23.75,
+      "max_genes_per_term": 89,
       "n_levels_in_ontology": 5,
       "best_effort_share": null
     },
@@ -570,14 +571,14 @@ ontology_landscape(organism="MED4", ontology=["tcdb", "cazy"])
       "ontology_type": "tcdb",
       "level": 2,
       "relevance_rank": 3,
-      "n_terms_with_genes": 22,
-      "n_genes_at_level": 197,
-      "genome_coverage": 0.09984794728839332,
-      "min_genes_per_term": 5,
-      "q1_genes_per_term": 6.0,
-      "median_genes_per_term": 8.0,
-      "q3_genes_per_term": 10.75,
-      "max_genes_per_term": 65,
+      "n_terms_with_genes": 8,
+      "n_genes_at_level": 123,
+      "genome_coverage": 0.06234161175874303,
+      "min_genes_per_term": 7,
+      "q1_genes_per_term": 8.75,
+      "median_genes_per_term": 10.0,
+      "q3_genes_per_term": 12.5,
+      "max_genes_per_term": 52,
       "n_levels_in_ontology": 5,
       "best_effort_share": null
     },
@@ -935,7 +936,7 @@ ontology_landscape(organism="MED4", informative_only=False)
     },
     "kegg": {
       "best_level": 1,
-      "best_genome_coverage": 0.3867207298530157,
+      "best_genome_coverage": 0.3841865179929042,
       "best_relevance_rank": 15,
       "n_levels": 3,
       "tree": null,
@@ -971,8 +972,8 @@ ontology_landscape(organism="MED4", informative_only=False)
     },
     "tcdb": {
       "best_level": 0,
-      "best_genome_coverage": 0.1804358844399392,
-      "best_relevance_rank": 28,
+      "best_genome_coverage": 0.10288900152052712,
+      "best_relevance_rank": 36,
       "n_levels": 5,
       "tree": null,
       "tree_code": null,
@@ -990,7 +991,7 @@ ontology_landscape(organism="MED4", informative_only=False)
     "brite:transporters": {
       "best_level": 0,
       "best_genome_coverage": 0.04308160162189559,
-      "best_relevance_rank": 44,
+      "best_relevance_rank": 45,
       "n_levels": 3,
       "tree": "transporters",
       "tree_code": "ko02000",
@@ -999,7 +1000,7 @@ ontology_landscape(organism="MED4", informative_only=False)
     "brite:trna_biogenesis": {
       "best_level": 0,
       "best_genome_coverage": 0.03294475418144957,
-      "best_relevance_rank": 47,
+      "best_relevance_rank": 48,
       "n_levels": 3,
       "tree": "trna_biogenesis",
       "tree_code": "ko03016",
@@ -1026,7 +1027,7 @@ ontology_landscape(organism="MED4", informative_only=False)
     "merops": {
       "best_level": 0,
       "best_genome_coverage": 0.017232640648758235,
-      "best_relevance_rank": 60,
+      "best_relevance_rank": 61,
       "n_levels": 2,
       "tree": null,
       "tree_code": null,
@@ -1035,7 +1036,7 @@ ontology_landscape(organism="MED4", informative_only=False)
     "cazy": {
       "best_level": 0,
       "best_genome_coverage": 0.016218955904713634,
-      "best_relevance_rank": 62,
+      "best_relevance_rank": 63,
       "n_levels": 2,
       "tree": null,
       "tree_code": null,
@@ -1044,7 +1045,7 @@ ontology_landscape(organism="MED4", informative_only=False)
     "brite:chaperones": {
       "best_level": 0,
       "best_genome_coverage": 0.012164216928535226,
-      "best_relevance_rank": 63,
+      "best_relevance_rank": 64,
       "n_levels": 1,
       "tree": "chaperones",
       "tree_code": "ko03110",
@@ -1053,7 +1054,7 @@ ontology_landscape(organism="MED4", informative_only=False)
     "brite:dna_replication": {
       "best_level": 0,
       "best_genome_coverage": 0.011150532184490624,
-      "best_relevance_rank": 64,
+      "best_relevance_rank": 65,
       "n_levels": 4,
       "tree": "dna_replication",
       "tree_code": "ko03032",
@@ -1062,7 +1063,7 @@ ontology_landscape(organism="MED4", informative_only=False)
     "brite:translation_factors": {
       "best_level": 0,
       "best_genome_coverage": 0.008109477952356817,
-      "best_relevance_rank": 66,
+      "best_relevance_rank": 67,
       "n_levels": 2,
       "tree": "translation_factors",
       "tree_code": "ko03012",
@@ -1071,7 +1072,7 @@ ontology_landscape(organism="MED4", informative_only=False)
     "ncbifam": {
       "best_level": 0,
       "best_genome_coverage": 0.008109477952356817,
-      "best_relevance_rank": 67,
+      "best_relevance_rank": 68,
       "n_levels": 1,
       "tree": null,
       "tree_code": null,
@@ -1080,7 +1081,7 @@ ontology_landscape(organism="MED4", informative_only=False)
     "brite:transcription_factors": {
       "best_level": 0,
       "best_genome_coverage": 0.00506842372022301,
-      "best_relevance_rank": 72,
+      "best_relevance_rank": 73,
       "n_levels": 2,
       "tree": "transcription_factors",
       "tree_code": "ko03000",
@@ -1089,7 +1090,7 @@ ontology_landscape(organism="MED4", informative_only=False)
     "brite:secretion": {
       "best_level": 0,
       "best_genome_coverage": 0.00456158134820071,
-      "best_relevance_rank": 73,
+      "best_relevance_rank": 74,
       "n_levels": 2,
       "tree": "secretion",
       "tree_code": "ko02044",
@@ -1098,7 +1099,7 @@ ontology_landscape(organism="MED4", informative_only=False)
     "brite:two_component": {
       "best_level": 0,
       "best_genome_coverage": 0.0030410542321338066,
-      "best_relevance_rank": 78,
+      "best_relevance_rank": 79,
       "n_levels": 1,
       "tree": "two_component",
       "tree_code": "ko02022",
@@ -1289,7 +1290,7 @@ results[0]['relevance_rank']
 
 - CAZy is a small ontology (64 nodes — 6 classes + 58 families). With default `min_gene_set_size=5`, only a handful of CAZy terms ever pass the filter — typically 1–2 rows per organism. This is expected, not a bug. Pass `min_gene_set_size=1` to see all CAZy classes/families.
 
-- TCDB and CAZy use organism-scoped term-size stats just like the other ontologies. TCDB has 5 levels (`tc_class`...`tc_specificity`); CAZy has 2 (`cazy_class`, `cazy_family`).
+- TCDB and CAZy use organism-scoped term-size stats just like the other ontologies. TCDB has 5 levels (`tc_class`...`tc_system`); its term sizes and coverage count gated edges only (`tcdb_gate` direct or annotated); CAZy has 2 (`cazy_class`, `cazy_family`).
 
 ```mistake
 result['total_rows']  # KeyError

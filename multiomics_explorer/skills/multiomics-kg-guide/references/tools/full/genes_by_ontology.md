@@ -25,10 +25,12 @@ docs://tools/genes_by_ontology; summary=True first.
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See list_filter_values('sources'). |
 | evidence | list[string] \| None | None | Keep rows whose compact evidence-ladder value is in this list. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See docs://analysis/annotation_evidence. |
-| max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (diamond truncation depth, 1-3; null tier always kept). Valid on tcdb, merops only. |
-| min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, tcdb, merops. |
+| max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (1-3; null always kept, e.g. TCDB eggnog). tcdb, merops only. TCDB tier is consensus tier on diamond_tier, identity band on diamond_best_hit; never compare across kinds or ontologies. |
+| min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, merops; TCDB carries no evidence_score (raises). |
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
+| tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked. Leaf mode still drops ancestors via all edges, so a call kind only on an ancestor term yields no row. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
+| include_weak_tcdb_hits | bool | False | TCDB only: also return one row per weak hit (tcdb_gate='below_gate', diamond only), tagged in tcdb_gate. Adds rows; default rows are unchanged. No-op for other ontologies. |
 | limit | int | 50 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -39,7 +41,7 @@ docs://tools/genes_by_ontology; summary=True first.
 ### Envelope
 
 ```expected-keys
-ontology, organism_name, total_matching, total_genes, total_terms, total_categories, genes_per_term_min, genes_per_term_median, genes_per_term_max, terms_per_gene_min, terms_per_gene_median, terms_per_gene_max, by_category, by_level, top_terms, n_best_effort_terms, not_found, wrong_ontology, wrong_level, filtered_out, size_filtered_terms, size_filtered_genes, resolved_aliases, returned, offset, truncated, trust_axes, warnings, filters_applied, skipped_ontologies, by_evidence, by_tier, by_sources, by_call_class, evidence_score_stats, results
+ontology, organism_name, total_matching, total_genes, total_terms, total_categories, genes_per_term_min, genes_per_term_median, genes_per_term_max, terms_per_gene_min, terms_per_gene_median, terms_per_gene_max, by_category, by_level, top_terms, n_best_effort_terms, not_found, wrong_ontology, wrong_level, filtered_out, size_filtered_terms, size_filtered_genes, resolved_aliases, returned, offset, truncated, trust_axes, warnings, filters_applied, skipped_ontologies, by_evidence, by_tier, by_sources, by_call_class, by_tcdb_call, evidence_score_stats, results
 ```
 
 - **ontology** (string): Echo of input ontology (e.g. 'go_bp')
@@ -68,7 +70,7 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 - **returned** (int): Rows in this response
 - **offset** (int): Offset into full result set
 - **truncated** (bool): True when total_matching > offset + returned
-- **trust_axes** (object): Trust axes this ontology carries, e.g. {'tcdb': ['sources','evidence','evidence_score','tier']}.
+- **trust_axes** (object): Trust axes this ontology carries, e.g. {'tcdb': ['sources','evidence','tier']} (TCDB has no evidence_score).
 - **warnings** (list[string]): Auto-warnings (e.g. nonpeptidase_homolog rows without a call_class filter).
 - **filters_applied** (object): Echo of the trust filters that were actually set on this call.
 - **skipped_ontologies** (list[object]): Empty for single-ontology tools; reserved for multi-ontology callers.
@@ -76,7 +78,8 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 - **by_tier** (list[object]): Rollup of tier over every matching row; carries an explicit 'null' bucket. Present in compact mode too, where tier itself is not on the row.
 - **by_sources** (list[object]): Membership counts per source value over every matching row.
 - **by_call_class** (list[object]): Rollup of MEROPS call_class over every matching row (merops only).
-- **evidence_score_stats** (object | None): {min, median, max, n_null} over evidence_score across every matching row.
+- **by_tcdb_call** (list[object]): Rollup of the representative tcdb_call over every matching row (tcdb only); twin of by_call_class.
+- **evidence_score_stats** (object | None): {min, median, max, n_null} over evidence_score across every matching row. None for TCDB (no evidence_score).
 - **evidence_score_signals** (object | None): Fired ControlledVocabulary signals per edge_type; present only when min_evidence_score was set.
 
 ### Per-result fields
@@ -99,6 +102,9 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 | signal_peptide_cleavage_probability | float \| None (optional) | SignalP cleavage-site probability (sparse: only set when ontology='signal_peptide_type' and cleavage_site present). |
 | evidence | string \| None (optional) | Compact trust ladder value (read it as-is; rung assignment is per ontology — see docs://analysis/annotation_evidence). Present on the 14 functional-edge ontologies; null on PSORTb/SignalP. |
 | call_class | string \| None (optional) | MEROPS peptidase call (sparse: merops only). 'nonpeptidase_homolog' rows are catalytically dead. |
+| tcdb_call | string \| None (optional) | TCDB call kind of the row's representative edge (precedence diamond_best_hit > diamond_tier > eggnog, then identity). Sparse: tcdb only. |
+| tcdb_gate | string \| None (optional) | KG gate of the representative TCDB edge: 'direct' / 'annotated' (default rows) or 'below_gate' (only with include_weak_tcdb_hits=True). Sparse: tcdb only. |
+| tcdb_calls | list[string] \| None (optional) | TCDB call kinds on the gene's gated edges along the term's lineage, in precedence order. The two diamond kinds are one run; eggnog + diamond = independent agreement. Sparse: tcdb only. |
 | interpro_type | string \| None (optional) | InterPro entry type (sparse: interpro only), e.g. 'DOMAIN', 'FAMILY', 'HOMOLOGOUS_SUPERFAMILY'. |
 
 **Verbose-only fields** (included when `verbose=True`):
@@ -106,17 +112,18 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 | Field | Type | Description |
 |---|---|---|
 | sources | list[string] \| None (optional) | Provenance tags on this edge (verbose only; sparse outside the 14 functional-edge ontologies), e.g. ['eggnog']. |
-| evidence_score | float \| None (optional) | Composite trust score in [0,1] (verbose only; sparse: go_bp/mf/cc, ec, pfam, cazy, tcdb, merops). |
-| tier | int \| None (optional) | Diamond truncation depth 1-3 (verbose only; sparse: tcdb, merops; owned-but-null when the edge carries no tier). |
-| attachment_depth | string \| None (optional) | TCDB rollup attachment depth: 'most_specific' or 'superseded' (verbose only; sparse: tcdb only). |
-| confidence_score | float \| None (optional) | Native rank score (verbose only; sparse: tcdb, merops). |
-| source_agreement | string \| None (optional) | TCDB two-source agreement detail (verbose only; sparse: tcdb only). |
-| pfam_support | string \| None (optional) | Pfam-domain corroboration detail (verbose only; sparse: tcdb, merops). |
-| go_support | string \| None (optional) | GO corroboration detail (verbose only; sparse: tcdb only). |
+| evidence_score | float \| None (optional) | Composite trust score in [0,1] (verbose only; sparse: go_bp/mf/cc, ec, pfam, cazy, merops). |
+| tier | int \| None (optional) | Diamond tier 1-3 (verbose only; sparse: tcdb, merops). TCDB: consensus tier on diamond_tier, identity band on diamond_best_hit, null on eggnog; never compare across kinds or ontologies. |
+| confidence_score | float \| None (optional) | Native rank score (verbose only; sparse: merops only). |
+| pfam_support | string \| None (optional) | Pfam-domain corroboration detail (verbose only; sparse: merops only). |
 | identity | float \| None (optional) | Alignment percent identity (verbose only; sparse: tcdb, merops). |
-| qcov | float \| None (optional) | Query coverage fraction (verbose only; sparse: tcdb, merops). |
+| qcov | float \| None (optional) | Query coverage, percent (verbose only; sparse: tcdb, merops). |
 | evalue | float \| None (optional) | Alignment e-value (verbose only; sparse: tcdb, merops, interpro, ncbifam). Never a filter cutoff. |
-| consensus_n | int \| None (optional) | Number of corroborating calls in consensus (verbose only; sparse: tcdb, merops). |
+| consensus_n | int \| None (optional) | Number of corroborating calls in consensus (verbose only; sparse: merops only). |
+| tcdb_scov | float \| None (optional) | TCDB diamond subject coverage, percent (verbose only; sparse: tcdb diamond edges). |
+| tcdb_best_hit_rank | int \| None (optional) | Rank of this TCDB best hit among the gene's hits (edge `rank`; 1 = top). Not a row rank (verbose only; sparse: tcdb diamond_best_hit edges). |
+| tcdb_bitscore | float \| None (optional) | TCDB diamond best-hit bit score (verbose only; sparse: tcdb diamond_best_hit edges). |
+| tcdb_bitscore_ratio | float \| None (optional) | TCDB best-hit bit score relative to the top hit (verbose only; sparse: tcdb diamond_best_hit edges). |
 | best_hit_kind | string \| None (optional) | MEROPS best-hit classification (verbose only; sparse: merops only). |
 | best_hit_id | string \| None (optional) | MEROPS best-hit identifier (verbose only; sparse: merops only). |
 | libraries | list[string] \| None (optional) | InterPro member-database libraries backing this match (verbose only; sparse: interpro only). |
@@ -185,6 +192,7 @@ genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
     {"count": 5, "source": "eggnog"}
   ],
   "by_call_class": [],
+  "by_tcdb_call": [],
   "evidence_score_stats": {"min": 0.667, "median": 0.667, "max": 1.0, "n_null": 0},
   "evidence_score_signals": null,
   "results": [
@@ -308,6 +316,7 @@ genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
   "by_tier": [],
   "by_sources": [{"count": 1761, "source": "cyanorak"}],
   "by_call_class": [],
+  "by_tcdb_call": [],
   "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
   "evidence_score_signals": null,
   "results": [
@@ -373,40 +382,42 @@ genes_by_ontology(ontology="brite", organism="MED4", level=1, tree="transporters
 genes_by_ontology(ontology="go_bp", organism="MED4", level=1, min_gene_set_size=0, max_gene_set_size=100000)
 ```
 
-### Example 7: TCDB family → gene drill-down (with descendant expansion)
+### Example 7: TCDB term → gene drill-down (with descendant expansion)
 
 ```example-call
-genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:2.A.1"])
+genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:2.A", "tcdb:2.A.1"])
 ```
 
-*The family expands DOWN through its subfamilies before binding to genes, and the default size filter applies to the expanded set: a family with fewer than `min_gene_set_size=5` MED4 genes (e.g. `tcdb:1.A.1`, 2 genes) lands in `filtered_out` with 0 rows — pass `min_gene_set_size=1` to see it.*
+*Each term expands DOWN through its families, subfamilies and systems before binding to genes, over gated edges only (`tcdb_gate` direct or annotated), so a term's gene set matches its `gene_count`. The default size filter applies to the expanded set: the subclass tcdb:2.A (Porters) keeps its MED4 genes, while MFS tcdb:2.A.1 has fewer than `min_gene_set_size=5` gated MED4 genes and lands in `filtered_out` with 0 rows — pass `min_gene_set_size=1` to see it. Rows carry `tcdb_call` / `tcdb_gate` / `tcdb_calls`; envelope `by_tcdb_call` counts them.*
 
 ```example-response
 {
   "ontology": "tcdb",
   "organism_name": "Prochlorococcus MED4",
-  "total_matching": 5,
-  "total_genes": 5,
+  "total_matching": 27,
+  "total_genes": 27,
   "total_terms": 1,
-  "total_categories": 4,
-  "genes_per_term_min": 5,
-  "genes_per_term_median": 5.0,
-  "genes_per_term_max": 5,
+  "total_categories": 8,
+  "genes_per_term_min": 27,
+  "genes_per_term_median": 27.0,
+  "genes_per_term_max": 27,
   "terms_per_gene_min": 1,
   "terms_per_gene_median": 1.0,
   "terms_per_gene_max": 1,
   "by_category": [
-    {"category": "Stress response and adaptation", "count": 2},
-    {"category": "Lipid metabolism", "count": 1},
-    {"category": "Carbohydrate metabolism", "count": 1},
-    {"category": "Amino acid metabolism", "count": 1}
+    {"category": "Transport", "count": 10},
+    {"category": "Post-translational modification", "count": 5},
+    {"category": "Stress response and adaptation", "count": 5},
+    {"category": "Cell wall and membrane", "count": 3},
+    {"category": "Amino acid metabolism", "count": 1},
+    ...
   ],
-  "by_level": [{"level": 2, "n_terms": 1, "n_genes": 5, "row_count": 5}],
+  "by_level": [{"level": 1, "n_terms": 1, "n_genes": 27, "row_count": 27}],
   "top_terms": [
     {
-      "term_id": "tcdb:2.A.1",
-      "term_name": "The Major Facilitator Superfamily (MFS)",
-      "count": 5,
+      "term_id": "tcdb:2.A",
+      "term_name": "Porters (uniporters, symporters, antiporters)",
+      "count": 27,
       "is_informative": true
     }
   ],
@@ -414,56 +425,72 @@ genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:2.A.1"])
   "not_found": [],
   "wrong_ontology": [],
   "wrong_level": [],
-  "filtered_out": [],
-  "size_filtered_terms": 0,
+  "filtered_out": ["tcdb:2.A.1"],
+  "size_filtered_terms": 1,
   "size_filtered_genes": 0,
   "resolved_aliases": {},
-  "returned": 5,
+  "returned": 27,
   "offset": 0,
   "truncated": false,
-  "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},
-  "warnings": [],
+  "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
+  "warnings": [
+    "1 terms (0 genes not otherwise covered) fell outside min_gene_set_size=5 / max_gene_set_size=500 and were dropped. Th..."
+  ],
   "filters_applied": {},
   "skipped_ontologies": [],
-  "by_evidence": [{"count": 4, "evidence": "homology"}, {"count": 1, "evidence": "family_inferred"}],
-  "by_tier": [{"count": 3, "tier": 3}, {"count": 1, "tier": "null"}, {"count": 1, "tier": 2}],
-  "by_sources": [{"count": 4, "source": "tcdb_diamond"}, {"count": 1, "source": "eggnog"}],
+  "by_evidence": [{"count": 15, "evidence": "family_inferred"}, {"count": 12, "evidence": "homology"}],
+  "by_tier": [{"count": 15, "tier": "null"}, {"count": 11, "tier": 2}, {"count": 1, "tier": 1}],
+  "by_sources": [{"count": 15, "source": "eggnog"}, {"count": 12, "source": "tcdb_diamond"}],
   "by_call_class": [],
-  "evidence_score_stats": {"min": 0.0, "median": 0.2, "max": 0.8, "n_null": 0},
+  "by_tcdb_call": [
+    {"count": 15, "tcdb_call": "eggnog"},
+    {"count": 11, "tcdb_call": "diamond_best_hit"},
+    {"count": 1, "tcdb_call": "diamond_tier"}
+  ],
+  "evidence_score_stats": null,
   "evidence_score_signals": null,
   "results": [
     {
-      "locus_tag": "PMM0402",
-      "gene_name": "fadD",
-      "product": "long-chain acyl-CoA synthetase",
-      "gene_category": "Lipid metabolism",
-      "term_id": "tcdb:2.A.1",
-      "term_name": "The Major Facilitator Superfamily (MFS)",
-      "level": 2,
+      "locus_tag": "PMM0084",
+      "gene_name": "ktrB",
+      "product": "Ktr-type potassium uptake transporter, potassium-translocating subunit B",
+      "gene_category": "Transport",
+      "term_id": "tcdb:2.A",
+      "term_name": "Porters (uniporters, symporters, antiporters)",
+      "level": 1,
       "is_informative": true,
-      "evidence": "homology"
+      "evidence": "family_inferred",
+      "tcdb_call": "eggnog",
+      "tcdb_gate": "annotated",
+      "tcdb_calls": ["eggnog"]
     },
     {
-      "locus_tag": "PMM0619",
-      "gene_name": "acs",
-      "product": "acetate--CoA ligase",
-      "gene_category": "Carbohydrate metabolism",
-      "term_id": "tcdb:2.A.1",
-      "term_name": "The Major Facilitator Superfamily (MFS)",
-      "level": 2,
+      "locus_tag": "PMM0085",
+      "gene_name": "ktrA",
+      "product": "Ktr-type potassium uptake system, NAD-binding component",
+      "gene_category": "Transport",
+      "term_id": "tcdb:2.A",
+      "term_name": "Porters (uniporters, symporters, antiporters)",
+      "level": 1,
       "is_informative": true,
-      "evidence": "homology"
+      "evidence": "homology",
+      "tcdb_call": "diamond_best_hit",
+      "tcdb_gate": "direct",
+      "tcdb_calls": ["diamond_best_hit", "diamond_tier", "eggnog"]
     },
     {
-      "locus_tag": "PMM0712",
-      "gene_name": "arsJ",
-      "product": "multidrug efflux transporter, MFS family",
-      "gene_category": "Stress response and adaptation",
-      "term_id": "tcdb:2.A.1",
-      "term_name": "The Major Facilitator Superfamily (MFS)",
-      "level": 2,
+      "locus_tag": "PMM0214",
+      "gene_name": "sul3",
+      "product": "sulfate transporter family protein",
+      "gene_category": "Transport",
+      "term_id": "tcdb:2.A",
+      "term_name": "Porters (uniporters, symporters, antiporters)",
+      "level": 1,
       "is_informative": true,
-      "evidence": "homology"
+      "evidence": "homology",
+      "tcdb_call": "diamond_best_hit",
+      "tcdb_gate": "direct",
+      "tcdb_calls": ["diamond_best_hit", "eggnog"]
     },
     ...
   ]
@@ -525,6 +552,7 @@ genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMe
   "by_tier": [],
   "by_sources": [],
   "by_call_class": [],
+  "by_tcdb_call": [],
   "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
   "evidence_score_signals": null,
   "results": [
@@ -619,6 +647,7 @@ genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_LIPO"], org
   "by_tier": [],
   "by_sources": [],
   "by_call_class": [],
+  "by_tcdb_call": [],
   "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
   "evidence_score_signals": null,
   "results": [
@@ -713,6 +742,7 @@ genes_by_ontology(ontology="interpro", organism="MED4", term_ids=["interpro:IPR0
   "by_tier": [],
   "by_sources": [{"count": 119, "source": "interproscan"}],
   "by_call_class": [],
+  "by_tcdb_call": [],
   "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
   "evidence_score_signals": null,
   "results": [
@@ -814,6 +844,7 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0, call_class=["p
   "by_tier": [{"count": 68, "tier": 3}, {"count": 4, "tier": 2}],
   "by_sources": [{"count": 72, "source": "merops_diamond"}],
   "by_call_class": [{"call_class": "peptidase", "count": 72}],
+  "by_tcdb_call": [],
   "evidence_score_stats": {"min": 0.0, "median": 0.5, "max": 1.0, "n_null": 0},
   "evidence_score_signals": null,
   "results": [
@@ -916,6 +947,7 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
   "by_tier": [{"count": 107, "tier": 3}, {"count": 5, "tier": 2}],
   "by_sources": [{"count": 112, "source": "merops_diamond"}],
   "by_call_class": [{"call_class": "peptidase", "count": 83}, {"call_class": "nonpeptidase_homolog", "count": 29}],
+  "by_tcdb_call": [],
   "evidence_score_stats": {"min": 0.0, "median": 0.5, "max": 1.0, "n_null": 0},
   "evidence_score_signals": null,
   "results": [
@@ -960,40 +992,35 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
 }
 ```
 
-### Example 14: TCDB trust detail — sources / evidence_score / tier (verbose)
+### Example 14: TCDB trust detail — sources / tier / DIAMOND statistics (verbose)
 
 ```example-call
-genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], verbose=True)
+genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1.4"], min_gene_set_size=1, verbose=True)
 ```
+
+*The urea / amino-acid subfamily tcdb:3.A.1.4 in MED4: the urtABCDE genes. Each row reports one edge by precedence (best hit, then tier, then eggNOG; then identity): `tcdb_call`, `tcdb_gate`, `sources`, `tier` and, on DIAMOND rows, `identity` / `qcov` (percent), `evalue`, `tcdb_scov`, `tcdb_best_hit_rank`, `tcdb_bitscore`, `tcdb_bitscore_ratio`. `tcdb_calls` lists every call kind on the gene's lineage through the term. TCDB carries no evidence score.*
 
 ```example-response
 {
   "ontology": "tcdb",
   "organism_name": "Prochlorococcus MED4",
-  "total_matching": 65,
-  "total_genes": 65,
+  "total_matching": 5,
+  "total_genes": 5,
   "total_terms": 1,
-  "total_categories": 11,
-  "genes_per_term_min": 65,
-  "genes_per_term_median": 65.0,
-  "genes_per_term_max": 65,
+  "total_categories": 1,
+  "genes_per_term_min": 5,
+  "genes_per_term_median": 5.0,
+  "genes_per_term_max": 5,
   "terms_per_gene_min": 1,
   "terms_per_gene_median": 1.0,
   "terms_per_gene_max": 1,
-  "by_category": [
-    {"category": "Transport", "count": 30},
-    {"category": "Stress response and adaptation", "count": 23},
-    {"category": "Central intermediary metabolism", "count": 3},
-    {"category": "Secondary metabolites", "count": 2},
-    {"category": "Translation", "count": 1},
-    ...
-  ],
-  "by_level": [{"level": 2, "n_terms": 1, "n_genes": 65, "row_count": 65}],
+  "by_category": [{"category": "Stress response and adaptation", "count": 5}],
+  "by_level": [{"level": 3, "n_terms": 1, "n_genes": 5, "row_count": 5}],
   "top_terms": [
     {
-      "term_id": "tcdb:3.A.1",
-      "term_name": "The ATP-binding Cassette (ABC) Superfamily",
-      "count": 65,
+      "term_id": "tcdb:3.A.1.4",
+      "term_name": "The Hydrophobic Amino Acid Uptake Transporter (HAAT) Family",
+      "count": 5,
       "is_informative": true
     }
   ],
@@ -1005,130 +1032,133 @@ genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], ver
   "size_filtered_terms": 0,
   "size_filtered_genes": 0,
   "resolved_aliases": {},
-  "returned": 50,
+  "returned": 5,
   "offset": 0,
-  "truncated": true,
-  "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},
+  "truncated": false,
+  "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
   "warnings": [],
   "filters_applied": {},
   "skipped_ontologies": [],
-  "by_evidence": [{"count": 40, "evidence": "family_inferred"}, {"count": 25, "evidence": "homology"}],
-  "by_tier": [{"count": 40, "tier": "null"}, {"count": 20, "tier": 3}, {"count": 5, "tier": 2}],
-  "by_sources": [{"count": 50, "source": "eggnog"}, {"count": 25, "source": "tcdb_diamond"}],
+  "by_evidence": [{"count": 5, "evidence": "homology"}],
+  "by_tier": [{"count": 5, "tier": 2}],
+  "by_sources": [{"count": 5, "source": "tcdb_diamond"}],
   "by_call_class": [],
-  "evidence_score_stats": {"min": 0.0, "median": 0.8, "max": 1.0, "n_null": 0},
+  "by_tcdb_call": [{"count": 5, "tcdb_call": "diamond_best_hit"}],
+  "evidence_score_stats": null,
   "evidence_score_signals": null,
   "results": [
     {
-      "locus_tag": "PMM0065",
-      "gene_name": "mcyH",
-      "product": "ABC transporter, ATPase component",
-      "gene_category": "Transport",
-      "term_id": "tcdb:3.A.1",
-      "term_name": "The ATP-binding Cassette (ABC) Superfamily",
-      "level": 2,
-      "is_informative": true,
-      "evidence": "family_inferred",
-      "sources": ["eggnog"],
-      "evidence_score": 0.8,
-      "tier": null,
-      "attachment_depth": "most_specific",
-      "confidence_score": null,
-      "source_agreement": "both_sources",
-      "pfam_support": "corroborated",
-      "go_support": "corroborated",
-      "identity": null,
-      "qcov": null,
-      "evalue": null,
-      "consensus_n": null,
-      "function_description": null
-    },
-    {
-      "locus_tag": "PMM0072",
-      "gene_name": "sufC",
-      "product": "ABC transporter involved in Fe-S cluster assembly, ATPase component",
+      "locus_tag": "PMM0970",
+      "gene_name": "urtA",
+      "product": "ABC-type urea transporter, substrate binding component",
       "gene_category": "Stress response and adaptation",
-      "term_id": "tcdb:3.A.1",
-      "term_name": "The ATP-binding Cassette (ABC) Superfamily",
-      "level": 2,
+      "term_id": "tcdb:3.A.1.4",
+      "term_name": "The Hydrophobic Amino Acid Uptake Transporter (HAAT) Family",
+      "level": 3,
       "is_informative": true,
       "evidence": "homology",
+      "tcdb_call": "diamond_best_hit",
+      "tcdb_gate": "direct",
+      "tcdb_calls": ["diamond_best_hit", "diamond_tier", "eggnog"],
       "sources": ["tcdb_diamond"],
-      "evidence_score": 0.4,
-      "tier": 3,
-      "attachment_depth": "most_specific",
-      "confidence_score": 0.1756,
-      "source_agreement": "single_source",
-      "pfam_support": "corroborated",
-      "go_support": "corroborated",
-      "identity": 30.9,
-      "qcov": 81.2,
-      "evalue": 4.45e-17,
-      "consensus_n": 24,
-      "function_description": "cluster assembly ATPase"
+      "tier": 2,
+      "identity": 57.1,
+      "qcov": 94.4,
+      "evalue": 4.3e-149,
+      "tcdb_scov": 90.1,
+      "tcdb_best_hit_rank": 1,
+      "tcdb_bitscore": 430.0,
+      "tcdb_bitscore_ratio": 1.0,
+      "function_description": "substrate binding protein"
     },
     {
-      "locus_tag": "PMM0089",
-      "gene_name": null,
-      "product": "ABC transport system ATP-binding/permease protein, Uup family",
-      "gene_category": "Transport",
-      "term_id": "tcdb:3.A.1",
-      "term_name": "The ATP-binding Cassette (ABC) Superfamily",
-      "level": 2,
+      "locus_tag": "PMM0971",
+      "gene_name": "urtB",
+      "product": "ABC-type urea transporter, permease component",
+      "gene_category": "Stress response and adaptation",
+      "term_id": "tcdb:3.A.1.4",
+      "term_name": "The Hydrophobic Amino Acid Uptake Transporter (HAAT) Family",
+      "level": 3,
       "is_informative": true,
       "evidence": "homology",
+      "tcdb_call": "diamond_best_hit",
+      "tcdb_gate": "direct",
+      "tcdb_calls": ["diamond_best_hit", "eggnog"],
       "sources": ["tcdb_diamond"],
-      "evidence_score": 0.4,
-      "tier": 3,
-      "attachment_depth": "most_specific",
-      "confidence_score": 0.2655,
-      "source_agreement": "single_source",
-      "pfam_support": "corroborated",
-      "go_support": "corroborated",
-      "identity": 38.5,
-      "qcov": 98.5,
-      "evalue": 1.4e-109,
-      "consensus_n": 24,
-      "function_description": null
+      "tier": 2,
+      "identity": 52.8,
+      "qcov": 98.7,
+      "evalue": 3.37e-117,
+      "tcdb_scov": 98.4,
+      "tcdb_best_hit_rank": 1,
+      "tcdb_bitscore": 345.0,
+      "tcdb_bitscore_ratio": 1.0,
+      "function_description": "Belongs to the binding-protein-dependent transport system permease family"
+    },
+    {
+      "locus_tag": "PMM0972",
+      "gene_name": "urtC",
+      "product": "ABC-type urea transporter, membrane component",
+      "gene_category": "Stress response and adaptation",
+      "term_id": "tcdb:3.A.1.4",
+      "term_name": "The Hydrophobic Amino Acid Uptake Transporter (HAAT) Family",
+      "level": 3,
+      "is_informative": true,
+      "evidence": "homology",
+      "tcdb_call": "diamond_best_hit",
+      "tcdb_gate": "direct",
+      "tcdb_calls": ["diamond_best_hit", "eggnog"],
+      "sources": ["tcdb_diamond"],
+      "tier": 2,
+      "identity": 54.2,
+      "qcov": 92.6,
+      "evalue": 5.55e-124,
+      "tcdb_scov": 93.0,
+      "tcdb_best_hit_rank": 1,
+      "tcdb_bitscore": 362.0,
+      "tcdb_bitscore_ratio": 1.0,
+      "function_description": "Belongs to the binding-protein-dependent transport system permease family"
     },
     ...
   ]
 }
 ```
 
-### Example 15: Cutoff on evidence_score (the only numeric trust filter)
+### Example 15: Trust filters on TCDB — DIAMOND calls at tier 1-2 only (evidence + max_tier + tcdb_call)
 
 ```example-call
-genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], min_evidence_score=0.6, evidence=["homology"])
+genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], evidence=["homology"], max_tier=2, tcdb_call=["diamond_best_hit", "diamond_tier"])
 ```
+
+*TCDB's trust axes are `sources`, `evidence` and `tier`, plus the `tcdb_call` filter; `min_evidence_score` raises on tcdb. `evidence=['homology']` and `tcdb_call` both drop the eggNOG rows here; `max_tier=2` keeps tier-null rows by design, so pair it with `evidence=['homology']` when you want DIAMOND calls only. `include_weak_tcdb_hits=True` would add the below-gate DIAMOND edges instead.*
 
 ```example-response
 {
   "ontology": "tcdb",
   "organism_name": "Prochlorococcus MED4",
-  "total_matching": 37,
-  "total_genes": 37,
+  "total_matching": 24,
+  "total_genes": 24,
   "total_terms": 1,
   "total_categories": 5,
-  "genes_per_term_min": 37,
-  "genes_per_term_median": 37.0,
-  "genes_per_term_max": 37,
+  "genes_per_term_min": 24,
+  "genes_per_term_median": 24.0,
+  "genes_per_term_max": 24,
   "terms_per_gene_min": 1,
   "terms_per_gene_median": 1.0,
   "terms_per_gene_max": 1,
   "by_category": [
-    {"category": "Transport", "count": 20},
-    {"category": "Stress response and adaptation", "count": 13},
-    {"category": "Central intermediary metabolism", "count": 2},
+    {"category": "Stress response and adaptation", "count": 12},
+    {"category": "Transport", "count": 7},
+    {"category": "Central intermediary metabolism", "count": 3},
     {"category": "Cellular processes", "count": 1},
     {"category": "Inorganic ion transport", "count": 1}
   ],
-  "by_level": [{"level": 2, "n_terms": 1, "n_genes": 37, "row_count": 37}],
+  "by_level": [{"level": 2, "n_terms": 1, "n_genes": 24, "row_count": 24}],
   "top_terms": [
     {
       "term_id": "tcdb:3.A.1",
       "term_name": "The ATP-binding Cassette (ABC) Superfamily",
-      "count": 37,
+      "count": 24,
       "is_informative": true
     }
   ],
@@ -1140,54 +1170,62 @@ genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], min
   "size_filtered_terms": 0,
   "size_filtered_genes": 0,
   "resolved_aliases": {},
-  "returned": 37,
+  "returned": 24,
   "offset": 0,
   "truncated": false,
-  "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},
-  "warnings": [
-    "min_evidence_score=0.6 applied — the one numeric trust cutoff. Read evidence_score_signals for the signals that fed e..."
-  ],
-  "filters_applied": {"evidence": ["homology"], "min_evidence_score": 0.6},
+  "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
+  "warnings": [],
+  "filters_applied": {"evidence": ["homology"], "max_tier": 2, "tcdb_call": ["diamond_best_hit", "diamond_tier"]},
   "skipped_ontologies": [],
-  "by_evidence": [{"count": 37, "evidence": "homology"}],
-  "by_tier": [{"count": 29, "tier": 3}, {"count": 8, "tier": 2}],
-  "by_sources": [{"count": 37, "source": "tcdb_diamond"}, {"count": 13, "source": "eggnog"}],
+  "by_evidence": [{"count": 24, "evidence": "homology"}],
+  "by_tier": [{"count": 20, "tier": 2}, {"count": 4, "tier": 1}],
+  "by_sources": [{"count": 24, "source": "tcdb_diamond"}],
   "by_call_class": [],
-  "evidence_score_stats": {"min": 0.6, "median": 0.6, "max": 1.0, "n_null": 0},
-  "evidence_score_signals": {"Gene_has_tcdb_family": ["eggnog_called", "source_agreement", "tier_le_2", "pfam_support", "go_support"]},
+  "by_tcdb_call": [{"count": 23, "tcdb_call": "diamond_best_hit"}, {"count": 1, "tcdb_call": "diamond_tier"}],
+  "evidence_score_stats": null,
+  "evidence_score_signals": null,
   "results": [
     {
-      "locus_tag": "PMM0065",
-      "gene_name": "mcyH",
-      "product": "ABC transporter, ATPase component",
+      "locus_tag": "PMM0290",
+      "gene_name": "mkl",
+      "product": "ABC transporter family protein",
       "gene_category": "Transport",
       "term_id": "tcdb:3.A.1",
       "term_name": "The ATP-binding Cassette (ABC) Superfamily",
       "level": 2,
       "is_informative": true,
-      "evidence": "homology"
+      "evidence": "homology",
+      "tcdb_call": "diamond_best_hit",
+      "tcdb_gate": "direct",
+      "tcdb_calls": ["diamond_best_hit", "eggnog"]
     },
     {
-      "locus_tag": "PMM0125",
-      "gene_name": "ecfA1",
-      "product": "energy-coupling factor transport system ATP-binding protein",
-      "gene_category": "Transport",
+      "locus_tag": "PMM0370",
+      "gene_name": "cynA",
+      "product": "cyanate ABC transporter, substrate-binding protein",
+      "gene_category": "Central intermediary metabolism",
       "term_id": "tcdb:3.A.1",
       "term_name": "The ATP-binding Cassette (ABC) Superfamily",
       "level": 2,
       "is_informative": true,
-      "evidence": "homology"
+      "evidence": "homology",
+      "tcdb_call": "diamond_best_hit",
+      "tcdb_gate": "direct",
+      "tcdb_calls": ["diamond_best_hit", "diamond_tier", "eggnog"]
     },
     {
-      "locus_tag": "PMM0192",
-      "gene_name": "ddpD",
-      "product": "peptide/nickel ABC transport system, ATP-binding component",
-      "gene_category": "Transport",
+      "locus_tag": "PMM0371",
+      "gene_name": "cynB",
+      "product": "cyanate ABC transporter, permease protein",
+      "gene_category": "Central intermediary metabolism",
       "term_id": "tcdb:3.A.1",
       "term_name": "The ATP-binding Cassette (ABC) Superfamily",
       "level": 2,
       "is_informative": true,
-      "evidence": "homology"
+      "evidence": "homology",
+      "tcdb_call": "diamond_best_hit",
+      "tcdb_gate": "direct",
+      "tcdb_calls": ["diamond_best_hit", "eggnog"]
     },
     ...
   ]
@@ -1276,6 +1314,7 @@ genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=Tr
   "by_tier": [],
   "by_sources": [{"count": 1094, "source": "eggnog"}],
   "by_call_class": [],
+  "by_tcdb_call": [],
   "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
   "evidence_score_signals": null,
   "results": [
@@ -1372,7 +1411,7 @@ genes_by_ontology(ontology='merops', call_class=['peptidase']) → pathway_enric
 
 - Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`.
 
-- Trust surface: compact rows on the 14 functional-edge ontologies (everything except PSORTb/SignalP) carry `evidence` — a categorical ladder `curated > signature > homology > family_inferred > domain_inferred`. `sources`, `evidence_score`, and `tier` (TCDB + MEROPS only) move to verbose. Filters `sources`, `evidence`, `max_tier`, `min_evidence_score` default to `None` and never narrow the result unless set; `min_evidence_score` is the only numeric cutoff anywhere in the surface. `call_class` (`peptidase` / `inhibitor` / `nonpeptidase_homolog`) is MEROPS-only and compact always (not verbose-gated) because it changes the biological reading. `interpro_type` is InterPro-only and compact always. Passing an axis an ontology doesn't carry raises `ValueError` naming that ontology's axes. See `docs://analysis/annotation_evidence` for the full per-ontology profile.
+- Trust surface: compact rows on the 14 functional-edge ontologies (everything except PSORTb/SignalP) carry `evidence` — a categorical ladder `curated > signature > homology > family_inferred > domain_inferred`. `sources`, `evidence_score` (not on TCDB), and `tier` (TCDB + MEROPS only) move to verbose. Filters `sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call` default to `None` and never narrow the result unless set; `min_evidence_score` is the only numeric cutoff anywhere in the surface. `call_class` (`peptidase` / `inhibitor` / `nonpeptidase_homolog`) is MEROPS-only and compact always (not verbose-gated) because it changes the biological reading. `interpro_type` is InterPro-only and compact always. `tcdb_call` (`eggnog` / `diamond_tier` / `diamond_best_hit`) is TCDB-only; TCDB rows also carry compact `tcdb_gate` and `tcdb_calls`. Passing an axis an ontology doesn't carry raises `ValueError` naming that ontology's axes. See `docs://analysis/annotation_evidence` for the full per-ontology profile.
 
 - `max_tier` keeps tier-null rows (`r.tier <= max_tier OR r.tier IS NULL`) — an eggNOG-only TCDB edge with no `tier` passes any `max_tier` filter. Check the envelope's `by_tier` `"null"` bucket to see how many rows that affects.
 
@@ -1388,11 +1427,13 @@ genes_by_ontology(ontology='go_bp', organism='MED4', level=3, call_class=['pepti
 list_filter_values(filter_type='trust_axes', ontology='go_bp')  # check axes first — go_bp supports sources/evidence/evidence_score only, raises ValueError otherwise
 ```
 
-- TCDB is hierarchical (5 levels: `tc_class` → `tc_subclass` → `tc_family` → `tc_subfamily` → `tc_specificity`). `term_ids=['tcdb:1.A.1']` expands DOWN through ~31 descendant subfamilies before binding to genes via `Gene_has_tcdb_family`.
+- TCDB is hierarchical (5 levels: `tc_class` → `tc_subclass` → `tc_family` → `tc_subfamily` → `tc_system`). `term_ids=['tcdb:1.A.1']` expands DOWN through its subfamilies and systems before binding to genes via `Gene_has_tcdb_family`. Only gated edges count (`tcdb_gate` direct or annotated), so the distinct genes per term equal `TcdbFamily.gene_count` and `pathway_enrichment` sees the same gene sets. `include_weak_tcdb_hits=True` adds the `below_gate` DIAMOND edges as extra rows (default rows unchanged); it is not offered on the enrichment tools.
+
+- Many TCDB nodes are range-only: a system or subfamily TCDB curates but no gene in the KG is called to (`gene_count = 0`). They exist so a family's substrate range is complete; they bind no genes here.
 
 - CAZy is a small ontology (~64 terms, 6 classes / 58 families). `level=0` gives ~6 class-level rows (GH, GT, PL, CE, AA, CBM); `level=1` gives families. With default `min_gene_set_size=5`, many CAZy terms are filtered out — pass `min_gene_set_size=1` to see all.
 
-- Substrate-anchored TCDB questions ('which genes transport sucrose?') chain via `genes_by_metabolite`, NOT `genes_by_ontology`. Use `genes_by_ontology(ontology='tcdb', term_ids=[...])` for *family*-level questions ('which genes are in voltage-gated ion channels?'). The metabolite-anchored route includes all TCDB families curating the substrate; the family-anchored route here is anchored on a single family ID and misses cross-family substrate hits.
+- Substrate-anchored TCDB questions ('which genes transport sucrose?') chain via `genes_by_metabolite`, NOT `genes_by_ontology`. Use `genes_by_ontology(ontology='tcdb', term_ids=[...])` for *family*-level questions ('which genes are in voltage-gated ion channels?'). The metabolite-anchored route includes every TC system curated with the substrate (plus the opt-in family walk); the family-anchored route here is anchored on one TC id and misses cross-family substrate hits.
 
 - Substrate-anchored EC questions ('which genes catalyse a reaction involving glucose?') chain via `genes_by_metabolite(metabolite_ids=[...], evidence_sources=['metabolism'])`, NOT `genes_by_ontology(ontology='ec', ...)`. The metabolite-anchored route reaches every EC number whose Reaction touches the compound; the EC-anchored route here is anchored on a single EC family and misses promiscuous reactions. See docs://analysis/metabolites for the full anchor-disambiguation.
 
@@ -1422,13 +1463,15 @@ response.total_genes  # distinct genes across all matches
 
 - `limit` defaults to 50 over MCP; the Python package defaults to unbounded (all rows), which `pathway_enrichment` / `cluster_enrichment` rely on for a complete TERM2GENE.
 
+- `tcdb_call` filters edges before the row's representative edge is chosen, so the same (gene, term) row can report a different `tcdb_call` under the filter: pstS (PMM0710) on tcdb:3.A.1.7 reads `diamond_best_hit` by default and `eggnog` with `tcdb_call=['eggnog']`. The filter selects genes with a call of that kind under the term; it does not rank them. (On `gene_ontology_terms` leaf mode the ancestor drop still uses all gated edges, so the same filter can return 0 rows there.)
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import genes_by_ontology
 
 result = genes_by_ontology(ontology=..., organism=...)
-# returns dict with keys: ontology, organism_name, total_matching, total_genes, total_terms, total_categories, genes_per_term_min, genes_per_term_median, genes_per_term_max, terms_per_gene_min, terms_per_gene_median, terms_per_gene_max, by_category, by_level, top_terms, n_best_effort_terms, not_found, wrong_ontology, wrong_level, filtered_out, size_filtered_terms, size_filtered_genes, resolved_aliases, returned, offset, truncated, trust_axes, warnings, filters_applied, skipped_ontologies, by_evidence, by_tier, by_sources, by_call_class, evidence_score_stats, evidence_score_signals, results
+# returns dict with keys: ontology, organism_name, total_matching, total_genes, total_terms, total_categories, genes_per_term_min, genes_per_term_median, genes_per_term_max, terms_per_gene_min, terms_per_gene_median, terms_per_gene_max, by_category, by_level, top_terms, n_best_effort_terms, not_found, wrong_ontology, wrong_level, filtered_out, size_filtered_terms, size_filtered_genes, resolved_aliases, returned, offset, truncated, trust_axes, warnings, filters_applied, skipped_ontologies, by_evidence, by_tier, by_sources, by_call_class, by_tcdb_call, evidence_score_stats, evidence_score_signals, results
 ```
 
 Use package import for bulk data extraction in scripts.

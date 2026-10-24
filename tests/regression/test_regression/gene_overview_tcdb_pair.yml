@@ -39,7 +39,7 @@ by_organism:
   organism_name: Prochlorococcus MED4
 case_id: gene_overview_tcdb_pair
 has_cazy: 0
-has_chemistry: 2
+has_chemistry: 1
 has_clusters: 2
 has_derived_metrics: 2
 has_discussed: 1
@@ -110,9 +110,8 @@ results:
   reaction_count: 4
   significant_down_count: 2
   significant_up_count: 5
-  tcdb_evidence_score_max: null
-  tcdb_family_count: 0
-  transport_substrate_resolution: null
+  tcdb_assignment_count: 0
+  tcdb_best_hit_identity: null
   transported_metabolite_count: 0
 - annotation_quality: 3
   annotation_state: informative_multi
@@ -142,9 +141,7 @@ results:
   - categorical
   - numeric
   discussed_in_publication_count: 0
-  evidence_sources:
-  - metabolomics
-  - transport
+  evidence_sources: []
   expression_edge_count: 30
   gene_category: Transport
   gene_name: cbiQ
@@ -168,10 +165,9 @@ results:
   reaction_count: 0
   significant_down_count: 1
   significant_up_count: 0
-  tcdb_evidence_score_max: 0.8
-  tcdb_family_count: 7
-  transport_substrate_resolution: resolved
-  transported_metabolite_count: 12
+  tcdb_assignment_count: 7
+  tcdb_best_hit_identity: 25.5
+  transported_metabolite_count: 0
 returned: 2
 row_count: 2
 top_discussing_publications:

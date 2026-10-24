@@ -277,11 +277,15 @@ or `pathway_enrichment(..., ontology="brite", tree="transporters", level=1)`.
 `ontology="interpro"` (raises otherwise). See section 11 and
 `docs://analysis/annotation_evidence`.
 
-**TCDB** TERM2GENE is built from every `Gene_has_tcdb_family` edge (recall
-semantics). Do not pre-filter membership by `tcdb_evidence_score`, by
-`annotation_types`, or to deepest attachments: the same rule must define
-numerator and denominator. Trust filters (section 11) are the sanctioned way to narrow
-— they move gene set and background together. What an enriched family
+**TCDB** TERM2GENE is gated: it is built from the `Gene_has_tcdb_family`
+edges the KG stamps `tcdb_gate` = `direct` or `annotated`, one row per
+(gene, term), so a term's gene set equals its `TcdbFamily.gene_count`. Weak
+hits (`below_gate`) never enter it, and `include_weak_tcdb_hits` is not
+offered on the enrichment tools. Do not pre-filter membership further by
+hand (by `annotation_types`, or by reading `tier` / identity yourself): the
+same rule must define numerator and denominator. Trust filters (section 11),
+including `tcdb_call` (`diamond_best_hit` / `diamond_tier` / `eggnog`), are
+the sanctioned way to narrow — they move gene set and background together. What an enriched family
 *transports* is a chemistry question — `docs://analysis/metabolites`.
 
 ---
@@ -335,8 +339,8 @@ records the setting; for locked baselines run with `False` and post-filter.
 
 Both enrichment tools accept the annotation-trust filters from
 `docs://analysis/annotation_evidence`: `sources`, `evidence`, `max_tier`,
-`min_evidence_score` (the only numeric cutoff), `call_class` (MEROPS) and
-`interpro_type` (InterPro; required there). They are `None` by default — no
+`min_evidence_score` (the only numeric cutoff; not on TCDB), `call_class`
+(MEROPS), `tcdb_call` (TCDB) and `interpro_type` (InterPro; required there). They are `None` by default — no
 filter unless you set one.
 
 The filters shape the TERM2GENE mapping **and** the background identically:
@@ -350,7 +354,7 @@ set), `trust_axes` (what this ontology can be filtered on),
 ```python
 result = pathway_enrichment(
     organism="MED4", experiment_ids=experiment_ids,
-    ontology="tcdb", level=2, evidence=["homology"], min_evidence_score=0.6,
+    ontology="tcdb", level=2, evidence=["homology"], max_tier=2,
 )
 result.to_envelope(summary=True)["background_filtered"]   # True
 ```

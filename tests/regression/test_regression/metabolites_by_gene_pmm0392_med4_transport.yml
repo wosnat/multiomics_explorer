@@ -28,14 +28,13 @@ by_gene:
   product: transmembrane component of ECF transporter energizing module
   reaction_count: 0
   rows: 13
-  tcdb_evidence_score_max: 0.8
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 13
-  transport_substrate_resolution: resolved
+  tcdb_assignment_count: 7
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 13
   transporter_count: 5
-by_substrate_depth:
+by_tcdb_route:
 - count: 13
-  substrate_depth: most_specific
+  tcdb_route: family
 case_id: metabolites_by_gene_pmm0392_med4_transport
 gene_count_total: 1
 metabolite_count_total: 13
@@ -50,7 +49,8 @@ offset: 0
 reaction_count_total: 0
 resolved_aliases: {}
 results:
-- ec_numbers: null
+- attached_tcdb_id: tcdb:3.A.1.32
+  ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
   go_axiom_term_id: null
@@ -68,13 +68,17 @@ results:
   product: transmembrane component of ECF transporter energizing module
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: chemical_role
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.32
   tcdb_family_name: The Cobalamin Precursor (B 12 -P) Family
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: family
+  tcdb_substrate_system_count: 1
+- attached_tcdb_id: tcdb:3.A.1.32
+  ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
   go_axiom_term_id: null
@@ -93,13 +97,47 @@ results:
   product: transmembrane component of ECF transporter energizing module
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.32
   tcdb_family_name: The Cobalamin Precursor (B 12 -P) Family
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: family
+  tcdb_substrate_system_count: 2
+- attached_tcdb_id: tcdb:3.A.1.28
+  ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '64299'
+  metabolite_formula: C17H21N5O6*2
+  metabolite_id: chebi:64299
+  metabolite_name: queuosine residue
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  target_kind: metabolite
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
+  tcdb_family_id: tcdb:3.A.1.28
+  tcdb_family_name: The Queuosine (Queuosine) Family
+  tcdb_identity: null
+  tcdb_route: family
+  tcdb_substrate_system_count: 1
+- attached_tcdb_id: tcdb:3.A.1.25
+  ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
   go_axiom_term_id: null
@@ -120,13 +158,17 @@ results:
   product: transmembrane component of ECF transporter energizing module
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: family
+  tcdb_substrate_system_count: 1
+- attached_tcdb_id: tcdb:3.A.1.25
+  ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
   go_axiom_term_id: null
@@ -147,13 +189,17 @@ results:
   product: transmembrane component of ECF transporter energizing module
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: family
+  tcdb_substrate_system_count: 1
+- attached_tcdb_id: tcdb:3.A.1.25
+  ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
   go_axiom_term_id: null
@@ -174,13 +220,17 @@ results:
   product: transmembrane component of ECF transporter energizing module
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: family
+  tcdb_substrate_system_count: 5
+- attached_tcdb_id: tcdb:3.A.1.33
+  ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
   go_axiom_term_id: null
@@ -201,13 +251,17 @@ results:
   product: transmembrane component of ECF transporter energizing module
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.33
   tcdb_family_name: The Methylthioadenosine (MTA) Family
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: family
+  tcdb_substrate_system_count: 1
+- attached_tcdb_id: tcdb:3.A.1.33
+  ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
   go_axiom_term_id: null
@@ -228,13 +282,17 @@ results:
   product: transmembrane component of ECF transporter energizing module
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.33
   tcdb_family_name: The Methylthioadenosine (MTA) Family
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: family
+  tcdb_substrate_system_count: 1
+- attached_tcdb_id: tcdb:3.A.1.25
+  ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
   go_axiom_term_id: null
@@ -255,13 +313,17 @@ results:
   product: transmembrane component of ECF transporter energizing module
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: family
+  tcdb_substrate_system_count: 4
+- attached_tcdb_id: tcdb:3.A.1.33
+  ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
   go_axiom_term_id: null
@@ -282,13 +344,17 @@ results:
   product: transmembrane component of ECF transporter energizing module
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.33
   tcdb_family_name: The Methylthioadenosine (MTA) Family
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: family
+  tcdb_substrate_system_count: 1
+- attached_tcdb_id: tcdb:3.A.1.30
+  ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
   go_axiom_term_id: null
@@ -309,66 +375,17 @@ results:
   product: transmembrane component of ECF transporter energizing module
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.30
   tcdb_family_name: The Thiamin Precursor (Thi-P) Family
-  transport_substrate_resolution: resolved
-- ec_numbers: null
-  evidence_source: transport
-  gene_name: cbiQ
-  go_axiom_term_id: null
-  go_axiom_term_name: null
-  go_evidence: null
-  go_namespace: null
-  go_sources: null
-  go_term_depth: null
-  go_term_id: null
-  go_term_name: null
-  locus_tag: PMM0392
-  mass_balance: null
-  metabolite_chebi_id: '72346'
-  metabolite_formula: C18H22N5O6
-  metabolite_id: kegg.compound:C21647
-  metabolite_mass: 404.403
-  metabolite_name: Roseoflavin
-  product: transmembrane component of ECF transporter energizing module
-  reaction_id: null
-  reaction_name: null
-  substrate_depth: most_specific
-  target_kind: metabolite
-  tcdb_evidence_score: 0.8
-  tcdb_family_id: tcdb:3.A.1.25
-  tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
-  transport_substrate_resolution: resolved
-- ec_numbers: null
-  evidence_source: transport
-  gene_name: cbiQ
-  go_axiom_term_id: null
-  go_axiom_term_name: null
-  go_evidence: null
-  go_namespace: null
-  go_sources: null
-  go_term_depth: null
-  go_term_id: null
-  go_term_name: null
-  locus_tag: PMM0392
-  mass_balance: null
-  metabolite_chebi_id: '64299'
-  metabolite_formula: C17H21N5O6*2
-  metabolite_id: chebi:64299
-  metabolite_name: queuosine residue
-  product: transmembrane component of ECF transporter energizing module
-  reaction_id: null
-  reaction_name: null
-  substrate_depth: most_specific
-  target_kind: metabolite
-  tcdb_evidence_score: 0.6
-  tcdb_family_id: tcdb:3.A.1.28
-  tcdb_family_name: The Queuosine (Queuosine) Family
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: family
+  tcdb_substrate_system_count: 1
+- attached_tcdb_id: tcdb:3.A.1.28
+  ec_numbers: null
   evidence_source: transport
   gene_name: cbiQ
   go_axiom_term_id: null
@@ -389,16 +406,51 @@ results:
   product: transmembrane component of ECF transporter energizing module
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.6
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.28
   tcdb_family_name: The Queuosine (Queuosine) Family
-  transport_substrate_resolution: resolved
+  tcdb_identity: null
+  tcdb_route: family
+  tcdb_substrate_system_count: 1
+- attached_tcdb_id: tcdb:3.A.1.25
+  ec_numbers: null
+  evidence_source: transport
+  gene_name: cbiQ
+  go_axiom_term_id: null
+  go_axiom_term_name: null
+  go_evidence: null
+  go_namespace: null
+  go_sources: null
+  go_term_depth: null
+  go_term_id: null
+  go_term_name: null
+  locus_tag: PMM0392
+  mass_balance: null
+  metabolite_chebi_id: '72346'
+  metabolite_formula: C18H22N5O6
+  metabolite_id: kegg.compound:C21647
+  metabolite_mass: 404.403
+  metabolite_name: Roseoflavin
+  product: transmembrane component of ECF transporter energizing module
+  reaction_id: null
+  reaction_name: null
+  target_kind: metabolite
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
+  tcdb_family_id: tcdb:3.A.1.25
+  tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
+  tcdb_identity: null
+  tcdb_route: family
+  tcdb_substrate_system_count: 1
 returned: 13
 row_count: 13
-rows_by_go_term_depth: []
 stereo_relatives: {}
+tcdb_family_substrates_not_shown: null
+tcdb_family_substrates_skipped: []
 top_gene_categories:
 - category: Transport
   gene_count: 1
@@ -411,7 +463,7 @@ top_metabolite_pathways:
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko00780
   metabolite_pathway_name: Biotin metabolism
-  pathway_metabolite_count: 23
+  pathway_metabolite_count: 22
   pathway_reaction_count: 18
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko00670
@@ -441,17 +493,17 @@ top_metabolite_pathways:
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko01240
   metabolite_pathway_name: Biosynthesis of cofactors
-  pathway_metabolite_count: 286
+  pathway_metabolite_count: 284
   pathway_reaction_count: 223
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
-  pathway_metabolite_count: 618
+  pathway_metabolite_count: 614
   pathway_reaction_count: 536
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-  pathway_metabolite_count: 1627
+  pathway_metabolite_count: 1608
   pathway_reaction_count: 1718
 top_metabolites:
 - formula: null
@@ -462,8 +514,8 @@ top_metabolites:
   multi_source_gene_count: 0
   name: vitamin (role)
   reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 1
   transporter_count: 1
 - formula: null
   gene_count: 1
@@ -473,8 +525,8 @@ top_metabolites:
   multi_source_gene_count: 0
   name: cobalamin
   reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 1
   transporter_count: 1
 - formula: C17H21N5O6*2
   gene_count: 1
@@ -484,8 +536,8 @@ top_metabolites:
   multi_source_gene_count: 0
   name: queuosine residue
   reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 1
   transporter_count: 1
 - formula: C27H33N9O15P2
   gene_count: 1
@@ -495,8 +547,8 @@ top_metabolites:
   multi_source_gene_count: 0
   name: FAD
   reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 1
   transporter_count: 1
 - formula: C17H21N4O9P
   gene_count: 1
@@ -506,8 +558,8 @@ top_metabolites:
   multi_source_gene_count: 0
   name: FMN
   reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 1
   transporter_count: 1
 - formula: C10H15N2O3S
   gene_count: 1
@@ -517,8 +569,8 @@ top_metabolites:
   multi_source_gene_count: 0
   name: Biotin
   reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 1
   transporter_count: 1
 - formula: C11H15N5O3S
   gene_count: 1
@@ -528,8 +580,8 @@ top_metabolites:
   multi_source_gene_count: 0
   name: 5^-Methylthioadenosine
   reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 1
   transporter_count: 1
 - formula: Co
   gene_count: 1
@@ -539,8 +591,8 @@ top_metabolites:
   multi_source_gene_count: 0
   name: Cobalt ion
   reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 1
   transporter_count: 1
 - formula: C17H19N4O6
   gene_count: 1
@@ -550,8 +602,8 @@ top_metabolites:
   multi_source_gene_count: 0
   name: Riboflavin
   reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 1
   transporter_count: 1
 - formula: Mg
   gene_count: 1
@@ -561,41 +613,46 @@ top_metabolites:
   multi_source_gene_count: 0
   name: Magnesium cation
   reaction_count: 0
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 1
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 1
   transporter_count: 1
 top_reactions: []
 top_tcdb_families:
-- gene_count: 1
+- direction: uptake
+  gene_count: 1
   level_kind: tc_subfamily
   metabolite_count: 5
-  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.25
   tcdb_family_name: The Biotin Uptake Transporter (BioMNY) Family
-- gene_count: 1
+  tcdb_route: family
+- direction: uptake
+  gene_count: 1
   level_kind: tc_subfamily
   metabolite_count: 2
-  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.28
   tcdb_family_name: The Queuosine (Queuosine) Family
-- gene_count: 1
+  tcdb_route: family
+- direction: uptake
+  gene_count: 1
   level_kind: tc_subfamily
   metabolite_count: 1
-  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.30
   tcdb_family_name: The Thiamin Precursor (Thi-P) Family
-- gene_count: 1
+  tcdb_route: family
+- direction: uptake
+  gene_count: 1
   level_kind: tc_subfamily
   metabolite_count: 2
-  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.32
   tcdb_family_name: The Cobalamin Precursor (B 12 -P) Family
-- gene_count: 1
+  tcdb_route: family
+- direction: uptake
+  gene_count: 1
   level_kind: tc_subfamily
   metabolite_count: 3
-  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.33
   tcdb_family_name: The Methylthioadenosine (MTA) Family
+  tcdb_route: family
 total_matching: 13
 transporter_count_total: 5
 truncated: false

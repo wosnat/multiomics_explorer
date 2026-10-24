@@ -14,10 +14,10 @@ Runnable companion: `docs://examples/metabolites.py` (7 scenarios).
 | `evidence_source` | Path in KG | Question it answers | Native tools | Key caveats |
 |---|---|---|---|---|
 | `metabolism` | `Gene → Reaction → Metabolite` (KEGG-derived) | "Which metabolites is this gene's reaction involved in?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['metabolism']`) | KO inference may be putative; `Reaction_has_metabolite` is undirected — upstream KEGG direction is unreliable, so the convention is permanent: use "involved in" framing, never "produces"/"consumes"; promiscuous enzymes inflate counts |
-| `transport` | `Gene → TcdbFamily → Metabolite` (TCDB-derived) | "Which metabolites does this gene transport (or could transport, via an inherited family substrate set)?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['transport']`) | `inherited` ≫ `most_specific` rows; superfamily-only genes read `transport_substrate_resolution='family_inferred'` (reachability, not capability) and trigger the auto-warning; rows are deepest-attachment projections; no import/export direction |
+| `transport` | `Gene → TcdbFamily (tc_system) → Metabolite` (TCDB-derived) | "Which metabolites does this gene transport, through a TCDB system it is directly assigned to?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['transport']`) | Default rows need a `direct` system call; genes TCDB placed only at family or subfamily level need `include_tcdb_family_substrates=True` (family rows, a recall expansion); TCDB curation can be narrow (Pst → triphosphate only); direction is node-level (`tcdb_direction`), not per gene |
 | `metabolomics` | `MetaboliteAssay → Metabolite` (mass-spec) | "Which metabolites were measured under this condition?" | `list_metabolite_assays` (discovery), `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay` (per-arm drill-down), `assays_by_metabolite` (reverse lookup) — see Track B | No gene anchor; `Assay_quantifies` (concentration/intensity) ≠ `Assay_flags` (qualitative detection); compartment matters (`whole_cell` / `extracellular` / `vesicle`); ~149 of ~3.3k metabolites measured (~95% are annotation-only); 3 papers, 14 assays (12 numeric + 2 boolean), 12 experiments; replicate / normalisation conventions vary by paper |
 
-The `metabolism` and `transport` rows share tools — the `evidence_source` field on result rows is the discriminator, and `substrate_depth ∈ {most_specific, inherited}` plus `tcdb_evidence_score` further qualify transport rows (see substrate resolution / depth under Track A2). The `metabolomics` row has dedicated tools — see Track B.
+The `metabolism` and `transport` rows share tools — the `evidence_source` field on result rows is the discriminator, and `tcdb_route ∈ {direct, family}`, `tcdb_identity` and `tcdb_calls` further qualify transport rows (see "Direct vs family substrates" under Track A2). The `metabolomics` row has dedicated tools — see Track B.
 
 The `Metabolite.evidence_sources` list field on each Metabolite node already indicates which of the three pipelines contribute (e.g., `['metabolism', 'transport', 'metabolomics']`); read this to route quickly.
 
@@ -74,7 +74,7 @@ retired ids match too. They are filters, not resolution: they report nothing in
 placeholder (`C2H4NO2*` for 'Amino acid'), whose element set still feeds the `elements`
 filter. Filter `structure_kind=['defined']` when a question is about specific molecules.
 
-**Row schema is unified across both annotation arms.** `genes_by_metabolite` and `metabolites_by_gene` rows carry the full cross-arm key set — every row has `evidence_source`, `substrate_depth`, `tcdb_evidence_score`, `reaction_id`, `reaction_name`, `ec_numbers`, `mass_balance`, `tcdb_family_id`, `tcdb_family_name`, with explicit `None` on the fields belonging to the other arm. Code against `evidence_source` to discriminate (or `substrate_depth is not None` for transport-only); the cross-arm `None`s mean every row has identical keys, no `KeyError` branching.
+**Row schema is unified across both annotation arms.** `genes_by_metabolite` and `metabolites_by_gene` rows carry the full cross-arm key set — every row has `evidence_source`, `reaction_id`, `reaction_name`, `ec_numbers`, `mass_balance`, `tcdb_route`, `tcdb_family_id`, `tcdb_family_name`, `tcdb_calls`, `tcdb_identity`, `tcdb_direction`, with explicit `None` on the fields belonging to the other arm. Code against `evidence_source` to discriminate (or `tcdb_route is not None` for TCDB rows); the cross-arm `None`s mean every row has identical keys, no `KeyError` branching.
 
 ## Stereo forms: generic vs specific nodes
 
@@ -88,7 +88,7 @@ on different nodes of the same family:
 
 | Source | Names compounds… | So its evidence sits on… | Example |
 |---|---|---|---|
-| TCDB substrate lists (`transport`) | generically ("cysteine", "alanine") | the **unspecified** node | Cysteine `C00736`: many transporter genes, **0** catalyst genes |
+| TCDB substrate lists (`transport`) | generically ("cysteine", "alanine") | the **unspecified** node | Cysteine `C00736`: transporter genes only, **0** catalyst genes |
 | KEGG reactions (`metabolism`) | as the specific form | the **specific** node | L-Cysteine `C00097`: the catalysts (and some transport) |
 | Measured compounds whose paper gave no form (`metabolomics`) | placed on the most-catalysed form (`stereo_assignment='dominant_form_assumed'`) | usually the **specific L-form** | 'Alanine' measurements sit on L-Alanine `C00041`, while most alanine transport sits on Alanine `C01401` |
 
@@ -159,11 +159,20 @@ from multiomics_explorer import genes_by_metabolite
 
 r = genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"],   # Cysteine (generic)
                         organism="Prochlorococcus MED4", summary=True)
-# r["by_metabolite"][0]: reaction_count 0, transport only (TCDB names it generically).
+# No direct rows: no MED4 gene has a TCDB system curated with Cysteine, and it has
+#   0 reactions (KEGG uses L-Cysteine). Cysteine lands in not_matched.
 # r["stereo_relatives"]["kegg.compound:C00736"]: L-Cysteine kegg.compound:C00097,
-#   relation 'specific_form', e.g. 13 reactions / 3 transporter families / 38 genes.
+#   relation 'specific_form', with its own reaction / gene counts.
 #   D-Cysteine is not listed: it has no MED4 genes.
-# r["warnings"][0] starts "Stereo forms hold more rows: Cysteine (...) → L-Cysteine (...)"
+# r["warnings"][0] starts "Stereo forms hold more rows: Cysteine (...) → L-Cysteine (...)";
+# another warning says 5 genes reach Cysteine only through a family call
+#   (tcdb_family_substrates_not_shown).
+
+r = genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"],
+                        organism="Prochlorococcus MED4",
+                        include_tcdb_family_substrates=True)
+# 5 family rows: mcyH, mdlB, hetA, sodX on tcdb:3.A.1.106, glcH on tcdb:2.A.2
+#   (tcdb_route='family' — candidates, not system calls).
 
 r = genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"],
                         organism="Prochlorococcus MED4", include_stereo_forms=True)
@@ -175,10 +184,12 @@ r = genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"],
 ```
 
 The gene-anchored route is the same split seen from the other side. `metabolites_by_gene` on
-MED4's cysteine transporters (e.g. PMM0065 mcyH, on `tcdb:3.A.1.106`) returns Cysteine
-transport rows plus a `stereo_relatives` entry pointing at L-Cysteine. Chain it into
-`genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"], organism=...,
-include_stereo_forms=True)` to get the transporters and the L-cysteine enzymes in one result.
+MED4's cysteine transporter candidates (e.g. PMM0065 mcyH, family `tcdb:3.A.1.106`) with
+`include_tcdb_family_substrates=True` returns a Cysteine family row plus a `stereo_relatives`
+entry pointing at L-Cysteine. Chain it into `genes_by_metabolite(metabolite_ids=
+["kegg.compound:C00736"], organism=..., include_tcdb_family_substrates=True,
+include_stereo_forms=True)` to get the transporter candidates and the L-cysteine enzymes in
+one result.
 
 **What is and isn't linked.** A link exists when ChEBI places the specific form under the
 generic one with the same formula and charge (plus a short curated list), so common generic
@@ -270,7 +281,7 @@ list and both are **partial**. Read this before using either to include, exclude
 Always restate the row's caveats when the answer touches it. The LLM should never claim:
 
 - "This gene produces X" — only "this gene catalyses a reaction involving X". This is the permanent convention: upstream KEGG annotation direction is unreliable, so the KG intentionally stays undirected.
-- "This gene transports X" without qualifying the evidence — when the gene reads `transport_substrate_resolution='family_inferred'`, or the row is `substrate_depth='inherited'`, X came down from a lumping family's substrate set; we don't know which specific subfamily applies. Say "this gene belongs to a TCDB family whose substrate set includes X — the annotation can't pin the subfamily, so X is candidate-only". Quote the `tcdb_evidence_score` when you rank candidates.
+- "This gene transports X" from a family row — a `tcdb_route='family'` row means the gene's TCDB family or subfamily has some system curated with X; the annotation can't pin the system. Say "this gene belongs to a TCDB family that includes a system moving X, so X is candidate-only". Quote `tcdb_identity` and `tcdb_calls` when you rank candidates; even a direct row is a homology call, not a measured activity.
 - "No gene in this organism acts on X" from a `0` on one stereo form — a generic node (Cysteine) has 0 reactions by construction and the catalysts sit on the specific form (L-Cysteine). Read `stereo_relatives` first (see "Stereo forms: generic vs specific nodes").
 - "Metabolite X was not produced under condition Y" based on metabolomics absence — say "X was not detected in the targeted panel under condition Y" (targeted ≠ comprehensive).
 
@@ -356,71 +367,68 @@ result = metabolites_by_gene(
 
 ## Track A2 — Transport (TCDB) annotation
 
-For substrates the gene's TCDB family transports. Always restate inline: substrate resolution and depth (score → resolution → depth, section g below); ABC superfamily promiscuity; no direction.
+For substrates of the TCDB systems a gene is assigned to. Always restate inline: direct or family row, `tcdb_identity`, and that direction (`tcdb_direction`) is TCDB's statement about the node, not a per-gene fact.
 
 ### b2 — Transport-anchored: compound → genes
 
 **Tool:** `genes_by_metabolite` filtered to `evidence_sources=['transport']`.
 
-**When:** "which MED4 genes are predicted to transport glycine betaine?"
+**When:** "which MED4 genes are predicted to transport nitrite?"
 
 ```python
 result = genes_by_metabolite(
-    metabolite_ids=["C00719"],            # glycine betaine
+    metabolite_ids=["kegg.compound:C00088"],   # nitrite
     organism="MED4",
     evidence_sources=["transport"],
-    substrate_depth=["most_specific"],    # tighten when inherited rows dominate
 )
-# Each row has evidence_source="transport", substrate_depth ∈ {most_specific, inherited}
-# and tcdb_evidence_score (rank by it; never treat 0 as "absent").
+# Direct rows only by default: cynA / cynB / cynD on tcdb:3.A.1.16.1 / 3.A.1.16.2.
+# Each row: tcdb_route="direct", tcdb_family_id = the system, tcdb_identity, tcdb_calls.
+# result["tcdb_family_substrates_not_shown"] says what include_tcdb_family_substrates=True would add.
 ```
 
 ### c2 — Transport-anchored: gene → metabolites
 
 **Tool:** `metabolites_by_gene` filtered to `evidence_sources=['transport']`.
 
-**When:** "what does this gene's TCDB family transport?"
+**When:** "what does this gene's TCDB system transport?"
 
 ```python
 result = metabolites_by_gene(
-    locus_tags=["PMM0001"],
+    locus_tags=["PMM0372"],                    # cynD
     organism="MED4",
     evidence_sources=["transport"],
 )
-# Detail rows are sorted metabolism → most_specific → inherited, then tcdb_evidence_score desc.
-# result["by_gene"][i] carries transport_substrate_resolution + tcdb_evidence_score_max.
+# Two direct systems: tcdb:3.A.1.16.2 (cyanate, nitrite) and tcdb:3.A.1.16.1 (nitrate, nitrite).
+# result["by_gene"][0]: tcdb_direct_rows, tcdb_family_rows, tcdb_assignment_count (2).
 ```
 
-### g — Substrate resolution and depth (score → resolution → depth)
+### g — Direct vs family substrates
 
-Both depths are annotations, not ground truth — transporter specificity in nature is often promiscuous or under-characterized. TCDB substrates are attached to transporter family nodes and inherited down the family hierarchy, so a gene annotated to a broad family (common in homology-based annotation) still surfaces candidate substrates. Read transport evidence top-down through three fields, each answering a different question:
+TCDB curates substrates on **systems** (5-part TC numbers such as `tcdb:3.A.1.4.4`, level kind `tc_system`) and nowhere else. The KG stamps every gene → TCDB edge with a gate (`tcdb_gate`):
 
-1. **`tcdb_evidence_score`** (row) / **`tcdb_evidence_score_max`** (gene; `gene_overview` rows, `genes_by_metabolite.top_genes[]`, `metabolites_by_gene.by_gene[]`) — *how corroborated is the gene × family call?* Rank by it; never filter by it. `0` is an uncorroborated hit; absent is `None` (no TCDB call). The `'tcdb' ∈ annotation_types` gate on `gene_overview` is the binary version of the same evidence; the score is the graded one.
-2. **`transport_substrate_resolution`** (gene) — *is the gene's substrate breadth meaningful?* `family_inferred` = every deepest attachment is a lumping family (reachability, not capability); `resolved` = at least one deepest attachment is non-lumping — not all of them. A gene attached at both a specific family and the ABC superfamily is `resolved` and still carries the superfamily rollup in its `transported_metabolite_count`; only the row level separates them. The gene's value is repeated on each of its transport rows (`None` on metabolism rows) so a batch scan can drop `family_inferred` rows without joining back to `by_gene[]` / `top_genes[]`; it never varies across one gene's rows.
-3. **`substrate_depth`** (row) — *where does this substrate sit for this family?* `most_specific` = the most specific **surviving** transporter node in the gene-pruned hierarchy (can be a family node, e.g. nitrite via `tcdb:2.A.16` in MED4; not a curation level); `inherited` = came down from an ancestor's substrate set (usually the ABC superfamily `tcdb:3.A.1`).
+| `tcdb_gate` | Which calls | What it feeds |
+|---|---|---|
+| `direct` | a rank-1 DIAMOND best hit at tier ≤ 2 (≥ 40% identity), a tier-1 DIAMOND call, or an eggNOG call onto a system | transport rows, `transported_metabolite_count`, `transporter_gene_count` |
+| `annotated` | other eggNOG calls; tier-2 DIAMOND calls (family / subfamily) | the TCDB annotation (`tcdb_assignment_count`, ontology rows, TERM2GENE) and family-walk starts |
+| `below_gate` | tier-3 calls, near-tie best hits, best hits under 40% identity | nothing; evidence only (`include_weak_tcdb_hits=True` on `gene_ontology_terms`) |
 
-**What "lumping" means.** A TCDB family is *lumping* when the KG marks it
-`TcdbFamily.substrate_breadth = 'lumping'`: a pinned set of broad superfamilies and families
-(the ABC superfamily `tcdb:3.A.1`, MFS `tcdb:2.A.1`, APC `tcdb:2.A.3`, …) whose substrate list
-pools what their many subfamilies carry, so a substrate count there is reachability, not
-capability. The other values are `specific` (level 2 or deeper and not lumping) and
-`not_assessed` (TCDB class / subclass nodes, whose substrate counts grow with level by
-construction). The set is curated, not a cutoff — a `level` / `metabolite_count` threshold does
-not reproduce it, so read the property instead (`ontology_term_details(term_ids=[...],
-verbose=True)` shows it under `properties`). `transport_substrate_resolution` and the
-`substrate_depth` warnings are built on this property.
+**Direct rows (default).** One row per gene × system × metabolite, from `direct` edges only. Distinct Metabolite targets across a gene's direct rows equal `gene_overview.transported_metabolite_count`, and distinct genes across a metabolite's direct rows, summed over organisms, equal `list_metabolites.transporter_gene_count`. Rank within the route by `tcdb_identity` (percent identity of the representative DIAMOND edge; null on eggNOG-only calls), then by `tcdb_calls` (eggNOG plus a DIAMOND kind is independent agreement; `diamond_best_hit` and `diamond_tier` come from one DIAMOND run).
 
-**Rows are deepest-attachment projections.** A gene attached to a family *and* to one of its descendants contributes rows only through the descendant; the ancestor's substrate rollup is intentionally absent. So distinct metabolites across a gene's transport rows equal `gene_overview.transported_metabolite_count` (PMM0392: 13, not the ABC-superfamily plateau of 554), and distinct genes across a metabolite's transport rows, summed over organisms, equal `list_metabolites.transporter_gene_count`. Full family membership, ancestors included, is visible via `gene_ontology_terms(ontology=['tcdb'], mode='leaf', include_superseded=True)` — without `include_superseded=True` leaf mode also shows deepest attachments only.
+**Family rows (`include_tcdb_family_substrates=True`).** A fallback for genes TCDB could not place in a system. The walk starts from the gene's deepest `annotated` family or subfamily call, goes down to every system below it, and adds one `tcdb_route='family'` row per (gene, attached node, metabolite), with `tcdb_substrate_system_count` = how many of those systems carry the metabolite. The switch only adds rows. It never walks above a direct system the gene already has (that would add only the sibling systems' substrates), never starts from a class or subclass, and never starts from a node curated with more than 200 substrates (ABC `tcdb:3.A.1`, MFS `tcdb:2.A.1`): those genes are listed in `tcdb_family_substrates_skipped` (substrate unknown; `metabolites_by_gene` also warns, `genes_by_metabolite` does not).
 
-**Choose the depth filter by question shape, not by reflex toward "high confidence":**
+- **Motivating case: phosphate in MED4.** `genes_by_metabolite(['kegg.compound:C00009'], organism='MED4')` (orthophosphate) returns no transport rows. phnD (PMM0673), the phosphonate-binding protein, has only an eggNOG call on subfamily `tcdb:3.A.1.9` (PhnT) plus a weak hit on the ABC superfamily. The envelope's `tcdb_family_substrates_not_shown` reads `{genes: 4, metabolites: 1, rows: 4}` (phnC, phnD, phnE, PMM0717) and the warning says to pass `include_tcdb_family_substrates=True`; with it, phnD reaches orthophosphate, phosphonic acid, phosphite, phosphinate and Fe³⁺ through `tcdb:3.A.1.9`.
+- **Curation caveat: Pst.** MED4 pstA/B/C/S have direct calls onto `tcdb:3.A.1.7.6` ("High affinity phosphate-specific transporter, PstABCS"), which TCDB curates with **triphosphate only**. They therefore drop out of the orthophosphate answer, and because they have a direct system, no family walk brings them back. When a substrate answer looks too narrow, read the system names in `tcdb_family_name` and `top_tcdb_families`.
+- **A real transporter can sit in family rows only.** MED4 gltS (PMM0628) has an eggNOG call on the glutamate:Na+ symporter family `tcdb:2.A.27` and only weak DIAMOND hits, so it has no direct rows; the walk reaches glutamate through the family.
+- **Catch-all substrates.** TCDB curates some generic substrates ("molecule", "Peptide", "Protein"); they pass through as curated and can top family-row counts. Treat them as "some substrate".
+- **Family rows are a recall expansion.** They say the gene's family moves the compound somewhere, not that the gene does. Most of their noise is eggNOG family calls on genes that are not transporters at all (cell-division, chaperone and protease genes among them). The KG has no per-gene transporter call yet, so do not count family rows as transport capability.
 
-- **`substrate_depth=['most_specific']`** — narrower, more conservative cast. Use when the downstream inference is fragile (cross-organism cross-feeding) or when over-claiming specific substrates would mislead.
-- **No filter / both depths** — broader cast that includes inherited family potential. Use for screening questions ("which transporters could plausibly act on N substrates?") where you'd rather over-include and let downstream evidence (e.g. DE response) anchor the interpretation. A real N-uptake transporter can sit entirely in inherited rows: PMM0628 (gltS) reaches its 5 substrates via `inherited` rows only, so `most_specific` alone silently excludes it (PMM0263 amt1, by contrast, has 7 `most_specific` rows and 0 inherited).
-- **Pivot** for a single transporter family: `genes_by_ontology(ontology="tcdb", term_ids=[...])`. (But for substrate-anchored questions — "which genes transport X" — prefer the metabolite-anchored route under "Track A2 — Transport (TCDB) annotation".)
+**Choose by question shape:**
 
-The auto-warning is informational, not a defect signal. `genes_by_metabolite` fires it when inherited rows dominate the transport rows (nitrite × MED4: 23 of the 29 deepest-attachment rows are inherited via `tcdb:3.A.1`); `metabolites_by_gene` fires it when input genes read `transport_substrate_resolution='family_inferred'` — their substrate breadth is reachability, not capability.
+- **Default (direct rows)** — conservative. Use for cross-organism inference and whenever over-claiming a substrate would mislead.
+- **`include_tcdb_family_substrates=True`** — broad screen ("which transporters could plausibly act on these N substrates?"), or when the direct answer is empty and `tcdb_family_substrates_not_shown` is non-zero. Report family rows as candidates.
+- **Pivot** for a single transporter family: `genes_by_ontology(ontology="tcdb", term_ids=[...])`. (For substrate-anchored questions prefer the metabolite-anchored route above.)
 
-Empirical scale: the 13 MED4 genes carrying `transport_substrate_resolution='family_inferred'` (e.g. PMM0913 salY, PMM0434 ftsE) plateau at the ABC-superfamily rollup — 518 transport rows each, of which 301 are `inherited` and **217 are `most_specific` at `tcdb:3.A.1` itself** (substrates no kept child of the superfamily carries). `substrate_depth=['most_specific']` therefore does *not* remove superfamily-only genes; `most_specific` at a lumping superfamily is a superfamily-level position, not a subfamily call, and the gene-level resolution is the only guard against reading those substrates. PMM0392, by contrast, is attached to seven ABC subfamilies, so under the deepest-attachment rule it reads 12 metabolites, `resolved`, score 0.8. Expect the warning when querying common metabolites against MED4.
+Scale in MED4: 203 genes carry a gate-passing TCDB call, 89 reach a substrate directly, and 98 have a gate-passing call but no direct edge (their transport arm is empty by default).
 
 ---
 
@@ -437,8 +445,8 @@ Workflows that cross both reaction and transport arms, or that consume the annot
 | # | Confounder | Arm | Mitigation |
 |---|---|---|---|
 | 1 | **Currency cofactors flood the rollup.** `top_metabolites` is sorted by gene_count, which is exactly the wrong sort for cross-feeding because the highest-reach metabolites are universal (H2O, ATP/ADP/AMP, Pi, PPi, NAD(P)(H), CO2). | metabolism | Pass `exclude_metabolite_ids=CURRENCY_METABOLITES_MIN8` directly on the next call (tool-side filter — pushes the mitigation into the query so envelope rollups also benefit; available on `list_metabolites`, `genes_by_metabolite`, `metabolites_by_gene`). Minimal-8 (H2O, CO2, ATP, ADP, AMP, Pi, PPi, NAD(P)(H)) is the conservative default — see `examples/metabolites.py::CURRENCY_METABOLITES_MIN8`. Extend with H+, Glu/Gln, CoA, FAD if the seed pulls them in (these are borderline and depend on whether you care about central-N flux as a signal). Set-difference semantics with `metabolite_ids` — exclude wins on overlap. |
-| 2 | **Family-level transport casts a wide net.** Superfamily-only genes (especially ABC, `tcdb:3.A.1`) inherit ~518 substrates each via the family rollup. Substrate specificity is often unknown or context-dependent in nature — `inherited` rows reflect family-level potential, not per-substrate confirmation. For cross-feeding *inferences* (which over-claim a specific substrate flowing between organisms), the conservative `most_specific` cast is preferable. | transport | `substrate_depth=['most_specific']` on the Step-2 `genes_by_metabolite` call; then rank the survivors by `tcdb_evidence_score`. **Note:** for *broad-screen* questions (e.g. "which transporters could plausibly act on N?", scenario `n_source_de`) the opposite call applies — drop the filter so inherited biology is included; see the broad-screen note below. |
-| 3 | **Transport polarity not encoded.** TCDB annotation says "transports X" without import/export direction (TCDB lacks direction upstream; permanently unmitigable). Even with clean filters, "MED4 has cynA, ALT has nrtA" tells you both touch the substrate, not who's the producer. | both | None on the annotation side — surface the limitation in the answer ("compatible with", not "confirmed"). The Track-B measurement layer can corroborate (extracellular elevation in coculture) but cannot confirm causality. |
+| 2 | **Family-level transport casts a wide net.** Family rows (`include_tcdb_family_substrates=True`) reflect a family's whole curated range, not a per-gene substrate. For cross-feeding *inferences* (which over-claim a specific substrate flowing between organisms), keep the default direct rows. | transport | Leave `include_tcdb_family_substrates` off on the Step-2 `genes_by_metabolite` call; rank the direct rows by `tcdb_identity`, then `tcdb_calls`. **Note:** for *broad-screen* questions (e.g. "which transporters could plausibly act on N?", scenario `n_source_de`) the opposite call applies — turn the walk on so family-level candidates are included. |
+| 3 | **Transport polarity is node-level at best.** TCDB rows carry `tcdb_direction` (`uptake` / `export` / `unknown`), read from TCDB's numbering or names for the node, not measured per gene, and most nodes read `unknown`. KEGG reactions are undirected. Even with clean filters, "MED4 has cynA, ALT has nrtA" tells you both touch the substrate, not who's the producer. | both | Use `tcdb_direction` as a hint only and surface the limitation in the answer ("compatible with", not "confirmed"). The Track-B measurement layer can corroborate (extracellular elevation in coculture) but cannot confirm causality. |
 
 **Pattern (two-step, with all three mitigations applied):**
 
@@ -470,15 +478,15 @@ med4_chem = metabolites_by_gene(
 )
 metabolite_ids = [m["metabolite_id"] for m in med4_chem["top_metabolites"]]
 
-# 2. Cross to ALT — split per-arm so both have airtime and the inherited
-#    superfamily plateau is killed on the transport side only. Pass `exclude_metabolite_ids`
+# 2. Cross to ALT — split per-arm so both have airtime; the transport side keeps
+#    direct TCDB rows only (the default). Pass `exclude_metabolite_ids`
 #    again as a belt-and-braces guard (cross-organism enrichment can re-introduce
 #    currency hits — exclude is harmless if the input is already clean).
 alt_transport = genes_by_metabolite(
     metabolite_ids=metabolite_ids,
     organism="Alteromonas macleodii HOT1A3",   # one strain, not the species — keeps locus tags consistent and cuts cross-strain duplicate rows
     evidence_sources=["transport"],
-    substrate_depth=["most_specific"],                   # confounder #2
+    # confounder #2: include_tcdb_family_substrates stays False (direct rows only)
     exclude_metabolite_ids=CURRENCY,
 )
 alt_metab = genes_by_metabolite(
@@ -515,35 +523,34 @@ de = differential_expression_by_gene(
 )
 ```
 
-**Caveat — promiscuous enzymes / inherited transport substrates inflate the gene set fed to DE.** Tighten via `evidence_sources=['metabolism']` or `substrate_depth=['most_specific']` if results are noisy; `by_gene[].transport_substrate_resolution` tells you which genes contribute reachability rather than capability. Symmetric primitives exist for `metabolite_elements=['P']`, `['S']`, `['Fe']`, etc.
+**Caveat — promiscuous enzymes and family-level transport substrates inflate the gene set fed to DE.** Tighten via `evidence_sources=['metabolism']`, or leave `include_tcdb_family_substrates` off, if results are noisy; `by_gene[].tcdb_direct_rows` / `tcdb_family_rows` tell you which genes contribute only family-level reach. Symmetric primitives exist for `metabolite_elements=['P']`, `['S']`, `['Fe']`, etc.
 
 ### f — Ontology bridges
 
 **TCDB substrate-anchored:** for "which genes transport substrate X?", prefer the metabolite-anchored route (`genes_by_metabolite(metabolite_ids=[...], evidence_sources=['transport'])`) over the family-anchored route (`genes_by_ontology(ontology='tcdb', ...)`). The metabolite-anchored route includes all families curating the substrate; the ontology route is family-anchored and misses cross-family substrate hits.
 
-**TCDB family-anchored context:** to see what a family *is* before trusting its substrate set — its level (class / subclass / family / subfamily), parents and children, `member_count` vs `gene_count`, and the Pfam domains / GO terms it is built from (`links_out`, composition) — use `ontology_term_details(term_ids=['tcdb:3.A.1'])`. Browse families by size with `search_ontology(ontology=['tcdb'], level=2)`. The full TCDB reference (identifier form, `attachment_depth` — visible only with `gene_ontology_terms(mode='leaf', include_superseded=True, verbose=True)` — evidence, pitfalls) is `docs://ontologies/tcdb`; the other ontologies are indexed at `docs://ontologies/index`.
+**TCDB family-anchored context:** to see what a family *is* before trusting its substrate set — its level (class / subclass / family / subfamily), parents and children, `member_count` vs `gene_count`, and the Pfam domains / GO terms it is built from (`links_out`, composition) — use `ontology_term_details(term_ids=['tcdb:3.A.1'])`. Browse families by size with `search_ontology(ontology=['tcdb'], level=2)`. The full TCDB reference (identifier form, the `tcdb_gate` / `tcdb_call` edge model, `direction`, `tcdb_substrate_count`, pitfalls) is `docs://ontologies/tcdb`; the other ontologies are indexed at `docs://ontologies/index`.
 
 **Chemical roles (siderophores, vitamins, antibiotics):** role terms are `ChemicalRole` nodes
-(`chebi.role:<n>`), not metabolites, so no metabolite tool returns them and a role id passed as
-`metabolite_ids` lands in `not_found` with a warning naming the role. TCDB curates some
-substrates only as a role ("siderophore"), reachable through `run_cypher`:
+(`chebi.role:<n>`), not metabolites, so `list_metabolites` does not return them. A role id is a
+valid input to `genes_by_metabolite` and `metabolites_by_gene`, which return TCDB and GO role
+rows (`target_kind='chemical_role'`). TCDB curates some substrates only as a role
+("siderophore"); to see which systems carry a role and its narrower roles, use `run_cypher`:
 
 ```cypher
 CALL db.index.fulltext.queryNodes('chemicalRoleFullText', 'siderophore')
 YIELD node AS role, score
 WITH role ORDER BY score DESC LIMIT 1
 MATCH (sub:ChemicalRole)-[:Chemical_role_is_a_chemical_role*0..]->(role)
-MATCH (f:TcdbFamily)-[:Tcdb_family_transports_chemical_role]->(sub)
-WHERE f.substrate_breadth <> 'not_assessed'
-RETURN role.id AS role_id, f.id AS tcdb_family_id, f.name AS tcdb_family_name,
-       f.substrate_breadth AS substrate_breadth,
-       collect(DISTINCT sub.name) AS via_roles
-ORDER BY tcdb_family_id
+MATCH (s:TcdbFamily {level_kind: 'tc_system'})-[:Tcdb_family_transports_chemical_role]->(sub)
+RETURN role.id AS role_id, s.id AS tcdb_system_id, s.name AS tcdb_system_name,
+       s.gene_count AS gene_count, collect(DISTINCT sub.name) AS via_roles
+ORDER BY gene_count DESC, tcdb_system_id
 ```
 
-`*0..` includes the role itself plus its narrower roles. Discount `lumping` families (see
-"What lumping means" under g), then take the family ids to
-`genes_by_ontology(ontology='tcdb', term_ids=[...], organism=...)` for the genes.
+`*0..` includes the role itself plus its narrower roles. Substrate edges leave systems only, and
+most systems carry no genes (`gene_count = 0`: TCDB's range, not this KG's genomes). For the genes,
+call `genes_by_metabolite(metabolite_ids=[role_id], organism=...)`.
 
 **KEGG pathway-anchored — pick the right surface:**
 - **metabolite_pathways** (compound-anchored): which metabolites are in pathway X → `list_metabolites(pathway_ids=[...])`. Edge: `Metabolite_in_pathway`.

@@ -96,10 +96,8 @@ kg_schema(labels=['Gene'], section='nodes')
         "start": "int",
         "strand": "string",
         "subcellular_localization": "string",
-        "tcdb_evidence_score_max": "float",
-        "tcdb_family_count": "int",
+        "tcdb_assignment_count": "int",
         "transmembrane_regions": "list",
-        "transport_substrate_resolution": "string",
         "transported_metabolite_count": "int"
       }
     }
@@ -152,7 +150,19 @@ kg_schema(section='relationships', relationship_types=['Molecular_function_trans
 *The edge description carries the reading rule: GO defines the term as a transporter activity whose primary input is the compound (a term definition, not a gene fact), only the term's own axiom is stated, and filtered targets return empty by curation. The four GO edge types and `Tcdb_family_transports_chemical_role` are listed together under `section='relationships'`.*
 
 ```example-response
-{"relationships": {}}
+{
+  "nodes": {},
+  "relationships": {
+    "Molecular_function_transports_metabolite": {
+      "source_labels": ["BiologicalEntity", "BiologicalProcessOrActivity", "Entity", "MolecularFunction", "NamedThing"],
+      "target_labels": ["Entity", "Metabolite", "NamedThing"],
+      "properties": {"go_chebi_ids": "list"},
+      "description": "GO defines this molecular-function term as a transporter activity whose primary input (RO:0004009) is this compound. ..."
+    }
+  },
+  "not_found_labels": [],
+  "not_found_relationship_types": []
+}
 ```
 
 ## Chaining patterns

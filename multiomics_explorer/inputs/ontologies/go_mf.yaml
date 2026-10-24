@@ -58,8 +58,8 @@ pitfalls: |
     molecular-function terms (`Tcdb_family_enables_molecular_function`);
     the bridge is forward-only — visible on the `tcdb` term, never on the
     GO term. For the reverse direction use `run_cypher`.
-  - Do not compare `evidence_score` to TCDB or MEROPS scores — each is a
-    within-ontology composite.
+  - Do not compare `evidence_score` to MEROPS scores — each is a
+    within-ontology composite (TCDB carries no evidence score).
 
 typical_questions:
   - "Which genes in MIT9313 have a non-domain-inferred oxidoreductase activity annotation? — `genes_by_ontology(ontology='go_mf', organism='MIT9313', term_ids=['go:0016491'], evidence=['curated','family_inferred'])`"

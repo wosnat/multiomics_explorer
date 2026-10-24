@@ -74,12 +74,18 @@ VALID_OMICS_TYPES: set[str] = {
 # rephrased without apostrophes, built 2026-10-18T07:51Z; + TCDB diamond
 # best hit: six new open sparse entries Gene_has_tcdb_family.best_hit_{tcids,
 # names, identity, substrate_tcids, substrate_ids, substrate_names}, built
-# 2026-10-19T17:03Z). The recipe lives KG-side (docs/kg-changes/
+# 2026-10-19T17:03Z; + TCDB cleanup 3a + post-3a fixes: best_hit_* and
+# attachment_depth / substrate_depth / scored edge props retired, new
+# Gene_has_tcdb_family.{tcdb_call, tcdb_gate, rank, bitscore, bitscore_ratio,
+# scov}, TcdbFamily.{direction, direction_basis, tcdb_substrate_count},
+# level_kind tc_specificity -> tc_system, Gene.tcdb_family_count ->
+# tcdb_assignment_count, MEROPS qcov declared percent, stereo_assignment and
+# direction descriptions reworded, built 2026-10-24T17:33Z). The recipe lives KG-side (docs/kg-changes/
 # vocabulary-contract.md). A mismatch means baked docs / parameter descriptions
 # may list stale values — filters still validate live. Must equal the live
 # KG's value at release cut.
 EXPECTED_CONTROLLED_VOCABULARIES_HASH: str = (
-    "sha256:eaf6e672af08a1c4071c79bcffbc7a98cda8a3f449f2af96ab322558c8edc54d"
+    "sha256:7e2ada529d49f19b64ddd3fb6eef9332150e64160d5ba4256cccc48b7720e190"
 )
 
 EXPECTED_KG_SHAPE: dict[str, tuple[str, ...] | str] = {

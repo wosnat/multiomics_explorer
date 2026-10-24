@@ -1,5 +1,5 @@
 case_id: mfa_msystems_as_reported_only
-row_count: 72
+row_count: 70
 rows:
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
@@ -119,18 +119,6 @@ rows:
   n_positive: 1
   n_replicates: 1
   name: Glycerone phosphate
-  organism_name: Prochlorococcus MIT9301
-  stereo_assignment: as_reported
-- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
-  compartment: whole_cell
-  condition_label: ''
-  flag_value: true
-  kegg_compound_id: C00123
-  metabolite_id: kegg.compound:C00123
-  metric_type: presence_flag_intracellular
-  n_positive: 1
-  n_replicates: 1
-  name: L-Leucine
   organism_name: Prochlorococcus MIT9301
   stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
@@ -527,18 +515,6 @@ rows:
   n_positive: 0
   n_replicates: 1
   name: Pyridoxine
-  organism_name: Prochlorococcus MIT9301
-  stereo_assignment: as_reported
-- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
-  compartment: whole_cell
-  condition_label: ''
-  flag_value: false
-  kegg_compound_id: C00328
-  metabolite_id: kegg.compound:C00328
-  metric_type: presence_flag_intracellular
-  n_positive: 0
-  n_replicates: 1
-  name: L-Kynurenine
   organism_name: Prochlorococcus MIT9301
   stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular

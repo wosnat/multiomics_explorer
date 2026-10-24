@@ -41,7 +41,7 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 - **has_discussed** (int): Count of requested locus_tags discussed in prose by at least one publication (discussed_in_publication_count > 0).
 - **top_discussing_publications** (list[OverviewDiscussingPublication]): Publications ranked by how many of the queried genes they discuss (batch set-coverage — recovers 'which one paper covers most of my gene set'). Feed a doi into discussed_by_publication for that paper's full discussed set.
 - **has_ncbifam** (int): Count of requested locus_tags with at least one NCBIfam family annotation (ncbifam_family_count > 0).
-- **has_tcdb** (int): Count of requested locus_tags with at least one deepest-attachment TCDB family (tcdb_family_count > 0).
+- **has_tcdb** (int): Count of requested locus_tags with at least one gated TCDB call (tcdb_assignment_count > 0).
 - **has_cazy** (int): Count of requested locus_tags with at least one CAZy family annotation (cazy_family_count > 0).
 - **by_merops_class** (list[OverviewMeropsClassBreakdown]): Rollup of merops_classes over the result set, sorted desc by count.
 - **returned** (int): Results in this response (0 when summary=true).
@@ -73,17 +73,16 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 | derived_metric_count | int (optional) | Total DerivedMetric annotations on this gene (sum across numeric/boolean/categorical kinds). |
 | derived_metric_value_kinds | list[string] (optional) | Subset of {numeric, boolean, categorical} where this gene has DM annotations. Use to route to genes_by_{kind}_metric drill-downs. |
 | reaction_count | int (optional) | Distinct reactions catalysed by this gene (precomputed Gene-side rollup). When > 0, drill via metabolites_by_gene(locus_tags=[locus_tag], organism=...). |
-| catalyzed_metabolite_count | int (optional) | Distinct metabolites reachable via catalysis only (Gene_catalyzes_reaction → Reaction_has_metabolite). Transport-only genes read 0 — check transported_metabolite_count / 'transport' in evidence_sources (e.g. PMM0392: 0 here, 13 transported). |
-| tcdb_evidence_score_max | float \| None (optional) | Max KG 5-signal composite evidence_score over this gene's TCDB calls, in [0,1]. Rank with it, don't filter: 0 = uncorroborated DIAMOND hit, not absent. None = no TCDB call (never a sentinel). |
-| transported_metabolite_count | int (optional) | Distinct metabolites this gene transports via its deepest TCDB attachments (precomputed Gene.transported_metabolite_count). Pairs with catalyzed_metabolite_count. When > 0, drill via metabolites_by_gene(locus_tags=[...]). |
+| catalyzed_metabolite_count | int (optional) | Distinct metabolites reachable via catalysis only (Gene_catalyzes_reaction → Reaction_has_metabolite). Transport-only genes read 0 — check transported_metabolite_count / 'transport' in evidence_sources (e.g. cynD PMM0372: 0 here, 3 transported). |
+| tcdb_best_hit_identity | float \| None (optional) | Percent identity of the gene's rank-1 diamond best hit to TCDB, read live and NOT gated (reported even below the 40% gate). How close the nearest characterised system is; rank, don't filter. None = no best hit. |
+| transported_metabolite_count | int (optional) | Distinct metabolites this gene transports via its direct TCDB systems (tcdb_gate='direct'; precomputed Gene.transported_metabolite_count). Pairs with catalyzed_metabolite_count. When > 0, drill via metabolites_by_gene(locus_tags=[...]). |
 | go_transport_metabolite_count | int (optional) | GO-route mirror of transported_metabolite_count: distinct metabolites (not roles) via the gene's direct GO terms; is_a-inherited not counted. A term-definition count, not a gene fact. Drill via metabolites_by_gene. |
-| transport_substrate_resolution | string \| None (optional) | 'resolved' = at least one deepest TCDB attachment is a non-lumping family (lumping = TcdbFamily.substrate_breadth='lumping'); 'family_inferred' = transported_metabolite_count is reachability, not capability. None = no TCDB call. |
 | evidence_sources | list[string] (optional) | Path provenance — values from {'metabolism', 'transport', 'metabolomics', 'go_transport'}. When non-empty, drill into metabolites_by_gene(locus_tags=[...]). Per-source definitions: see docs://guide/concepts. |
 | merops_classes | list[string] (optional) | Distinct MEROPS call_class values across this gene's MEROPS calls (e.g. ['peptidase']). Empty when no MEROPS annotation. Drill via gene_ontology_terms(ontology='merops'). |
 | ncbifam_family_count | int (optional) | Distinct NCBIfam family annotations on this gene. When > 0, drill via gene_ontology_terms(ontology='ncbifam'). |
-| tcdb_family_count | int (optional) | Distinct TCDB families at the deepest attachment only (superseded ancestors excluded); equals the default TCDB row count from gene_ontology_terms. 0 = no TCDB call (score and resolution null). Drill via gene_ontology_terms(ontology=['tcdb']). |
+| tcdb_assignment_count | int (optional) | Distinct gated TCDB targets (systems, subfamilies, families) minus any that is an ancestor of another (precomputed Gene.tcdb_assignment_count); equals the default TCDB leaf row count from gene_ontology_terms. 0 = no gated TCDB call. |
 | cazy_family_count | int (optional) | Distinct CAZy families on this gene (precomputed Gene.cazy_family_count; flat ontology). When > 0, drill via gene_ontology_terms(ontology=['cazy']) or find peers with genes_by_ontology(ontology='cazy'). |
-| merops_evidence_score_max | float \| None (optional) | Max MEROPS evidence_score over this gene's calls, in [0,1]. Twin of tcdb_evidence_score_max — uncoalesced: None = no MEROPS call at all, 0 = an uncorroborated one. Rank with it, don't filter. |
+| merops_evidence_score_max | float \| None (optional) | Max MEROPS evidence_score over this gene's calls, in [0,1]. Uncoalesced: None = no MEROPS call at all, 0 = an uncorroborated one. Rank with it, don't filter. |
 | discussed_in_publication_count | int (optional) | Distinct publications that discuss this gene in prose (precomputed Gene.discussed_in_publication_count). Recall-biased narrative mention, NOT DE-table expression. When > 0, set verbose=True for the per-paper DOI list, or call discussed_by_publication for a paper's full discussed set. |
 | numeric_metric_count | int \| None (optional) | Numeric DM count (verbose-only). |
 | boolean_metric_count | int \| None (optional) | Boolean DM count (verbose-only). |
@@ -162,13 +161,13 @@ gene_overview(locus_tags=["PMM1428"])
       "derived_metric_value_kinds": ["numeric", "boolean", "categorical"],
       "reaction_count": 0,
       "catalyzed_metabolite_count": 0,
-      "tcdb_evidence_score_max": null,
+      "tcdb_best_hit_identity": null,
       "transported_metabolite_count": 0,
-      "transport_substrate_resolution": null,
+      "go_transport_metabolite_count": 0,
       "evidence_sources": [],
       "merops_classes": [],
       "ncbifam_family_count": 0,
-      "tcdb_family_count": 0,
+      "tcdb_assignment_count": 0,
       "cazy_family_count": 0,
       "merops_evidence_score_max": null,
       "discussed_in_publication_count": 0
@@ -260,13 +259,13 @@ gene_overview(locus_tags=["MIT1002_01809"])
       "derived_metric_value_kinds": ["boolean"],
       "reaction_count": 0,
       "catalyzed_metabolite_count": 0,
-      "tcdb_evidence_score_max": null,
+      "tcdb_best_hit_identity": null,
       "transported_metabolite_count": 0,
-      "transport_substrate_resolution": null,
+      "go_transport_metabolite_count": 0,
       "evidence_sources": [],
       "merops_classes": [],
       "ncbifam_family_count": 0,
-      "tcdb_family_count": 0,
+      "tcdb_assignment_count": 0,
       "cazy_family_count": 0,
       "merops_evidence_score_max": null,
       "discussed_in_publication_count": 0
@@ -275,23 +274,26 @@ gene_overview(locus_tags=["MIT1002_01809"])
 }
 ```
 
-### Example 6: Transport-only gene — resolved transporter with zero catalysis reach
+### Example 6: Transport-only gene — direct TCDB systems, zero catalysis reach
 
 ```example-call
-gene_overview(locus_tags=["PMM0392", "PMM0001"])
+gene_overview(locus_tags=["PMM0372", "PMM0001"])
 ```
 
 ```example-response
 {
   "total_matching": 2,
   "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 2}],
-  "by_category": [{"category": "Transport", "count": 1}, {"category": "Replication and repair", "count": 1}],
+  "by_category": [
+    {"category": "Central intermediary metabolism", "count": 1},
+    {"category": "Replication and repair", "count": 1}
+  ],
   "by_annotation_type": [
     {"annotation_type": "go_bp", "count": 2},
+    {"annotation_type": "go_mf", "count": 2},
     {"annotation_type": "go_cc", "count": 2},
     {"annotation_type": "pfam", "count": 2},
     {"annotation_type": "cog_category", "count": 2},
-    {"annotation_type": "kegg", "count": 2},
     ...
   ],
   "by_annotation_state": [{"annotation_state": "informative_multi", "count": 2}],
@@ -301,15 +303,20 @@ gene_overview(locus_tags=["PMM0392", "PMM0001"])
   "has_clusters": 2,
   "has_derived_metrics": 2,
   "has_chemistry": 2,
-  "has_discussed": 1,
+  "has_discussed": 2,
   "top_discussing_publications": [
     {
       "doi": "10.1186/gb-2010-11-5-r54",
       "title": "RNA half-lives in the slow-growing marine cyanobacterium Prochlorococcus",
       "n_genes": 1
+    },
+    {
+      "doi": "10.64898/2026.04.15.718746",
+      "title": "Extreme genome reduction selectively retains modular regulatory architecture in Prochlorococcus MED4: conserved trans...",
+      "n_genes": 1
     }
   ],
-  "has_ncbifam": 1,
+  "has_ncbifam": 2,
   "has_tcdb": 1,
   "has_cazy": 0,
   "by_merops_class": [],
@@ -340,48 +347,48 @@ gene_overview(locus_tags=["PMM0392", "PMM0001"])
       "derived_metric_value_kinds": ["numeric", "boolean", "categorical"],
       "reaction_count": 4,
       "catalyzed_metabolite_count": 6,
-      "tcdb_evidence_score_max": null,
+      "tcdb_best_hit_identity": null,
       "transported_metabolite_count": 0,
-      "transport_substrate_resolution": null,
+      "go_transport_metabolite_count": 0,
       "evidence_sources": ["metabolism"],
       "merops_classes": [],
       "ncbifam_family_count": 1,
-      "tcdb_family_count": 0,
+      "tcdb_assignment_count": 0,
       "cazy_family_count": 0,
       "merops_evidence_score_max": null,
       "discussed_in_publication_count": 1
     },
     {
-      "locus_tag": "PMM0392",
-      "gene_name": "cbiQ",
-      "product": "transmembrane component of ECF transporter energizing module",
-      "gene_category": "Transport",
+      "locus_tag": "PMM0372",
+      "gene_name": "cynD",
+      "product": "cyanate ABC transporter ATP-binding protein",
+      "gene_category": "Central intermediary metabolism",
       "annotation_quality": 3,
       "organism_name": "Prochlorococcus MED4",
-      "annotation_types": ["go_bp", "go_cc", "pfam", "cog_category", "kegg", ...],
+      "annotation_types": ["go_bp", "go_mf", "go_cc", "pfam", "cog_category", ...],
       "annotation_state": "informative_multi",
-      "informative_annotation_types": ["go_bp", "go_cc", "pfam", "cog_category", "kegg", ...],
+      "informative_annotation_types": ["go_bp", "go_mf", "go_cc", "pfam", "cog_category", ...],
       "expression_edge_count": 30,
-      "significant_up_count": 0,
+      "significant_up_count": 12,
       "significant_down_count": 1,
-      "closest_ortholog_group_size": 22,
+      "closest_ortholog_group_size": 3,
       "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
-      "cluster_membership_count": 1,
-      "cluster_types": ["diel"],
+      "cluster_membership_count": 4,
+      "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
       "derived_metric_count": 9,
       "derived_metric_value_kinds": ["numeric", "boolean", "categorical"],
       "reaction_count": 0,
       "catalyzed_metabolite_count": 0,
-      "tcdb_evidence_score_max": 0.8,
-      "transported_metabolite_count": 12,
-      "transport_substrate_resolution": "resolved",
-      "evidence_sources": ["transport", "metabolomics"],
+      "tcdb_best_hit_identity": 59.2,
+      "transported_metabolite_count": 3,
+      "go_transport_metabolite_count": 2,
+      "evidence_sources": ["transport", "go_transport"],
       "merops_classes": [],
-      "ncbifam_family_count": 0,
-      "tcdb_family_count": 7,
+      "ncbifam_family_count": 1,
+      "tcdb_assignment_count": 2,
       "cazy_family_count": 0,
       "merops_evidence_score_max": null,
-      "discussed_in_publication_count": 0
+      "discussed_in_publication_count": 1
     }
   ]
 }
@@ -446,13 +453,13 @@ gene_overview(locus_tags=["HP15_1897"])
       "derived_metric_value_kinds": [],
       "reaction_count": 3,
       "catalyzed_metabolite_count": 4,
-      "tcdb_evidence_score_max": null,
+      "tcdb_best_hit_identity": null,
       "transported_metabolite_count": 0,
-      "transport_substrate_resolution": null,
+      "go_transport_metabolite_count": 0,
       "evidence_sources": ["metabolism"],
       "merops_classes": [],
       "ncbifam_family_count": 0,
-      "tcdb_family_count": 0,
+      "tcdb_assignment_count": 0,
       "cazy_family_count": 4,
       "merops_evidence_score_max": null,
       "discussed_in_publication_count": 0
@@ -520,13 +527,13 @@ gene_overview(locus_tags=["MIT1002_03660"])
       "derived_metric_value_kinds": [],
       "reaction_count": 0,
       "catalyzed_metabolite_count": 0,
-      "tcdb_evidence_score_max": null,
+      "tcdb_best_hit_identity": null,
       "transported_metabolite_count": 0,
-      "transport_substrate_resolution": null,
+      "go_transport_metabolite_count": 0,
       "evidence_sources": [],
       "merops_classes": ["peptidase"],
       "ncbifam_family_count": 2,
-      "tcdb_family_count": 0,
+      "tcdb_assignment_count": 0,
       "cazy_family_count": 0,
       "merops_evidence_score_max": 1.0,
       "discussed_in_publication_count": 0
@@ -593,13 +600,13 @@ gene_overview(locus_tags=["PMT2118", "PMT_1030"])
       "derived_metric_value_kinds": ["numeric", "boolean"],
       "reaction_count": 0,
       "catalyzed_metabolite_count": 0,
-      "tcdb_evidence_score_max": null,
+      "tcdb_best_hit_identity": null,
       "transported_metabolite_count": 0,
-      "transport_substrate_resolution": null,
+      "go_transport_metabolite_count": 0,
       "evidence_sources": [],
       "merops_classes": [],
       "ncbifam_family_count": 1,
-      "tcdb_family_count": 0,
+      "tcdb_assignment_count": 0,
       "cazy_family_count": 0,
       "merops_evidence_score_max": null,
       "discussed_in_publication_count": 1
@@ -625,13 +632,13 @@ gene_overview(locus_tags=["PMT2118", "PMT_1030"])
       "derived_metric_value_kinds": ["numeric", "boolean"],
       "reaction_count": 0,
       "catalyzed_metabolite_count": 0,
-      "tcdb_evidence_score_max": null,
+      "tcdb_best_hit_identity": null,
       "transported_metabolite_count": 0,
-      "transport_substrate_resolution": null,
+      "go_transport_metabolite_count": 0,
       "evidence_sources": [],
       "merops_classes": [],
       "ncbifam_family_count": 2,
-      "tcdb_family_count": 0,
+      "tcdb_assignment_count": 0,
       "cazy_family_count": 0,
       "merops_evidence_score_max": null,
       "discussed_in_publication_count": 1
@@ -712,13 +719,13 @@ gene_overview(locus_tags=["PMM0533", "PMM0970"])
       "derived_metric_value_kinds": ["numeric", "boolean", "categorical"],
       "reaction_count": 0,
       "catalyzed_metabolite_count": 0,
-      "tcdb_evidence_score_max": null,
+      "tcdb_best_hit_identity": null,
       "transported_metabolite_count": 0,
-      "transport_substrate_resolution": null,
+      "go_transport_metabolite_count": 4,
       "evidence_sources": ["go_transport"],
       "merops_classes": [],
       "ncbifam_family_count": 1,
-      "tcdb_family_count": 0,
+      "tcdb_assignment_count": 0,
       "cazy_family_count": 0,
       "merops_evidence_score_max": null,
       "discussed_in_publication_count": 0
@@ -744,13 +751,13 @@ gene_overview(locus_tags=["PMM0533", "PMM0970"])
       "derived_metric_value_kinds": ["numeric", "boolean", "categorical"],
       "reaction_count": 0,
       "catalyzed_metabolite_count": 0,
-      "tcdb_evidence_score_max": 0.6,
+      "tcdb_best_hit_identity": 57.1,
       "transported_metabolite_count": 3,
-      "transport_substrate_resolution": "resolved",
+      "go_transport_metabolite_count": 1,
       "evidence_sources": ["transport", "go_transport"],
       "merops_classes": [],
       "ncbifam_family_count": 1,
-      "tcdb_family_count": 2,
+      "tcdb_assignment_count": 2,
       "cazy_family_count": 0,
       "merops_evidence_score_max": null,
       "discussed_in_publication_count": 2
@@ -762,21 +769,169 @@ gene_overview(locus_tags=["PMM0533", "PMM0970"])
 ### Example 11: GO-route metabolite count next to the TCDB count
 
 ```example-call
-gene_overview(locus_tags=["PMM0392", "PMM0970", "PMM0974"])
+gene_overview(locus_tags=["PMM0372", "PMM0970", "PMM0974"])
 ```
 
-*`go_transport_metabolite_count` mirrors `transported_metabolite_count` for the GO route: distinct metabolites named by the gene's own GO transport terms. urtE (PMM0974) reaches 3, urtA (PMM0970) 1, and cbiQ (PMM0392, 12 TCDB metabolites) none. Chemical roles and is_a-inherited GO targets are not counted; drill in with `metabolites_by_gene(..., evidence_sources=['go_transport'])`.*
+*`go_transport_metabolite_count` mirrors `transported_metabolite_count` for the GO route: distinct metabolites named by the gene's own GO transport terms. urtE (PMM0974) reaches 3, cynD (PMM0372) 2 and urtA (PMM0970) 1, while all three reach 3 metabolites through their direct TCDB systems. Chemical roles and is_a-inherited GO targets are not counted; drill in with `metabolites_by_gene(..., evidence_sources=['go_transport'])`.*
 
 ```example-response
 {
-  "results": [
-    {"locus_tag": "PMM0392", "gene_name": "cbiQ", "transported_metabolite_count": 12, "go_transport_metabolite_count": 0},
-    {"locus_tag": "PMM0970", "gene_name": "urtA", "transported_metabolite_count": 3, "go_transport_metabolite_count": 1},
-    {"locus_tag": "PMM0974", "gene_name": "urtE", "transported_metabolite_count": 5, "go_transport_metabolite_count": 3}
+  "total_matching": 3,
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "count": 3}],
+  "by_category": [
+    {"category": "Stress response and adaptation", "count": 2},
+    {"category": "Central intermediary metabolism", "count": 1}
   ],
-  ...
+  "by_annotation_type": [
+    {"annotation_type": "go_bp", "count": 3},
+    {"annotation_type": "go_mf", "count": 3},
+    {"annotation_type": "go_cc", "count": 3},
+    {"annotation_type": "pfam", "count": 3},
+    {"annotation_type": "cog_category", "count": 3},
+    ...
+  ],
+  "by_annotation_state": [{"annotation_state": "informative_multi", "count": 3}],
+  "has_expression": 3,
+  "has_significant_expression": 3,
+  "has_orthologs": 3,
+  "has_clusters": 3,
+  "has_derived_metrics": 3,
+  "has_chemistry": 3,
+  "has_discussed": 3,
+  "top_discussing_publications": [
+    {
+      "doi": "10.1038/ismej.2017.88",
+      "title": "Nitrogen cost minimization is promoted by structural changes in the transcriptome of N-deprived Prochlorococcus cells",
+      "n_genes": 2
+    },
+    {
+      "doi": "10.1038/msb4100087",
+      "title": "Global gene expression of Prochlorococcus ecotypes in response to changes in nitrogen availability",
+      "n_genes": 1
+    },
+    {
+      "doi": "10.64898/2026.04.15.718746",
+      "title": "Extreme genome reduction selectively retains modular regulatory architecture in Prochlorococcus MED4: conserved trans...",
+      "n_genes": 1
+    }
+  ],
+  "has_ncbifam": 3,
+  "has_tcdb": 3,
+  "has_cazy": 0,
+  "by_merops_class": [],
+  "returned": 3,
+  "offset": 0,
+  "truncated": false,
+  "not_found": [],
+  "warnings": [],
+  "results": [
+    {
+      "locus_tag": "PMM0372",
+      "gene_name": "cynD",
+      "product": "cyanate ABC transporter ATP-binding protein",
+      "gene_category": "Central intermediary metabolism",
+      "annotation_quality": 3,
+      "organism_name": "Prochlorococcus MED4",
+      "annotation_types": ["go_bp", "go_mf", "go_cc", "pfam", "cog_category", ...],
+      "annotation_state": "informative_multi",
+      "informative_annotation_types": ["go_bp", "go_mf", "go_cc", "pfam", "cog_category", ...],
+      "expression_edge_count": 30,
+      "significant_up_count": 12,
+      "significant_down_count": 1,
+      "closest_ortholog_group_size": 3,
+      "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+      "cluster_membership_count": 4,
+      "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
+      "derived_metric_count": 9,
+      "derived_metric_value_kinds": ["numeric", "boolean", "categorical"],
+      "reaction_count": 0,
+      "catalyzed_metabolite_count": 0,
+      "tcdb_best_hit_identity": 59.2,
+      "transported_metabolite_count": 3,
+      "go_transport_metabolite_count": 2,
+      "evidence_sources": ["transport", "go_transport"],
+      "merops_classes": [],
+      "ncbifam_family_count": 1,
+      "tcdb_assignment_count": 2,
+      "cazy_family_count": 0,
+      "merops_evidence_score_max": null,
+      "discussed_in_publication_count": 1
+    },
+    {
+      "locus_tag": "PMM0970",
+      "gene_name": "urtA",
+      "product": "ABC-type urea transporter, substrate binding component",
+      "gene_category": "Stress response and adaptation",
+      "annotation_quality": 3,
+      "organism_name": "Prochlorococcus MED4",
+      "annotation_types": ["go_bp", "go_mf", "go_cc", "pfam", "cog_category", ...],
+      "annotation_state": "informative_multi",
+      "informative_annotation_types": ["go_bp", "go_mf", "go_cc", "pfam", "cog_category", ...],
+      "expression_edge_count": 53,
+      "significant_up_count": 17,
+      "significant_down_count": 10,
+      "closest_ortholog_group_size": 21,
+      "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+      "cluster_membership_count": 5,
+      "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
+      "derived_metric_count": 11,
+      "derived_metric_value_kinds": ["numeric", "boolean", "categorical"],
+      "reaction_count": 0,
+      "catalyzed_metabolite_count": 0,
+      "tcdb_best_hit_identity": 57.1,
+      "transported_metabolite_count": 3,
+      "go_transport_metabolite_count": 1,
+      "evidence_sources": ["transport", "go_transport"],
+      "merops_classes": [],
+      "ncbifam_family_count": 1,
+      "tcdb_assignment_count": 2,
+      "cazy_family_count": 0,
+      "merops_evidence_score_max": null,
+      "discussed_in_publication_count": 2
+    },
+    {
+      "locus_tag": "PMM0974",
+      "gene_name": "urtE",
+      "product": "ABC-type urea transporter, ATPase component UrtE",
+      "gene_category": "Stress response and adaptation",
+      "annotation_quality": 3,
+      "organism_name": "Prochlorococcus MED4",
+      "annotation_types": ["go_bp", "go_mf", "go_cc", "pfam", "cog_category", ...],
+      "annotation_state": "informative_multi",
+      "informative_annotation_types": ["go_bp", "go_mf", "go_cc", "pfam", "cog_category", ...],
+      "expression_edge_count": 34,
+      "significant_up_count": 8,
+      "significant_down_count": 1,
+      "closest_ortholog_group_size": 19,
+      "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+      "cluster_membership_count": 2,
+      "cluster_types": ["genomic_island", "diel"],
+      "derived_metric_count": 12,
+      "derived_metric_value_kinds": ["numeric", "boolean", "categorical"],
+      "reaction_count": 0,
+      "catalyzed_metabolite_count": 0,
+      "tcdb_best_hit_identity": 62.1,
+      "transported_metabolite_count": 3,
+      "go_transport_metabolite_count": 3,
+      "evidence_sources": ["transport", "go_transport"],
+      "merops_classes": [],
+      "ncbifam_family_count": 1,
+      "tcdb_assignment_count": 2,
+      "cazy_family_count": 0,
+      "merops_evidence_score_max": null,
+      "discussed_in_publication_count": 1
+    }
+  ]
 }
 ```
+
+### Example 12: TCDB triage — assignment count, best-hit identity and the direct transport reach
+
+```example-call
+gene_overview(locus_tags=["PMM0372", "PMM0125", "PMM0673", "PMM0024"])
+```
+
+*`tcdb_assignment_count` counts the gene's gated TCDB targets (`tcdb_gate` direct or annotated, minus any target that is an ancestor of another). cynD (PMM0372) has 2 sibling systems and reaches 3 metabolites directly; ecfA1 (PMM0125) has 7 eggNOG subfamily calls but no system, so `transported_metabolite_count=0`; phnD (PMM0673) has 1 subfamily call and also 0 direct reach (its substrates come from the family walk in `metabolites_by_gene`); thiL (PMM0024) has 0, because its only TCDB edge is a weak tier-3 DIAMOND hit. `tcdb_best_hit_identity` is the identity of the rank-1 DIAMOND best hit, reported even below the gate (ecfA1 33.5) and null when there is none (phnD, thiL): rank by it, never filter.*
 
 ## Chaining patterns
 
@@ -790,12 +945,13 @@ gene_overview → gene_clusters_by_gene
 gene_overview(locus_tags=...) → for genes with derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric; for ['numeric'] use genes_by_numeric_metric; for ['categorical'] use genes_by_categorical_metric
 gene_overview(verbose=True) → see compartments_observed for vesicle/whole-cell triage
 gene_overview (per-row `evidence_sources` non-empty) → metabolites_by_gene OR genes_by_metabolite for chemistry drill-down.
-gene_overview (per-row `transport_substrate_resolution='resolved'`, after reading `tcdb_evidence_score_max`) → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['transport']) — distinct metabolites in the rows equal `transported_metabolite_count`.
+gene_overview (per-row `transported_metabolite_count` > 0) → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['transport']) — distinct Metabolite targets in the direct rows equal `transported_metabolite_count`.
+gene_overview (per-row `tcdb_assignment_count` > 0 but `transported_metabolite_count` = 0) → metabolites_by_gene(locus_tags=[...], organism=..., include_tcdb_family_substrates=True) for family-level substrate candidates.
 gene_overview (per-row `discussed_in_publication_count` > 0) → use verbose=True for the per-gene {doi, prominence, evidence} list, or discussed_by_publication(publication_dois=[...]) for the paper's full discussed set.
-gene_overview (per-row `tcdb_family_count` > 0) → gene_ontology_terms(locus_tags=[...], ontology=['tcdb']) for the family IDs and evidence; `cazy_family_count` > 0 → gene_ontology_terms(locus_tags=[...], ontology=['cazy']), or genes_by_ontology(ontology='cazy', organism=...) for peers.
+gene_overview (per-row `tcdb_assignment_count` > 0) → gene_ontology_terms(locus_tags=[...], ontology=['tcdb']) for the TC ids, `tcdb_call` / `tcdb_gate` and evidence; `cazy_family_count` > 0 → gene_ontology_terms(locus_tags=[...], ontology=['cazy']), or genes_by_ontology(ontology='cazy', organism=...) for peers.
 gene_overview envelope `has_tcdb` / `has_cazy` = batch triage (how many input genes carry a transporter-family / carbohydrate-active-enzyme call) before deciding whether a pathway_enrichment(ontology='tcdb'|'cazy') run is worth it.
 gene_overview (per-row `merops_classes` non-empty) → gene_ontology_terms(locus_tags=[...], ontology=['merops'], verbose=True) for the confidence_score / pfam_support detail behind the call, or genes_by_ontology(ontology='merops', call_class=['peptidase']) to find peers.
-`merops_classes` is a list (`[]` default) because a gene can carry both a `peptidase` and a `nonpeptidase_homolog` MEROPS call on different families — don't assume at most one value. `merops_evidence_score_max` is sparse and uncoalesced (null = no MEROPS call at all, the twin contract of `tcdb_evidence_score_max`) — rank by it, never filter by it.
+`merops_classes` is a list (`[]` default) because a gene can carry both a `peptidase` and a `nonpeptidase_homolog` MEROPS call on different families — don't assume at most one value. `merops_evidence_score_max` is sparse and uncoalesced (null = no MEROPS call at all) — rank by it, never filter by it.
 gene_overview (per-row derived_metric_count > 0) → gene_derived_metrics(locus_tags=[...], organism=...) for the gene's full DM profile across numeric, boolean and categorical kinds
 gene_overview → evidence_sources contains 'go_transport' → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['go_transport']) for the GO term and target behind the tag
 ```
@@ -812,9 +968,11 @@ gene_overview → evidence_sources contains 'go_transport' → metabolites_by_ge
 
 - `catalyzed_metabolite_count` counts the catalysis arm only (distinct metabolites via Gene → Reaction → Metabolite). It is NOT a total chemistry reach: a transport-only gene reads 0 here while `transported_metabolite_count > 0` and 'transport' appears in `evidence_sources`. Use `evidence_sources` to see which arms exist before interpreting a 0.
 
-- TCDB routing rule: read the score; if resolved, drill into substrates. `tcdb_evidence_score_max` is the gene's most corroborated TCDB call (null = no TCDB call; 0 = an uncorroborated hit, not absence) — rank by it, never filter by it. `transport_substrate_resolution='family_inferred'` means `transported_metabolite_count` is reachability through a lumping family, not capability; `'resolved'` means at least one deepest attachment is non-lumping (not all of them — a superfamily rollup can still sit inside the count). Per-row `substrate_depth` in `metabolites_by_gene` separates the two.
+- TCDB routing rule: `transported_metabolite_count > 0` means the gene points directly (`tcdb_gate='direct'`) at a TC system that TCDB curates with substrates; drill with `metabolites_by_gene`. `tcdb_assignment_count > 0` with `transported_metabolite_count = 0` means TCDB placed the gene only at family or subfamily level (or at a system with no curated substrate): its substrate candidates come from `metabolites_by_gene(..., include_tcdb_family_substrates=True)`, a recall expansion. `tcdb_assignment_count = 0` with a TCDB edge means weak DIAMOND hits only; `gene_ontology_terms(..., include_weak_tcdb_hits=True)` shows them.
 
-- `tcdb_family_count` counts TCDB families at the deepest attachment only (superseded ancestor families excluded) — it equals the TCDB row count of `gene_ontology_terms(ontology=['tcdb'])` in default leaf mode. Ancestor membership is still visible with `include_superseded=True`. `tcdb_family_count > 0` exactly when `tcdb_evidence_score_max` / `transport_substrate_resolution` are non-null.
+- `tcdb_assignment_count` is the KG's count of the gene's gated TCDB targets (`tcdb_gate` direct or annotated), minus any target that is an ancestor of another; most are systems or subfamilies, not families. It equals the TCDB row count of `gene_ontology_terms(ontology=['tcdb'])` in default leaf mode. `has_tcdb` counts genes with `tcdb_assignment_count > 0`.
+
+- `tcdb_best_hit_identity` is the percent identity of the gene's rank-1 DIAMOND best hit against TCDB, read without the gate: it is reported even when that hit is below the gate (< 40%). It is a hint of how close the nearest characterised system is. Rank by it, never filter; null means no best hit, not no TCDB call (an eggNOG-only gene reads null).
 
 - discussed_in_publication_count > 0 means at least one publication names this gene in prose (a recall-biased literature index, NOT DE-table expression). At ~1 pub/gene the answer is usually inline: verbose=True returns discussed_in_publications as {doi, prominence, evidence} per gene. Use discussed_by_publication for a paper's full discussed set.
 
@@ -828,9 +986,9 @@ gene_overview(locus_tags=['PMM0845'])  # compact carries every routing count; ve
 
 - `limit` defaults to every input gene (min 25) rather than a small page — pass an explicit number to page.
 
-- The annotation-family columns (`merops_classes`, `tcdb_family_count`, `cazy_family_count`, `ncbifam_family_count`, `tcdb_evidence_score_max`, `merops_evidence_score_max`) belong to the annotation-trust surface — see docs://analysis/annotation_evidence for how to read them.
+- The annotation-family columns (`merops_classes`, `tcdb_assignment_count`, `tcdb_best_hit_identity`, `cazy_family_count`, `ncbifam_family_count`, `merops_evidence_score_max`) belong to the annotation-trust surface — see docs://analysis/annotation_evidence for how to read them.
 
-- The `go_transport` tag in `evidence_sources` means the gene carries a GO term that GO defines as moving some compound or role (a term definition, not a measured transport activity). It is separate from `transport` (TCDB) and does not change `transport_substrate_resolution`, `tcdb_*` counts or `catalyzed_metabolite_count`. A biological-process term can tag a gene that is not a transporter (MED4 `ftn` reaches iron through "iron ion transport"). Read `docs://analysis/transport` before combining the routes.
+- The `go_transport` tag in `evidence_sources` means the gene carries a GO term that GO defines as moving some compound or role (a term definition, not a measured transport activity). It is separate from `transport` (TCDB) and does not change `transported_metabolite_count`, `tcdb_*` counts or `catalyzed_metabolite_count`. A biological-process term can tag a gene that is not a transporter (MED4 `ftn` reaches iron through "iron ion transport"). Read `docs://analysis/transport` before combining the routes.
 
 - `go_transport_metabolite_count` counts metabolites, not chemical roles, and direct GO terms only (no is_a-inherited targets). It is a count of what the gene's GO terms are defined to move, not a measured activity, and it does not add to `transported_metabolite_count` (TCDB) or `catalyzed_metabolite_count`. A gene can read 0 here and still carry `go_transport` in `evidence_sources` through a role target.
 

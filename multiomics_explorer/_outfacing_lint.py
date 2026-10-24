@@ -41,7 +41,9 @@ LINT_PATTERN = re.compile(
     r"|\b(?:Gene|OrganismTaxon)\.metabolite_count\b"
     r"|\bMetabolite\.gene_count\b"
     r"|results\[\]\.gene_count"
-    # Retired TCDB trust vocabulary (2026-08 substrate_depth migration).
+    # Retired TCDB trust vocabulary (2026-08 substrate_depth migration; the
+    # TCDB cleanup of 2026-10 removed substrate_depth itself — the removed
+    # identifiers are policed by inputs/lint/stale_identifiers.yaml).
     # Source violations: analysis/metabolites.md decision-tree label
     # "g (precision-tier)"; the pre-migration warning concept.
     r"|precision[ -]tier"
@@ -52,9 +54,17 @@ LINT_PATTERN = re.compile(
     r"|\bField descriptions?\b"
     # Retired-name lineage ("the corrected successor of the removed
     # transporter_count"): what a column replaced is CHANGELOG material,
-    # not usage guidance. Source violation: the gene_overview
-    # tcdb_family_count parameter description and example comment.
+    # not usage guidance. Source violation: the gene_overview TCDB count
+    # parameter description and example comment (that column is now
+    # tcdb_assignment_count).
     r"|\b(?:successor|replacement)s? (?:of|for|to) the (?:removed|retired|old)\b"
+    # TCDB carries no evidence_score axis and no rank_prop (its representative
+    # edge is an ordered categorical on tcdb_call, then identity). Source
+    # violation: the `trust_axes` example in the pathway_enrichment /
+    # cluster_enrichment response descriptions (mcp_server/tools.py),
+    # {'tcdb': ['sources','evidence','evidence_score','tier']}.
+    r"|['\"]tcdb['\"]:\s*\[[^\]]*['\"]evidence_score['\"]"
+    r"|(?i:\brank_prop\b[^\n]{0,60}\btcdb\b|\btcdb\b[^\n]{0,60}\brank_prop\b)"
 )
 
 # Path-scoped stale-language patterns: keyed by file name, applied only to
@@ -67,8 +77,9 @@ LINT_PATTERN = re.compile(
 # review finding 7); assays_by_metabolite's numeric + boolean "both arms"
 # stays legitimate.
 # `by_evidence_source` on the three-arm chemistry pages had "≤2 entries"
-# left over from the two-arm era (go-transport follow-ups review); the
-# `by_substrate_depth` "≤2 entries" stays legitimate.
+# left over from the two-arm era (go-transport follow-ups review); a
+# two-valued breakdown such as `by_tcdb_route` (direct / family) may still
+# say "≤2 entries" legitimately.
 _THREE_ARM_CHEMISTRY = re.compile(
     r"\bboth arms\b|\beither arm\b"
     r"|values present in\s+the slice \(≤2 entries\)"

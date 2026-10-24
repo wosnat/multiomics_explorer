@@ -85,7 +85,6 @@ gene_details(locus_tags=["PMM0001"])
       "boolean_metric_count": 2,
       "transported_metabolite_count": 0,
       "organism_name": "Prochlorococcus MED4",
-      "tcdb_family_count": 0,
       "reaction_count": 4,
       "function_description": "Confers DNA tethering and processivity to DNA polymerases and other proteins. Acts as a clamp, forming a ring around ...",
       "subcellular_localization": "Cytoplasmic",
@@ -110,6 +109,7 @@ gene_details(locus_tags=["PMM0001"])
       "contributing_sources": ["cyanorak", "eggnog", "interproscan", "ncbi", "psortb", ...],
       "interpro_entry_count": 5,
       "preferred_id": "ncbigene",
+      "tcdb_assignment_count": 0,
       "product": "DNA polymerase III, beta subunit",
       "cazy_family_count": 0,
       "boolean_metric_types_observed": ["expressed_above_background", "has_primary_tss"],
@@ -168,7 +168,7 @@ gene_overview → gene_details
 resolve_gene → gene_details
 genes_by_function → gene_details
 gene_details → gene_ontology_terms(locus_tags=[...], ontology=['ec', 'kegg']) — the EC numbers / KO terms behind a gene live on edges, not on the node.
-gene_details → metabolites_by_gene — when reaction_count / transported_metabolite_count are non-zero, list the metabolites this gene's reactions involve / its TCDB families transport. Single-gene chemistry deep-dive. See docs://analysis/metabolites.
+gene_details → metabolites_by_gene — when reaction_count / transported_metabolite_count are non-zero, list the metabolites this gene's reactions involve / its direct TC systems transport. Single-gene chemistry deep-dive. See docs://analysis/metabolites.
 gene_details → gene_homologs(locus_tags=[...]) for ortholog group memberships, and list_organisms for the organism's taxonomy and capability rollups
 ```
 
@@ -182,7 +182,7 @@ gene_details → gene_homologs(locus_tags=[...]) for ortholog group memberships,
 
 - The Gene node carries NO `ec_numbers`, `ko_terms`, `kegg_ids` or `cog_categories` properties — those are null on every gene. Ontology memberships (GO, KEGG KO / pathway, EC, COG, TCDB, CAZy, Pfam, ...) are graph edges: use gene_ontology_terms(locus_tags=[...], ontology=['ec', 'kegg']) (or any ontology list) to read them, gene_overview's `annotation_types` to see which exist.
 
-- Chemistry context lives in three places: (1) edge-side EC / KO terms via `gene_ontology_terms(ontology=['ec', 'kegg'])` plus the sparse `catalytic_activities` text returned here; (2) `gene_overview` per-row `reaction_count` / `catalyzed_metabolite_count` / `tcdb_family_count` / `transported_metabolite_count` + `evidence_sources` rollup (routing surface — when non-zero, drill; the same counts are on the raw node here); (3) `metabolites_by_gene` for the actual metabolite list (per-arm: reaction-anchored via Gene → Reaction → Metabolite, transport-anchored via Gene → TcdbFamily → Metabolite). For 'what compounds does this gene's chemistry touch?', chain `gene_details → metabolites_by_gene` (or pre-filter with `gene_overview` first to skip genes with no chemistry).
+- Chemistry context lives in three places: (1) edge-side EC / KO terms via `gene_ontology_terms(ontology=['ec', 'kegg'])` plus the sparse `catalytic_activities` text returned here; (2) `gene_overview` per-row `reaction_count` / `catalyzed_metabolite_count` / `tcdb_assignment_count` / `transported_metabolite_count` + `evidence_sources` rollup (routing surface — when non-zero, drill; the same counts are on the raw node here); (3) `metabolites_by_gene` for the actual metabolite list (per-arm: reaction-anchored via Gene → Reaction → Metabolite, transport-anchored via the TC systems the gene points at directly). For 'what compounds does this gene's chemistry touch?', chain `gene_details → metabolites_by_gene` (or pre-filter with `gene_overview` first to skip genes with no chemistry).
 
 ```mistake
 gene_details(locus_tags='PMM0001')

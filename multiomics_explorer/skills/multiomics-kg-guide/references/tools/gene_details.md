@@ -46,7 +46,7 @@ total_matching, returned, offset, truncated, not_found, warnings, results
 - resolve_gene → gene_details
 - genes_by_function → gene_details
 - gene_details → gene_ontology_terms(locus_tags=[...], ontology=['ec', 'kegg']) — the EC numbers / KO terms behind a gene live on edges, not on the node.
-- gene_details → metabolites_by_gene — when reaction_count / transported_metabolite_count are non-zero, list the metabolites this gene's reactions involve / its TCDB families transport. Single-gene chemistry deep-dive. See docs://analysis/metabolites.
+- gene_details → metabolites_by_gene — when reaction_count / transported_metabolite_count are non-zero, list the metabolites this gene's reactions involve / its direct TC systems transport. Single-gene chemistry deep-dive. See docs://analysis/metabolites.
 - gene_details → gene_homologs(locus_tags=[...]) for ortholog group memberships, and list_organisms for the organism's taxonomy and capability rollups
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/gene_details/full`

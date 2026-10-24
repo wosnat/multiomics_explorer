@@ -175,11 +175,13 @@ _KNOWN_MAP_KEYS = {
     # aliases not property accesses.
     "evidence_kind", "det", "flag",
     "metabolite_id", "metabolite_name", "assay_id", "assay_name",
-    # TCDB substrate_depth migration (2026-08): edge/gene-level TCDB facts
-    # carried through GBM/MBG row maps + gene_overview/list_* projections.
-    "substrate_depth", "tcdb_evidence_score", "transport_substrate_resolution",
-    "tcdb_evidence_score_max", "transported_metabolite_count",
-    "transporter_gene_count",
+    # TCDB cleanup surface (KG 3a): edge/gene-level TCDB facts carried
+    # through GBM/MBG row maps + gene_overview/list_* projections (the
+    # 2026-08 substrate_depth / tcdb_evidence_score /
+    # transport_substrate_resolution aliases are retired).
+    "tcdb_route", "tcdb_calls", "tcdb_identity", "tcdb_direction",
+    "attached_tcdb_id", "tcdb_substrate_system_count", "tcdb_best_hit_identity",
+    "transported_metabolite_count", "transporter_gene_count",
     # metabolite stereo-form hint: `relation` is a CASE-derived alias inside
     # list_metabolites' stereo_relatives COLLECT map (not a Metabolite prop).
     "relation",

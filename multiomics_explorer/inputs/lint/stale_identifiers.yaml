@@ -21,7 +21,7 @@
   near: 'gene_overview'
   near_lines: 3
   reason: "gene_overview.transporter_count was removed (counted superseded ancestor attachments)"
-  replacement: "tcdb_family_count (deepest-attachment families) or transported_metabolite_count"
+  replacement: "tcdb_assignment_count (gated TCDB targets) or transported_metabolite_count"
   allow_files:
     - "multiomics_explorer/inputs/tools/list_metabolites.yaml"
     - "multiomics_explorer/inputs/tools/genes_by_metabolite.yaml"
@@ -31,8 +31,8 @@
     - "multiomics_explorer/skills/multiomics-kg-guide/references/tools/metabolites_by_gene.md"
 
 - pattern: '\btransport_confidence\b'
-  reason: "renamed to substrate_depth (values most_specific / inherited)"
-  replacement: "substrate_depth"
+  reason: "renamed to substrate_depth, itself removed in the TCDB cleanup (2026-10)"
+  replacement: "tcdb_route ('direct' / 'family')"
   allow_in: '(?i)rename|raise'
 
 - pattern: '\bkegg:K\d+'
@@ -97,3 +97,41 @@
 - pattern: '(?i)Metabolite\.name only'
   reason: "metaboliteFullText covers name + formula + identifier tokens"
   replacement: "name, formula and identifiers"
+
+# --- TCDB cleanup (KG project 3a, 2026-10): every scored / rolled-up TCDB
+# property is gone; the explorer reads the per-edge tcdb_gate instead.
+- pattern: '\bsubstrate_depth\b|\bby_substrate_depth\b|\brows_by_substrate_depth\b'
+  reason: "removed with the TCDB cleanup: substrate edges leave TC systems only, so there is no depth"
+  replacement: "tcdb_route ('direct' / 'family'), by_tcdb_route, include_tcdb_family_substrates"
+
+- pattern: '\btransport_(?:most_specific|inherited)_rows\b'
+  reason: "removed with substrate_depth (TCDB cleanup)"
+  replacement: "tcdb_direct_rows / tcdb_family_rows"
+
+- pattern: '\binclude_superseded\b'
+  reason: "removed with the TCDB cleanup; leaf mode now reads the tcdb_gate"
+  replacement: "include_weak_tcdb_hits (adds below_gate edges)"
+
+- pattern: '\btransport_substrate_resolution\b'
+  reason: "Gene.transport_substrate_resolution was removed from the KG (TCDB cleanup)"
+  replacement: "transported_metabolite_count > 0 (direct) vs tcdb_assignment_count; tcdb_family_substrates_not_shown"
+
+- pattern: '\btcdb_evidence_score(?:_max)?\b'
+  reason: "TCDB evidence scores were removed from the KG (TCDB cleanup); TCDB has no evidence_score axis"
+  replacement: "tcdb_identity (row), tcdb_best_hit_identity (gene_overview), tcdb_calls"
+
+- pattern: '\battachment_depth\b'
+  reason: "Gene_has_tcdb_family.attachment_depth was removed (TCDB cleanup)"
+  replacement: "tcdb_gate ('direct' / 'annotated' / 'below_gate')"
+
+- pattern: '\btc_specificity\b'
+  reason: "TcdbFamily level_kind renamed (TCDB cleanup)"
+  replacement: "tc_system"
+
+- pattern: '\btcdb_family_count\b'
+  reason: "Gene.tcdb_family_count renamed (no alias); ChemicalRole's became tcdb_system_count"
+  replacement: "tcdb_assignment_count (gene_overview / Gene); tcdb_system_count (ChemicalRole)"
+
+- pattern: '\bsource_agreement\b|\bgo_support\b'
+  reason: "TCDB-only edge columns removed (TCDB cleanup)"
+  replacement: "tcdb_calls (call kinds on the row's lineage)"

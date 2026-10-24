@@ -316,10 +316,8 @@ schema:
         start: int
         strand: string
         subcellular_localization: string
-        tcdb_evidence_score_max: float
-        tcdb_family_count: int
+        tcdb_assignment_count: int
         transmembrane_regions: list
-        transport_substrate_resolution: string
         transported_metabolite_count: int
     GeneCluster:
       properties:
@@ -796,18 +794,20 @@ schema:
     TcdbFamily:
       properties:
         direct_gene_count: int
+        direction: string
+        direction_basis: string
         gene_count: int
         id: string
         level: int
         level_kind: string
         member_count: int
-        metabolite_count: int
         name: string
         organism_count: int
         preferred_id: string
         superfamily: string
         tc_class_id: string
         tcdb_id: string
+        tcdb_substrate_count: int
     TigrRole:
       properties:
         code: string
@@ -1403,19 +1403,18 @@ schema:
       - NamedThing
       - TcdbFamily
       properties:
-        attachment_depth: string
-        confidence_score: float
-        consensus_n: int
+        bitscore: float
+        bitscore_ratio: float
         evalue: float
         evidence: string
-        evidence_score: float
-        go_support: string
         id: string
         identity: float
-        pfam_support: string
         qcov: float
-        source_agreement: string
+        rank: int
+        scov: float
         sources: list
+        tcdb_call: string
+        tcdb_gate: string
         tier: int
     Gene_has_tigr_role:
       source_labels:
@@ -1936,7 +1935,6 @@ schema:
       - NamedThing
       properties:
         id: string
-        substrate_depth: string
     Tcdb_family_transports_metabolite:
       source_labels:
       - Entity
@@ -1948,7 +1946,6 @@ schema:
       - NamedThing
       properties:
         id: string
-        substrate_depth: string
     Tigr_role_is_a_tigr_role:
       source_labels:
       - Entity

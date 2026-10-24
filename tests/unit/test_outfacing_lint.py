@@ -483,3 +483,42 @@ def test_lint_catches_two_entry_evidence_source_on_three_arm_pages(
             "rows are excluded).\n")
         vs = lint_mod.lint_about_content([md])
         assert [v[1] for v in vs] == [1], name
+
+
+def test_lint_catches_tcdb_evidence_score_axis(lint_mod, tmp_path):
+    """TCDB has no evidence_score trust axis. Source violation: the
+    `trust_axes` example in the pathway_enrichment / cluster_enrichment
+    response descriptions (mcp_server/tools.py), which listed
+    {'tcdb': ['sources','evidence','evidence_score','tier']}."""
+    md = tmp_path / "t.md"
+    md.write_text(
+        "- **trust_axes** (object): e.g. {'tcdb': ['sources','evidence','evidence_score','tier']}.\n"
+        '"trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]}\n'
+    )
+    vs = lint_mod.lint_about_content([md])
+    assert len(vs) == 2
+
+
+def test_lint_ignores_correct_tcdb_trust_axes(lint_mod, tmp_path):
+    md = tmp_path / "t.md"
+    md.write_text(
+        "e.g. {'tcdb': ['sources','evidence','tier']} (TCDB has no evidence_score).\n"
+        "{'merops': ['evidence_score'], 'tcdb': ['tier']}\n"
+    )
+    assert lint_mod.lint_about_content([md]) == []
+
+
+def test_lint_catches_tcdb_rank_prop(lint_mod, tmp_path):
+    """TCDB ranks its representative edge by an ordered categorical on
+    tcdb_call (then identity), not a rank_prop. Same source as the
+    evidence_score pattern: the TCDB trust config the cleanup removed."""
+    md = tmp_path / "t.md"
+    md.write_text(
+        "TCDB rows rank by `rank_prop` identity.\n"
+        "chosen by `rank_prop` — call kind then identity for TCDB\n"
+    )
+    vs = lint_mod.lint_about_content([md])
+    assert len(vs) == 2
+    clean = tmp_path / "c.md"
+    clean.write_text("MEROPS ranks by `rank_prop` = confidence_score.\n")
+    assert lint_mod.lint_about_content([clean]) == []

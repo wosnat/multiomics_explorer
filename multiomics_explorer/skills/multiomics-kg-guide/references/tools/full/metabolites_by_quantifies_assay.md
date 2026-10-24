@@ -272,15 +272,15 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:1462-2920.15834:s7_
 ```example-response
 {
   "results": [],
-  "total_matching": 49,
+  "total_matching": 48,
   "by_detection_status": [
     {"detection_status": "detected", "count": 33},
-    {"detection_status": "sporadic", "count": 11},
+    {"detection_status": "sporadic", "count": 10},
     {"detection_status": "not_detected", "count": 5}
   ],
-  "by_stereo_assignment": [{"stereo_assignment": "as_reported", "count": 49}],
+  "by_stereo_assignment": [{"stereo_assignment": "as_reported", "count": 48}],
   "by_metric_bucket": [
-    {"bucket": "mid", "count": 25},
+    {"bucket": "mid", "count": 24},
     {"bucket": "low", "count": 16},
     {"bucket": "top_decile", "count": 4},
     {"bucket": "top_quartile", "count": 4}
@@ -288,17 +288,17 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:1462-2920.15834:s7_
   "by_assay": [
     {
       "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9313:relative_peak_area_biovolume_normalized",
-      "count": 49
+      "count": 48
     }
   ],
-  "by_compartment": [{"compartment": "whole_cell", "count": 49}],
-  "by_organism": [{"organism_name": "Prochlorococcus MIT9313", "count": 49}],
+  "by_compartment": [{"compartment": "whole_cell", "count": 48}],
+  "by_organism": [{"organism_name": "Prochlorococcus MIT9313", "count": 48}],
   "by_metric": [
     {
       "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9313:relative_peak_area_biovolume_normalized",
       "name": "MIT9313 whole-cell targeted metabolite relative peak area (biovolume-normalized)",
       "metric_type": "",
-      "count": 49,
+      "count": 48,
       "filtered_value_min": 0.0,
       "filtered_value_max": 32.0,
       "assay_value_min": 0.0,

@@ -92,7 +92,7 @@ and `vesicle` simultaneously — distinct rows. Filter via
   rollups: `expression_edge_count`, `numeric_metric_count` /
   `boolean_metric_count` / `categorical_metric_count`,
   `cluster_membership_count`, `closest_ortholog_group_size`,
-  `reaction_count`, `catalyzed_metabolite_count`, `tcdb_family_count`,
+  `reaction_count`, `catalyzed_metabolite_count`, `tcdb_assignment_count`,
   `cazy_family_count`, `ncbifam_family_count`,
   `discussed_in_publication_count`, `compartments_observed`,
   `annotation_quality` (0..3 — see `docs://guide/conventions`). Each
@@ -182,21 +182,23 @@ and `vesicle` simultaneously — distinct rows. Filter via
   `metabolites_by_gene`. They are stored undirected — KEGG equation
   order is unreliable upstream, so the KG does not encode substrate
   vs product.
-- **`TcdbFamily`** — TCDB transporter family hierarchy (class →
-  subclass → family → subfamily). Genes connect via
-  `Gene_has_tcdb_family`; substrates via
-  `Tcdb_family_transports_metabolite`. Substrates attach to family
-  nodes and are inherited **down** the hierarchy, so genes annotated to
-  broad families still surface candidate substrates. Each substrate edge
-  carries `substrate_depth`: `most_specific` (the most specific
-  surviving node for that substrate in the gene-pruned hierarchy — not a
-  curation level) or `inherited`. Each gene × family edge carries a
-  composite `evidence_score` on `[0, 1]`; genes carry
-  `tcdb_evidence_score_max`, `transported_metabolite_count` and
-  `transport_substrate_resolution` (`resolved` / `family_inferred`),
-  all computed over the gene's deepest attachments only. Inherited rows
-  dominate by volume — see the trust ladder in
-  `docs://analysis/metabolites`.
+- **`TcdbFamily`** — TCDB's transporter hierarchy, five levels: class →
+  subclass → family → subfamily → system (`level_kind` `tc_system`, a
+  5-part TC number such as `tcdb:3.A.1.4.4`). Substrates attach to
+  **systems only**, through `Tcdb_family_transports_metabolite` /
+  `Tcdb_family_transports_chemical_role`, as TCDB curates them; a
+  family's range is the union of its systems' substrates
+  (`tcdb_substrate_count`). Nodes also carry a TCDB-stated `direction`
+  (`uptake` / `export` / `unknown`). Many nodes are range-only
+  (`gene_count = 0`): they exist so a family's full TCDB range is
+  reachable. Genes connect via `Gene_has_tcdb_family`, one edge per
+  source (`tcdb_call`: `diamond_best_hit`, `diamond_tier`, `eggnog`),
+  each stamped with a gate (`tcdb_gate`: `direct` onto a system,
+  `annotated`, or `below_gate` for weak hits). Transport rows use
+  `direct` edges; annotation rows, `tcdb_assignment_count` and
+  enrichment use `direct` + `annotated`. Genes carry
+  `tcdb_assignment_count` and `transported_metabolite_count` — see
+  `docs://analysis/transport` and `docs://analysis/metabolites`.
 
 ### Ontology nodes (17 ontologies)
 
@@ -243,8 +245,8 @@ pointers, never gene-function calls). Walk them with
 Fifteen of the seventeen carry a gene-edge **annotation-trust surface** —
 `sources[]`, an `evidence` ladder (`curated > signature > homology >
 family_inferred > domain_inferred`), and (on a subset) `evidence_score` /
-`tier` — plus ontology-specific native detail (TCDB's `confidence_score` /
-`attachment_depth`, MEROPS's `call_class`, InterPro's `libraries`, and so
+`tier` — plus ontology-specific detail (TCDB's `tcdb_call` / `tcdb_gate` and
+DIAMOND `identity`, MEROPS's `call_class`, InterPro's `libraries`, and so
 on). PSORTb and SignalP carry no trust axes (their `localization_score` /
 `signal_peptide_probability` are native detail only, verbose). See
 `docs://analysis/annotation_evidence` for the per-ontology trust profile and
@@ -342,9 +344,10 @@ independent pipelines, indicated by `Metabolite.evidence_sources`:
 1. **`metabolism`** — `Gene → Reaction → Metabolite` from KEGG. Catalysis
    evidence; direction-agnostic (KEGG equation order is unreliable, so
    we do not encode produced vs consumed).
-2. **`transport`** — `Gene → TcdbFamily → Metabolite` from TCDB. Transport
-   substrate evidence; `substrate_depth` (`most_specific` / `inherited`)
-   and `tcdb_evidence_score` qualify each transport row.
+2. **`transport`** — `Gene → TcdbFamily (system) → Metabolite` from TCDB.
+   Transport substrate evidence; direct rows by default (the gene's own
+   system call), family-level rows with `include_tcdb_family_substrates=True`;
+   `tcdb_identity` and `tcdb_calls` qualify each row.
 3. **`metabolomics`** — `MetaboliteAssay → Metabolite`. Mass-spec
    measurement evidence; *no gene anchor* — the measurement is on the
    compound, not the gene.

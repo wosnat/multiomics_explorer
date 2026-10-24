@@ -58,7 +58,7 @@ Result row: `metabolite_id, name, formula, elements, mass, catalyst_gene_count, 
 
 - list_organisms (per-row catalyzed_metabolite_count > 0) → list_metabolites(organism_names=[...])
 - list_metabolites → genes_by_metabolite(metabolite_ids=[...], organism=...)
-- list_metabolites (per-row `transporter_gene_count > 0`) → genes_by_metabolite(metabolite_ids=[...], organism=..., evidence_sources=['transport']) — distinct genes in the transport rows, summed over organisms, equal transporter_gene_count
+- list_metabolites (per-row `transporter_gene_count > 0`) → genes_by_metabolite(metabolite_ids=[...], organism=..., evidence_sources=['transport']) — distinct genes in the direct transport rows, unioned over organisms, equal transporter_gene_count
 - list_metabolites (per-row `stereo_relatives`) → genes_by_metabolite(metabolite_ids=[generic id], organism=..., include_stereo_forms=True) — transport on the generic form plus catalysis on the specific form, per organism
 - list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)
 - differential_expression_by_gene → metabolites_by_gene(metabolite_elements=['N']) → list_metabolites for chemistry context

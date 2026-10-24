@@ -33,6 +33,7 @@ examples:
         "by_tier": [],
         "by_sources": [{"source": "uniprot", "count": 1}],
         "by_call_class": [],
+        "by_tcdb_call": [],
         "evidence_score_stats": {"min": 0.667, "median": 0.667, "max": 0.667, "n_null": 0},
         "evidence_score_signals": null,
         "filters_applied": {},
@@ -96,6 +97,7 @@ examples:
         "by_tier": [],
         "by_sources": [{"source": "eggnog", "count": 4}, {"source": "interproscan", "count": 2}],
         "by_call_class": [],
+        "by_tcdb_call": [],
         "evidence_score_stats": {"min": 0.333, "median": 0.5, "max": 0.667, "n_null": 0},
         "evidence_score_signals": null,
         "filters_applied": {},
@@ -130,7 +132,7 @@ examples:
         ]
       }
 
-  - title: TCDB family annotations for a gene
+  - title: TCDB annotations for a gene
     call: gene_ontology_terms(locus_tags=["PMM0402"], organism="MED4", ontology="tcdb")
 
   - title: Multiple ontologies in one call (ontology now accepts a list)
@@ -187,15 +189,13 @@ examples:
         "truncated": false,
         "not_found": [],
         "no_terms": [],
-        "trust_axes": {
-          "tcdb": ["sources", "evidence", "evidence_score", "tier"],
-          "merops": ["sources", "evidence", "evidence_score", "tier"]
-        },
+        "trust_axes": {"tcdb": ["sources", "evidence", "tier"], "merops": ["sources", "evidence", "evidence_score", "tier"]},
         "by_evidence": [{"evidence": "family_inferred", "count": 7}],
         "by_tier": [{"tier": "null", "count": 7}],
         "by_sources": [{"source": "eggnog", "count": 7}],
         "by_call_class": [],
-        "evidence_score_stats": {"min": 0.6, "median": 0.8, "max": 0.8, "n_null": 0},
+        "by_tcdb_call": [{"tcdb_call": "eggnog", "count": 7}],
+        "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
         "evidence_score_signals": null,
         "filters_applied": {},
         "skipped_ontologies": [],
@@ -208,7 +208,10 @@ examples:
             "level": 3,
             "is_informative": true,
             "ontology_type": "tcdb",
-            "evidence": "family_inferred"
+            "evidence": "family_inferred",
+            "tcdb_call": "eggnog",
+            "tcdb_gate": "annotated",
+            "tcdb_calls": ["eggnog"]
           },
           {
             "locus_tag": "PMM0392",
@@ -217,7 +220,10 @@ examples:
             "level": 3,
             "is_informative": true,
             "ontology_type": "tcdb",
-            "evidence": "family_inferred"
+            "evidence": "family_inferred",
+            "tcdb_call": "eggnog",
+            "tcdb_gate": "annotated",
+            "tcdb_calls": ["eggnog"]
           },
           {
             "locus_tag": "PMM0392",
@@ -226,279 +232,242 @@ examples:
             "level": 3,
             "is_informative": true,
             "ontology_type": "tcdb",
-            "evidence": "family_inferred"
+            "evidence": "family_inferred",
+            "tcdb_call": "eggnog",
+            "tcdb_gate": "annotated",
+            "tcdb_calls": ["eggnog"]
           },
           ...
         ]
       }
 
-  - title: TCDB leaf mode — most-specific attachments only (default)
-    call: gene_ontology_terms(locus_tags=["PMM0392"], organism="MED4", ontology=["tcdb"], mode="leaf", verbose=True)
-    note: "Default mode='leaf' on tcdb applies `attachment_depth='most_specific'` under the hood. PMM0392 carries 8 TCDB edges — the ABC superfamily (tcdb:3.A.1) plus seven of its subfamilies — and the superfamily edge is superseded by the deeper ones, so 7 rows come back. `most_specific` is not unique per gene: every deepest attachment survives. `attachment_depth` is verbose-only (compact rows omit it)."
+  - title: TCDB leaf mode — gated targets, one row per gene × TC node (default)
+    call: gene_ontology_terms(locus_tags=["PMM0372", "PMM0710"], organism="MED4", ontology=["tcdb"], mode="leaf", verbose=True)
+    note: "Leaf mode on tcdb keeps the gene's gate-passing edges (`tcdb_gate` direct or annotated) and drops any node that is an ancestor of another gated target, so the row count per gene equals `gene_overview.tcdb_assignment_count`. cynD (PMM0372) gives 2 rows, its two sibling systems (an eggNOG call on tcdb:3.A.1.16.1, a rank-1 DIAMOND best hit on tcdb:3.A.1.16.2); its weak tier-3 call on 3.A.1 is not shown. pstS (PMM0710) gives 1 row on tcdb:3.A.1.7.6: its eggNOG and tier-2 calls sit on the ancestor 3.A.1.7, so the row's `tcdb_calls` lists all three call kinds. When several edges point at the same node, the row reports one by precedence (`tcdb_call` best hit, then tier, then eggNOG; then identity). DIAMOND detail (`identity`, `qcov` in percent, `evalue`, `tcdb_scov`, `tcdb_best_hit_rank`, `tcdb_bitscore`, `tcdb_bitscore_ratio`) is verbose-only."
     response: |
       {
-        "total_matching": 7,
-        "total_genes": 1,
-        "total_terms": 7,
-        "by_ontology": [{"ontology_type": "tcdb", "term_count": 7, "gene_count": 1, "tree": null, "tree_code": null}],
+        "total_matching": 3,
+        "total_genes": 2,
+        "total_terms": 3,
+        "by_ontology": [{"ontology_type": "tcdb", "term_count": 3, "gene_count": 2, "tree": null, "tree_code": null}],
         "by_term": [
           {
-            "term_id": "tcdb:3.A.1.33",
-            "term_name": "The Methylthioadenosine (MTA) Family",
-            "level": 3,
+            "term_id": "tcdb:3.A.1.16.2",
+            "term_name": "Bispecific cyanate/nitrite transporter.",
+            "level": 4,
             "ontology_type": "tcdb",
             "count": 1
           },
           {
-            "term_id": "tcdb:3.A.1.32",
-            "term_name": "The Cobalamin Precursor (B 12 -P) Family",
-            "level": 3,
+            "term_id": "tcdb:3.A.1.16.1",
+            "term_name": "Four component nitrate/nitrite porter.",
+            "level": 4,
             "ontology_type": "tcdb",
             "count": 1
           },
           {
-            "term_id": "tcdb:3.A.1.31",
-            "term_name": "The Unknown-ABC1 (U-ABC1) Family",
-            "level": 3,
+            "term_id": "tcdb:3.A.1.7.6",
+            "term_name": "High affinity phosphate-specific transporter, PstABCS, where PstA (AAZ57802) = 304 aas with 6 TMSs, PstB (AAZ57801) =...",
+            "level": 4,
             "ontology_type": "tcdb",
             "count": 1
-          },
-          {
-            "term_id": "tcdb:3.A.1.30",
-            "term_name": "The Thiamin Precursor (Thi-P) Family",
-            "level": 3,
-            "ontology_type": "tcdb",
-            "count": 1
-          },
-          {
-            "term_id": "tcdb:3.A.1.29",
-            "term_name": "The Methionine Precursor (Met-P) Family",
-            "level": 3,
-            "ontology_type": "tcdb",
-            "count": 1
-          },
-          ...
+          }
         ],
-        "terms_per_gene_min": 7,
-        "terms_per_gene_max": 7,
-        "terms_per_gene_median": 7.0,
-        "returned": 7,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_max": 2,
+        "terms_per_gene_median": 1.5,
+        "returned": 3,
         "offset": 0,
         "truncated": false,
         "not_found": [],
         "no_terms": [],
-        "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},
-        "by_evidence": [{"evidence": "family_inferred", "count": 7}],
-        "by_tier": [{"tier": "null", "count": 7}],
-        "by_sources": [{"source": "eggnog", "count": 7}],
+        "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
+        "by_evidence": [{"evidence": "homology", "count": 2}, {"evidence": "family_inferred", "count": 1}],
+        "by_tier": [{"tier": "null", "count": 1}, {"tier": 2, "count": 1}, {"tier": 1, "count": 1}],
+        "by_sources": [{"source": "tcdb_diamond", "count": 2}, {"source": "eggnog", "count": 1}],
         "by_call_class": [],
-        "evidence_score_stats": {"min": 0.6, "median": 0.8, "max": 0.8, "n_null": 0},
+        "by_tcdb_call": [{"tcdb_call": "diamond_best_hit", "count": 2}, {"tcdb_call": "eggnog", "count": 1}],
+        "evidence_score_stats": null,
         "evidence_score_signals": null,
         "filters_applied": {},
         "skipped_ontologies": [],
         "warnings": [],
         "results": [
           {
-            "locus_tag": "PMM0392",
-            "term_id": "tcdb:3.A.1.25",
-            "term_name": "The Biotin Uptake Transporter (BioMNY) Family",
-            "level": 3,
+            "locus_tag": "PMM0372",
+            "term_id": "tcdb:3.A.1.16.1",
+            "term_name": "Four component nitrate/nitrite porter.",
+            "level": 4,
             "is_informative": true,
             "ontology_type": "tcdb",
             "evidence": "family_inferred",
+            "tcdb_call": "eggnog",
+            "tcdb_gate": "direct",
+            "tcdb_calls": ["eggnog"],
             "sources": ["eggnog"],
-            "evidence_score": 0.8,
             "tier": null,
-            "attachment_depth": "most_specific",
-            "confidence_score": null,
-            "source_agreement": "both_sources",
-            "pfam_support": "corroborated",
-            "go_support": "corroborated",
             "identity": null,
             "qcov": null,
             "evalue": null,
-            "consensus_n": null,
+            "tcdb_scov": null,
+            "tcdb_best_hit_rank": null,
+            "tcdb_bitscore": null,
+            "tcdb_bitscore_ratio": null,
             "organism_name": "Prochlorococcus MED4"
           },
           {
-            "locus_tag": "PMM0392",
-            "term_id": "tcdb:3.A.1.28",
-            "term_name": "The Queuosine (Queuosine) Family",
-            "level": 3,
+            "locus_tag": "PMM0372",
+            "term_id": "tcdb:3.A.1.16.2",
+            "term_name": "Bispecific cyanate/nitrite transporter.",
+            "level": 4,
             "is_informative": true,
             "ontology_type": "tcdb",
-            "evidence": "family_inferred",
-            "sources": ["eggnog"],
-            "evidence_score": 0.6,
-            "tier": null,
-            "attachment_depth": "most_specific",
-            "confidence_score": null,
-            "source_agreement": "both_sources",
-            "pfam_support": "corroborated",
-            "go_support": "uncorroborated",
-            "identity": null,
-            "qcov": null,
-            "evalue": null,
-            "consensus_n": null,
+            "evidence": "homology",
+            "tcdb_call": "diamond_best_hit",
+            "tcdb_gate": "direct",
+            "tcdb_calls": ["diamond_best_hit"],
+            "sources": ["tcdb_diamond"],
+            "tier": 2,
+            "identity": 59.2,
+            "qcov": 95.4,
+            "evalue": 1.16e-108,
+            "tcdb_scov": 94.1,
+            "tcdb_best_hit_rank": 1,
+            "tcdb_bitscore": 316.0,
+            "tcdb_bitscore_ratio": 1.0,
             "organism_name": "Prochlorococcus MED4"
           },
           {
-            "locus_tag": "PMM0392",
-            "term_id": "tcdb:3.A.1.29",
-            "term_name": "The Methionine Precursor (Met-P) Family",
-            "level": 3,
+            "locus_tag": "PMM0710",
+            "term_id": "tcdb:3.A.1.7.6",
+            "term_name": "High affinity phosphate-specific transporter, PstABCS, where PstA (AAZ57802) = 304 aas with 6 TMSs, PstB (AAZ57801) =...",
+            "level": 4,
             "is_informative": true,
             "ontology_type": "tcdb",
-            "evidence": "family_inferred",
-            "sources": ["eggnog"],
-            "evidence_score": 0.8,
-            "tier": null,
-            "attachment_depth": "most_specific",
-            "confidence_score": null,
-            "source_agreement": "both_sources",
-            "pfam_support": "corroborated",
-            "go_support": "corroborated",
-            "identity": null,
-            "qcov": null,
-            "evalue": null,
-            "consensus_n": null,
+            "evidence": "homology",
+            "tcdb_call": "diamond_best_hit",
+            "tcdb_gate": "direct",
+            "tcdb_calls": ["diamond_best_hit", "diamond_tier", "eggnog"],
+            "sources": ["tcdb_diamond"],
+            "tier": 1,
+            "identity": 85.9,
+            "qcov": 94.1,
+            "evalue": 2.83e-188,
+            "tcdb_scov": 95.3,
+            "tcdb_best_hit_rank": 1,
+            "tcdb_bitscore": 520.0,
+            "tcdb_bitscore_ratio": 1.0,
             "organism_name": "Prochlorococcus MED4"
-          },
-          ...
+          }
         ]
       }
 
-  - title: TCDB leaf mode with include_superseded — see the collapsed rows too
-    call: gene_ontology_terms(locus_tags=["PMM0392"], organism="MED4", ontology=["tcdb"], mode="leaf", include_superseded=True, verbose=True)
-    note: "include_superseded=True adds back the rows most_specific mode drops — each labelled attachment_depth='superseded' (PMM0392: 7 → 8 rows). 'Superseded' means less specific, not wrong: it is a real annotation, just not the gene's deepest call for that lineage."
+  - title: Weak TCDB hits are opt-in — include_weak_tcdb_hits=True adds the below-gate DIAMOND rows
+    call: gene_ontology_terms(locus_tags=["PMM0125", "PMM0024"], organism="MED4", ontology=["tcdb"], include_weak_tcdb_hits=True)
+    note: "The switch only adds rows, each tagged `tcdb_gate='below_gate'`; the default rows come back unchanged. ecfA1 (PMM0125) keeps its 7 eggNOG subfamily rows (3.A.1.25 … 3.A.1.33) and gains 3 best-hit system rows at 33–35% identity. thiL (PMM0024), a thiamine-monophosphate kinase, has no default TCDB row (`tcdb_assignment_count = 0`); its only edge is a 28.5% tier-3 hit on tcdb:8.A.159, a ubiquitin-ligase family. That is what weak hits mostly are on non-transporters. A below-gate edge on an ancestor of a row already returned is skipped. Passing the switch with a non-TCDB ontology is a no-op."
     response: |
       {
-        "total_matching": 8,
-        "total_genes": 1,
-        "total_terms": 8,
-        "by_ontology": [{"ontology_type": "tcdb", "term_count": 8, "gene_count": 1, "tree": null, "tree_code": null}],
+        "total_matching": 11,
+        "total_genes": 2,
+        "total_terms": 11,
+        "by_ontology": [{"ontology_type": "tcdb", "term_count": 11, "gene_count": 2, "tree": null, "tree_code": null}],
         "by_term": [
           {
-            "term_id": "tcdb:3.A.1",
-            "term_name": "The ATP-binding Cassette (ABC) Superfamily",
+            "term_id": "tcdb:8.A.159",
+            "term_name": "The MARCH Ubiquitin Ligase (MARCH) Family",
             "level": 2,
             "ontology_type": "tcdb",
             "count": 1
           },
           {
+            "term_id": "tcdb:3.A.1.26.10",
+            "term_name": "ATP-dependent folic acid uptake porter, FolT/EcfT/EcfA1/EcfA2.",
+            "level": 4,
+            "ontology_type": "tcdb",
+            "count": 1
+          },
+          {
+            "term_id": "tcdb:3.A.1.25.8",
+            "term_name": "An ECF ABC transporter with 4 subunits, EcfS/EcfT/EcfA/EcfA^.",
+            "level": 4,
+            "ontology_type": "tcdb",
+            "count": 1
+          },
+          {
+            "term_id": "tcdb:3.A.1.25.5",
+            "term_name": "Biotin/Riboflavin ECF transport system, EcfAA^T/RibU/BioY.",
+            "level": 4,
+            "ontology_type": "tcdb",
+            "count": 1
+          },
+          {
             "term_id": "tcdb:3.A.1.33",
             "term_name": "The Methylthioadenosine (MTA) Family",
             "level": 3,
             "ontology_type": "tcdb",
             "count": 1
           },
-          {
-            "term_id": "tcdb:3.A.1.32",
-            "term_name": "The Cobalamin Precursor (B 12 -P) Family",
-            "level": 3,
-            "ontology_type": "tcdb",
-            "count": 1
-          },
-          {
-            "term_id": "tcdb:3.A.1.31",
-            "term_name": "The Unknown-ABC1 (U-ABC1) Family",
-            "level": 3,
-            "ontology_type": "tcdb",
-            "count": 1
-          },
-          {
-            "term_id": "tcdb:3.A.1.30",
-            "term_name": "The Thiamin Precursor (Thi-P) Family",
-            "level": 3,
-            "ontology_type": "tcdb",
-            "count": 1
-          },
           ...
         ],
-        "terms_per_gene_min": 8,
-        "terms_per_gene_max": 8,
-        "terms_per_gene_median": 8.0,
-        "returned": 8,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_max": 10,
+        "terms_per_gene_median": 5.5,
+        "returned": 11,
         "offset": 0,
         "truncated": false,
         "not_found": [],
         "no_terms": [],
-        "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},
-        "by_evidence": [{"evidence": "family_inferred", "count": 7}, {"evidence": "homology", "count": 1}],
-        "by_tier": [{"tier": "null", "count": 7}, {"tier": 3, "count": 1}],
-        "by_sources": [{"source": "eggnog", "count": 8}, {"source": "tcdb_diamond", "count": 1}],
+        "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
+        "by_evidence": [{"evidence": "family_inferred", "count": 7}, {"evidence": "homology", "count": 4}],
+        "by_tier": [{"tier": "null", "count": 7}, {"tier": 3, "count": 4}],
+        "by_sources": [{"source": "eggnog", "count": 7}, {"source": "tcdb_diamond", "count": 4}],
         "by_call_class": [],
-        "evidence_score_stats": {"min": 0.6, "median": 0.8, "max": 0.8, "n_null": 0},
+        "by_tcdb_call": [
+          {"tcdb_call": "eggnog", "count": 7},
+          {"tcdb_call": "diamond_best_hit", "count": 3},
+          {"tcdb_call": "diamond_tier", "count": 1}
+        ],
+        "evidence_score_stats": null,
         "evidence_score_signals": null,
         "filters_applied": {},
         "skipped_ontologies": [],
         "warnings": [],
         "results": [
           {
-            "locus_tag": "PMM0392",
-            "term_id": "tcdb:3.A.1",
-            "term_name": "The ATP-binding Cassette (ABC) Superfamily",
+            "locus_tag": "PMM0024",
+            "term_id": "tcdb:8.A.159",
+            "term_name": "The MARCH Ubiquitin Ligase (MARCH) Family",
             "level": 2,
             "is_informative": true,
             "ontology_type": "tcdb",
             "evidence": "homology",
-            "sources": ["eggnog", "tcdb_diamond"],
-            "evidence_score": 0.8,
-            "tier": 3,
-            "attachment_depth": "superseded",
-            "confidence_score": 0.1545,
-            "source_agreement": "both_sources",
-            "pfam_support": "corroborated",
-            "go_support": "corroborated",
-            "identity": 26.4,
-            "qcov": 83.6,
-            "evalue": 1.78e-22,
-            "consensus_n": 2,
-            "organism_name": "Prochlorococcus MED4"
+            "tcdb_call": "diamond_tier",
+            "tcdb_gate": "below_gate",
+            "tcdb_calls": ["diamond_tier"]
           },
           {
-            "locus_tag": "PMM0392",
+            "locus_tag": "PMM0125",
             "term_id": "tcdb:3.A.1.25",
             "term_name": "The Biotin Uptake Transporter (BioMNY) Family",
             "level": 3,
             "is_informative": true,
             "ontology_type": "tcdb",
             "evidence": "family_inferred",
-            "sources": ["eggnog"],
-            "evidence_score": 0.8,
-            "tier": null,
-            "attachment_depth": "most_specific",
-            "confidence_score": null,
-            "source_agreement": "both_sources",
-            "pfam_support": "corroborated",
-            "go_support": "corroborated",
-            "identity": null,
-            "qcov": null,
-            "evalue": null,
-            "consensus_n": null,
-            "organism_name": "Prochlorococcus MED4"
+            "tcdb_call": "eggnog",
+            "tcdb_gate": "annotated",
+            "tcdb_calls": ["eggnog"]
           },
           {
-            "locus_tag": "PMM0392",
-            "term_id": "tcdb:3.A.1.28",
-            "term_name": "The Queuosine (Queuosine) Family",
-            "level": 3,
+            "locus_tag": "PMM0125",
+            "term_id": "tcdb:3.A.1.25.5",
+            "term_name": "Biotin/Riboflavin ECF transport system, EcfAA^T/RibU/BioY.",
+            "level": 4,
             "is_informative": true,
             "ontology_type": "tcdb",
-            "evidence": "family_inferred",
-            "sources": ["eggnog"],
-            "evidence_score": 0.6,
-            "tier": null,
-            "attachment_depth": "most_specific",
-            "confidence_score": null,
-            "source_agreement": "both_sources",
-            "pfam_support": "corroborated",
-            "go_support": "uncorroborated",
-            "identity": null,
-            "qcov": null,
-            "evalue": null,
-            "consensus_n": null,
-            "organism_name": "Prochlorococcus MED4"
+            "evidence": "homology",
+            "tcdb_call": "diamond_best_hit",
+            "tcdb_gate": "below_gate",
+            "tcdb_calls": ["diamond_best_hit", "diamond_tier", "eggnog"]
           },
           ...
         ]
@@ -534,6 +503,7 @@ examples:
         "by_tier": [{"tier": 2, "count": 1}],
         "by_sources": [{"source": "merops_diamond", "count": 1}],
         "by_call_class": [{"call_class": "peptidase", "count": 1}],
+        "by_tcdb_call": [],
         "evidence_score_stats": {"min": 1.0, "median": 1.0, "max": 1.0, "n_null": 0},
         "evidence_score_signals": null,
         "filters_applied": {},
@@ -619,18 +589,19 @@ examples:
         "truncated": false,
         "not_found": [],
         "no_terms": [],
-        "trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]},
+        "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
         "by_evidence": [{"evidence": "family_inferred", "count": 7}],
         "by_tier": [{"tier": "null", "count": 7}],
         "by_sources": [{"source": "eggnog", "count": 7}],
         "by_call_class": [],
-        "evidence_score_stats": {"min": 0.6, "median": 0.8, "max": 0.8, "n_null": 0},
+        "by_tcdb_call": [{"tcdb_call": "eggnog", "count": 7}],
+        "evidence_score_stats": null,
         "evidence_score_signals": null,
         "filters_applied": {"max_tier": 2},
         "skipped_ontologies": [{"ontology": "kegg", "reason": "does not carry the max_tier filter"}],
         "warnings": [
           "Dropped 1 ontologies that do not carry max_tier: kegg. Re-run without max_tier to see them.",
-          "max_tier=2 kept 7 rows that carry no tier — single-source edges are never truncated, so a null tier is not a tier-1 c..."
+          "max_tier=2 kept 7 rows that carry no tier — not a tier-1 call: tier is set only on truncated diamond edges (for TCDB,..."
         ],
         "results": [
           {
@@ -640,7 +611,10 @@ examples:
             "level": 3,
             "is_informative": true,
             "ontology_type": "tcdb",
-            "evidence": "family_inferred"
+            "evidence": "family_inferred",
+            "tcdb_call": "eggnog",
+            "tcdb_gate": "annotated",
+            "tcdb_calls": ["eggnog"]
           },
           {
             "locus_tag": "PMM0392",
@@ -649,7 +623,10 @@ examples:
             "level": 3,
             "is_informative": true,
             "ontology_type": "tcdb",
-            "evidence": "family_inferred"
+            "evidence": "family_inferred",
+            "tcdb_call": "eggnog",
+            "tcdb_gate": "annotated",
+            "tcdb_calls": ["eggnog"]
           },
           {
             "locus_tag": "PMM0392",
@@ -658,11 +635,18 @@ examples:
             "level": 3,
             "is_informative": true,
             "ontology_type": "tcdb",
-            "evidence": "family_inferred"
+            "evidence": "family_inferred",
+            "tcdb_call": "eggnog",
+            "tcdb_gate": "annotated",
+            "tcdb_calls": ["eggnog"]
           },
           ...
         ]
       }
+
+  - title: Filter TCDB rows by call kind — tcdb_call=['eggnog']
+    call: gene_ontology_terms(locus_tags=["PMM0372", "PMM0710"], organism="MED4", ontology=["tcdb"], tcdb_call=["eggnog"])
+    note: "`tcdb_call` keeps only rows whose edges are of the listed kinds (`eggnog`, `diamond_tier`, `diamond_best_hit`; `list_filter_values('tcdb_call')`). The leaf rule still runs on every gated edge, so the filter never promotes an ancestor to a leaf. cynD keeps its eggNOG system tcdb:3.A.1.16.1. pstS drops out: its eggNOG call sits on tcdb:3.A.1.7, an ancestor of its best-hit system, so it is not a leaf. Envelope `by_tcdb_call` counts rows by representative call. With a single non-TCDB ontology the filter raises; with an ontology list it applies to tcdb and skips the rest."
 
   - title: Filter out uninformative terms (KOs named "uncharacterized protein")
     call: gene_ontology_terms(locus_tags=["PMM0001"], organism="Prochlorococcus MED4", ontology="kegg", informative_only=True)
@@ -695,6 +679,7 @@ examples:
         "by_tier": [],
         "by_sources": [{"source": "eggnog", "count": 1}],
         "by_call_class": [],
+        "by_tcdb_call": [],
         "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
         "evidence_score_signals": null,
         "filters_applied": {},
@@ -758,6 +743,7 @@ examples:
         "by_tier": [],
         "by_sources": [],
         "by_call_class": [],
+        "by_tcdb_call": [],
         "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
         "evidence_score_signals": null,
         "filters_applied": {},
@@ -803,18 +789,19 @@ examples:
 
 verbose_fields:
   - organism_name
-  - attachment_depth
   - sources
   - evidence_score
   - tier
   - confidence_score
-  - source_agreement
   - pfam_support
-  - go_support
   - identity
   - qcov
   - evalue
   - consensus_n
+  - tcdb_scov
+  - tcdb_best_hit_rank
+  - tcdb_bitscore
+  - tcdb_bitscore_ratio
   - best_hit_kind
   - best_hit_id
   - libraries
@@ -842,9 +829,11 @@ mistakes:
   - "Use `tree` to scope BRITE rollup to a single tree (e.g. 'transporters'). Without it, rollup mixes all BRITE trees."
   - "Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`."
   - "`ontology` accepts `str | list[str] | None`. With a list: a filter carried by all requested ontologies applies normally; carried by some but not all applies to those and drops the rest into `skipped_ontologies` with a warning; carried by none raises `ValueError`. An unknown ontology name always raises."
-  - "`include_superseded=False` (default) applies TCDB's `attachment_depth='most_specific'` predicate in leaf mode — ancestor rows made redundant by a deeper attachment on the same gene are dropped. `include_superseded=True` adds them back labelled `attachment_depth='superseded'`; superseded means less specific, not incorrect. `most_specific` is not unique per gene — a gene attached to several sibling subfamilies keeps one row per subfamily (PMM0392: 7). `attachment_depth` itself is verbose-only."
-  - "Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`) mirror `genes_by_ontology` exactly — same defaults (`None`, never filter), same per-ontology axis gating, same `ValueError` on an unsupported axis. See `docs://analysis/annotation_evidence` for the per-ontology axis table."
-  - "Compact rows carry `evidence` on the 14 functional-edge ontologies (null on PSORTb/SignalP); `interpro_type` (interpro rows) and `call_class` (merops rows) are compact always. `sources`, `evidence_score`, `tier`, `attachment_depth` (tcdb) and native detail (`confidence_score`, `libraries`, `evalue`, `signal_peptide_*`, `localization_score`, ...) are verbose-only."
+  - "TCDB rows are gated by default: only edges the KG stamps `tcdb_gate` `direct` (a system call) or `annotated` (a family or subfamily call) count, and leaf mode drops a node that is an ancestor of another gated target for the same gene. Leaf rows per gene therefore equal `gene_overview.tcdb_assignment_count`, and a gene can keep several sibling rows (ecfA1 PMM0125: 7 subfamilies). `include_weak_tcdb_hits=True` adds the `below_gate` DIAMOND edges (tier-3 calls, near-tie best hits, best hits under 40% identity) as extra rows; the default rows never change. Do not re-derive the gate from `tcdb_call` or `tier`."
+  - "`tcdb_calls` lists the call kinds found anywhere on the row's lineage (the node, its ancestors and descendants) in precedence order, and `tcdb_call` / `tcdb_gate` describe the one edge the row reports. eggNOG plus a DIAMOND kind is independent agreement; `diamond_tier` and `diamond_best_hit` come from the same DIAMOND run, so the two together count as one source. `tier` is null on eggNOG rows and means different things on the two DIAMOND kinds (consensus tier vs identity band): never compare tiers across kinds."
+  - "Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call`) mirror `genes_by_ontology` exactly — same defaults (`None`, never filter), same per-ontology axis gating, same `ValueError` on an unsupported axis (`min_evidence_score` with `ontology='tcdb'` raises: TCDB has no evidence score). See `docs://analysis/annotation_evidence` for the per-ontology axis table."
+  - "Compact rows carry `evidence` on the 14 functional-edge ontologies (null on PSORTb/SignalP); `interpro_type` (interpro rows) and `call_class` (merops rows) are compact always. `tcdb_call`, `tcdb_gate` and `tcdb_calls` (tcdb rows) are compact too. `sources`, `evidence_score`, `tier` and native detail (`identity`, `qcov`, `evalue`, `tcdb_scov`, `tcdb_best_hit_rank`, `confidence_score`, `libraries`, `signal_peptide_*`, `localization_score`, ...) are verbose-only; `identity` and `qcov` are percent on both TCDB and MEROPS."
   - "CAZy rollup at `level=0` returns the 6 top-level classes (GH, GT, PL, CE, AA, CBM). Genes commonly belong to multiple top-level classes (e.g. a CBM-domain-containing GH); duplicates per `(gene × class)` are de-duped automatically."
-  - "TCDB substrate-level questions ('which genes does this metabolite bind to?') chain via `genes_by_metabolite`, NOT this tool. Use `gene_ontology_terms(ontology='tcdb')` for *family*-level annotations (e.g. 'what TCDB family does PMM1129 belong to?')."
+  - "TCDB substrate-level questions ('which genes does this metabolite bind to?') chain via `genes_by_metabolite`, NOT this tool. Use `gene_ontology_terms(ontology='tcdb')` for the TC ids a gene is called to (e.g. 'which TCDB system or family is PMM1129 placed in?')."
   - "`informative_only` (default False here) drops terms the KG flags uninformative — ontology roots and catch-all KO terms, plus the KEGG global / overview maps. It is term-side only and never restricts the gene set. See docs://analysis/annotation_evidence."
+  - "`tcdb_call` filters edges before the row's representative edge is chosen, but in leaf mode the ancestor drop still runs over every gated edge. So a call kind that sits only on an ancestor of the gene's leaf returns nothing: `gene_ontology_terms(['PMM0710'], 'MED4', ontology=['tcdb'], tcdb_call=['eggnog'])` returns 0 rows, because pstS's eggNOG call is on tcdb:3.A.1.7, an ancestor of its best-hit leaf tcdb:3.A.1.7.6. Zero rows under `tcdb_call` means no leaf of that kind, not no call of that kind; drop the filter and read `tcdb_calls`, or use `mode='rollup'`."

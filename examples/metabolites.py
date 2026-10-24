@@ -11,35 +11,31 @@ read responses, not just consume detail rows.
 
 Run with: uv run python examples/metabolites.py --scenario <name>
 
-Scenarios:
-  1. discover            — element + organism filter (sources: reaction + transport)
-  2. compound_to_genes   — evidence_source split on glutamine (reaction + transport)
-  3. gene_to_metabolites — element signature + top_metabolite_pathways (reaction + transport)
-  4. cross_feeding       — bridge MED4 → ALT (reaction + transport)
-  5. n_source_de         — N-source primitive → DE (reaction + transport → expression)
-  6. tcdb_chain          — substrate-anchored vs family-anchored 3-route comparison (transport)
-  7. measurement         — P-stress metabolomics via native MetaboliteAssay tools (measurement)
+Scenarios: see CONTENTS below.
 
 Notes:
 - Metabolite IDs: bare / xref forms (`C00064`, `CHEBI:...`, `HMDB...`, `MNXM...`)
   are coerced to canonical `kegg.compound:C00064` and reported in
   `resolved_aliases`; the canonical prefixed form skips coercion.
 - evidence_sources filter is needed to narrow at-scale; per-row schema is union
-  (metabolism rows have reaction_id/ec_numbers; transport rows have
-  substrate_depth/tcdb_evidence_score/tcdb_family_id; cross-arm fields default to
+  (metabolism rows have reaction_id/ec_numbers; TCDB transport rows have
+  tcdb_route/tcdb_family_id/tcdb_identity/tcdb_calls; cross-arm fields default to
   explicit None).
+- TCDB transport rows are direct by default (the gene's own call onto a TCDB
+  system). include_tcdb_family_substrates=True adds family-level rows for
+  genes TCDB could not place in a system (a recall expansion).
 - list_metabolites passes through `measured_assay_count`, `measured_paper_count`,
   `measured_organisms`, `measured_compartments` per row. Use these to find
   measured-and-transport-able metabolites in one call.
 """
 # CONTENTS
-#   1. scenario_discover            — element + organism filter (line ~76)
-#   2. scenario_compound_to_genes   — evidence_source split on glutamine (line ~115)
-#   3. scenario_gene_to_metabolites — element signature + top_metabolite_pathways (line ~203)
-#   4. scenario_cross_feeding       — bridge MED4 -> ALT (line ~256)
-#   5. scenario_n_source_de         — N-source primitive -> DE (line ~395)
-#   6. scenario_tcdb_chain          — substrate-anchored vs family-anchored routes (line ~508)
-#   7. scenario_measurement         — P-stress metabolomics via MetaboliteAssay tools (line ~611)
+#   1. scenario_discover            — element + organism filter (line ~74)
+#   2. scenario_compound_to_genes   — evidence_source split on glutamine (line ~113)
+#   3. scenario_gene_to_metabolites — element signature + top_metabolite_pathways (line ~204)
+#   4. scenario_cross_feeding       — bridge MED4 -> ALT (line ~257)
+#   5. scenario_n_source_de         — N-source primitive -> DE (line ~396)
+#   6. scenario_tcdb_chain          — direct vs family TCDB rows (line ~515)
+#   7. scenario_measurement         — P-stress metabolomics via MetaboliteAssay tools (line ~610)
 from __future__ import annotations
 
 import argparse
@@ -119,9 +115,10 @@ def scenario_compound_to_genes() -> None:
 
     Sources: reaction + transport (response is split by evidence_source).
     Caveat surfaced: metabolism vs transport semantics differ; row counts
-    are not comparable (transport rows are often inherited). Per-row
-    schema is union — metabolism rows carry reaction_id/ec_numbers;
-    transport rows carry substrate_depth/tcdb_evidence_score/tcdb_family_id.
+    are not comparable (a reaction row and a transporter row answer
+    different questions). Per-row schema is union — metabolism rows carry
+    reaction_id/ec_numbers; TCDB rows carry tcdb_route/tcdb_family_id/
+    tcdb_identity/tcdb_calls.
 
     Two-step chain: name → metabolite_id (via list_metabolites search)
     → genes (via genes_by_metabolite). Most user-facing questions arrive
@@ -138,8 +135,9 @@ def scenario_compound_to_genes() -> None:
     print(f"  returned={name_lookup['returned']}  total_matching={name_lookup['total_matching']}")
     for row in name_lookup["results"][:5]:
         print(f"  {row['metabolite_id']:<25} {row['name']}")
-    # Pick the canonical L-Glutamine match (KEGG C00064) — N-bearing, has
-    # BOTH metabolism and transport arms in MED4.
+    # Pick the canonical L-Glutamine match (KEGG C00064) — N-bearing; in MED4
+    # it has metabolism rows and no direct TCDB transporter (the envelope's
+    # tcdb_family_substrates_not_shown counts the family-level candidates).
     canonical_id = next(
         (row["metabolite_id"] for row in name_lookup["results"]
          if row.get("name") == "L-Glutamine"),
@@ -163,15 +161,16 @@ def scenario_compound_to_genes() -> None:
 
     by_es = result.get("by_evidence_source") or []
     print(f"by_evidence_source: {[(e.get('evidence_source'), e.get('count')) for e in by_es]}")
-    by_sd = result.get("by_substrate_depth") or []
-    print(f"by_substrate_depth: {[(e.get('substrate_depth'), e.get('count')) for e in by_sd]}")
+    by_route = result.get("by_tcdb_route") or []
+    print(f"by_tcdb_route: {[(e.get('tcdb_route'), e.get('count')) for e in by_route]}")
+    print(f"tcdb_family_substrates_not_shown: {result.get('tcdb_family_substrates_not_shown')}")
     top_genes = result.get("top_genes") or []
-    print("top_genes (resolution + score_max are gene-level facts, not per row):")
+    print("top_genes (tcdb_assignment_count is a gene-level KG count, not per row):")
     for g in top_genes[:5]:
         print(
             f"  {g.get('locus_tag', '?'):<12} "
-            f"resolution={g.get('transport_substrate_resolution')}  "
-            f"score_max={g.get('tcdb_evidence_score_max')}"
+            f"tcdb_direct_rows={g.get('tcdb_direct_rows')}  "
+            f"tcdb_assignment_count={g.get('tcdb_assignment_count')}"
         )
     print(f"warnings: {result.get('warnings', [])}")
     print()
@@ -188,18 +187,18 @@ def scenario_compound_to_genes() -> None:
         elif es == "transport":
             print(
                 f"  {row.get('locus_tag', '?'):<12} transport   "
-                f"depth={str(row.get('substrate_depth', '?')):<14} "
-                f"score={row.get('tcdb_evidence_score')}  "
-                f"family={str(row.get('tcdb_family_id', '?'))}"
+                f"route={str(row.get('tcdb_route', '?')):<7} "
+                f"identity={row.get('tcdb_identity')}  "
+                f"calls={row.get('tcdb_calls')}  "
+                f"system={str(row.get('tcdb_family_id', '?'))}"
             )
         else:
             print(f"  {row.get('locus_tag', '?'):<12} {es}")
     print()
     print("LESSON: rows have UNION shape — different fields per evidence_source.")
-    print("        Counts NOT comparable across arms (transport rows are often inherited).")
-    print("        Trust ladder: score (rank, never filter; 0 = uncorroborated, not absent)")
-    print("        -> gene resolution (family_inferred = reachability, not capability)")
-    print("        -> row substrate_depth (most specific SURVIVING node, not a curation level).")
+    print("        Counts NOT comparable across arms (reaction vs transporter evidence).")
+    print("        TCDB rows: direct = the gene's own system call; rank by tcdb_identity,")
+    print("        then tcdb_calls (eggnog + a DIAMOND kind = independent agreement).")
 
 
 def scenario_gene_to_metabolites() -> None:
@@ -250,8 +249,8 @@ def scenario_gene_to_metabolites() -> None:
             print(
                 f"  {str(row.get('metabolite_id', '?'))[:18]:<18} "
                 f"{str(row.get('metabolite_name', '?'))[:30]:<30} "
-                f"transport   depth={row.get('substrate_depth', '?')} "
-                f"score={row.get('tcdb_evidence_score')}"
+                f"transport   route={row.get('tcdb_route', '?')} "
+                f"identity={row.get('tcdb_identity')}"
             )
 
 
@@ -274,13 +273,14 @@ def scenario_cross_feeding() -> None:
        output deliberately keeps H+ outside the minimal-8 blacklist — proton
        channels (MotA/TolQ/ExbB family) surface in the transport arm and
        demonstrate when extension is warranted.
-    2. Inherited-substrate plateau (transport arm) — superfamily-only ABC
-       annotations propagate ~554 metabolites per MED4 gene as inherited rows.
-       Mitigation: substrate_depth=['most_specific'] on Step 2, then rank
-       survivors by tcdb_evidence_score.
-    3. Transport polarity not encoded — TCDB annotation says 'transports X'
-       without import/export direction (permanently unmitigable). Even
-       with clean filters, the result is 'compatible with cross-feeding',
+    2. Family-level reach (transport arm) — family rows
+       (include_tcdb_family_substrates=True) carry a whole family's curated
+       range, not a per-gene substrate. Mitigation: keep the default direct
+       rows on Step 2 and rank them by tcdb_identity, then tcdb_calls.
+    3. Transport polarity is node-level at best — TCDB rows carry
+       tcdb_direction (uptake / export / unknown), stated by TCDB for the
+       node, not measured per gene; most nodes read unknown. Even with
+       clean filters, the result is 'compatible with cross-feeding',
        never confirmed.
 
     Seed choice: 6 MED4 N-metabolism genes derived live from
@@ -326,8 +326,8 @@ def scenario_cross_feeding() -> None:
         print(
             f"    {r['metabolite_id']:<22} {(r.get('name') or '?'):<32} "
             f"metab={r.get('metabolism_rows')} "
-            f"trans_most_specific={r.get('transport_most_specific_rows')} "
-            f"trans_inherited={r.get('transport_inherited_rows')}"
+            f"tcdb_direct={r.get('tcdb_direct_rows')} "
+            f"tcdb_family={r.get('tcdb_family_rows')}"
         )
 
     metabolite_ids = [
@@ -342,13 +342,12 @@ def scenario_cross_feeding() -> None:
 
     print(f"Step 2: which Alteromonas genes touch any of the {len(metabolite_ids)} metabolites?")
     print("  (split per-arm so both transport and metabolism get airtime;")
-    print("   substrate_depth=['most_specific'] kills the ABC inherited plateau;")
+    print("   direct TCDB rows only — include_tcdb_family_substrates stays off;")
     print("   exclude_metabolite_ids=CURRENCY repeated as belt-and-braces guard)")
     alt_transport = genes_by_metabolite(
         metabolite_ids=metabolite_ids,
         organism="Alteromonas macleodii HOT1A3",
         evidence_sources=["transport"],
-        substrate_depth=["most_specific"],
         exclude_metabolite_ids=list(CURRENCY_METABOLITES_MIN8),
         limit=8,
     )
@@ -364,14 +363,14 @@ def scenario_cross_feeding() -> None:
     print()
     print("  CAVEATS — Workflow B′ is 'compatible with cross-feeding', never confirmed:")
     print("    1. Currency cofactors blacklisted above (mitigated)")
-    print("    2. substrate_depth filter applied (mitigated for ABC plateau)")
-    print("    3. Transport polarity not encoded (permanently unmitigable;")
-    print("       TCDB lacks direction upstream). The Track-B measurement")
+    print("    2. Direct TCDB rows only (family-level reach left out)")
+    print("    3. Transport polarity is node-level at best (tcdb_direction is")
+    print("       TCDB's statement about the system, not the gene). The Track-B measurement")
     print("       layer can corroborate (extracellular elevation in coculture) but")
     print("       cannot confirm causality.")
     print()
 
-    print(f"Top {alt_transport['returned']} ALT transporter candidates (most_specific, ranked by score):")
+    print(f"Top {alt_transport['returned']} ALT transporter candidates (direct rows, ranked by tcdb_identity):")
     for row in alt_transport["results"]:
         suffix = (
             "  [H+ → extend blacklist if PMF-coupling components are noise]"
@@ -382,7 +381,7 @@ def scenario_cross_feeding() -> None:
             f"  {row.get('locus_tag', '?'):<14} → "
             f"{str(row.get('metabolite_id', '?'))[:22]:<22} "
             f"{(row.get('product') or row.get('gene_name') or '')[:48]}  "
-            f"score={row.get('tcdb_evidence_score')}{suffix}"
+            f"identity={row.get('tcdb_identity')} direction={row.get('tcdb_direction')}{suffix}"
         )
     print()
     print(f"Top {alt_metab['returned']} ALT metabolism candidates (involved-in framing):")
@@ -403,21 +402,19 @@ def scenario_n_source_de() -> None:
     Demonstrates how the chemistry layer can scope a DE-style query without
     requiring a hand-curated gene pool.
 
-    Important re: substrate_depth — this scenario does NOT filter to
-    most_specific (contrast with cross_feeding A4). Transporter specificity
-    in nature is often promiscuous or under-characterized; `most_specific`
-    means "the most specific surviving node for this substrate in the
-    gene-pruned hierarchy" (not a curation level), `inherited` means "came
-    down from an ancestor family's substrate set". Both are annotations,
-    neither is ground truth. For a broad-screen question like 'which N-source
-    transporters respond?', inherited rows are appropriate — you want any
-    candidate that could plausibly act on N substrates, including the real
-    MED4 N-uptake genes (PMM0263 amt1, PMM0628 gltS) which the KG reaches
-    only through inherited rows.
+    Important re: family rows — this scenario turns on
+    include_tcdb_family_substrates=True (contrast with cross_feeding A4).
+    Direct rows need the gene's own TCDB system call; family rows come from
+    a family or subfamily call and carry the family's curated range. Both
+    are annotations, neither is ground truth. For a broad-screen question
+    like 'which N-source transporters respond?', family rows are
+    appropriate — you want any candidate that could plausibly act on N
+    substrates, including real N-uptake genes TCDB placed only at family
+    level (PMM0628 gltS, glutamate:Na+ symporter family tcdb:2.A.27).
 
-    The opposite filter call applies in cross_feeding (A4) — there the
-    narrower most_specific cast is the more conservative call for
-    cross-organism inferences that are already fragile.
+    The opposite call applies in cross_feeding (A4) — there direct rows
+    are the more conservative cast for cross-organism inferences that are
+    already fragile.
 
     Tolonen 2006 (10.1038/msb4100087) is the canonical MED4 N-source paper:
     3 microarray experiments (cyanate, urea, N-deprivation) provide the
@@ -436,7 +433,11 @@ def scenario_n_source_de() -> None:
         exclude_metabolite_ids=list(CURRENCY_METABOLITES_MIN8),
         limit=50,
     )
-    candidates = metabs["results"][:10]
+    # 'transport' in evidence_sources means TCDB lists the compound as a
+    # substrate of some kept system, not that a gene reaches it: route on
+    # transporter_gene_count > 0 (a KG-wide count) before drilling in.
+    candidates = [r for r in metabs["results"]
+                  if (r.get("transporter_gene_count") or 0) > 0][:10]
     metabolite_ids = [row["metabolite_id"] for row in candidates]
     print(f"  total_matching={metabs.get('total_matching')}  "
           f"top-10: {len(metabolite_ids)}")
@@ -448,22 +449,26 @@ def scenario_n_source_de() -> None:
     print()
 
     print(f"Step 2: genes_by_metabolite — MED4 transporter genes for these {len(metabolite_ids)} substrates")
-    print("  (no substrate_depth filter — see docstring; inherited rows are appropriate here)")
+    print("  (include_tcdb_family_substrates=True — see docstring; family rows are appropriate here)")
     g = genes_by_metabolite(
         metabolite_ids=metabolite_ids,
         organism="MED4",
         evidence_sources=["transport"],
+        include_tcdb_family_substrates=True,
         limit=300,
     )
     distinct_genes = sorted({row["locus_tag"] for row in g["results"] if row.get("locus_tag")})
-    most_specific_genes = sorted({
+    direct_genes = sorted({
         row["locus_tag"] for row in g["results"]
-        if row.get("substrate_depth") == "most_specific" and row.get("locus_tag")
+        if row.get("tcdb_route") == "direct" and row.get("locus_tag")
     })
-    inherited_only = sorted(set(distinct_genes) - set(most_specific_genes))
+    family_only = sorted(set(distinct_genes) - set(direct_genes))
     print(f"  total_matching={g['total_matching']}  distinct_genes={len(distinct_genes)}")
-    print(f"  most_specific alone:     {len(most_specific_genes)} genes (mostly efflux / detoxification)")
-    print(f"  inherited (additional):  {len(inherited_only)} genes (incl. real N-uptake — see below)")
+    print(f"  direct rows:             {len(direct_genes)} genes (own TCDB system call)")
+    print(f"  family rows only:        {len(family_only)} genes (family-level call; candidates)")
+    if g.get("tcdb_family_substrates_skipped"):
+        print(f"  skipped by the breadth cap (superfamily call, substrate unknown): "
+              f"{sorted({e.get('locus_tag') for e in g['tcdb_family_substrates_skipped']})}")
     print()
 
     print(f"Step 3: gene_response_profile — how do these {len(distinct_genes)} genes respond across N treatments?")
@@ -502,112 +507,104 @@ def scenario_n_source_de() -> None:
         )
     print()
     print("  CAVEAT: transporter specificity is often unknown or context-dependent in nature.")
-    print("  inherited rows reflect family-level transport potential, not per-substrate")
+    print("  Family rows reflect family-level transport potential, not per-substrate")
     print("  confirmation. The DE column is the empirical anchor: genes that respond to")
-    print("  N stress are functionally implicated regardless of substrate_depth.")
+    print("  N stress are functionally implicated whichever TCDB route reached them.")
 
 
 def scenario_tcdb_chain() -> None:
-    """Use this when the user asks 'which MED4 genes transport glycine betaine?'
+    """Use this when the user asks 'which MED4 genes transport orthophosphate?'
 
     Sources: transport (TCDB).
 
-    Demonstrates substrate-anchored vs family-anchored routing through three
-    concrete routes, with the family-anchored alternative made explicit (not
-    just asserted). For betaine in MED4 specifically, only the substrate-
-    anchored inherited rollup surfaces candidate transporters — the
-    literal 'betaine family' (BCCT, tcdb:2.A.15) has zero MED4 members.
+    Demonstrates direct vs family TCDB rows and the family-anchored
+    alternative, on the case that motivates the family walk: MED4's
+    phosphonate transporter phnCDE has no TCDB system call, only a
+    subfamily call on tcdb:3.A.1.9 (PhnT), so the default direct answer
+    for orthophosphate is empty and the envelope says what the walk adds.
 
     Three-route comparison teaches:
-      - Substrate-anchored is the right primitive for 'which genes transport X?'
-        questions because it scopes by substrate, not by family taxonomy.
-      - Family-anchored is the right primitive for 'what does this family
-        transport?' or 'which genes are in this family?' — different shape.
-      - The most_specific vs no-filter call is question-shape-dependent
-        (annotations are not ground truth; transporter specificity is often
-        promiscuous in nature).
+      - Direct rows (default) need the gene's own call onto a TCDB system.
+      - include_tcdb_family_substrates=True is a fallback for genes TCDB
+        could not place in a system — a recall expansion, not a per-gene call.
+      - Family-anchored genes_by_ontology answers 'which genes are in family
+        Y?', a different question.
+      - TCDB curation can be narrow: the Pst system (tcdb:3.A.1.7.6) is
+        curated with triphosphate only, so pstS is absent from the
+        orthophosphate answer although its system name says phosphate.
     """
     print("=== Scenario: tcdb_chain ===")
     print("Question class: 'which genes transport this substrate?' "
-          "(substrate-anchored, not family-anchored)")
+          "(direct vs family TCDB rows)")
     print()
 
-    print("Step 1: discover betaine-relevant TCDB family via search_ontology")
-    found = search_ontology(search_text="betaine", ontology="tcdb", limit=5)
-    bcct_term_id: str | None = None
-    for row in found["results"]:
-        print(f"  {row.get('id'):<22} level={row.get('level')}  {row.get('name')}")
-        if "BCCT" in (row.get("name") or "") or "Betaine" in (row.get("name") or ""):
-            bcct_term_id = row.get("id")
-    print(f"  → discovered family: {bcct_term_id}")
-    print()
-
-    BETAINE = "kegg.compound:C00719"
-    print(f"Step 2: three routes to answer 'which MED4 genes transport {BETAINE}?'")
-    print()
-
-    # Route A — substrate-anchored, most_specific only (most conservative)
+    PHOSPHATE = "kegg.compound:C00009"   # orthophosphate
+    print(f"Step 1: direct rows only (default) for {PHOSPHATE} in MED4")
     a = genes_by_metabolite(
-        metabolite_ids=[BETAINE],
+        metabolite_ids=[PHOSPHATE],
         organism="MED4",
         evidence_sources=["transport"],
-        substrate_depth=["most_specific"],
         limit=50,
     )
     a_genes = sorted({r["locus_tag"] for r in a["results"] if r.get("locus_tag")})
-    print(f"  Route A — substrate-anchored, most_specific only: {len(a_genes)} genes")
-    print(f"           call: genes_by_metabolite(metabolite_ids=['{BETAINE}'],")
-    print("                                    substrate_depth=['most_specific'])")
-    print("           interp: no MED4 gene is attached at a node where betaine is the")
-    print("                   most specific surviving substrate")
+    print(f"  direct transport genes: {len(a_genes)} {a_genes}")
+    print(f"  tcdb_family_substrates_not_shown: {a.get('tcdb_family_substrates_not_shown')}")
+    for w in a.get("warnings") or []:
+        print(f"  warning: {w}")
     print()
 
-    # Route B — substrate-anchored, no filter (substrate scoped via family rollup)
+    print("Step 2: re-run with include_tcdb_family_substrates=True")
     b = genes_by_metabolite(
-        metabolite_ids=[BETAINE],
+        metabolite_ids=[PHOSPHATE],
         organism="MED4",
         evidence_sources=["transport"],
+        include_tcdb_family_substrates=True,
         limit=50,
     )
-    b_genes = sorted({r["locus_tag"] for r in b["results"] if r.get("locus_tag")})
-    b_families = sorted({r.get("tcdb_family_id") for r in b["results"] if r.get("tcdb_family_id")})
-    print(f"  Route B — substrate-anchored, no substrate_depth filter: {len(b_genes)} genes")
-    print(f"           call: genes_by_metabolite(metabolite_ids=['{BETAINE}'])")
-    print("           interp: MED4 genes annotated to families that include betaine via rollup")
-    print(f"           tcdb_family_ids surfaced: {b_families}")
-    print(f"           genes: {b_genes}")
+    print(f"  by_tcdb_route: {[(e.get('tcdb_route'), e.get('count')) for e in b.get('by_tcdb_route') or []]}")
+    for r in b["results"]:
+        print(
+            f"  {r.get('locus_tag', '?'):<10} {(r.get('gene_name') or '-'):<6} "
+            f"route={r.get('tcdb_route'):<7} attached={r.get('attached_tcdb_id')}  "
+            f"systems_with_substrate={r.get('tcdb_substrate_system_count')}  "
+            f"calls={r.get('tcdb_calls')}  direction={r.get('tcdb_direction')}"
+        )
     print()
 
-    # Route C — family-anchored on the literal 'betaine family' (BCCT)
-    if bcct_term_id is None:
-        bcct_term_id = "tcdb:2.A.15"  # fallback to canonical BCCT id
+    print("Step 3: family-anchored — which MED4 genes sit in the PhnT subfamily?")
     c = genes_by_ontology(
         ontology="tcdb",
-        term_ids=[bcct_term_id],
+        term_ids=["tcdb:3.A.1.9"],
         organism="MED4",
+        min_gene_set_size=1,
         limit=50,
     )
     c_genes = sorted({r["locus_tag"] for r in c["results"] if r.get("locus_tag")})
-    print(f"  Route C — family-anchored on the literal 'betaine family' ({bcct_term_id}, BCCT):")
-    print(f"           {len(c_genes)} genes")
-    print(f"           call: genes_by_ontology(ontology='tcdb', term_ids=['{bcct_term_id}'])")
-    print("           interp: MED4 has zero BCCT-family members — the family-anchored route")
-    print("                   would have missed the candidates that Route B surfaced")
+    print(f"  genes_by_ontology(ontology='tcdb', term_ids=['tcdb:3.A.1.9']): {c_genes}")
     print()
 
-    print("Reading the 3-way comparison:")
-    print("  - Substrate-anchored Routes A and B share the *anchor* (the metabolite),")
-    print("    differ only in the substrate_depth filter. A=conservative cast (most_specific);")
-    print("    B=broader cast that includes family-level transport potential.")
-    print("  - Family-anchored Route C uses a different anchor (the family taxonomy)")
-    print("    and answers a different question. For betaine in MED4 it returns zero —")
-    print("    the only candidates live in ABC superfamily (3.A.1) via inherited rollup.")
-    print("  - For 'which genes transport X?' — use substrate-anchored (A or B).")
-    print("  - For 'what does family Y transport?' or 'which genes are in family Y?' — use C.")
+    print("Step 4: the Pst curation caveat — what does pstS (PMM0710) reach directly?")
+    d = metabolites_by_gene(
+        locus_tags=["PMM0710"],
+        organism="MED4",
+        evidence_sources=["transport"],
+    )
+    for r in d["results"]:
+        print(
+            f"  {r.get('metabolite_name')!s:<14} via {r.get('tcdb_family_id')}  "
+            f"{str(r.get('tcdb_family_name'))[:60]}"
+        )
     print()
-    print("Filter call (most_specific vs no filter) is question-shape-dependent.")
-    print("Both depths are annotations, neither is ground truth; transporter")
-    print("specificity is often promiscuous or under-characterized in nature.")
+
+    print("Reading the comparison:")
+    print("  - Direct rows answer 'which genes have a TCDB system curated with X'.")
+    print("    For orthophosphate in MED4 that is empty: phnCDE have only a subfamily call.")
+    print("  - Family rows (Step 2) say the gene's family has some system moving X —")
+    print("    candidates, not calls; report tcdb_substrate_system_count with them.")
+    print("  - Family-anchored genes_by_ontology (Step 3) lists family members,")
+    print("    whatever they transport.")
+    print("  - TCDB curates Pst with triphosphate only, so pstABCS never reach")
+    print("    orthophosphate here; read system names when an answer looks too narrow.")
 
 
 def scenario_measurement() -> None:

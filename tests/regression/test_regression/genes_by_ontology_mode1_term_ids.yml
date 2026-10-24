@@ -31,6 +31,7 @@ by_sources:
   source: interproscan
 - count: 5
   source: eggnog
+by_tcdb_call: []
 by_tier: []
 case_id: genes_by_ontology_mode1_term_ids
 evidence_score_stats:

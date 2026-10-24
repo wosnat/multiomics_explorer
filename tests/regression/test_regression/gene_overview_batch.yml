@@ -30,9 +30,8 @@ rows:
   reaction_count: 0
   significant_down_count: 0
   significant_up_count: 0
-  tcdb_evidence_score_max: null
-  tcdb_family_count: 0
-  transport_substrate_resolution: null
+  tcdb_assignment_count: 0
+  tcdb_best_hit_identity: null
   transported_metabolite_count: 0
 - annotation_quality: 3
   annotation_state: informative_multi
@@ -73,7 +72,6 @@ rows:
   reaction_count: 0
   significant_down_count: 2
   significant_up_count: 4
-  tcdb_evidence_score_max: null
-  tcdb_family_count: 0
-  transport_substrate_resolution: null
+  tcdb_assignment_count: 0
+  tcdb_best_hit_identity: null
   transported_metabolite_count: 0

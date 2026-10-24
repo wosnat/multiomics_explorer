@@ -165,15 +165,19 @@ EvidenceParam = Annotated[list[str] | None, Field(
 )]
 
 MaxTierParam = Annotated[int | None, Field(
-    description="Keep rows with edge tier <= this value OR tier IS NULL (diamond truncation depth, 1-3; null tier always kept). Valid on tcdb, merops only.",
+    description="Keep rows with edge tier <= this value OR tier IS NULL (1-3; null always kept, e.g. TCDB eggnog). tcdb, merops only. TCDB tier is consensus tier on diamond_tier, identity band on diamond_best_hit; never compare across kinds or ontologies.",
     ge=1, le=3,
 )]
 
 MinEvidenceScoreParam = Annotated[float | None, Field(
-    description="Keep rows with edge evidence_score >= this cutoff (0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, tcdb, merops.",
+    description="Keep rows with edge evidence_score >= this cutoff (0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, merops; TCDB carries no evidence_score (raises).",
     ge=0, le=1,
 )]
 
 CallClassParam = Annotated[list[CallClass] | None, Field(
     description="MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows.",
+)]
+
+TcdbCallParam = Annotated[list[str] | None, Field(
+    description="TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked. Leaf mode still drops ancestors via all edges, so a call kind only on an ancestor term yields no row. Values: list_filter_values('tcdb_call').",
 )]

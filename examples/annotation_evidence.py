@@ -9,24 +9,24 @@ Run with: uv run python examples/annotation_evidence.py --scenario <name>
 
 Scenarios:
   1. merops_call_class    — peptidase-only clan census vs. unfiltered (call_class)
-  2. tcdb_attachment_depth — most-specific vs superseded leaf rows (attachment_depth)
+  2. tcdb_gate            — gated TCDB leaf rows vs include_weak_tcdb_hits (tcdb_gate / tcdb_calls)
   3. interpro_enrichment  — interpro_type required on enrichment, then supplied
-  4. trust_filtered_tcdb  — sources/evidence/min_evidence_score before enrichment
+  4. trust_filtered_tcdb  — evidence/max_tier/tcdb_call before enrichment
   5. organism_rollups     — per-organism protease / domain coverage (list_organisms)
 
 Notes:
 - Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`,
   `call_class`) default to `None` and never narrow a result unless set —
   every scenario below runs the unfiltered call first so the delta is visible.
-- `min_evidence_score` is the only numeric cutoff anywhere in this surface.
-  Native per-ontology scalars (evalue, bit_score, confidence_score, ...) are
-  verbose-only and never filterable.
+- `min_evidence_score` is the only numeric cutoff anywhere in this surface,
+  and it is not a TCDB axis. Native per-ontology scalars (evalue, bit_score,
+  identity, ...) are verbose-only and never filterable.
 """
 # CONTENTS
 #   1. scenario_merops_call_class      — peptidase clan census (call_class) (line ~58)
-#   2. scenario_tcdb_attachment_depth  — most-specific vs superseded leaf rows (line ~96)
+#   2. scenario_tcdb_gate              — gated leaf rows vs include_weak_tcdb_hits (line ~96)
 #   3. scenario_interpro_enrichment    — interpro_type required on enrichment (line ~138)
-#   4. scenario_trust_filtered_tcdb    — evidence + min_evidence_score before enrichment (line ~175)
+#   4. scenario_trust_filtered_tcdb    — evidence + max_tier + tcdb_call before enrichment (line ~175)
 #   5. scenario_organism_rollups       — per-organism protease/domain coverage (line ~220)
 from __future__ import annotations
 
@@ -93,46 +93,47 @@ def scenario_merops_call_class() -> None:
     print(f"  by_call_class: {[(c.get('call_class'), c.get('count')) for c in by_call_class]}")
 
 
-def scenario_tcdb_attachment_depth() -> None:
-    """Use this when the user asks 'what's this gene's actual TCDB call' —
-    the deepest attachment, not every ancestor family it also technically
-    belongs to.
+def scenario_tcdb_gate() -> None:
+    """Use this when the user asks 'what is this gene's TCDB call, and how
+    much should I trust it?' — the gated leaf rows, the call kinds behind
+    each, and the weak hits the default leaves out.
 
-    Trust axis: attachment_depth (native detail, TCDB-only) via mode='leaf'
-    and include_superseded.
+    Trust axes: tcdb_gate / tcdb_call / tcdb_calls (compact, TCDB-only) and
+    the include_weak_tcdb_hits switch.
     """
-    print("=== Scenario: tcdb_attachment_depth ===")
-    print("Question class: 'most-specific TCDB call vs every ancestor attachment'")
+    print("=== Scenario: tcdb_gate ===")
+    print("Question class: 'which TCDB calls pass the KG gate, and which are weak hits'")
     print()
 
-    leaf_only = gene_ontology_terms(
-        locus_tags=["PMM0392"],
-        organism="MED4",
-        ontology=["tcdb"],
-        mode="leaf",
+    # cynD: two direct systems; pstS: one system with three agreeing call kinds;
+    # ecfA1: seven eggNOG subfamilies plus weak best hits; thiL: weak hit only.
+    genes = ["PMM0372", "PMM0710", "PMM0125", "PMM0024"]
+
+    gated = gene_ontology_terms(
+        locus_tags=genes, organism="MED4", ontology=["tcdb"], mode="leaf",
     )
-    print("mode='leaf' (default — attachment_depth='most_specific' only):")
-    print(f"  total_matching={leaf_only.get('total_matching')}")
-    for row in leaf_only.get("results", [])[:5]:
-        print(f"    {row.get('term_id'):<16} evidence={row.get('evidence')}")
+    print("mode='leaf' (default — tcdb_gate in direct / annotated only):")
+    print(f"  total_matching={gated.get('total_matching')}")
+    for row in gated.get("results", []):
+        print(f"    {row.get('locus_tag')}  {row.get('term_id'):<18} "
+              f"tcdb_gate={row.get('tcdb_gate'):<9} tcdb_calls={row.get('tcdb_calls')}")
     print()
 
-    with_superseded = gene_ontology_terms(
-        locus_tags=["PMM0392"],
-        organism="MED4",
-        ontology=["tcdb"],
-        mode="leaf",
-        include_superseded=True,
-        # attachment_depth is TCDB native detail — verbose-only on the row.
-        verbose=True,
+    with_weak = gene_ontology_terms(
+        locus_tags=genes, organism="MED4", ontology=["tcdb"], mode="leaf",
+        include_weak_tcdb_hits=True,
     )
-    print("include_superseded=True (adds back less-specific ancestor rows):")
-    print(f"  total_matching={with_superseded.get('total_matching')}")
-    for row in with_superseded.get("results", [])[:5]:
-        print(f"    {row.get('term_id'):<16} attachment_depth={row.get('attachment_depth')}")
+    weak_rows = [r for r in with_weak.get("results", [])
+                 if r.get("tcdb_gate") == "below_gate"]
+    print("include_weak_tcdb_hits=True (adds below_gate rows; default rows unchanged):")
+    print(f"  total_matching={with_weak.get('total_matching')}  added={len(weak_rows)}")
+    for row in weak_rows:
+        print(f"    {row.get('locus_tag')}  {row.get('term_id'):<18} "
+              f"tcdb_gate={row.get('tcdb_gate')} tcdb_call={row.get('tcdb_call')}")
     print()
-    print("'superseded' means less specific, not wrong — a real annotation,")
-    print("just not the gene's deepest call for that lineage.")
+    print("thiL (PMM0024) has no default row: its only TCDB edge is a weak tier-3 hit.")
+    print("diamond_best_hit and diamond_tier come from one DIAMOND run — only eggnog")
+    print("plus a DIAMOND kind in tcdb_calls is independent agreement.")
 
 
 def scenario_interpro_enrichment() -> None:
@@ -174,15 +175,15 @@ def scenario_interpro_enrichment() -> None:
 
 def scenario_trust_filtered_tcdb() -> None:
     """Use this when the user wants a TCDB-based gene set tightened to
-    corroborated homology calls before feeding it into enrichment — the
-    trust-surface analog of substrate_depth=['most_specific'] on the
-    chemistry side (see docs://guide/conventions).
+    DIAMOND homology calls before feeding it into enrichment. The TCDB
+    TERM2GENE is already gated (direct + annotated edges); the trust
+    filters narrow it further, and shape the background identically.
 
-    Trust axes: evidence + min_evidence_score (comparable axes; the only
-    numeric cutoff in the whole surface).
+    Trust axes: evidence + max_tier (comparable axes) and tcdb_call
+    (TCDB-only, compact). min_evidence_score is not a TCDB axis.
     """
     print("=== Scenario: trust_filtered_tcdb ===")
-    print("Question class: 'restrict a hierarchical ontology gene set to corroborated calls'")
+    print("Question class: 'restrict a hierarchical ontology gene set to homology calls'")
     print()
 
     axes = list_filter_values(filter_type="trust_axes", ontology="tcdb")
@@ -190,18 +191,35 @@ def scenario_trust_filtered_tcdb() -> None:
     print()
 
     unfiltered = genes_by_ontology(ontology="tcdb", organism="MED4", level=2)
-    print(f"unfiltered: total_matching={unfiltered.get('total_matching')}")
+    print(f"unfiltered (gated): total_matching={unfiltered.get('total_matching')}")
 
     filtered = genes_by_ontology(
         ontology="tcdb",
         organism="MED4",
         level=2,
         evidence=["homology"],
-        min_evidence_score=0.6,
+        max_tier=2,
     )
-    print(f"evidence=['homology'] AND min_evidence_score=0.6: "
+    print(f"evidence=['homology'] AND max_tier=2: "
           f"total_matching={filtered.get('total_matching')}")
-    print(f"evidence_score_signals: {filtered.get('evidence_score_signals')}")
+
+    best_hits = genes_by_ontology(
+        ontology="tcdb",
+        organism="MED4",
+        level=2,
+        tcdb_call=["diamond_best_hit"],
+    )
+    print(f"tcdb_call=['diamond_best_hit']: "
+          f"total_matching={best_hits.get('total_matching')}  "
+          f"by_tcdb_call={best_hits.get('by_tcdb_call')}")
+    print()
+
+    try:
+        genes_by_ontology(ontology="tcdb", organism="MED4", level=2,
+                          min_evidence_score=0.6)
+        print("(unexpected: min_evidence_score accepted on tcdb)")
+    except ValueError as e:
+        print(f"min_evidence_score on tcdb raises (evidence_score is not a TCDB axis): {e}")
     print()
 
     enrichment = pathway_enrichment(
@@ -210,7 +228,7 @@ def scenario_trust_filtered_tcdb() -> None:
         ontology="tcdb",
         level=2,
         evidence=["homology"],
-        min_evidence_score=0.6,
+        max_tier=2,
     )
     envelope = enrichment.to_envelope(limit=5)
     print(f"pathway_enrichment with the same filters: "
@@ -272,7 +290,7 @@ def scenario_organism_rollups() -> None:
 
 SCENARIOS: dict[str, Callable[[], None]] = {
     "merops_call_class": scenario_merops_call_class,
-    "tcdb_attachment_depth": scenario_tcdb_attachment_depth,
+    "tcdb_gate": scenario_tcdb_gate,
     "interpro_enrichment": scenario_interpro_enrichment,
     "trust_filtered_tcdb": scenario_trust_filtered_tcdb,
     "organism_rollups": scenario_organism_rollups,

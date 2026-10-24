@@ -2,14 +2,8 @@
 # Live ControlledVocabulary values for the properties the docs quote.
 # tests/unit/test_docs_lint.py reads this offline; the -m kg test in
 # tests/integration/test_docs_kg_claims.py asserts it matches the live KG.
-kg_built_at: '2026-10-19T17:03:46.14Z'
+kg_built_at: '2026-10-24T17:33:40.709Z'
 vocabularies:
-  attachment_depth:
-    Gene_has_tcdb_family:
-      closed: true
-      values:
-      - most_specific
-      - superseded
   background_factors:
     ClusteringAnalysis:
       closed: true
@@ -83,6 +77,13 @@ vocabularies:
       - detected
       - not_detected
       - sporadic
+  direction:
+    TcdbFamily:
+      closed: true
+      values:
+      - export
+      - unknown
+      - uptake
   evidence:
     Gene_catalyzes_ec_number:
       closed: true
@@ -331,17 +332,6 @@ vocabularies:
       - defined
       - generic
       - polymer
-  substrate_depth:
-    Tcdb_family_transports_chemical_role:
-      closed: true
-      values:
-      - inherited
-      - most_specific
-    Tcdb_family_transports_metabolite:
-      closed: true
-      values:
-      - inherited
-      - most_specific
   table_scope:
     Experiment:
       closed: true
@@ -351,6 +341,20 @@ vocabularies:
       - significant_any_timepoint
       - significant_only
       - top_n
+  tcdb_call:
+    Gene_has_tcdb_family:
+      closed: true
+      values:
+      - diamond_best_hit
+      - diamond_tier
+      - eggnog
+  tcdb_gate:
+    Gene_has_tcdb_family:
+      closed: true
+      values:
+      - annotated
+      - below_gate
+      - direct
   treatment_type:
     ClusteringAnalysis:
       closed: true

@@ -65,7 +65,10 @@ total_matching, returned, offset, truncated, not_found, by_ontology, links_out_t
 | tc_class_id | string \| None (optional) | Parent TC class, e.g. '3.A' (sparse: tcdb) |
 | member_count | int \| None (optional) | Child/member term count (sparse: tcdb, interpro, merops) |
 | superfamily | string \| None (optional) | TCDB superfamily label (sparse: tcdb) |
-| metabolite_count | int \| None (optional) | Distinct metabolites attached (sparse: tcdb substrates; KEGG pathway chemistry) |
+| tcdb_substrate_count | int \| None (optional) | Distinct substrates curated under this TCDB node, any level (sparse: tcdb). Substrate edges leave tc_system nodes only. |
+| direction | string \| None (optional) | TCDB-stated transport direction: 'uptake' / 'export' / 'unknown' (sparse: tcdb) |
+| direction_basis | string \| None (optional) | How the TCDB direction was assigned (sparse: tcdb; absent when unstated) |
+| metabolite_count | int \| None (optional) | Distinct metabolites attached (sparse: KEGG pathway chemistry) |
 | reaction_count | int \| None (optional) | Reactions mapped to this KEGG pathway (sparse: kegg pathway terms) |
 | cazy_id | string \| None (optional) | CAZy family ID (sparse: cazy) |
 | psortb_id | string \| None (optional) | PSORTb localization ID (sparse: subcellular_localization) |
@@ -120,9 +123,9 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
     {"ontology": "ncbifam", "count": 1},
     {"ontology": "go_bp", "count": 1}
   ],
-  "links_out_total": 137,
+  "links_out_total": 20,
   "by_link_kind": [
-    {"link_kind": "composition", "count": 129},
+    {"link_kind": "composition", "count": 12},
     {"link_kind": "router", "count": 7},
     {"link_kind": "membership", "count": 1}
   ],
@@ -138,60 +141,62 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
       "level": 2,
       "level_kind": "tc_family",
       "is_informative": true,
-      "gene_count": 4900,
+      "gene_count": 3933,
       "organism_count": 43,
-      "direct_gene_count": 3910,
+      "direct_gene_count": 649,
       "tcdb_id": "3.A.1",
       "tc_class_id": "tcdb:3",
-      "member_count": 55,
+      "member_count": 98,
       "superfamily": "ArsA ATPase (ArsA) Superfamily",
-      "metabolite_count": 518,
+      "tcdb_substrate_count": 551,
+      "direction": "unknown",
+      "direction_basis": null,
       "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters", "level": 1}],
       "children": [
         {"id": "tcdb:3.A.1.1", "name": "The Carbohydrate Uptake Transporter-1 (CUT1) Family", "level": 3},
         {"id": "tcdb:3.A.1.10", "name": "The Ferric Iron Uptake Transporter (FeT) Family", "level": 3},
         {"id": "tcdb:3.A.1.101", "name": "The Capsular Polysaccharide Exporter (CPSE) Family", "level": 3},
+        {"id": "tcdb:3.A.1.102", "name": "The Lipooligosaccharide Exporter (LOSE) Family", "level": 3},
         {"id": "tcdb:3.A.1.103", "name": "The Lipopolysaccharide Exporter (LPSE) Family", "level": 3},
-        {"id": "tcdb:3.A.1.105", "name": "The Drug Exporter-1 (DrugE1) Family", "level": 3},
         ...
       ],
-      "children_total": 55,
+      "children_total": 98,
       "children_truncated": true,
       "links_out": [
         {
-          "rel": "Tcdb_family_located_in_cellular_component",
+          "rel": "Tcdb_family_enables_molecular_function",
           "link_kind": "composition",
-          "target_id": "go:0000139",
-          "target_ontology": "go_cc",
-          "target_name": "Golgi membrane"
+          "target_id": "go:0005524",
+          "target_ontology": "go_mf",
+          "target_name": "ATP binding"
         },
         {
           "rel": "Tcdb_family_located_in_cellular_component",
           "link_kind": "composition",
-          "target_id": "go:0000324",
+          "target_id": "go:0005886",
           "target_ontology": "go_cc",
-          "target_name": "fungal-type vacuole"
+          "target_name": "plasma membrane"
         },
         {
           "rel": "Tcdb_family_located_in_cellular_component",
           "link_kind": "composition",
-          "target_id": "go:0000329",
+          "target_id": "go:0016020",
           "target_ontology": "go_cc",
-          "target_name": "fungal-type vacuole membrane"
-        },
-        {
-          "rel": "Tcdb_family_involved_in_biological_process",
-          "link_kind": "composition",
-          "target_id": "go:0002790",
-          "target_ontology": "go_bp",
-          "target_name": "peptide secretion"
+          "target_name": "membrane"
         },
         {
           "rel": "Tcdb_family_enables_molecular_function",
           "link_kind": "composition",
-          "target_id": "go:0004888",
+          "target_id": "go:0016887",
           "target_ontology": "go_mf",
-          "target_name": "transmembrane signaling receptor activity"
+          "target_name": "ATP hydrolysis activity"
+        },
+        {
+          "rel": "Tcdb_family_involved_in_biological_process",
+          "link_kind": "composition",
+          "target_id": "go:0030153",
+          "target_ontology": "go_bp",
+          "target_name": "bacteriocin immunity"
         },
         ...
       ]
@@ -371,8 +376,8 @@ ontology_term_details(term_ids=["tcdb:3.A.1"], link_kinds=["composition"])
   "truncated": false,
   "not_found": [],
   "by_ontology": [{"ontology": "tcdb", "count": 1}],
-  "links_out_total": 128,
-  "by_link_kind": [{"link_kind": "composition", "count": 128}],
+  "links_out_total": 11,
+  "by_link_kind": [{"link_kind": "composition", "count": 11}],
   "resolved_aliases": {},
   "warnings": [],
   "results": [
@@ -385,60 +390,62 @@ ontology_term_details(term_ids=["tcdb:3.A.1"], link_kinds=["composition"])
       "level": 2,
       "level_kind": "tc_family",
       "is_informative": true,
-      "gene_count": 4900,
+      "gene_count": 3933,
       "organism_count": 43,
-      "direct_gene_count": 3910,
+      "direct_gene_count": 649,
       "tcdb_id": "3.A.1",
       "tc_class_id": "tcdb:3",
-      "member_count": 55,
+      "member_count": 98,
       "superfamily": "ArsA ATPase (ArsA) Superfamily",
-      "metabolite_count": 518,
+      "tcdb_substrate_count": 551,
+      "direction": "unknown",
+      "direction_basis": null,
       "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters", "level": 1}],
       "children": [
         {"id": "tcdb:3.A.1.1", "name": "The Carbohydrate Uptake Transporter-1 (CUT1) Family", "level": 3},
         {"id": "tcdb:3.A.1.10", "name": "The Ferric Iron Uptake Transporter (FeT) Family", "level": 3},
         {"id": "tcdb:3.A.1.101", "name": "The Capsular Polysaccharide Exporter (CPSE) Family", "level": 3},
+        {"id": "tcdb:3.A.1.102", "name": "The Lipooligosaccharide Exporter (LOSE) Family", "level": 3},
         {"id": "tcdb:3.A.1.103", "name": "The Lipopolysaccharide Exporter (LPSE) Family", "level": 3},
-        {"id": "tcdb:3.A.1.105", "name": "The Drug Exporter-1 (DrugE1) Family", "level": 3},
         ...
       ],
-      "children_total": 55,
+      "children_total": 98,
       "children_truncated": true,
       "links_out": [
         {
-          "rel": "Tcdb_family_located_in_cellular_component",
+          "rel": "Tcdb_family_enables_molecular_function",
           "link_kind": "composition",
-          "target_id": "go:0000139",
-          "target_ontology": "go_cc",
-          "target_name": "Golgi membrane"
+          "target_id": "go:0005524",
+          "target_ontology": "go_mf",
+          "target_name": "ATP binding"
         },
         {
           "rel": "Tcdb_family_located_in_cellular_component",
           "link_kind": "composition",
-          "target_id": "go:0000324",
+          "target_id": "go:0005886",
           "target_ontology": "go_cc",
-          "target_name": "fungal-type vacuole"
+          "target_name": "plasma membrane"
         },
         {
           "rel": "Tcdb_family_located_in_cellular_component",
           "link_kind": "composition",
-          "target_id": "go:0000329",
+          "target_id": "go:0016020",
           "target_ontology": "go_cc",
-          "target_name": "fungal-type vacuole membrane"
-        },
-        {
-          "rel": "Tcdb_family_involved_in_biological_process",
-          "link_kind": "composition",
-          "target_id": "go:0002790",
-          "target_ontology": "go_bp",
-          "target_name": "peptide secretion"
+          "target_name": "membrane"
         },
         {
           "rel": "Tcdb_family_enables_molecular_function",
           "link_kind": "composition",
-          "target_id": "go:0004888",
+          "target_id": "go:0016887",
           "target_ontology": "go_mf",
-          "target_name": "transmembrane signaling receptor activity"
+          "target_name": "ATP hydrolysis activity"
+        },
+        {
+          "rel": "Tcdb_family_involved_in_biological_process",
+          "link_kind": "composition",
+          "target_id": "go:0030153",
+          "target_ontology": "go_bp",
+          "target_name": "bacteriocin immunity"
         },
         ...
       ]
@@ -564,7 +571,7 @@ ontology_term_details(term_ids=["interpro:IPR000362"], verbose=True)
 ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", verbose=True)
 ```
 
-*With organism= set ('MED4' resolves to 'Prochlorococcus MED4'), compact rows gain organism_gene_count (subtree count, term + descendants — the same number search_ontology(organism=...) shows: 65 for tcdb:3.A.1 on both tools) and the verbose genes_by_organism[] holds only that organism.*
+*With organism= set ('MED4' resolves to 'Prochlorococcus MED4'), compact rows gain organism_gene_count (subtree count, term + descendants — the same number search_ontology(organism=...) shows: 52 for tcdb:3.A.1 on both tools, gated TCDB edges only) and the verbose genes_by_organism[] holds only that organism.*
 
 ```example-response
 {
@@ -574,8 +581,8 @@ ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", ve
   "truncated": false,
   "not_found": [],
   "by_ontology": [{"ontology": "go_bp", "count": 1}, {"ontology": "tcdb", "count": 1}],
-  "links_out_total": 128,
-  "by_link_kind": [{"link_kind": "composition", "count": 128}],
+  "links_out_total": 11,
+  "by_link_kind": [{"link_kind": "composition", "count": 11}],
   "resolved_aliases": {},
   "warnings": [],
   "results": [
@@ -621,89 +628,91 @@ ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", ve
       "level": 2,
       "level_kind": "tc_family",
       "is_informative": true,
-      "gene_count": 4900,
+      "gene_count": 3933,
       "organism_count": 43,
-      "direct_gene_count": 3910,
-      "organism_gene_count": 65,
+      "direct_gene_count": 649,
+      "organism_gene_count": 52,
       "tcdb_id": "3.A.1",
       "tc_class_id": "tcdb:3",
-      "member_count": 55,
+      "member_count": 98,
       "superfamily": "ArsA ATPase (ArsA) Superfamily",
-      "metabolite_count": 518,
+      "tcdb_substrate_count": 551,
+      "direction": "unknown",
+      "direction_basis": null,
       "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters", "level": 1}],
       "children": [
         {"id": "tcdb:3.A.1.1", "name": "The Carbohydrate Uptake Transporter-1 (CUT1) Family", "level": 3},
         {"id": "tcdb:3.A.1.10", "name": "The Ferric Iron Uptake Transporter (FeT) Family", "level": 3},
         {"id": "tcdb:3.A.1.101", "name": "The Capsular Polysaccharide Exporter (CPSE) Family", "level": 3},
+        {"id": "tcdb:3.A.1.102", "name": "The Lipooligosaccharide Exporter (LOSE) Family", "level": 3},
         {"id": "tcdb:3.A.1.103", "name": "The Lipopolysaccharide Exporter (LPSE) Family", "level": 3},
-        {"id": "tcdb:3.A.1.105", "name": "The Drug Exporter-1 (DrugE1) Family", "level": 3},
         ...
       ],
-      "children_total": 55,
+      "children_total": 98,
       "children_truncated": true,
       "links_out": [
         {
+          "rel": "Tcdb_family_enables_molecular_function",
+          "link_kind": "composition",
+          "target_id": "go:0005524",
+          "target_ontology": "go_mf",
+          "target_name": "ATP binding",
+          "props": {"id": "3.A.1-has_go-GO:0005524", "curated_tcids": ["3.A.1.118.1", "3.A.1.138.1"]}
+        },
+        {
           "rel": "Tcdb_family_located_in_cellular_component",
           "link_kind": "composition",
-          "target_id": "go:0000139",
+          "target_id": "go:0005886",
           "target_ontology": "go_cc",
-          "target_name": "Golgi membrane",
+          "target_name": "plasma membrane",
+          "props": {"id": "3.A.1-has_go-GO:0005886", "curated_tcids": ["3.A.1.118.1", "3.A.1.155.1", "3.A.1.155.3"]}
+        },
+        {
+          "rel": "Tcdb_family_located_in_cellular_component",
+          "link_kind": "composition",
+          "target_id": "go:0016020",
+          "target_ontology": "go_cc",
+          "target_name": "membrane",
           "props": {
-            "id": "3.A.1-has_go-GO:0000139",
-            "curated_tcids": ["3.A.1.201.13", "3.A.1.201.50", "3.A.1.204.12", "3.A.1.211.10", "3.A.1.211.9"]
+            "id": "3.A.1-has_go-GO:0016020",
+            "curated_tcids": ["3.A.1.155.2", "3.A.1.207.1", "3.A.1.207.2", "3.A.1.207.3", "3.A.1.207.4"]
           }
-        },
-        {
-          "rel": "Tcdb_family_located_in_cellular_component",
-          "link_kind": "composition",
-          "target_id": "go:0000324",
-          "target_ontology": "go_cc",
-          "target_name": "fungal-type vacuole",
-          "props": {"id": "3.A.1-has_go-GO:0000324", "curated_tcids": ["3.A.1.208.12"]}
-        },
-        {
-          "rel": "Tcdb_family_located_in_cellular_component",
-          "link_kind": "composition",
-          "target_id": "go:0000329",
-          "target_ontology": "go_cc",
-          "target_name": "fungal-type vacuole membrane",
-          "props": {"id": "3.A.1-has_go-GO:0000329", "curated_tcids": ["3.A.1.208.16", "3.A.1.208.18", "3.A.1.210.2"]}
-        },
-        {
-          "rel": "Tcdb_family_involved_in_biological_process",
-          "link_kind": "composition",
-          "target_id": "go:0002790",
-          "target_ontology": "go_bp",
-          "target_name": "peptide secretion",
-          "props": {"id": "3.A.1-has_go-GO:0002790", "curated_tcids": ["3.A.1.211.1"]}
         },
         {
           "rel": "Tcdb_family_enables_molecular_function",
           "link_kind": "composition",
-          "target_id": "go:0004888",
+          "target_id": "go:0016887",
           "target_ontology": "go_mf",
-          "target_name": "transmembrane signaling receptor activity",
-          "props": {"id": "3.A.1-has_go-GO:0004888", "curated_tcids": ["3.A.1.204.1"]}
+          "target_name": "ATP hydrolysis activity",
+          "props": {"id": "3.A.1-has_go-GO:0016887", "curated_tcids": ["3.A.1.138.1"]}
+        },
+        {
+          "rel": "Tcdb_family_involved_in_biological_process",
+          "link_kind": "composition",
+          "target_id": "go:0030153",
+          "target_ontology": "go_bp",
+          "target_name": "bacteriocin immunity",
+          "props": {"id": "3.A.1-has_go-GO:0030153", "curated_tcids": ["3.A.1.118.1"]}
         },
         ...
       ],
       "properties": {
         "level_kind": "tc_family",
         "tcdb_id": "3.A.1",
-        "gene_count": 4900,
-        "member_count": 55,
-        "direct_gene_count": 3910,
+        "gene_count": 3933,
+        "member_count": 98,
+        "direct_gene_count": 649,
         "superfamily": "ArsA ATPase (ArsA) Superfamily",
+        "direction": "unknown",
+        "tcdb_substrate_count": 551,
         "preferred_id": "tcdb",
         "id": "tcdb:3.A.1",
         "tc_class_id": "tcdb:3",
         "level": 2,
         "organism_count": 43,
-        "name": "The ATP-binding Cassette (ABC) Superfamily",
-        "metabolite_count": 518,
-        "substrate_breadth": "lumping"
+        "name": "The ATP-binding Cassette (ABC) Superfamily"
       },
-      "genes_by_organism": [{"organism": "Prochlorococcus MED4", "gene_count": 65}]
+      "genes_by_organism": [{"organism": "Prochlorococcus MED4", "gene_count": 52}]
     }
   ]
 }
@@ -768,6 +777,8 @@ discussed_by_publication(publication_dois=[...]) → ontology_term_details(term_
 
 - `member_count` (TCDB, MEROPS, InterPro) is the upstream database's family size, not a KG gene count.
 
+- TCDB rows carry `tcdb_substrate_count` (distinct substrates TCDB curates on the systems in the node's subtree; substrate edges leave `tc_system` nodes only, so a family's own range is the sum below it), `direction` (`uptake` / `export` / `unknown`, TCDB-stated: ABC numbering or the nearest named node up to family level) and sparse `direction_basis`. Use `tcdb_substrate_count` to see how broad a family call is before trusting a family walk: the ABC superfamily tcdb:3.A.1 reads 551. Many children are range-only (`gene_count = 0`): curated systems no KG gene is called to.
+
 - A compact column that is missing on the node is absent, not null: GO rows carry only `direct_gene_count` from their compact extras, Pfam rows `short_name`, KEGG `reaction_count` / `metabolite_count` only on pathway terms (absent on KO / module rows). Do not treat an absent key as `0`.
 
 - `limit` / `offset` page the *found* rows (input order); `total_matching` counts found terms, not input IDs. Default `limit=50`: a batch with more than 50 found IDs comes back `truncated: true` with the first 50 — pass `limit=None` (or a larger limit) or page with `offset`; `not_found` is always complete regardless of paging. There is no `summary` mode.
@@ -776,7 +787,7 @@ discussed_by_publication(publication_dois=[...]) → ontology_term_details(term_
 
 - `organism=` scopes `genes_by_organism` (verbose) and adds `organism_gene_count` to compact rows; it does not filter rows out — a term with zero genes in that organism still returns with `organism_gene_count: 0`. The name resolves like every other tool (`'MED4'` → `'Prochlorococcus MED4'`; unknown or ambiguous raises).
 
-- `organism_gene_count` is the subtree count (term + descendants, same scope as `gene_count`), identical to `search_ontology(organism=...).organism_gene_count` (`tcdb:3.A.1` in MED4: 65 on both). The node-local number is `direct_gene_count` (hierarchical labels only).
+- `organism_gene_count` is the subtree count (term + descendants, same scope as `gene_count`), identical to `search_ontology(organism=...).organism_gene_count` (`tcdb:3.A.1` in MED4: 52 on both). The node-local number is `direct_gene_count` (hierarchical labels only).
 
 ```mistake
 Assuming a bare accession ('3.A.1', 'ko00910') fails — it works via alias coercion (see `resolved_aliases`)

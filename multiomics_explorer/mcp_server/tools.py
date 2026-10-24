@@ -58,6 +58,7 @@ from multiomics_explorer.mcp_server.params import (  # noqa: E402
     PublicationDoisRequiredParam,
     SourcesParam,
     SummaryParam,
+    TcdbCallParam,
     TreatmentTypeParam,
     VerboseParam,
 )
@@ -365,7 +366,7 @@ class PathwayEnrichmentResponse(BaseModel):
     )
     trust_axes: dict = Field(
         default_factory=dict,
-        description="Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','evidence_score','tier']}.",
+        description="Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','tier']} (TCDB has no evidence_score).",
     )
     background_filtered: bool = Field(
         default=False,
@@ -512,7 +513,7 @@ class ClusterEnrichmentResponse(BaseModel):
     )
     trust_axes: dict = Field(
         default_factory=dict,
-        description="Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','evidence_score','tier']}.",
+        description="Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','tier']} (TCDB has no evidence_score).",
     )
     background_filtered: bool = Field(
         default=False,
@@ -549,8 +550,8 @@ class MetaboliteResult(SparseRow):
     mass: float | None = Field(default=None, description="Monoisotopic mass in Da (e.g. 180.156). Null on a minority of metabolites.")
     catalyst_gene_count: int = Field(default=0, description="Distinct catalyst genes via Gene → Reaction → Metabolite (catalysis arm only). Transport-only metabolites read 0 here with transporter_gene_count > 0; evidence_sources==['metabolomics'] means no gene path at all. Drill in via genes_by_metabolite.")
     organism_count: int = Field(default=0, description="Distinct organisms reaching this metabolite via KEGG reactions or TCDB transport only; GO reach is go_transport_organism_count. The organism_names filter matches either.")
-    transporter_count: int = Field(default=0, description="Distinct transporter systems (TcdbFamily nodes) whose substrate edge to this metabolite is substrate_depth='most_specific'. Systems, not genes — pair with transporter_gene_count and catalyst_gene_count; drill via genes_by_metabolite.")
-    transporter_gene_count: int = Field(default=0, description="Distinct genes (all organisms) whose deepest TCDB attachment transports this metabolite (precomputed Metabolite.transporter_gene_count). catalyst_gene_count=0 with transporter_gene_count>0 = transport-only; drill via genes_by_metabolite.")
+    transporter_count: int = Field(default=0, description="Distinct TCDB systems curated with this metabolite that some gene points at directly (tcdb_gate='direct'). Systems, not genes — pair with transporter_gene_count and catalyst_gene_count; drill via genes_by_metabolite.")
+    transporter_gene_count: int = Field(default=0, description="Distinct genes (all organisms) with a direct TCDB system curated with this metabolite (precomputed Metabolite.transporter_gene_count). catalyst_gene_count=0 with transporter_gene_count>0 = transport-only; drill via genes_by_metabolite.")
     evidence_sources: list[str] = Field(default_factory=list, description="Path provenance, any of 'metabolism', 'transport', 'metabolomics', 'go_transport' (e.g. ['metabolism', 'transport']). Definitions: list_filter_values(filter_type='evidence_source').")
     go_transport_organism_names: list[str] | None = Field(default=None, description="Organisms with a gene directly annotated to a GO transport term for this target. Absent = no directly annotated gene path, not 'no GO transport edge'. Drill via genes_by_metabolite(evidence_sources=['go_transport']).")
     go_transport_organism_count: int | None = Field(default=None, description="Number of organisms in go_transport_organism_names. Absent = no directly annotated gene path, not 'no GO transport edge'.")
@@ -680,14 +681,15 @@ class ListMetabolitesResponse(BaseModel):
 class GeneReactionMetaboliteTriplet(SparseRow):
     """Shared row class for genes_by_metabolite and metabolites_by_gene.
 
-    Compact mode: 18 fields (e.g. on a transport row) including
-    evidence_source, substrate_depth and tcdb_evidence_score. Verbose mode
-    adds 9 more. All
+    Compact mode carries evidence_source plus the per-arm fields (a
+    transport row adds tcdb_route, tcdb_calls, tcdb_identity,
+    tcdb_direction, attached_tcdb_id). Verbose mode adds 9 more. All
     per-arm-specific fields are Optional and explicitly `None` on rows
-    from the other arm — every row carries identical keys. Transport rows
-    are deepest-attachment projections (a gene attached to a family AND
-    one of its descendants contributes rows only via the descendant), so
-    row sets agree with the KG's precomputed transport counts.
+    from the other arm — every row carries identical keys. Direct transport
+    rows read only `tcdb_gate='direct'` edges onto TCDB systems, one row
+    per (gene, system, metabolite), so row sets agree with the KG's
+    precomputed transport counts. Family rows (opt-in walk) are a recall
+    expansion and sort after direct rows.
 
     Reaction edges are undirected AND carry no reversibility flag —
     interpret all reaction-arm rows as 'involved in', never 'produces' /
@@ -705,29 +707,43 @@ class GeneReactionMetaboliteTriplet(SparseRow):
         "label, e.g. 'ABC-type urea transporter, ATPase component UrtE').")
 
     evidence_source: Literal["metabolism", "transport", "go_transport"] = Field(
-        description="Path through which this row reaches the metabolite. "
-        "'metabolism' = `Gene → Reaction → Metabolite`. 'transport' = "
-        "`Gene → TcdbFamily → Metabolite` via the gene's deepest TCDB "
-        "attachments only. 'go_transport' = `Gene → GO term → target`. Metabolomics evidence has no gene anchor here.")
-    substrate_depth: Literal["most_specific", "inherited"] | None = Field(
+        description="Path to the metabolite: 'metabolism' = `Gene → "
+        "Reaction → Metabolite`; 'transport' = `Gene → TCDB node → "
+        "Metabolite` (see `tcdb_route`); 'go_transport' = `Gene → GO term → "
+        "target`. Metabolomics has no gene anchor here.")
+    tcdb_route: Literal["direct", "family"] | None = Field(
         default=None,
-        description="Transport rows only (None on metabolism rows). "
-        "'most_specific' = this family is the most specific surviving "
-        "transporter node for this substrate, relative to the gene-pruned "
-        "hierarchy — not a curation level. 'inherited' = rolled up from a "
-        "descendant.")
-    tcdb_evidence_score: float | None = Field(
+        description="Transport rows only. 'direct' = the gene's "
+        "tcdb_gate='direct' edge onto a TCDB system curated with the "
+        "metabolite. 'family' = opt-in walk (include_tcdb_family_substrates) "
+        "from a family / subfamily call down to its systems.")
+    tcdb_calls: list[str] | None = Field(
         default=None,
-        description="Transport rows only (None on metabolism rows). "
-        "KG 5-signal composite for the gene×family call, in [0,1]. Rank "
-        "with it, don't filter: 0 = uncorroborated DIAMOND hit, not "
-        "absent. Rows within a depth tier sort by it desc.")
-    transport_substrate_resolution: Literal["resolved", "family_inferred"] | None = Field(
+        description="Transport rows only. Call kinds on the gene's gated "
+        "TCDB edges along the row node's lineage, in precedence order (e.g. "
+        "['diamond_best_hit', 'eggnog']). The two diamond kinds are one "
+        "source; only eggnog + diamond is independent agreement.")
+    tcdb_identity: float | None = Field(
         default=None,
-        description="Transport rows only. The gene's TCDB substrate "
-        "resolution, repeated per row (not a per-substrate fact): 'resolved' "
-        "= a deepest attachment is non-lumping (TcdbFamily.substrate_breadth); "
-        "'family_inferred' = reachability, not capability.")
+        description="Transport rows only. Percent identity of the row's "
+        "representative TCDB edge (best hit > tier > eggnog); on family "
+        "rows the gene's edge to the attached node. Null when that edge is "
+        "eggnog. Rank within a route by it.")
+    tcdb_direction: Literal["uptake", "export", "unknown"] | None = Field(
+        default=None,
+        description="Transport rows only. TCDB-stated `direction` of the "
+        "row's node (the system; on family rows the attached node). "
+        "Node-level, not a per-gene fact.")
+    attached_tcdb_id: str | None = Field(
+        default=None,
+        description="Transport rows only. The TC node the gene's edge points "
+        "at (e.g. 'tcdb:3.A.1.9'). Equals `tcdb_family_id` on direct and "
+        "family rows.")
+    tcdb_substrate_system_count: int | None = Field(
+        default=None,
+        description="Family rows only (null on direct rows): number of "
+        "descendant TCDB systems of the attached node curated with this "
+        "metabolite (e.g. 5).")
 
     # metabolism-arm fields (None on transport rows)
     reaction_id: str | None = Field(
@@ -756,10 +772,10 @@ class GeneReactionMetaboliteTriplet(SparseRow):
         "Transport rows only.")
     tcdb_family_name: str | None = Field(
         default=None,
-        description="TCDB family name. For tc_family-level entries this is "
-        "human-readable (e.g. 'The ATP-binding Cassette (ABC) Superfamily'); "
-        "for tc_subfamily / tc_specificity it falls back to the tcdb_id. "
-        "Transport rows only.")
+        description="Name of `tcdb_family_id` (the system on direct rows, "
+        "the attached family / subfamily on family rows), e.g. 'High "
+        "affinity phosphate-specific transporter, PstABCS'. Transport rows "
+        "only.")
 
     # GO-transport-arm fields (None on metabolism / transport rows)
     go_term_id: str | None = Field(
@@ -852,12 +868,11 @@ class GeneReactionMetaboliteTriplet(SparseRow):
         default=None,
         description="Rhea reaction cross-refs. Verbose, metabolism rows only.")
     tcdb_level_kind: Literal["tc_class", "tc_subclass", "tc_family",
-                             "tc_subfamily", "tc_specificity"] | None = Field(
+                             "tc_subfamily", "tc_system"] | None = Field(
         default=None,
-        description="TCDB hierarchy level of the annotated family "
-        "(ontology convention). Verbose, transport rows only. Does NOT "
-        "drive `substrate_depth` — a family-level node can be "
-        "'most_specific' for a substrate.")
+        description="TCDB hierarchy level of `tcdb_family_id` (ontology "
+        "convention): always 'tc_system' on direct rows; 'tc_family' / "
+        "'tc_subfamily' on family rows. Verbose, transport rows only.")
     tc_class_id: str | None = Field(
         default=None,
         description="TCDB class ancestor (e.g. 'tcdb:3' for Primary Active "
@@ -922,18 +937,19 @@ class GbmByMetabolite(SparseRow):
         "metabolite is reachable only via metabolism / GO transport.")
     metabolism_rows: int = Field(
         description="Row count for the metabolism arm.")
-    transport_most_specific_rows: int = Field(
-        description="Transport rows with `substrate_depth='most_specific'` "
-        "(family is the most specific surviving transporter node for this "
-        "substrate in the gene-pruned hierarchy).")
-    transport_inherited_rows: int = Field(
-        description="Transport rows with `substrate_depth='inherited'` "
-        "(substrate rolled up from a descendant family — reachability, "
-        "not a capability claim for this gene).")
+    tcdb_direct_rows: int = Field(
+        default=0,
+        description="Transport rows with `tcdb_route='direct'` (a direct "
+        "gene edge onto a TCDB system curated with the metabolite).")
+    tcdb_family_rows: int = Field(
+        default=0,
+        description="Transport rows with `tcdb_route='family'` (opt-in "
+        "family walk; 0 unless include_tcdb_family_substrates=True). A "
+        "recall expansion, not a capability claim.")
     go_transport_rows: int = Field(
         default=0,
         description="GO route (go_transport) rows in the filtered slice. "
-        "`rows` = metabolism + transport tiers + this.")
+        "`rows` = metabolism + TCDB direct + TCDB family + this.")
     multi_source_gene_count: int = Field(
         default=0,
         description="Genes reaching this metabolite through >=2 evidence "
@@ -963,19 +979,17 @@ class GbmByEvidenceSource(BaseModel):
         description="Row count for this evidence_source in the filtered slice.")
 
 
-class GbmBySubstrateDepth(BaseModel):
-    """Frequency rollup over `substrate_depth` for transport rows only.
+class GbmByTcdbRoute(BaseModel):
+    """Frequency rollup over `tcdb_route` for transport rows only.
 
-    ≤2 entries — `most_specific` and/or `inherited`. Metabolism rows are
-    excluded from this rollup (their `substrate_depth` is None).
+    ≤2 entries — `direct` then `family` (family only when
+    include_tcdb_family_substrates=True). Metabolism / GO rows excluded.
     """
-    substrate_depth: Literal["most_specific", "inherited"] = Field(
-        description="Edge-level depth: 'most_specific' = most specific "
-        "surviving transporter node for the substrate in the gene-pruned "
-        "hierarchy (not a curation level); 'inherited' = rolled up from a "
-        "descendant family.")
+    tcdb_route: Literal["direct", "family"] = Field(
+        description="'direct' = gene's direct edge onto a TCDB system; "
+        "'family' = opt-in walk from a family / subfamily call.")
     count: int = Field(
-        description="Transport-row count for this substrate_depth in the "
+        description="Transport-row count for this tcdb_route in the "
         "filtered slice.")
 
 
@@ -1004,20 +1018,22 @@ class GbmTopTcdbFamily(BaseModel):
     tcdb_family_name: str = Field(
         description="Display name. For tc_family-level entries this is "
         "human-readable (e.g. 'The ATP-binding Cassette (ABC) Superfamily'); "
-        "for tc_subfamily / tc_specificity levels it falls back to the "
+        "for tc_subfamily / tc_system levels it falls back to the "
         "`tcdb_id` value.")
     level_kind: str = Field(
-        description="One of tc_class / tc_subclass / tc_family / "
-        "tc_subfamily / tc_specificity (ontology convention; does not "
-        "determine `substrate_depth`).")
-    substrate_depth: Literal["most_specific", "inherited"] = Field(
-        description="Depth of this family's substrate edges in the slice: "
-        "'most_specific' = most specific surviving transporter node for "
-        "the substrate (gene-pruned hierarchy, not a curation level); "
-        "'inherited' = rolled up from a descendant.")
+        description="One of tc_family / tc_subfamily / tc_system (ontology "
+        "convention): tc_system on direct rows, tc_family / tc_subfamily "
+        "on family-walk rows.")
+    tcdb_route: Literal["direct", "family"] = Field(
+        description="Route of this node's rows: 'direct' (a system the "
+        "genes point at directly) or 'family' (opt-in family walk start).")
+    direction: Literal["uptake", "export", "unknown"] | None = Field(
+        default=None,
+        description="TCDB-stated `direction` of the node (node-level, not "
+        "per gene).")
     gene_count: int = Field(
-        description="Distinct genes deepest-attached to this TCDB family "
-        "in the filtered transport-row slice.")
+        description="Distinct genes with rows through this TCDB node in "
+        "the filtered transport-row slice.")
     metabolite_count: int = Field(
         description="Distinct input metabolites this family transports.")
 
@@ -1054,35 +1070,29 @@ class GbmTopGene(BaseModel):
         "arm.")
     metabolism_rows: int = Field(
         description="Metabolism-arm row count for this gene.")
-    transport_most_specific_rows: int = Field(
-        description="Transport-arm rows for this gene with "
-        "`substrate_depth='most_specific'`.")
-    transport_inherited_rows: int = Field(
-        description="Transport-arm rows for this gene with "
-        "`substrate_depth='inherited'` (rolled up from a descendant "
-        "family).")
+    tcdb_direct_rows: int = Field(
+        default=0,
+        description="Transport rows with `tcdb_route='direct'` (a direct "
+        "gene edge onto a TCDB system curated with the metabolite).")
+    tcdb_family_rows: int = Field(
+        default=0,
+        description="Transport rows with `tcdb_route='family'` (opt-in "
+        "family walk; 0 unless include_tcdb_family_substrates=True). A "
+        "recall expansion, not a capability claim.")
     go_transport_rows: int = Field(
         default=0,
         description="GO route (go_transport) rows in the filtered slice. "
-        "`rows` = metabolism + transport tiers + this.")
+        "`rows` = metabolism + TCDB direct + TCDB family + this.")
     multi_source_metabolite_count: int = Field(
         default=0,
         description="Metabolites this gene reaches through >=2 evidence "
         "sources (see by_evidence_source_combination). Correlated routes "
         "(shared homology): raises confidence, does not prove.")
-    transport_substrate_resolution: str | None = Field(
+    tcdb_assignment_count: int | None = Field(
         default=None,
-        description="Gene-level `Gene.transport_substrate_resolution`: "
-        "'resolved' = a deepest attachment is non-lumping "
-        "(`TcdbFamily.substrate_breadth`); 'family_inferred' = "
-        "substrate breadth is reachability, not capability. None = no TCDB "
-        "call.")
-    tcdb_evidence_score_max: float | None = Field(
-        default=None,
-        description="Gene-level max of the KG 5-signal composite "
-        "`evidence_score` over its TCDB calls, in [0,1]. Rank, don't "
-        "filter; 0 = uncorroborated DIAMOND hit. None = no TCDB call "
-        "(never a sentinel).")
+        description="KG precompute `Gene.tcdb_assignment_count`: distinct "
+        "gated TCDB targets of the gene, minus any that is an ancestor of "
+        "another. 0 = no gated TCDB call.")
 
 
 class RowsByGoTermDepth(BaseModel):
@@ -1102,11 +1112,42 @@ class EvidenceSourceCombination(BaseModel):
     """
     evidence_sources: list[Literal["metabolism", "transport", "go_transport"]] = Field(
         description="Sorted set of arms with >=1 row for the pair (e.g. "
-        "['go_transport', 'transport']). Transport counts once regardless "
-        "of substrate_depth.")
+        "['go_transport', 'transport']). Transport counts once whatever "
+        "its tcdb_route; family rows join only when "
+        "include_tcdb_family_substrates=True.")
     pair_count: int = Field(
         description="Distinct (gene, metabolite_id) pairs reached by exactly "
         "this set of sources in the filtered slice (e.g. 5).")
+
+
+class TcdbFamilySubstratesNotShown(BaseModel):
+    """What include_tcdb_family_substrates=True would add (shared by
+    genes_by_metabolite and metabolites_by_gene), after the walk start
+    rules, the breadth cap and the dedupe against direct rows."""
+    genes: int = Field(
+        default=0,
+        description="Distinct genes the family walk would add (e.g. 4 for "
+        "orthophosphate in MED4: phnC, phnD, phnE, PMM0717).")
+    metabolites: int = Field(
+        default=0,
+        description="Distinct metabolites the family walk would add.")
+    rows: int = Field(
+        default=0,
+        description="Family rows (gene x attached node x metabolite) the "
+        "walk would add.")
+
+
+class TcdbFamilySubstrateSkipped(BaseModel):
+    """A family-walk start removed by the breadth cap: the gene's TCDB call
+    is superfamily-level and its substrate is unknown."""
+    locus_tag: str = Field(
+        description="Gene locus tag (e.g. 'PMM0234').")
+    tcdb_id: str = Field(
+        description="The capped start node (e.g. 'tcdb:3.A.1', the ABC "
+        "superfamily). Inspect its range via ontology_term_details.")
+    tcdb_substrate_count: int = Field(
+        description="Substrates curated under the node (e.g. 551); above "
+        "the 200-substrate walk cap.")
 
 
 class GbmNotFound(BaseModel):
@@ -1144,14 +1185,10 @@ class GenesByMetaboliteResponse(BaseModel):
         description="True when `offset + limit < total_matching`.")
     warnings: list[str] = Field(
         default_factory=list,
-        description="Diagnostic strings. Currently emitted: inherited-"
-        "dominance auto-warning when `substrate_depth='inherited'` rows "
-        "are the transport-arm majority and `substrate_depth` was not set "
-        "explicitly; a removed-metabolite or chemical-role id (kept in "
-        "not_found, with where to look instead); a `gene_categories` "
-        "value not found in the live vocabulary; first, a stereo-forms "
-        "warning when a relative (e.g. L-Cysteine of Cysteine) has rows "
-        "here (see `stereo_relatives`).")
+        description="Diagnostics: stereo relatives with rows (first); genes "
+        "reachable only via a family call (pass "
+        "include_tcdb_family_substrates=True); breadth-capped superfamily "
+        "starts; removed / chemical-role ids; unknown gene_categories.")
     stereo_relatives: dict[str, list[StereoRelative]] = Field(
         default_factory=dict,
         description="Input id -> its stereo forms with rows in this organism "
@@ -1190,10 +1227,22 @@ class GenesByMetaboliteResponse(BaseModel):
         "pair_count desc. Agreement = independent routes naming the same "
         "pair; correlated (shared homology), so it raises confidence but "
         "does not prove. [] on empty.")
-    by_substrate_depth: list[GbmBySubstrateDepth] = Field(
+    by_tcdb_route: list[GbmByTcdbRoute] = Field(
         default_factory=list,
-        description="Frequency over `substrate_depth` values across "
-        "transport rows only (≤2 entries; metabolism rows are excluded).")
+        description="Frequency over `tcdb_route` across transport rows "
+        "only, direct then family (≤2 entries; family only with "
+        "include_tcdb_family_substrates=True).")
+    tcdb_family_substrates_not_shown: TcdbFamilySubstratesNotShown | None = Field(
+        default=None,
+        description="Walk off: what include_tcdb_family_substrates=True "
+        "would add ({genes, metabolites, rows}; zeros = nothing). Null "
+        "when the walk is on (those rows are in results). Read it before "
+        "concluding 'no transporter'.")
+    tcdb_family_substrates_skipped: list[TcdbFamilySubstrateSkipped] = Field(
+        default_factory=list,
+        description="Genes whose family-walk start was removed by the "
+        "200-substrate breadth cap (superfamily call, substrate unknown), "
+        "e.g. ABC 3.A.1. Always computed.")
     rows_by_go_term_depth: list[RowsByGoTermDepth] | None = Field(
         default=None,
         description="GO route rows per `go_term_depth`, sorted by depth "
@@ -1272,36 +1321,29 @@ class MbgByGene(BaseModel):
         "metabolism / GO transport.")
     metabolism_rows: int = Field(
         description="Row count for the metabolism arm.")
-    transport_most_specific_rows: int = Field(
-        description="Transport rows with `substrate_depth='most_specific'` "
-        "(family is the most specific surviving transporter node for the "
-        "substrate in the gene-pruned hierarchy).")
-    transport_inherited_rows: int = Field(
-        description="Transport rows with `substrate_depth='inherited'` "
-        "(substrate rolled up from a descendant family — reachability, "
-        "not a capability claim for this gene).")
+    tcdb_direct_rows: int = Field(
+        default=0,
+        description="Transport rows with `tcdb_route='direct'` (a direct "
+        "gene edge onto a TCDB system curated with the metabolite).")
+    tcdb_family_rows: int = Field(
+        default=0,
+        description="Transport rows with `tcdb_route='family'` (opt-in "
+        "family walk; 0 unless include_tcdb_family_substrates=True). A "
+        "recall expansion, not a capability claim.")
     go_transport_rows: int = Field(
         default=0,
         description="GO route (go_transport) rows in the filtered slice. "
-        "`rows` = metabolism + transport tiers + this.")
+        "`rows` = metabolism + TCDB direct + TCDB family + this.")
     multi_source_metabolite_count: int = Field(
         default=0,
         description="Metabolites this gene reaches through >=2 evidence "
         "sources (see by_evidence_source_combination). Correlated routes "
         "(shared homology): raises confidence, does not prove.")
-    transport_substrate_resolution: str | None = Field(
+    tcdb_assignment_count: int | None = Field(
         default=None,
-        description="Gene-level `Gene.transport_substrate_resolution`: "
-        "'resolved' = a deepest attachment is non-lumping "
-        "(`TcdbFamily.substrate_breadth`); 'family_inferred' = "
-        "substrate breadth is reachability, not capability. None = no TCDB "
-        "call.")
-    tcdb_evidence_score_max: float | None = Field(
-        default=None,
-        description="Gene-level max of the KG 5-signal composite "
-        "`evidence_score` over its TCDB calls, in [0,1]. Rank, don't "
-        "filter; 0 = uncorroborated DIAMOND hit. None = no TCDB call "
-        "(never a sentinel).")
+        description="KG precompute `Gene.tcdb_assignment_count`: distinct "
+        "gated TCDB targets of the gene, minus any that is an ancestor of "
+        "another. 0 = no gated TCDB call.")
 
 
 class MbgByEvidenceSource(BaseModel):
@@ -1314,27 +1356,23 @@ class MbgByEvidenceSource(BaseModel):
     evidence_source: Literal["metabolism", "transport", "go_transport"] = Field(
         description="Path through which the gene reaches the metabolite. "
         "'metabolism' = `Gene → Reaction → Metabolite`. 'transport' = "
-        "`Gene → TcdbFamily → Metabolite` via the gene's deepest TCDB "
-        "attachments only.")
+        "`Gene → TCDB system → Metabolite` (see `tcdb_route`).")
     count: int = Field(
         description="Row count for this evidence_source in the filtered "
         "slice.")
 
 
-class MbgBySubstrateDepth(BaseModel):
-    """Frequency rollup over `substrate_depth` for transport rows only.
+class MbgByTcdbRoute(BaseModel):
+    """Frequency rollup over `tcdb_route` for transport rows only.
 
-    ≤2 entries — `most_specific` and/or `inherited`. Identical shape to
-    GBM's `GbmBySubstrateDepth`. Metabolism rows are excluded from this
-    rollup (their `substrate_depth` is None).
+    ≤2 entries — `direct` then `family`. Identical shape to GBM's
+    `GbmByTcdbRoute`. Metabolism / GO rows excluded.
     """
-    substrate_depth: Literal["most_specific", "inherited"] = Field(
-        description="Edge-level depth: 'most_specific' = most specific "
-        "surviving transporter node for the substrate in the gene-pruned "
-        "hierarchy (not a curation level); 'inherited' = rolled up from a "
-        "descendant family.")
+    tcdb_route: Literal["direct", "family"] = Field(
+        description="'direct' = gene's direct edge onto a TCDB system; "
+        "'family' = opt-in walk from a family / subfamily call.")
     count: int = Field(
-        description="Transport-row count for this substrate_depth in the "
+        description="Transport-row count for this tcdb_route in the "
         "filtered slice.")
 
 
@@ -1393,16 +1431,19 @@ class MbgTopMetabolite(BaseModel):
         "reachable only via metabolism / GO transport.")
     metabolism_rows: int = Field(
         description="Metabolism-arm row count for this metabolite.")
-    transport_most_specific_rows: int = Field(
-        description="Transport-arm rows with "
-        "`substrate_depth='most_specific'` for this metabolite.")
-    transport_inherited_rows: int = Field(
-        description="Transport-arm rows with `substrate_depth='inherited'` "
-        "for this metabolite (rolled up from a descendant family).")
+    tcdb_direct_rows: int = Field(
+        default=0,
+        description="Transport rows with `tcdb_route='direct'` (a direct "
+        "gene edge onto a TCDB system curated with the metabolite).")
+    tcdb_family_rows: int = Field(
+        default=0,
+        description="Transport rows with `tcdb_route='family'` (opt-in "
+        "family walk; 0 unless include_tcdb_family_substrates=True). A "
+        "recall expansion, not a capability claim.")
     go_transport_rows: int = Field(
         default=0,
         description="GO route (go_transport) rows in the filtered slice. "
-        "`rows` = metabolism + transport tiers + this.")
+        "`rows` = metabolism + TCDB direct + TCDB family + this.")
     multi_source_gene_count: int = Field(
         default=0,
         description="Input genes reaching this metabolite through >=2 "
@@ -1448,20 +1489,22 @@ class MbgTopTcdbFamily(BaseModel):
     tcdb_family_name: str = Field(
         description="Display name. For tc_family-level entries this is "
         "human-readable (e.g. 'The ATP-binding Cassette (ABC) Superfamily'); "
-        "for tc_subfamily / tc_specificity it falls back to the `tcdb_id` "
+        "for tc_subfamily / tc_system it falls back to the `tcdb_id` "
         "value.")
     level_kind: str = Field(
-        description="One of tc_class / tc_subclass / tc_family / "
-        "tc_subfamily / tc_specificity (ontology convention; does not "
-        "determine `substrate_depth`).")
-    substrate_depth: Literal["most_specific", "inherited"] = Field(
-        description="Depth of this family's substrate edges in the slice: "
-        "'most_specific' = most specific surviving transporter node for "
-        "the substrate (gene-pruned hierarchy, not a curation level); "
-        "'inherited' = rolled up from a descendant.")
+        description="One of tc_family / tc_subfamily / tc_system (ontology "
+        "convention): tc_system on direct rows, tc_family / tc_subfamily "
+        "on family-walk rows.")
+    tcdb_route: Literal["direct", "family"] = Field(
+        description="Route of this node's rows: 'direct' (a system the "
+        "genes point at directly) or 'family' (opt-in family walk start).")
+    direction: Literal["uptake", "export", "unknown"] | None = Field(
+        default=None,
+        description="TCDB-stated `direction` of the node (node-level, not "
+        "per gene).")
     gene_count: int = Field(
-        description="Distinct input genes deepest-attached to this TCDB "
-        "family in the filtered transport-row slice.")
+        description="Distinct input genes with rows through this TCDB "
+        "node in the filtered transport-row slice.")
     metabolite_count: int = Field(
         description="Distinct metabolites this family transports in the "
         "filtered slice.")
@@ -1566,15 +1609,10 @@ class MetabolitesByGeneResponse(BaseModel):
         description="True when `offset + limit < total_matching`.")
     warnings: list[str] = Field(
         default_factory=list,
-        description="Diagnostic strings. Currently emitted: gene-anchored "
-        "auto-warning naming input genes whose "
-        "`transport_substrate_resolution='family_inferred'` — their "
-        "substrate breadth is reachability, not capability; a "
-        "removed-metabolite or chemical-role id (kept in not_found); a "
-        "`gene_categories` value not found in the live vocabulary; "
-        "a `not_found.locus_tags` entry differing only by case from a real "
-        "one (locus_tags are never case-normalised); first, a stereo-forms "
-        "warning when a slice metabolite's stereo relative has genes here.")
+        description="Diagnostics: stereo relatives (first); per gene with "
+        "TCDB calls but no direct system, try "
+        "include_tcdb_family_substrates=True (or superfamily-only, substrate "
+        "unknown); capped starts; removed ids; locus_tag case mismatches.")
     stereo_relatives: dict[str, list[StereoRelative]] = Field(
         default_factory=dict,
         description="Slice metabolite id -> its stereo forms with genes in "
@@ -1607,10 +1645,22 @@ class MetabolitesByGeneResponse(BaseModel):
         "pair_count desc. Agreement = independent routes naming the same "
         "pair; correlated (shared homology), so it raises confidence but "
         "does not prove. [] on empty.")
-    by_substrate_depth: list[MbgBySubstrateDepth] = Field(
+    by_tcdb_route: list[MbgByTcdbRoute] = Field(
         default_factory=list,
-        description="Frequency over `substrate_depth` values across "
-        "transport rows only (≤2 entries; metabolism rows are excluded).")
+        description="Frequency over `tcdb_route` across transport rows "
+        "only, direct then family (≤2 entries; family only with "
+        "include_tcdb_family_substrates=True).")
+    tcdb_family_substrates_not_shown: TcdbFamilySubstratesNotShown | None = Field(
+        default=None,
+        description="Walk off: what include_tcdb_family_substrates=True "
+        "would add ({genes, metabolites, rows}; zeros = nothing). Null "
+        "when the walk is on (those rows are in results). Read it before "
+        "concluding 'no transporter'.")
+    tcdb_family_substrates_skipped: list[TcdbFamilySubstrateSkipped] = Field(
+        default_factory=list,
+        description="Genes whose family-walk start was removed by the "
+        "200-substrate breadth cap (superfamily call, substrate unknown), "
+        "e.g. ABC 3.A.1. Always computed.")
     rows_by_go_term_depth: list[RowsByGoTermDepth] | None = Field(
         default=None,
         description="GO route rows per `go_term_depth`, sorted by depth "
@@ -1829,7 +1879,7 @@ def register_tools(mcp: FastMCP):
     # Annotation-trust surface (PR 3a). Shared Field descriptions for
     # sources / evidence / max_tier / min_evidence_score / call_class now
     # live in mcp_server/params.py (SourcesParam and friends, spec 2b.5
-    # D3). interpro_type and include_superseded stay tool-local — each
+    # D3). interpro_type and include_weak_tcdb_hits stay tool-local — each
     # site inlines its own description below.
     # See docs://analysis/annotation_evidence for the full trust model.
     # -------------------------------------------------------------------
@@ -2003,7 +2053,8 @@ def register_tools(mcp: FastMCP):
                     "evidence", "sources", "call_class", "interpro_type",
                     "ncbifam_family_type", "merops_catalytic_type",
                     "merops_family_class", "best_hit_kind", "pfam_support",
-                    "attachment_depth", "trust_axes", "link_kinds",
+                    "tcdb_call", "tcdb_gate", "direction",
+                    "trust_axes", "link_kinds",
                     "cluster_type", "treatment_type", "background_factors",
                     "table_scope", "detection_status", "expression_status",
                     "partner_role", "structure_kind",
@@ -2079,7 +2130,7 @@ def register_tools(mcp: FastMCP):
         # Chemistry rollups
         reaction_count: int = Field(default=0, description="Distinct reactions catalyzed by genes in this organism. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
         catalyzed_metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes can catalyze reactions on (Gene → Reaction → Metabolite; catalysis arm only — transport-reach excluded). Does NOT mean measured. When > 0, drill in via list_metabolites(organism_names=[organism_name]).")
-        transported_metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes transport via their deepest TCDB attachments (precomputed OrganismTaxon.transported_metabolite_count). Pairs with catalyzed_metabolite_count; 0 when no TCDB calls.")
+        transported_metabolite_count: int = Field(default=0, description="Distinct metabolites this organism's genes transport via their direct TCDB systems (tcdb_gate='direct'; precomputed OrganismTaxon.transported_metabolite_count). Pairs with catalyzed_metabolite_count; 0 when no TCDB calls.")
         go_transport_metabolite_count: int = Field(default=0, description="Distinct metabolites (not roles) this organism's genes reach via direct GO transport terms; same set as list_metabolites go_transport_organism_names. Term-definition count, not a gene fact.")
         # Metabolomics measurement rollup
         measured_metabolite_count: int = Field(default=0, description="Distinct metabolites measured in this organism via any MetaboliteAssay (precomputed OrganismTaxon.measured_metabolite_count). Different from catalyzed_metabolite_count (catalysis-arm chemistry capability). When > 0, drill in via list_metabolite_assays(organism=organism_name).")
@@ -2119,7 +2170,7 @@ def register_tools(mcp: FastMCP):
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
         reaction_count: int = Field(description="Distinct reactions catalyzed by this organism's genes.")
         catalyzed_metabolite_count: int = Field(description="Distinct metabolites reachable via catalysis (Gene → Reaction → Metabolite). Same semantics as OrganismResult.catalyzed_metabolite_count.")
-        transported_metabolite_count: int = Field(default=0, description="Distinct metabolites transported via deepest TCDB attachments. Same semantics as OrganismResult.transported_metabolite_count. Column only — ranking stays on catalyzed_metabolite_count.")
+        transported_metabolite_count: int = Field(default=0, description="Distinct metabolites transported via direct TCDB systems. Same semantics as OrganismResult.transported_metabolite_count. Column only — ranking stays on catalyzed_metabolite_count.")
         go_transport_metabolite_count: int = Field(default=0, description="Distinct metabolites (not roles) reached via direct GO transport terms. Same semantics as OrganismResult.go_transport_metabolite_count. Column only — ranking stays on catalysis.")
 
     class OrgAnnotationCapabilityBreakdown(BaseModel):
@@ -2458,23 +2509,19 @@ def register_tools(mcp: FastMCP):
         )
         catalyzed_metabolite_count: int = Field(
             default=0,
-            description="Distinct metabolites reachable via catalysis only (Gene_catalyzes_reaction → Reaction_has_metabolite). Transport-only genes read 0 — check transported_metabolite_count / 'transport' in evidence_sources (e.g. PMM0392: 0 here, 13 transported).",
+            description="Distinct metabolites reachable via catalysis only (Gene_catalyzes_reaction → Reaction_has_metabolite). Transport-only genes read 0 — check transported_metabolite_count / 'transport' in evidence_sources (e.g. cynD PMM0372: 0 here, 3 transported).",
         )
-        tcdb_evidence_score_max: float | None = Field(
+        tcdb_best_hit_identity: float | None = Field(
             default=None,
-            description="Max KG 5-signal composite evidence_score over this gene's TCDB calls, in [0,1]. Rank with it, don't filter: 0 = uncorroborated DIAMOND hit, not absent. None = no TCDB call (never a sentinel).",
+            description="Percent identity of the gene's rank-1 diamond best hit to TCDB, read live and NOT gated (reported even below the 40% gate). How close the nearest characterised system is; rank, don't filter. None = no best hit.",
         )
         transported_metabolite_count: int = Field(
             default=0,
-            description="Distinct metabolites this gene transports via its deepest TCDB attachments (precomputed Gene.transported_metabolite_count). Pairs with catalyzed_metabolite_count. When > 0, drill via metabolites_by_gene(locus_tags=[...]).",
+            description="Distinct metabolites this gene transports via its direct TCDB systems (tcdb_gate='direct'; precomputed Gene.transported_metabolite_count). Pairs with catalyzed_metabolite_count. When > 0, drill via metabolites_by_gene(locus_tags=[...]).",
         )
         go_transport_metabolite_count: int = Field(
             default=0,
             description="GO-route mirror of transported_metabolite_count: distinct metabolites (not roles) via the gene's direct GO terms; is_a-inherited not counted. A term-definition count, not a gene fact. Drill via metabolites_by_gene.",
-        )
-        transport_substrate_resolution: str | None = Field(
-            default=None,
-            description="'resolved' = at least one deepest TCDB attachment is a non-lumping family (lumping = TcdbFamily.substrate_breadth='lumping'); 'family_inferred' = transported_metabolite_count is reachability, not capability. None = no TCDB call.",
         )
         evidence_sources: list[str] = Field(
             default_factory=list,
@@ -2492,12 +2539,12 @@ def register_tools(mcp: FastMCP):
             description="Distinct NCBIfam family annotations on this gene. When > 0, "
                         "drill via gene_ontology_terms(ontology='ncbifam').",
         )
-        tcdb_family_count: int = Field(
+        tcdb_assignment_count: int = Field(
             0,
-            description="Distinct TCDB families at the deepest attachment only "
-                        "(superseded ancestors excluded); equals the default TCDB row "
-                        "count from gene_ontology_terms. 0 = no TCDB call (score and "
-                        "resolution null). Drill via gene_ontology_terms(ontology=['tcdb']).",
+            description="Distinct gated TCDB targets (systems, subfamilies, families) "
+                        "minus any that is an ancestor of another (precomputed "
+                        "Gene.tcdb_assignment_count); equals the default TCDB leaf row "
+                        "count from gene_ontology_terms. 0 = no gated TCDB call.",
         )
         cazy_family_count: int = Field(
             0,
@@ -2509,7 +2556,7 @@ def register_tools(mcp: FastMCP):
         merops_evidence_score_max: float | None = Field(
             default=None,
             description="Max MEROPS evidence_score over this gene's calls, in [0,1]. "
-                        "Twin of tcdb_evidence_score_max — uncoalesced: None = no MEROPS "
+                        "Uncoalesced: None = no MEROPS "
                         "call at all, 0 = an uncorroborated one. Rank with it, don't filter.",
         )
         # Literature 'discusses' rollup
@@ -2591,7 +2638,7 @@ def register_tools(mcp: FastMCP):
         )
         has_tcdb: int = Field(
             default=0,
-            description="Count of requested locus_tags with at least one deepest-attachment TCDB family (tcdb_family_count > 0).",
+            description="Count of requested locus_tags with at least one gated TCDB call (tcdb_assignment_count > 0).",
         )
         has_cazy: int = Field(
             default=0,
@@ -2956,9 +3003,12 @@ def register_tools(mcp: FastMCP):
                         "descendants (verbose only; hierarchical ontologies).")
         superfamily: str | None = Field(default=None,
             description="TCDB superfamily label (verbose only; sparse: tcdb).")
-        metabolite_count: int | None = Field(default=None,
-            description="Distinct substrate metabolites attached to this TCDB "
-                        "family (verbose only; sparse: tcdb).")
+        tcdb_substrate_count: int | None = Field(default=None,
+            description="Distinct substrates curated under this TCDB node, all "
+                        "levels (verbose only; sparse: tcdb).")
+        direction: str | None = Field(default=None,
+            description="TCDB-stated transport direction: 'uptake' / 'export' / "
+                        "'unknown' (verbose only; sparse: tcdb).")
         family_type: str | None = Field(default=None,
             description="NCBIfam family type, e.g. 'equivalog', 'subfamily' "
                         "(verbose only; sparse: ncbifam).")
@@ -3162,8 +3212,14 @@ def register_tools(mcp: FastMCP):
         member_count: int | None = Field(default=None,
             description="Child/member term count (sparse: tcdb, interpro, merops)")
         superfamily: str | None = Field(default=None, description="TCDB superfamily label (sparse: tcdb)")
+        tcdb_substrate_count: int | None = Field(default=None,
+            description="Distinct substrates curated under this TCDB node, any level (sparse: tcdb). Substrate edges leave tc_system nodes only.")
+        direction: str | None = Field(default=None,
+            description="TCDB-stated transport direction: 'uptake' / 'export' / 'unknown' (sparse: tcdb)")
+        direction_basis: str | None = Field(default=None,
+            description="How the TCDB direction was assigned (sparse: tcdb; absent when unstated)")
         metabolite_count: int | None = Field(default=None,
-            description="Distinct metabolites attached (sparse: tcdb substrates; KEGG pathway chemistry)")
+            description="Distinct metabolites attached (sparse: KEGG pathway chemistry)")
         reaction_count: int | None = Field(default=None,
             description="Reactions mapped to this KEGG pathway (sparse: kegg pathway terms)")
         cazy_id: str | None = Field(default=None, description="CAZy family ID (sparse: cazy)")
@@ -3336,6 +3392,19 @@ def register_tools(mcp: FastMCP):
         call_class: str | None = Field(default=None,
             description="MEROPS peptidase call (sparse: merops only). "
                         "'nonpeptidase_homolog' rows are catalytically dead.")
+        tcdb_call: str | None = Field(default=None,
+            description="TCDB call kind of the row's representative edge "
+                        "(precedence diamond_best_hit > diamond_tier > eggnog, "
+                        "then identity). Sparse: tcdb only.")
+        tcdb_gate: str | None = Field(default=None,
+            description="KG gate of the representative TCDB edge: 'direct' / "
+                        "'annotated' (default rows) or 'below_gate' (only with "
+                        "include_weak_tcdb_hits=True). Sparse: tcdb only.")
+        tcdb_calls: list[str] | None = Field(default=None,
+            description="TCDB call kinds on the gene's gated edges along the "
+                        "term's lineage, in precedence order. The two diamond "
+                        "kinds are one run; eggnog + diamond = independent "
+                        "agreement. Sparse: tcdb only.")
         interpro_type: str | None = Field(default=None,
             description="InterPro entry type (sparse: interpro only), e.g. "
                         "'DOMAIN', 'FAMILY', 'HOMOLOGOUS_SUPERFAMILY'.")
@@ -3346,29 +3415,37 @@ def register_tools(mcp: FastMCP):
                         "outside the 14 functional-edge ontologies), e.g. ['eggnog'].")
         evidence_score: float | None = Field(default=None,
             description="Composite trust score in [0,1] (verbose only; sparse: "
-                        "go_bp/mf/cc, ec, pfam, cazy, tcdb, merops).")
+                        "go_bp/mf/cc, ec, pfam, cazy, merops).")
         tier: int | None = Field(default=None,
-            description="Diamond truncation depth 1-3 (verbose only; sparse: "
-                        "tcdb, merops; owned-but-null when the edge carries no tier).")
-        attachment_depth: str | None = Field(default=None,
-            description="TCDB rollup attachment depth: 'most_specific' or "
-                        "'superseded' (verbose only; sparse: tcdb only).")
+            description="Diamond tier 1-3 (verbose only; sparse: tcdb, merops). "
+                        "TCDB: consensus tier on diamond_tier, identity band on "
+                        "diamond_best_hit, null on eggnog; never compare across "
+                        "kinds or ontologies.")
         confidence_score: float | None = Field(default=None,
-            description="Native rank score (verbose only; sparse: tcdb, merops).")
-        source_agreement: str | None = Field(default=None,
-            description="TCDB two-source agreement detail (verbose only; sparse: tcdb only).")
+            description="Native rank score (verbose only; sparse: merops only).")
         pfam_support: str | None = Field(default=None,
-            description="Pfam-domain corroboration detail (verbose only; sparse: tcdb, merops).")
-        go_support: str | None = Field(default=None,
-            description="GO corroboration detail (verbose only; sparse: tcdb only).")
+            description="Pfam-domain corroboration detail (verbose only; sparse: merops only).")
         identity: float | None = Field(default=None,
             description="Alignment percent identity (verbose only; sparse: tcdb, merops).")
         qcov: float | None = Field(default=None,
-            description="Query coverage fraction (verbose only; sparse: tcdb, merops).")
+            description="Query coverage, percent (verbose only; sparse: tcdb, merops).")
         evalue: float | None = Field(default=None,
             description="Alignment e-value (verbose only; sparse: tcdb, merops, interpro, ncbifam). Never a filter cutoff.")
         consensus_n: int | None = Field(default=None,
-            description="Number of corroborating calls in consensus (verbose only; sparse: tcdb, merops).")
+            description="Number of corroborating calls in consensus (verbose only; sparse: merops only).")
+        tcdb_scov: float | None = Field(default=None,
+            description="TCDB diamond subject coverage, percent (verbose only; "
+                        "sparse: tcdb diamond edges).")
+        tcdb_best_hit_rank: int | None = Field(default=None,
+            description="Rank of this TCDB best hit among the gene's hits (edge "
+                        "`rank`; 1 = top). Not a row rank (verbose only; sparse: "
+                        "tcdb diamond_best_hit edges).")
+        tcdb_bitscore: float | None = Field(default=None,
+            description="TCDB diamond best-hit bit score (verbose only; sparse: "
+                        "tcdb diamond_best_hit edges).")
+        tcdb_bitscore_ratio: float | None = Field(default=None,
+            description="TCDB best-hit bit score relative to the top hit (verbose "
+                        "only; sparse: tcdb diamond_best_hit edges).")
         best_hit_kind: str | None = Field(default=None,
             description="MEROPS best-hit classification (verbose only; sparse: merops only).")
         best_hit_id: str | None = Field(default=None,
@@ -3452,7 +3529,8 @@ def register_tools(mcp: FastMCP):
         trust_axes: dict[str, list[str]] = Field(
             default_factory=dict,
             description="Trust axes this ontology carries, e.g. {'tcdb': "
-                        "['sources','evidence','evidence_score','tier']}.")
+                        "['sources','evidence','tier']} (TCDB has no "
+                        "evidence_score).")
         warnings: list[str] = Field(default_factory=list,
             description="Auto-warnings (e.g. nonpeptidase_homolog rows without a call_class filter).")
         filters_applied: dict = Field(default_factory=dict,
@@ -3472,9 +3550,12 @@ def register_tools(mcp: FastMCP):
         by_call_class: list[dict] = Field(default_factory=list,
             description="Rollup of MEROPS call_class over every matching row "
                         "(merops only).")
+        by_tcdb_call: list[dict] = Field(default_factory=list,
+            description="Rollup of the representative tcdb_call over every "
+                        "matching row (tcdb only); twin of by_call_class.")
         evidence_score_stats: dict | None = Field(default=None,
             description="{min, median, max, n_null} over evidence_score across "
-                        "every matching row.")
+                        "every matching row. None for TCDB (no evidence_score).")
         evidence_score_signals: dict | None = Field(default=None,
             description="Fired ControlledVocabulary signals per edge_type; present only "
                         "when min_evidence_score was set.")
@@ -3528,11 +3609,17 @@ def register_tools(mcp: FastMCP):
         max_tier: MaxTierParam = None,
         min_evidence_score: MinEvidenceScoreParam = None,
         call_class: CallClassParam = None,
+        tcdb_call: TcdbCallParam = None,
         interpro_type: Annotated[_INTERPRO_TYPES | None, Field(
             description=(
                 "Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful."
             ),
         )] = None,
+        include_weak_tcdb_hits: Annotated[bool, Field(
+            description=(
+                "TCDB only: also return one row per weak hit (tcdb_gate='below_gate', diamond only), tagged in tcdb_gate. Adds rows; default rows are unchanged. No-op for other ontologies."
+            ),
+        )] = False,
         limit: LimitParam = 50,
         offset: OffsetParam = 0,
     ) -> GenesByOntologyResponse:
@@ -3560,7 +3647,8 @@ def register_tools(mcp: FastMCP):
                 tree=tree,
                 sources=sources, evidence=evidence,
                 max_tier=max_tier, min_evidence_score=min_evidence_score,
-                call_class=call_class, interpro_type=interpro_type,
+                call_class=call_class, tcdb_call=tcdb_call, interpro_type=interpro_type,
+                include_weak_tcdb_hits=include_weak_tcdb_hits,
                 conn=conn,
             )
             if data["wrong_ontology"]:
@@ -3619,6 +3707,19 @@ def register_tools(mcp: FastMCP):
                         "14 functional-edge ontologies; null on PSORTb/SignalP.")
         call_class: str | None = Field(default=None,
             description="MEROPS peptidase call (sparse: merops only).")
+        tcdb_call: str | None = Field(default=None,
+            description="TCDB call kind of the row's representative edge "
+                        "(precedence diamond_best_hit > diamond_tier > eggnog, "
+                        "then identity). Sparse: tcdb only.")
+        tcdb_gate: str | None = Field(default=None,
+            description="KG gate of the representative TCDB edge: 'direct' / "
+                        "'annotated' (default rows) or 'below_gate' (only with "
+                        "include_weak_tcdb_hits=True). Sparse: tcdb only.")
+        tcdb_calls: list[str] | None = Field(default=None,
+            description="TCDB call kinds on the gene's gated edges along the "
+                        "term's lineage, in precedence order. The two diamond "
+                        "kinds are one run; eggnog + diamond = independent "
+                        "agreement. Sparse: tcdb only.")
         interpro_type: str | None = Field(default=None,
             description="InterPro entry type (sparse: interpro only).")
         sources: list[str] | None = Field(default=None,
@@ -3626,26 +3727,32 @@ def register_tools(mcp: FastMCP):
         evidence_score: float | None = Field(default=None,
             description="Composite trust score in [0,1] (verbose only; sparse).")
         tier: int | None = Field(default=None,
-            description="Diamond truncation depth 1-3 (verbose only; sparse: tcdb, merops).")
-        attachment_depth: str | None = Field(default=None,
-            description="TCDB attachment depth: 'most_specific' or 'superseded' "
-                        "(verbose only; sparse: tcdb only).")
+            description="Diamond tier 1-3 (verbose only; sparse: tcdb, merops). TCDB: consensus tier on diamond_tier, identity band on diamond_best_hit, null on eggnog; never compare across kinds or ontologies.")
         confidence_score: float | None = Field(default=None,
-            description="Native rank score (verbose only; sparse: tcdb, merops).")
-        source_agreement: str | None = Field(default=None,
-            description="TCDB two-source agreement detail (verbose only; sparse: tcdb only).")
+            description="Native rank score (verbose only; sparse: merops only).")
         pfam_support: str | None = Field(default=None,
-            description="Pfam-domain corroboration detail (verbose only; sparse: tcdb, merops).")
-        go_support: str | None = Field(default=None,
-            description="GO corroboration detail (verbose only; sparse: tcdb only).")
+            description="Pfam-domain corroboration detail (verbose only; sparse: merops only).")
         identity: float | None = Field(default=None,
             description="Alignment percent identity (verbose only; sparse: tcdb, merops).")
         qcov: float | None = Field(default=None,
-            description="Query coverage fraction (verbose only; sparse: tcdb, merops).")
+            description="Query coverage, percent (verbose only; sparse: tcdb, merops).")
         evalue: float | None = Field(default=None,
             description="Alignment e-value (verbose only; sparse). Never a filter cutoff.")
         consensus_n: int | None = Field(default=None,
-            description="Corroborating-calls count (verbose only; sparse: tcdb, merops).")
+            description="Corroborating-calls count (verbose only; sparse: merops only).")
+        tcdb_scov: float | None = Field(default=None,
+            description="TCDB diamond subject coverage, percent (verbose only; "
+                        "sparse: tcdb diamond edges).")
+        tcdb_best_hit_rank: int | None = Field(default=None,
+            description="Rank of this TCDB best hit among the gene's hits (edge "
+                        "`rank`; 1 = top). Not a row rank (verbose only; sparse: "
+                        "tcdb diamond_best_hit edges).")
+        tcdb_bitscore: float | None = Field(default=None,
+            description="TCDB diamond best-hit bit score (verbose only; sparse: "
+                        "tcdb diamond_best_hit edges).")
+        tcdb_bitscore_ratio: float | None = Field(default=None,
+            description="TCDB best-hit bit score relative to the top hit (verbose "
+                        "only; sparse: tcdb diamond_best_hit edges).")
         best_hit_kind: str | None = Field(default=None,
             description="MEROPS best-hit classification (verbose only; sparse: merops only).")
         best_hit_id: str | None = Field(default=None,
@@ -3711,9 +3818,14 @@ def register_tools(mcp: FastMCP):
         by_call_class: list[dict] = Field(default_factory=list,
             description="Rollup of MEROPS call_class over every matching row "
                         "(merops only). Empty with summary=true.")
+        by_tcdb_call: list[dict] = Field(default_factory=list,
+            description="Rollup of the representative tcdb_call over every "
+                        "matching row (tcdb only); twin of by_call_class. "
+                        "Empty with summary=true.")
         evidence_score_stats: dict | None = Field(default=None,
             description="{min, median, max, n_null} over evidence_score across "
-                        "every matching row. All-null with summary=true.")
+                        "every matching row. None for TCDB (no evidence_score). "
+                        "All-null with summary=true.")
         evidence_score_signals: dict | None = Field(default=None,
             description="Fired ControlledVocabulary signals per edge_type; present only "
                         "when min_evidence_score was set.")
@@ -3767,14 +3879,15 @@ def register_tools(mcp: FastMCP):
         max_tier: MaxTierParam = None,
         min_evidence_score: MinEvidenceScoreParam = None,
         call_class: CallClassParam = None,
+        tcdb_call: TcdbCallParam = None,
         interpro_type: Annotated[_INTERPRO_TYPES | None, Field(
             description=(
                 "Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful."
             ),
         )] = None,
-        include_superseded: Annotated[bool, Field(
+        include_weak_tcdb_hits: Annotated[bool, Field(
             description=(
-                "TCDB leaf mode only: when True, also include rows whose gene->term attachment is less specific ('superseded') rather than the deepest ('most_specific'). Default False."
+                "TCDB only: also return one row per weak hit (tcdb_gate='below_gate', diamond only), tagged in tcdb_gate. Adds rows; default rows are unchanged. No-op for other ontologies."
             ),
         )] = False,
         limit: LimitParam = 50,
@@ -3783,7 +3896,7 @@ def register_tools(mcp: FastMCP):
         """Reverse lookup: locus_tags to their ontology annotations in ONE organism, most-specific leaves (default) or rolled up to a level.
 
         Use for what a gene carries; for which genes carry a term use `genes_by_ontology`, to find term IDs `search_ontology`.
-        Filters: locus_tags, organism, ontology, mode, level, tree, informative_only, include_superseded, trust filters.
+        Filters: locus_tags, organism, ontology, mode, level, tree, informative_only, include_weak_tcdb_hits, trust filters (+tcdb_call).
         Returns: by_ontology, by_term, terms-per-gene stats, trust rollups, skipped_ontologies, not_found, no_terms; one row = (locus_tag, term_id, evidence).
         docs://tools/gene_ontology_terms; summary=True first.
         """
@@ -3800,8 +3913,8 @@ def register_tools(mcp: FastMCP):
                 summary=summary, verbose=verbose, limit=limit, offset=offset,
                 sources=sources, evidence=evidence,
                 max_tier=max_tier, min_evidence_score=min_evidence_score,
-                call_class=call_class, interpro_type=interpro_type,
-                include_superseded=include_superseded,
+                call_class=call_class, tcdb_call=tcdb_call, interpro_type=interpro_type,
+                include_weak_tcdb_hits=include_weak_tcdb_hits,
                 conn=conn,
             )
             results = [OntologyTermRow(**r) for r in data["results"]]
@@ -6797,6 +6910,7 @@ def register_tools(mcp: FastMCP):
         )] = 500,
         informative_only: InformativeOnlyParam = True,
         call_class: CallClassParam = None,
+        tcdb_call: TcdbCallParam = None,
         interpro_type: Annotated[_INTERPRO_TYPES | None, Field(
             description=(
                 "Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful."
@@ -6822,7 +6936,7 @@ def register_tools(mcp: FastMCP):
                 max_gene_set_size=max_gene_set_size,
                 tree=tree,
                 informative_only=informative_only,
-                call_class=call_class, interpro_type=interpro_type,
+                call_class=call_class, tcdb_call=tcdb_call, interpro_type=interpro_type,
                 conn=conn,
             )
             return OntologyLandscapeResponse(**data)
@@ -6909,6 +7023,7 @@ def register_tools(mcp: FastMCP):
         max_tier: MaxTierParam = None,
         min_evidence_score: MinEvidenceScoreParam = None,
         call_class: CallClassParam = None,
+        tcdb_call: TcdbCallParam = None,
         interpro_type: Annotated[_INTERPRO_TYPES | None, Field(
             description=(
                 "Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful."
@@ -6952,7 +7067,7 @@ def register_tools(mcp: FastMCP):
                 informative_only=informative_only,
                 sources=sources, evidence=evidence,
                 max_tier=max_tier, min_evidence_score=min_evidence_score,
-                call_class=call_class, interpro_type=interpro_type,
+                call_class=call_class, tcdb_call=tcdb_call, interpro_type=interpro_type,
                 conn=conn,
             )
         except ValueError as e:
@@ -7034,6 +7149,7 @@ def register_tools(mcp: FastMCP):
         max_tier: MaxTierParam = None,
         min_evidence_score: MinEvidenceScoreParam = None,
         call_class: CallClassParam = None,
+        tcdb_call: TcdbCallParam = None,
         interpro_type: Annotated[_INTERPRO_TYPES | None, Field(
             description=(
                 "Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful."
@@ -7075,7 +7191,7 @@ def register_tools(mcp: FastMCP):
                 informative_only=informative_only,
                 sources=sources, evidence=evidence,
                 max_tier=max_tier, min_evidence_score=min_evidence_score,
-                call_class=call_class, interpro_type=interpro_type,
+                call_class=call_class, tcdb_call=tcdb_call, interpro_type=interpro_type,
                 conn=conn,
             )
         except ValueError as e:
@@ -8504,15 +8620,6 @@ def register_tools(mcp: FastMCP):
             "all three arms uniformly). Use `list_filter_values(filter_type=\"gene_category\")` "
             "to discover valid values.",
         )] = None,
-        substrate_depth: Annotated[
-            list[Literal["most_specific", "inherited"]] | None,
-            Field(
-                description="Keep transport rows whose edge `substrate_depth` "
-                "is in this list. 'most_specific' = most specific surviving "
-                "transporter node for the substrate (gene-pruned hierarchy, "
-                "not a curation level). Transport arm only.",
-            ),
-        ] = None,
         evidence_sources: Annotated[
             list[Literal["metabolism", "transport", "go_transport"]] | None,
             Field(
@@ -8523,6 +8630,12 @@ def register_tools(mcp: FastMCP):
                 "`list_metabolites`.",
             ),
         ] = None,
+        include_tcdb_family_substrates: Annotated[bool, Field(
+            description="TCDB arm: also walk from the gene's family / "
+            "subfamily calls down to their systems' substrates (tcdb_route="
+            "'family'; a recall fallback for genes with no system). Adds "
+            "rows only; ignored without the transport arm.",
+        )] = False,
         go_include_ancestors: Annotated[bool, Field(
             description="GO route only: also return inherited rows, where a "
             "gene's GO term reaches the target through is_a ancestors "
@@ -8556,9 +8669,9 @@ def register_tools(mcp: FastMCP):
     ) -> GenesByMetaboliteResponse:
         """Metabolite / `chebi.role:` IDs to genes in ONE organism via KEGG, TCDB and GO transport (GO rows: term definitions, not gene facts).
 
-        Use for compound → genes; mirror `metabolites_by_gene`; docs://analysis/transport.
-        Filters: metabolite_ids (+exclude, +stereo), ec_numbers, metabolite_pathway_ids, substrate_depth, evidence_sources, go_include_ancestors/namespace/evidence.
-        Returns: by_metabolite, by_evidence_source(_combination), rows_by_go_term_depth, top_genes, top_reactions/tcdb_families; row = gene × reaction|family|GO term × metabolite.
+        Use for compound → genes; mirror metabolites_by_gene; docs://analysis/transport.
+        Filters: metabolite_ids (+exclude, +stereo), ec_numbers, metabolite_pathway_ids, evidence_sources, include_tcdb_family_substrates, go_*.
+        Returns: by_metabolite, by_evidence_source(_combination), by_tcdb_route, tcdb_family_substrates_not_shown, top_genes/reactions/tcdb_families; row = gene × reaction|TCDB node|GO term × compound.
         docs://tools/genes_by_metabolite; summary=True first.
         """
         await ctx.info(
@@ -8566,7 +8679,7 @@ def register_tools(mcp: FastMCP):
             f"organism={organism} ec_numbers={ec_numbers} "
             f"metabolite_pathway_ids={metabolite_pathway_ids} "
             f"mass_balance={mass_balance} gene_categories={gene_categories} "
-            f"substrate_depth={substrate_depth} "
+            f"include_tcdb_family_substrates={include_tcdb_family_substrates} "
             f"evidence_sources={evidence_sources} "
             f"go_include_ancestors={go_include_ancestors} "
             f"go_namespace={go_namespace} go_evidence={go_evidence} "
@@ -8583,7 +8696,7 @@ def register_tools(mcp: FastMCP):
                 metabolite_pathway_ids=metabolite_pathway_ids,
                 mass_balance=mass_balance,
                 gene_categories=gene_categories,
-                substrate_depth=substrate_depth,
+                include_tcdb_family_substrates=include_tcdb_family_substrates,
                 evidence_sources=evidence_sources,
                 go_include_ancestors=go_include_ancestors,
                 go_namespace=go_namespace,
@@ -8604,9 +8717,17 @@ def register_tools(mcp: FastMCP):
             by_evidence_source = [
                 GbmByEvidenceSource(**b) for b in result["by_evidence_source"]
             ]
-            by_substrate_depth = [
-                GbmBySubstrateDepth(**b)
-                for b in result["by_substrate_depth"]
+            by_tcdb_route = [
+                GbmByTcdbRoute(**b)
+                for b in result.get("by_tcdb_route") or []
+            ]
+            hint = result.get("tcdb_family_substrates_not_shown")
+            tcdb_family_substrates_not_shown = (
+                TcdbFamilySubstratesNotShown(**hint) if hint is not None
+                else None)
+            tcdb_family_substrates_skipped = [
+                TcdbFamilySubstrateSkipped(**b)
+                for b in result.get("tcdb_family_substrates_skipped") or []
             ]
             top_reactions = [
                 GbmTopReaction(**b) for b in result["top_reactions"]
@@ -8639,7 +8760,9 @@ def register_tools(mcp: FastMCP):
                     EvidenceSourceCombination(**b)
                     for b in result.get("by_evidence_source_combination") or []
                 ],
-                by_substrate_depth=by_substrate_depth,
+                by_tcdb_route=by_tcdb_route,
+                tcdb_family_substrates_not_shown=tcdb_family_substrates_not_shown,
+                tcdb_family_substrates_skipped=tcdb_family_substrates_skipped,
                 rows_by_go_term_depth=(
                     [RowsByGoTermDepth(**b)
                      for b in result["rows_by_go_term_depth"]]
@@ -8740,15 +8863,6 @@ def register_tools(mcp: FastMCP):
             "input; useful when locus_tags is a broad batch and you want "
             "chemistry from specific functional categories only.",
         )] = None,
-        substrate_depth: Annotated[
-            list[Literal["most_specific", "inherited"]] | None,
-            Field(
-                description="Keep transport rows whose edge `substrate_depth` "
-                "is in this list. 'most_specific' = most specific surviving "
-                "transporter node for the substrate (gene-pruned hierarchy, "
-                "not a curation level). Transport arm only; mutes ABC tails.",
-            ),
-        ] = None,
         evidence_sources: Annotated[
             list[Literal["metabolism", "transport", "go_transport"]] | None,
             Field(
@@ -8759,6 +8873,12 @@ def register_tools(mcp: FastMCP):
                 "`list_metabolites`.",
             ),
         ] = None,
+        include_tcdb_family_substrates: Annotated[bool, Field(
+            description="TCDB arm: also walk from the gene's family / "
+            "subfamily calls down to their systems' substrates (tcdb_route="
+            "'family'; a recall fallback for genes with no system). Adds "
+            "rows only; ignored without the transport arm.",
+        )] = False,
         go_include_ancestors: Annotated[bool, Field(
             description="GO route only: also return inherited rows, where a "
             "gene's GO term reaches the target through is_a ancestors "
@@ -8786,9 +8906,9 @@ def register_tools(mcp: FastMCP):
     ) -> MetabolitesByGeneResponse:
         """Metabolites a gene batch reaches in ONE organism via KEGG, TCDB and GO transport (GO rows: term definitions, not gene facts).
 
-        Use for gene → compounds; mirror `genes_by_metabolite`; docs://analysis/transport.
-        Filters: locus_tags, organism, metabolite_elements, metabolite_ids (+exclude, `chebi.role:` ok), ec_numbers, evidence_sources, go_include_ancestors/namespace/evidence.
-        Returns: by_gene, by_element, by_evidence_source(_combination), rows_by_go_term_depth, top_metabolites; row = gene × reaction|family|GO term × metabolite.
+        Use for gene → compounds; mirror genes_by_metabolite; docs://analysis/transport.
+        Filters: locus_tags, metabolite_elements, metabolite_ids (+exclude, roles ok), ec_numbers, evidence_sources, include_tcdb_family_substrates, go_*.
+        Returns: by_gene, by_element, by_evidence_source(_combination), by_tcdb_route, tcdb_family_substrates_not_shown, top_metabolites; row = gene × reaction|TCDB|GO term × compound.
         docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
         """
         await ctx.info(
@@ -8799,7 +8919,7 @@ def register_tools(mcp: FastMCP):
             f"metabolite_pathway_ids={metabolite_pathway_ids} "
             f"mass_balance={mass_balance} "
             f"gene_categories={gene_categories} "
-            f"substrate_depth={substrate_depth} "
+            f"include_tcdb_family_substrates={include_tcdb_family_substrates} "
             f"evidence_sources={evidence_sources} "
             f"go_include_ancestors={go_include_ancestors} "
             f"go_namespace={go_namespace} go_evidence={go_evidence} "
@@ -8818,7 +8938,7 @@ def register_tools(mcp: FastMCP):
                 metabolite_pathway_ids=metabolite_pathway_ids,
                 mass_balance=mass_balance,
                 gene_categories=gene_categories,
-                substrate_depth=substrate_depth,
+                include_tcdb_family_substrates=include_tcdb_family_substrates,
                 evidence_sources=evidence_sources,
                 go_include_ancestors=go_include_ancestors,
                 go_namespace=go_namespace,
@@ -8837,9 +8957,17 @@ def register_tools(mcp: FastMCP):
                 MbgByEvidenceSource(**b)
                 for b in result["by_evidence_source"]
             ]
-            by_substrate_depth = [
-                MbgBySubstrateDepth(**b)
-                for b in result["by_substrate_depth"]
+            by_tcdb_route = [
+                MbgByTcdbRoute(**b)
+                for b in result.get("by_tcdb_route") or []
+            ]
+            hint = result.get("tcdb_family_substrates_not_shown")
+            tcdb_family_substrates_not_shown = (
+                TcdbFamilySubstratesNotShown(**hint) if hint is not None
+                else None)
+            tcdb_family_substrates_skipped = [
+                TcdbFamilySubstrateSkipped(**b)
+                for b in result.get("tcdb_family_substrates_skipped") or []
             ]
             by_element = [MbgByElement(**b) for b in result["by_element"]]
             top_metabolites = [
@@ -8879,7 +9007,9 @@ def register_tools(mcp: FastMCP):
                     EvidenceSourceCombination(**b)
                     for b in result.get("by_evidence_source_combination") or []
                 ],
-                by_substrate_depth=by_substrate_depth,
+                by_tcdb_route=by_tcdb_route,
+                tcdb_family_substrates_not_shown=tcdb_family_substrates_not_shown,
+                tcdb_family_substrates_skipped=tcdb_family_substrates_skipped,
                 rows_by_go_term_depth=(
                     [RowsByGoTermDepth(**b)
                      for b in result["rows_by_go_term_depth"]]

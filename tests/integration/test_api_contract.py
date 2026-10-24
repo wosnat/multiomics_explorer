@@ -121,19 +121,20 @@ class TestGeneOverviewContract:
             "closest_ortholog_genera", "cluster_membership_count", "cluster_types",
             "derived_metric_count", "derived_metric_value_kinds",
             "reaction_count", "catalyzed_metabolite_count", "evidence_sources",
-            # TCDB substrate_depth migration (2026-08): gene-level TCDB surface
-            # replaces transporter_count.
-            "tcdb_evidence_score_max", "transported_metabolite_count",
+            # TCDB cleanup surface (KG 3a): tcdb_evidence_score_max and
+            # transport_substrate_resolution removed; tcdb_best_hit_identity
+            # added (ungated rank-1 best-hit identity).
+            "tcdb_best_hit_identity", "transported_metabolite_count",
             "go_transport_metabolite_count",
-            "transport_substrate_resolution",
             # Literature "discusses" arm (Extension 1): always-present compact count.
             "discussed_in_publication_count",
             # Annotation-trust surface (spec section 3.6 / 6): protease +
             # family-domain routing signals. merops_evidence_score_max is
             # sparse and uncoalesced (null = no MEROPS call at all).
             "merops_classes", "ncbifam_family_count", "merops_evidence_score_max",
-            # Backlog 3.4: TCDB (most-specific depth only) / CAZy family counts.
-            "tcdb_family_count", "cazy_family_count",
+            # KG 3a rename tcdb_family_count -> tcdb_assignment_count (gated
+            # KG precompute); CAZy family count unchanged.
+            "tcdb_assignment_count", "cazy_family_count",
         }
         assert set(result["results"][0].keys()) == expected_keys
 
@@ -1430,19 +1431,20 @@ class TestPhase1PlumbingContract:
     that mocked unit tests miss."""
 
     def test_gene_overview_evidence_sources_on_transport_only_gene(self, conn):
-        """Spec §6.1: PMM0392 (broad ABC transporter, reaction_count=0)
-        must NOT have 'metabolism' in evidence_sources — the path-existence
-        Cypher correctly distinguishes from metabolite-level rollup."""
-        result = api.gene_overview(["PMM0392"], conn=conn)
+        """Spec §6.1: a transport-only gene (reaction_count=0) must NOT have
+        'metabolism' in evidence_sources — the path-existence Cypher
+        correctly distinguishes from metabolite-level rollup. TCDB cleanup:
+        PMM0392 has no direct TCDB system post-3a, so the exemplar is cynD
+        PMM0372 (2 direct systems, 3 metabolites)."""
+        result = api.gene_overview(["PMM0372"], conn=conn)
         assert result["total_matching"] == 1
         row = result["results"][0]
         assert row["reaction_count"] == 0
         assert "transporter_count" not in row
-        assert row["tcdb_evidence_score_max"] == 0.8
-        assert row["transported_metabolite_count"] == 12  # 13 → 12: role chebi:10004 left Metabolite (2026-10-15)
-        assert row["transport_substrate_resolution"] == "resolved"
+        assert row["tcdb_assignment_count"] == 2
+        assert row["transported_metabolite_count"] == 3
         assert "metabolism" not in row["evidence_sources"], (
-            f"PMM0392 has reaction_count=0 but evidence_sources contains "
+            f"PMM0372 has reaction_count=0 but evidence_sources contains "
             f"'metabolism' — path-existence Cypher regression. "
             f"Got: {row['evidence_sources']}"
         )
@@ -1460,9 +1462,10 @@ class TestPhase1PlumbingContract:
         """Spec §6.1: envelope `has_chemistry` counts genes with non-empty
         evidence_sources."""
         result = api.gene_overview(
-            ["PMM0392", "PMM0001", "PMM1428"], conn=conn,
+            ["PMM0372", "PMM0001", "PMM1428"], conn=conn,
         )
-        # PMM0392 + PMM0001 have chemistry; PMM1428 (EVE domain) does not.
+        # PMM0372 (direct TCDB) + PMM0001 have chemistry; PMM1428 (EVE
+        # domain) does not.
         assert result["has_chemistry"] == 2
 
     def test_list_filter_values_omics_type_includes_metabolomics(self, conn):
@@ -1618,9 +1621,10 @@ class TestMetabolitesByFlagsAssayContract:
         # excluded_assays always [] on boolean arm (§5.3).
         assert validated.excluded_assays == []
         # warnings carries only the dominant-form stereo warning (metabolite-
-        # identity-surface spec D): 21 of the 93 msystems presence-flag rows.
+        # identity-surface spec D): 23 of the 93 msystems presence-flag rows
+        # (21 → 23 2026-10-24T17:33Z: stereo rule change).
         assert len(validated.warnings) == 1
-        assert validated.warnings[0].startswith("21 of 93 rows assume the dominant stereo form")
+        assert validated.warnings[0].startswith("23 of 93 rows assume the dominant stereo form")
         # Detail rows surface flag_value as Python bool.
         for r in validated.results:
             assert isinstance(r.flag_value, bool)
@@ -1937,7 +1941,10 @@ class TestMetabolitesByGeneNoFormulaContract:
 
     def test_transporter_gene_reports_no_formula(self, conn):
         r = api.metabolites_by_gene(
-            locus_tags=["PMM0913", "PMM0331", "PMM1590"], organism=self._ORG,
+            # PMM0203 replaces PMM0913 (ABC-superfamily-only: no direct TCDB
+            # rows post-3a); its direct transport arm reaches 1 formula-less
+            # target under metabolite_elements=['N'].
+            locus_tags=["PMM0203", "PMM0331", "PMM1590"], organism=self._ORG,
             metabolite_elements=["N"], summary=True, conn=conn,
         )
         assert isinstance(r["no_formula_excluded"], int)

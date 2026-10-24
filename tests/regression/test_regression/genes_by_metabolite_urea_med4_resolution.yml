@@ -15,12 +15,12 @@ by_metabolite:
   name: Urea
   reaction_count: 0
   rows: 10
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 10
+  tcdb_direct_rows: 10
+  tcdb_family_rows: 0
   transporter_count: 2
-by_substrate_depth:
+by_tcdb_route:
 - count: 10
-  substrate_depth: most_specific
+  tcdb_route: direct
 case_id: genes_by_metabolite_urea_med4_resolution
 gene_count_total: 5
 metabolite_count_total: 1
@@ -33,7 +33,8 @@ offset: 0
 reaction_count_total: 0
 resolved_aliases: {}
 results:
-- ec_numbers: null
+- attached_tcdb_id: tcdb:3.A.1.4.4
+  ec_numbers: null
   evidence_source: transport
   gene_name: urtA
   go_axiom_term_id: null
@@ -54,13 +55,19 @@ results:
   product: ABC-type urea transporter, substrate binding component
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.6
+  tcdb_calls:
+  - diamond_best_hit
+  - diamond_tier
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: The high-affinity (<1 μM) urea porter
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: 57.1
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
+- attached_tcdb_id: tcdb:3.A.1.4.5
+  ec_numbers: null
   evidence_source: transport
   gene_name: urtA
   go_axiom_term_id: null
@@ -81,13 +88,18 @@ results:
   product: ABC-type urea transporter, substrate binding component
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.6
+  tcdb_calls:
+  - diamond_tier
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
+- attached_tcdb_id: tcdb:3.A.1.4.4
+  ec_numbers: null
   evidence_source: transport
   gene_name: urtB
   go_axiom_term_id: null
@@ -108,13 +120,18 @@ results:
   product: ABC-type urea transporter, permease component
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - diamond_best_hit
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: The high-affinity (<1 μM) urea porter
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: 52.8
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
+- attached_tcdb_id: tcdb:3.A.1.4.5
+  ec_numbers: null
   evidence_source: transport
   gene_name: urtB
   go_axiom_term_id: null
@@ -135,13 +152,17 @@ results:
   product: ABC-type urea transporter, permease component
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
+- attached_tcdb_id: tcdb:3.A.1.4.4
+  ec_numbers: null
   evidence_source: transport
   gene_name: urtC
   go_axiom_term_id: null
@@ -162,13 +183,18 @@ results:
   product: ABC-type urea transporter, membrane component
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - diamond_best_hit
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: The high-affinity (<1 μM) urea porter
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: 54.2
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
+- attached_tcdb_id: tcdb:3.A.1.4.5
+  ec_numbers: null
   evidence_source: transport
   gene_name: urtC
   go_axiom_term_id: null
@@ -189,13 +215,17 @@ results:
   product: ABC-type urea transporter, membrane component
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
+- attached_tcdb_id: tcdb:3.A.1.4.4
+  ec_numbers: null
   evidence_source: transport
   gene_name: urtD
   go_axiom_term_id: null
@@ -216,13 +246,18 @@ results:
   product: ABC-type urea transporter, ATP-binding component UrtD
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - diamond_best_hit
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: The high-affinity (<1 μM) urea porter
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: 47.3
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
+- attached_tcdb_id: tcdb:3.A.1.4.5
+  ec_numbers: null
   evidence_source: transport
   gene_name: urtD
   go_axiom_term_id: null
@@ -243,13 +278,17 @@ results:
   product: ABC-type urea transporter, ATP-binding component UrtD
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: null
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
+- attached_tcdb_id: tcdb:3.A.1.4.4
+  ec_numbers: null
   evidence_source: transport
   gene_name: urtE
   go_axiom_term_id: null
@@ -270,13 +309,18 @@ results:
   product: ABC-type urea transporter, ATPase component UrtE
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - diamond_best_hit
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: The high-affinity (<1 μM) urea porter
-  transport_substrate_resolution: resolved
-- ec_numbers: null
+  tcdb_identity: 62.1
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
+- attached_tcdb_id: tcdb:3.A.1.4.5
+  ec_numbers: null
   evidence_source: transport
   gene_name: urtE
   go_axiom_term_id: null
@@ -297,16 +341,33 @@ results:
   product: ABC-type urea transporter, ATPase component UrtE
   reaction_id: null
   reaction_name: null
-  substrate_depth: most_specific
   target_kind: metabolite
-  tcdb_evidence_score: 0.8
+  tcdb_calls:
+  - eggnog
+  tcdb_direction: uptake
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
-  transport_substrate_resolution: resolved
+  tcdb_identity: null
+  tcdb_route: direct
+  tcdb_substrate_system_count: null
 returned: 10
 row_count: 10
 stereo_forms_added: {}
 stereo_relatives: {}
+tcdb_family_substrates_not_shown: null
+tcdb_family_substrates_skipped:
+- locus_tag: PMM0449
+  tcdb_id: tcdb:3.A.1
+  tcdb_substrate_count: 551
+- locus_tag: PMM0450
+  tcdb_id: tcdb:3.A.1
+  tcdb_substrate_count: 551
+- locus_tag: PMM0913
+  tcdb_id: tcdb:3.A.1
+  tcdb_substrate_count: 551
+- locus_tag: PMM0977
+  tcdb_id: tcdb:3.A.1
+  tcdb_substrate_count: 551
 top_gene_categories:
 - category: Stress response and adaptation
   gene_count: 5
@@ -318,10 +379,9 @@ top_genes:
   metabolite_count: 1
   multi_source_metabolite_count: 0
   reaction_count: 0
-  tcdb_evidence_score_max: 0.6
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 2
-  transport_substrate_resolution: resolved
+  tcdb_assignment_count: 2
+  tcdb_direct_rows: 2
+  tcdb_family_rows: 0
   transporter_count: 2
 - gene_name: urtB
   go_transport_rows: 0
@@ -330,10 +390,9 @@ top_genes:
   metabolite_count: 1
   multi_source_metabolite_count: 0
   reaction_count: 0
-  tcdb_evidence_score_max: 0.8
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 2
-  transport_substrate_resolution: resolved
+  tcdb_assignment_count: 2
+  tcdb_direct_rows: 2
+  tcdb_family_rows: 0
   transporter_count: 2
 - gene_name: urtC
   go_transport_rows: 0
@@ -342,10 +401,9 @@ top_genes:
   metabolite_count: 1
   multi_source_metabolite_count: 0
   reaction_count: 0
-  tcdb_evidence_score_max: 0.8
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 2
-  transport_substrate_resolution: resolved
+  tcdb_assignment_count: 2
+  tcdb_direct_rows: 2
+  tcdb_family_rows: 0
   transporter_count: 2
 - gene_name: urtD
   go_transport_rows: 0
@@ -354,10 +412,9 @@ top_genes:
   metabolite_count: 1
   multi_source_metabolite_count: 0
   reaction_count: 0
-  tcdb_evidence_score_max: 0.8
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 2
-  transport_substrate_resolution: resolved
+  tcdb_assignment_count: 2
+  tcdb_direct_rows: 2
+  tcdb_family_rows: 0
   transporter_count: 2
 - gene_name: urtE
   go_transport_rows: 0
@@ -366,25 +423,26 @@ top_genes:
   metabolite_count: 1
   multi_source_metabolite_count: 0
   reaction_count: 0
-  tcdb_evidence_score_max: 0.8
-  transport_inherited_rows: 0
-  transport_most_specific_rows: 2
-  transport_substrate_resolution: resolved
+  tcdb_assignment_count: 2
+  tcdb_direct_rows: 2
+  tcdb_family_rows: 0
   transporter_count: 2
 top_reactions: []
 top_tcdb_families:
-- gene_count: 5
-  level_kind: tc_specificity
+- direction: uptake
+  gene_count: 5
+  level_kind: tc_system
   metabolite_count: 1
-  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.4.4
   tcdb_family_name: The high-affinity (<1 μM) urea porter
-- gene_count: 5
-  level_kind: tc_specificity
+  tcdb_route: direct
+- direction: uptake
+  gene_count: 5
+  level_kind: tc_system
   metabolite_count: 1
-  substrate_depth: most_specific
   tcdb_family_id: tcdb:3.A.1.4.5
   tcdb_family_name: The high affinity urea/thiourea/hydroxyurea porter
+  tcdb_route: direct
 total_matching: 10
 transporter_count_total: 2
 truncated: false

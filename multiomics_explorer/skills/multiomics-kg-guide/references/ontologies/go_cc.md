@@ -73,13 +73,6 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="go_cc")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
-
-- `CellularComponent.is_uninformative`: `true`
-- `CellularComponent.level_is_best_effort`: `true`
-- `Gene_located_in_cellular_component.evidence`: `curated`, `family_inferred`, `domain_inferred`
-- `Gene_located_in_cellular_component.sources`: `cyanorak`, `eggnog`, `interproscan`, `ncbi`, `uniprot`
-
 ## Interpretation
 
 Useful for "which complexes / compartments does this gene set touch"

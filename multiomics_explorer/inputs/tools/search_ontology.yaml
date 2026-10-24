@@ -129,12 +129,12 @@ examples:
 
   - title: Browse per organism — which TCDB families are biggest in MED4
     call: search_ontology(ontology=["tcdb"], level=2, organism="MED4", min_gene_count=5)
-    note: "organism= scopes the count: rows gain organism_gene_count, and the sort and min_gene_count apply to it (gene_count stays KG-wide). 'MED4' resolves to 'Prochlorococcus MED4'. organism_gene_count is subtree-scoped (term + descendants), the same number ontology_term_details(organism=...) reports — tcdb:3.A.1 in MED4 reads 65 on both tools."
+    note: "organism= scopes the count: rows gain organism_gene_count, and the sort and min_gene_count apply to it (gene_count stays KG-wide). 'MED4' resolves to 'Prochlorococcus MED4'. organism_gene_count is subtree-scoped (term + descendants), the same number ontology_term_details(organism=...) reports — tcdb:3.A.1 in MED4 reads 52 on both tools. TCDB counts are gated: only edges with `tcdb_gate` direct or annotated count."
     response: |
       {
         "mode": "browse",
-        "total_entries": 1515,
-        "total_matching": 22,
+        "total_entries": 9370,
+        "total_matching": 8,
         "score_max": null,
         "score_median": null,
         "returned": 5,
@@ -143,14 +143,14 @@ examples:
         "by_ontology": [
           {
             "ontology": "tcdb",
-            "total_entries": 1515,
-            "total_matching": 22,
+            "total_entries": 9370,
+            "total_matching": 8,
             "score_max": null,
             "returned": 5,
             "truncated": true
           }
         ],
-        "by_level": [{"level": 2, "count": 22}],
+        "by_level": [{"level": 2, "count": 8}],
         "by_interpro_type": [],
         "by_family_type": [],
         "skipped_ontologies": [],
@@ -163,9 +163,9 @@ examples:
             "score": null,
             "level": 2,
             "is_informative": true,
-            "gene_count": 4900,
+            "gene_count": 3933,
             "organism_count": 43,
-            "organism_gene_count": 65
+            "organism_gene_count": 52
           },
           {
             "id": "tcdb:3.D.1",
@@ -174,20 +174,20 @@ examples:
             "score": null,
             "level": 2,
             "is_informative": true,
-            "gene_count": 894,
+            "gene_count": 597,
             "organism_count": 43,
-            "organism_gene_count": 20
+            "organism_gene_count": 17
           },
           {
-            "id": "tcdb:3.A.9",
-            "name": "The Chloroplast Envelope Protein Translocase (CEPT or Tic-Toc) Family",
+            "id": "tcdb:3.E.2",
+            "name": "The Photosynthetic Reaction Center (PRC) Family",
             "ontology_type": "tcdb",
             "score": null,
             "level": 2,
             "is_informative": true,
-            "gene_count": 663,
-            "organism_count": 43,
-            "organism_gene_count": 17
+            "gene_count": 383,
+            "organism_count": 32,
+            "organism_gene_count": 11
           },
           ...
         ]
@@ -340,10 +340,10 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 4837,
-        "total_matching": 366,
-        "score_max": 3.735538959503174,
-        "score_median": 2.0432791709899902,
+        "total_entries": 12692,
+        "total_matching": 845,
+        "score_max": 4.514525413513184,
+        "score_median": 2.8362488746643066,
         "returned": 10,
         "offset": 0,
         "truncated": true,
@@ -358,9 +358,9 @@ examples:
           },
           {
             "ontology": "tcdb",
-            "total_entries": 1515,
-            "total_matching": 42,
-            "score_max": 3.735538959503174,
+            "total_entries": 9370,
+            "total_matching": 521,
+            "score_max": 4.514525413513184,
             "returned": 5,
             "truncated": true
           }
@@ -410,8 +410,8 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 49029,
-        "total_matching": 155,
+        "total_entries": 56676,
+        "total_matching": 205,
         "score_max": 7.6005682945251465,
         "score_median": 3.41845965385437,
         "returned": 19,
@@ -452,9 +452,9 @@ examples:
           },
           {
             "ontology": "kegg",
-            "total_entries": 5148,
+            "total_entries": 4940,
             "total_matching": 20,
-            "score_max": 2.7983765602111816,
+            "score_max": 2.7988977432250977,
             "returned": 2,
             "truncated": true
           },
@@ -561,24 +561,25 @@ examples:
   - title: Filter search results by hierarchy level
     call: search_ontology(search_text="oxido*", ontology=["kegg"], level=2)
 
-  - title: Find TCDB families that move sucrose
+  - title: Find TCDB nodes that move sucrose
     call: search_ontology(search_text="sucrose", ontology=["tcdb"])
+    note: "Most hits are `tc_system` nodes, and many read `gene_count = 0`: they are range-only systems TCDB curates but no gene in the KG is called to. They are legitimate discovery results (they carry the substrate edges a family walk reads), but to keep only gene-bearing terms read `gene_count`, or browse with `min_gene_count=1`. Verbose adds `tcdb_substrate_count` and TCDB's `direction`."
     response: |
       {
         "mode": "search",
-        "total_entries": 1515,
-        "total_matching": 6,
-        "score_max": 6.876675605773926,
-        "score_median": 1.8640555143356323,
+        "total_entries": 9370,
+        "total_matching": 35,
+        "score_max": 8.590202331542969,
+        "score_median": 3.736258029937744,
         "returned": 5,
         "offset": 0,
         "truncated": true,
         "by_ontology": [
           {
             "ontology": "tcdb",
-            "total_entries": 1515,
-            "total_matching": 6,
-            "score_max": 6.876675605773926,
+            "total_entries": 9370,
+            "total_matching": 35,
+            "score_max": 8.590202331542969,
             "returned": 5,
             "truncated": true
           }
@@ -593,31 +594,31 @@ examples:
             "id": "tcdb:3.A.1.1.8",
             "name": "Sucrose/maltose/trehalose porter (sucrose-inducible)",
             "ontology_type": "tcdb",
-            "score": 6.876675605773926,
+            "score": 8.590202331542969,
             "level": 4,
             "is_informative": true,
             "gene_count": 3,
             "organism_count": 1
           },
           {
-            "id": "tcdb:3.A.1.1.17",
-            "name": "Trehalose/maltose/sucrose porter (trehalose inducible)",
+            "id": "tcdb:2.A.2.4.11",
+            "name": "Sucrose transport protein SUT5 (Sucrose permease 5) (Sucrose transporter 5) (OsSUT5) (Sucrose-proton symporter 5).",
             "ontology_type": "tcdb",
-            "score": 5.345425605773926,
+            "score": 8.30156135559082,
             "level": 4,
             "is_informative": true,
-            "gene_count": 3,
-            "organism_count": 1
+            "gene_count": 0,
+            "organism_count": 0
           },
           {
-            "id": "tcdb:1.B.3.1.2",
-            "name": "Oligosaccharide porin, ScrY (transports sucrose, raffinose and maltooligo-saccharides).",
+            "id": "tcdb:2.A.2.4.6",
+            "name": "Vacuolar sucrose;H + symporter, Suc4, catalyzes sucrose export from vacuoles.",
             "ontology_type": "tcdb",
-            "score": 4.577001571655273,
+            "score": 7.476313591003418,
             "level": 4,
             "is_informative": true,
-            "gene_count": 1,
-            "organism_count": 1
+            "gene_count": 0,
+            "organism_count": 0
           },
           ...
         ]
@@ -871,19 +872,19 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 5148,
-        "total_matching": 329,
-        "score_max": 1.7510488033294678,
-        "score_median": 1.1552175283432007,
+        "total_entries": 4940,
+        "total_matching": 327,
+        "score_max": 1.7353379726409912,
+        "score_median": 1.1521457433700562,
         "returned": 5,
         "offset": 0,
         "truncated": true,
         "by_ontology": [
           {
             "ontology": "kegg",
-            "total_entries": 5148,
-            "total_matching": 329,
-            "score_max": 1.7510488033294678,
+            "total_entries": 4940,
+            "total_matching": 327,
+            "score_max": 1.7353379726409912,
             "returned": 5,
             "truncated": true
           }
@@ -898,7 +899,7 @@ examples:
             "id": "kegg.subcategory:09131",
             "name": "Membrane transport",
             "ontology_type": "kegg",
-            "score": 1.7510488033294678,
+            "score": 1.7353379726409912,
             "level": 1,
             "is_informative": true,
             "discussed_by_n_publications": 0,
@@ -909,7 +910,7 @@ examples:
             "id": "kegg.subcategory:09141",
             "name": "Transport and catabolism",
             "ontology_type": "kegg",
-            "score": 1.612439751625061,
+            "score": 1.6003291606903076,
             "level": 1,
             "is_informative": true,
             "discussed_by_n_publications": 0,
@@ -920,7 +921,7 @@ examples:
             "id": "kegg.orthology:K06197",
             "name": "chaB; cation transport regulator",
             "ontology_type": "kegg",
-            "score": 1.4941649436950684,
+            "score": 1.4848110675811768,
             "level": 3,
             "is_informative": true,
             "discussed_by_n_publications": 0,
@@ -936,19 +937,19 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 5148,
+        "total_entries": 4940,
         "total_matching": 1,
-        "score_max": 4.122564792633057,
-        "score_median": 4.122564792633057,
+        "score_max": 4.1332902908325195,
+        "score_median": 4.1332902908325195,
         "returned": 1,
         "offset": 0,
         "truncated": false,
         "by_ontology": [
           {
             "ontology": "kegg",
-            "total_entries": 5148,
+            "total_entries": 4940,
             "total_matching": 1,
-            "score_max": 4.122564792633057,
+            "score_max": 4.1332902908325195,
             "returned": 1,
             "truncated": false
           }
@@ -963,7 +964,7 @@ examples:
             "id": "kegg.pathway:ko00710",
             "name": "Carbon fixation by Calvin cycle",
             "ontology_type": "kegg",
-            "score": 4.122564792633057,
+            "score": 4.1332902908325195,
             "level": 2,
             "is_informative": true,
             "discussed_by_n_publications": 24,
@@ -1003,7 +1004,8 @@ verbose_fields:
   - level_kind
   - direct_gene_count
   - superfamily
-  - metabolite_count
+  - tcdb_substrate_count
+  - direction
   - family_type
   - gene_symbol
   - family_class
@@ -1025,7 +1027,7 @@ mistakes:
   - "`ontology` is a list (a single string is accepted); omit it to fan out over all 17 in registry order. `limit` / `offset` apply PER ontology (lockstep paging — `returned <= limit x n`); read `by_ontology[].truncated` to see which ontology still has pages. See docs://guide/conventions."
   - "Browse mode (no `search_text`) sorts by `gene_count DESC, id` and leaves `score` null; a browse that truncates with no `level` / facet / `min_gene_count` / `organism` filter adds a warning — you are paging through a whole ontology. Narrow first."
   - "`organism=` (browse) changes what is sorted and filtered: rows gain `organism_gene_count`, `min_gene_count` applies to it, and `gene_count` stays KG-wide. Without `organism=`, `gene_count` / `organism_count` are counts across all organisms on the term node. The name resolves like every other tool (`'MED4'` → `'Prochlorococcus MED4'`; unknown or ambiguous raises)."
-  - "`organism_gene_count` is subtree-scoped (term + descendants, one organism; BRITE via its KEGG bridge) — the same scope as `gene_count` (all organisms) and the same number `ontology_term_details(organism=...)` reports (`tcdb:3.A.1` in MED4: 65 on both). A parent therefore never shows fewer genes than its child. For node-local counts read `direct_gene_count` (verbose, hierarchical labels only)."
+  - "`organism_gene_count` is subtree-scoped (term + descendants, one organism; BRITE via its KEGG bridge) — the same scope as `gene_count` (all organisms) and the same number `ontology_term_details(organism=...)` reports (`tcdb:3.A.1` in MED4: 52 on both; TCDB counts use gated edges only). A parent therefore never shows fewer genes than its child. For node-local counts read `direct_gene_count` (verbose, hierarchical labels only)."
   - "`score_median` is over the full match on a single-ontology search, but over the RETURNED PAGE on multi-ontology calls (the per-ontology summaries carry no pooled median). `score_max` is exact in both cases."
   - "Lucene scores are per index: rows of two ontologies in one call are grouped by ontology, not interleaved by score. Never rank a `go_bp` row against a `tcdb` row by `score`."
   - "A facet (`tree` for BRITE, `interpro_type` for InterPro) narrows only its owner and raises when the owner is not in the ontology list. For BRITE, always pass `tree=` — without it the `enzymes` tree dominates. Discover trees via `list_filter_values('brite_tree')`."

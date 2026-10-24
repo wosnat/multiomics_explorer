@@ -87,13 +87,6 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="ncbifam")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
-
-- `Gene_has_ncbifam_family.evidence`: `signature`
-- `Gene_has_ncbifam_family.sources`: `interproscan`
-- `NcbifamFamily.family_type`: `PfamAutoEq`, `PfamEq`, `domain`, `equivalog`, `equivalog_domain`, `exception`, `hypoth_equivalog`, `hypoth_equivalog_domain`, `paralog`, `paralog_domain`, `repeat`, `retired`, `signature`, `subfamily`, `subfamily_domain`, `superfamily`
-- `NcbifamFamily.is_uninformative`: `true`
-
 ## Interpretation
 
 Read `family_type` before trusting the name: `equivalog` (and

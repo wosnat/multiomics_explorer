@@ -347,7 +347,7 @@ rows:
   derived_metric_count: 0
   derived_metric_value_kinds: []
   discussed_gene_count: 40
-  discussed_pathway_count: 8
+  discussed_pathway_count: 7
   doi: 10.1128/spectrum.03275-22
   experiment_count: 60
   growth_phases:

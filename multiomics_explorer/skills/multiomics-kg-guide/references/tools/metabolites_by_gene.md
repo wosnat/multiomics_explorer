@@ -4,9 +4,9 @@
 
 Metabolites a gene batch reaches in ONE organism via KEGG, TCDB and GO transport (GO rows: term definitions, not gene facts).
 
-Use for gene → compounds; mirror `genes_by_metabolite`; docs://analysis/transport.
-Filters: locus_tags, organism, metabolite_elements, metabolite_ids (+exclude, `chebi.role:` ok), ec_numbers, evidence_sources, go_include_ancestors/namespace/evidence.
-Returns: by_gene, by_element, by_evidence_source(_combination), rows_by_go_term_depth, top_metabolites; row = gene × reaction|family|GO term × metabolite.
+Use for gene → compounds; mirror genes_by_metabolite; docs://analysis/transport.
+Filters: locus_tags, metabolite_elements, metabolite_ids (+exclude, roles ok), ec_numbers, evidence_sources, include_tcdb_family_substrates, go_*.
+Returns: by_gene, by_element, by_evidence_source(_combination), by_tcdb_route, tcdb_family_substrates_not_shown, top_metabolites; row = gene × reaction|TCDB|GO term × compound.
 docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
 
 ## Parameters
@@ -22,8 +22,8 @@ docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
 | metabolite_pathway_ids | list[string] \| None | None | Filter to rows where the **metabolite** is in any of these KEGG pathways (`KeggTerm.id`, e.g. ['kegg.pathway:ko00910'] for nitrogen metabolism). Anchored on `Metabolite.pathway_ids` (transport-extended), so applies uniformly to all three arms. **Not gene-anchored** — for filtering by genes' KEGG-pathway annotations, route through `genes_by_ontology(ontology="kegg", term_ids=[pathway_id], organism=...)` first to obtain locus_tags. `not_found.metabolite_pathway_ids` lists IDs that don't exist as a KeggTerm. |
 | mass_balance | string ('balanced', 'unbalanced') \| None | None | Narrow metabolism rows to those whose Reaction has this mass balance status. **Metabolism arm only — does not affect TCDB or GO transport rows**. Combine with `evidence_sources=['metabolism']` to restrict to metabolism rows alone. |
 | gene_categories | list[string] \| None | None | Filter on `Gene.gene_category` (exact match, applies to all three arms uniformly). Use `list_filter_values(filter_type="gene_category")` for valid values. Note: somewhat redundant with `locus_tags` input; useful when locus_tags is a broad batch and you want chemistry from specific functional categories only. |
-| substrate_depth | list[string ('most_specific', 'inherited')] \| None | None | Keep transport rows whose edge `substrate_depth` is in this list. 'most_specific' = most specific surviving transporter node for the substrate (gene-pruned hierarchy, not a curation level). Transport arm only; mutes ABC tails. |
 | evidence_sources | list[string ('metabolism', 'transport', 'go_transport')] \| None | None | Path selector — restricts which arms execute (metabolism, transport, go_transport). Default fires all three. `['metabolism']` skips transport rollup noise. 'metabolomics' is NOT valid here (no gene anchor); see `list_metabolites`. |
+| include_tcdb_family_substrates | bool | False | TCDB arm: also walk from the gene's family / subfamily calls down to their systems' substrates (tcdb_route='family'; a recall fallback for genes with no system). Adds rows only; ignored without the transport arm. |
 | go_include_ancestors | bool | False | GO route only: also return inherited rows, where a gene's GO term reaches the target through is_a ancestors (go_term_depth > 0). Default False = directly annotated terms. |
 | go_namespace | list[string ('molecular_function', 'biological_process')] \| None | None | GO arm only: keep GO rows whose gene->GO edge is in these namespaces. TCDB / KEGG rows untouched. Filtered result is always a subset of the unfiltered one. |
 | go_evidence | list[string] \| None | None | GO arm only: keep GO rows whose gene->GO edge evidence is in this list (e.g. ['curated']; family_inferred, domain_inferred). Unknown values raise. TCDB / KEGG rows untouched; result is a subset of the unfiltered one. |
@@ -36,19 +36,19 @@ docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
 
 ## Example
 
-### Single-gene drill-down — resolved transporter (Workflow D)
+### Single-gene drill-down — a direct transporter (Workflow D)
 
 ```python
-metabolites_by_gene(locus_tags=["PMM0392"], organism="Prochlorococcus MED4", evidence_sources=["transport"])
+metabolites_by_gene(locus_tags=["PMM0372"], organism="Prochlorococcus MED4", evidence_sources=["transport"])
 ```
 
 ## Response sketch
 
 ```expected-keys
-total_matching, returned, offset, truncated, warnings, stereo_relatives, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_evidence_source_combination, by_substrate_depth, rows_by_go_term_depth, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
+total_matching, returned, offset, truncated, warnings, stereo_relatives, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_evidence_source_combination, by_tcdb_route, tcdb_family_substrates_not_shown, tcdb_family_substrates_skipped, rows_by_go_term_depth, by_element, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 
-Result row: `locus_tag, gene_name, product, evidence_source, substrate_depth, tcdb_evidence_score, transport_substrate_resolution, reaction_id, reaction_name, ec_numbers, mass_balance, tcdb_family_id, …`
+Result row: `locus_tag, gene_name, product, evidence_source, tcdb_route, tcdb_calls, tcdb_identity, tcdb_direction, attached_tcdb_id, tcdb_substrate_system_count, reaction_id, reaction_name, …`
 
 ## Common mistakes
 

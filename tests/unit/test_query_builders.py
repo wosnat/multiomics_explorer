@@ -7778,8 +7778,6 @@ class TestBuildGenesByMetaboliteMetabolism:
             "g.gene_name AS gene_name",
             "g.product AS product",
             "'metabolism' AS evidence_source",
-            "null AS substrate_depth",
-            "null AS tcdb_evidence_score",
             "r.id AS reaction_id",
             "r.name AS reaction_name",
             "coalesce(r.ec_numbers, []) AS ec_numbers",
@@ -7860,13 +7858,6 @@ class TestBuildGenesByMetaboliteTransport:
         # re-pinned: GO transport surface (spec §6.3)
         assert "(g:Gene)" + _TRANSPORT_ARM_PATTERN in cypher
 
-    def test_deepest_attachment_predicate(self):
-        """Decision 4: the transport arm walks only the gene's deepest TCDB
-        attachments (an attachment to `tf` is superseded when the same gene
-        is attached to a descendant of `tf`)."""
-        cypher, _ = self._build()
-        _assert_deepest_predicate(cypher)
-
     def test_metabolite_ids_in_where(self):
         cypher, params = self._build()
         assert "m.id IN $metabolite_ids" in cypher
@@ -7893,26 +7884,6 @@ class TestBuildGenesByMetaboliteTransport:
         cypher, params = self._build(gene_categories=["Transport"])
         assert "g.gene_category IN $gene_categories" in cypher
         assert params["gene_categories"] == ["Transport"]
-
-    def test_substrate_depth_filter_single(self):
-        """substrate_depth=['most_specific'] → `r.substrate_depth IN
-        $substrate_depth` on the transport edge (KG edge property)."""
-        cypher, params = self._build(substrate_depth=["most_specific"])
-        assert "r.substrate_depth IN $substrate_depth" in cypher
-        assert params["substrate_depth"] == ["most_specific"]
-
-    def test_substrate_depth_filter_multiple(self):
-        cypher, params = self._build(
-            substrate_depth=["most_specific", "inherited"],
-        )
-        assert "r.substrate_depth IN $substrate_depth" in cypher
-        assert params["substrate_depth"] == ["most_specific", "inherited"]
-
-    def test_no_substrate_depth_filter_when_none(self):
-        """Default (no substrate_depth) → no depth predicate, no param."""
-        cypher, params = self._build()
-        assert "$substrate_depth" not in cypher
-        assert "substrate_depth" not in params
 
     def test_no_tc_specificity_predicate_anywhere(self):
         """Grep acceptance: `level_kind = 'tc_specificity'` no longer drives
@@ -7947,8 +7918,6 @@ class TestBuildGenesByMetaboliteTransport:
             "g.gene_name AS gene_name",
             "g.product AS product",
             "'transport' AS evidence_source",
-            "r.substrate_depth AS substrate_depth",
-            "gt.evidence_score AS tcdb_evidence_score",
             "tf.id AS tcdb_family_id",
             "tf.name AS tcdb_family_name",
             "null AS reaction_id",
@@ -7989,21 +7958,6 @@ class TestBuildGenesByMetaboliteTransport:
         assert "substrate_confirmed" not in cypher
         assert "family_inferred" not in cypher
 
-    def test_order_by_most_specific_first_then_score_desc(self):
-        """Detail sort: ORDER BY metabolite_id, depth tier (most_specific
-        before inherited), tcdb_evidence_score DESC within the tier, then the
-        existing tiebreakers (tcdb_family_id, locus_tag)."""
-        cypher, _ = self._build()
-        order_by = cypher.split("ORDER BY", 1)[1]
-        assert order_by.lstrip().startswith("metabolite_id")
-        depth_case = "CASE WHEN r.substrate_depth = 'most_specific' THEN 0 ELSE 1 END"
-        assert depth_case in order_by
-        m = re.search(r"(tcdb_evidence_score|gt\.evidence_score) DESC", order_by)
-        assert m, f"score DESC missing from ORDER BY: {order_by!r}"
-        assert order_by.index(depth_case) < m.start()
-        assert m.start() < order_by.index("tcdb_family_id")
-        assert order_by.index("tcdb_family_id") < order_by.rindex("locus_tag")
-
     def test_limit_and_offset_clauses(self):
         cypher, params = self._build(limit=10, offset=5)
         assert "SKIP $offset" in cypher
@@ -8039,30 +7993,6 @@ class TestBuildGenesByMetaboliteSummary:
         assert "(g:Gene)-[gt:Gene_has_tcdb_family]->(tf:TcdbFamily)" in cypher
         assert "UNION" in cypher
 
-    def test_transport_arm_deepest_attachment_predicate(self):
-        """Decision 4: the summary's transport arm walks deepest attachments
-        only, so envelope counts and detail rows project one set."""
-        cypher, _ = self._build()
-        _assert_deepest_predicate(cypher)
-
-    def test_transport_arm_carries_substrate_depth_and_score(self):
-        """Row maps carry `substrate_depth` (edge) + the gene-level
-        `transport_substrate_resolution` / `tcdb_evidence_score_max`
-        needed by `top_genes[]`; `top_tcdb_families` derives from the
-        collected substrate_depth, not level_kind."""
-        cypher, _ = self._build()
-        assert re.search(r"\.substrate_depth IN \$substrate_depth", cypher) is None
-        assert "substrate_depth" in cypher
-        assert "g.transport_substrate_resolution" in cypher
-        assert "g.tcdb_evidence_score_max" in cypher
-        assert "gt.evidence_score" in cypher
-        assert "transport_most_specific_rows" in cypher
-        assert "transport_inherited_rows" in cypher
-        assert "transport_substrate_confirmed_rows" not in cypher
-        assert "transport_family_inferred_rows" not in cypher
-        assert "tc_specificity" not in cypher
-        assert "transport_confidence" not in cypher
-
     def test_returns_envelope_keys(self):
         """Per spec § build_genes_by_metabolite_summary."""
         cypher, _ = self._build()
@@ -8073,7 +8003,7 @@ class TestBuildGenesByMetaboliteSummary:
             "transporter_count_total",
             "metabolite_count_total",
             "rows_by_evidence_source",
-            "rows_by_substrate_depth",
+            "rows_by_tcdb_route",
             "by_metabolite",
             "top_reactions",
             "top_tcdb_families",
@@ -8102,15 +8032,6 @@ class TestBuildGenesByMetaboliteSummary:
         assert "$mass_balance" in cypher
         assert params["ec_numbers"] == ["6.3.1.2"]
         assert params["mass_balance"] == "balanced"
-
-    def test_transport_only_filter_propagates_to_transport_arm(self):
-        """substrate_depth reaches the WHERE block (transport-arm only)."""
-        cypher, params = self._build(substrate_depth=["most_specific"])
-        assert re.search(r"\.substrate_depth IN \$substrate_depth", cypher)
-        assert params["substrate_depth"] == ["most_specific"]
-        # metabolism arm is untouched by the transport-only filter
-        metab_arm = cypher.split("Gene_has_tcdb_family")[0]
-        assert "$substrate_depth" not in metab_arm
 
     def test_uniform_filters_propagate_to_both_arms(self):
         """metabolite_pathway_ids and gene_categories narrow both arms."""
@@ -8265,8 +8186,6 @@ class TestBuildMetabolitesByGeneMetabolism:
             "g.gene_name AS gene_name",
             "g.product AS product",
             "'metabolism' AS evidence_source",
-            "null AS substrate_depth",
-            "null AS tcdb_evidence_score",
             "r.id AS reaction_id",
             "r.name AS reaction_name",
             "coalesce(r.ec_numbers, []) AS ec_numbers",
@@ -8358,13 +8277,6 @@ class TestBuildMetabolitesByGeneTransport:
         # re-pinned: GO transport surface (spec §6.3)
         assert "(g:Gene)" + _TRANSPORT_ARM_PATTERN in cypher
 
-    def test_deepest_attachment_predicate(self):
-        """Decision 4 (mirror GBM): deepest TCDB attachments only — PMM0392
-        must yield 13 distinct metabolites, not the 554-substrate `3.A.1`
-        superfamily rollup."""
-        cypher, _ = self._build()
-        _assert_deepest_predicate(cypher)
-
     def test_locus_tags_in_where(self):
         cypher, params = self._build()
         assert "g.locus_tag IN $locus_tags" in cypher
@@ -8409,23 +8321,6 @@ class TestBuildMetabolitesByGeneTransport:
         )
         assert params["metabolite_elements"] == ["N"]
 
-    def test_substrate_depth_filter_single(self):
-        cypher, params = self._build(substrate_depth=["most_specific"])
-        assert "r.substrate_depth IN $substrate_depth" in cypher
-        assert params["substrate_depth"] == ["most_specific"]
-
-    def test_substrate_depth_filter_multiple(self):
-        cypher, params = self._build(
-            substrate_depth=["most_specific", "inherited"],
-        )
-        assert "r.substrate_depth IN $substrate_depth" in cypher
-        assert params["substrate_depth"] == ["most_specific", "inherited"]
-
-    def test_no_substrate_depth_filter_when_none(self):
-        cypher, params = self._build()
-        assert "$substrate_depth" not in cypher
-        assert "substrate_depth" not in params
-
     def test_no_tc_specificity_predicate_anywhere(self):
         cypher, _ = self._build(verbose=True)
         assert "tc_specificity" not in cypher
@@ -8457,8 +8352,6 @@ class TestBuildMetabolitesByGeneTransport:
             "g.gene_name AS gene_name",
             "g.product AS product",
             "'transport' AS evidence_source",
-            "r.substrate_depth AS substrate_depth",
-            "gt.evidence_score AS tcdb_evidence_score",
             "tf.id AS tcdb_family_id",
             "tf.name AS tcdb_family_name",
             "null AS reaction_id",
@@ -8497,20 +8390,6 @@ class TestBuildMetabolitesByGeneTransport:
         assert "substrate_confirmed" not in cypher
         assert "family_inferred" not in cypher
 
-    def test_order_by_uses_input_index(self):
-        """Per MBG spec: ORDER BY depth tier (most_specific first), then
-        tcdb_evidence_score DESC within the tier, then
-        apoc.coll.indexOf($locus_tags, ...) for input-gene-order."""
-        cypher, _ = self._build()
-        order_by = cypher.split("ORDER BY", 1)[1]
-        depth_case = "CASE WHEN r.substrate_depth = 'most_specific' THEN 0 ELSE 1 END"
-        assert depth_case in order_by
-        m = re.search(r"(tcdb_evidence_score|gt\.evidence_score) DESC", order_by)
-        assert m, f"score DESC missing from ORDER BY: {order_by!r}"
-        assert "apoc.coll.indexOf($locus_tags" in order_by
-        assert order_by.index(depth_case) < m.start()
-        assert m.start() < order_by.index("apoc.coll.indexOf($locus_tags")
-
     def test_limit_and_offset_clauses(self):
         cypher, params = self._build(limit=10, offset=5)
         assert "SKIP $offset" in cypher
@@ -8548,26 +8427,6 @@ class TestBuildMetabolitesByGeneSummary:
         assert "(g:Gene)-[gt:Gene_has_tcdb_family]->(tf:TcdbFamily)" in cypher
         assert "UNION" in cypher
 
-    def test_transport_arm_deepest_attachment_predicate(self):
-        cypher, _ = self._build()
-        _assert_deepest_predicate(cypher)
-
-    def test_transport_arm_carries_substrate_depth_and_score(self):
-        """Row maps carry `substrate_depth`; `by_gene[]` sources the
-        gene-level `transport_substrate_resolution` / `tcdb_evidence_score_max`
-        (drives the gene-anchored auto-warning)."""
-        cypher, _ = self._build()
-        assert "substrate_depth" in cypher
-        assert "g.transport_substrate_resolution" in cypher
-        assert "g.tcdb_evidence_score_max" in cypher
-        assert "gt.evidence_score" in cypher
-        assert "transport_most_specific_rows" in cypher
-        assert "transport_inherited_rows" in cypher
-        assert "transport_substrate_confirmed_rows" not in cypher
-        assert "transport_family_inferred_rows" not in cypher
-        assert "tc_specificity" not in cypher
-        assert "transport_confidence" not in cypher
-
     def test_returns_envelope_keys(self):
         """Per spec § build_metabolites_by_gene_summary RETURN keys.
 
@@ -8583,7 +8442,7 @@ class TestBuildMetabolitesByGeneSummary:
             "transporter_count_total",
             "metabolite_count_total",
             "rows_by_evidence_source",
-            "rows_by_substrate_depth",
+            "rows_by_tcdb_route",
             "by_gene",
             "top_reactions",
             "top_tcdb_families",
@@ -8613,14 +8472,6 @@ class TestBuildMetabolitesByGeneSummary:
         assert "$mass_balance" in cypher
         assert params["ec_numbers"] == ["3.5.1.5"]
         assert params["mass_balance"] == "balanced"
-
-    def test_transport_only_filter_propagates_to_transport_arm(self):
-        """substrate_depth reaches only the transport arm WHERE."""
-        cypher, params = self._build(substrate_depth=["most_specific"])
-        assert re.search(r"\.substrate_depth IN \$substrate_depth", cypher)
-        assert params["substrate_depth"] == ["most_specific"]
-        metab_arm = cypher.split("Gene_has_tcdb_family")[0]
-        assert "$substrate_depth" not in metab_arm
 
     def test_uniform_filters_propagate_to_both_arms(self):
         """metabolite_pathway_ids, gene_categories, metabolite_ids,
@@ -9325,30 +9176,10 @@ class TestBuildGeneOverviewPhase1Plumbing:
         # `tcdb_family_count` (deepest-attachment precompute) is the
         # replacement column; only the old name must stay gone.
 
-    def test_compact_returns_tcdb_evidence_score_max_uncoalesced(self):
-        """null = no TCDB call — sparse KG property surfaced as null, never
-        coalesced to a sentinel."""
-        cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
-        assert "g.tcdb_evidence_score_max AS tcdb_evidence_score_max" in cypher
-        assert "coalesce(g.tcdb_evidence_score_max" not in cypher
-
     def test_compact_returns_transported_metabolite_count(self):
         cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
         assert ("coalesce(g.transported_metabolite_count, 0) "
                 "AS transported_metabolite_count") in cypher
-
-    def test_compact_returns_transport_substrate_resolution(self):
-        cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
-        assert ("g.transport_substrate_resolution "
-                "AS transport_substrate_resolution") in cypher
-        assert "coalesce(g.transport_substrate_resolution" not in cypher
-
-    def test_evidence_sources_tcdb_arm_uses_deepest_attachment(self):
-        """Decision 4: the evidence_sources path-existence traversal's TCDB
-        arm carries the deepest-attachment predicate so `'transport'` and
-        `'metabolomics'` agree with the KG's transport counts."""
-        cypher, _ = build_gene_overview(locus_tags=["PMM0001"])
-        _assert_deepest_predicate(cypher)
 
     def test_compact_returns_evidence_sources(self):
         """evidence_sources column present in RETURN."""
@@ -9374,15 +9205,13 @@ class TestBuildGeneOverviewPhase1Plumbing:
         assert "measured_assay_count" in cypher
 
     def test_verbose_still_has_chemistry_columns(self):
-        """Verbose mode keeps all the new chemistry columns."""
+        """Verbose mode keeps all the chemistry columns (TCDB cleanup: the
+        score / resolution columns are gone, see TestTcdbCleanupGeneOverview)."""
         cypher, _ = build_gene_overview(locus_tags=["PMM0001"], verbose=True)
         assert "reaction_count" in cypher
         assert "catalyzed_metabolite_count" in cypher
-        assert "tcdb_evidence_score_max" in cypher
         assert "transported_metabolite_count" in cypher
-        assert "transport_substrate_resolution" in cypher
         assert "evidence_sources" in cypher
-
 
 class TestBuildGeneOverviewSummaryPhase1Plumbing:
     """gene_overview_summary: adds has_chemistry envelope key."""
@@ -9390,13 +9219,6 @@ class TestBuildGeneOverviewSummaryPhase1Plumbing:
     def test_summary_returns_has_chemistry(self):
         cypher, _ = build_gene_overview_summary(locus_tags=["PMM0001"])
         assert "has_chemistry" in cypher
-
-    def test_has_chemistry_tcdb_arm_uses_deepest_attachment(self):
-        """Decision 4: has_chemistry's TCDB arm walks deepest attachments
-        only (same predicate as the detail traversal)."""
-        cypher, _ = build_gene_overview_summary(locus_tags=["PMM0001"])
-        _assert_deepest_predicate(cypher)
-
 
 class TestBuildListPublicationsPhase1Plumbing:
     """list_publications detail: pass-through additions for measurement
@@ -11499,12 +11321,19 @@ class TestOntologyRowColumns:
             "evidence", "sources"]
 
     def test_tcdb_verbose_is_axes_then_native_detail(self):
+        """TCDB cleanup: compact edge categoricals first, then the remaining
+        axes (no evidence_score), then the renamed native detail."""
         from multiomics_explorer.kg.queries_lib import ontology_row_columns
-        assert ontology_row_columns("tcdb", verbose=True) == [
-            "evidence", "sources", "evidence_score", "tier",
-            "confidence_score", "source_agreement", "pfam_support", "go_support",
-            "identity", "qcov", "evalue", "consensus_n", "attachment_depth",
-        ]
+        cols = ontology_row_columns("tcdb", verbose=True)
+        assert cols[:3] == ["evidence", "tcdb_call", "tcdb_gate"]
+        for col in ("sources", "tier", "identity", "qcov", "evalue",
+                    "tcdb_scov", "tcdb_best_hit_rank", "tcdb_bitscore",
+                    "tcdb_bitscore_ratio"):
+            assert col in cols, col
+        for gone in ("evidence_score", "confidence_score", "source_agreement",
+                     "pfam_support", "go_support", "consensus_n",
+                     "attachment_depth"):
+            assert gone not in cols, gone
 
     def test_merops_compact_carries_call_class(self):
         """`call_class` is materially important — absence changes the
@@ -11586,10 +11415,10 @@ class TestOntologyTrustAxes:
     gene edge carries. Drives the envelope `trust_axes` key and the
     unsupported-axis validation message."""
 
-    def test_tcdb_has_all_four_axes(self):
+    def test_tcdb_has_three_axes(self):
+        """TCDB cleanup G3: the evidence_score axis is retired for TCDB."""
         from multiomics_explorer.kg.queries_lib import ontology_trust_axes
-        assert ontology_trust_axes("tcdb") == [
-            "sources", "evidence", "evidence_score", "tier"]
+        assert ontology_trust_axes("tcdb") == ["sources", "evidence", "tier"]
 
     def test_kegg_has_two_axes(self):
         from multiomics_explorer.kg.queries_lib import ontology_trust_axes
@@ -11832,19 +11661,6 @@ class TestOneEdgePerGeneTermRebind:
     list-comprehension + apoc.coll.sortMulti, so there is exactly one row per
     (gene, term)."""
 
-    def test_tcdb_rollup_sorts_edges_by_evidence_score(self):
-        from multiomics_explorer.kg.queries_lib import (
-            build_genes_by_ontology_detail,
-        )
-        cypher, _ = build_genes_by_ontology_detail(
-            ontology="tcdb", organism="Prochlorococcus MED4", level=2,
-        )
-        assert "apoc.coll.sortMulti(" in cypher
-        assert "['evidence_score', 'attachment_level']" in cypher  # 2.1 tie-break
-        assert "attachment_level: l2.level" in cypher
-        assert "head(apoc.coll.sortMulti(" in cypher
-        assert "reverse(" not in cypher  # sortMulti is DESC per key (spec §14)
-
     def test_merops_rollup_sorts_edges_by_confidence_score(self):
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
@@ -11912,19 +11728,23 @@ class TestOntologyRowColumnsInCypher:
         cypher, _ = build_genes_by_ontology_detail(
             ontology="tcdb", organism="Prochlorococcus MED4", level=2,
         )
-        for col in ("evidence", "sources", "evidence_score", "tier"):
+        for col in ("evidence", "sources", "tier", "tcdb_call", "tcdb_gate"):
             assert f"AS {col}" in cypher, col
-        assert "AS attachment_depth" not in cypher
-        assert "AS source_agreement" not in cypher
+        assert "AS evidence_score" not in cypher
+        assert "AS tcdb_scov" not in cypher
+        assert "AS tcdb_bitscore" not in cypher
 
     def test_compact_row_columns_still_exclude_the_extra_axes(self):
         """`ontology_row_columns` — what the api layer keeps — is unchanged:
         the forced projection is a query-side concern only."""
         from multiomics_explorer.kg.queries_lib import ontology_row_columns
-        assert ontology_row_columns("tcdb", verbose=False) == ["evidence"]
-        assert ontology_row_columns(
-            "tcdb", verbose=False, force_trust_axes=True,
-        ) == ["evidence", "sources", "evidence_score", "tier"]
+        compact = ontology_row_columns("tcdb", verbose=False)
+        assert compact[:3] == ["evidence", "tcdb_call", "tcdb_gate"]
+        assert "sources" not in compact and "tier" not in compact
+        forced = ontology_row_columns(
+            "tcdb", verbose=False, force_trust_axes=True)
+        assert "sources" in forced and "tier" in forced
+        assert "evidence_score" not in forced
 
     def test_tcdb_verbose_projects_axes_and_native_detail(self):
         from multiomics_explorer.kg.queries_lib import (
@@ -11934,9 +11754,13 @@ class TestOntologyRowColumnsInCypher:
             ontology="tcdb", organism="Prochlorococcus MED4", level=2,
             verbose=True,
         )
-        for col in ("evidence", "sources", "evidence_score", "tier",
-                    "attachment_depth", "source_agreement"):
+        for col in ("evidence", "sources", "tier", "tcdb_call", "tcdb_gate",
+                    "identity", "qcov", "evalue", "tcdb_scov",
+                    "tcdb_best_hit_rank", "tcdb_bitscore",
+                    "tcdb_bitscore_ratio"):
             assert f"AS {col}" in cypher, col
+        for gone in ("attachment_depth", "source_agreement", "evidence_score"):
+            assert f"AS {gone}" not in cypher, gone
 
     def test_merops_compact_projects_call_class(self):
         from multiomics_explorer.kg.queries_lib import (
@@ -11974,8 +11798,10 @@ class TestOntologyRowColumnsInCypher:
             locus_tags=["PMM0392"], ontology="tcdb",
             organism_name="Prochlorococcus MED4", mode="leaf", verbose=True,
         )
-        assert "AS attachment_depth" in cypher
-        assert "AS evidence_score" in cypher
+        assert "AS tcdb_scov" in cypher
+        assert "AS tcdb_best_hit_rank" in cypher
+        assert "AS attachment_depth" not in cypher
+        assert "AS evidence_score" not in cypher
 
     def test_gene_ontology_terms_compact_omits_native_detail(self):
         from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
@@ -11998,7 +11824,7 @@ class TestLeafFilterMostSpecificAttachment:
             locus_tags=["PMM0392"], ontology="tcdb",
             organism_name="Prochlorococcus MED4", mode="leaf",
         )
-        assert "Tcdb_family_is_a_tcdb_family*1..]->(t)" in cypher
+        assert re.search(r"Tcdb_family_is_a_tcdb_family\*1\.\.\d*\]", cypher)
 
     def test_merops_leaf_filter_uses_transitive_star_one(self):
         from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
@@ -12016,29 +11842,6 @@ class TestLeafFilterMostSpecificAttachment:
         )
         assert "-[:Tcdb_family_is_a_tcdb_family]->(t)" not in cypher
 
-    def test_tcdb_leaf_defaults_to_most_specific_attachment(self):
-        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
-        cypher, _ = build_gene_ontology_terms(
-            locus_tags=["PMM0392"], ontology="tcdb",
-            organism_name="Prochlorococcus MED4", mode="leaf",
-        )
-        assert "r.attachment_depth = 'most_specific'" in cypher
-
-    def test_include_superseded_drops_the_attachment_depth_predicate(self):
-        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
-        cypher, _ = build_gene_ontology_terms(
-            locus_tags=["PMM0392"], ontology="tcdb",
-            organism_name="Prochlorococcus MED4", mode="leaf",
-            include_superseded=True,
-        )
-        assert "r.attachment_depth = 'most_specific'" not in cypher
-
-    def test_include_superseded_defaults_to_false(self):
-        import inspect
-        from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
-        sig = inspect.signature(build_gene_ontology_terms)
-        assert sig.parameters["include_superseded"].default is False
-
     def test_attachment_depth_predicate_is_tcdb_only(self):
         from multiomics_explorer.kg.queries_lib import build_gene_ontology_terms
         cypher, _ = build_gene_ontology_terms(
@@ -12048,16 +11851,17 @@ class TestLeafFilterMostSpecificAttachment:
         assert "attachment_depth" not in cypher
 
     def test_summary_builder_applies_the_same_leaf_predicate(self):
+        """TCDB cleanup: the summary's leaf mode is gated like the detail."""
         from multiomics_explorer.kg.queries_lib import (
             build_gene_ontology_terms_summary,
         )
-        cypher, _ = build_gene_ontology_terms_summary(
+        cypher, params = build_gene_ontology_terms_summary(
             locus_tags=["PMM0392"], ontology="tcdb",
             organism_name="Prochlorococcus MED4", mode="leaf",
         )
-        assert "r.attachment_depth = 'most_specific'" in cypher
-        assert "Tcdb_family_is_a_tcdb_family*1..]->(t)" in cypher
-
+        assert "attachment_depth" not in cypher
+        assert re.search(r"Tcdb_family_is_a_tcdb_family\*1\.\.\d*\]", cypher)
+        _assert_tcdb_gate_pass(cypher, params)
 
 class TestFacetGeneralization:
     """`tree` keeps its name and behaviour; the facet mechanism generalizes
@@ -12440,14 +12244,14 @@ class TestGeneOverviewFamilyCountColumns:
     'most_specific' edges only since the 2026-08-29 rebuild; cazy is flat),
     plus the has_tcdb / has_cazy envelope counts."""
 
-    def test_detail_projects_tcdb_family_count_from_the_precompute(self):
-        """Gene.tcdb_family_count counts attachment_depth='most_specific'
-        edges only (KG rebuild 2026-08-29; PMM0392 reads 7, not the 8 of the
-        earlier all-edges definition). Read it zero-filled; the -m kg
-        invariant test compares it with the live edge count."""
+    def test_detail_projects_tcdb_assignment_count_from_the_precompute(self):
+        """TCDB cleanup: Gene.tcdb_family_count -> Gene.tcdb_assignment_count
+        (KG rename, no alias); read the precompute zero-filled."""
         cypher, _ = build_gene_overview(locus_tags=["PMM0392"])
-        assert "coalesce(g.tcdb_family_count, 0) AS tcdb_family_count" in cypher
-        assert "Gene_has_tcdb_family" not in cypher.split("AS tcdb_family_count")[0].split("ncbifam_family_count,")[-1]
+        assert re.search(
+            r"coalesce\(g\.tcdb_assignment_count, 0\) AS tcdb_assignment_count",
+            cypher)
+        assert "tcdb_family_count" not in cypher
 
     def test_detail_projects_cazy_family_count_defaulted_to_zero(self):
         cypher, _ = build_gene_overview(locus_tags=["PMM0392"])
@@ -12455,7 +12259,9 @@ class TestGeneOverviewFamilyCountColumns:
 
     def test_summary_emits_has_tcdb_from_the_precompute(self):
         cypher, _ = build_gene_overview_summary(locus_tags=["PMM0392"])
-        assert "coalesce(g.tcdb_family_count, 0) > 0]) AS has_tcdb" in cypher
+        assert "tcdb_assignment_count" in cypher
+        assert "AS has_tcdb" in cypher
+        assert "tcdb_family_count" not in cypher
 
     def test_summary_emits_has_cazy(self):
         cypher, _ = build_gene_overview_summary(locus_tags=["PMM0392"])
@@ -12947,7 +12753,7 @@ class TestBuildSearchOntologyVerboseColumns:
         assert "direct_gene_count" not in cypher
 
     @pytest.mark.parametrize("ontology,props", [
-        ("tcdb", ["superfamily", "metabolite_count"]),
+        ("tcdb", ["superfamily", "tcdb_substrate_count", "direction"]),
         ("ncbifam", ["family_type", "gene_symbol"]),
         ("merops", ["family_class", "catalytic_type", "peptidase_gene_count"]),
     ])
@@ -12958,7 +12764,7 @@ class TestBuildSearchOntologyVerboseColumns:
             assert f"t.{prop} AS {prop}" in cypher, prop
 
     @pytest.mark.parametrize("ontology,props", [
-        ("tcdb", ["superfamily", "metabolite_count"]),
+        ("tcdb", ["superfamily", "tcdb_substrate_count", "direction"]),
         ("merops", ["family_class", "catalytic_type", "peptidase_gene_count"]),
     ])
     def test_compact_never_projects_term_verbose(self, ontology, props):
@@ -13019,11 +12825,21 @@ class TestBuildGenesByOntologyTrustRollups:
         assert "count(" in cypher or "apoc.coll.frequencies" in cypher
 
     @pytest.mark.parametrize("key", [
-        "by_evidence", "by_tier", "by_sources", "evidence_score_stats",
+        "by_evidence", "by_tier", "by_sources",
     ])
     def test_returns_the_envelope_rollup(self, key):
         cypher, _ = self._build()
         assert key in cypher
+
+    def test_scored_ontology_returns_evidence_score_stats(self):
+        # TCDB carries no evidence_score after the 3a cleanup (spec G3);
+        # MEROPS still does.
+        cypher, _ = self._build(ontology="merops", level=1)
+        assert "evidence_score_stats" in cypher
+
+    def test_tcdb_has_no_evidence_score_stats(self):
+        cypher, _ = self._build()
+        assert "evidence_score_stats" not in cypher
 
     def test_merops_returns_by_call_class(self):
         cypher, _ = self._build(ontology="merops", level=1)
@@ -13130,87 +12946,6 @@ class TestBuildListOrganismsAnnotationRollups:
         )
         for fn in (build_list_organisms, build_list_organisms_summary):
             assert "min_peptidase_gene_count" not in inspect.signature(fn).parameters
-
-
-class TestTransportSubstrateResolutionDetailColumn:
-    """Spec §3.2 / §7.3: the gene-level `transport_substrate_resolution` is
-    projected on every transport-arm detail row and null-padded on the
-    metabolism arm, for both triplet tools."""
-
-    _TRANSPORT = "g.transport_substrate_resolution AS transport_substrate_resolution"
-    _PADDING = "null AS transport_substrate_resolution"
-
-    def test_gbm_transport_arm_projects_gene_resolution(self):
-        from multiomics_explorer.kg.queries_lib import (
-            build_genes_by_metabolite_transport,
-        )
-        cypher, _ = build_genes_by_metabolite_transport(
-            metabolite_ids=["kegg.compound:C00086"],
-            organism="Prochlorococcus MED4")
-        assert self._TRANSPORT in cypher
-        assert self._PADDING not in cypher
-
-    def test_gbm_metabolism_arm_pads_null(self):
-        from multiomics_explorer.kg.queries_lib import (
-            build_genes_by_metabolite_metabolism,
-        )
-        cypher, _ = build_genes_by_metabolite_metabolism(
-            metabolite_ids=["kegg.compound:C00086"],
-            organism="Prochlorococcus MED4")
-        assert self._PADDING in cypher
-        assert self._TRANSPORT not in cypher
-
-    def test_mbg_transport_arm_projects_gene_resolution(self):
-        from multiomics_explorer.kg.queries_lib import (
-            build_metabolites_by_gene_transport,
-        )
-        cypher, _ = build_metabolites_by_gene_transport(
-            locus_tags=["PMM0392"], organism="Prochlorococcus MED4")
-        assert self._TRANSPORT in cypher
-        assert self._PADDING not in cypher
-
-    def test_mbg_metabolism_arm_pads_null(self):
-        from multiomics_explorer.kg.queries_lib import (
-            build_metabolites_by_gene_metabolism,
-        )
-        cypher, _ = build_metabolites_by_gene_metabolism(
-            locus_tags=["PMM0963"], organism="Prochlorococcus MED4")
-        assert self._PADDING in cypher
-        assert self._TRANSPORT not in cypher
-
-    @pytest.mark.parametrize("verbose", [False, True])
-    def test_column_sits_right_after_tcdb_evidence_score_on_both_arms(self, verbose):
-        """Spec §3.2: compact, right after `tcdb_evidence_score` — same
-        RETURN order on both arms so the UNION-shaped rows stay aligned."""
-        from multiomics_explorer.kg.queries_lib import (
-            build_genes_by_metabolite_metabolism,
-            build_genes_by_metabolite_transport,
-            build_metabolites_by_gene_metabolism,
-            build_metabolites_by_gene_transport,
-        )
-        builders = [
-            build_genes_by_metabolite_metabolism(
-                metabolite_ids=["kegg.compound:C00086"],
-                organism="Prochlorococcus MED4", verbose=verbose)[0],
-            build_genes_by_metabolite_transport(
-                metabolite_ids=["kegg.compound:C00086"],
-                organism="Prochlorococcus MED4", verbose=verbose)[0],
-            build_metabolites_by_gene_metabolism(
-                locus_tags=["PMM0963"], organism="Prochlorococcus MED4",
-                verbose=verbose)[0],
-            build_metabolites_by_gene_transport(
-                locus_tags=["PMM0392"], organism="Prochlorococcus MED4",
-                verbose=verbose)[0],
-        ]
-        for cypher in builders:
-            score_at = cypher.index("AS tcdb_evidence_score")
-            res_at = cypher.index("AS transport_substrate_resolution")
-            assert res_at > score_at
-            between = cypher[score_at:res_at]
-            # The slice opens at the `A` of `AS tcdb_evidence_score` (no
-            # leading space) and closes before `AS transport_...`, so a
-            # directly-adjacent projection leaves NO other alias boundary.
-            assert between.count(" AS ") == 0, between
 
 
 class TestClusterTypeVocabulary:
@@ -13438,10 +13173,6 @@ class TestBuildMetabolitesByGeneNoFormulaCount:
         assert "$metabolite_elements" not in cypher
         assert _EMPTY_ELEMENTS_COND in _norm_ws(cypher)
 
-    def test_transport_arm_deepest_attachment_predicate(self):
-        cypher, _ = self._build(metabolite_elements=["N"])
-        _assert_deepest_predicate(cypher)
-
     def test_returns_rows_and_metabolites(self):
         cypher, _ = self._build(metabolite_elements=["N"])
         assert re.search(r"\bAS rows\b", cypher), cypher
@@ -13481,15 +13212,6 @@ class TestBuildMetabolitesByGeneNoFormulaCount:
         transport_arm = cypher.split("Gene_has_tcdb_family", 1)[1]
         assert "$ec_numbers" not in transport_arm
         assert "$mass_balance" not in transport_arm
-
-    def test_transport_only_filter_stays_in_transport_arm(self):
-        cypher, params = self._build(
-            metabolite_elements=["N"], substrate_depth=["most_specific"],
-        )
-        assert re.search(r"\.substrate_depth IN \$substrate_depth", cypher)
-        assert params["substrate_depth"] == ["most_specific"]
-        metab_arm = cypher.split("Gene_has_tcdb_family")[0]
-        assert "$substrate_depth" not in metab_arm
 
     def test_arms_metabolism_only(self):
         cypher, _ = self._build(
@@ -15089,3 +14811,991 @@ class TestBuildChemistrySummaryRouteAgreement:
         cypher, _ = getattr(self, builder)()
         assert "UNWIND arm_rows AS x" in cypher
         assert "count(*) AS total_matching" in cypher
+
+
+# ===========================================================================
+# TCDB cleanup surface (docs/tool-specs/tcdb-cleanup-surface.md)
+#
+# KG project 3a: one Gene_has_tcdb_family edge per (gene, node, tcdb_call),
+# stamped with an ordered `tcdb_gate` in {direct, annotated, below_gate};
+# substrate edges leave `tc_system` nodes only; every scored / rolled-up
+# TCDB property is gone. Stage-1 RED: these tests encode the spec contract
+# (G1 gate, G2 one row per (gene, node), G3 removals, G4 weak-hit opt-in,
+# G5 tcdb_call filter, the opt-in family substrate walk and its hint).
+# New builders are looked up by name inside the tests so a missing builder
+# fails only its own tests.
+# ===========================================================================
+
+import multiomics_explorer.kg.queries_lib as _qltc
+
+_TC_ORG = "Prochlorococcus MED4"
+_TC_METS = ["kegg.compound:C00009"]  # orthophosphate (phnD family-walk case)
+_TC_LOCI = ["PMM0710", "PMM0372"]    # pstS, cynD
+_TC_PASS = ["direct", "annotated"]
+_TC_CALL_ORDER = ["diamond_best_hit", "diamond_tier", "eggnog"]
+
+
+def _tc_builder(name):
+    fn = getattr(_qltc, name, None)
+    assert fn is not None, f"queries_lib.{name} is missing (TCDB cleanup)"
+    return fn
+
+
+def _assert_tcdb_gate_pass(cypher: str, params: dict) -> None:
+    """G1 annotation / ontology gate: tcdb_gate IN ['direct','annotated']
+    (literal list or a param carrying exactly that list)."""
+    assert "tcdb_gate" in cypher, "no tcdb_gate predicate (G1)"
+    literal = "'direct'" in cypher and "'annotated'" in cypher
+    as_param = any(
+        isinstance(v, (list, tuple)) and list(v) == _TC_PASS
+        for v in (params or {}).values()
+    )
+    assert literal or as_param, "gate-passing set ['direct','annotated'] absent"
+
+
+# Gate predicates may be written `r.tcdb_gate = 'x'` or as a map pattern
+# `-[r:Gene_has_tcdb_family {tcdb_gate: 'x'}]->` (spec "Verified Cypher").
+_GATE_DIRECT_RE = re.compile(r"tcdb_gate\s*(=|:)\s*'direct'")
+_GATE_ANNOTATED_RE = re.compile(r"tcdb_gate\s*(=|:)\s*'annotated'")
+
+
+def _assert_tcdb_gate_direct(cypher: str, params: dict) -> None:
+    """G1 transport-arm gate: tcdb_gate = 'direct' (literal or param)."""
+    literal = _GATE_DIRECT_RE.search(cypher)
+    as_param = re.search(r"tcdb_gate\s*(=|IN)\s*\$\w+", cypher) and any(
+        v == "direct" or (isinstance(v, (list, tuple)) and list(v) == ["direct"])
+        for v in (params or {}).values()
+    )
+    assert literal or as_param, "no tcdb_gate = 'direct' predicate (G1)"
+
+
+# G1 "never re-derive the gate from tcdb_call, tier or rank".
+_REDERIVE_PATTERNS = [
+    r"\brank\s*=\s*1\b",
+    r"\btier\s*(<=|<|=)\s*\d",
+    r"tcdb_call\s*=\s*'",
+]
+
+
+def _assert_gate_not_rederived(cypher: str) -> None:
+    for pat in _REDERIVE_PATTERNS:
+        assert not re.search(pat, cypher), (
+            f"gate re-derived from edge props ({pat}) — read tcdb_gate")
+
+
+# G3 / KG removals: no TCDB-touching builder may reference these.
+_TC_REMOVED_TOKENS = [
+    "attachment_depth", "substrate_depth", "transport_substrate_resolution",
+    "tcdb_evidence_score", "substrate_breadth", "tc_specificity",
+    "tcdb_family_count", "include_superseded", "leaf_attachment",
+    "transport_most_specific_rows", "transport_inherited_rows",
+]
+
+
+def _gbm_kw(**kw):
+    kw.setdefault("metabolite_ids", _TC_METS)
+    kw.setdefault("organism", _TC_ORG)
+    return kw
+
+
+def _mbg_kw(**kw):
+    kw.setdefault("locus_tags", _TC_LOCI)
+    kw.setdefault("organism", _TC_ORG)
+    return kw
+
+
+def _got_kw(**kw):
+    kw.setdefault("locus_tags", _TC_LOCI)
+    kw.setdefault("ontology", "tcdb")
+    kw.setdefault("organism_name", _TC_ORG)
+    return kw
+
+
+def _gbo_kw(**kw):
+    kw.setdefault("ontology", "tcdb")
+    kw.setdefault("organism", _TC_ORG)
+    kw.setdefault("level", 2)
+    return kw
+
+
+# (case id, builder name, kwargs, is-a-tcdb-ontology-query)
+_TC_SWEEP_CASES = [
+    ("gbm_transport", "build_genes_by_metabolite_transport", _gbm_kw(), False),
+    ("gbm_transport_verbose", "build_genes_by_metabolite_transport",
+     _gbm_kw(verbose=True), False),
+    ("gbm_metabolism", "build_genes_by_metabolite_metabolism", _gbm_kw(), False),
+    ("gbm_go", "build_genes_by_metabolite_go_transport", _gbm_kw(), False),
+    ("gbm_summary", "build_genes_by_metabolite_summary", _gbm_kw(), False),
+    ("gbm_summary_walk", "build_genes_by_metabolite_summary",
+     _gbm_kw(include_tcdb_family_substrates=True), False),
+    ("gbm_walk", "build_genes_by_metabolite_tcdb_family",
+     _gbm_kw(verbose=True), False),
+    ("gbm_hint", "build_genes_by_metabolite_tcdb_family_hint", _gbm_kw(), False),
+    ("mbg_transport", "build_metabolites_by_gene_transport",
+     _mbg_kw(verbose=True), False),
+    ("mbg_metabolism", "build_metabolites_by_gene_metabolism", _mbg_kw(), False),
+    ("mbg_go", "build_metabolites_by_gene_go_transport", _mbg_kw(), False),
+    ("mbg_summary", "build_metabolites_by_gene_summary", _mbg_kw(), False),
+    ("mbg_summary_walk", "build_metabolites_by_gene_summary",
+     _mbg_kw(include_tcdb_family_substrates=True), False),
+    ("mbg_no_formula", "build_metabolites_by_gene_no_formula_count",
+     _mbg_kw(metabolite_elements=["N"]), False),
+    ("mbg_walk", "build_metabolites_by_gene_tcdb_family",
+     _mbg_kw(verbose=True), False),
+    ("mbg_hint", "build_metabolites_by_gene_tcdb_family_hint", _mbg_kw(), False),
+    ("gene_overview", "build_gene_overview",
+     {"locus_tags": _TC_LOCI, "verbose": True}, False),
+    ("gene_overview_summary", "build_gene_overview_summary",
+     {"locus_tags": _TC_LOCI}, False),
+    ("got_leaf", "build_gene_ontology_terms", _got_kw(verbose=True), True),
+    ("got_rollup", "build_gene_ontology_terms",
+     _got_kw(mode="rollup", level=2, verbose=True), True),
+    ("got_summary", "build_gene_ontology_terms_summary", _got_kw(), True),
+    ("gbo_detail", "build_genes_by_ontology_detail", _gbo_kw(verbose=True), True),
+    ("gbo_per_term", "build_genes_by_ontology_per_term", _gbo_kw(), True),
+    ("gbo_per_gene", "build_genes_by_ontology_per_gene", _gbo_kw(), True),
+    ("gbo_trust_rollups", "build_genes_by_ontology_trust_rollups",
+     _gbo_kw(), True),
+    ("landscape", "build_ontology_landscape",
+     {"ontology": "tcdb", "organism_name": _TC_ORG, "verbose": True}, True),
+    ("search_ontology", "build_search_ontology",
+     {"ontology": "tcdb", "search_text": "phosphate", "verbose": True,
+      "organism": _TC_ORG}, True),
+    ("search_ontology_browse", "build_search_ontology",
+     {"ontology": "tcdb", "verbose": True, "organism": _TC_ORG}, True),
+    ("search_ontology_summary", "build_search_ontology_summary",
+     {"ontology": "tcdb", "search_text": "phosphate", "organism": _TC_ORG},
+     True),
+]
+
+
+class TestTcdbRemovedPropSweep:
+    """G3: no TCDB-touching builder references a removed KG property or a
+    retired explorer-side name."""
+
+    @pytest.mark.parametrize(
+        "builder_name,kwargs,is_tcdb_ontology",
+        [c[1:] for c in _TC_SWEEP_CASES], ids=[c[0] for c in _TC_SWEEP_CASES])
+    def test_no_removed_tokens(self, builder_name, kwargs, is_tcdb_ontology):
+        cypher, _ = _tc_builder(builder_name)(**kwargs)
+        for token in _TC_REMOVED_TOKENS:
+            assert token not in cypher, f"{builder_name}: {token}"
+        # TcdbFamily.metabolite_count -> tcdb_substrate_count.
+        assert not re.search(r"\btf?\.metabolite_count\b", cypher)
+        # TCDB edges carry no evidence_score any more.
+        assert not re.search(r"\bgt\.evidence_score\b", cypher)
+        if is_tcdb_ontology:
+            assert "evidence_score" not in cypher, builder_name
+
+    def test_term_details_tcdb_has_no_removed_tokens(self):
+        cypher, _ = _qltc.build_ontology_term_details(
+            term_ids=["tcdb:3.A.1", "tcdb:3.A.1.7.6"], verbose=True,
+            organism=_TC_ORG)
+        for token in _TC_REMOVED_TOKENS:
+            assert token not in cypher, token
+
+    def test_deepest_attachment_predicate_absent(self):
+        assert not hasattr(_qltc, "TCDB_DEEPEST_ATTACHMENT_PREDICATE"), (
+            "the ungated deepest-attachment predicate must go (G3)")
+
+    def test_leaf_filter_has_no_include_superseded(self):
+        import inspect
+        fn = _qltc._gene_ontology_terms_leaf_filter
+        assert "include_superseded" not in inspect.signature(fn).parameters
+
+    def test_queries_fewshots_have_no_retired_tcdb_props(self):
+        """The `substrate_breadth` few-shot is rewritten as a walk to systems."""
+        import inspect
+        from multiomics_explorer.kg import queries
+        src = inspect.getsource(queries)
+        for token in ("substrate_breadth", "substrate_depth",
+                      "attachment_depth", "tc_specificity",
+                      "transport_substrate_resolution",
+                      "tcdb_evidence_score_max"):
+            assert token not in src, token
+
+
+class TestTcdbGateOnOntologyTraversals:
+    """G1: annotation / ontology traversals filter
+    tcdb_gate IN ['direct','annotated'] by default; non-TCDB queries never
+    mention the gate."""
+
+    _GATED = [c for c in _TC_SWEEP_CASES if c[3]]
+
+    @pytest.mark.parametrize(
+        "builder_name,kwargs", [c[1:3] for c in _GATED],
+        ids=[c[0] for c in _GATED])
+    def test_tcdb_query_is_gated(self, builder_name, kwargs):
+        cypher, params = _tc_builder(builder_name)(**kwargs)
+        _assert_tcdb_gate_pass(cypher, params)
+        _assert_gate_not_rederived(cypher)
+        assert "below_gate" not in cypher
+
+    @pytest.mark.parametrize("builder_name,kwargs", [
+        ("build_gene_ontology_terms", _got_kw(ontology="go_bp")),
+        ("build_gene_ontology_terms",
+         _got_kw(ontology="merops", mode="rollup", level=0)),
+        ("build_genes_by_ontology_detail", _gbo_kw(ontology="go_bp")),
+        ("build_ontology_landscape",
+         {"ontology": "merops", "organism_name": _TC_ORG}),
+    ])
+    def test_non_tcdb_query_has_no_gate(self, builder_name, kwargs):
+        cypher, _ = _tc_builder(builder_name)(**kwargs)
+        assert "tcdb_gate" not in cypher
+        assert "tcdb_calls" not in cypher
+
+    def test_genes_by_ontology_walk_down_mode_is_gated(self):
+        cypher, params = _qltc.build_genes_by_ontology_detail(
+            ontology="tcdb", organism=_TC_ORG, term_ids=["tcdb:3.A.1"])
+        _assert_tcdb_gate_pass(cypher, params)
+
+    def test_match_stage_gate_precedes_size_collapse(self):
+        """Gene sets are gated before collect(DISTINCT g), so TERM2GENE sizes
+        equal TcdbFamily.gene_count (spec: 0 mismatches)."""
+        cypher, _ = _qltc._genes_by_ontology_match_stage(
+            ontology="tcdb", level=2, term_ids=None, organism=_TC_ORG)
+        gate = cypher.index("tcdb_gate")
+        collapse = cypher.index("collect(DISTINCT g) AS term_genes")
+        assert gate < collapse, cypher
+
+    def test_landscape_gate_precedes_per_term_aggregation(self):
+        cypher, _ = _qltc.build_ontology_landscape(
+            ontology="tcdb", organism_name=_TC_ORG)
+        assert cypher.index("tcdb_gate") < cypher.index(
+            "count(DISTINCT g) AS n_g_per_term")
+
+    def test_landscape_experiment_coverage_is_gated(self):
+        cypher, params = _qltc.build_ontology_expcov(
+            ontology="tcdb", organism_name=_TC_ORG, experiment_ids=["e1"])
+        _assert_tcdb_gate_pass(cypher, params)
+
+    def test_term_details_organism_gene_count_is_gated(self):
+        """organism_gene_count is a live count -> gated (G1)."""
+        cypher, params = _qltc.build_ontology_term_details(
+            term_ids=["tcdb:3.A.1"], organism=_TC_ORG)
+        _assert_tcdb_gate_pass(cypher, params)
+
+    def test_term_details_verbose_genes_by_organism_is_gated(self):
+        cypher, params = _qltc.build_ontology_term_details(
+            term_ids=["tcdb:3.A.1"], verbose=True)
+        _assert_tcdb_gate_pass(cypher, params)
+
+    def test_search_ontology_without_organism_needs_no_gene_walk(self):
+        """Without organism the counts are KG precomputes (already gated)."""
+        cypher, _ = _qltc.build_search_ontology(
+            ontology="tcdb", search_text="phosphate")
+        assert "Gene_has_tcdb_family" not in cypher
+
+
+class TestTcdbRepresentativeEdge:
+    """G2: one row per (gene, node); the reported edge is chosen by
+    tcdb_call precedence (best hit, tier, eggNOG) then identity DESC, and
+    every row carries `tcdb_calls`."""
+
+    @staticmethod
+    def _assert_precedence(cypher, params):
+        blob = cypher + repr(params)
+        positions = [blob.find(v) for v in _TC_CALL_ORDER]
+        assert all(p >= 0 for p in positions), (
+            f"call-kind precedence values missing: {_TC_CALL_ORDER}")
+        assert positions == sorted(positions), "precedence order wrong"
+        assert "identity" in cypher
+
+    def test_rank_key_is_no_longer_evidence_score(self):
+        key = _qltc._best_edge_rank_key(_qltc.ONTOLOGY_CONFIG["tcdb"])
+        assert "evidence_score" not in repr(key)
+        assert "tcdb_call" in repr(key) or "identity" in repr(key)
+
+    def test_merops_rank_key_unchanged(self):
+        assert _qltc._best_edge_rank_key(
+            _qltc.ONTOLOGY_CONFIG["merops"]) == "confidence_score"
+
+    def test_rollup_rebind_uses_call_precedence(self):
+        cypher, params = _qltc.build_genes_by_ontology_detail(**_gbo_kw())
+        assert "evidence_score" not in cypher
+        self._assert_precedence(cypher, params)
+
+    def test_leaf_mode_is_one_row_per_gene_term(self):
+        """Today's leaf path emits one row per edge (PMM0970 3.A.1.4.4 and
+        PMM0710 3.A.1.7 appear twice) — leaf mode needs the rebind too."""
+        cypher, params = _qltc.build_gene_ontology_terms(**_got_kw())
+        assert ("sortMulti" in cypher or "collect(" in cypher), (
+            "leaf mode must collapse a (gene, term) pair's edges")
+        self._assert_precedence(cypher, params)
+
+    def test_leaf_not_exists_is_gated(self):
+        """Leaf = gated targets minus any ancestor of another gated target
+        of the same gene: the descendant probe is gated too."""
+        cypher, _ = _qltc.build_gene_ontology_terms(**_got_kw())
+        start = cypher.index("NOT EXISTS")
+        block = cypher[start:cypher.index("}", start)]
+        assert "tcdb_gate" in block, block
+
+    @pytest.mark.parametrize("builder_name,kwargs", [
+        ("build_gene_ontology_terms", _got_kw()),
+        ("build_gene_ontology_terms", _got_kw(mode="rollup", level=2)),
+        ("build_genes_by_ontology_detail", _gbo_kw()),
+        ("build_genes_by_ontology_detail",
+         _gbo_kw(level=None, term_ids=["tcdb:3.A.1"])),
+    ])
+    def test_rows_carry_compact_tcdb_columns(self, builder_name, kwargs):
+        cypher, _ = _tc_builder(builder_name)(**kwargs)
+        for col in ("evidence", "tcdb_call", "tcdb_gate", "tcdb_calls"):
+            assert f"AS {col}" in cypher, col
+
+    def test_tcdb_calls_walks_the_lineage(self):
+        """tcdb_calls = call kinds on the row's node, its ancestors or its
+        descendants — the hierarchy rel appears in both directions."""
+        cypher, _ = _qltc.build_gene_ontology_terms(**_got_kw())
+        tail = cypher[:cypher.index("AS tcdb_calls")]
+        assert "Tcdb_family_is_a_tcdb_family" in tail
+        assert "<-[:Tcdb_family_is_a_tcdb_family" in cypher or (
+            "]-(" in cypher and "-[:Tcdb_family_is_a_tcdb_family" in cypher)
+
+
+class TestTcdbIncludeWeakHits:
+    """G4: include_weak_tcdb_hits replaces include_superseded; TCDB-only;
+    only adds rows (the default branch stays gated)."""
+
+    _CASES = [
+        ("build_gene_ontology_terms", _got_kw()),
+        ("build_gene_ontology_terms", _got_kw(mode="rollup", level=2)),
+        ("build_gene_ontology_terms_summary", _got_kw()),
+        ("build_genes_by_ontology_detail", _gbo_kw()),
+        ("build_genes_by_ontology_per_term", _gbo_kw()),
+        ("build_genes_by_ontology_per_gene", _gbo_kw()),
+        ("build_genes_by_ontology_trust_rollups", _gbo_kw()),
+    ]
+
+    @pytest.mark.parametrize("builder_name", sorted({c[0] for c in _CASES}))
+    def test_param_defaults_to_false(self, builder_name):
+        import inspect
+        sig = inspect.signature(_tc_builder(builder_name))
+        assert sig.parameters["include_weak_tcdb_hits"].default is False
+
+    @pytest.mark.parametrize("builder_name", [
+        "build_gene_ontology_terms", "build_gene_ontology_terms_summary"])
+    def test_include_superseded_is_gone(self, builder_name):
+        with pytest.raises(TypeError):
+            _tc_builder(builder_name)(**_got_kw(include_superseded=True))
+
+    @pytest.mark.parametrize("builder_name,kwargs", _CASES)
+    def test_switch_changes_tcdb_query(self, builder_name, kwargs):
+        """The switch changes the TCDB query (Cypher text or a param such as
+        the spec's `$include_weak`); the default query never names
+        below_gate."""
+        fn = _tc_builder(builder_name)
+        default = fn(**kwargs)
+        weak = fn(**kwargs, include_weak_tcdb_hits=True)
+        assert "below_gate" not in default[0]
+        assert weak != default
+
+    def test_leaf_mode_keeps_the_gated_default_branch(self):
+        """Only adds rows: with the switch on, leaf mode still computes the
+        gate-passing set (default rows, ancestor-drop against gated targets)."""
+        cypher, params = _qltc.build_gene_ontology_terms(
+            **_got_kw(include_weak_tcdb_hits=True))
+        _assert_tcdb_gate_pass(cypher, params)
+        assert "NOT EXISTS" in cypher
+
+    @pytest.mark.parametrize("builder_name,kwargs", [
+        ("build_gene_ontology_terms", _got_kw(ontology="go_bp")),
+        ("build_gene_ontology_terms",
+         _got_kw(ontology="merops", mode="rollup", level=0)),
+        ("build_gene_ontology_terms_summary", _got_kw(ontology="cazy")),
+        ("build_genes_by_ontology_detail", _gbo_kw(ontology="go_bp", level=3)),
+        ("build_genes_by_ontology_per_term", _gbo_kw(ontology="merops", level=0)),
+    ])
+    def test_noop_on_non_tcdb_ontology(self, builder_name, kwargs):
+        fn = _tc_builder(builder_name)
+        assert fn(**kwargs, include_weak_tcdb_hits=True) == fn(**kwargs)
+
+
+class TestTcdbCallFilter:
+    """G5: tcdb_call is wired through compact_edge like MEROPS call_class and
+    inherits its scoping (raises on a non-TCDB ontology)."""
+
+    def test_trust_clause_emits_tcdb_call(self):
+        frag, params = _qltc.build_trust_filter_clause(
+            "tcdb", tcdb_call=["eggnog"])
+        assert "r.tcdb_call IN $tcdb_call" in frag
+        assert params["tcdb_call"] == ["eggnog"]
+
+    def test_trust_clause_honours_rel_var(self):
+        frag, _ = _qltc.build_trust_filter_clause(
+            "tcdb", tcdb_call=["diamond_tier"], rel_var="r2")
+        assert "r2.tcdb_call IN $tcdb_call" in frag
+
+    def test_trust_clause_combines_with_axes(self):
+        frag, params = _qltc.build_trust_filter_clause(
+            "tcdb", tcdb_call=["eggnog"], evidence=["family_inferred"])
+        assert " AND " in frag
+        assert params["evidence"] == ["family_inferred"]
+
+    @pytest.mark.parametrize("ontology", ["merops", "go_bp", "cazy"])
+    def test_tcdb_call_on_non_tcdb_raises(self, ontology):
+        with pytest.raises(ValueError, match="tcdb_call"):
+            _qltc.build_trust_filter_clause(ontology, tcdb_call=["eggnog"])
+
+    def test_call_class_on_tcdb_still_raises(self):
+        with pytest.raises(ValueError, match="call_class"):
+            _qltc.build_trust_filter_clause("tcdb", call_class=["peptidase"])
+
+    def test_min_evidence_score_on_tcdb_raises_unsupported_axis(self):
+        with pytest.raises(ValueError, match="min_evidence_score"):
+            _qltc.build_trust_filter_clause("tcdb", min_evidence_score=0.5)
+
+    def test_tcdb_gate_is_not_a_filter_param(self):
+        with pytest.raises(TypeError):
+            _qltc.build_trust_filter_clause("tcdb", tcdb_gate=["direct"])
+
+    def test_no_filter_emits_no_tcdb_call_predicate(self):
+        frag, params = _qltc.build_trust_filter_clause("tcdb")
+        assert frag == ""
+        assert params == {}
+
+    @pytest.mark.parametrize("builder_name,kwargs", [
+        ("build_genes_by_ontology_detail", _gbo_kw()),
+        ("build_genes_by_ontology_per_term", _gbo_kw()),
+        ("build_genes_by_ontology_per_gene", _gbo_kw()),
+        ("build_genes_by_ontology_trust_rollups", _gbo_kw()),
+        ("build_gene_ontology_terms", _got_kw()),
+        ("build_gene_ontology_terms", _got_kw(mode="rollup", level=2)),
+        ("build_gene_ontology_terms_summary", _got_kw()),
+        ("build_ontology_landscape",
+         {"ontology": "tcdb", "organism_name": _TC_ORG}),
+    ])
+    def test_builders_thread_tcdb_call(self, builder_name, kwargs):
+        cypher, params = _tc_builder(builder_name)(
+            **kwargs, tcdb_call=["diamond_best_hit"])
+        assert re.search(r"\br2?\.tcdb_call IN \$tcdb_call", cypher)
+        assert params["tcdb_call"] == ["diamond_best_hit"]
+
+    @pytest.mark.parametrize("builder_name,kwargs", [
+        ("build_genes_by_ontology_detail", _gbo_kw(ontology="merops", level=0)),
+        ("build_gene_ontology_terms", _got_kw(ontology="go_bp")),
+        ("build_ontology_landscape",
+         {"ontology": "merops", "organism_name": _TC_ORG}),
+    ])
+    def test_builders_raise_on_non_tcdb(self, builder_name, kwargs):
+        with pytest.raises(ValueError, match="tcdb_call"):
+            _tc_builder(builder_name)(**kwargs, tcdb_call=["eggnog"])
+
+    def test_predicate_precedes_hierarchy_walk(self):
+        cypher, _ = _qltc._genes_by_ontology_match_stage(
+            ontology="tcdb", level=2, term_ids=None, organism=_TC_ORG,
+            tcdb_call=["eggnog"])
+        pred = cypher.index("r.tcdb_call IN $tcdb_call")
+        assert pred < cypher.index("collect(DISTINCT g) AS term_genes")
+
+
+class TestTcdbTermColumns:
+    """search_ontology / ontology_term_details: metabolite_count ->
+    tcdb_substrate_count + direction (+ direction_basis on details)."""
+
+    def test_search_ontology_verbose_projects_new_term_columns(self):
+        cypher, _ = _qltc.build_search_ontology(
+            ontology="tcdb", search_text="phosphate", verbose=True)
+        assert "t.tcdb_substrate_count AS tcdb_substrate_count" in cypher
+        assert "t.direction AS direction" in cypher
+        assert "t.superfamily AS superfamily" in cypher
+        assert "metabolite_count" not in cypher
+
+    def test_search_ontology_compact_keeps_counts_only(self):
+        cypher, _ = _qltc.build_search_ontology(
+            ontology="tcdb", search_text="phosphate")
+        assert "AS gene_count" in cypher
+        assert "tcdb_substrate_count" not in cypher
+
+    def test_search_ontology_no_default_gene_count_floor(self):
+        """Range-only nodes (gene_count = 0) stay discoverable by default."""
+        _, params = _qltc.build_search_ontology(ontology="tcdb")
+        assert "min_gene_count" not in params
+
+    def test_term_details_projects_new_compact_columns(self):
+        cypher, _ = _qltc.build_ontology_term_details(term_ids=["tcdb:3.A.1"])
+        for col in ("tcdb_substrate_count", "direction", "direction_basis"):
+            assert f"t.{col} AS {col}" in cypher, col
+
+
+class TestTcdbTransportDirectArm:
+    """gbm / mbg transport arm (default rows): tcdb_gate='direct' edges only,
+    one row per (gene, system, metabolite), new TCDB row fields."""
+
+    _BUILDERS = [
+        ("build_genes_by_metabolite_transport", _gbm_kw),
+        ("build_metabolites_by_gene_transport", _mbg_kw),
+    ]
+
+    @pytest.mark.parametrize("name,kw", _BUILDERS)
+    @pytest.mark.parametrize("verbose", [False, True])
+    def test_direct_gate_only(self, name, kw, verbose):
+        cypher, params = _tc_builder(name)(**kw(verbose=verbose))
+        _assert_tcdb_gate_direct(cypher, params)
+        assert not _GATE_ANNOTATED_RE.search(cypher)
+        assert "below_gate" not in cypher
+        _assert_gate_not_rederived(cypher)
+
+    @pytest.mark.parametrize("name,kw", _BUILDERS)
+    def test_substrate_depth_param_removed(self, name, kw):
+        with pytest.raises(TypeError):
+            _tc_builder(name)(**kw(substrate_depth=["most_specific"]))
+
+    @pytest.mark.parametrize("name,kw", _BUILDERS)
+    def test_compact_tcdb_row_fields(self, name, kw):
+        cypher, _ = _tc_builder(name)(**kw())
+        assert "'direct' AS tcdb_route" in cypher
+        assert "null AS tcdb_substrate_system_count" in cypher
+        for col in ("tcdb_calls", "tcdb_identity", "tcdb_direction",
+                    "attached_tcdb_id", "tcdb_family_id", "tcdb_family_name"):
+            assert f"AS {col}" in cypher, col
+        assert re.search(r"\.direction AS tcdb_direction", cypher)
+        assert "'transport' AS evidence_source" in cypher
+
+    @pytest.mark.parametrize("name,kw", _BUILDERS)
+    def test_one_row_per_gene_system_metabolite(self, name, kw):
+        """A (gene, system) pair can carry 2 direct edges (eggNOG + best hit,
+        tier + best hit): the arm collapses them (G2)."""
+        cypher, params = _tc_builder(name)(**kw())
+        assert ("collect(" in cypher or "sortMulti" in cypher
+                or "WITH DISTINCT" in cypher)
+        blob = cypher + repr(params)
+        assert all(v in blob for v in _TC_CALL_ORDER)
+
+    @pytest.mark.parametrize("name,kw", _BUILDERS)
+    def test_verbose_keeps_level_kind_and_class(self, name, kw):
+        cypher, _ = _tc_builder(name)(**kw(verbose=True))
+        assert "AS tcdb_level_kind" in cypher
+        assert "AS tc_class_id" in cypher
+
+    def test_gbm_order_by_identity_desc_then_family_then_locus(self):
+        cypher, _ = _qltc.build_genes_by_metabolite_transport(**_gbm_kw())
+        order_by = cypher.split("ORDER BY", 1)[1]
+        m = re.search(r"tcdb_identity\b[^,]*\bDESC", order_by)
+        assert m, order_by
+        assert m.start() < order_by.index("tcdb_family_id")
+        assert order_by.index("tcdb_family_id") < order_by.rindex("locus_tag")
+
+    def test_mbg_order_by_identity_desc(self):
+        cypher, _ = _qltc.build_metabolites_by_gene_transport(**_mbg_kw())
+        order_by = cypher.split("ORDER BY", 1)[1]
+        assert re.search(r"tcdb_identity\b[^,]*\bDESC", order_by), order_by
+
+    def test_mbg_no_formula_count_transport_arm_is_direct(self):
+        cypher, params = _qltc.build_metabolites_by_gene_no_formula_count(
+            **_mbg_kw(metabolite_elements=["N"]))
+        _assert_tcdb_gate_direct(cypher, params)
+        assert not _GATE_ANNOTATED_RE.search(cypher)
+
+    def test_mbg_no_formula_count_drops_substrate_depth(self):
+        with pytest.raises(TypeError):
+            _qltc.build_metabolites_by_gene_no_formula_count(
+                **_mbg_kw(substrate_depth=["most_specific"]))
+
+
+class TestTcdbRowFieldPaddingOnOtherArms:
+    """Metabolism / GO rows carry the new TCDB fields as explicit null
+    (polymorphic row shape)."""
+
+    _COLS = ("tcdb_route", "tcdb_calls", "tcdb_identity", "tcdb_direction",
+             "attached_tcdb_id", "tcdb_substrate_system_count")
+
+    @pytest.mark.parametrize("name,kw", [
+        ("build_genes_by_metabolite_metabolism", _gbm_kw),
+        ("build_metabolites_by_gene_metabolism", _mbg_kw),
+        ("build_genes_by_metabolite_go_transport", _gbm_kw),
+        ("build_metabolites_by_gene_go_transport", _mbg_kw),
+    ])
+    def test_null_padding(self, name, kw):
+        cypher, _ = _tc_builder(name)(**kw())
+        for col in self._COLS:
+            assert f"null AS {col}" in cypher, col
+        for gone in ("substrate_depth", "tcdb_evidence_score",
+                     "transport_substrate_resolution"):
+            assert gone not in cypher, gone
+
+
+class TestTcdbTransportSummaries:
+    """Summary builders: direct gate by default, by_tcdb_route rollup,
+    per-route row counts, tcdb_assignment_count; the walk arm joins only with
+    include_tcdb_family_substrates=True; the hint stays its own query."""
+
+    _BUILDERS = [
+        ("build_genes_by_metabolite_summary", _gbm_kw),
+        ("build_metabolites_by_gene_summary", _mbg_kw),
+    ]
+
+    @pytest.mark.parametrize("name,kw", _BUILDERS)
+    def test_switch_defaults_to_false(self, name, kw):
+        import inspect
+        sig = inspect.signature(_tc_builder(name))
+        assert sig.parameters["include_tcdb_family_substrates"].default is False
+        assert "substrate_depth" not in sig.parameters
+
+    @pytest.mark.parametrize("name,kw", _BUILDERS)
+    def test_default_is_direct_only(self, name, kw):
+        cypher, params = _tc_builder(name)(**kw())
+        _assert_tcdb_gate_direct(cypher, params)
+        assert not _GATE_ANNOTATED_RE.search(cypher)
+        assert "AS tcdb_family_substrates_skipped" not in cypher
+
+    @pytest.mark.parametrize("name,kw", _BUILDERS)
+    def test_route_rollups(self, name, kw):
+        cypher, _ = _tc_builder(name)(**kw())
+        assert "rows_by_tcdb_route" in cypher
+        assert "rows_by_substrate_depth" not in cypher
+        for key in ("tcdb_direct_rows", "tcdb_family_rows",
+                    "tcdb_assignment_count", "tcdb_route", "direction"):
+            assert key in cypher, key
+        assert "g.tcdb_assignment_count" in cypher
+
+    @pytest.mark.parametrize("name,kw", _BUILDERS)
+    def test_walk_arm_joins_only_when_on(self, name, kw):
+        fn = _tc_builder(name)
+        cypher, params = fn(**kw(include_tcdb_family_substrates=True))
+        assert _GATE_ANNOTATED_RE.search(cypher)
+        assert "Tcdb_family_is_a_tcdb_family*1..4" in cypher
+        assert "AS tcdb_family_substrates_skipped" not in cypher
+        _assert_tcdb_gate_direct(cypher, params)
+
+    @pytest.mark.parametrize("name,kw", _BUILDERS)
+    def test_walk_switch_ignored_without_transport_arm(self, name, kw):
+        fn = _tc_builder(name)
+        on, _ = fn(**kw(arms=("metabolism",),
+                        include_tcdb_family_substrates=True))
+        assert "Gene_has_tcdb_family" not in on
+
+    @pytest.mark.parametrize("name,kw", _BUILDERS)
+    def test_substrate_depth_param_removed(self, name, kw):
+        with pytest.raises(TypeError):
+            _tc_builder(name)(**kw(substrate_depth=["most_specific"]))
+
+
+_TC_WALK = [
+    ("build_genes_by_metabolite_tcdb_family", _gbm_kw),
+    ("build_metabolites_by_gene_tcdb_family", _mbg_kw),
+]
+_TC_HINT = [
+    ("build_genes_by_metabolite_tcdb_family_hint", _gbm_kw),
+    ("build_metabolites_by_gene_tcdb_family_hint", _mbg_kw),
+]
+
+
+def _assert_walk_rules(cypher: str, params: dict) -> None:
+    # start: annotated edges only; below_gate never starts a walk
+    assert _GATE_ANNOTATED_RE.search(cypher)
+    assert "below_gate" not in cypher
+    # rule 1: family / subfamily starts only
+    assert (("tc_family" in cypher and "tc_subfamily" in cypher)
+            or re.search(r"level\s+IN\s+\[\s*2\s*,\s*3\s*\]", cypher)), (
+        "walk start not restricted to family / subfamily")
+    # rule 2: deepest annotated node per lineage (a second annotated probe)
+    assert cypher.count("'annotated'") >= 2
+    # rule 3: breadth cap on tcdb_substrate_count (200)
+    assert "tcdb_substrate_count" in cypher
+    assert (re.search(r"tcdb_substrate_count\s*(<=|>)\s*200\b", cypher)
+            or 200 in (params or {}).values())
+    # walk to descendant systems, both substrate edge types
+    assert "Tcdb_family_is_a_tcdb_family*1..4" in cypher
+    assert "tc_system" in cypher
+    assert "Tcdb_family_transports_metabolite" in cypher
+    assert "Tcdb_family_transports_chemical_role" in cypher
+
+
+def _not_exists_blocks(cypher: str) -> list[str]:
+    """Bodies of every `NOT EXISTS { ... }` subquery (brace-balanced, so map
+    patterns like `{tcdb_gate: 'direct'}` inside the body are kept)."""
+    out: list[str] = []
+    for m in re.finditer(r"NOT\s+EXISTS\s*\{", cypher):
+        depth, i = 1, m.end()
+        while i < len(cypher) and depth:
+            depth += {"{": 1, "}": -1}.get(cypher[i], 0)
+            i += 1
+        out.append(cypher[m.end():i - 1])
+    return out
+
+
+def _assert_no_walk_above_direct_system(cypher: str) -> None:
+    """Start rule 3: skip a start node when the gene has a direct edge to a
+    system under it — a NOT EXISTS over a `tcdb_gate` direct edge whose target
+    walks UP the is_a hierarchy (`*1..4`) to a bound node (the start), with no
+    substrate edge in the block (that one is the dedupe-vs-direct block).
+    Variable names are not pinned."""
+    hits = [
+        b for b in _not_exists_blocks(cypher)
+        if _GATE_DIRECT_RE.search(b)
+        and re.search(r"Tcdb_family_is_a_tcdb_family\*1\.\.4\]->\(\w+\)", b)
+        and "Tcdb_family_transports_" not in b
+    ]
+    assert hits, (
+        "no 'no walk above a direct system' exclusion (start rule 3): expected "
+        "NOT EXISTS { (g)-[:Gene_has_tcdb_family {tcdb_gate: 'direct'}]->(ds) "
+        "WHERE (ds)-[:Tcdb_family_is_a_tcdb_family*1..4]->(start) }")
+
+
+class TestTcdbFamilyWalkBuilders:
+    """Opt-in family substrate walk detail rows (include_tcdb_family_substrates)."""
+
+    def test_cap_constant(self):
+        assert getattr(_qltc, "TCDB_FAMILY_WALK_MAX_SUBSTRATES", None) == 200
+
+    @pytest.mark.parametrize("name,kw", _TC_WALK)
+    def test_walk_rules(self, name, kw):
+        cypher, params = _tc_builder(name)(**kw())
+        _assert_walk_rules(cypher, params)
+        _assert_gate_not_rederived(cypher)
+
+    @pytest.mark.parametrize("name,kw", _TC_WALK)
+    def test_no_walk_above_a_direct_system(self, name, kw):
+        """Start rule 3: urtA (direct 3.A.1.4.4 / .5) never walks 3.A.1.4;
+        pstS (direct 3.A.1.7.6) never walks 3.A.1.7."""
+        cypher, _ = _tc_builder(name)(**kw())
+        _assert_no_walk_above_direct_system(cypher)
+
+    @pytest.mark.parametrize("name,kw", _TC_WALK)
+    def test_dedupes_against_direct_rows(self, name, kw):
+        """Drop a family row when the (gene, metabolite) has a direct row."""
+        cypher, _ = _tc_builder(name)(**kw())
+        assert _GATE_DIRECT_RE.search(cypher)
+        assert "NOT EXISTS" in cypher
+
+    @pytest.mark.parametrize("name,kw", _TC_WALK)
+    def test_row_columns(self, name, kw):
+        cypher, _ = _tc_builder(name)(**kw())
+        assert "'family' AS tcdb_route" in cypher
+        assert "'transport' AS evidence_source" in cypher
+        for col in ("tcdb_substrate_system_count", "attached_tcdb_id",
+                    "tcdb_family_id", "tcdb_family_name", "tcdb_direction",
+                    "tcdb_identity", "tcdb_calls", "metabolite_id",
+                    "locus_tag", "target_kind"):
+            assert f"AS {col}" in cypher, col
+        assert "AS total_matching" not in cypher
+
+    @pytest.mark.parametrize("name,kw", _TC_WALK)
+    def test_verbose_columns(self, name, kw):
+        cypher, _ = _tc_builder(name)(**kw(verbose=True))
+        assert "AS tcdb_level_kind" in cypher
+        assert "AS metabolite_inchikey" in cypher
+
+    @pytest.mark.parametrize("name,kw", _TC_WALK)
+    def test_paging_and_order(self, name, kw):
+        cypher, params = _tc_builder(name)(**kw(limit=7, offset=3))
+        assert "ORDER BY" in cypher
+        assert "LIMIT $limit" in cypher and "SKIP $offset" in cypher
+        assert params["limit"] == 7 and params["offset"] == 3
+
+    @pytest.mark.parametrize("name,kw", _TC_WALK)
+    def test_arm_scoped_filters_rejected(self, name, kw):
+        fn = _tc_builder(name)
+        with pytest.raises(TypeError):
+            fn(**kw(substrate_depth=["most_specific"]))
+        with pytest.raises(TypeError):
+            fn(**kw(ec_numbers=["3.5.1.5"]))
+
+    def test_gbm_walk_threads_shared_filters(self):
+        cypher, params = _qltc.build_genes_by_metabolite_tcdb_family(
+            **_gbm_kw(exclude_metabolite_ids=["kegg.compound:C00002"],
+                      metabolite_pathway_ids=["kegg.pathway:ko00910"],
+                      gene_categories=["Transport"]))
+        assert re.search(r"\w+\.id IN \$metabolite_ids", cypher)
+        assert "$exclude_metabolite_ids" in cypher
+        assert "$metabolite_pathway_ids" in cypher
+        assert re.search(r"\w+\.gene_category IN \$gene_categories", cypher)
+        assert _TC_ORG in (params or {}).values()
+        assert params["metabolite_ids"] == _TC_METS
+        assert params["gene_categories"] == ["Transport"]
+
+    def test_mbg_walk_threads_shared_filters(self):
+        cypher, params = _qltc.build_metabolites_by_gene_tcdb_family(
+            **_mbg_kw(metabolite_elements=["P"],
+                      metabolite_ids=["kegg.compound:C00009"],
+                      exclude_metabolite_ids=["kegg.compound:C00002"],
+                      metabolite_pathway_ids=["kegg.pathway:ko00910"],
+                      gene_categories=["Transport"]))
+        assert "$locus_tags" in cypher
+        assert "$metabolite_elements" in cypher
+        assert re.search(r"\w+\.id IN \$metabolite_ids", cypher)
+        assert "$exclude_metabolite_ids" in cypher
+        assert "$metabolite_pathway_ids" in cypher
+        assert "$gene_categories" in cypher
+        assert params["locus_tags"] == _TC_LOCI
+        assert params["metabolite_elements"] == ["P"]
+
+
+class TestTcdbFamilyWalkHintBuilders:
+    """tcdb_family_substrates_not_shown / _skipped: what the walk would add,
+    after the start rules, the cap and the dedupe; always its own query."""
+
+    @pytest.mark.parametrize("name,kw", _TC_HINT)
+    def test_hint_shape(self, name, kw):
+        cypher, params = _tc_builder(name)(**kw())
+        assert "AS tcdb_family_substrates_not_shown" in cypher
+        assert "AS tcdb_family_substrates_skipped" in cypher
+        for key in ("genes:", "metabolites:", "rows:",
+                    "locus_tag:", "tcdb_id:", "tcdb_substrate_count:"):
+            assert key in cypher, key
+        assert "AS total_matching" not in cypher
+
+    @pytest.mark.parametrize("name,kw", _TC_HINT)
+    def test_hint_applies_the_walk_rules_and_dedupe(self, name, kw):
+        cypher, params = _tc_builder(name)(**kw())
+        _assert_walk_rules(cypher, params)
+        assert _GATE_DIRECT_RE.search(cypher)
+
+    @pytest.mark.parametrize("name,kw", _TC_HINT)
+    def test_hint_applies_no_walk_above_direct_system(self, name, kw):
+        """Start rule 3 shapes the hint too: not_shown (orthophosphate in
+        MED4 = phnC/D/E + PMM0717, pstA/B/C/S excluded) AND the breadth-cap
+        skipped list (a gene with a direct system under 3.A.1 is not
+        "superfamily, substrate unknown")."""
+        cypher, _ = _tc_builder(name)(**kw())
+        _assert_no_walk_above_direct_system(cypher)
+
+    def test_gbm_hint_threads_shared_filters(self):
+        cypher, params = _qltc.build_genes_by_metabolite_tcdb_family_hint(
+            **_gbm_kw(gene_categories=["Transport"],
+                      exclude_metabolite_ids=["kegg.compound:C00002"]))
+        assert re.search(r"\w+\.id IN \$metabolite_ids", cypher)
+        assert "$gene_categories" in cypher
+        assert "$exclude_metabolite_ids" in cypher
+        assert _TC_ORG in params.values()
+
+    def test_mbg_hint_reports_genes_without_direct_edges(self):
+        """Per requested gene with gate-passing edges but no direct edge:
+        `walkable` False = every walk start is capped (superfamily call)."""
+        cypher, params = _qltc.build_metabolites_by_gene_tcdb_family_hint(
+            **_mbg_kw(metabolite_elements=["P"]))
+        assert "AS tcdb_no_direct_genes" in cypher
+        assert "walkable" in cypher
+        assert "$locus_tags" in cypher
+        assert params["metabolite_elements"] == ["P"]
+
+
+class TestTcdbCleanupReviewFixes:
+    """Stage-3 code-review regressions (tcdb-cleanup-surface)."""
+
+    # --- 1. summary arms dedupe on their own (transport-only, no UNION) ---
+    @pytest.mark.parametrize("name,kw", [
+        ("build_genes_by_metabolite_summary", _gbm_kw),
+        ("build_metabolites_by_gene_summary", _mbg_kw),
+        ("build_metabolites_by_gene_no_formula_count", _mbg_kw),
+    ])
+    @pytest.mark.parametrize("walk", [False, True])
+    def test_transport_only_summary_arms_return_distinct(self, name, kw, walk):
+        """A (gene, system, metabolite) triple with 2 direct edges must count
+        once even when transport is the only arm (no UNION to collapse)."""
+        cypher, _ = _tc_builder(name)(
+            **kw(arms=("transport",), include_tcdb_family_substrates=walk))
+        if not walk:
+            assert "UNION" not in cypher
+        returns = re.findall(r"RETURN\s+(DISTINCT\s+)?g, null AS r", cypher)
+        assert returns and all(d for d in returns), returns
+        assert len(returns) == (2 if walk else 1)
+
+    # --- 2. include_weak_tcdb_hits sizes gated terms on gated genes ---
+    @pytest.mark.parametrize("builder_name", [
+        "build_genes_by_ontology_detail", "build_genes_by_ontology_per_term",
+        "build_genes_by_ontology_per_gene",
+    ])
+    @pytest.mark.parametrize("kwargs", [
+        _gbo_kw(), _gbo_kw(level=None, term_ids=["tcdb:3.A"]),
+        _gbo_kw(informative_only=True),
+    ])
+    def test_weak_switch_sizes_on_gated_genes(self, builder_name, kwargs):
+        """G4: the switch only adds rows -- a term with any gate-passing gene
+        is sized on those genes for min/max_gene_set_size."""
+        cypher, _ = _tc_builder(builder_name)(
+            **kwargs, include_weak_tcdb_hits=True)
+        assert re.search(
+            r"collect\(DISTINCT CASE WHEN r\.tcdb_gate IN "
+            r"\['direct', 'annotated'\] THEN g END\) AS gated_genes", cypher)
+        assert ("CASE WHEN size(gated_genes) > 0 THEN size(gated_genes)"
+                " ELSE size(term_genes) END AS set_size") in cypher
+        assert "set_size >= $min_gene_set_size" in cypher
+        assert "set_size <= $max_gene_set_size" in cypher
+        assert "size(term_genes) >= $min_gene_set_size" not in cypher
+
+    def test_default_sizing_unchanged(self):
+        cypher, _ = _qltc.build_genes_by_ontology_detail(**_gbo_kw())
+        assert "gated_genes" not in cypher
+        assert "size(term_genes) >= $min_gene_set_size" in cypher
+
+    def test_weak_sizing_noop_on_ungated_ontology(self):
+        kw = _gbo_kw(ontology="go_bp", level=3)
+        assert (_qltc.build_genes_by_ontology_per_term(
+            **kw, include_weak_tcdb_hits=True)
+            == _qltc.build_genes_by_ontology_per_term(**kw))
+
+    # --- 3. the hint returns example_genes ---
+    @pytest.mark.parametrize("name,kw", _TC_HINT)
+    def test_hint_returns_example_genes(self, name, kw):
+        cypher, _ = _tc_builder(name)(**kw())
+        assert ("collect(DISTINCT coalesce(g.gene_name, g.locus_tag))[0..8]"
+                " AS example_genes") in cypher
+        assert re.search(r"RETURN[\s\S]*\bexample_genes\b[\s\S]*$", cypher)
+
+    # --- 4. walk starts / walkable need a non-empty substrate set ---
+    def test_walk_start_requires_substrates(self):
+        start = _qltc._tcdb_walk_start_where()
+        assert "a.tcdb_substrate_count > 0" in start
+        capped = _qltc._tcdb_walk_start_where(cap_op=">")
+        assert "> 0" not in capped
+
+    @pytest.mark.parametrize("name,kw", _TC_HINT + _TC_WALK)
+    def test_walk_builders_require_substrates(self, name, kw):
+        cypher, _ = _tc_builder(name)(**kw())
+        assert "a.tcdb_substrate_count > 0" in cypher
+
+    def test_mbg_walkable_requires_substrates(self):
+        cypher, _ = _qltc.build_metabolites_by_gene_tcdb_family_hint(
+            **_mbg_kw())
+        walkable = cypher.split("AS walkable")[0].split("WITH g, EXISTS {")[1]
+        assert "a.tcdb_substrate_count > 0" in walkable
+
+    # --- 5. the back-compat alias is gone ---
+    def test_deepest_attachment_alias_removed(self):
+        assert not hasattr(_qltc, "TCDB_DEEPEST_ATTACHMENT_PREDICATE")
+        assert _qltc.TCDB_DIRECT_GATE_PREDICATE == "gt.tcdb_gate = 'direct'"
+
+
+class TestTcdbCleanupGeneOverview:
+    """gene_overview: tcdb_assignment_count (KG precompute),
+    tcdb_best_hit_identity (rank-1 best hit, NOT gated); evidence_sources /
+    has_chemistry 'transport' follows the direct set."""
+
+    def test_detail_projects_new_columns(self):
+        cypher, _ = build_gene_overview(locus_tags=_TC_LOCI)
+        assert "AS tcdb_assignment_count" in cypher
+        assert "AS tcdb_best_hit_identity" in cypher
+        for gone in ("tcdb_family_count", "tcdb_evidence_score_max",
+                     "transport_substrate_resolution"):
+            assert gone not in cypher, gone
+
+    def test_best_hit_identity_reads_rank_one_best_hit_ungated(self):
+        """Read from the rank-1 diamond_best_hit edge (pattern comprehension
+        or OPTIONAL MATCH, `rank = 1` or `{rank: 1}`), with no gate on that
+        edge: a below_gate (< 40%) hit is still reported."""
+        cypher, _ = build_gene_overview(locus_tags=_TC_LOCI)
+        assert "AS tcdb_best_hit_identity" in cypher
+        m = re.search(r"diamond_best_hit", cypher)
+        assert m, "best-hit identity must read the diamond_best_hit edge"
+        window = cypher[max(0, m.start() - 160):m.end() + 160]
+        assert re.search(r"\brank\s*(=|:)\s*1\b", window), window
+        assert not re.search(r"tcdb_gate\s*(=|:|IN)", window), (
+            "best-hit identity is not gated")
+        assert ".identity" in cypher
+
+    def test_evidence_sources_transport_arm_is_direct(self):
+        cypher, params = build_gene_overview(locus_tags=_TC_LOCI)
+        _assert_tcdb_gate_direct(cypher, params)
+        assert not _GATE_ANNOTATED_RE.search(cypher)
+
+    def test_has_chemistry_transport_arm_is_direct(self):
+        cypher, params = build_gene_overview_summary(locus_tags=_TC_LOCI)
+        _assert_tcdb_gate_direct(cypher, params)
+        assert not _GATE_ANNOTATED_RE.search(cypher)
+
+    def test_summary_has_tcdb_reads_assignment_count(self):
+        cypher, _ = build_gene_overview_summary(locus_tags=_TC_LOCI)
+        m = re.search(r"tcdb_assignment_count[^\n]*AS has_tcdb", cypher)
+        assert m, "has_tcdb must read Gene.tcdb_assignment_count > 0"

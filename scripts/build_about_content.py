@@ -876,7 +876,10 @@ _NODE_PROP_NOTES = {
     "tcdb_id": "bare TC number (e.g. `3.A.1.14`); `id` is the `tcdb:` CURIE",
     "tc_class_id": "CURIE of the level-0 TC class this node sits under (e.g. `tcdb:3`) — for grouping without walking the hierarchy",
     "superfamily": "TCDB superfamily name the family belongs to, where TCDB assigns one (sparse)",
-    "metabolite_count": "distinct substrates reachable via `Tcdb_family_transports_metabolite` (rolled up over the subtree, so it grows toward the root) — on KEGG, metabolites in the pathway",
+    "metabolite_count": "KEGG: metabolites in the pathway",
+    "tcdb_substrate_count": "distinct Metabolite + ChemicalRole substrates TCDB curates on the `tc_system` nodes in this node's subtree (TCDB's range; on a system, its own count, 0 when none)",
+    "direction": "`uptake` / `export` / `unknown`, set only where TCDB states it (ABC numbering, or the nearest named node's name) and inherited downward — node-level, not a per-gene call",
+    "direction_basis": "sparse: which rule set `direction` (`abc_numbering` / `tcdb_name`)",
     "cazy_id": "bare CAZy family code (e.g. `GH13`); `id` is the `cazy:` CURIE",
     "psortb_id": "PSORTb localization label as emitted by the tool (e.g. `CytoplasmicMembrane`)",
     "signalp_id": "SignalP signal-peptide type code as emitted by the tool (e.g. `SP`, `LIPO`, `TAT`)",
@@ -915,7 +918,7 @@ _ONTOLOGY_OWNED_FILTER_TYPES: dict[str, list[str]] = {
     "merops": ["call_class"],
     "interpro": ["interpro_type"],
     "ncbifam": ["ncbifam_family_type"],
-    "tcdb": ["attachment_depth"],
+    "tcdb": ["tcdb_call", "tcdb_gate", "direction"],
     "brite": ["brite_tree"],
 }
 _UNSCOPED_FILTER_TYPES = frozenset({"link_kinds", "brite_tree"})
@@ -1134,11 +1137,19 @@ def render_ontology(key: str, data: dict, vocab_values: dict | None = None) -> s
                 prop, col = entry
                 cols.append(f"`{col}` (edge prop `{prop}`)")
         L.append(f"| Verbose edge detail | {', '.join(cols)} |")
-    if cfg.get("leaf_attachment"):
-        la = cfg["leaf_attachment"]
+    if cfg.get("rank_order"):
+        ro = cfg["rank_order"]
+        order = " > ".join(f"`{v}`" for v in ro["order"])
         L.append(
-            f"| Leaf mode predicate | `{la['prop']} = '{la['value']}'` "
-            f"unless `{la['override_param']}=True` |"
+            f"| Representative edge per (gene, term) | `{ro['prop']}`: {order}, "
+            f"then `{ro['then']}` DESC |"
+        )
+    if cfg.get("gate"):
+        g = cfg["gate"]
+        passing = " / ".join(f"`{v}`" for v in g["pass"])
+        L.append(
+            f"| Gene-edge gate | `{g['prop']}` in {passing} by default; "
+            f"`{g['override_param']}=True` adds the rest |"
         )
     if cfg.get("term_verbose"):
         cols = ", ".join(f"`{c}`" for c in cfg["term_verbose"])

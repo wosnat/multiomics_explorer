@@ -1014,7 +1014,7 @@ class TestOntologyTermDetailsCorrectnessKG:
     def test_verified_counts(self, conn, run_query):
         rows = self._rows(conn)
         t = rows["tcdb:3.A.1"]
-        assert (len(t["parents"]), t["children_total"], t["links_total"]) == (1, 55, 128)  # 129 → 128 2026-10-18: go:0005548 retired by the GO update
+        assert (len(t["parents"]), t["children_total"], t["links_total"]) == (1, 98, 11)  # 129 → 128 2026-10-18: go:0005548 retired by the GO update; → (98, 11) 2026-10-24T17:33Z: TCDB 3a range-only children, bridges on systems
         assert len(t["children"]) == 50
         s = rows["merops.family:S14"]
         assert (len(s["parents"]), s["children_total"], s["links_total"]) == (1, 0, 1)
@@ -1202,14 +1202,15 @@ class TestGoTransportFollowupsKG:
     # --- 2c.17 route agreement -------------------------------------------
 
     def test_gbm_urea_med4_combination(self, conn):
+        """TCDB cleanup: the 20 inherited-3.A.1-only (transport,) pairs are
+        gone with the direct gate; urtA-E agree across TCDB + GO."""
         r = api.genes_by_metabolite([_UREA], self._ORG, summary=True, conn=conn)
         assert _combo_map(r) == {
-            ("transport",): 20,
             ("go_transport", "transport"): 5,
             ("metabolism",): 4,
         }
         assert [e["pair_count"] for e in r["by_evidence_source_combination"]] \
-            == [20, 5, 4]
+            == [5, 4]
 
     def test_gbm_urea_multi_source_gene_count(self, conn):
         r = api.genes_by_metabolite([_UREA], self._ORG, summary=True, conn=conn)
@@ -1227,8 +1228,11 @@ class TestGoTransportFollowupsKG:
         r = api.metabolites_by_gene(
             ["PMM0970", "PMM0971", "PMM0974"], self._ORG, summary=True,
             conn=conn)
+        # TCDB cleanup: transport-only pairs 8 -> 6 (urtA/urtB/urtE reach
+        # hydroxyurea / thiourea via direct 3.A.1.4.5 only; the inherited
+        # 3.A.1 pairs are gone). GO and TCDB+GO pairs unchanged.
         assert _combo_map(r) == {
-            ("transport",): 8,
+            ("transport",): 6,
             ("go_transport", "transport"): 3,
             ("go_transport",): 3,
         }
@@ -1258,8 +1262,11 @@ class TestGoTransportFollowupsKG:
                    for e in r["by_evidence_source_combination"]) == n_pairs
 
     def test_combination_unchanged_total_matching(self, conn):
+        """The combination rollup never changes total_matching: it equals
+        the row count (4 metabolism + 10 TCDB direct + 11 GO post-3a)."""
         r = api.genes_by_metabolite([_UREA], self._ORG, summary=True, conn=conn)
-        assert r["total_matching"] == 45
+        full = api.genes_by_metabolite([_UREA], self._ORG, limit=500, conn=conn)
+        assert r["total_matching"] == len(full["results"]) == 25
 
     # --- 2c.15 GO-arm filters ---------------------------------------------
 
