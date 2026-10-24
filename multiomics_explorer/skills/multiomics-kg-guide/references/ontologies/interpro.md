@@ -87,6 +87,15 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="interpro")`) lists which comparable axes the gene edge carries.
 
+Snapshot of vocabulary values at build time (`--live-vocab`):
+
+- `Gene_has_interpro_entry.evalue_library`: `CDD`, `GENE3D`, `HAMAP`, `NCBIFAM`, `PANTHER`, `PFAM`, `PIRSF`, `PRINTS`, `PROSITE_PATTERNS`, `PROSITE_PROFILES`, `SFLD`, `SMART`, `SUPERFAMILY`
+- `Gene_has_interpro_entry.evidence`: `signature`
+- `Gene_has_interpro_entry.libraries`: `CDD`, `GENE3D`, `HAMAP`, `NCBIFAM`, `PANTHER`, `PFAM`, `PIRSF`, `PRINTS`, `PROSITE_PATTERNS`, `PROSITE_PROFILES`, `SFLD`, `SMART`, `SUPERFAMILY`
+- `Gene_has_interpro_entry.sources`: `interproscan`
+- `InterproEntry.interpro_type`: `FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`, `ACTIVE_SITE`, `BINDING_SITE`, `PTM`
+- `InterproEntry.is_uninformative`: `true`
+
 ## Interpretation
 
 Type first, then level. A `FAMILY` entry is a whole-protein family call

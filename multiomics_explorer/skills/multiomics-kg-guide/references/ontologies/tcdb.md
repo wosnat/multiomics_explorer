@@ -119,6 +119,16 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 
 Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="tcdb")`) lists which comparable axes the gene edge carries.
 
+Snapshot of vocabulary values at build time (`--live-vocab`):
+
+- `Gene_has_tcdb_family.evidence`: `family_inferred`, `homology`
+- `Gene_has_tcdb_family.sources`: `eggnog`, `tcdb_diamond`
+- `Gene_has_tcdb_family.tcdb_call`: `eggnog`, `diamond_tier`, `diamond_best_hit`
+- `Gene_has_tcdb_family.tcdb_gate`: `direct`, `annotated`, `below_gate`
+- `TcdbFamily.direction`: `uptake`, `export`, `unknown`
+- `TcdbFamily.direction_basis`: `abc_numbering`, `tcdb_name`
+- `TcdbFamily.level_kind`: `tc_class`, `tc_subclass`, `tc_family`, `tc_subfamily`, `tc_system`
+
 ## Interpretation
 
 A gene's leaf rows (`gene_ontology_terms`, default leaf mode) are its
