@@ -799,3 +799,135 @@ id, or a prefix match that `3.A.1` loses to ArsA's entry.
   `ontology_term_details` compact column, so the wrong value reaches agents.
 - **What we do in the meantime:** pass it through unchanged and add no special handling. A fix
   KG-side is a data change only, absorbed with the next rebuild.
+
+### KG reply: A1, B1, and a second batch of TCDB changes (2026-10-25)
+
+**Status.** All of this is merged to KG `main` locally (`c80084e4`, branch
+`fix/tcdb-direction-conservative`). It is **not pushed or rebuilt** yet. The numbers are
+measured on the step-6 caches and the adapter. We'll confirm them in a "KG built" note.
+
+**A1 — done.** The file is `docs/kg-changes/kegg-pathway-exclusions/removed_ids.tsv`, with
+columns `change`, `id`, `name` and `reason`, measured against the build before the exclusion
+(`daff04d8^`). It has 206 rows:
+- 182 `pathway_removed` (`kegg.pathway:ko…`);
+- 22 `subcategory_removed` (`kegg.subcategory:091…`);
+- 1 `category_removed` (`kegg.category:09150`, Organismal Systems);
+- 1 `discusses_edge_removed`: `doi:10.1128/spectrum.03275-22 -> kegg.pathway:ko04710`, the Moreno
+  2023 "circadian rhythm" mention, `central`.
+
+**B1 — upstream, not a join bug.** TCDB's own `superfamilies.tsv` puts every one of its 1,050
+ABC rows (`3.A.1.*`) in "ArsA ATPase (ArsA) Superfamily". We copy the value as is. Our policy is
+not to correct TCDB's data in code, so it stays, and CLAUDE.md now documents it. What we did fix:
+788 values had a trailing space, and those are stripped. Please treat `superfamily` as TCDB's
+label, which is unreliable for whole groups.
+
+**The −14 CorC genes.** Noted. The "KG built" note will cite the cause: `1.C.126.1.2` carries no
+curated substrates.
+
+**Changes you'll need to absorb:**
+
+1. **BREAKING: `TcdbFamily.direction` is conservative, and only systems take it from names.**
+   This replaces the R5 answer ("inherited downward") and P1's "nearest named node wins".
+   - **What the rule reads.** There are two sources:
+     - a `tc_system`'s **own** TCDB name;
+     - ABC uptake numbering for `3.A.1.1–99`, on the subfamily and its systems.
+   - **No inheritance from names.** Family and subfamily names never give a direction, either to
+     the node itself or to its systems. A family is named after one characterised member, and the
+     audit found many members going the other way. Examples: the DME "Drug/Metabolite Exporter"
+     family holds SAM and riboflavin importers; the AEC "Auxin Efflux Carrier" family holds malate
+     importers.
+   - **What follows.** Every family or subfamily outside the ABC uptake range reads `unknown`, and
+     so does an unnamed or plainly named system. `3.A.1.100+` gets a direction only from a
+     system's own name.
+   - **When a name gives `unknown`.** A name decides unless:
+     - a hedge comes before the direction word (putative, probable, may, uncharacterized, `?`);
+     - a role phrase comes before it ("involved in", "controls", "affects", "required for");
+     - a negation sits just before it;
+     - an organelle appears anywhere in the name (vacuole, mitochondria, vesicle, ER, …);
+     - a homologue word follows it;
+     - it states both directions.
+   - **Secretion counts as export.** "Secretion" and "secretory" are export words, covering Sec,
+     type II–IX secretion, Dot/Icm and SecDF.
+   - **What else can remove a direction.**
+     - The node's TCDB description can veto: "both uptake and efflux", "under debate", or the
+       opposite direction in its first sentence.
+     - A curated `config/tcdb_direction_overrides.yaml` has 66 entries, each with a reason and a
+       reference. It only ever removes a direction. It covers Mla, ABC-F, BceAB, FtsEX, SEDS
+       FtsW/RodA, toxins `1.C`, Ccm, Sap, ZntB, NarK, P1B-ATPase "uptake" claims, and others.
+   - **Counts.**
+     - uptake **646** (397 by ABC numbering, 33 subfamilies + 364 systems; 249 by name);
+     - export **566**;
+     - unknown **8,156**;
+     - was 956 / 1,367 / 7,066.
+     - 77% of the (direct-gate gene, node) links that read uptake or export in the live graph keep
+       the same direction (3,388 of 4,372).
+     - `direction_basis = 'tcdb_name'` now occurs on `tc_system` nodes only.
+   - **How it was checked.** Seven reviewers read every node that has a direction (1,915). The
+     method and the per-case reasons are in `docs/kg-changes/tcdb-cleanup.md`.
+   - **On your side.** "Uptake systems for X" works at system level, where substrates live. If any
+     fixture or example reads `direction` on a family or subfamily, expect `unknown` there, except
+     on the ABC uptake subfamilies.
+
+2. **New: `TcdbFamily.proteins`, and TCDB names cleaned.**
+   - **`proteins`.** Sparse, on `tc_system` only. It holds the protein cell of the TCDB row: gene
+     symbols, accessions and source organism, with lines joined by `; `. For example, `3.A.1.4.4`
+     reads "UrtA-E urea porter of Anabaena sp. PCC7120; UrtA (R); UrtB (M); …". It is in
+     `tcdbFamilyFullText`, so a search for `UrtA` now finds the urea porters. Consider it for
+     `search_ontology` / `ontology_term_details`.
+   - **Name fixes.**
+     - Superscripts and subscripts no longer become spaces: "Na + ", "CO 2" and "B 12" are now
+       "Na+", "CO2" and "B12". This affected 1,100 names, and is why searching for CO2 found 2 of
+       ~117 systems.
+     - Names keep their head noun: `3.A.1.5.24` was "The antimicrobial peptide" and now ends
+       "… exporter, YejABEF".
+     - 1,842 names changed in total. The TC ids were verified to point at the right text on all
+       593 pages.
+   - **A retired id re-anchored.** TCDB's "originally assigned to" move re-anchors `3.A.1.129.1`
+     (CydC/D) onto `3.A.1.106.22`. TcdbFamily goes from **9,370 to 9,368**.
+   - **Unnamed systems.** Systems still named by their TC id: **120** (was 134). These are
+     retired ids that TCDB's TSVs still list.
+
+3. **BREAKING: TCDB substrates.**
+   - **ChEBI decides the compound.** Resolution was always keyed on TCDB's ChEBI id, but the KEGG
+     id came from MNX's lowest C-number. It now comes from ChEBI.
+     - **Generic names stay generic.** An unspecified "leucine", "glutamate", "tryptophan",
+       "histidine", "proline", "valine", "lysine", "tyrosine", "cystine", "homocysteine" or
+       "malate" now lands on the generic node, not the L form. `Metabolite_is_stereo_form_of`
+       links each L form to its generic node (96 → 112 edges).
+     - **Placeholders and coupling ions are dropped.** "molecule", "ion", "cation", "anion" and
+       similar, plus H⁺ and Na⁺, are no longer substrate targets. The new
+       `config/tcdb_substrate_target_filter.yaml` drops 2,213 (system, target) pairs.
+   - **Edge counts.** `Tcdb_family_transports_metabolite` goes from **10,765 to 8,548**, over
+     5,218 systems. Role edges are unchanged at 365.
+   - **New `Schema_info.tcdb_substrate_excluded_targets`** (str[]). It works like
+     `go_transport_excluded_targets`: an empty TCDB answer for those ids means we filtered them, not
+     that no system moves them. Na⁺/H⁺ antiporters now carry no metabolite edge.
+   - **Protein is one node and stays a substrate.**
+     - `chebi:36080` is merged into **`kegg.compound:C00017`** by an identity `merge:` override.
+     - It is the substrate of 332 TCDB systems, 43 of them `export`, so Sec, Tat and the secretion
+       systems now answer "what moves protein".
+   - **Metabolite ids.** Metabolites stay at 3,178. The sweep list is
+     `docs/kg-changes/tcdb-cleanup/review_2026-10-25_metabolite_ids.tsv`, with 37 rows:
+     - 17 `metabolite_rekeyed`, with the new id given. Examples: `kegg.compound:C01829` → `chebi:30660`
+       (thyroxine), `C01478` → `C11215` (arsenate ion), `C00725` → `C16241` ((R)-lipoate),
+       `chebi:36080` → `C00017`.
+     - 9 `metabolite_removed`: the placeholders and Na⁺ `C01330`.
+     - 11 `metabolite_added`: the generic forms.
+     - 0 paper assay rows are repointed.
+   - **Not corrected, by policy.** TCDB's own wrong ChEBI ids are still there: PstABCS lists
+     triphosphate, DAPI appears as nifedipine, and TPP is read as thiamine diphosphate. A curated
+     override file is on our backlog. Two ChEBI-defined cases stay too: "corrinoid" resolves to
+     C06021, a corrinoid protein, and oxonium resolves to water.
+
+4. **GO transport.**
+   - Protein left the GO filter as well, so the two routes agree. This adds GO:0071806 → Protein:
+     edges go from 518 to **519**.
+   - `go_transport_excluded_targets` has **12** ids (was 13). Na⁺ is now published as `chebi:29101`,
+     because no Na⁺ node is written any more; it was `kegg.compound:C01330`. If you pin `C01330`
+     in that list, update it.
+
+5. **`controlled_vocabularies_hash` moves.** The `direction` and `direction_basis` descriptions
+   changed.
+
+Nothing in `tcdb_gate`, `tcdb_call` or the gene-edge contract changed. The transport arm reads the
+same `direct` edges; only the substrates they reach changed, as described in item 3.
