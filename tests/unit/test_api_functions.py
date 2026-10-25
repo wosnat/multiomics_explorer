@@ -9471,6 +9471,19 @@ class TestGenesByMetabolite:
         out = gbm(self._METS, self._ORG, limit=2, conn=conn)
         assert out["truncated"] is True
 
+    def test_limit_none_returns_all_rows(self):
+        """limit=None (backlog 3.18): no TypeError, every arm row, untruncated."""
+        gbm = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_MS, self._TRANS_ROW_LOW],
+            [{"found": ["kegg.compound:C00086"]}],
+        )
+        out = gbm(self._METS, self._ORG, limit=None, conn=conn)
+        assert len(out["results"]) == 3
+        assert out["truncated"] is False
+
     def test_offset_echoed_in_envelope(self):
         gbm = self._api()
         conn = self._mock_conn(
@@ -10532,6 +10545,19 @@ class TestMetabolitesByGene:
         )
         out = mbg(self._LOCUS, self._ORG, limit=2, conn=conn)
         assert out["truncated"] is True
+
+    def test_limit_none_returns_all_rows(self):
+        """limit=None (backlog 3.18): no TypeError, every arm row, untruncated."""
+        mbg = self._api()
+        conn = self._mock_conn(
+            [self._SUMMARY_ROW_BOTH_ARMS],
+            [self._METAB_ROW],
+            [self._TRANS_ROW_MS],
+            [{"found": ["PMM0963", "PMM0964", "PMM0965"]}],
+        )
+        out = mbg(self._LOCUS, self._ORG, limit=None, conn=conn)
+        assert len(out["results"]) == 2
+        assert out["truncated"] is False
 
     def test_offset_echoed_in_envelope(self):
         mbg = self._api()

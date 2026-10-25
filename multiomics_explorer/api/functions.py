@@ -27,6 +27,7 @@ from CyVer import PropertiesValidator, SchemaValidator, SyntaxValidator
 from neo4j.exceptions import ClientError as Neo4jClientError
 
 from multiomics_explorer.api._compat import deprecated_alias
+from multiomics_explorer.api._guards import listify_bare_str
 from multiomics_explorer.kg.connection import GraphConnection
 from multiomics_explorer.kg.constants import (
     ALL_ONTOLOGIES,
@@ -1442,6 +1443,7 @@ def _edge_descriptions() -> dict[str, str]:
     return {str(k): str(v) for k, v in (data or {}).items()}
 
 
+@listify_bare_str
 def kg_schema(
     labels: list[str] | None = None,
     relationship_types: list[str] | None = None,
@@ -1551,6 +1553,7 @@ def resolve_gene(
     return _cap_breakdowns(envelope, ("by_organism",), summary=summary)
 
 
+@listify_bare_str
 def genes_by_function(
     search_text: str,
     organism: str | None = None,
@@ -1681,6 +1684,7 @@ def genes_by_function(
     return _cap_breakdowns(envelope, ("by_organism",), summary=summary)
 
 
+@listify_bare_str
 def gene_overview(
     locus_tags: list[str],
     summary: bool = False,
@@ -1849,6 +1853,7 @@ _DISCUSSES_ENTITY_KINDS = ("gene", "kegg_pathway")
 _DISCUSSES_PROMINENCE = ("central", "peripheral")
 
 
+@listify_bare_str
 def discussed_by_publication(
     publication_dois: list[str],
     entity_kind: str | None = None,
@@ -1965,6 +1970,7 @@ def discussed_by_publication(
     return envelope
 
 
+@listify_bare_str
 def gene_details(
     locus_tags: list[str],
     summary: bool = False,
@@ -2024,6 +2030,7 @@ def gene_details(
 
 
 
+@listify_bare_str
 def gene_homologs(
     locus_tags: list[str],
     source: str | None = None,
@@ -2377,6 +2384,7 @@ def list_filter_values(
     }
 
 
+@listify_bare_str
 def list_organisms(
     organism_names: list[str] | None = None,
     compartment: str | None = None,
@@ -2646,6 +2654,7 @@ def _rank_annotation_capability(rows: list[dict]) -> list[dict]:
     return entries
 
 
+@listify_bare_str
 def list_publications(
     organism: str | None = None,
     treatment_type: list[str] | None = None,
@@ -2826,6 +2835,7 @@ def list_publications(
     )
 
 
+@listify_bare_str
 def list_experiments(
     organism: str | None = None,
     treatment_type: list[str] | None = None,
@@ -3435,6 +3445,7 @@ def search_ontology(
     }
 
 
+@listify_bare_str
 def search_homolog_groups(
     search_text: str,
     source: str | None = None,
@@ -3553,6 +3564,7 @@ def search_homolog_groups(
     return envelope
 
 
+@listify_bare_str
 def genes_by_homolog_group(
     group_ids: list[str],
     organisms: list[str] | None = None,
@@ -3788,6 +3800,7 @@ def _term_details_row(row: dict, *, verbose: bool, organism: str | None) -> dict
     return out
 
 
+@listify_bare_str
 def ontology_term_details(
     term_ids: list[str],
     organism: str | None = None,
@@ -3906,6 +3919,7 @@ def ontology_term_details(
     }
 
 
+@listify_bare_str
 def genes_by_ontology(
     ontology: str,
     organism: str,
@@ -4305,6 +4319,7 @@ def genes_by_ontology(
     return envelope
 
 
+@listify_bare_str
 def gene_ontology_terms(
     locus_tags: list[str],
     organism: str,
@@ -4762,6 +4777,7 @@ def _validate_organism_inputs(
     return first
 
 
+@listify_bare_str
 def differential_expression_by_gene(
     organism: str | None = None,
     locus_tags: list[str] | None = None,
@@ -5033,6 +5049,7 @@ def differential_expression_by_gene(
     return _cap_breakdowns(envelope, ("experiments",), summary=summary)
 
 
+@listify_bare_str
 def differential_expression_by_ortholog(
     group_ids: list[str],
     organisms: list[str] | None = None,
@@ -5289,6 +5306,7 @@ def differential_expression_by_ortholog(
 _FULL_COVERAGE_SCOPES = {"significant_only", "significant_any_timepoint"}
 
 
+@listify_bare_str
 def gene_response_profile(
     locus_tags: list[str],
     organism: str | None = None,
@@ -5497,6 +5515,7 @@ def gene_response_profile(
     }
 
 
+@listify_bare_str
 def list_clustering_analyses(
     search_text: str | None = None,
     organism: str | None = None,
@@ -5664,6 +5683,7 @@ _LIST_DM_COMPACT_DROP = (
 )
 
 
+@listify_bare_str
 def list_derived_metrics(
     search_text: str | None = None,
     organism: str | None = None,
@@ -5818,6 +5838,7 @@ def list_derived_metrics(
     return envelope
 
 
+@listify_bare_str
 def gene_clusters_by_gene(
     locus_tags: list[str],
     organism: str | None = None,
@@ -5933,6 +5954,7 @@ def gene_clusters_by_gene(
     return envelope
 
 
+@listify_bare_str
 def gene_derived_metrics(
     locus_tags: list[str],
     organism: str | None = None,
@@ -6121,6 +6143,7 @@ _DM_COMPACT_DROP = (
 )
 
 
+@listify_bare_str
 def genes_by_numeric_metric(
     derived_metric_ids: list[str] | None = None,
     metric_types: list[str] | None = None,
@@ -6498,6 +6521,7 @@ def genes_by_numeric_metric(
     }
 
 
+@listify_bare_str
 def genes_by_boolean_metric(
     derived_metric_ids: list[str] | None = None,
     metric_types: list[str] | None = None,
@@ -6777,6 +6801,7 @@ def genes_by_boolean_metric(
     }
 
 
+@listify_bare_str
 def genes_by_categorical_metric(
     derived_metric_ids: list[str] | None = None,
     metric_types: list[str] | None = None,
@@ -7064,6 +7089,7 @@ def genes_by_categorical_metric(
     }
 
 
+@listify_bare_str
 def genes_in_cluster(
     cluster_ids: list[str] | None = None,
     analysis_id: str | None = None,
@@ -7282,6 +7308,7 @@ def _ontology_exp_coverage_stats(
 # ---------------------------------------------------------------------------
 
 
+@listify_bare_str
 def ontology_landscape(
     organism: str,
     ontology: str | list[str] | None = None,
@@ -7590,6 +7617,7 @@ def _check_enrichment_level(ontology: str, level: int | None, conn: "GraphConnec
 # ---------------------------------------------------------------------------
 
 
+@listify_bare_str
 def pathway_enrichment(
     organism: str,
     experiment_ids: list[str],
@@ -7833,6 +7861,7 @@ def pathway_enrichment(
 # ---------------------------------------------------------------------------
 
 
+@listify_bare_str
 def cluster_enrichment(
     analysis_id: str,
     organism: str,
@@ -8436,6 +8465,7 @@ def _with_not_classified(
     return rows
 
 
+@listify_bare_str
 def list_metabolites(
     search_text: str | None = None,
     metabolite_ids: list[str] | None = None,
@@ -9339,6 +9369,7 @@ def _stereo_hint_warning(
     return text
 
 
+@listify_bare_str
 def genes_by_metabolite(
     metabolite_ids: list[str],
     organism: str,
@@ -9356,7 +9387,7 @@ def genes_by_metabolite(
     go_evidence: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
-    limit: int = 10,
+    limit: int | None = 10,
     offset: int = 0,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -9824,13 +9855,14 @@ def genes_by_metabolite(
         # Mode 3: over-fetch limit+offset per arm, concat, global-sort,
         # slice. Each builder's ORDER BY is the restriction of
         # _gbm_sort_key to its arm, so the slice is exact.
-        per_arm_fetch = limit + offset
+        per_arm_fetch = None if limit is None else limit + offset
         combined: list[dict] = []
         for arm in detail_arms:
             cypher, params = _arm_query(arm, per_arm_fetch, 0)
             combined.extend(conn.execute_query(cypher, **params))
         combined.sort(key=_gbm_sort_key)
-        results = combined[offset:offset + limit]
+        results = (combined[offset:] if limit is None
+                   else combined[offset:offset + limit])
 
     # 5. Sparse-strip nullable result columns; tag rows reached through an
     # added stereo form (expansion mode only).
@@ -10048,7 +10080,7 @@ def genes_by_metabolite(
         "offset": offset,
         # Per spec § "Result-size controls" line 966 + Pydantic doc:
         # truncated iff (offset + limit) < total_matching.
-        "truncated": (offset + limit) < total_matching,
+        "truncated": limit is not None and (offset + limit) < total_matching,
         "warnings": warnings,
         "resolved_aliases": resolved_aliases,
         "not_found": not_found,
@@ -10148,6 +10180,7 @@ def _mbg_sort_key(row: dict, locus_index: dict[str, int]) -> tuple:
     )
 
 
+@listify_bare_str
 def metabolites_by_gene(
     locus_tags: list[str],
     organism: str,
@@ -10166,7 +10199,7 @@ def metabolites_by_gene(
     go_evidence: list[str] | None = None,
     summary: bool = False,
     verbose: bool = False,
-    limit: int = 10,
+    limit: int | None = 10,
     offset: int = 0,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -10636,13 +10669,14 @@ def metabolites_by_gene(
         # Mode 3: over-fetch limit+offset per arm, concat, global-sort,
         # slice. Each builder's ORDER BY is the restriction of
         # _mbg_sort_key to its arm, so the slice is exact.
-        per_arm_fetch = limit + offset
+        per_arm_fetch = None if limit is None else limit + offset
         combined: list[dict] = []
         for arm in detail_arms:
             cypher, params = _arm_query(arm, per_arm_fetch, 0)
             combined.extend(conn.execute_query(cypher, **params))
         combined.sort(key=lambda r: _mbg_sort_key(r, locus_index))
-        results = combined[offset:offset + limit]
+        results = (combined[offset:] if limit is None
+                   else combined[offset:offset + limit])
 
     # 5. Sparse-strip nullable result columns.
     results = [
@@ -10901,7 +10935,7 @@ def metabolites_by_gene(
         "returned": len(results),
         "offset": offset,
         # truncated iff (offset + limit) < total_matching (mirrors GBM).
-        "truncated": (offset + limit) < total_matching,
+        "truncated": limit is not None and (offset + limit) < total_matching,
         "warnings": warnings,
         "resolved_aliases": resolved_aliases,
         "not_found": not_found,
@@ -10944,6 +10978,7 @@ def metabolites_by_gene(
 # ---------------------------------------------------------------------------
 
 
+@listify_bare_str
 def list_metabolite_assays(
     search_text: str | None = None,
     organism: str | None = None,
@@ -11291,6 +11326,7 @@ def _null_rank_on_absent(rows: list[dict]) -> list[dict]:
     return rows
 
 
+@listify_bare_str
 def metabolites_by_quantifies_assay(
     *,
     assay_ids: list[str],
@@ -11622,6 +11658,7 @@ def metabolites_by_quantifies_assay(
     }
 
 
+@listify_bare_str
 def metabolites_by_flags_assay(
     *,
     assay_ids: list[str],
@@ -11840,6 +11877,7 @@ def metabolites_by_flags_assay(
     }
 
 
+@listify_bare_str
 def assays_by_metabolite(
     *,
     metabolite_ids: list[str],
@@ -12037,6 +12075,7 @@ def assays_by_metabolite(
 # ---------------------------------------------------------------------------
 
 
+@listify_bare_str
 def gene_aa_sequence(
     locus_tags: list[str],
     fasta: bool = False,
@@ -12169,6 +12208,7 @@ GENE_NEIGHBORS_MAX_WINDOW = 100
 GENE_NEIGHBORS_MAX_ROWS = 100_000
 
 
+@listify_bare_str
 def gene_neighbors(
     locus_tags: list[str],
     window: int = 5,

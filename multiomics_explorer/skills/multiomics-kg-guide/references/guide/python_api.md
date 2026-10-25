@@ -130,10 +130,13 @@ A handful keep numeric defaults (`genes_by_metabolite` /
 `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay` 5;
 `discussed_by_publication` / `ontology_term_details` 50;
 `gene_aa_sequence` / `gene_neighbors` 25) — pass `limit=None` explicitly
-there for bulk extraction, except `genes_by_metabolite` and
-`metabolites_by_gene`, which currently reject `limit=None` with a
-`TypeError` — pass a high number (e.g. `limit=10_000`) instead. `returned` and `truncated` are present in the
+there for bulk extraction. `returned` and `truncated` are present in the
 dict; they only diverge from the full set when a `limit` is in effect.
+
+Parameters declared `list[str]` also accept a single bare string, read
+as a one-element list: `list_experiments(omics_type="RNASEQ")` is
+`omics_type=["RNASEQ"]`. (The MCP tools are stricter — their schemas
+require a JSON array.)
 
 ### 2. `EnrichmentResult` (2 API functions — `pathway_enrichment`, `cluster_enrichment` — plus the building block `fisher_ora`)
 
@@ -378,7 +381,7 @@ with GraphConnection() as conn:
     drill = genes_by_metabolite(
         metabolite_ids=metabolite_ids,
         organism="Prochlorococcus MED4",
-        limit=10_000,  # package default is 10 here; limit=None raises
+        limit=None,  # package default is 10 here
         conn=conn,
     )
     df_genes = to_dataframe(drill)
