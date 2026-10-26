@@ -59,6 +59,6 @@ It is a warn, never worse. The hash covers the vocabulary VALUE SETS (ids, value
 - kg_release_info → kg_schema (verify compat, then introspect schema)
 - kg_release_info → any analysis tool (if verdict != 'ok', surface warning before running real analysis)
 - kg_release_info (controlled_vocabularies_hash assert failed) → list_filter_values(filter_type=...) for the live value set instead of any quoted list
-- kg_release_info → kg.go_transport_excluded_targets → read before interpreting an empty `go_transport` answer from genes_by_metabolite / metabolites_by_gene
+- kg_release_info → kg.go_transport_excluded_targets / kg.tcdb_substrate_excluded_targets → read before interpreting an empty `go_transport` / `transport` answer from genes_by_metabolite / metabolites_by_gene
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/kg_release_info/full`

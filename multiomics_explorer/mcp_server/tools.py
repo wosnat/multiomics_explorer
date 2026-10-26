@@ -733,7 +733,8 @@ class GeneReactionMetaboliteTriplet(SparseRow):
         default=None,
         description="Transport rows only. TCDB-stated `direction` of the "
         "row's node (the system; on family rows the attached node). "
-        "Node-level, not a per-gene fact.")
+        "Node-level, not per gene. Set only by ABC uptake numbering or a "
+        "system's own name; family rows mostly read 'unknown'.")
     attached_tcdb_id: str | None = Field(
         default=None,
         description="Transport rows only. The TC node the gene's edge points "
@@ -1146,7 +1147,7 @@ class TcdbFamilySubstrateSkipped(BaseModel):
         description="The capped start node (e.g. 'tcdb:3.A.1', the ABC "
         "superfamily). Inspect its range via ontology_term_details.")
     tcdb_substrate_count: int = Field(
-        description="Substrates curated under the node (e.g. 551); above "
+        description="Substrates curated under the node (e.g. 546); above "
         "the 200-substrate walk cap.")
 
 
@@ -1805,7 +1806,11 @@ class KGIdentity(BaseModel):
     )
     go_transport_excluded_targets: list[str] | None = Field(
         default=None,
-        description="Metabolite ids curated out of the GO transport route (coupling ions, upper-level classes). An empty GO answer for these is curation, not biology; TCDB rows still answer. Null on older KGs.",
+        description="Metabolite ids curated out of the GO transport route (coupling ions, upper-level classes). An empty GO answer for these is curation, not biology. Null on older KGs.",
+    )
+    tcdb_substrate_excluded_targets: list[str] | None = Field(
+        default=None,
+        description="Metabolite ids curated out of the TCDB substrate route (coupling ions H+ / Na+, placeholders such as molecule / cation / anion); a superset of go_transport_excluded_targets. An empty TCDB answer for these is curation, not biology: Na+/H+ antiporters carry no metabolite rows. Null on older KGs.",
     )
     gene_count: int | None = Field(default=None, description="Number of Gene nodes in the KG.")
     experiment_count: int | None = Field(default=None, description="Number of Experiment nodes in the KG.")
@@ -3002,13 +3007,16 @@ def register_tools(mcp: FastMCP):
             description="Genes annotated directly to this term, excluding "
                         "descendants (verbose only; hierarchical ontologies).")
         superfamily: str | None = Field(default=None,
-            description="TCDB superfamily label (verbose only; sparse: tcdb).")
+            description="TCDB's own superfamily label, copied as is; "
+                        "unreliable for whole groups (ABC 3.A.1 nodes read "
+                        "ArsA) (verbose only; sparse: tcdb).")
         tcdb_substrate_count: int | None = Field(default=None,
             description="Distinct substrates curated under this TCDB node, all "
                         "levels (verbose only; sparse: tcdb).")
         direction: str | None = Field(default=None,
             description="TCDB-stated transport direction: 'uptake' / 'export' / "
-                        "'unknown' (verbose only; sparse: tcdb).")
+                        "'unknown'; only systems and ABC uptake subfamilies "
+                        "carry one (verbose only; sparse: tcdb).")
         family_type: str | None = Field(default=None,
             description="NCBIfam family type, e.g. 'equivalog', 'subfamily' "
                         "(verbose only; sparse: ncbifam).")
@@ -3211,13 +3219,13 @@ def register_tools(mcp: FastMCP):
         tc_class_id: str | None = Field(default=None, description="Parent TC class, e.g. '3.A' (sparse: tcdb)")
         member_count: int | None = Field(default=None,
             description="Child/member term count (sparse: tcdb, interpro, merops)")
-        superfamily: str | None = Field(default=None, description="TCDB superfamily label (sparse: tcdb)")
+        superfamily: str | None = Field(default=None, description="TCDB's own superfamily label, copied as is; unreliable for whole groups (ABC 3.A.1 nodes read ArsA) (sparse: tcdb)")
         tcdb_substrate_count: int | None = Field(default=None,
             description="Distinct substrates curated under this TCDB node, any level (sparse: tcdb). Substrate edges leave tc_system nodes only.")
         direction: str | None = Field(default=None,
-            description="TCDB-stated transport direction: 'uptake' / 'export' / 'unknown' (sparse: tcdb)")
+            description="TCDB-stated transport direction: 'uptake' / 'export' / 'unknown' (sparse: tcdb). Conservative: only tc_system nodes and the ABC uptake subfamilies (3.A.1.1-99) carry one; families read 'unknown'.")
         direction_basis: str | None = Field(default=None,
-            description="How the TCDB direction was assigned (sparse: tcdb; absent when unstated)")
+            description="How the TCDB direction was assigned: 'abc_numbering' (ABC uptake range, uptake only) or 'tcdb_name' (a system's own name) (sparse: tcdb; absent when unstated)")
         metabolite_count: int | None = Field(default=None,
             description="Distinct metabolites attached (sparse: KEGG pathway chemistry)")
         reaction_count: int | None = Field(default=None,

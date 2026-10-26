@@ -2064,3 +2064,4 @@ class TestGoTransportContract:
     def test_kg_release_info_kg_block_has_excluded_targets(self, conn):
         r = api.kg_release_info(conn)
         assert isinstance(r["kg"]["go_transport_excluded_targets"], list)
+        assert isinstance(r["kg"]["tcdb_substrate_excluded_targets"], list)

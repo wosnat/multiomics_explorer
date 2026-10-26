@@ -112,7 +112,7 @@ Step 3: read each failure's detail string
 kg_release_info → kg_schema (verify compat, then introspect schema)
 kg_release_info → any analysis tool (if verdict != 'ok', surface warning before running real analysis)
 kg_release_info (controlled_vocabularies_hash assert failed) → list_filter_values(filter_type=...) for the live value set instead of any quoted list
-kg_release_info → kg.go_transport_excluded_targets → read before interpreting an empty `go_transport` answer from genes_by_metabolite / metabolites_by_gene
+kg_release_info → kg.go_transport_excluded_targets / kg.tcdb_substrate_excluded_targets → read before interpreting an empty `go_transport` / `transport` answer from genes_by_metabolite / metabolites_by_gene
 ```
 
 ## Common mistakes
@@ -153,7 +153,7 @@ The pin lives in the explorer (EXPECTED_KG_SHAPE) and is set at explorer release
 
 - Verdict `unknown` means the check could not be evaluated at all — no `Schema_info` node in the KG (a build without release metadata, or the wrong database). Treat quoted value lists the same way as under `warn`. On any non-`ok` verdict the tool also emits a `ctx.warning` so the MCP client surfaces it.
 
-- `kg.go_transport_excluded_targets` lists the canonical ids deliberately removed from the GO transport route (coupling ions H+ and Na+, upper-level ChEBI classes such as ion and chemical entity). An empty GO answer for one of them is curation, not biology; TCDB and KEGG rows still answer. Like the other identity fields it is passed through from Schema_info and is null on a build that does not stamp it.
+- `kg.go_transport_excluded_targets` lists the canonical ids deliberately removed from the GO transport route (coupling ions H+ and Na+, upper-level ChEBI classes such as ion and chemical entity). `kg.tcdb_substrate_excluded_targets` does the same for the TCDB substrate route and is a superset (it adds placeholders such as molecule, cation, anion), so Na+/H+ antiporters carry no metabolite rows. An empty answer for these ids is curation, not biology; only KEGG rows can still answer. Like the other identity fields both are passed through from Schema_info and are null on a build that does not stamp them.
 
 ## Package import equivalent
 

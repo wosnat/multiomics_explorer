@@ -31,7 +31,7 @@
 - `docs://tools/genes_by_numeric_metric` — ~1657 tok
 - `docs://tools/genes_by_ontology` — ~1799 tok
 - `docs://tools/genes_in_cluster` — ~778 tok
-- `docs://tools/kg_release_info` — ~633 tok
+- `docs://tools/kg_release_info` — ~646 tok
 - `docs://tools/kg_schema` — ~619 tok
 - `docs://tools/list_clustering_analyses` — ~977 tok
 - `docs://tools/list_derived_metrics` — ~1553 tok
@@ -74,11 +74,11 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/genes_by_categorical_metric/full` — ~6068 tok
 - `docs://tools/genes_by_function/full` — ~2692 tok
 - `docs://tools/genes_by_homolog_group/full` — ~2436 tok
-- `docs://tools/genes_by_metabolite/full` — ~23425 tok
+- `docs://tools/genes_by_metabolite/full` — ~23484 tok
 - `docs://tools/genes_by_numeric_metric/full` — ~6747 tok
 - `docs://tools/genes_by_ontology/full` — ~16404 tok
 - `docs://tools/genes_in_cluster/full` — ~1960 tok
-- `docs://tools/kg_release_info/full` — ~2353 tok
+- `docs://tools/kg_release_info/full` — ~2416 tok
 - `docs://tools/kg_schema/full` — ~2205 tok
 - `docs://tools/list_clustering_analyses/full` — ~2571 tok
 - `docs://tools/list_derived_metrics/full` — ~3493 tok
@@ -89,15 +89,15 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/list_organisms/full` — ~14494 tok
 - `docs://tools/list_publications/full` — ~8817 tok
 - `docs://tools/metabolites_by_flags_assay/full` — ~4799 tok
-- `docs://tools/metabolites_by_gene/full` — ~17301 tok
+- `docs://tools/metabolites_by_gene/full` — ~17323 tok
 - `docs://tools/metabolites_by_quantifies_assay/full` — ~6456 tok
 - `docs://tools/ontology_landscape/full` — ~10889 tok
-- `docs://tools/ontology_term_details/full` — ~9459 tok
+- `docs://tools/ontology_term_details/full` — ~9529 tok
 - `docs://tools/pathway_enrichment/full` — ~13390 tok
 - `docs://tools/resolve_gene/full` — ~1520 tok
 - `docs://tools/run_cypher/full` — ~972 tok
 - `docs://tools/search_homolog_groups/full` — ~2275 tok
-- `docs://tools/search_ontology/full` — ~10400 tok
+- `docs://tools/search_ontology/full` — ~10432 tok
 
 ## Analysis
 
@@ -106,7 +106,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://analysis/enrichment` — ~7337 tok — How to run over-representation analysis (ORA) with the `multiomics_explorer` package: the building blocks…
 - `docs://analysis/expression` — ~2361 tok — The differential-expression (DE) tool family and the two analysis utilities that reshape its output into…
 - `docs://analysis/metabolites` — ~14529 tok — LLM-facing decision-tree guide for metabolite questions.
-- `docs://analysis/transport` — ~3894 tok — What transports compound X in organism Y, or what does gene Z move? The KG answers from three routes.
+- `docs://analysis/transport` — ~3905 tok — What transports compound X in organism Y, or what does gene Z move? The KG answers from three routes.
 
 ## Ontologies
 

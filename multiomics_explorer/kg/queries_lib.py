@@ -1246,8 +1246,8 @@ TCDB_DIRECT_GATE_PREDICATE = "gt.tcdb_gate = 'direct'"
 # Opt-in family substrate walk (include_tcdb_family_substrates): a start node
 # with more curated substrates than this is skipped and reported instead —
 # a superfamily call says nothing about substrate (start rule 4). Removes
-# exactly ABC 3.A.1 (551) and MFS 2.A.1 (471); the next-broadest start is
-# DHA1 2.A.1.2 at 125. A constant, not a param.
+# exactly ABC 3.A.1 (546) and MFS 2.A.1 (468); the next-broadest start is
+# 2.A.7 at 134. A constant, not a param.
 TCDB_FAMILY_WALK_MAX_SUBSTRATES = 200
 
 _TCDB_SUBSTRATE_RELS = (

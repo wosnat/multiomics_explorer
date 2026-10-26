@@ -5475,11 +5475,11 @@ class TestGoTransportGenesByMetabolite:
         r = api.genes_by_metabolite(["chebi:23906"], _GOT_MED4, conn=conn)
         assert "chebi:23906" in r["not_found"]["metabolite_ids"]
         assert any(
-            "'chebi:23906' is excluded from the GO transport route by "
-            "curation" in w for w in r["warnings"])
+            "'chebi:23906' is excluded from both transport routes (TCDB and "
+            "GO) by curation" in w for w in r["warnings"])
 
     @pytest.mark.parametrize("mid,metabolism_rows", [
-        ("kegg.compound:C00080", 250),   # GO 0 + metabolism 250 + TCDB direct
+        ("kegg.compound:C00080", 250),   # GO 0 + TCDB 0 + metabolism 250
     ])
     def test_gbm_excluded_target_with_node(self, conn, mid, metabolism_rows):
         r = api.genes_by_metabolite([mid], _GOT_MED4, limit=1, conn=conn)
@@ -5488,13 +5488,24 @@ class TestGoTransportGenesByMetabolite:
         go_count = {e["evidence_source"]: e["count"]
                     for e in r["by_evidence_source"]}.get("go_transport", 0)
         assert go_count == 0
-        assert any(f"'{mid}' is excluded from the GO transport route by "
-                   "curation" in w for w in r["warnings"])
+        assert tcdb == 0  # H+ is a filtered TCDB substrate target too
+        assert any(f"'{mid}' is excluded from both transport routes (TCDB "
+                   "and GO) by curation" in w for w in r["warnings"])
 
-    def test_gbm_excluded_warning_silent_without_go_arm(self, conn):
+    def test_gbm_excluded_warning_names_tcdb_without_go_arm(self, conn):
         r = api.genes_by_metabolite(
             ["kegg.compound:C00080"], _GOT_MED4, limit=1,
             evidence_sources=["metabolism", "transport"], conn=conn)
+        curation = [w for w in r["warnings"] if "by curation" in w]
+        assert curation == [
+            "'kegg.compound:C00080' is excluded from the TCDB substrate route "
+            "by curation (coupling ion or placeholder) — an empty TCDB answer "
+            "is not biology."]
+
+    def test_gbm_excluded_warning_silent_without_transport_arms(self, conn):
+        r = api.genes_by_metabolite(
+            ["kegg.compound:C00080"], _GOT_MED4, limit=1,
+            evidence_sources=["metabolism"], conn=conn)
         assert not any("by curation" in w for w in r["warnings"])
 
     def test_gbm_role_with_no_edges_is_not_matched(self, conn):
@@ -5763,6 +5774,9 @@ class TestGoTransportPassThroughs:
         assert len(excluded) == 12  # 13 → 12 2026-10-26T04:21Z: Na+ now chebi:29101
         assert "kegg.compound:C00080" in excluded
         assert "chebi:23906" in excluded
+        tcdb = r["kg"]["tcdb_substrate_excluded_targets"]
+        assert set(excluded) <= set(tcdb)
+        assert "chebi:25367" in tcdb  # molecule: TCDB-only placeholder
 
     def test_kg_schema_go_edge_descriptions(self, conn):
         r = api.kg_schema(conn=conn)

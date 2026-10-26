@@ -13839,10 +13839,11 @@ class TestGoTransportWrappers:
             n for n in dir(tools_mod)
             if n.startswith("KG") and hasattr(getattr(tools_mod, n), "model_fields")
         ]
-        assert any(
-            "go_transport_excluded_targets" in getattr(tools_mod, n).model_fields
-            for n in names
-        ), names
+        for field in ("go_transport_excluded_targets",
+                      "tcdb_substrate_excluded_targets"):
+            assert any(
+                field in getattr(tools_mod, n).model_fields for n in names
+            ), (field, names)
 
 
 # ---------------------------------------------------------------------------

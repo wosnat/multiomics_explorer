@@ -1903,11 +1903,13 @@ mistakes:
     BP rows answer "which genes the literature or annotation links to this
     transport process".
   - >-
-    An empty GO answer for H+, Na+ or an upper-level class (ion, monoatomic
-    cation, chemical entity, ...) is curation, not biology: those targets were
-    deliberately removed from the GO route. The list is
-    `Schema_info.go_transport_excluded_targets` (surfaced by `kg_release_info`);
-    a warning fires when you ask for one. TCDB and KEGG rows still answer them.
+    An empty transport answer for H+, Na+ or a placeholder / upper-level class
+    (ion, monoatomic cation, molecule, ...) is curation, not biology: those
+    targets were deliberately removed from the GO route and the TCDB substrate
+    route. The lists are `Schema_info.go_transport_excluded_targets` and
+    `Schema_info.tcdb_substrate_excluded_targets` (both surfaced by
+    `kg_release_info`); a warning naming the route(s) fires when you ask for
+    one. Only KEGG rows can still answer (H+ has 250 metabolism rows in MED4).
   - >-
     The three routes are correlated, not independent: GO terms often arrive
     through InterPro2GO or eggNOG, which share homology with the TCDB calls.

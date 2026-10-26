@@ -77,9 +77,9 @@ mode, total_entries, total_matching, score_max, score_median, returned, offset, 
 | description | string \| None (optional) | Term description / definition (verbose only; sparse). |
 | level_kind | string \| None (optional) | What `level` measures for this ontology, e.g. 'depth', 'tc_family' (verbose only). |
 | direct_gene_count | int \| None (optional) | Genes annotated directly to this term, excluding descendants (verbose only; hierarchical ontologies). |
-| superfamily | string \| None (optional) | TCDB superfamily label (verbose only; sparse: tcdb). |
+| superfamily | string \| None (optional) | TCDB's own superfamily label, copied as is; unreliable for whole groups (ABC 3.A.1 nodes read ArsA) (verbose only; sparse: tcdb). |
 | tcdb_substrate_count | int \| None (optional) | Distinct substrates curated under this TCDB node, all levels (verbose only; sparse: tcdb). |
-| direction | string \| None (optional) | TCDB-stated transport direction: 'uptake' / 'export' / 'unknown' (verbose only; sparse: tcdb). |
+| direction | string \| None (optional) | TCDB-stated transport direction: 'uptake' / 'export' / 'unknown'; only systems and ABC uptake subfamilies carry one (verbose only; sparse: tcdb). |
 | family_type | string \| None (optional) | NCBIfam family type, e.g. 'equivalog', 'subfamily' (verbose only; sparse: ncbifam). |
 | gene_symbol | string \| None (optional) | NCBIfam gene symbol (verbose only; sparse: ncbifam). |
 | family_class | string \| None (optional) | MEROPS family class ('peptidase' or 'inhibitor'; verbose only; sparse: merops). |

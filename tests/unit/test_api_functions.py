@@ -9504,6 +9504,8 @@ class TestGenesByMetabolite:
             "multiomics_explorer.api.functions.GraphConnection",
         ) as MockConn, patch.object(
             api, "_go_transport_excluded_targets", return_value=frozenset(),
+        ), patch.object(
+            api, "_tcdb_substrate_excluded_targets", return_value=frozenset(),
         ):
             mock_instance = MockConn.return_value
             mock_instance.execute_query.side_effect = _resolver_aware([
@@ -21528,6 +21530,15 @@ _GO_EXCLUDED_WARNING = (
     "ion or upper-level class) — an empty GO answer is not biology; TCDB "
     "rows still answer."
 )
+_TCDB_EXCLUDED_WARNING = (
+    "'{id}' is excluded from the TCDB substrate route by curation (coupling "
+    "ion or placeholder) — an empty TCDB answer is not biology."
+)
+_BOTH_EXCLUDED_WARNING = (
+    "'{id}' is excluded from both transport routes (TCDB and GO) by "
+    "curation (coupling ion or placeholder) — an empty transport answer is "
+    "not biology."
+)
 _NEUROTRANSMITTER_WARNING = (
     "chebi.role:25512 (neurotransmitter) on the GO route is mostly "
     "bacterial NSS amino-acid transporters, not neurotransmitter transport."
@@ -21583,10 +21594,11 @@ class _GoConn:
     Schema_info and stereo queries are answered generically."""
 
     def __init__(self, arm_rows=None, summary=None, excluded=None,
-                 missing_ids=()):
+                 missing_ids=(), tcdb_excluded=None):
         self.arm_rows = arm_rows or {}
         self.summary = summary or {}
         self.excluded = list(excluded or [])
+        self.tcdb_excluded = list(tcdb_excluded or [])
         self.missing = set(missing_ids)
         self.arm_calls = []
 
@@ -21604,6 +21616,7 @@ class _GoConn:
             return [{
                 "schema_info": {
                     "go_transport_excluded_targets": self.excluded,
+                    "tcdb_substrate_excluded_targets": self.tcdb_excluded,
                 },
                 "labels": [], "rel_types": [],
             }]
@@ -21876,6 +21889,47 @@ class TestGoTransportApiGbm:
             evidence_sources=["metabolism", "transport"])
         assert not any("by curation" in w for w in out["warnings"])
 
+    def test_gbm_excluded_from_both_routes_one_warning(self, monkeypatch):
+        conn = _GoConn(
+            summary=_GO_SUMMARY, excluded=["kegg.compound:C00080"],
+            tcdb_excluded=["kegg.compound:C00080"])
+        out, _, _ = self._run(
+            monkeypatch, conn=conn, metabolite_ids=["kegg.compound:C00080"])
+        curation = [w for w in out["warnings"] if "by curation" in w]
+        assert curation == [
+            _BOTH_EXCLUDED_WARNING.format(id="kegg.compound:C00080")]
+
+    def test_gbm_tcdb_only_excluded_target_warning(self, monkeypatch):
+        conn = _GoConn(
+            summary=_GO_SUMMARY, excluded=["kegg.compound:C00080"],
+            tcdb_excluded=["chebi:25367"], missing_ids=["chebi:25367"])
+        out, _, _ = self._run(
+            monkeypatch, conn=conn, metabolite_ids=["chebi:25367"])
+        assert _TCDB_EXCLUDED_WARNING.format(id="chebi:25367") in out["warnings"]
+
+    def test_gbm_go_arm_only_still_names_tcdb_exclusion(self, monkeypatch):
+        """The GO-only text says "TCDB rows still answer" — never emit it for
+        an id TCDB drops too, even with the TCDB arm off."""
+        conn = _GoConn(
+            summary=_GO_SUMMARY, excluded=["kegg.compound:C00080"],
+            tcdb_excluded=["kegg.compound:C00080"])
+        out, _, _ = self._run(
+            monkeypatch, conn=conn, metabolite_ids=["kegg.compound:C00080"],
+            evidence_sources=["metabolism", "go_transport"])
+        curation = [w for w in out["warnings"] if "by curation" in w]
+        assert curation == [
+            _BOTH_EXCLUDED_WARNING.format(id="kegg.compound:C00080")]
+
+    def test_gbm_tcdb_only_exclusion_silent_without_transport_arm(
+            self, monkeypatch):
+        conn = _GoConn(
+            summary=_GO_SUMMARY, tcdb_excluded=["chebi:25367"],
+            missing_ids=["chebi:25367"])
+        out, _, _ = self._run(
+            monkeypatch, conn=conn, metabolite_ids=["chebi:25367"],
+            evidence_sources=["metabolism", "go_transport"])
+        assert not any("by curation" in w for w in out["warnings"])
+
     def test_gbm_non_excluded_target_no_curation_warning(self, monkeypatch):
         conn = _GoConn(
             summary=_GO_SUMMARY, excluded=["kegg.compound:C00080"])
@@ -22097,6 +22151,22 @@ class TestKgReleaseInfoGoExcludedTargets:
         assert "go_transport_excluded_targets" in api._KG_IDENTITY_FIELDS
         assert report["kg"]["go_transport_excluded_targets"] == [
             "chebi:24834", "kegg.compound:C00080"]
+
+    def test_kg_release_info_passes_tcdb_excluded_targets(self):
+        conn = MagicMock()
+        conn.execute_query.return_value = [{
+            "schema_info": {
+                "version": "0.1.0", "built_at": "2026-10-26T04:21:53Z",
+                "mcp_min_version": "0.0.1",
+                "tcdb_substrate_excluded_targets": [
+                    "chebi:25367", "kegg.compound:C00080"],
+            },
+            "labels": ["Schema_info"], "rel_types": [],
+        }]
+        report = api.kg_release_info(conn)
+        assert "tcdb_substrate_excluded_targets" in api._KG_IDENTITY_FIELDS
+        assert report["kg"]["tcdb_substrate_excluded_targets"] == [
+            "chebi:25367", "kegg.compound:C00080"]
 
 
 class TestKgSchemaEdgeDescriptions:

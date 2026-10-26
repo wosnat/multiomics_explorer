@@ -8875,6 +8875,15 @@ _GO_EXCLUDED_TARGET_WARNING = (
     "ion or upper-level class) — an empty GO answer is not biology; TCDB "
     "rows still answer."
 )
+_TCDB_EXCLUDED_TARGET_WARNING = (
+    "'{id}' is excluded from the TCDB substrate route by curation (coupling "
+    "ion or placeholder) — an empty TCDB answer is not biology."
+)
+_TRANSPORT_EXCLUDED_TARGET_WARNING = (
+    "'{id}' is excluded from both transport routes (TCDB and GO) by "
+    "curation (coupling ion or placeholder) — an empty transport answer is "
+    "not biology."
+)
 _NEUROTRANSMITTER_ROLE_ID = "chebi.role:25512"
 _NEUROTRANSMITTER_WARNING = (
     "chebi.role:25512 (neurotransmitter) on the GO route is mostly "
@@ -9550,14 +9559,17 @@ def genes_by_metabolite(
     share homology), so it raises confidence without proving it, and a
     single-source pair is not wrong.
 
-    GO warnings (GO arm active only): one per requested id that the KG
-    curated out of the GO route (`kg_release_info`
-    `kg.go_transport_excluded_targets`: H+, Na+, upper-level ChEBI
-    classes) — `"'<id>' is excluded from the GO transport route by
-    curation (coupling ion or upper-level class) — an empty GO answer is
-    not biology; TCDB rows still answer."`; and, when `chebi.role:25512`
-    (neurotransmitter) is an input, a note that its GO rows are mostly
-    bacterial NSS amino-acid transporters.
+    Curated-exclusion warnings: one per requested id that the KG curated
+    out of an active transport route (`kg_release_info`
+    `kg.go_transport_excluded_targets` for GO,
+    `kg.tcdb_substrate_excluded_targets` for TCDB: H+, Na+, placeholder
+    and upper-level ChEBI classes). The text names the route(s) the id is
+    excluded from — both (`"... excluded from both transport routes (TCDB
+    and GO) by curation ..."`; also when only the GO arm is on), TCDB only,
+    or GO only (`"... TCDB rows still answer."`) — and says an empty answer
+    is not biology. GO arm
+    only: when `chebi.role:25512` (neurotransmitter) is an input, a note
+    that its GO rows are mostly bacterial NSS amino-acid transporters.
 
     Stereo forms: the KG keeps a stereo-unspecified metabolite (Cysteine)
     and its specific forms (L-Cysteine, D-Cysteine) as separate nodes, and
@@ -10046,18 +10058,31 @@ def genes_by_metabolite(
     # No breadth-cap warning here (spec decision 7): ABC 3.A.1 covers most
     # substrates, so it would name the same genes for almost any query. The
     # envelope keeps tcdb_family_substrates_skipped.
-    # 11b. GO-route warnings (GO arm active only): one per requested id the
-    # KG curated out of the GO route, and the neurotransmitter-role caveat.
-    if go_active and caller_ids:
-        excluded_targets = _go_transport_excluded_targets(conn)
+    # 11b. Curated-exclusion warnings: one per requested id the KG curated
+    # out of an active transport route (TCDB and / or GO), and the GO
+    # neurotransmitter-role caveat.
+    if (go_active or tcdb_active) and caller_ids:
+        go_excluded = _go_transport_excluded_targets(conn)
+        tcdb_excluded = _tcdb_substrate_excluded_targets(conn)
         # Normalise first: an excluded id with no Metabolite node passes
         # alias resolution unchanged, so `CHEBI:23906` / bare `23906`
         # would otherwise miss the canonical `chebi:23906` entry.
         for mid in caller_ids:
             canon = _normalize_metabolite_curie(mid)
-            if canon in excluded_targets:
-                warnings.append(_GO_EXCLUDED_TARGET_WARNING.format(id=canon))
-        if _NEUROTRANSMITTER_ROLE_ID in caller_ids:
+            in_go = go_active and canon in go_excluded
+            # A GO hit names TCDB too even with the TCDB arm off, so the
+            # GO-only text ("TCDB rows still answer") is never wrong.
+            in_tcdb = canon in tcdb_excluded and (tcdb_active or in_go)
+            if in_go and in_tcdb:
+                template = _TRANSPORT_EXCLUDED_TARGET_WARNING
+            elif in_go:
+                template = _GO_EXCLUDED_TARGET_WARNING
+            elif in_tcdb:
+                template = _TCDB_EXCLUDED_TARGET_WARNING
+            else:
+                continue
+            warnings.append(template.format(id=canon))
+        if go_active and _NEUROTRANSMITTER_ROLE_ID in caller_ids:
             warnings.append(_NEUROTRANSMITTER_WARNING)
     if stereo_relatives:
         source_names = {
@@ -12393,23 +12418,29 @@ _KG_IDENTITY_FIELDS = (
     "expression_edge_count", "release_notes_url",
     "release_highlights", "breaking_changes", "deployment_role",
     "controlled_vocabularies_hash", "go_transport_excluded_targets",
+    "tcdb_substrate_excluded_targets",
 )
 
-# `Schema_info.go_transport_excluded_targets`, read once per KG endpoint
-# (GraphConnection) or per connection object (fakes / custom conns).
-# The cache lives for the process (like the kg_release_info cache): restart
-# the server after a KG rebuild.
-_GO_EXCLUDED_BY_ENDPOINT: dict[tuple, frozenset[str]] = {}
-_GO_EXCLUDED_BY_CONN: "weakref.WeakKeyDictionary" = weakref.WeakKeyDictionary()
+# The `Schema_info` curated-exclusion id lists
+# (`go_transport_excluded_targets`, `tcdb_substrate_excluded_targets`),
+# read once per KG endpoint (GraphConnection) or per connection object
+# (fakes / custom conns), keyed by property. The cache lives for the
+# process (like the kg_release_info cache): restart the server after a KG
+# rebuild.
+_EXCLUDED_TARGET_PROPS = (
+    "go_transport_excluded_targets", "tcdb_substrate_excluded_targets",
+)
+_EXCLUDED_BY_ENDPOINT: dict[tuple, dict[str, frozenset[str]]] = {}
+_EXCLUDED_BY_CONN: "weakref.WeakKeyDictionary" = weakref.WeakKeyDictionary()
 
 
-def _go_transport_excluded_targets(conn: GraphConnection) -> frozenset[str]:
-    """Metabolite ids curated out of the GO transport route.
+def _excluded_targets(conn: GraphConnection, prop: str) -> frozenset[str]:
+    """One `Schema_info` curated-exclusion id list (`_EXCLUDED_TARGET_PROPS`).
 
     Runs the `kg_release_info` query (`build_kg_release_info`) once and
-    reads `schema_info.go_transport_excluded_targets`; the result is cached
-    per process for each KG endpoint. Empty when the KG does not carry the
-    property or the query fails (the caller's warning is advisory).
+    reads both lists; the result is cached per process for each KG
+    endpoint. Empty when the KG does not carry the property or the query
+    fails (the caller's warning is advisory).
     """
     settings = getattr(conn, "_settings", None)
     endpoint = (
@@ -12417,31 +12448,42 @@ def _go_transport_excluded_targets(conn: GraphConnection) -> frozenset[str]:
         if isinstance(conn, GraphConnection) and settings is not None
         else None
     )
-    if endpoint is not None and endpoint in _GO_EXCLUDED_BY_ENDPOINT:
-        return _GO_EXCLUDED_BY_ENDPOINT[endpoint]
+    if endpoint is not None and endpoint in _EXCLUDED_BY_ENDPOINT:
+        return _EXCLUDED_BY_ENDPOINT[endpoint][prop]
     if endpoint is None:
         try:
-            if conn in _GO_EXCLUDED_BY_CONN:
-                return _GO_EXCLUDED_BY_CONN[conn]
+            if conn in _EXCLUDED_BY_CONN:
+                return _EXCLUDED_BY_CONN[conn][prop]
         except TypeError:
             pass
     try:
         cypher, params = build_kg_release_info()
         rows = conn.execute_query(cypher, **params) or []
         schema_info = (rows[0].get("schema_info") if rows else None) or {}
-        excluded = frozenset(
-            schema_info.get("go_transport_excluded_targets") or [])
+        lists = {
+            p: frozenset(schema_info.get(p) or [])
+            for p in _EXCLUDED_TARGET_PROPS}
     except Exception:  # noqa: BLE001 — advisory lookup, never fails a call
-        logger.debug("go_transport_excluded_targets lookup failed", exc_info=True)
+        logger.debug("excluded-targets lookup failed", exc_info=True)
         return frozenset()
     if endpoint is not None:
-        _GO_EXCLUDED_BY_ENDPOINT[endpoint] = excluded
+        _EXCLUDED_BY_ENDPOINT[endpoint] = lists
     else:
         try:
-            _GO_EXCLUDED_BY_CONN[conn] = excluded
+            _EXCLUDED_BY_CONN[conn] = lists
         except TypeError:
             pass
-    return excluded
+    return lists[prop]
+
+
+def _go_transport_excluded_targets(conn: GraphConnection) -> frozenset[str]:
+    """Metabolite ids curated out of the GO transport route."""
+    return _excluded_targets(conn, "go_transport_excluded_targets")
+
+
+def _tcdb_substrate_excluded_targets(conn: GraphConnection) -> frozenset[str]:
+    """Metabolite ids curated out of the TCDB substrate route."""
+    return _excluded_targets(conn, "tcdb_substrate_excluded_targets")
 
 
 _VOCAB_HASH_KEY = "controlled_vocabularies_hash"
@@ -12550,7 +12592,9 @@ def kg_release_info(conn: GraphConnection) -> dict:
     `go_transport_excluded_targets` (list[str] | None: metabolite ids the
     KG curated out of the GO transport route — coupling ions such as H+ /
     Na+ and upper-level ChEBI classes; an empty GO answer for them is
-    curation, not biology).
+    curation, not biology) and `tcdb_substrate_excluded_targets` (the same
+    for the TCDB substrate route; a superset of the GO list that adds
+    placeholders such as molecule / cation / anion).
     """
     cypher, params = build_kg_release_info()
     rows = conn.execute_query(cypher, **params)

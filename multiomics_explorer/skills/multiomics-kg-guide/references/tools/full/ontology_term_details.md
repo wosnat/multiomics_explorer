@@ -64,10 +64,10 @@ total_matching, returned, offset, truncated, not_found, by_ontology, links_out_t
 | tcdb_id | string \| None (optional) | Bare TC number, e.g. '3.A.1' (sparse: tcdb) |
 | tc_class_id | string \| None (optional) | Parent TC class, e.g. '3.A' (sparse: tcdb) |
 | member_count | int \| None (optional) | Child/member term count (sparse: tcdb, interpro, merops) |
-| superfamily | string \| None (optional) | TCDB superfamily label (sparse: tcdb) |
+| superfamily | string \| None (optional) | TCDB's own superfamily label, copied as is; unreliable for whole groups (ABC 3.A.1 nodes read ArsA) (sparse: tcdb) |
 | tcdb_substrate_count | int \| None (optional) | Distinct substrates curated under this TCDB node, any level (sparse: tcdb). Substrate edges leave tc_system nodes only. |
-| direction | string \| None (optional) | TCDB-stated transport direction: 'uptake' / 'export' / 'unknown' (sparse: tcdb) |
-| direction_basis | string \| None (optional) | How the TCDB direction was assigned (sparse: tcdb; absent when unstated) |
+| direction | string \| None (optional) | TCDB-stated transport direction: 'uptake' / 'export' / 'unknown' (sparse: tcdb). Conservative: only tc_system nodes and the ABC uptake subfamilies (3.A.1.1-99) carry one; families read 'unknown'. |
+| direction_basis | string \| None (optional) | How the TCDB direction was assigned: 'abc_numbering' (ABC uptake range, uptake only) or 'tcdb_name' (a system's own name) (sparse: tcdb; absent when unstated) |
 | metabolite_count | int \| None (optional) | Distinct metabolites attached (sparse: KEGG pathway chemistry) |
 | reaction_count | int \| None (optional) | Reactions mapped to this KEGG pathway (sparse: kegg pathway terms) |
 | cazy_id | string \| None (optional) | CAZy family ID (sparse: cazy) |

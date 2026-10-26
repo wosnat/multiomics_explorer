@@ -42,7 +42,7 @@ The MCP server (`multiomics_explorer/mcp_server/`) is the primary interface for 
 
 | Tool | Purpose |
 |---|---|
-| `kg_release_info` | KG release identity (version, built_at, counts, `controlled_vocabularies_hash`, `go_transport_excluded_targets`) + compatibility verdict `ok` / `warn` / `unknown` vs what this explorer build expects. Recommended first call. `warn` = quoted value lists in docs may be stale; calls are unaffected. The excluded-target list explains an empty GO transport answer (curation, not biology). |
+| `kg_release_info` | KG release identity (version, built_at, counts, `controlled_vocabularies_hash`, `go_transport_excluded_targets`, `tcdb_substrate_excluded_targets`) + compatibility verdict `ok` / `warn` / `unknown` vs what this explorer build expects. Recommended first call. `warn` = quoted value lists in docs may be stale; calls are unaffected. The excluded-target lists explain an empty GO / TCDB transport answer (curation, not biology). |
 | `kg_schema` | Graph schema with node labels, relationship types, property names; edge descriptions carry reading caveats (e.g. the GO transport edges are term definitions, not gene facts). Read before `run_cypher`. |
 | `resolve_gene` | Resolve a gene identifier (case-insensitive name / locus tag / partial label) to matching Gene nodes, sorted by organism. First step when the input isn't a locus tag. |
 | `genes_by_function` | Free-text Lucene search across gene functional annotations; `organism` / `gene_categories` / `min_quality` filters. Envelope `by_organism`, `by_category`, score stats. `[AQ]` |
