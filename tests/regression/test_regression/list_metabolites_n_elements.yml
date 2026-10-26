@@ -1,14 +1,14 @@
 by_evidence_source:
 - count: 1231
   evidence_source: metabolism
-- count: 620
+- count: 628
   evidence_source: transport
 - count: 101
   evidence_source: metabolomics
-- count: 85
+- count: 89
   evidence_source: go_transport
 by_kegg_brite_class:
-- count: 118
+- count: 117
   kegg_brite_class: 'Lipids: Fatty acyls'
 - count: 34
   kegg_brite_class: 'Phytochemical compounds: Alkaloids'
@@ -50,7 +50,7 @@ by_kegg_brite_class:
   kegg_brite_class: 'Natural toxins: Marine biotoxins'
 - count: 1
   kegg_brite_class: 'Phytochemical compounds: Terpenoids'
-- count: 1380
+- count: 1391
   kegg_brite_class: not classified
 by_kegg_functional_category:
 - count: 59
@@ -61,7 +61,7 @@ by_kegg_functional_category:
   kegg_functional_category: Vitamins and cofactors
 - count: 25
   kegg_functional_category: Antibiotics
-- count: 15
+- count: 14
   kegg_functional_category: Hormones and transmitters
 - count: 12
   kegg_functional_category: Carbohydrates
@@ -69,7 +69,7 @@ by_kegg_functional_category:
   kegg_functional_category: Lipids
 - count: 2
   kegg_functional_category: Steroids
-- count: 1471
+- count: 1481
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment:
@@ -80,7 +80,7 @@ by_measurement_coverage:
   - compartment: whole_cell
     count: 101
   by_paper_count:
-  - count: 1562
+  - count: 1572
     paper_count: 0
   - count: 68
     paper_count: 1
@@ -89,18 +89,18 @@ by_measurement_coverage:
   - count: 1
     paper_count: 3
 by_structure_kind:
-- count: 1414
+- count: 1423
   structure_kind: defined
-- count: 244
+- count: 245
   structure_kind: generic
 - count: 5
   structure_kind: polymer
 case_id: list_metabolites_n_elements
 mass_stats:
   mass_max: 5227.103
-  mass_median: 325.27
+  mass_median: 322.799
   mass_min: 18.039
-no_formula_excluded: 247
+no_formula_excluded: 237
 not_found:
   elements: []
   metabolite_ids: []
@@ -342,10 +342,10 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 894
+- count: 893
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 326
+- count: 327
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
 - count: 203
@@ -354,7 +354,7 @@ top_metabolite_pathways:
 - count: 182
   metabolite_pathway_id: kegg.pathway:ko01240
   metabolite_pathway_name: Biosynthesis of cofactors
-- count: 86
+- count: 87
   metabolite_pathway_id: kegg.pathway:ko00860
   metabolite_pathway_name: Porphyrin metabolism
 - count: 79
@@ -373,34 +373,34 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko00330
   metabolite_pathway_name: Arginine and proline metabolism
 top_organisms:
-- count: 1020
+- count: 1029
   organism_name: Pseudomonas putida KT2440
-- count: 967
+- count: 974
   organism_name: Ruegeria pomeroyi DSS-3
-- count: 895
+- count: 903
   organism_name: Shewanella sp. W3-18-1
-- count: 891
+- count: 893
   organism_name: Alteromonas mediterranea AltDE1
-- count: 889
+- count: 891
   organism_name: Alteromonas (MarRef v6)
-- count: 878
+- count: 880
   organism_name: Alteromonas mediterranea AltDE
-- count: 873
+- count: 875
   organism_name: Alteromonas macleodii EZ55
-- count: 872
+- count: 874
   organism_name: Alteromonas macleodii MIT1002
-- count: 869
+- count: 871
   organism_name: Alteromonas macleodii ATCC27126
-- count: 869
+- count: 871
   organism_name: Alteromonas macleodii BGP6
 total_entries: 3178
-total_matching: 1663
+total_matching: 1673
 truncated: true
 warnings:
-- 247 metabolites have no formula and can never match an element filter (often generic
+- 237 metabolites have no formula and can never match an element filter (often generic
   classes such as 'amino acid' or 'dipeptide'). Re-run without elements to inspect
   them.
 xref_coverage:
-  with_chebi: 1595
-  with_hmdb: 879
+  with_chebi: 1605
+  with_hmdb: 876
   with_mnxm: 1659

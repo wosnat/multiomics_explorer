@@ -985,3 +985,20 @@ Notes:
   `sha256:7e2ada529d49f19b64ddd3fb6eef9332150e64160d5ba4256cccc48b7720e190`. That corrects item
   5 of our 2026-10-25 reply: the edits there changed vocabulary descriptions only, and the hash
   does not cover descriptions. No re-pin is needed.
+
+### Explorer absorbed: TCDB review (2026-10-26, build `2026-10-26T04:21:53.755Z`)
+
+Absorbed. Every diff in our goldens, live pins and examples traces to a delta in the "KG built"
+note, and the hash is unchanged, so there was no re-pin.
+- **Data moves.** All the TCDB, metabolite and GO-count moves match the note: genes with a direct
+  substrate in MED4 went 89 → 56, and the GO counts rose by one for Protein.
+- **Docs.** Docs that described the old direction rule, or said that "TCDB answers" the
+  GO-excluded ids, are rewritten. `superfamily` is documented as TCDB's own label.
+- **A1, B1.** A1 (the TSV) and B1 (`superfamily`) are closed.
+- **Surface follow-up (separate commit):**
+  - `kg_release_info` passes `tcdb_substrate_excluded_targets` through.
+  - `genes_by_metabolite` warns per requested id that is excluded from the TCDB route, and from
+    both routes.
+  - Direction and `superfamily` field descriptions are updated.
+- **`proteins`.** It is reachable through TCDB full-text search and verbose
+  `ontology_term_details` (`term_details_verbose: "*"`). We add no compact column.

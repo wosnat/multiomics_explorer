@@ -804,6 +804,7 @@ schema:
         name: string
         organism_count: int
         preferred_id: string
+        proteins: string
         superfamily: string
         tc_class_id: string
         tcdb_id: string

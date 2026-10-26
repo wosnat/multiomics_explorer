@@ -378,9 +378,12 @@ results:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00819'',
     ''name'': ''D-Glutamine'', ''relation'': ''enantiomer'', ''catalyst_gene_count'':
     13}'
+  - '{''transporter_gene_count'': 128, ''metabolite_id'': ''kegg.compound:C00303'',
+    ''name'': ''Glutamine'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
+    0}'
   structure_kind: defined
-  transporter_count: 11
-  transporter_gene_count: 128
+  transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 463
   chebi_id: '17544'
   elements:

@@ -175,10 +175,10 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00009"], organism="Prochloro
   "by_tcdb_route": [],
   "tcdb_family_substrates_not_shown": {"genes": 4, "metabolites": 1, "rows": 4},
   "tcdb_family_substrates_skipped": [
-    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551}
+    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546}
   ],
   "rows_by_go_term_depth": null,
   "top_reactions": [],
@@ -237,10 +237,10 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00009"], organism="Prochloro
   "by_tcdb_route": [{"tcdb_route": "family", "count": 4}],
   "tcdb_family_substrates_not_shown": null,
   "tcdb_family_substrates_skipped": [
-    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551}
+    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546}
   ],
   "rows_by_go_term_depth": null,
   "top_reactions": [],
@@ -490,10 +490,10 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"], organism="Prochloro
   "by_tcdb_route": [],
   "tcdb_family_substrates_not_shown": {"genes": 5, "metabolites": 1, "rows": 5},
   "tcdb_family_substrates_skipped": [
-    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551}
+    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546}
   ],
   "rows_by_go_term_depth": [],
   "top_reactions": [],
@@ -555,10 +555,10 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"], organism="Prochloro
   "by_tcdb_route": [],
   "tcdb_family_substrates_not_shown": {"genes": 5, "metabolites": 1, "rows": 5},
   "tcdb_family_substrates_skipped": [
-    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551}
+    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546}
   ],
   "rows_by_go_term_depth": [],
   "top_reactions": [
@@ -854,10 +854,10 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochloro
   "by_tcdb_route": [{"tcdb_route": "direct", "count": 10}],
   "tcdb_family_substrates_not_shown": {"genes": 0, "metabolites": 0, "rows": 0},
   "tcdb_family_substrates_skipped": [
-    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551}
+    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546}
   ],
   "rows_by_go_term_depth": [{"go_term_depth": 0, "count": 11}],
   "top_reactions": [
@@ -1559,10 +1559,10 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochloro
   "by_tcdb_route": [{"tcdb_route": "direct", "count": 10}],
   "tcdb_family_substrates_not_shown": {"genes": 0, "metabolites": 0, "rows": 0},
   "tcdb_family_substrates_skipped": [
-    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551}
+    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546}
   ],
   "rows_by_go_term_depth": [{"go_term_depth": 0, "count": 11}],
   "top_reactions": [
@@ -1733,10 +1733,10 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochloro
   "by_tcdb_route": [{"tcdb_route": "direct", "count": 10}],
   "tcdb_family_substrates_not_shown": {"genes": 0, "metabolites": 0, "rows": 0},
   "tcdb_family_substrates_skipped": [
-    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-    {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551}
+    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546}
   ],
   "rows_by_go_term_depth": [{"go_term_depth": 0, "count": 4}],
   "top_reactions": [
@@ -1891,9 +1891,9 @@ list_metabolites(evidence_sources=['go_transport']) → per-row go_transport_org
 
 - An empty transport arm does not mean no transporter. Many genes are placed by TCDB only at family or subfamily level (`tcdb_gate='annotated'`), and those never produce a default row. Read `tcdb_family_substrates_not_shown` (what `include_tcdb_family_substrates=True` would add: genes, metabolites, rows) and the warning, then opt in. Orthophosphate in MED4 has 0 direct genes; the walk adds phnC/D/E and PMM0717 through subfamily tcdb:3.A.1.9. Genes whose only usable call is on a node curated with over 200 substrates (the ABC superfamily tcdb:3.A.1, MFS tcdb:2.A.1) are listed in `tcdb_family_substrates_skipped`: their substrate is unknown, and the walk never starts there.
 
-- Family rows (`tcdb_route='family'`) are a recall expansion, not a substrate call. The walk runs from the gene's deepest `annotated` family or subfamily down to every TC system under it and reports the systems' curated substrates, one row per gene × attached node × metabolite (`tcdb_family_id` = `attached_tcdb_id` = the family itself; `tcdb_substrate_system_count` = systems under it curated with the metabolite). It never starts above a gene's own direct system, so a gene with a direct call keeps exactly its system's substrates. TCDB curation is taken as-is: the Pst phosphate system tcdb:3.A.1.7.6 is curated with triphosphate only, so pstA/B/C/S do not reach orthophosphate (the system name still says phosphate), and catch-all substrates ("molecule", "Peptide", "Protein") pass through. Most remaining noise is eggNOG family calls on genes that are not transporters at all.
+- Family rows (`tcdb_route='family'`) are a recall expansion, not a substrate call. The walk runs from the gene's deepest `annotated` family or subfamily down to every TC system under it and reports the systems' curated substrates, one row per gene × attached node × metabolite (`tcdb_family_id` = `attached_tcdb_id` = the family itself; `tcdb_substrate_system_count` = systems under it curated with the metabolite). It never starts above a gene's own direct system, so a gene with a direct call keeps exactly its system's substrates. TCDB curation is taken as-is: the Pst phosphate system tcdb:3.A.1.7.6 is curated with triphosphate only, so pstA/B/C/S do not reach orthophosphate (the system name still says phosphate), and catch-all substrates ("Peptide", "Protein") pass through. Most remaining noise is eggNOG family calls on genes that are not transporters at all.
 
-- `tcdb_direction` (`uptake` / `export` / `unknown`) is TCDB's direction for the row's node, not a per-gene measurement. It comes from ABC numbering (subfamilies 3.A.1.1-99 uptake, 100+ export) or from the nearest named node up to family level whose TCDB name says import or export. Most nodes read `unknown`. GO and KEGG rows carry no direction.
+- `tcdb_direction` (`uptake` / `export` / `unknown`) is TCDB's direction for the row's node, not a per-gene measurement. It is conservative: ABC uptake numbering (subfamilies 3.A.1.1-99 and their systems) or a system's own TCDB name. Family and subfamily names never set it, so family rows read `unknown` outside the ABC uptake range. Most nodes read `unknown`. GO and KEGG rows carry no direction.
 
 - Distinct direct genes across the transport rows, unioned over organisms, equal `list_metabolites.transporter_gene_count`, and gene-side, distinct direct Metabolite targets equal `gene_overview.transported_metabolite_count` (role rows excluded). Family rows are not in either count. Genes with only weak DIAMOND hits (`tcdb_gate='below_gate'`) never reach a substrate here; `gene_ontology_terms(..., include_weak_tcdb_hits=True)` shows them.
 

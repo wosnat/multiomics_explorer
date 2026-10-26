@@ -16,7 +16,7 @@ rows:
   experiment_count: 6
   gene_count: 3929
   genus: Alteromonas
-  go_transport_metabolite_count: 82
+  go_transport_metabolite_count: 85
   growth_phases: []
   interpro_gene_count: 3495
   measured_metabolite_count: 0
@@ -34,7 +34,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: AD45
-  transported_metabolite_count: 152
+  transported_metabolite_count: 144
   treatment_types:
   - compartment
 - background_factors:
@@ -52,7 +52,7 @@ rows:
   experiment_count: 6
   gene_count: 3834
   genus: Alteromonas
-  go_transport_metabolite_count: 86
+  go_transport_metabolite_count: 89
   growth_phases: []
   interpro_gene_count: 3456
   measured_metabolite_count: 0
@@ -70,7 +70,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: ATCC27126
-  transported_metabolite_count: 161
+  transported_metabolite_count: 153
   treatment_types:
   - compartment
 - background_factors:
@@ -88,7 +88,7 @@ rows:
   experiment_count: 6
   gene_count: 4063
   genus: Alteromonas
-  go_transport_metabolite_count: 93
+  go_transport_metabolite_count: 96
   growth_phases: []
   interpro_gene_count: 3608
   measured_metabolite_count: 0
@@ -106,7 +106,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: BGP6
-  transported_metabolite_count: 159
+  transported_metabolite_count: 151
   treatment_types:
   - compartment
 - background_factors:
@@ -124,7 +124,7 @@ rows:
   experiment_count: 6
   gene_count: 3741
   genus: Alteromonas
-  go_transport_metabolite_count: 80
+  go_transport_metabolite_count: 83
   growth_phases: []
   interpro_gene_count: 3349
   measured_metabolite_count: 0
@@ -142,7 +142,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: BS11
-  transported_metabolite_count: 156
+  transported_metabolite_count: 148
   treatment_types:
   - compartment
 - background_factors:
@@ -162,7 +162,7 @@ rows:
   experiment_count: 21
   gene_count: 4028
   genus: Alteromonas
-  go_transport_metabolite_count: 85
+  go_transport_metabolite_count: 88
   growth_phases:
   - death
   - exponential
@@ -185,7 +185,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: HOT1A3
-  transported_metabolite_count: 151
+  transported_metabolite_count: 142
   treatment_types:
   - coculture
   - compartment
@@ -210,7 +210,7 @@ rows:
   experiment_count: 14
   gene_count: 4028
   genus: Alteromonas
-  go_transport_metabolite_count: 88
+  go_transport_metabolite_count: 91
   growth_phases:
   - darkness
   - diel
@@ -233,7 +233,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: MIT1002
-  transported_metabolite_count: 151
+  transported_metabolite_count: 142
   treatment_types:
   - coculture
   - compartment
@@ -266,7 +266,7 @@ rows:
   experiment_count: 118
   gene_count: 1973
   genus: Prochlorococcus
-  go_transport_metabolite_count: 45
+  go_transport_metabolite_count: 46
   growth_phases:
   - acclimated_steady_state
   - acute_stress
@@ -298,7 +298,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MED4
-  transported_metabolite_count: 43
+  transported_metabolite_count: 39
   treatment_types:
   - carbon
   - coculture
@@ -332,7 +332,7 @@ rows:
   experiment_count: 27
   gene_count: 1970
   genus: Prochlorococcus
-  go_transport_metabolite_count: 44
+  go_transport_metabolite_count: 45
   growth_phases:
   - acclimated_steady_state
   - acute_stress
@@ -357,7 +357,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9312
-  transported_metabolite_count: 46
+  transported_metabolite_count: 42
   treatment_types:
   - carbon
   - coculture
@@ -384,7 +384,7 @@ rows:
   experiment_count: 39
   gene_count: 2906
   genus: Prochlorococcus
-  go_transport_metabolite_count: 53
+  go_transport_metabolite_count: 54
   growth_phases:
   - acute_stress
   - exponential
@@ -410,7 +410,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9313
-  transported_metabolite_count: 77
+  transported_metabolite_count: 72
   treatment_types:
   - carbon
   - coculture

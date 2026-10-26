@@ -47,7 +47,7 @@ results:
     (Pep3E) Family''}'
   - '{''id'': ''tcdb:3.A.1.114'', ''level'': 3, ''name'': ''The Probable Glycolipid
     Exporter (DevE) Family''}'
-  - '{''id'': ''tcdb:3.A.1.115'', ''level'': 3, ''name'': ''The Na + Exporter (NatE)
+  - '{''id'': ''tcdb:3.A.1.115'', ''level'': 3, ''name'': ''The Na+ Exporter (NatE)
     Family''}'
   - '{''id'': ''tcdb:3.A.1.116'', ''level'': 3, ''name'': ''The Microcin B17 Exporter
     (McbE) Family''}'
@@ -70,14 +70,13 @@ results:
   - '{''id'': ''tcdb:3.A.1.125'', ''level'': 3, ''name'': ''The Lipoprotein Translocase
     (LPT) Family (This TC subfamily overlaps with TC# 3.A.1.122)''}'
   - '{''id'': ''tcdb:3.A.1.126'', ''level'': 3, ''name'': ''The β-Exotoxin I Exporter
-    ( βETE ) Family''}'
+    (βETE) Family''}'
   - '{''id'': ''tcdb:3.A.1.127'', ''level'': 3, ''name'': ''The AmfS Peptide Exporter
     (AmfS-E) Family''}'
   - '{''id'': ''tcdb:3.A.1.128'', ''level'': 3, ''name'': ''The SkfA Peptide Exporter
     (SkfA-E) Family''}'
-  - '{''id'': ''tcdb:3.A.1.129'', ''level'': 3, ''name'': ''3.A.1.129''}'
-  - '{''id'': ''tcdb:3.A.1.13'', ''level'': 3, ''name'': ''The Vitamin B 12 Uptake
-    Transporter (B 12 T) Family (Similar to 3.A.1.14)''}'
+  - '{''id'': ''tcdb:3.A.1.13'', ''level'': 3, ''name'': ''The Vitamin B12 Uptake
+    Transporter (B12T) Family (Similar to 3.A.1.14)''}'
   - '{''id'': ''tcdb:3.A.1.130'', ''level'': 3, ''name'': ''The Multidrug/Hemolysin
     Exporter (MHE) Family''}'
   - '{''id'': ''tcdb:3.A.1.131'', ''level'': 3, ''name'': ''The Bacitracin Resistance
@@ -112,7 +111,9 @@ results:
     and undecylprodigiosin (RED) exporter (ARE) family''}'
   - '{''id'': ''tcdb:3.A.1.147'', ''level'': 3, ''name'': ''Functionally Uncharacterized
     ABC2-3 (ABC2-3) Family''}'
-  children_total: 98
+  - '{''id'': ''tcdb:3.A.1.148'', ''level'': 3, ''name'': ''Functionally Uncharacterized
+    ABC2-4 (ABC2-4) Family''}'
+  children_total: 97
   children_truncated: true
   description: null
   direct_gene_count: 649
@@ -124,7 +125,7 @@ results:
   level: 2
   level_kind: tc_family
   links_out: []
-  member_count: 98
+  member_count: 97
   name: The ATP-binding Cassette (ABC) Superfamily
   ontology: tcdb
   organism_count: 43
@@ -134,7 +135,7 @@ results:
   superfamily: ArsA ATPase (ArsA) Superfamily
   tc_class_id: tcdb:3
   tcdb_id: 3.A.1
-  tcdb_substrate_count: 551
+  tcdb_substrate_count: 546
   term_id: tcdb:3.A.1
 - children:
   - '{''id'': ''interpro:IPR004708'', ''level'': 1, ''name'': ''Aspartate ammonia-lyase''}'

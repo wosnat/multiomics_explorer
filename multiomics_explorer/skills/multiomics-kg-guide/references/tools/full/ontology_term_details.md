@@ -146,9 +146,9 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
       "direct_gene_count": 649,
       "tcdb_id": "3.A.1",
       "tc_class_id": "tcdb:3",
-      "member_count": 98,
+      "member_count": 97,
       "superfamily": "ArsA ATPase (ArsA) Superfamily",
-      "tcdb_substrate_count": 551,
+      "tcdb_substrate_count": 546,
       "direction": "unknown",
       "direction_basis": null,
       "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters", "level": 1}],
@@ -160,7 +160,7 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
         {"id": "tcdb:3.A.1.103", "name": "The Lipopolysaccharide Exporter (LPSE) Family", "level": 3},
         ...
       ],
-      "children_total": 98,
+      "children_total": 97,
       "children_truncated": true,
       "links_out": [
         {
@@ -395,9 +395,9 @@ ontology_term_details(term_ids=["tcdb:3.A.1"], link_kinds=["composition"])
       "direct_gene_count": 649,
       "tcdb_id": "3.A.1",
       "tc_class_id": "tcdb:3",
-      "member_count": 98,
+      "member_count": 97,
       "superfamily": "ArsA ATPase (ArsA) Superfamily",
-      "tcdb_substrate_count": 551,
+      "tcdb_substrate_count": 546,
       "direction": "unknown",
       "direction_basis": null,
       "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters", "level": 1}],
@@ -409,7 +409,7 @@ ontology_term_details(term_ids=["tcdb:3.A.1"], link_kinds=["composition"])
         {"id": "tcdb:3.A.1.103", "name": "The Lipopolysaccharide Exporter (LPSE) Family", "level": 3},
         ...
       ],
-      "children_total": 98,
+      "children_total": 97,
       "children_truncated": true,
       "links_out": [
         {
@@ -634,9 +634,9 @@ ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", ve
       "organism_gene_count": 52,
       "tcdb_id": "3.A.1",
       "tc_class_id": "tcdb:3",
-      "member_count": 98,
+      "member_count": 97,
       "superfamily": "ArsA ATPase (ArsA) Superfamily",
-      "tcdb_substrate_count": 551,
+      "tcdb_substrate_count": 546,
       "direction": "unknown",
       "direction_basis": null,
       "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters", "level": 1}],
@@ -648,7 +648,7 @@ ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", ve
         {"id": "tcdb:3.A.1.103", "name": "The Lipopolysaccharide Exporter (LPSE) Family", "level": 3},
         ...
       ],
-      "children_total": 98,
+      "children_total": 97,
       "children_truncated": true,
       "links_out": [
         {
@@ -700,11 +700,11 @@ ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", ve
         "level_kind": "tc_family",
         "tcdb_id": "3.A.1",
         "gene_count": 3933,
-        "member_count": 98,
+        "member_count": 97,
         "direct_gene_count": 649,
         "superfamily": "ArsA ATPase (ArsA) Superfamily",
         "direction": "unknown",
-        "tcdb_substrate_count": 551,
+        "tcdb_substrate_count": 546,
         "preferred_id": "tcdb",
         "id": "tcdb:3.A.1",
         "tc_class_id": "tcdb:3",
@@ -777,7 +777,7 @@ discussed_by_publication(publication_dois=[...]) → ontology_term_details(term_
 
 - `member_count` (TCDB, MEROPS, InterPro) is the upstream database's family size, not a KG gene count.
 
-- TCDB rows carry `tcdb_substrate_count` (distinct substrates TCDB curates on the systems in the node's subtree; substrate edges leave `tc_system` nodes only, so a family's own range is the sum below it), `direction` (`uptake` / `export` / `unknown`, TCDB-stated: ABC numbering or the nearest named node up to family level) and sparse `direction_basis`. Use `tcdb_substrate_count` to see how broad a family call is before trusting a family walk: the ABC superfamily tcdb:3.A.1 reads 551. Many children are range-only (`gene_count = 0`): curated systems no KG gene is called to.
+- TCDB rows carry `tcdb_substrate_count` (distinct substrates TCDB curates on the systems in the node's subtree; substrate edges leave `tc_system` nodes only, so a family's own range is the sum below it), `direction` (`uptake` / `export` / `unknown`, TCDB-stated and conservative: ABC uptake numbering or a system's own name; families read `unknown`) and sparse `direction_basis`. Use `tcdb_substrate_count` to see how broad a family call is before trusting a family walk: the ABC superfamily tcdb:3.A.1 reads 546. Many children are range-only (`gene_count = 0`): curated systems no KG gene is called to.
 
 - A compact column that is missing on the node is absent, not null: GO rows carry only `direct_gene_count` from their compact extras, Pfam rows `short_name`, KEGG `reaction_count` / `metabolite_count` only on pathway terms (absent on KO / module rows). Do not treat an absent key as `0`.
 

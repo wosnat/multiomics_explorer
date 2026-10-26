@@ -69,7 +69,7 @@ results:
   organism_count: 26
   pathway_count: 0
   pathway_ids: []
-  score: 3.0666
+  score: 3.067
   stereo_relatives:
   - '{''transporter_gene_count'': 16, ''metabolite_id'': ''kegg.compound:C00031'',
     ''name'': ''D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
@@ -125,7 +125,7 @@ results:
   - kegg.pathway:ko01240
   - kegg.pathway:ko01250
   - kegg.pathway:ko04082
-  score: 2.5821
+  score: 2.5827
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -207,7 +207,7 @@ results:
   - kegg.pathway:ko04148
   - kegg.pathway:ko04152
   - kegg.pathway:ko05111
-  score: 2.5821
+  score: 2.5827
   stereo_relatives:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00221'',
     ''name'': ''beta-D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
@@ -253,7 +253,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 2.5821
+  score: 2.5827
   structure_kind: defined
   transporter_count: 1
   transporter_gene_count: 9
@@ -285,7 +285,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 2.5821
+  score: 2.5827
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -317,7 +317,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 2.5821
+  score: 2.5827
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -348,7 +348,7 @@ results:
   - kegg.pathway:ko01110
   - kegg.pathway:ko01120
   - kegg.pathway:ko01200
-  score: 2.2298
+  score: 2.2305
   stereo_relatives:
   - '{''transporter_gene_count'': 16, ''metabolite_id'': ''kegg.compound:C00031'',
     ''name'': ''D-Glucose'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
@@ -386,7 +386,7 @@ results:
   - kegg.pathway:ko01120
   - kegg.pathway:ko01200
   - kegg.pathway:ko01250
-  score: 2.2298
+  score: 2.2305
   stereo_relatives:
   - '{''transporter_gene_count'': 16, ''metabolite_id'': ''kegg.compound:C00031'',
     ''name'': ''D-Glucose'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
@@ -436,7 +436,7 @@ results:
   - kegg.pathway:ko02020
   - kegg.pathway:ko02060
   - kegg.pathway:ko05111
-  score: 1.9621
+  score: 1.9628
   stereo_relatives:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00668'',
     ''name'': ''alpha-D-Glucose 6-phosphate'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
@@ -490,7 +490,7 @@ results:
   - kegg.pathway:ko01120
   - kegg.pathway:ko01240
   - kegg.pathway:ko01250
-  score: 1.9621
+  score: 1.9628
   stereo_relatives:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''chebi:16077'', ''name'':
     ''D-glucopyranose 1-phosphate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
@@ -521,7 +521,7 @@ results:
   organism_count: 0
   pathway_count: 0
   pathway_ids: []
-  score: 1.9621
+  score: 1.9628
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -558,7 +558,7 @@ results:
   - kegg.pathway:ko01240
   - kegg.pathway:ko01250
   - kegg.pathway:ko04152
-  score: 1.7518
+  score: 1.7525
   stereo_relatives:
   - '{''transporter_gene_count'': 5, ''metabolite_id'': ''kegg.compound:C00092'',
     ''name'': ''D-Glucose 6-phosphate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
@@ -596,7 +596,7 @@ results:
   - kegg.pathway:ko01120
   - kegg.pathway:ko01200
   - kegg.pathway:ko04152
-  score: 1.7518
+  score: 1.7525
   stereo_relatives:
   - '{''transporter_gene_count'': 5, ''metabolite_id'': ''kegg.compound:C00092'',
     ''name'': ''D-Glucose 6-phosphate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
@@ -627,7 +627,7 @@ results:
   pathway_count: 1
   pathway_ids:
   - kegg.pathway:ko00500
-  score: 1.7518
+  score: 1.7525
   stereo_relatives:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''chebi:16077'', ''name'':
     ''D-glucopyranose 1-phosphate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
@@ -661,7 +661,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.7518
+  score: 1.7525
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -686,7 +686,7 @@ results:
   organism_count: 0
   pathway_count: 0
   pathway_ids: []
-  score: 1.7518
+  score: 1.7525
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -721,7 +721,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.4426
+  score: 1.4432
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -751,7 +751,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.4426
+  score: 1.4432
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -781,7 +781,7 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.4426
+  score: 1.4432
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -814,7 +814,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.4426
+  score: 1.4432
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -842,7 +842,7 @@ results:
   pathway_ids:
   - kegg.pathway:ko00500
   - kegg.pathway:ko02060
-  score: 1.3256
+  score: 1.3262
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -875,7 +875,7 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.2261
+  score: 1.2267
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -902,14 +902,14 @@ results:
   pathway_ids:
   - kegg.pathway:ko00052
   - kegg.pathway:ko01100
-  score: 1.1406
+  score: 1.1412
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
 returned: 23
 row_count: 23
-score_max: 3.0665931701660156
-score_median: 1.751826524734497
+score_max: 3.0670156478881836
+score_median: 1.752516269683838
 top_metabolite_pathways:
 - count: 18
   metabolite_pathway_id: kegg.pathway:ko01100

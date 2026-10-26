@@ -233,7 +233,7 @@ search_ontology(ontology=["tcdb"], level=2, organism="MED4", min_gene_count=5)
 ```example-response
 {
   "mode": "browse",
-  "total_entries": 9370,
+  "total_entries": 9368,
   "total_matching": 8,
   "score_max": null,
   "score_median": null,
@@ -243,7 +243,7 @@ search_ontology(ontology=["tcdb"], level=2, organism="MED4", min_gene_count=5)
   "by_ontology": [
     {
       "ontology": "tcdb",
-      "total_entries": 9370,
+      "total_entries": 9368,
       "total_matching": 8,
       "score_max": null,
       "returned": 5,
@@ -457,10 +457,10 @@ search_ontology(search_text="transport", ontology=["go_bp", "tcdb"], limit=5)
 ```example-response
 {
   "mode": "search",
-  "total_entries": 12692,
-  "total_matching": 845,
-  "score_max": 4.514525413513184,
-  "score_median": 2.8362488746643066,
+  "total_entries": 12690,
+  "total_matching": 850,
+  "score_max": 7.3615570068359375,
+  "score_median": 3.394239902496338,
   "returned": 10,
   "offset": 0,
   "truncated": true,
@@ -475,9 +475,9 @@ search_ontology(search_text="transport", ontology=["go_bp", "tcdb"], limit=5)
     },
     {
       "ontology": "tcdb",
-      "total_entries": 9370,
-      "total_matching": 521,
-      "score_max": 4.514525413513184,
+      "total_entries": 9368,
+      "total_matching": 526,
+      "score_max": 7.3615570068359375,
       "returned": 5,
       "truncated": true
     }
@@ -532,9 +532,9 @@ search_ontology(search_text="nitrate", limit=2)
 ```example-response
 {
   "mode": "search",
-  "total_entries": 56676,
+  "total_entries": 56674,
   "total_matching": 205,
-  "score_max": 7.6005682945251465,
+  "score_max": 11.322080612182617,
   "score_median": 3.41845965385437,
   "returned": 19,
   "offset": 0,
@@ -706,19 +706,19 @@ search_ontology(search_text="sucrose", ontology=["tcdb"])
 ```example-response
 {
   "mode": "search",
-  "total_entries": 9370,
+  "total_entries": 9368,
   "total_matching": 35,
-  "score_max": 8.590202331542969,
-  "score_median": 3.736258029937744,
+  "score_max": 9.365047454833984,
+  "score_median": 4.339223861694336,
   "returned": 5,
   "offset": 0,
   "truncated": true,
   "by_ontology": [
     {
       "ontology": "tcdb",
-      "total_entries": 9370,
+      "total_entries": 9368,
       "total_matching": 35,
-      "score_max": 8.590202331542969,
+      "score_max": 9.365047454833984,
       "returned": 5,
       "truncated": true
     }
@@ -730,30 +730,30 @@ search_ontology(search_text="sucrose", ontology=["tcdb"])
   "warnings": [],
   "results": [
     {
-      "id": "tcdb:3.A.1.1.8",
-      "name": "Sucrose/maltose/trehalose porter (sucrose-inducible)",
+      "id": "tcdb:2.A.2.4.17",
+      "name": "High affinity sucrose transporter of 617 aas and 12 TMSs, Sut1B.",
       "ontology_type": "tcdb",
-      "score": 8.590202331542969,
-      "level": 4,
-      "is_informative": true,
-      "gene_count": 3,
-      "organism_count": 1
-    },
-    {
-      "id": "tcdb:2.A.2.4.11",
-      "name": "Sucrose transport protein SUT5 (Sucrose permease 5) (Sucrose transporter 5) (OsSUT5) (Sucrose-proton symporter 5).",
-      "ontology_type": "tcdb",
-      "score": 8.30156135559082,
+      "score": 9.365047454833984,
       "level": 4,
       "is_informative": true,
       "gene_count": 0,
       "organism_count": 0
     },
     {
-      "id": "tcdb:2.A.2.4.6",
-      "name": "Vacuolar sucrose;H + symporter, Suc4, catalyzes sucrose export from vacuoles.",
+      "id": "tcdb:3.A.1.1.8",
+      "name": "Sucrose/maltose/trehalose porter (sucrose-inducible)",
       "ontology_type": "tcdb",
-      "score": 7.476313591003418,
+      "score": 8.554240226745605,
+      "level": 4,
+      "is_informative": true,
+      "gene_count": 3,
+      "organism_count": 1
+    },
+    {
+      "id": "tcdb:4.A.1.2.1",
+      "name": "Sucrose porter IIBCScr (ScrA) of 456 aas and 10 or 11 TMSs.",
+      "ontology_type": "tcdb",
+      "score": 8.547380447387695,
       "level": 4,
       "is_informative": true,
       "gene_count": 0,

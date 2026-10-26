@@ -21,7 +21,7 @@ examples:
     # PMM0913 (salY) carries a usable TCDB call only on the ABC superfamily
     # tcdb:3.A.1. It points at no system, so the transport arm is empty, and
     # the family walk never starts from a node curated with over 200
-    # substrates (tcdb:3.A.1 has 551). `tcdb_family_substrates_skipped` names
+    # substrates (tcdb:3.A.1 has 546). `tcdb_family_substrates_skipped` names
     # the gene and node, and the warning says the call is superfamily-level
     # with the substrate unknown. Read it as "an ABC transporter of unknown
     # substrate", not as "no transporter".
@@ -176,7 +176,7 @@ examples:
             "gene_name": "mcyH",
             "product": "ABC transporter, ATPase component",
             "rows": 40,
-            "metabolite_count": 38,
+            "metabolite_count": 37,
             "reaction_count": 0,
             "transporter_count": 8,
             "metabolism_rows": 0,
@@ -188,7 +188,7 @@ examples:
           }
         ],
         "by_evidence_source": [{"evidence_source": "transport", "count": 40}],
-        "by_evidence_source_combination": [{"evidence_sources": ["transport"], "pair_count": 38}],
+        "by_evidence_source_combination": [{"evidence_sources": ["transport"], "pair_count": 37}],
         "by_tcdb_route": [{"tcdb_route": "direct", "count": 2}, {"tcdb_route": "family", "count": 38}],
         "tcdb_family_substrates_not_shown": null,
         "tcdb_family_substrates_skipped": [],
@@ -256,9 +256,9 @@ examples:
             "multi_source_gene_count": 0
           },
           {
-            "metabolite_id": "chebi:36080",
-            "name": "protein",
-            "formula": null,
+            "metabolite_id": "chebi:42478",
+            "name": "ethidium",
+            "formula": "C21H20N3",
             "gene_count": 1,
             "reaction_count": 0,
             "transporter_count": 1,
@@ -277,7 +277,7 @@ examples:
             "tcdb_family_name": "The Lipid Exporter (LipidE) Family",
             "level_kind": "tc_subfamily",
             "tcdb_route": "family",
-            "direction": "export",
+            "direction": "unknown",
             "gene_count": 1,
             "metabolite_count": 29
           },
@@ -286,7 +286,7 @@ examples:
             "tcdb_family_name": "The Protein-2 Exporter (Prot2E) Family",
             "level_kind": "tc_subfamily",
             "tcdb_route": "family",
-            "direction": "export",
+            "direction": "unknown",
             "gene_count": 1,
             "metabolite_count": 2
           },
@@ -295,7 +295,7 @@ examples:
             "tcdb_family_name": "The Peptide-2 Exporter (Pep2E) Family",
             "level_kind": "tc_subfamily",
             "tcdb_route": "family",
-            "direction": "export",
+            "direction": "unknown",
             "gene_count": 1,
             "metabolite_count": 1
           },
@@ -304,7 +304,7 @@ examples:
             "tcdb_family_name": "The Peptide-3 Exporter (Pep3E) Family",
             "level_kind": "tc_subfamily",
             "tcdb_route": "family",
-            "direction": "export",
+            "direction": "unknown",
             "gene_count": 1,
             "metabolite_count": 3
           },
@@ -313,7 +313,7 @@ examples:
             "tcdb_family_name": "The Drug Exporter-2 (DrugE2) Family",
             "level_kind": "tc_subfamily",
             "tcdb_route": "family",
-            "direction": "export",
+            "direction": "unknown",
             "gene_count": 1,
             "metabolite_count": 1
           },
@@ -364,7 +364,7 @@ examples:
         "gene_count_total": 1,
         "reaction_count_total": 0,
         "transporter_count_total": 8,
-        "metabolite_count_total": 38,
+        "metabolite_count_total": 37,
         "results": []
       }
 
@@ -1057,7 +1057,7 @@ mistakes:
     deepest `annotated` family or subfamily call, never above one of its own
     direct systems, and reports every curated substrate of the systems under
     it (`tcdb_substrate_system_count` systems per row). TCDB curation passes
-    through as-is: catch-all substrates ("molecule", "Peptide", "Protein")
+    through as-is: catch-all substrates ("Peptide", "Protein")
     appear, and pstS (PMM0710) reaches only triphosphate because TCDB curates
     its Pst system that way. Most remaining noise is eggNOG family calls on
     genes that are not transporters. `docs://analysis/transport`.
@@ -1160,9 +1160,9 @@ mistakes:
     `metabolite_ids`). KG namespace is `kegg.compound:` (not `chebi:`).
   - >-
     Direction is thin. TCDB rows carry `tcdb_direction` (`uptake` / `export`
-    / `unknown`), which is TCDB's direction for the row's node (ABC numbering,
-    or the nearest named node up to family level), not a per-gene call; most
-    nodes read `unknown`. The metabolism arm's `Reaction_has_metabolite` edge
+    / `unknown`), which is TCDB's direction for the row's node (ABC uptake
+    numbering, or a system's own name; family names never set it), not a
+    per-gene call; most nodes, and nearly all family rows, read `unknown`. The metabolism arm's `Reaction_has_metabolite` edge
     does not distinguish substrate from product (KEGG equation order is
     arbitrary). To distinguish for a gene, layer transcriptional evidence (`differential_expression_by_gene`) and
     functional annotation (`gene_overview` Pfam / KEGG KO names like

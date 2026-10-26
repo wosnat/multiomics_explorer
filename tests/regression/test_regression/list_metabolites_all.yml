@@ -1,9 +1,9 @@
 by_evidence_source:
 - count: 2221
   evidence_source: metabolism
-- count: 1285
+- count: 1282
   evidence_source: transport
-- count: 208
+- count: 212
   evidence_source: go_transport
 - count: 135
   evidence_source: metabolomics
@@ -66,13 +66,13 @@ by_kegg_brite_class:
 - count: 2544
   kegg_brite_class: not classified
 by_kegg_functional_category:
-- count: 65
+- count: 64
   kegg_functional_category: Carbohydrates
 - count: 59
   kegg_functional_category: Peptides
 - count: 47
   kegg_functional_category: Nucleic acids
-- count: 40
+- count: 39
   kegg_functional_category: Vitamins and cofactors
 - count: 37
   kegg_functional_category: Lipids
@@ -80,11 +80,11 @@ by_kegg_functional_category:
   kegg_functional_category: Organic acids
 - count: 28
   kegg_functional_category: Antibiotics
-- count: 23
+- count: 22
   kegg_functional_category: Hormones and transmitters
 - count: 14
   kegg_functional_category: Steroids
-- count: 2855
+- count: 2857
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment:
@@ -104,16 +104,16 @@ by_measurement_coverage:
   - count: 5
     paper_count: 3
 by_structure_kind:
-- count: 2523
+- count: 2531
   structure_kind: defined
-- count: 630
+- count: 622
   structure_kind: generic
 - count: 25
   structure_kind: polymer
 case_id: list_metabolites_all
 mass_stats:
   mass_max: 5227.103
-  mass_median: 245.876
+  mass_median: 244.179
   mass_min: 1.00794
 not_found:
   elements: []
@@ -213,7 +213,6 @@ results:
   - H
   evidence_sources:
   - metabolism
-  - transport
   formula: H
   go_transport_organism_count: null
   go_transport_organism_names: null
@@ -234,8 +233,8 @@ results:
   - kegg.pathway:ko04075
   - kegg.pathway:ko04371
   structure_kind: defined
-  transporter_count: 88
-  transporter_gene_count: 1883
+  transporter_count: 0
+  transporter_gene_count: 0
 - catalyst_gene_count: 4325
   chebi_id: '29888'
   elements:
@@ -342,10 +341,10 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 1608
+- count: 1606
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 614
+- count: 615
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
 - count: 589
@@ -360,7 +359,7 @@ top_metabolite_pathways:
 - count: 125
   metabolite_pathway_id: kegg.pathway:ko01230
   metabolite_pathway_name: Biosynthesis of amino acids
-- count: 124
+- count: 121
   metabolite_pathway_id: kegg.pathway:ko02010
   metabolite_pathway_name: ABC transporters
 - count: 105
@@ -369,35 +368,35 @@ top_metabolite_pathways:
 - count: 104
   metabolite_pathway_id: kegg.pathway:ko01200
   metabolite_pathway_name: Carbon metabolism
-- count: 91
+- count: 92
   metabolite_pathway_id: kegg.pathway:ko00860
   metabolite_pathway_name: Porphyrin metabolism
 top_organisms:
-- count: 1725
+- count: 1728
   organism_name: Pseudomonas putida KT2440
-- count: 1601
+- count: 1604
   organism_name: Ruegeria pomeroyi DSS-3
-- count: 1568
+- count: 1563
   organism_name: Alteromonas macleodii EZ55
-- count: 1490
-  organism_name: Alteromonas macleodii MIT1002
-- count: 1486
+- count: 1489
   organism_name: Marinobacter (MarRef v6)
-- count: 1480
+- count: 1484
+  organism_name: Alteromonas macleodii MIT1002
+- count: 1481
   organism_name: Shewanella sp. W3-18-1
-- count: 1478
-  organism_name: Alteromonas macleodii BGP6
-- count: 1478
+- count: 1474
   organism_name: Alteromonas (MarRef v6)
-- count: 1468
+- count: 1473
+  organism_name: Alteromonas macleodii BGP6
+- count: 1462
   organism_name: Alteromonas macleodii HOT1A3
-- count: 1467
+- count: 1461
   organism_name: Alteromonas mediterranea AltDE1
 total_entries: 3178
 total_matching: 3178
 truncated: true
 warnings: []
 xref_coverage:
-  with_chebi: 3053
-  with_hmdb: 1469
-  with_mnxm: 3167
+  with_chebi: 3054
+  with_hmdb: 1463
+  with_mnxm: 3155

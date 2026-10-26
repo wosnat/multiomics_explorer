@@ -419,7 +419,7 @@ TCDB curates substrates on **systems** (5-part TC numbers such as `tcdb:3.A.1.4.
 - **Motivating case: phosphate in MED4.** `genes_by_metabolite(['kegg.compound:C00009'], organism='MED4')` (orthophosphate) returns no transport rows. phnD (PMM0673), the phosphonate-binding protein, has only an eggNOG call on subfamily `tcdb:3.A.1.9` (PhnT) plus a weak hit on the ABC superfamily. The envelope's `tcdb_family_substrates_not_shown` reads `{genes: 4, metabolites: 1, rows: 4}` (phnC, phnD, phnE, PMM0717) and the warning says to pass `include_tcdb_family_substrates=True`; with it, phnD reaches orthophosphate, phosphonic acid, phosphite, phosphinate and Fe³⁺ through `tcdb:3.A.1.9`.
 - **Curation caveat: Pst.** MED4 pstA/B/C/S have direct calls onto `tcdb:3.A.1.7.6` ("High affinity phosphate-specific transporter, PstABCS"), which TCDB curates with **triphosphate only**. They therefore drop out of the orthophosphate answer, and because they have a direct system, no family walk brings them back. When a substrate answer looks too narrow, read the system names in `tcdb_family_name` and `top_tcdb_families`.
 - **A real transporter can sit in family rows only.** MED4 gltS (PMM0628) has an eggNOG call on the glutamate:Na+ symporter family `tcdb:2.A.27` and only weak DIAMOND hits, so it has no direct rows; the walk reaches glutamate through the family.
-- **Catch-all substrates.** TCDB curates some generic substrates ("molecule", "Peptide", "Protein"); they pass through as curated and can top family-row counts. Treat them as "some substrate".
+- **Catch-all substrates.** TCDB curates some generic substrates ("Peptide", "Protein"); they pass through as curated and can top family-row counts. Treat them as "some substrate".
 - **Family rows are a recall expansion.** They say the gene's family moves the compound somewhere, not that the gene does. Most of their noise is eggNOG family calls on genes that are not transporters at all (cell-division, chaperone and protease genes among them). The KG has no per-gene transporter call yet, so do not count family rows as transport capability.
 
 **Choose by question shape:**
@@ -428,7 +428,7 @@ TCDB curates substrates on **systems** (5-part TC numbers such as `tcdb:3.A.1.4.
 - **`include_tcdb_family_substrates=True`** — broad screen ("which transporters could plausibly act on these N substrates?"), or when the direct answer is empty and `tcdb_family_substrates_not_shown` is non-zero. Report family rows as candidates.
 - **Pivot** for a single transporter family: `genes_by_ontology(ontology="tcdb", term_ids=[...])`. (For substrate-anchored questions prefer the metabolite-anchored route above.)
 
-Scale in MED4: 203 genes carry a gate-passing TCDB call, 89 reach a substrate directly, and 98 have a gate-passing call but no direct edge (their transport arm is empty by default).
+Scale in MED4: 203 genes carry a gate-passing TCDB call, 56 reach a substrate directly, and 98 have a gate-passing call but no direct edge (their transport arm is empty by default).
 
 ---
 

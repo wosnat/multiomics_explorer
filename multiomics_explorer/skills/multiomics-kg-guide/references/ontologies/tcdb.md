@@ -54,7 +54,7 @@ with `level_kind` `tc_class` → `tc_subclass` → `tc_family` →
 `tc_subfamily` → `tc_system`. Substrate edges leave `tc_system` nodes
 only, so a family's substrate range is the union of its systems';
 `tcdb_substrate_count` holds that range at every level (the ABC
-superfamily `tcdb:3.A.1` reads 551). `gene_count` / `organism_count` are
+superfamily `tcdb:3.A.1` reads 546). `gene_count` / `organism_count` are
 subtree-inclusive and count gated edges only, so a class reports
 thousands of genes while its `direct_gene_count` is 0. Most nodes are
 range-only: systems TCDB curates (and their ancestors) with no KG gene
@@ -62,9 +62,14 @@ called to them, `gene_count = 0`; they exist so a family's range is
 complete. Filter them with `min_gene_count=1` or by reading `gene_count`.
 `member_count` is TCDB's own family size. Nodes carry TCDB's transport
 `direction` (`uptake` / `export` / `unknown`, dense) and sparse
-`direction_basis` (`abc_numbering`: ABC subfamilies 3.A.1.1-99 uptake,
-100+ export; `tcdb_name`: the nearest node up to family level whose TCDB
-name says import or export). The ABC superfamily has 98 children, so
+`direction_basis` (`abc_numbering`: ABC subfamilies 3.A.1.1-99 and their
+systems, uptake only; `tcdb_name`: a `tc_system`'s own TCDB name, with
+secretion read as export). Direction is conservative: family and
+subfamily names never set it, so every family, and every subfamily outside
+the ABC uptake range, reads `unknown`; hedged, organelle or two-way names
+and a curated override list also leave `unknown`. `superfamily` is TCDB's
+own label, copied as is and unreliable for whole groups (most ABC
+`3.A.1.*` node reads "ArsA ATPase (ArsA) Superfamily"). The ABC superfamily has 97 children, so
 `ontology_term_details` truncates its `children[]`.
 
 ## Graph shape (from the registry)
@@ -91,8 +96,8 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 | Property | Type | Meaning |
 |---|---|---|
 | `direct_gene_count` | int | genes attached to this exact node (not descendants); absent where it would be vacuous |
-| `direction` | string | `uptake` / `export` / `unknown`, set only where TCDB states it (ABC numbering, or the nearest named node's name) and inherited downward — node-level, not a per-gene call |
-| `direction_basis` | string | sparse: which rule set `direction` (`abc_numbering` / `tcdb_name`) |
+| `direction` | string | `uptake` / `export` / `unknown`, conservative: set only by ABC uptake numbering (3.A.1.1-99 subfamilies and their systems) or a `tc_system`'s own name; family and subfamily names never set it — node-level, not a per-gene call |
+| `direction_basis` | string | sparse: which rule set `direction` (`abc_numbering`: uptake only / `tcdb_name`: systems only) |
 | `gene_count` | int | genes annotated to the term — subtree-inclusive on hierarchical labels, direct on flat ones |
 | `id` | string | term ID as used in `term_ids=[...]` (self-prefixed CURIE) |
 | `level` | int | hierarchy depth, 0 = root / broadest |
@@ -101,7 +106,8 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 | `name` | string | term name (what `search_ontology` indexes) |
 | `organism_count` | int | organisms with at least one gene annotated to the term (subtree-inclusive where `gene_count` is) |
 | `preferred_id` | string | same value as `id` |
-| `superfamily` | string | TCDB superfamily name the family belongs to, where TCDB assigns one (sparse) |
+| `proteins` | string | `tc_system` only (sparse): TCDB's protein cell — gene symbols, accessions and source organism, lines joined by `; ` (e.g. `UrtA (R); UrtB (M)`); indexed by the TCDB full-text search |
+| `superfamily` | string | TCDB's own superfamily label, copied as is (sparse); unreliable for whole groups — TCDB files every ABC `3.A.1.*` row under ArsA |
 | `tc_class_id` | string | CURIE of the level-0 TC class this node sits under (e.g. `tcdb:3`) — for grouping without walking the hierarchy |
 | `tcdb_id` | string | bare TC number (e.g. `3.A.1.14`); `id` is the `tcdb:` CURIE |
 | `tcdb_substrate_count` | int | distinct Metabolite + ChemicalRole substrates TCDB curates on the `tc_system` nodes in this node's subtree (TCDB's range; on a system, its own count, 0 when none) |
@@ -167,7 +173,10 @@ superfamily behave as catch-alls by size; enrich at `level=2` (family) or
   `tcdb_family_substrates_skipped` lists it.
 - TCDB curation is reported as-is: the Pst phosphate system
   `tcdb:3.A.1.7.6` is curated with triphosphate only, and catch-all
-  substrates ("molecule", "Peptide", "Protein") appear on some systems.
+  substrates ("Peptide", "Protein") appear on some systems. Coupling
+  ions (H+, Na+) and placeholders ("molecule", "ion") are filtered out
+  (`Schema_info.tcdb_substrate_excluded_targets`), so Na+/H+ antiporters
+  reach no metabolite.
 - `direction` is node-level and TCDB-stated, not a per-gene measurement;
   most nodes read `unknown`.
 - `tcdb_substrate_count` is TCDB's curated range for the node, not what

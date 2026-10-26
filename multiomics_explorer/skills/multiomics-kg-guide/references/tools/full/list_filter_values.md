@@ -278,8 +278,8 @@ list_filter_values(filter_type="evidence_source")
   "warnings": [],
   "results": [
     {"value": "metabolism", "count": 2221},
-    {"value": "transport", "count": 1285},
-    {"value": "go_transport", "count": 208},
+    {"value": "transport", "count": 1282},
+    {"value": "go_transport", "count": 212},
     ...
   ]
 }

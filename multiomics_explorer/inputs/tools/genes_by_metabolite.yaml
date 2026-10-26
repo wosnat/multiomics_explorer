@@ -56,10 +56,10 @@ examples:
         "by_tcdb_route": [],
         "tcdb_family_substrates_not_shown": {"genes": 4, "metabolites": 1, "rows": 4},
         "tcdb_family_substrates_skipped": [
-          {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551}
+          {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546}
         ],
         "rows_by_go_term_depth": null,
         "top_reactions": [],
@@ -112,10 +112,10 @@ examples:
         "by_tcdb_route": [{"tcdb_route": "family", "count": 4}],
         "tcdb_family_substrates_not_shown": null,
         "tcdb_family_substrates_skipped": [
-          {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551}
+          {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546}
         ],
         "rows_by_go_term_depth": null,
         "top_reactions": [],
@@ -366,10 +366,10 @@ examples:
         "by_tcdb_route": [],
         "tcdb_family_substrates_not_shown": {"genes": 5, "metabolites": 1, "rows": 5},
         "tcdb_family_substrates_skipped": [
-          {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551}
+          {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546}
         ],
         "rows_by_go_term_depth": [],
         "top_reactions": [],
@@ -425,10 +425,10 @@ examples:
         "by_tcdb_route": [],
         "tcdb_family_substrates_not_shown": {"genes": 5, "metabolites": 1, "rows": 5},
         "tcdb_family_substrates_skipped": [
-          {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551}
+          {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546}
         ],
         "rows_by_go_term_depth": [],
         "top_reactions": [
@@ -716,10 +716,10 @@ examples:
         "by_tcdb_route": [{"tcdb_route": "direct", "count": 10}],
         "tcdb_family_substrates_not_shown": {"genes": 0, "metabolites": 0, "rows": 0},
         "tcdb_family_substrates_skipped": [
-          {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551}
+          {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546}
         ],
         "rows_by_go_term_depth": [{"go_term_depth": 0, "count": 11}],
         "top_reactions": [
@@ -1403,10 +1403,10 @@ examples:
         "by_tcdb_route": [{"tcdb_route": "direct", "count": 10}],
         "tcdb_family_substrates_not_shown": {"genes": 0, "metabolites": 0, "rows": 0},
         "tcdb_family_substrates_skipped": [
-          {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551}
+          {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546}
         ],
         "rows_by_go_term_depth": [{"go_term_depth": 0, "count": 11}],
         "top_reactions": [
@@ -1571,10 +1571,10 @@ examples:
         "by_tcdb_route": [{"tcdb_route": "direct", "count": 10}],
         "tcdb_family_substrates_not_shown": {"genes": 0, "metabolites": 0, "rows": 0},
         "tcdb_family_substrates_skipped": [
-          {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551},
-          {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 551}
+          {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+          {"locus_tag": "PMM0977", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546}
         ],
         "rows_by_go_term_depth": [{"go_term_depth": 0, "count": 4}],
         "top_reactions": [
@@ -1781,15 +1781,15 @@ mistakes:
     with a direct call keeps exactly its system's substrates. TCDB curation is
     taken as-is: the Pst phosphate system tcdb:3.A.1.7.6 is curated with
     triphosphate only, so pstA/B/C/S do not reach orthophosphate (the system
-    name still says phosphate), and catch-all substrates ("molecule",
-    "Peptide", "Protein") pass through. Most remaining noise is eggNOG family
+    name still says phosphate), and catch-all substrates ("Peptide",
+    "Protein") pass through. Most remaining noise is eggNOG family
     calls on genes that are not transporters at all.
   - >-
     `tcdb_direction` (`uptake` / `export` / `unknown`) is TCDB's direction for
-    the row's node, not a per-gene measurement. It comes from ABC numbering
-    (subfamilies 3.A.1.1-99 uptake, 100+ export) or from the nearest named node
-    up to family level whose TCDB name says import or export. Most nodes read
-    `unknown`. GO and KEGG rows carry no direction.
+    the row's node, not a per-gene measurement. It is conservative: ABC uptake
+    numbering (subfamilies 3.A.1.1-99 and their systems) or a system's own
+    TCDB name. Family and subfamily names never set it, so family rows read
+    `unknown` outside the ABC uptake range. Most nodes read `unknown`. GO and KEGG rows carry no direction.
   - >-
     Distinct direct genes across the transport rows, unioned over organisms,
     equal `list_metabolites.transporter_gene_count`, and gene-side, distinct

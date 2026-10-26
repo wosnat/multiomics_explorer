@@ -28,7 +28,7 @@ tcdb_family_substrates_not_shown:
 tcdb_family_substrates_skipped:
 - locus_tag: PMM0913
   tcdb_id: tcdb:3.A.1
-  tcdb_substrate_count: 551
+  tcdb_substrate_count: 546
 top_gene_categories: []
 top_metabolite_pathways: []
 top_metabolites: []
@@ -40,7 +40,7 @@ truncated: false
 warnings:
 - 'No direct TCDB system call for PMM0913: the TCDB call is superfamily-level, so
   the substrate is unknown (see tcdb_family_substrates_skipped).'
-- 'Family walk skipped for nodes curated with over 200 substrates: tcdb:3.A.1 (551
+- 'Family walk skipped for nodes curated with over 200 substrates: tcdb:3.A.1 (546
   substrates; PMM0913). These genes carry a superfamily-level TCDB call, so their
   substrate is unknown — tcdb_family_substrates_skipped lists them; ontology_term_details
   shows a node''s substrate range.'

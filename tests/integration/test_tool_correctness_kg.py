@@ -1014,7 +1014,7 @@ class TestOntologyTermDetailsCorrectnessKG:
     def test_verified_counts(self, conn, run_query):
         rows = self._rows(conn)
         t = rows["tcdb:3.A.1"]
-        assert (len(t["parents"]), t["children_total"], t["links_total"]) == (1, 98, 11)  # 129 → 128 2026-10-18: go:0005548 retired by the GO update; → (98, 11) 2026-10-24T17:33Z: TCDB 3a range-only children, bridges on systems
+        assert (len(t["parents"]), t["children_total"], t["links_total"]) == (1, 97, 11)  # 129 → 128 2026-10-18: go:0005548 retired by the GO update; → (98, 11) 2026-10-24T17:33Z: TCDB 3a range-only children, bridges on systems; → 97 2026-10-26T04:21Z: 3.A.1.129 re-anchored
         assert len(t["children"]) == 50
         s = rows["merops.family:S14"]
         assert (len(s["parents"]), s["children_total"], s["links_total"]) == (1, 0, 1)
@@ -1152,7 +1152,7 @@ class TestGoTransportCorrectnessKG:
         n = kg_count(
             "MATCH (m:Metabolite) WHERE $o IN coalesce(m.go_transport_organism_names, []) "
             "RETURN count(m)", o=self._ORG)
-        assert n == 45
+        assert n == 46  # 45 → 46 2026-10-26T04:21Z: GO:0071806 → Protein
         r = api.list_metabolites(
             evidence_sources=["go_transport"], organism_names=[self._ORG],
             summary=True, conn=conn)
@@ -1367,13 +1367,13 @@ class TestGoTransportFollowupsKG:
 
     def test_list_organisms_med4_go_count(self, conn):
         r = api.list_organisms(organism_names=[self._ORG], conn=conn)
-        assert r["results"][0]["go_transport_metabolite_count"] == 45
+        assert r["results"][0]["go_transport_metabolite_count"] == 46  # 45 → 46 2026-10-26T04:21Z: Protein
 
     def test_list_organisms_capability_carries_go_count(self, conn):
         r = api.list_organisms(
             organism_names=[self._ORG], summary=True, conn=conn)
         cap = {e["organism_name"]: e for e in r["top_metabolic_capability"]}
-        assert cap[self._ORG]["go_transport_metabolite_count"] == 45
+        assert cap[self._ORG]["go_transport_metabolite_count"] == 46
 
     def test_list_organisms_go_count_matches_live_walk(self, conn, kg_count):
         """Count via Metabolite.go_transport_organism_names == live walk
@@ -1385,7 +1385,7 @@ class TestGoTransportFollowupsKG:
             "Biological_process_transports_metabolite]->(m:Metabolite) "
             "RETURN count(DISTINCT m)", o=_KT2440)
         r = api.list_organisms(organism_names=[_KT2440], conn=conn)
-        assert r["results"][0]["go_transport_metabolite_count"] == walk == 144
+        assert r["results"][0]["go_transport_metabolite_count"] == walk == 147  # 144 → 147 2026-10-26T04:21Z: Protein + TCDB review re-keys
 
     # --- 2c.14 gene_overview GO count --------------------------------------
 

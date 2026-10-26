@@ -361,16 +361,16 @@ tcdb_family_substrates_not_shown:
 tcdb_family_substrates_skipped:
 - locus_tag: PMM0449
   tcdb_id: tcdb:3.A.1
-  tcdb_substrate_count: 551
+  tcdb_substrate_count: 546
 - locus_tag: PMM0450
   tcdb_id: tcdb:3.A.1
-  tcdb_substrate_count: 551
+  tcdb_substrate_count: 546
 - locus_tag: PMM0913
   tcdb_id: tcdb:3.A.1
-  tcdb_substrate_count: 551
+  tcdb_substrate_count: 546
 - locus_tag: PMM0977
   tcdb_id: tcdb:3.A.1
-  tcdb_substrate_count: 551
+  tcdb_substrate_count: 546
 top_gene_categories:
 - category: Stress response and adaptation
   gene_count: 5

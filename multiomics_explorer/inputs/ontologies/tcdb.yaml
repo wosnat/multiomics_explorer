@@ -49,7 +49,7 @@ hierarchy: |
   `tc_subfamily` → `tc_system`. Substrate edges leave `tc_system` nodes
   only, so a family's substrate range is the union of its systems';
   `tcdb_substrate_count` holds that range at every level (the ABC
-  superfamily `tcdb:3.A.1` reads 551). `gene_count` / `organism_count` are
+  superfamily `tcdb:3.A.1` reads 546). `gene_count` / `organism_count` are
   subtree-inclusive and count gated edges only, so a class reports
   thousands of genes while its `direct_gene_count` is 0. Most nodes are
   range-only: systems TCDB curates (and their ancestors) with no KG gene
@@ -57,9 +57,14 @@ hierarchy: |
   complete. Filter them with `min_gene_count=1` or by reading `gene_count`.
   `member_count` is TCDB's own family size. Nodes carry TCDB's transport
   `direction` (`uptake` / `export` / `unknown`, dense) and sparse
-  `direction_basis` (`abc_numbering`: ABC subfamilies 3.A.1.1-99 uptake,
-  100+ export; `tcdb_name`: the nearest node up to family level whose TCDB
-  name says import or export). The ABC superfamily has 98 children, so
+  `direction_basis` (`abc_numbering`: ABC subfamilies 3.A.1.1-99 and their
+  systems, uptake only; `tcdb_name`: a `tc_system`'s own TCDB name, with
+  secretion read as export). Direction is conservative: family and
+  subfamily names never set it, so every family, and every subfamily outside
+  the ABC uptake range, reads `unknown`; hedged, organelle or two-way names
+  and a curated override list also leave `unknown`. `superfamily` is TCDB's
+  own label, copied as is and unreliable for whole groups (most ABC
+  `3.A.1.*` node reads "ArsA ATPase (ArsA) Superfamily"). The ABC superfamily has 97 children, so
   `ontology_term_details` truncates its `children[]`.
 
 interpretation: |
@@ -97,7 +102,10 @@ pitfalls: |
     `tcdb_family_substrates_skipped` lists it.
   - TCDB curation is reported as-is: the Pst phosphate system
     `tcdb:3.A.1.7.6` is curated with triphosphate only, and catch-all
-    substrates ("molecule", "Peptide", "Protein") appear on some systems.
+    substrates ("Peptide", "Protein") appear on some systems. Coupling
+    ions (H+, Na+) and placeholders ("molecule", "ion") are filtered out
+    (`Schema_info.tcdb_substrate_excluded_targets`), so Na+/H+ antiporters
+    reach no metabolite.
   - `direction` is node-level and TCDB-stated, not a per-gene measurement;
     most nodes read `unknown`.
   - `tcdb_substrate_count` is TCDB's curated range for the node, not what

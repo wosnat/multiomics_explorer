@@ -1,11 +1,11 @@
 by_evidence_source:
 - count: 616
   evidence_source: metabolism
-- count: 136
+- count: 134
   evidence_source: transport
 - count: 74
   evidence_source: metabolomics
-- count: 46
+- count: 47
   evidence_source: go_transport
 by_kegg_brite_class:
 - count: 24
@@ -68,7 +68,7 @@ mass_stats:
   mass_max: 1920.269
   mass_median: 344.2
   mass_min: 18.039
-no_formula_excluded: 31
+no_formula_excluded: 29
 not_found:
   elements: []
   metabolite_ids: []
@@ -365,7 +365,7 @@ total_entries: 3178
 total_matching: 630
 truncated: true
 warnings:
-- 31 metabolites have no formula and can never match an element filter (often generic
+- 29 metabolites have no formula and can never match an element filter (often generic
   classes such as 'amino acid' or 'dipeptide'). Re-run without elements to inspect
   them.
 xref_coverage:

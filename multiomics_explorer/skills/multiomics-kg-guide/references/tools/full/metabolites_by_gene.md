@@ -296,7 +296,7 @@ metabolites_by_gene(locus_tags=["PMM0065"], organism="Prochlorococcus MED4", evi
       "gene_name": "mcyH",
       "product": "ABC transporter, ATPase component",
       "rows": 40,
-      "metabolite_count": 38,
+      "metabolite_count": 37,
       "reaction_count": 0,
       "transporter_count": 8,
       "metabolism_rows": 0,
@@ -308,7 +308,7 @@ metabolites_by_gene(locus_tags=["PMM0065"], organism="Prochlorococcus MED4", evi
     }
   ],
   "by_evidence_source": [{"evidence_source": "transport", "count": 40}],
-  "by_evidence_source_combination": [{"evidence_sources": ["transport"], "pair_count": 38}],
+  "by_evidence_source_combination": [{"evidence_sources": ["transport"], "pair_count": 37}],
   "by_tcdb_route": [{"tcdb_route": "direct", "count": 2}, {"tcdb_route": "family", "count": 38}],
   "tcdb_family_substrates_not_shown": null,
   "tcdb_family_substrates_skipped": [],
@@ -376,9 +376,9 @@ metabolites_by_gene(locus_tags=["PMM0065"], organism="Prochlorococcus MED4", evi
       "multi_source_gene_count": 0
     },
     {
-      "metabolite_id": "chebi:36080",
-      "name": "protein",
-      "formula": null,
+      "metabolite_id": "chebi:42478",
+      "name": "ethidium",
+      "formula": "C21H20N3",
       "gene_count": 1,
       "reaction_count": 0,
       "transporter_count": 1,
@@ -397,7 +397,7 @@ metabolites_by_gene(locus_tags=["PMM0065"], organism="Prochlorococcus MED4", evi
       "tcdb_family_name": "The Lipid Exporter (LipidE) Family",
       "level_kind": "tc_subfamily",
       "tcdb_route": "family",
-      "direction": "export",
+      "direction": "unknown",
       "gene_count": 1,
       "metabolite_count": 29
     },
@@ -406,7 +406,7 @@ metabolites_by_gene(locus_tags=["PMM0065"], organism="Prochlorococcus MED4", evi
       "tcdb_family_name": "The Protein-2 Exporter (Prot2E) Family",
       "level_kind": "tc_subfamily",
       "tcdb_route": "family",
-      "direction": "export",
+      "direction": "unknown",
       "gene_count": 1,
       "metabolite_count": 2
     },
@@ -415,7 +415,7 @@ metabolites_by_gene(locus_tags=["PMM0065"], organism="Prochlorococcus MED4", evi
       "tcdb_family_name": "The Peptide-2 Exporter (Pep2E) Family",
       "level_kind": "tc_subfamily",
       "tcdb_route": "family",
-      "direction": "export",
+      "direction": "unknown",
       "gene_count": 1,
       "metabolite_count": 1
     },
@@ -424,7 +424,7 @@ metabolites_by_gene(locus_tags=["PMM0065"], organism="Prochlorococcus MED4", evi
       "tcdb_family_name": "The Peptide-3 Exporter (Pep3E) Family",
       "level_kind": "tc_subfamily",
       "tcdb_route": "family",
-      "direction": "export",
+      "direction": "unknown",
       "gene_count": 1,
       "metabolite_count": 3
     },
@@ -433,7 +433,7 @@ metabolites_by_gene(locus_tags=["PMM0065"], organism="Prochlorococcus MED4", evi
       "tcdb_family_name": "The Drug Exporter-2 (DrugE2) Family",
       "level_kind": "tc_subfamily",
       "tcdb_route": "family",
-      "direction": "export",
+      "direction": "unknown",
       "gene_count": 1,
       "metabolite_count": 1
     },
@@ -484,7 +484,7 @@ metabolites_by_gene(locus_tags=["PMM0065"], organism="Prochlorococcus MED4", evi
   "gene_count_total": 1,
   "reaction_count_total": 0,
   "transporter_count_total": 8,
-  "metabolite_count_total": 38,
+  "metabolite_count_total": 37,
   "results": []
 }
 ```
@@ -1136,7 +1136,7 @@ metabolites_by_gene → go_transport rows with target_kind='chemical_role' → g
 
 - An empty transport arm for a gene with a TCDB call has two readings, and the warning names which one applies. (1) The gene is placed only at family or subfamily level: pass `include_tcdb_family_substrates=True` for `tcdb_route='family'` rows (phnD PMM0673 → 5 metabolites via tcdb:3.A.1.9). (2) Its only usable call is on a node curated with over 200 substrates (ABC tcdb:3.A.1, MFS tcdb:2.A.1): it is listed in `tcdb_family_substrates_skipped` and its substrate is unknown. Genes with only weak DIAMOND hits (`below_gate`) reach no substrate here; `gene_ontology_terms(..., include_weak_tcdb_hits=True)` shows them.
 
-- Family rows are a recall expansion. The walk starts from the gene's deepest `annotated` family or subfamily call, never above one of its own direct systems, and reports every curated substrate of the systems under it (`tcdb_substrate_system_count` systems per row). TCDB curation passes through as-is: catch-all substrates ("molecule", "Peptide", "Protein") appear, and pstS (PMM0710) reaches only triphosphate because TCDB curates its Pst system that way. Most remaining noise is eggNOG family calls on genes that are not transporters. `docs://analysis/transport`.
+- Family rows are a recall expansion. The walk starts from the gene's deepest `annotated` family or subfamily call, never above one of its own direct systems, and reports every curated substrate of the systems under it (`tcdb_substrate_system_count` systems per row). TCDB curation passes through as-is: catch-all substrates ("Peptide", "Protein") appear, and pstS (PMM0710) reaches only triphosphate because TCDB curates its Pst system that way. Most remaining noise is eggNOG family calls on genes that are not transporters. `docs://analysis/transport`.
 
 - Every result row has the same key set — cross-arm fields are explicitly `None` on rows from the other arm (metabolism rows have `tcdb_route`/`tcdb_calls`/`tcdb_identity`/`tcdb_direction`/`tcdb_family_id`/`tcdb_family_name` = None; transport rows have `reaction_id`/`reaction_name`/`ec_numbers`/`mass_balance` = None). Use `row['tcdb_route']` (KeyError-free) rather than `row.get('tcdb_route')` if the difference matters.
 
@@ -1162,7 +1162,7 @@ metabolites_by_gene → go_transport rows with target_kind='chemical_role' → g
 
 - When `top_metabolites` is dominated by ATP / ADP / NADH / NADPH / H2O, pass `exclude_metabolite_ids=[<kegg.compound:Cxxxxx>]` to strip the currency-cofactor noise. Set-difference semantics with `metabolite_ids` — exclude wins on overlap (silent). Per-arm scope: exclude applies on BOTH metabolism + transport arms (mirrors `metabolite_ids`). KG namespace is `kegg.compound:` (not `chebi:`).
 
-- Direction is thin. TCDB rows carry `tcdb_direction` (`uptake` / `export` / `unknown`), which is TCDB's direction for the row's node (ABC numbering, or the nearest named node up to family level), not a per-gene call; most nodes read `unknown`. The metabolism arm's `Reaction_has_metabolite` edge does not distinguish substrate from product (KEGG equation order is arbitrary). To distinguish for a gene, layer transcriptional evidence (`differential_expression_by_gene`) and functional annotation (`gene_overview` Pfam / KEGG KO names like `*-synthase` vs `*-permease`).
+- Direction is thin. TCDB rows carry `tcdb_direction` (`uptake` / `export` / `unknown`), which is TCDB's direction for the row's node (ABC uptake numbering, or a system's own name; family names never set it), not a per-gene call; most nodes, and nearly all family rows, read `unknown`. The metabolism arm's `Reaction_has_metabolite` edge does not distinguish substrate from product (KEGG equation order is arbitrary). To distinguish for a gene, layer transcriptional evidence (`differential_expression_by_gene`) and functional annotation (`gene_overview` Pfam / KEGG KO names like `*-synthase` vs `*-permease`).
 
 ```mistake
 metabolites_by_gene(locus_tags=['PMM0673'], organism='MED4')  # 0 transport rows, then reporting phnD as 'no transporter'

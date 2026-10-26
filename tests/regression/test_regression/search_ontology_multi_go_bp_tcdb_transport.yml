@@ -10,9 +10,9 @@ by_ontology:
   truncated: true
 - ontology: tcdb
   returned: 5
-  score_max: 4.514525413513184
-  total_entries: 9370
-  total_matching: 521
+  score_max: 7.3615570068359375
+  total_entries: 9368
+  total_matching: 526
   truncated: true
 case_id: search_ontology_multi_go_bp_tcdb_transport
 mode: search
@@ -59,29 +59,13 @@ results:
   organism_count: 43
   score: 1.3548
 - gene_count: 0
-  id: tcdb:1.A.35.1.3
+  id: tcdb:1.A.1.29.5
   is_informative: true
   level: 4
-  name: Magnesium transport protein CorA
+  name: Ion transport 2 domain-containing protein of 345 aas and 2 TMSs
   ontology_type: tcdb
   organism_count: 0
-  score: 4.3225
-- gene_count: 0
-  id: tcdb:2.A.1.1.100
-  is_informative: true
-  level: 4
-  name: Probable metabolite transport protein YFL040W
-  ontology_type: tcdb
-  organism_count: 0
-  score: 4.1489
-- gene_count: 0
-  id: tcdb:2.A.1.1.101
-  is_informative: true
-  level: 4
-  name: Probable metabolite transport protein YDR387C
-  ontology_type: tcdb
-  organism_count: 0
-  score: 4.1489
+  score: 5.9985
 - gene_count: 0
   id: tcdb:2.A.39.1.7
   is_informative: true
@@ -89,7 +73,15 @@ results:
   name: Putative transmembrane transport protein
   ontology_type: tcdb
   organism_count: 0
-  score: 4.3225
+  score: 7.3616
+- gene_count: 0
+  id: tcdb:2.A.55.3.4
+  is_informative: true
+  level: 4
+  name: Putative metal ion transport protein
+  ontology_type: tcdb
+  organism_count: 0
+  score: 7.0202
 - gene_count: 0
   id: tcdb:3.A.1.1.36
   is_informative: true
@@ -97,13 +89,22 @@ results:
   name: Putative transport system
   ontology_type: tcdb
   organism_count: 0
-  score: 4.5145
+  score: 6.6627
+- gene_count: 0
+  id: tcdb:9.B.14.2.5
+  is_informative: true
+  level: 4
+  name: ABC-type cytochrome c biogenesis putative heme transport system permease component
+    C of 234 aas
+  ontology_type: tcdb
+  organism_count: 0
+  score: 5.2648
 returned: 10
 row_count: 10
-score_max: 4.514525413513184
-score_median: 2.8362488746643066
+score_max: 7.3615570068359375
+score_median: 3.394239902496338
 skipped_ontologies: []
-total_entries: 12692
-total_matching: 845
+total_entries: 12690
+total_matching: 850
 truncated: true
 warnings: []

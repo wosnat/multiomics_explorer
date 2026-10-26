@@ -1941,10 +1941,10 @@ class TestMetabolitesByGeneNoFormulaContract:
 
     def test_transporter_gene_reports_no_formula(self, conn):
         r = api.metabolites_by_gene(
-            # PMM0203 replaces PMM0913 (ABC-superfamily-only: no direct TCDB
-            # rows post-3a); its direct transport arm reaches 1 formula-less
-            # target under metabolite_elements=['N'].
-            locus_tags=["PMM0203", "PMM0331", "PMM1590"], organism=self._ORG,
+            # PMM0709 replaces PMM0203 (2026-10-26T04:21Z: its direct system's only
+            # substrate was a placeholder the TCDB substrate filter drops);
+            # PMM0709 reaches formula-less Fe(III)-complexed siderophore.
+            locus_tags=["PMM0709", "PMM0331", "PMM1590"], organism=self._ORG,
             metabolite_elements=["N"], summary=True, conn=conn,
         )
         assert isinstance(r["no_formula_excluded"], int)

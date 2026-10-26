@@ -296,7 +296,7 @@ gene_ontology_terms(locus_tags=["PMM0392"], organism="MED4", ontology=["tcdb", "
     },
     {
       "term_id": "tcdb:3.A.1.32",
-      "term_name": "The Cobalamin Precursor (B 12 -P) Family",
+      "term_name": "The Cobalamin Precursor (B12-P) Family",
       "level": 3,
       "ontology_type": "tcdb",
       "count": 1
@@ -416,7 +416,7 @@ gene_ontology_terms(locus_tags=["PMM0372", "PMM0710"], organism="MED4", ontology
     },
     {
       "term_id": "tcdb:3.A.1.7.6",
-      "term_name": "High affinity phosphate-specific transporter, PstABCS, where PstA (AAZ57802) = 304 aas with 6 TMSs, PstB (AAZ57801) =...",
+      "term_name": "High affinity phosphate-specific transporter, PstABCS, where PstA = 304 aas with 6 TMSs, PstB = 267 aas with 0 TMSs, ...",
       "level": 4,
       "ontology_type": "tcdb",
       "count": 1
@@ -489,7 +489,7 @@ gene_ontology_terms(locus_tags=["PMM0372", "PMM0710"], organism="MED4", ontology
     {
       "locus_tag": "PMM0710",
       "term_id": "tcdb:3.A.1.7.6",
-      "term_name": "High affinity phosphate-specific transporter, PstABCS, where PstA (AAZ57802) = 304 aas with 6 TMSs, PstB (AAZ57801) =...",
+      "term_name": "High affinity phosphate-specific transporter, PstABCS, where PstA = 304 aas with 6 TMSs, PstB = 267 aas with 0 TMSs, ...",
       "level": 4,
       "is_informative": true,
       "ontology_type": "tcdb",
@@ -718,7 +718,7 @@ gene_ontology_terms(locus_tags=["PMM0392"], organism="MED4", ontology=["tcdb", "
     },
     {
       "term_id": "tcdb:3.A.1.32",
-      "term_name": "The Cobalamin Precursor (B 12 -P) Family",
+      "term_name": "The Cobalamin Precursor (B12-P) Family",
       "level": 3,
       "ontology_type": "tcdb",
       "count": 1

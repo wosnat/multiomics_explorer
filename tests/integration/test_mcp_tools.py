@@ -2627,7 +2627,7 @@ class TestListMetabolites:
         keep_separate; → 1694 at the 2026-10-18T18:40Z GO-transport rebuild:
         2 of the 29 new GO-substrate nodes carry N)."""
         result = api.list_metabolites(elements=["N"], conn=conn)
-        assert result["total_matching"] == 1663  # 1694 → 1663 2026-10-24T17:33Z: TCDB 3a removed 65 transport-only metabolites
+        assert result["total_matching"] == 1673  # 1694 → 1663 2026-10-24T17:33Z: TCDB 3a removed 65 transport-only metabolites → 1673 2026-10-26T04:21Z: 10 N-bearing generic forms added (TCDB review)
 
     def test_elements_n_and_p_filter(self, conn):
         """Multi-element AND filter (must contain both N and P)."""
@@ -2693,7 +2693,7 @@ class TestListMetabolites:
         result = api.list_metabolites(
             evidence_sources=["transport"], conn=conn,
         )
-        assert result["total_matching"] == 1285  # 1382 → 1285 2026-10-24T17:33Z: 'transport' = substrate of a kept TCDB system (65 removed, 31 lost the tag)
+        assert result["total_matching"] == 1282  # 1382 → 1285 2026-10-24T17:33Z: 'transport' = substrate of a kept TCDB system (65 removed, 31 lost the tag) → 1282 2026-10-26T04:21Z: TCDB substrate filter
 
     def test_summary_mode_empty_results_envelope_populated(self, conn, kg_count):
         """summary=True returns no result rows but envelope is populated."""
@@ -2945,21 +2945,22 @@ class TestTcdbDirectGateCrossToolAgreement:
     def test_list_metabolites_transporter_gene_count_closes_trap_loop(self, conn, kg_count):
         """list_metabolites row `transporter_gene_count` == the KG's gated
         precompute; the transport-only trap loop (catalyst 0, transporter
-        > 0) is pinned on sodium cation (kegg.compound:C01330)."""
+        > 0) is pinned on tetracycline (kegg.compound:C06570; was sodium
+        cation C01330, removed 2026-10-26T04:21Z by the TCDB substrate filter)."""
         rows = api.list_metabolites(
-            metabolite_ids=["kegg.compound:C00031", "kegg.compound:C01330"],
+            metabolite_ids=["kegg.compound:C00031", "kegg.compound:C06570"],
             limit=10, conn=conn,
         )["results"]
         by_id = {r["metabolite_id"]: r for r in rows}
         glucose = by_id["kegg.compound:C00031"]
         assert glucose["transporter_gene_count"] == kg_count(
             "MATCH (m:Metabolite {id: 'kegg.compound:C00031'}) RETURN m.transporter_gene_count")
-        sodium = by_id["kegg.compound:C01330"]
-        assert sodium["catalyst_gene_count"] == 0
-        assert sodium["transporter_gene_count"] == kg_count(
-            "MATCH (m:Metabolite {id: 'kegg.compound:C01330'}) RETURN m.transporter_gene_count")
-        assert sodium["transporter_gene_count"] > 0
-        assert sodium["evidence_sources"] == ["transport"]
+        tet = by_id["kegg.compound:C06570"]
+        assert tet["catalyst_gene_count"] == 0
+        assert tet["transporter_gene_count"] == kg_count(
+            "MATCH (m:Metabolite {id: 'kegg.compound:C06570'}) RETURN m.transporter_gene_count")
+        assert tet["transporter_gene_count"] > 0
+        assert tet["evidence_sources"] == ["transport"]
 
     def test_list_organisms_med4_transported_metabolite_count(self, conn):
         """list_organisms: MED4 transported_metabolite_count > 0 on the row
@@ -4077,7 +4078,7 @@ class TestOntologyTermDetailsLive:
         row = rows["tcdb:3.A.1"]
         assert row["ontology"] == "tcdb"
         assert len(row["parents"]) == 1
-        assert row["children_total"] == 98  # 55 → 98 2026-10-24T17:33Z: TCDB 3a keeps range-only subfamilies
+        assert row["children_total"] == 97  # 55 → 98 2026-10-24T17:33Z: TCDB 3a keeps range-only subfamilies → 97 2026-10-26T04:21Z: 3.A.1.129 re-anchored
         assert len(row["children"]) == 50
         assert row["children_truncated"] is True
         # 129 → 128 2026-10-18: GO update retired go:0005548 (its 3.A.1 bridge went with it).
@@ -4843,7 +4844,7 @@ class TestMetaboliteIdentitySurface:
     @pytest.mark.parametrize("kwargs", [
         {"chebi_ids": ["chebi:14654"]},
         {"chebi_ids": ["17632"]},
-        {"mnxm_ids": ["mnx:MNXM732398"]},
+        {"mnxm_ids": ["mnx:MNXM732399"]},  # MNXM732398 left nitrate 2026-10-26T04:21Z
     ])
     def test_xref_filters_find_nitrate(self, conn, kwargs):
         out = api.list_metabolites(conn=conn, **kwargs)
@@ -4869,7 +4870,7 @@ class TestMetaboliteIdentitySurface:
             structure_kind=["generic", "polymer"], summary=True, conn=conn)
         # 650 → 675 2026-10-18T18:40Z: 25 of the 29 new GO-substrate nodes are generic.
         # 675 → 655 2026-10-24T17:33Z: TCDB 3a removed transport-only metabolites.
-        assert out["total_matching"] == 655
+        assert out["total_matching"] == 647  # 655 → 647 2026-10-26T04:21Z: TCDB review re-keys
 
     def test_kegg_functional_category_peptides(self, conn):
         out = api.list_metabolites(
@@ -4905,23 +4906,23 @@ class TestMetaboliteIdentitySurface:
         out = api.list_metabolites(summary=True, conn=conn)
         # +29 GO-substrate nodes 2026-10-18T18:40Z (4 defined, 25 generic).
         assert out["by_kegg_functional_category"][-1] == {
-            "kegg_functional_category": "not classified", "count": 2855}  # 2026-10-24T17:33Z: TCDB 3a removals
+            "kegg_functional_category": "not classified", "count": 2857}  # 2026-10-24T17:33Z: TCDB 3a removals; 2026-10-26T04:21Z: TCDB review re-keys
         assert out["by_kegg_brite_class"][-1] == {
             "kegg_brite_class": "not classified", "count": 2544}
         assert {b["structure_kind"]: b["count"]
                 for b in out["by_structure_kind"]} == {
-            "defined": 2523, "generic": 630, "polymer": 25}
+            "defined": 2531, "generic": 622, "polymer": 25}
 
     def test_transport_n_breakdown(self, conn):
         out = api.list_metabolites(
             evidence_sources=["transport"], elements=["N"], summary=True,
             conn=conn)
-        assert out["total_matching"] == 620  # 672 → 620 2026-10-24T17:33Z: TCDB 3a
+        assert out["total_matching"] == 628  # 672 → 620 2026-10-24T17:33Z: TCDB 3a → 628 2026-10-26T04:21Z: generic forms added
         assert {b["structure_kind"]: b["count"]
                 for b in out["by_structure_kind"]} == {
-            "defined": 559, "generic": 57, "polymer": 4}
+            "defined": 566, "generic": 58, "polymer": 4}
         assert out["by_kegg_functional_category"][-1] == {
-            "kegg_functional_category": "not classified", "count": 491}
+            "kegg_functional_category": "not classified", "count": 501}
 
     def test_unknown_brite_class_warns_and_matches_nothing(self, conn):
         out = api.list_metabolites(
@@ -5479,7 +5480,6 @@ class TestGoTransportGenesByMetabolite:
 
     @pytest.mark.parametrize("mid,metabolism_rows", [
         ("kegg.compound:C00080", 250),   # GO 0 + metabolism 250 + TCDB direct
-        ("kegg.compound:C01330", 0),     # GO 0 + TCDB direct
     ])
     def test_gbm_excluded_target_with_node(self, conn, mid, metabolism_rows):
         r = api.genes_by_metabolite([mid], _GOT_MED4, limit=1, conn=conn)
@@ -5600,25 +5600,25 @@ class TestGoTransportMetabolitesByGene:
         kw = dict(evidence_sources=["go_transport"], limit=500, conn=conn)
         full = api.metabolites_by_gene(
             tags, _GOT_MED4, go_include_ancestors=True, **kw)
-        assert full["total_matching"] == 199
+        assert full["total_matching"] == 206  # 199 → 206 2026-10-26T04:21Z: GO:0071806 → Protein
         assert any(x["target_kind"] == "chemical_role" for x in full["results"])
         n = api.metabolites_by_gene(
             tags, _GOT_MED4, go_include_ancestors=True,
             metabolite_elements=["N"], **kw)
-        assert n["total_matching"] == 46
+        assert n["total_matching"] == 53
         assert all(x["target_kind"] == "metabolite" for x in n["results"])
         assert n["rows_by_go_term_depth"] == [
-            {"go_term_depth": 0, "count": 43}, {"go_term_depth": 1, "count": 3}]
+            {"go_term_depth": 0, "count": 45}, {"go_term_depth": 1, "count": 8}]
         direct = api.metabolites_by_gene(
             tags, _GOT_MED4, metabolite_elements=["N"], **kw)
-        assert direct["total_matching"] == 43
+        assert direct["total_matching"] == 45
 
     @pytest.mark.parametrize("kwargs,expected", [
-        ({}, 126),
+        ({}, 128),  # +2 each 2026-10-26T04:21Z: GO:0071806 → Protein
         ({"gene_categories": ["Transport"]}, 40),
         ({"metabolite_pathway_ids": ["kegg.pathway:ko02010"]}, 58),
-        ({"exclude_metabolite_ids": ["kegg.compound:C00086"]}, 115),
-        ({"metabolite_elements": ["N"]}, 43),
+        ({"exclude_metabolite_ids": ["kegg.compound:C00086"]}, 117),
+        ({"metabolite_elements": ["N"]}, 45),
         ({"metabolite_ids": ["kegg.compound:C00086"]}, 11),
     ])
     def test_mbg_shared_filters_change_go_arm(self, conn, kwargs, expected):
@@ -5736,14 +5736,14 @@ class TestGoTransportPassThroughs:
         """Spec §7.6: organism filter unions go_transport_organism_names."""
         r = api.list_metabolites(
             organism_names=[_GOT_MED4], summary=True, conn=conn)
-        assert r["total_matching"] == 1092  # 1891 → 1092 2026-10-24T17:33Z: MED4 transport arm now direct systems only
+        assert r["total_matching"] == 1089  # 1891 → 1092 2026-10-24T17:33Z: MED4 transport arm now direct systems only → 1089 2026-10-26T04:21Z: TCDB substrate filter
         top = {o["organism_name"]: o["count"] for o in r["top_organisms"]}
-        assert top[_GOT_MED4] == 1092
+        assert top[_GOT_MED4] == 1089
 
     def test_list_metabolites_go_transport_source(self, conn):
         r = api.list_metabolites(
             evidence_sources=["go_transport"], summary=True, conn=conn)
-        assert r["total_matching"] == 208
+        assert r["total_matching"] == 212  # 208 → 212 2026-10-26T04:21Z: Protein + TCDB review re-keys
         both = api.list_metabolites(
             evidence_sources=["go_transport"], organism_names=[_GOT_MED4],
             summary=True, conn=conn)
@@ -5760,7 +5760,7 @@ class TestGoTransportPassThroughs:
     def test_kg_release_info_carries_excluded_targets(self, conn):
         r = api.kg_release_info(conn)
         excluded = r["kg"]["go_transport_excluded_targets"]
-        assert len(excluded) == 13
+        assert len(excluded) == 12  # 13 → 12 2026-10-26T04:21Z: Na+ now chebi:29101
         assert "kegg.compound:C00080" in excluded
         assert "chebi:23906" in excluded
 

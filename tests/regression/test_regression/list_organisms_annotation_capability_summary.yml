@@ -69,7 +69,7 @@ results:
   experiment_count: 60
   gene_count: 4305
   genus: Alteromonas
-  go_transport_metabolite_count: 72
+  go_transport_metabolite_count: 75
   growth_phases:
   - darkness
   - exponential
@@ -89,7 +89,7 @@ results:
   reference_proteome: UP000262181
   species: null
   strain: Alt_MarRef
-  transported_metabolite_count: 136
+  transported_metabolite_count: 128
   treatment_types:
   - carbon
 - background_factors:
@@ -158,7 +158,7 @@ results:
   experiment_count: 118
   gene_count: 1973
   genus: Prochlorococcus
-  go_transport_metabolite_count: 45
+  go_transport_metabolite_count: 46
   growth_phases:
   - acclimated_steady_state
   - acute_stress
@@ -188,7 +188,7 @@ results:
   reaction_count: 943
   species: Prochlorococcus marinus
   strain: MED4
-  transported_metabolite_count: 43
+  transported_metabolite_count: 39
   treatment_types:
   - carbon
   - coculture
@@ -221,15 +221,15 @@ top_annotation_capability:
   preferred_name: Prochlorococcus MED4
 top_metabolic_capability:
 - catalyzed_metabolite_count: 1356
-  go_transport_metabolite_count: 72
+  go_transport_metabolite_count: 75
   organism_name: Alteromonas (MarRef v6)
   reaction_count: 1263
-  transported_metabolite_count: 136
+  transported_metabolite_count: 128
 - catalyzed_metabolite_count: 1039
-  go_transport_metabolite_count: 45
+  go_transport_metabolite_count: 46
   organism_name: Prochlorococcus MED4
   reaction_count: 943
-  transported_metabolite_count: 43
+  transported_metabolite_count: 39
 total_entries: 47
 total_matching: 3
 truncated: false

@@ -45,7 +45,7 @@ rows:
   experiment_count: 60
   gene_count: 4305
   genus: Alteromonas
-  go_transport_metabolite_count: 72
+  go_transport_metabolite_count: 75
   growth_phases:
   - darkness
   - exponential
@@ -65,7 +65,7 @@ rows:
   reference_proteome: UP000262181
   species: null
   strain: Alt_MarRef
-  transported_metabolite_count: 136
+  transported_metabolite_count: 128
   treatment_types:
   - carbon
 - background_factors:
@@ -83,7 +83,7 @@ rows:
   experiment_count: 6
   gene_count: 3929
   genus: Alteromonas
-  go_transport_metabolite_count: 82
+  go_transport_metabolite_count: 85
   growth_phases: []
   interpro_gene_count: 3495
   measured_metabolite_count: 0
@@ -101,7 +101,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: AD45
-  transported_metabolite_count: 152
+  transported_metabolite_count: 144
   treatment_types:
   - compartment
 - background_factors:
@@ -119,7 +119,7 @@ rows:
   experiment_count: 6
   gene_count: 3834
   genus: Alteromonas
-  go_transport_metabolite_count: 86
+  go_transport_metabolite_count: 89
   growth_phases: []
   interpro_gene_count: 3456
   measured_metabolite_count: 0
@@ -137,7 +137,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: ATCC27126
-  transported_metabolite_count: 161
+  transported_metabolite_count: 153
   treatment_types:
   - compartment
 - background_factors:
@@ -155,7 +155,7 @@ rows:
   experiment_count: 6
   gene_count: 4063
   genus: Alteromonas
-  go_transport_metabolite_count: 93
+  go_transport_metabolite_count: 96
   growth_phases: []
   interpro_gene_count: 3608
   measured_metabolite_count: 0
@@ -173,7 +173,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: BGP6
-  transported_metabolite_count: 159
+  transported_metabolite_count: 151
   treatment_types:
   - compartment
 - background_factors:
@@ -191,7 +191,7 @@ rows:
   experiment_count: 6
   gene_count: 3741
   genus: Alteromonas
-  go_transport_metabolite_count: 80
+  go_transport_metabolite_count: 83
   growth_phases: []
   interpro_gene_count: 3349
   measured_metabolite_count: 0
@@ -209,7 +209,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: BS11
-  transported_metabolite_count: 156
+  transported_metabolite_count: 148
   treatment_types:
   - compartment
 - background_factors:
@@ -229,7 +229,7 @@ rows:
   experiment_count: 16
   gene_count: 4136
   genus: Alteromonas
-  go_transport_metabolite_count: 98
+  go_transport_metabolite_count: 101
   growth_phases:
   - acclimated_steady_state
   - exponential
@@ -251,7 +251,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: EZ55
-  transported_metabolite_count: 155
+  transported_metabolite_count: 147
   treatment_types:
   - carbon
   - coculture
@@ -273,7 +273,7 @@ rows:
   experiment_count: 21
   gene_count: 4028
   genus: Alteromonas
-  go_transport_metabolite_count: 85
+  go_transport_metabolite_count: 88
   growth_phases:
   - death
   - exponential
@@ -296,7 +296,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: HOT1A3
-  transported_metabolite_count: 151
+  transported_metabolite_count: 142
   treatment_types:
   - coculture
   - compartment
@@ -321,7 +321,7 @@ rows:
   experiment_count: 14
   gene_count: 4028
   genus: Alteromonas
-  go_transport_metabolite_count: 88
+  go_transport_metabolite_count: 91
   growth_phases:
   - darkness
   - diel
@@ -344,7 +344,7 @@ rows:
   reference_proteome: null
   species: Alteromonas macleodii
   strain: MIT1002
-  transported_metabolite_count: 151
+  transported_metabolite_count: 142
   treatment_types:
   - coculture
   - compartment
@@ -361,7 +361,7 @@ rows:
   experiment_count: 0
   gene_count: 3817
   genus: Alteromonas
-  go_transport_metabolite_count: 94
+  go_transport_metabolite_count: 97
   growth_phases: []
   interpro_gene_count: 3363
   measured_metabolite_count: 0
@@ -378,7 +378,7 @@ rows:
   reference_proteome: null
   species: Alteromonas mediterranea
   strain: AltDE
-  transported_metabolite_count: 148
+  transported_metabolite_count: 140
   treatment_types: []
 - background_factors: []
   catalyzed_metabolite_count: 1324
@@ -391,7 +391,7 @@ rows:
   experiment_count: 0
   gene_count: 4238
   genus: Alteromonas
-  go_transport_metabolite_count: 87
+  go_transport_metabolite_count: 90
   growth_phases: []
   interpro_gene_count: 3621
   measured_metabolite_count: 0
@@ -408,7 +408,7 @@ rows:
   reference_proteome: null
   species: Alteromonas mediterranea
   strain: AltDE1
-  transported_metabolite_count: 157
+  transported_metabolite_count: 148
   treatment_types: []
 - background_factors:
   - light
@@ -459,7 +459,7 @@ rows:
   experiment_count: 60
   gene_count: 4240
   genus: Marinobacter
-  go_transport_metabolite_count: 103
+  go_transport_metabolite_count: 106
   growth_phases:
   - darkness
   - exponential
@@ -479,7 +479,7 @@ rows:
   reference_proteome: GCF_000166295.1
   species: Marinobacter adhaerens
   strain: HP15
-  transported_metabolite_count: 166
+  transported_metabolite_count: 161
   treatment_types:
   - carbon
 - background_factors:
@@ -495,7 +495,7 @@ rows:
   experiment_count: 1
   gene_count: 2884
   genus: Meiothermus
-  go_transport_metabolite_count: 64
+  go_transport_metabolite_count: 65
   growth_phases: []
   interpro_gene_count: 2492
   measured_metabolite_count: 0
@@ -513,7 +513,7 @@ rows:
   reference_proteome: null
   species: null
   strain: MruberA
-  transported_metabolite_count: 122
+  transported_metabolite_count: 117
   treatment_types:
   - light
   - oxygen
@@ -572,7 +572,7 @@ rows:
   experiment_count: 1
   gene_count: 1945
   genus: Prochlorococcus
-  go_transport_metabolite_count: 41
+  go_transport_metabolite_count: 42
   growth_phases:
   - acclimated_steady_state
   interpro_gene_count: 1547
@@ -591,7 +591,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: AS9601
-  transported_metabolite_count: 39
+  transported_metabolite_count: 35
   treatment_types:
   - salt
 - background_factors:
@@ -621,7 +621,7 @@ rows:
   experiment_count: 118
   gene_count: 1973
   genus: Prochlorococcus
-  go_transport_metabolite_count: 45
+  go_transport_metabolite_count: 46
   growth_phases:
   - acclimated_steady_state
   - acute_stress
@@ -653,7 +653,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MED4
-  transported_metabolite_count: 43
+  transported_metabolite_count: 39
   treatment_types:
   - carbon
   - coculture
@@ -681,7 +681,7 @@ rows:
   experiment_count: 3
   gene_count: 2111
   genus: Prochlorococcus
-  go_transport_metabolite_count: 34
+  go_transport_metabolite_count: 35
   growth_phases:
   - acute_stress
   interpro_gene_count: 1600
@@ -700,7 +700,7 @@ rows:
   reference_proteome: null
   species: null
   strain: MIT0604
-  transported_metabolite_count: 40
+  transported_metabolite_count: 36
   treatment_types:
   - chemical
   - light
@@ -716,7 +716,7 @@ rows:
   experiment_count: 6
   gene_count: 2330
   genus: Prochlorococcus
-  go_transport_metabolite_count: 37
+  go_transport_metabolite_count: 38
   growth_phases: []
   interpro_gene_count: 1616
   measured_metabolite_count: 92
@@ -734,7 +734,7 @@ rows:
   reference_proteome: null
   species: null
   strain: MIT0801
-  transported_metabolite_count: 49
+  transported_metabolite_count: 44
   treatment_types:
   - growth_phase
   - phosphorus
@@ -750,7 +750,7 @@ rows:
   experiment_count: 0
   gene_count: 1883
   genus: Prochlorococcus
-  go_transport_metabolite_count: 25
+  go_transport_metabolite_count: 26
   growth_phases: []
   interpro_gene_count: 1541
   measured_metabolite_count: 0
@@ -767,7 +767,7 @@ rows:
   reference_proteome: null
   species: null
   strain: MIT1314
-  transported_metabolite_count: 39
+  transported_metabolite_count: 35
   treatment_types: []
 - background_factors: []
   catalyzed_metabolite_count: 1084
@@ -780,7 +780,7 @@ rows:
   experiment_count: 0
   gene_count: 2452
   genus: Prochlorococcus
-  go_transport_metabolite_count: 43
+  go_transport_metabolite_count: 44
   growth_phases: []
   interpro_gene_count: 1923
   measured_metabolite_count: 0
@@ -797,7 +797,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT1327
-  transported_metabolite_count: 81
+  transported_metabolite_count: 76
   treatment_types: []
 - background_factors: []
   catalyzed_metabolite_count: 1014
@@ -810,7 +810,7 @@ rows:
   experiment_count: 0
   gene_count: 2005
   genus: Prochlorococcus
-  go_transport_metabolite_count: 38
+  go_transport_metabolite_count: 39
   growth_phases: []
   interpro_gene_count: 1529
   measured_metabolite_count: 0
@@ -827,7 +827,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9202
-  transported_metabolite_count: 38
+  transported_metabolite_count: 34
   treatment_types: []
 - background_factors: []
   catalyzed_metabolite_count: 1048
@@ -840,7 +840,7 @@ rows:
   experiment_count: 0
   gene_count: 2022
   genus: Prochlorococcus
-  go_transport_metabolite_count: 41
+  go_transport_metabolite_count: 42
   growth_phases: []
   interpro_gene_count: 1580
   measured_metabolite_count: 0
@@ -857,7 +857,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9215
-  transported_metabolite_count: 39
+  transported_metabolite_count: 35
   treatment_types: []
 - background_factors:
   - axenic
@@ -875,7 +875,7 @@ rows:
   experiment_count: 8
   gene_count: 1926
   genus: Prochlorococcus
-  go_transport_metabolite_count: 45
+  go_transport_metabolite_count: 46
   growth_phases:
   - exponential
   interpro_gene_count: 1537
@@ -895,7 +895,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9301
-  transported_metabolite_count: 40
+  transported_metabolite_count: 36
   treatment_types:
   - growth_phase
   - phosphorus
@@ -914,7 +914,7 @@ rows:
   experiment_count: 4
   gene_count: 3091
   genus: Prochlorococcus
-  go_transport_metabolite_count: 52
+  go_transport_metabolite_count: 53
   growth_phases:
   - exponential
   interpro_gene_count: 2015
@@ -934,7 +934,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9303
-  transported_metabolite_count: 81
+  transported_metabolite_count: 76
   treatment_types:
   - carbon
 - background_factors:
@@ -955,7 +955,7 @@ rows:
   experiment_count: 27
   gene_count: 1970
   genus: Prochlorococcus
-  go_transport_metabolite_count: 44
+  go_transport_metabolite_count: 45
   growth_phases:
   - acclimated_steady_state
   - acute_stress
@@ -980,7 +980,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9312
-  transported_metabolite_count: 46
+  transported_metabolite_count: 42
   treatment_types:
   - carbon
   - coculture
@@ -1007,7 +1007,7 @@ rows:
   experiment_count: 39
   gene_count: 2906
   genus: Prochlorococcus
-  go_transport_metabolite_count: 53
+  go_transport_metabolite_count: 54
   growth_phases:
   - acute_stress
   - exponential
@@ -1033,7 +1033,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9313
-  transported_metabolite_count: 77
+  transported_metabolite_count: 72
   treatment_types:
   - carbon
   - coculture
@@ -1054,7 +1054,7 @@ rows:
   experiment_count: 0
   gene_count: 1945
   genus: Prochlorococcus
-  go_transport_metabolite_count: 40
+  go_transport_metabolite_count: 41
   growth_phases: []
   interpro_gene_count: 1538
   measured_metabolite_count: 0
@@ -1071,7 +1071,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9515
-  transported_metabolite_count: 45
+  transported_metabolite_count: 41
   treatment_types: []
 - background_factors:
   - axenic
@@ -1087,7 +1087,7 @@ rows:
   experiment_count: 2
   gene_count: 2221
   genus: Prochlorococcus
-  go_transport_metabolite_count: 46
+  go_transport_metabolite_count: 47
   growth_phases:
   - acclimated_steady_state
   interpro_gene_count: 1573
@@ -1106,7 +1106,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: NATL1A
-  transported_metabolite_count: 49
+  transported_metabolite_count: 44
   treatment_types:
   - salt
 - background_factors:
@@ -1130,7 +1130,7 @@ rows:
   experiment_count: 17
   gene_count: 2210
   genus: Prochlorococcus
-  go_transport_metabolite_count: 44
+  go_transport_metabolite_count: 45
   growth_phases:
   - acute_stress
   - darkness
@@ -1158,7 +1158,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: NATL2A
-  transported_metabolite_count: 49
+  transported_metabolite_count: 44
   treatment_types:
   - coculture
   - darkness
@@ -1176,7 +1176,7 @@ rows:
   experiment_count: 0
   gene_count: 2317
   genus: Prochlorococcus
-  go_transport_metabolite_count: 39
+  go_transport_metabolite_count: 40
   growth_phases: []
   interpro_gene_count: 1563
   measured_metabolite_count: 0
@@ -1193,7 +1193,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: PAC1
-  transported_metabolite_count: 49
+  transported_metabolite_count: 44
   treatment_types: []
 - background_factors: []
   catalyzed_metabolite_count: 1043
@@ -1207,7 +1207,7 @@ rows:
   experiment_count: 0
   gene_count: 1870
   genus: Prochlorococcus
-  go_transport_metabolite_count: 29
+  go_transport_metabolite_count: 30
   growth_phases: []
   interpro_gene_count: 1550
   measured_metabolite_count: 0
@@ -1224,7 +1224,7 @@ rows:
   reference_proteome: null
   species: null
   strain: RSP50
-  transported_metabolite_count: 45
+  transported_metabolite_count: 41
   treatment_types: []
 - background_factors: []
   catalyzed_metabolite_count: 1025
@@ -1237,7 +1237,7 @@ rows:
   experiment_count: 0
   gene_count: 1950
   genus: Prochlorococcus
-  go_transport_metabolite_count: 43
+  go_transport_metabolite_count: 44
   growth_phases: []
   interpro_gene_count: 1525
   measured_metabolite_count: 0
@@ -1254,7 +1254,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: SB
-  transported_metabolite_count: 43
+  transported_metabolite_count: 39
   treatment_types: []
 - background_factors:
   - axenic
@@ -1273,7 +1273,7 @@ rows:
   experiment_count: 64
   gene_count: 1959
   genus: Prochlorococcus
-  go_transport_metabolite_count: 37
+  go_transport_metabolite_count: 38
   growth_phases:
   - acute_stress
   - darkness
@@ -1295,7 +1295,7 @@ rows:
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: SS120
-  transported_metabolite_count: 48
+  transported_metabolite_count: 43
   treatment_types:
   - carbon
   - nitrogen
@@ -1312,7 +1312,7 @@ rows:
   experiment_count: 4
   gene_count: 5487
   genus: Pseudomonas
-  go_transport_metabolite_count: 144
+  go_transport_metabolite_count: 147
   growth_phases:
   - exponential
   interpro_gene_count: 4961
@@ -1332,7 +1332,7 @@ rows:
   reference_proteome: null
   species: Pseudomonas putida
   strain: KT2440
-  transported_metabolite_count: 285
+  transported_metabolite_count: 279
   treatment_types:
   - coculture
 - background_factors:
@@ -1350,7 +1350,7 @@ rows:
   experiment_count: 9
   gene_count: 4368
   genus: Ruegeria
-  go_transport_metabolite_count: 82
+  go_transport_metabolite_count: 83
   growth_phases:
   - acclimated_steady_state
   - exponential
@@ -1373,7 +1373,7 @@ rows:
   reference_proteome: null
   species: Ruegeria pomeroyi
   strain: DSS-3
-  transported_metabolite_count: 160
+  transported_metabolite_count: 154
   treatment_types:
   - coculture
 - background_factors:
@@ -1388,7 +1388,7 @@ rows:
   experiment_count: 6
   gene_count: 4058
   genus: Shewanella
-  go_transport_metabolite_count: 106
+  go_transport_metabolite_count: 110
   growth_phases:
   - acclimated_steady_state
   interpro_gene_count: 3636
@@ -1407,7 +1407,7 @@ rows:
   reference_proteome: null
   species: Shewanella sp.
   strain: W3-18-1
-  transported_metabolite_count: 203
+  transported_metabolite_count: 195
   treatment_types:
   - carbon
   - coculture
@@ -1425,7 +1425,7 @@ rows:
   experiment_count: 11
   gene_count: 3038
   genus: Synechococcus
-  go_transport_metabolite_count: 38
+  go_transport_metabolite_count: 39
   growth_phases:
   - exponential
   interpro_gene_count: 2152
@@ -1444,7 +1444,7 @@ rows:
   reference_proteome: null
   species: null
   strain: CC9311
-  transported_metabolite_count: 87
+  transported_metabolite_count: 83
   treatment_types:
   - carbon
   - coculture
@@ -1460,7 +1460,7 @@ rows:
   experiment_count: 6
   gene_count: 3207
   genus: Picosynechococcus
-  go_transport_metabolite_count: 47
+  go_transport_metabolite_count: 48
   growth_phases:
   - acclimated_steady_state
   interpro_gene_count: 2721
@@ -1479,7 +1479,7 @@ rows:
   reference_proteome: null
   species: null
   strain: PCC7002
-  transported_metabolite_count: 98
+  transported_metabolite_count: 90
   treatment_types:
   - carbon
   - coculture
@@ -1499,7 +1499,7 @@ rows:
   experiment_count: 73
   gene_count: 2590
   genus: Synechococcus
-  go_transport_metabolite_count: 29
+  go_transport_metabolite_count: 30
   growth_phases:
   - acclimated_steady_state
   - darkness
@@ -1526,7 +1526,7 @@ rows:
   reference_proteome: null
   species: null
   strain: WH7803
-  transported_metabolite_count: 84
+  transported_metabolite_count: 79
   treatment_types:
   - carbon
   - coculture
@@ -1547,7 +1547,7 @@ rows:
   experiment_count: 77
   gene_count: 2830
   genus: Parasynechococcus
-  go_transport_metabolite_count: 61
+  go_transport_metabolite_count: 62
   growth_phases:
   - darkness
   - exponential
@@ -1571,7 +1571,7 @@ rows:
   reference_proteome: null
   species: Parasynechococcus marenigrum
   strain: WH8102
-  transported_metabolite_count: 82
+  transported_metabolite_count: 78
   treatment_types:
   - carbon
   - coculture
@@ -1588,7 +1588,7 @@ rows:
   experiment_count: 3
   gene_count: 2681
   genus: Synechococcus
-  go_transport_metabolite_count: 37
+  go_transport_metabolite_count: 38
   growth_phases:
   - infected
   interpro_gene_count: 1869
@@ -1607,7 +1607,7 @@ rows:
   reference_proteome: null
   species: null
   strain: WH8109
-  transported_metabolite_count: 73
+  transported_metabolite_count: 68
   treatment_types:
   - viral
 - background_factors:
@@ -1622,7 +1622,7 @@ rows:
   experiment_count: 4
   gene_count: 2717
   genus: Synechococcus
-  go_transport_metabolite_count: 57
+  go_transport_metabolite_count: 58
   growth_phases:
   - exponential
   interpro_gene_count: 2339
@@ -1642,7 +1642,7 @@ rows:
   reference_proteome: null
   species: Synechococcus elongatus
   strain: PCC7942
-  transported_metabolite_count: 88
+  transported_metabolite_count: 82
   treatment_types:
   - coculture
 - background_factors:
@@ -1657,7 +1657,7 @@ rows:
   experiment_count: 2
   gene_count: 2714
   genus: Synechococcus
-  go_transport_metabolite_count: 38
+  go_transport_metabolite_count: 39
   growth_phases:
   - exponential
   interpro_gene_count: 2336
@@ -1677,7 +1677,7 @@ rows:
   reference_proteome: null
   species: Synechococcus elongatus
   strain: UTEX2973
-  transported_metabolite_count: 88
+  transported_metabolite_count: 82
   treatment_types:
   - coculture
 - background_factors:
@@ -1694,7 +1694,7 @@ rows:
   experiment_count: 60
   gene_count: 2567
   genus: Synechococcus
-  go_transport_metabolite_count: 37
+  go_transport_metabolite_count: 38
   growth_phases:
   - darkness
   - exponential
@@ -1714,7 +1714,7 @@ rows:
   reference_proteome: null
   species: Synechococcus sp.
   strain: BL107
-  transported_metabolite_count: 66
+  transported_metabolite_count: 62
   treatment_types:
   - carbon
 - background_factors:
@@ -1730,7 +1730,7 @@ rows:
   experiment_count: 1
   gene_count: 2449
   genus: Thermosynechococcus
-  go_transport_metabolite_count: 56
+  go_transport_metabolite_count: 57
   growth_phases: []
   interpro_gene_count: 2178
   measured_metabolite_count: 0
@@ -1748,7 +1748,7 @@ rows:
   reference_proteome: null
   species: Thermosynechococcus vestitus
   strain: BP1
-  transported_metabolite_count: 87
+  transported_metabolite_count: 80
   treatment_types:
   - light
   - oxygen

@@ -69,22 +69,10 @@ rows_by_go_term_depth: []
 stereo_forms_added: {}
 stereo_relatives: {}
 tcdb_family_substrates_not_shown:
-  genes: 1
-  metabolites: 1
-  rows: 1
-tcdb_family_substrates_skipped:
-- locus_tag: PMM0449
-  tcdb_id: tcdb:3.A.1
-  tcdb_substrate_count: 551
-- locus_tag: PMM0450
-  tcdb_id: tcdb:3.A.1
-  tcdb_substrate_count: 551
-- locus_tag: PMM0913
-  tcdb_id: tcdb:3.A.1
-  tcdb_substrate_count: 551
-- locus_tag: PMM0977
-  tcdb_id: tcdb:3.A.1
-  tcdb_substrate_count: 551
+  genes: 0
+  metabolites: 0
+  rows: 0
+tcdb_family_substrates_skipped: []
 top_gene_categories:
 - category: Amino acid metabolism
   gene_count: 1
@@ -112,7 +100,4 @@ top_tcdb_families: []
 total_matching: 1
 transporter_count_total: 0
 truncated: false
-warnings:
-- No gene reaches these metabolites through a direct TCDB system call in this organism.
-  1 gene reaches these metabolites only through a TCDB family or subfamily call (e.g.
-  murJ); pass include_tcdb_family_substrates=True to add those rows (counts in tcdb_family_substrates_not_shown).
+warnings: []
