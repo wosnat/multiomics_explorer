@@ -548,7 +548,7 @@ Unchanged: `control_timing` dense on every Experiment with a DE contrast, absent
 `design_notes` sparse, required for `baseline` / `mixed`, in `experimentFullText`; `mixed` ⇒
 ≥ 2 timepoints (T5); writing rules (T4) minus the shared-model clause.
 
-Counts: 174 DE experiments — 150 `matched`, 21 `baseline`, 3 `mixed` (Thompson 2011 went 5 → 4
+Counts (live graph, 2026-10-18 rebuild): 173 DE experiments — 151 `matched`, 18 `baseline`, 4 `mixed` (Thompson 2011 went 5 → 4
 Experiments: its MED4 48h contrast merged into the starvation experiment as `mixed`). Weissberg
 `coculture_alteromonas_hot1a3_med4_rnaseq` reads `matched` (growth-state match vs the axenic repeat on
 days 7 / 14), not `mixed` as S1 assumed. Curation log: KG `plans/control_timing_curation.md`.
