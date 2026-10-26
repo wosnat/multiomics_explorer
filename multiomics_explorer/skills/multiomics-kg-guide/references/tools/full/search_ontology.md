@@ -80,6 +80,7 @@ mode, total_entries, total_matching, score_max, score_median, returned, offset, 
 | superfamily | string \| None (optional) | TCDB's own superfamily label, copied as is; unreliable for whole groups (ABC 3.A.1 nodes read ArsA) (verbose only; sparse: tcdb). |
 | tcdb_substrate_count | int \| None (optional) | Distinct substrates curated under this TCDB node, all levels (verbose only; sparse: tcdb). |
 | direction | string \| None (optional) | TCDB-stated transport direction: 'uptake' / 'export' / 'unknown'; only systems and ABC uptake subfamilies carry one (verbose only; sparse: tcdb). |
+| proteins | string \| None (optional) | TCDB's protein list for a tc_system: gene symbols, accessions, source organism, joined by '; ' (e.g. 'UrtA (R); UrtB (M)'); searched by search_text (verbose only; sparse: tcdb systems). |
 | family_type | string \| None (optional) | NCBIfam family type, e.g. 'equivalog', 'subfamily' (verbose only; sparse: ncbifam). |
 | gene_symbol | string \| None (optional) | NCBIfam gene symbol (verbose only; sparse: ncbifam). |
 | family_class | string \| None (optional) | MEROPS family class ('peptidase' or 'inhibitor'; verbose only; sparse: merops). |
@@ -764,7 +765,79 @@ search_ontology(search_text="sucrose", ontology=["tcdb"])
 }
 ```
 
-### Example 12: Search InterPro entries, scoped to one interpro_type
+### Example 12: Find a TCDB system by a protein symbol (verbose shows the protein list)
+
+```example-call
+search_ontology(search_text="UrtA", ontology=["tcdb"], verbose=True, limit=2)
+```
+
+*TCDB search covers each system's `proteins` cell (gene symbols, accessions, source organism), so a gene symbol such as UrtA finds the urea porters. `proteins` is a verbose column, set on `tc_system` nodes only; it is TCDB's text for the reference system, not a call on any KG gene.*
+
+```example-response
+{
+  "mode": "search",
+  "total_entries": 9368,
+  "total_matching": 2,
+  "score_max": 3.453925609588623,
+  "score_median": 3.2717318534851074,
+  "returned": 2,
+  "offset": 0,
+  "truncated": false,
+  "by_ontology": [
+    {
+      "ontology": "tcdb",
+      "total_entries": 9368,
+      "total_matching": 2,
+      "score_max": 3.453925609588623,
+      "returned": 2,
+      "truncated": false
+    }
+  ],
+  "by_level": [],
+  "by_interpro_type": [],
+  "by_family_type": [],
+  "skipped_ontologies": [],
+  "warnings": [],
+  "results": [
+    {
+      "id": "tcdb:3.A.1.4.4",
+      "name": "The high-affinity (<1 μM) urea porter",
+      "ontology_type": "tcdb",
+      "score": 3.453925609588623,
+      "level": 4,
+      "is_informative": true,
+      "gene_count": 143,
+      "organism_count": 28,
+      "description": "The high-affinity (<1 μM) urea porter",
+      "level_kind": "tc_system",
+      "direct_gene_count": 143,
+      "superfamily": "ArsA ATPase (ArsA) Superfamily",
+      "tcdb_substrate_count": 1,
+      "direction": "uptake",
+      "proteins": "UrtA-E urea porter of Anabaena sp. PCC7120; UrtA (R); UrtB (M); UrtC (M); UrtD (C); UrtE (C)"
+    },
+    {
+      "id": "tcdb:3.A.1.4.5",
+      "name": "The high affinity urea/thiourea/hydroxyurea porter",
+      "ontology_type": "tcdb",
+      "score": 3.2717318534851074,
+      "level": 4,
+      "is_informative": true,
+      "gene_count": 143,
+      "organism_count": 28,
+      "description": "The high affinity urea/thiourea/hydroxyurea porter (Beckers et al., 2004)",
+      "level_kind": "tc_system",
+      "direct_gene_count": 143,
+      "superfamily": "ArsA ATPase (ArsA) Superfamily",
+      "tcdb_substrate_count": 3,
+      "direction": "uptake",
+      "proteins": "UrtA-E of Corynebacterium glutamicum; UrtA (R) CAF19637; UrtB (M) CAF19636; UrtC (M) CAF19638; UrtD (C) CAF19639; Urt..."
+    }
+  ]
+}
+```
+
+### Example 13: Search InterPro entries, scoped to one interpro_type
 
 ```example-call
 search_ontology(search_text="P-loop", ontology=["interpro"], interpro_type="HOMOLOGOUS_SUPERFAMILY")
@@ -834,7 +907,7 @@ search_ontology(search_text="P-loop", ontology=["interpro"], interpro_type="HOMO
 }
 ```
 
-### Example 13: Browse NCBIfam families with their family_type (verbose)
+### Example 14: Browse NCBIfam families with their family_type (verbose)
 
 ```example-call
 search_ontology(ontology=["ncbifam"], min_gene_count=300, verbose=True)
@@ -913,7 +986,7 @@ search_ontology(ontology=["ncbifam"], min_gene_count=300, verbose=True)
 }
 ```
 
-### Example 14: Search MEROPS peptidase families
+### Example 15: Search MEROPS peptidase families
 
 ```example-call
 search_ontology(search_text="serine protease", ontology=["merops"])
@@ -980,7 +1053,7 @@ search_ontology(search_text="serine protease", ontology=["merops"])
 }
 ```
 
-### Example 15: Find PSORTb subcellular localizations
+### Example 16: Find PSORTb subcellular localizations
 
 ```example-call
 search_ontology(search_text="outer", ontology=["subcellular_localization"])
@@ -1026,7 +1099,7 @@ search_ontology(search_text="outer", ontology=["subcellular_localization"])
 }
 ```
 
-### Example 16: Filter out uninformative terms (term-side, opt-in)
+### Example 17: Filter out uninformative terms (term-side, opt-in)
 
 ```example-call
 search_ontology(search_text="transport", ontology=["kegg"], informative_only=True)
@@ -1098,7 +1171,7 @@ search_ontology(search_text="transport", ontology=["kegg"], informative_only=Tru
 }
 ```
 
-### Example 17: Which papers discuss a KEGG pathway (literature index)
+### Example 18: Which papers discuss a KEGG pathway (literature index)
 
 ```example-call
 search_ontology(search_text="calvin", ontology=["kegg"])
@@ -1145,7 +1218,7 @@ search_ontology(search_text="calvin", ontology=["kegg"])
 }
 ```
 
-### Example 18: From search to gene discovery
+### Example 19: From search to gene discovery
 
 ```
 Step 1: search_ontology(search_text="replication", ontology=["go_bp"])
@@ -1162,7 +1235,7 @@ Step 4: gene_overview(locus_tags=["PMM0845", ...])
         → data availability for the discovered genes
 ```
 
-### Example 19: Browse → pick a level → enrich
+### Example 20: Browse → pick a level → enrich
 
 ```
 Step 1: search_ontology(ontology=["cyanorak_role"], level=1, organism="MED4")

@@ -292,7 +292,7 @@ class TestVerboseEdge:
 # --- term side --------------------------------------------------------------
 
 EXPECTED_TERM_VERBOSE = {
-    "tcdb": ["superfamily", "tcdb_substrate_count", "direction"],
+    "tcdb": ["superfamily", "tcdb_substrate_count", "direction", "proteins"],
     "merops": ["family_class", "catalytic_type", "peptidase_gene_count"],
     "ncbifam": ["family_type", "gene_symbol"],
 }
@@ -334,7 +334,7 @@ class TestTermSide:
         assert ONTOLOGY_CONFIG["tcdb"]["term_details_compact"] == [
             "tcdb_id", "tc_class_id", "direct_gene_count", "member_count",
             "superfamily", "tcdb_substrate_count", "direction",
-            "direction_basis",
+            "direction_basis", "proteins",
         ]
 
     def test_merops_term_details_compact_matches_spec(self):

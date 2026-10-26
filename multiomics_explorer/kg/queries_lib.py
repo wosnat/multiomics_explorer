@@ -216,11 +216,13 @@ ONTOLOGY_CONFIG = {
             "override_param": "include_weak_tcdb_hits",
         },
         "term_compact": ["gene_count", "organism_count"],
-        "term_verbose": ["superfamily", "tcdb_substrate_count", "direction"],
+        "term_verbose": [
+            "superfamily", "tcdb_substrate_count", "direction", "proteins",
+        ],
         "term_details_compact": [
             "tcdb_id", "tc_class_id", "direct_gene_count", "member_count",
             "superfamily", "tcdb_substrate_count", "direction",
-            "direction_basis",
+            "direction_basis", "proteins",
         ],
         "term_details_verbose": "*",
         "bridges_out": [

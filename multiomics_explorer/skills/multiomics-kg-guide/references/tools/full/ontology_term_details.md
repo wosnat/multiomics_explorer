@@ -68,6 +68,7 @@ total_matching, returned, offset, truncated, not_found, by_ontology, links_out_t
 | tcdb_substrate_count | int \| None (optional) | Distinct substrates curated under this TCDB node, any level (sparse: tcdb). Substrate edges leave tc_system nodes only. |
 | direction | string \| None (optional) | TCDB-stated transport direction: 'uptake' / 'export' / 'unknown' (sparse: tcdb). Conservative: only tc_system nodes and the ABC uptake subfamilies (3.A.1.1-99) carry one; families read 'unknown'. |
 | direction_basis | string \| None (optional) | How the TCDB direction was assigned: 'abc_numbering' (ABC uptake range, uptake only) or 'tcdb_name' (a system's own name) (sparse: tcdb; absent when unstated) |
+| proteins | string \| None (optional) | TCDB's protein list for a tc_system: gene symbols, accessions, source organism, joined by '; ' (e.g. 'UrtA (R); UrtB (M)') (sparse: tcdb systems) |
 | metabolite_count | int \| None (optional) | Distinct metabolites attached (sparse: KEGG pathway chemistry) |
 | reaction_count | int \| None (optional) | Reactions mapped to this KEGG pathway (sparse: kegg pathway terms) |
 | cazy_id | string \| None (optional) | CAZy family ID (sparse: cazy) |
@@ -777,7 +778,7 @@ discussed_by_publication(publication_dois=[...]) → ontology_term_details(term_
 
 - `member_count` (TCDB, MEROPS, InterPro) is the upstream database's family size, not a KG gene count.
 
-- TCDB rows carry `tcdb_substrate_count` (distinct substrates TCDB curates on the systems in the node's subtree; substrate edges leave `tc_system` nodes only, so a family's own range is the sum below it), `direction` (`uptake` / `export` / `unknown`, TCDB-stated and conservative: ABC uptake numbering or a system's own name; families read `unknown`) and sparse `direction_basis`. Use `tcdb_substrate_count` to see how broad a family call is before trusting a family walk: the ABC superfamily tcdb:3.A.1 reads 546. Many children are range-only (`gene_count = 0`): curated systems no KG gene is called to.
+- TCDB rows carry `tcdb_substrate_count` (distinct substrates TCDB curates on the systems in the node's subtree; substrate edges leave `tc_system` nodes only, so a family's own range is the sum below it), `direction` (`uptake` / `export` / `unknown`, TCDB-stated and conservative: ABC uptake numbering or a system's own name; families read `unknown`), sparse `direction_basis` and, on `tc_system` nodes, `proteins` (TCDB's protein list: gene symbols, accessions, source organism). Use `tcdb_substrate_count` to see how broad a family call is before trusting a family walk: the ABC superfamily tcdb:3.A.1 reads 546. Many children are range-only (`gene_count = 0`): curated systems no KG gene is called to.
 
 - A compact column that is missing on the node is absent, not null: GO rows carry only `direct_gene_count` from their compact extras, Pfam rows `short_name`, KEGG `reaction_count` / `metabolite_count` only on pathway terms (absent on KO / module rows). Do not treat an absent key as `0`.
 

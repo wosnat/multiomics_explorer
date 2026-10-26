@@ -11371,7 +11371,7 @@ class TestSearchOntologyWrapper3b:
 
     @pytest.mark.parametrize("field", [
         "ontology_type", "description", "level_kind", "direct_gene_count",
-        "superfamily", "tcdb_substrate_count", "direction",
+        "superfamily", "tcdb_substrate_count", "direction", "proteins",
         "family_type", "gene_symbol",
         "family_class", "catalytic_type", "peptidase_gene_count",
         "interpro_type", "organism_gene_count",
@@ -14334,7 +14334,8 @@ class TestTcdbCleanupOntologyEnvelopes:
 
     def test_search_ontology_row_tcdb_term_columns(self, tool_fns):
         row = _row_model(tool_fns, "search_ontology")
-        for f in ("superfamily", "tcdb_substrate_count", "direction"):
+        for f in ("superfamily", "tcdb_substrate_count", "direction",
+                  "proteins"):
             assert f in row.model_fields, f
         # TcdbFamily.metabolite_count is gone; the column was TCDB-only here.
         assert "metabolite_count" not in row.model_fields
@@ -14342,7 +14343,8 @@ class TestTcdbCleanupOntologyEnvelopes:
     def test_ontology_term_details_row_tcdb_columns(self, tool_fns):
         row = _row_model(tool_fns, "ontology_term_details")
         for f in ("tcdb_id", "tc_class_id", "superfamily",
-                  "tcdb_substrate_count", "direction", "direction_basis"):
+                  "tcdb_substrate_count", "direction", "direction_basis",
+                  "proteins"):
             assert f in row.model_fields, f
         # KEGG pathway terms keep metabolite_count; its prose must drop TCDB.
         desc = row.model_fields["metabolite_count"].description or ""

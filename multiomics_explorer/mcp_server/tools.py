@@ -3017,6 +3017,11 @@ def register_tools(mcp: FastMCP):
             description="TCDB-stated transport direction: 'uptake' / 'export' / "
                         "'unknown'; only systems and ABC uptake subfamilies "
                         "carry one (verbose only; sparse: tcdb).")
+        proteins: str | None = Field(default=None,
+            description="TCDB's protein list for a tc_system: gene symbols, "
+                        "accessions, source organism, joined by '; ' (e.g. "
+                        "'UrtA (R); UrtB (M)'); searched by search_text "
+                        "(verbose only; sparse: tcdb systems).")
         family_type: str | None = Field(default=None,
             description="NCBIfam family type, e.g. 'equivalog', 'subfamily' "
                         "(verbose only; sparse: ncbifam).")
@@ -3226,6 +3231,8 @@ def register_tools(mcp: FastMCP):
             description="TCDB-stated transport direction: 'uptake' / 'export' / 'unknown' (sparse: tcdb). Conservative: only tc_system nodes and the ABC uptake subfamilies (3.A.1.1-99) carry one; families read 'unknown'.")
         direction_basis: str | None = Field(default=None,
             description="How the TCDB direction was assigned: 'abc_numbering' (ABC uptake range, uptake only) or 'tcdb_name' (a system's own name) (sparse: tcdb; absent when unstated)")
+        proteins: str | None = Field(default=None,
+            description="TCDB's protein list for a tc_system: gene symbols, accessions, source organism, joined by '; ' (e.g. 'UrtA (R); UrtB (M)') (sparse: tcdb systems)")
         metabolite_count: int | None = Field(default=None,
             description="Distinct metabolites attached (sparse: KEGG pathway chemistry)")
         reaction_count: int | None = Field(default=None,

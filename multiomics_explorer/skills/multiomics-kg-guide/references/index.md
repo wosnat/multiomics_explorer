@@ -92,12 +92,12 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/metabolites_by_gene/full` — ~17323 tok
 - `docs://tools/metabolites_by_quantifies_assay/full` — ~6456 tok
 - `docs://tools/ontology_landscape/full` — ~10889 tok
-- `docs://tools/ontology_term_details/full` — ~9529 tok
+- `docs://tools/ontology_term_details/full` — ~9601 tok
 - `docs://tools/pathway_enrichment/full` — ~13390 tok
 - `docs://tools/resolve_gene/full` — ~1520 tok
 - `docs://tools/run_cypher/full` — ~972 tok
 - `docs://tools/search_homolog_groups/full` — ~2275 tok
-- `docs://tools/search_ontology/full` — ~10432 tok
+- `docs://tools/search_ontology/full` — ~11078 tok
 
 ## Analysis
 
@@ -126,7 +126,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://ontologies/pfam` — ~1983 tok
 - `docs://ontologies/signal_peptide_type` — ~1488 tok
 - `docs://ontologies/subcellular_localization` — ~1510 tok
-- `docs://ontologies/tcdb` — ~3492 tok
+- `docs://ontologies/tcdb` — ~3530 tok
 - `docs://ontologies/tigr_role` — ~2602 tok
 
 ## Examples

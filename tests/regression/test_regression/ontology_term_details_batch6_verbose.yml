@@ -244,6 +244,7 @@ results:
     tc_class_id: tcdb:3
     tcdb_id: 3.A.1
     tcdb_substrate_count: 546
+  proteins: null
   superfamily: ArsA ATPase (ArsA) Superfamily
   tc_class_id: tcdb:3
   tcdb_id: 3.A.1

@@ -40,8 +40,10 @@ id_form: |
   `tcdb:3.A.1.2.3` — prefix plus the dotted TC number; the number of fields
   gives the level: `tcdb:3` class, `tcdb:3.A` subclass, `tcdb:3.A.1`
   family, `tcdb:3.A.1.2` subfamily, `tcdb:3.A.1.2.3` system.
-  Node `tcdb_id` holds the bare number, `tc_class_id` the class, and
-  `superfamily` the superfamily name where TCDB assigns one.
+  Node `tcdb_id` holds the bare number, `tc_class_id` the class,
+  `superfamily` the superfamily name where TCDB assigns one, and (systems
+  only) `proteins` TCDB's protein list, which the TCDB search covers, so a
+  gene symbol such as `UrtA` finds its system.
 
 hierarchy: |
   Strict five-level tree via `Tcdb_family_is_a_tcdb_family`, `level` 0-4

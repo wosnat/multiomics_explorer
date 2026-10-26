@@ -12753,7 +12753,8 @@ class TestBuildSearchOntologyVerboseColumns:
         assert "direct_gene_count" not in cypher
 
     @pytest.mark.parametrize("ontology,props", [
-        ("tcdb", ["superfamily", "tcdb_substrate_count", "direction"]),
+        ("tcdb", ["superfamily", "tcdb_substrate_count", "direction",
+                  "proteins"]),
         ("ncbifam", ["family_type", "gene_symbol"]),
         ("merops", ["family_class", "catalytic_type", "peptidase_gene_count"]),
     ])
@@ -12764,7 +12765,8 @@ class TestBuildSearchOntologyVerboseColumns:
             assert f"t.{prop} AS {prop}" in cypher, prop
 
     @pytest.mark.parametrize("ontology,props", [
-        ("tcdb", ["superfamily", "tcdb_substrate_count", "direction"]),
+        ("tcdb", ["superfamily", "tcdb_substrate_count", "direction",
+                  "proteins"]),
         ("merops", ["family_class", "catalytic_type", "peptidase_gene_count"]),
     ])
     def test_compact_never_projects_term_verbose(self, ontology, props):

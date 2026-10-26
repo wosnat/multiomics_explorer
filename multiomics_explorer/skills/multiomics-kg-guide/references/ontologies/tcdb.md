@@ -44,8 +44,10 @@ naming the curated members behind each link).
 `tcdb:3.A.1.2.3` — prefix plus the dotted TC number; the number of fields
 gives the level: `tcdb:3` class, `tcdb:3.A` subclass, `tcdb:3.A.1`
 family, `tcdb:3.A.1.2` subfamily, `tcdb:3.A.1.2.3` system.
-Node `tcdb_id` holds the bare number, `tc_class_id` the class, and
-`superfamily` the superfamily name where TCDB assigns one.
+Node `tcdb_id` holds the bare number, `tc_class_id` the class,
+`superfamily` the superfamily name where TCDB assigns one, and (systems
+only) `proteins` TCDB's protein list, which the TCDB search covers, so a
+gene symbol such as `UrtA` finds its system.
 
 ## Hierarchy
 
@@ -85,8 +87,8 @@ own label, copied as is and unreliable for whole groups (most ABC
 | Verbose edge detail | `identity`, `qcov`, `evalue`, `tcdb_scov` (edge prop `scov`), `tcdb_best_hit_rank` (edge prop `rank`), `tcdb_bitscore` (edge prop `bitscore`), `tcdb_bitscore_ratio` (edge prop `bitscore_ratio`) |
 | Representative edge per (gene, term) | `tcdb_call`: `diamond_best_hit` > `diamond_tier` > `eggnog`, then `identity` DESC |
 | Gene-edge gate | `tcdb_gate` in `direct` / `annotated` by default; `include_weak_tcdb_hits=True` adds the rest |
-| Term columns, verbose `search_ontology` | `superfamily`, `tcdb_substrate_count`, `direction` |
-| Extra compact columns, `ontology_term_details` | `tcdb_id`, `tc_class_id`, `direct_gene_count`, `member_count`, `superfamily`, `tcdb_substrate_count`, `direction`, `direction_basis` |
+| Term columns, verbose `search_ontology` | `superfamily`, `tcdb_substrate_count`, `direction`, `proteins` |
+| Extra compact columns, `ontology_term_details` | `tcdb_id`, `tc_class_id`, `direct_gene_count`, `member_count`, `superfamily`, `tcdb_substrate_count`, `direction`, `direction_basis`, `proteins` |
 | Bridges out (`links_out`) | `Tcdb_family_has_pfam_domain` → `pfam` (*composition*); `Tcdb_family_involved_in_biological_process` → `go_bp` (*composition*); `Tcdb_family_enables_molecular_function` → `go_mf` (*composition*); `Tcdb_family_located_in_cellular_component` → `go_cc` (*composition*) |
 
 Bridges are forward-only: `ontology_term_details` lists `links_out` on the source term; there is no `links_in`. `composition` = built from these parts; `membership` = one of that ontology's known members; `router` = a computed cross-reference, recall-biased, never a gene-function call.

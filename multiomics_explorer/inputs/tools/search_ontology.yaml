@@ -624,6 +624,72 @@ examples:
         ]
       }
 
+  - title: Find a TCDB system by a protein symbol (verbose shows the protein list)
+    call: search_ontology(search_text="UrtA", ontology=["tcdb"], verbose=True, limit=2)
+    note: "TCDB search covers each system's `proteins` cell (gene symbols, accessions, source organism), so a gene symbol such as UrtA finds the urea porters. `proteins` is a verbose column, set on `tc_system` nodes only; it is TCDB's text for the reference system, not a call on any KG gene."
+    response: |
+      {
+        "mode": "search",
+        "total_entries": 9368,
+        "total_matching": 2,
+        "score_max": 3.453925609588623,
+        "score_median": 3.2717318534851074,
+        "returned": 2,
+        "offset": 0,
+        "truncated": false,
+        "by_ontology": [
+          {
+            "ontology": "tcdb",
+            "total_entries": 9368,
+            "total_matching": 2,
+            "score_max": 3.453925609588623,
+            "returned": 2,
+            "truncated": false
+          }
+        ],
+        "by_level": [],
+        "by_interpro_type": [],
+        "by_family_type": [],
+        "skipped_ontologies": [],
+        "warnings": [],
+        "results": [
+          {
+            "id": "tcdb:3.A.1.4.4",
+            "name": "The high-affinity (<1 μM) urea porter",
+            "ontology_type": "tcdb",
+            "score": 3.453925609588623,
+            "level": 4,
+            "is_informative": true,
+            "gene_count": 143,
+            "organism_count": 28,
+            "description": "The high-affinity (<1 μM) urea porter",
+            "level_kind": "tc_system",
+            "direct_gene_count": 143,
+            "superfamily": "ArsA ATPase (ArsA) Superfamily",
+            "tcdb_substrate_count": 1,
+            "direction": "uptake",
+            "proteins": "UrtA-E urea porter of Anabaena sp. PCC7120; UrtA (R); UrtB (M); UrtC (M); UrtD (C); UrtE (C)"
+          },
+          {
+            "id": "tcdb:3.A.1.4.5",
+            "name": "The high affinity urea/thiourea/hydroxyurea porter",
+            "ontology_type": "tcdb",
+            "score": 3.2717318534851074,
+            "level": 4,
+            "is_informative": true,
+            "gene_count": 143,
+            "organism_count": 28,
+            "description": "The high affinity urea/thiourea/hydroxyurea porter (Beckers et al., 2004)",
+            "level_kind": "tc_system",
+            "direct_gene_count": 143,
+            "superfamily": "ArsA ATPase (ArsA) Superfamily",
+            "tcdb_substrate_count": 3,
+            "direction": "uptake",
+            "proteins": "UrtA-E of Corynebacterium glutamicum; UrtA (R) CAF19637; UrtB (M) CAF19636; UrtC (M) CAF19638; UrtD (C) CAF19639; Urt..."
+          }
+        ]
+      }
+
   - title: Search InterPro entries, scoped to one interpro_type
     call: search_ontology(search_text="P-loop", ontology=["interpro"], interpro_type="HOMOLOGOUS_SUPERFAMILY")
     response: |
@@ -1006,6 +1072,7 @@ verbose_fields:
   - superfamily
   - tcdb_substrate_count
   - direction
+  - proteins
   - family_type
   - gene_symbol
   - family_class
