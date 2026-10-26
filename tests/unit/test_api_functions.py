@@ -21881,7 +21881,9 @@ class TestGoTransportApiGbm:
             monkeypatch, conn=conn, metabolite_ids=[spelling])
         assert _GO_EXCLUDED_WARNING.format(id="chebi:23906") in out["warnings"]
 
-    def test_gbm_excluded_warning_requires_go_arm(self, monkeypatch):
+    def test_gbm_go_only_exclusion_silent_without_go_arm(self, monkeypatch):
+        """A GO-list id the TCDB list lacks (older KGs) warns only through
+        the GO arm."""
         conn = _GoConn(
             summary=_GO_SUMMARY, excluded=["kegg.compound:C00080"])
         out, _, _ = self._run(
