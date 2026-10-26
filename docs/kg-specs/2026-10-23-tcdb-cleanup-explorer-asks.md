@@ -926,8 +926,62 @@ curated substrates.
      because no Na⁺ node is written any more; it was `kegg.compound:C01330`. If you pin `C01330`
      in that list, update it.
 
-5. **`controlled_vocabularies_hash` moves.** The `direction` and `direction_basis` descriptions
-   changed.
+5. **`controlled_vocabularies_hash`:** ~~moves~~ unchanged. Only descriptions changed, and the
+   hash does not cover them; see the "KG built" note below.
 
 Nothing in `tcdb_gate`, `tcdb_call` or the gene-edge contract changed. The transport arm reads the
 same `direct` edges; only the substrates they reach changed, as described in item 3.
+
+### KG built: TCDB review (2026-10-26, build `2026-10-26T04:21:53.755Z`)
+
+The changes in the 2026-10-25 reply are rebuilt on the dev graph, from KG `main` at `c80084e4`.
+The KG validity suite passes (1,350 passed, 7 skipped) once the expectation updates in
+`6582526e` are in. Every predicted number matched the live graph.
+
+| | Before (post-3a build) | Now |
+|---|---|---|
+| TcdbFamily nodes | 9,370 | **9,368** (`3.A.1.129.1` re-anchored onto `3.A.1.106.22`) |
+| … with `gene_count > 0` | 2,190 | 2,184 |
+| … with `proteins` | — | **7,180** (new) |
+| … still named by their TC id | 134 | **120** |
+| `direction` uptake / export / unknown | 956 / 1,367 / 7,066 | **646 / 566 / 8,156** |
+| … `abc_numbering` | 924 | **397** (uptake only) |
+| `Tcdb_family_transports_metabolite` | 10,765 | **8,548** |
+| `Tcdb_family_transports_chemical_role` | 365 | 365 |
+| `Schema_info.tcdb_substrate_excluded_targets` | — | **18 ids** (new) |
+| `go_transport_excluded_targets` | 13 | **12** (Na⁺ is now `chebi:29101`) |
+| GO transport edges | 518 | **519** (GO:0071806 → Protein) |
+| Protein node `kegg.compound:C00017` | 180 systems; `chebi:36080` separate (154) | **332** systems, one node |
+| Metabolite nodes | 3,178 | 3,178 (26 out, 26 in; sweep TSV) |
+| `Metabolite_is_stereo_form_of` | 96 | **112** |
+| Genes with a transport arm | 6,981 | **5,058** |
+| `Organism_has_metabolite` | 52,648 | **52,567** |
+| Metabolites with `transporter_count > 0` | 460 | **455** |
+| `'transport'` in `evidence_sources` | 1,285 (825 with no gene) | **1,282** (827) |
+
+Unchanged:
+- **`Gene_has_tcdb_family`:** 75,823 edges. `tcdb_gate` counts are unchanged: `direct` 11,158 ·
+  `annotated` 19,866 · `below_gate` 44,799.
+- **`'tcdb'` in `annotation_types`:** 15,800 genes.
+- **Unchanged on purpose:** 102 ChemicalRoles and 267 pathways.
+
+Notes:
+- **Why the transport arm dropped by 1,923 genes.** These genes keep their `direct` edges. Their
+  direct systems list only H⁺, Na⁺ or a placeholder as substrate, and the filter now removes
+  those. Na⁺/H⁺ antiporters are the bulk. Your 34-check recompute rule is unchanged. The counts
+  move only because the substrate edge set changed.
+- **Identifiers that left surviving nodes** (identity follow-on). A handful of MNX and ChEBI ids
+  left nodes that still exist. In every case the id belonged to a different compound:
+  - L-tryptophan no longer carries the generic tryptophan zwitterion `chebi:64554`.
+  - D-galacturonate and trans-cinnamate lose their generic forms' ChEBI, HMDB and InChIKey ids.
+    The generic forms are now separate nodes.
+  - Nitrate loses `mnx:MNXM732398` and keeps `MNXM732399`.
+
+  If a fixture searches by any of these, point it at the generic node.
+- **Name changes.** Snapshot-style fixtures that pin TCDB names will see the cleaned text: "K+",
+  not "K + ". PstABCS also drops two accession parentheticals so that PstC and PstS fit under the
+  name cap.
+- **`controlled_vocabularies_hash` did not move.** It is still
+  `sha256:7e2ada529d49f19b64ddd3fb6eef9332150e64160d5ba4256cccc48b7720e190`. That corrects item
+  5 of our 2026-10-25 reply: the edits there changed vocabulary descriptions only, and the hash
+  does not cover descriptions. No re-pin is needed.
