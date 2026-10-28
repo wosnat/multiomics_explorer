@@ -4,44 +4,44 @@ by_level: []
 by_ontology:
 - ontology: go_bp
   returned: 5
-  score_max: 1.5236425399780273
-  total_entries: 3322
-  total_matching: 324
+  score_max: 1.5253678560256958
+  total_entries: 3411
+  total_matching: 332
   truncated: true
 - ontology: tcdb
   returned: 5
-  score_max: 7.3615570068359375
-  total_entries: 9368
-  total_matching: 526
+  score_max: 7.366277694702148
+  total_entries: 9725
+  total_matching: 527
   truncated: true
 case_id: search_ontology_multi_go_bp_tcdb_transport
 mode: search
 offset: 0
 results:
-- gene_count: 10992
+- gene_count: 23853
   id: go:0006810
   is_informative: true
   level: 3
   name: transport
   ontology_type: go_bp
-  organism_count: 43
-  score: 1.5236
-- gene_count: 57
+  organism_count: 117
+  score: 1.5254
+- gene_count: 209
   id: go:0006821
   is_informative: true
   level: 5
   name: chloride transport
   ontology_type: go_bp
-  organism_count: 43
-  score: 1.3266
-- gene_count: 4
+  organism_count: 117
+  score: 1.3283
+- gene_count: 9
   id: go:0006833
   is_informative: true
   level: 5
   name: water transport
   ontology_type: go_bp
-  organism_count: 4
-  score: 1.3266
+  organism_count: 9
+  score: 1.3283
 - gene_count: 5
   id: go:0006836
   is_informative: true
@@ -49,15 +49,15 @@ results:
   name: neurotransmitter transport
   ontology_type: go_bp
   organism_count: 3
-  score: 1.3266
-- gene_count: 155
+  score: 1.3283
+- gene_count: 239
   id: go:0015990
   is_informative: true
   level: 7
   name: electron transport coupled proton transport
   ontology_type: go_bp
-  organism_count: 43
-  score: 1.3548
+  organism_count: 116
+  score: 1.3568
 - gene_count: 0
   id: tcdb:1.A.1.29.5
   is_informative: true
@@ -65,7 +65,7 @@ results:
   name: Ion transport 2 domain-containing protein of 345 aas and 2 TMSs
   ontology_type: tcdb
   organism_count: 0
-  score: 5.9985
+  score: 5.9922
 - gene_count: 0
   id: tcdb:2.A.39.1.7
   is_informative: true
@@ -73,7 +73,7 @@ results:
   name: Putative transmembrane transport protein
   ontology_type: tcdb
   organism_count: 0
-  score: 7.3616
+  score: 7.3663
 - gene_count: 0
   id: tcdb:2.A.55.3.4
   is_informative: true
@@ -81,7 +81,7 @@ results:
   name: Putative metal ion transport protein
   ontology_type: tcdb
   organism_count: 0
-  score: 7.0202
+  score: 7.0223
 - gene_count: 0
   id: tcdb:3.A.1.1.36
   is_informative: true
@@ -89,7 +89,7 @@ results:
   name: Putative transport system
   ontology_type: tcdb
   organism_count: 0
-  score: 6.6627
+  score: 6.6706
 - gene_count: 0
   id: tcdb:9.B.14.2.5
   is_informative: true
@@ -98,13 +98,13 @@ results:
     C of 234 aas
   ontology_type: tcdb
   organism_count: 0
-  score: 5.2648
+  score: 5.2572
 returned: 10
 row_count: 10
-score_max: 7.3615570068359375
-score_median: 3.394239902496338
+score_max: 7.366277694702148
+score_median: 3.3912983536720276
 skipped_ontologies: []
-total_entries: 12690
-total_matching: 850
+total_entries: 13136
+total_matching: 859
 truncated: true
 warnings: []

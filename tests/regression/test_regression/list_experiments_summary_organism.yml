@@ -18,7 +18,7 @@ rows:
   - '{''count'': 6, ''item'': ''background''}'
   by_compartment:
   - '{''count'': 2, ''item'': ''vesicle''}'
-  - '{''count'': 42, ''item'': ''whole_cell''}'
+  - '{''count'': 43, ''item'': ''whole_cell''}'
   by_control_timing:
   - '{''count'': 2, ''item'': ''mixed''}'
   - '{''count'': 29, ''item'': ''matched''}'
@@ -57,10 +57,13 @@ rows:
   - '{''count'': 1, ''item'': ''rapid_recovery_low_co2_shock''}'
   - '{''count'': 1, ''item'': ''rna_decay_time_min''}'
   - '{''count'': 1, ''item'': ''rna_half_life_min''}'
+  - '{''count'': 1, ''item'': ''sbp_nutrient_class''}'
+  - '{''count'': 1, ''item'': ''sbp_predicted_substrate''}'
   - '{''count'': 1, ''item'': ''tss_distance_to_cds''}'
   - '{''count'': 1, ''item'': ''vesicle_dna_avg_read_coverage''}'
   - '{''count'': 1, ''item'': ''vesicle_proteome_member''}'
   by_omics_type:
+  - '{''count'': 1, ''item'': ''BIOINFORMATIC''}'
   - '{''count'': 1, ''item'': ''PAIRED_RNASEQ_PROTEOME''}'
   - '{''count'': 1, ''item'': ''VESICLE_DNASEQ''}'
   - '{''count'': 1, ''item'': ''VESICLE_PROTEOMICS''}'
@@ -68,12 +71,13 @@ rows:
   - '{''count'': 19, ''item'': ''MICROARRAY''}'
   - '{''count'': 8, ''item'': ''PROTEOMICS''}'
   by_organism:
-  - '{''count'': 44, ''item'': ''Prochlorococcus MED4''}'
+  - '{''count'': 45, ''item'': ''Prochlorococcus MED4''}'
   by_publication:
   - '{''count'': 1, ''item'': ''10.1038/ismej.2014.57''}'
   - '{''count'': 1, ''item'': ''10.1038/ismej.2016.70''}'
   - '{''count'': 1, ''item'': ''10.1038/ismej.2017.88''}'
   - '{''count'': 1, ''item'': ''10.1038/nature06130''}'
+  - '{''count'': 1, ''item'': ''10.1042/BST20200244''}'
   - '{''count'': 1, ''item'': ''10.1073/pnas.0601301103''}'
   - '{''count'': 1, ''item'': ''10.1186/1471-2180-14-11''}'
   - '{''count'': 1, ''item'': ''10.1186/gb-2010-11-5-r54''}'
@@ -98,6 +102,7 @@ rows:
   - '{''count'': 6, ''item'': ''significant_only''}'
   by_treatment_type:
   - '{''count'': 1, ''item'': ''darkness''}'
+  - '{''count'': 1, ''item'': ''genomic_analysis''}'
   - '{''count'': 1, ''item'': ''growth_phase''}'
   - '{''count'': 1, ''item'': ''phosphorus''}'
   - '{''count'': 1, ''item'': ''rna_decay''}'
@@ -112,8 +117,8 @@ rows:
   - '{''count'': 8, ''item'': ''carbon''}'
   - '{''count'': 8, ''item'': ''nitrogen''}'
   by_value_kind:
-  - '{''count'': 4, ''item'': ''categorical''}'
   - '{''count'': 5, ''item'': ''boolean''}'
+  - '{''count'': 5, ''item'': ''categorical''}'
   - '{''count'': 5, ''item'': ''numeric''}'
   time_course_count: 15
-  total_matching: 44
+  total_matching: 45

@@ -1,5 +1,5 @@
 case_id: list_organisms_raw
-row_count: 47
+row_count: 121
 rows:
 - clade: null
   experiment_count: 0
@@ -13,7 +13,7 @@ rows:
   strain: null
   treatment_types: []
 - clade: null
-  experiment_count: 60
+  experiment_count: 20
   gene_count: 4305
   genus: Alteromonas
   ncbi_taxon_id: 232
@@ -26,7 +26,7 @@ rows:
   treatment_types:
   - carbon
 - clade: null
-  experiment_count: 6
+  experiment_count: 1
   gene_count: 3929
   genus: Alteromonas
   ncbi_taxon_id: 1004787
@@ -39,7 +39,7 @@ rows:
   treatment_types:
   - compartment
 - clade: null
-  experiment_count: 6
+  experiment_count: 1
   gene_count: 3834
   genus: Alteromonas
   ncbi_taxon_id: 529120
@@ -52,7 +52,7 @@ rows:
   treatment_types:
   - compartment
 - clade: null
-  experiment_count: 6
+  experiment_count: 1
   gene_count: 4063
   genus: Alteromonas
   ncbi_taxon_id: 28108
@@ -65,7 +65,7 @@ rows:
   treatment_types:
   - compartment
 - clade: null
-  experiment_count: 6
+  experiment_count: 1
   gene_count: 3741
   genus: Alteromonas
   ncbi_taxon_id: 1004785
@@ -78,7 +78,7 @@ rows:
   treatment_types:
   - compartment
 - clade: null
-  experiment_count: 16
+  experiment_count: 12
   gene_count: 4136
   genus: Alteromonas
   ncbi_taxon_id: 28108
@@ -95,7 +95,7 @@ rows:
   - coculture
   - compartment
 - clade: null
-  experiment_count: 21
+  experiment_count: 8
   gene_count: 4028
   genus: Alteromonas
   ncbi_taxon_id: 28108
@@ -112,7 +112,7 @@ rows:
   - compartment
   - nitrogen
 - clade: null
-  experiment_count: 14
+  experiment_count: 5
   gene_count: 4028
   genus: Alteromonas
   ncbi_taxon_id: 28108
@@ -124,7 +124,6 @@ rows:
   species: Alteromonas macleodii
   strain: MIT1002
   treatment_types:
-  - coculture
   - compartment
   - darkness
   - growth_phase
@@ -150,22 +149,58 @@ rows:
   species: Alteromonas mediterranea
   strain: AltDE1
   treatment_types: []
+- clade: '5.2'
+  experiment_count: 1
+  gene_count: 2975
+  genus: Cyanobium
+  ncbi_taxon_id: 261284
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Cyanobium NS01
+  publication_count: 1
+  species: null
+  strain: NS01
+  treatment_types:
+  - genomic_analysis
+- clade: '5.2'
+  experiment_count: 1
+  gene_count: 3425
+  genus: Cyanobium
+  ncbi_taxon_id: 292564
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Cyanobium PCC6307
+  publication_count: 1
+  species: Cyanobium gracile
+  strain: PCC6307
+  treatment_types:
+  - genomic_analysis
+- clade: '5.2'
+  experiment_count: 1
+  gene_count: 2929
+  genus: Cyanobium
+  ncbi_taxon_id: 180281
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Cyanobium PCC7001
+  publication_count: 1
+  species: null
+  strain: PCC7001
+  treatment_types:
+  - genomic_analysis
 - clade: null
-  experiment_count: 2
+  experiment_count: 0
   gene_count: 0
   genus: Escherichia
   ncbi_taxon_id: 562
-  omics_types:
-  - PROTEOMICS
-  - RNASEQ
+  omics_types: []
   organism_name: Escherichia coli
   publication_count: 1
   species: null
   strain: null
-  treatment_types:
-  - coculture
+  treatment_types: []
 - clade: null
-  experiment_count: 60
+  experiment_count: 20
   gene_count: 4240
   genus: Marinobacter
   ncbi_taxon_id: 225937
@@ -178,53 +213,114 @@ rows:
   treatment_types:
   - carbon
 - clade: null
-  experiment_count: 1
+  experiment_count: 0
   gene_count: 2884
   genus: Meiothermus
   ncbi_taxon_id: 172827
-  omics_types:
-  - RNASEQ
+  omics_types: []
   organism_name: Meiothermus ruber
   publication_count: 1
   species: null
   strain: MruberA
-  treatment_types:
-  - light
-  - oxygen
+  treatment_types: []
 - clade: null
-  experiment_count: 9
+  experiment_count: 0
   gene_count: 0
   genus: null
   ncbi_taxon_id: 10239
-  omics_types:
-  - MICROARRAY
-  - RNASEQ
+  omics_types: []
   organism_name: Phage
   publication_count: 4
   species: null
   strain: null
-  treatment_types:
-  - light
-  - viral
+  treatment_types: []
 - clade: HLII
-  experiment_count: 1
+  experiment_count: 2
   gene_count: 1945
   genus: Prochlorococcus
   ncbi_taxon_id: 146891
   omics_types:
+  - BIOINFORMATIC
   - RNASEQ
   organism_name: Prochlorococcus AS9601
-  publication_count: 1
+  publication_count: 2
   species: Prochlorococcus marinus
   strain: AS9601
   treatment_types:
+  - genomic_analysis
   - salt
 - clade: HLI
-  experiment_count: 118
+  experiment_count: 1
+  gene_count: 1990
+  genus: Prochlorococcus
+  ncbi_taxon_id: 190047
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus EQPAC1
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: EQPAC1
+  treatment_types:
+  - genomic_analysis
+- clade: HLII
+  experiment_count: 1
+  gene_count: 1913
+  genus: Prochlorococcus
+  ncbi_taxon_id: 59925
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus GP2
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: GP2
+  treatment_types:
+  - genomic_analysis
+- clade: HLIV
+  experiment_count: 1
+  gene_count: 2137
+  genus: Prochlorococcus
+  ncbi_taxon_id: 1041938
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus HNLC1
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: HNLC1
+  treatment_types:
+  - genomic_analysis
+- clade: HLIII
+  experiment_count: 1
+  gene_count: 1886
+  genus: Prochlorococcus
+  ncbi_taxon_id: 1041939
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus HNLC2
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: HNLC2
+  treatment_types:
+  - genomic_analysis
+- clade: LLII
+  experiment_count: 1
+  gene_count: 2027
+  genus: Prochlorococcus
+  ncbi_taxon_id: 167556
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus LG
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: LG
+  treatment_types:
+  - genomic_analysis
+- clade: HLI
+  experiment_count: 45
   gene_count: 1973
   genus: Prochlorococcus
   ncbi_taxon_id: 59919
   omics_types:
+  - BIOINFORMATIC
   - MICROARRAY
   - PAIRED_RNASEQ_PROTEOME
   - PROTEOMICS
@@ -232,7 +328,7 @@ rows:
   - VESICLE_DNASEQ
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MED4
-  publication_count: 20
+  publication_count: 21
   species: Prochlorococcus marinus
   strain: MED4
   treatment_types:
@@ -241,6 +337,7 @@ rows:
   - compartment
   - darkness
   - diel
+  - genomic_analysis
   - growth_phase
   - iron
   - light
@@ -250,34 +347,115 @@ rows:
   - salt
   - tss_mapping
   - viral
+- clade: LLIII
+  experiment_count: 1
+  gene_count: 1956
+  genus: Prochlorococcus
+  ncbi_taxon_id: 1499498
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT0601
+  publication_count: 1
+  species: null
+  strain: MIT0601
+  treatment_types:
+  - genomic_analysis
+- clade: LLII
+  experiment_count: 1
+  gene_count: 2026
+  genus: Prochlorococcus
+  ncbi_taxon_id: 1499499
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT0602
+  publication_count: 1
+  species: null
+  strain: MIT0602
+  treatment_types:
+  - genomic_analysis
+- clade: LLII
+  experiment_count: 1
+  gene_count: 2047
+  genus: Prochlorococcus
+  ncbi_taxon_id: 1499500
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT0603
+  publication_count: 1
+  species: null
+  strain: MIT0603
+  treatment_types:
+  - genomic_analysis
 - clade: HLII
-  experiment_count: 3
+  experiment_count: 4
   gene_count: 2111
   genus: Prochlorococcus
   ncbi_taxon_id: 1501268
   omics_types:
+  - BIOINFORMATIC
   - RNASEQ
   organism_name: Prochlorococcus MIT0604
-  publication_count: 1
+  publication_count: 2
   species: null
   strain: MIT0604
   treatment_types:
   - chemical
+  - genomic_analysis
   - light
+- clade: LLIV
+  experiment_count: 1
+  gene_count: 3203
+  genus: Prochlorococcus
+  ncbi_taxon_id: 1499502
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT0701
+  publication_count: 1
+  species: null
+  strain: MIT0701
+  treatment_types:
+  - genomic_analysis
+- clade: LLIV
+  experiment_count: 1
+  gene_count: 3189
+  genus: Prochlorococcus
+  ncbi_taxon_id: 1499503
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT0702
+  publication_count: 1
+  species: null
+  strain: MIT0702
+  treatment_types:
+  - genomic_analysis
+- clade: LLIV
+  experiment_count: 1
+  gene_count: 3185
+  genus: Prochlorococcus
+  ncbi_taxon_id: 1499504
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT0703
+  publication_count: 1
+  species: null
+  strain: MIT0703
+  treatment_types:
+  - genomic_analysis
 - clade: LLI
-  experiment_count: 6
+  experiment_count: 3
   gene_count: 2330
   genus: Prochlorococcus
   ncbi_taxon_id: 1501269
   omics_types:
+  - BIOINFORMATIC
   - METABOLOMICS
   organism_name: Prochlorococcus MIT0801
-  publication_count: 1
+  publication_count: 2
   species: null
   strain: MIT0801
   treatment_types:
+  - genomic_analysis
   - growth_phase
-  - phosphorus
 - clade: HLII
   experiment_count: 0
   gene_count: 1883
@@ -301,154 +479,314 @@ rows:
   strain: MIT1327
   treatment_types: []
 - clade: HLII
-  experiment_count: 0
+  experiment_count: 1
+  gene_count: 2010
+  genus: Prochlorococcus
+  ncbi_taxon_id: 59921
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9107
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: MIT9107
+  treatment_types:
+  - genomic_analysis
+- clade: HLII
+  experiment_count: 1
+  gene_count: 1997
+  genus: Prochlorococcus
+  ncbi_taxon_id: 167544
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9116
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: MIT9116
+  treatment_types:
+  - genomic_analysis
+- clade: HLII
+  experiment_count: 1
+  gene_count: 2031
+  genus: Prochlorococcus
+  ncbi_taxon_id: 167545
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9123
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: MIT9123
+  treatment_types:
+  - genomic_analysis
+- clade: HLII
+  experiment_count: 1
+  gene_count: 2028
+  genus: Prochlorococcus
+  ncbi_taxon_id: 93057
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9201
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: MIT9201
+  treatment_types:
+  - genomic_analysis
+- clade: HLII
+  experiment_count: 1
   gene_count: 2005
   genus: Prochlorococcus
   ncbi_taxon_id: 93058
-  omics_types: []
+  omics_types:
+  - BIOINFORMATIC
   organism_name: Prochlorococcus MIT9202
-  publication_count: 0
+  publication_count: 1
   species: Prochlorococcus marinus
   strain: MIT9202
-  treatment_types: []
+  treatment_types:
+  - genomic_analysis
+- clade: LLIII
+  experiment_count: 1
+  gene_count: 1888
+  genus: Prochlorococcus
+  ncbi_taxon_id: 93059
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9211
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: MIT9211
+  treatment_types:
+  - genomic_analysis
 - clade: HLII
-  experiment_count: 0
+  experiment_count: 1
   gene_count: 2022
   genus: Prochlorococcus
   ncbi_taxon_id: 93060
-  omics_types: []
+  omics_types:
+  - BIOINFORMATIC
   organism_name: Prochlorococcus MIT9215
-  publication_count: 0
+  publication_count: 1
   species: Prochlorococcus marinus
   strain: MIT9215
-  treatment_types: []
+  treatment_types:
+  - genomic_analysis
 - clade: HLII
-  experiment_count: 8
+  experiment_count: 5
   gene_count: 1926
   genus: Prochlorococcus
   ncbi_taxon_id: 167546
   omics_types:
+  - BIOINFORMATIC
   - METABOLOMICS
   - RNASEQ
   organism_name: Prochlorococcus MIT9301
-  publication_count: 3
+  publication_count: 4
   species: Prochlorococcus marinus
   strain: MIT9301
   treatment_types:
+  - genomic_analysis
   - growth_phase
   - phosphorus
   - temperature
+- clade: HLII
+  experiment_count: 1
+  gene_count: 2047
+  genus: Prochlorococcus
+  ncbi_taxon_id: 74545
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9302
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: MIT9302
+  treatment_types:
+  - genomic_analysis
 - clade: LLIV
-  experiment_count: 4
+  experiment_count: 3
   gene_count: 3091
   genus: Prochlorococcus
   ncbi_taxon_id: 59922
   omics_types:
+  - BIOINFORMATIC
   - METABOLOMICS
   - RNASEQ
   organism_name: Prochlorococcus MIT9303
-  publication_count: 1
+  publication_count: 2
   species: Prochlorococcus marinus
   strain: MIT9303
   treatment_types:
   - carbon
+  - genomic_analysis
 - clade: HLII
-  experiment_count: 27
+  experiment_count: 1
+  gene_count: 2019
+  genus: Prochlorococcus
+  ncbi_taxon_id: 167547
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9311
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: MIT9311
+  treatment_types:
+  - genomic_analysis
+- clade: HLII
+  experiment_count: 9
   gene_count: 1970
   genus: Prochlorococcus
   ncbi_taxon_id: 74546
   omics_types:
+  - BIOINFORMATIC
   - METABOLOMICS
   - PROTEOMICS
   - RNASEQ
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9312
-  publication_count: 5
+  publication_count: 6
   species: Prochlorococcus marinus
   strain: MIT9312
   treatment_types:
   - carbon
-  - coculture
   - compartment
+  - genomic_analysis
   - phosphorus
   - plastic
 - clade: LLIV
-  experiment_count: 39
+  experiment_count: 19
   gene_count: 2906
   genus: Prochlorococcus
   ncbi_taxon_id: 74547
   omics_types:
+  - BIOINFORMATIC
   - METABOLOMICS
   - MICROARRAY
   - RNASEQ
-  - VESICLE_DNASEQ
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9313
-  publication_count: 10
+  publication_count: 11
   species: Prochlorococcus marinus
   strain: MIT9313
   treatment_types:
   - carbon
   - coculture
   - compartment
+  - genomic_analysis
   - growth_phase
   - iron
   - nitrogen
   - phosphorus
   - tss_mapping
+- clade: HLII
+  experiment_count: 1
+  gene_count: 2017
+  genus: Prochlorococcus
+  ncbi_taxon_id: 167548
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9314
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: MIT9314
+  treatment_types:
+  - genomic_analysis
+- clade: HLII
+  experiment_count: 1
+  gene_count: 1984
+  genus: Prochlorococcus
+  ncbi_taxon_id: 167549
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9321
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: MIT9321
+  treatment_types:
+  - genomic_analysis
+- clade: HLII
+  experiment_count: 1
+  gene_count: 1988
+  genus: Prochlorococcus
+  ncbi_taxon_id: 167550
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9322
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: MIT9322
+  treatment_types:
+  - genomic_analysis
+- clade: HLII
+  experiment_count: 1
+  gene_count: 2004
+  genus: Prochlorococcus
+  ncbi_taxon_id: 167551
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9401
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: MIT9401
+  treatment_types:
+  - genomic_analysis
 - clade: HLI
-  experiment_count: 0
+  experiment_count: 1
   gene_count: 1945
   genus: Prochlorococcus
   ncbi_taxon_id: 167542
-  omics_types: []
+  omics_types:
+  - BIOINFORMATIC
   organism_name: Prochlorococcus MIT9515
-  publication_count: 0
+  publication_count: 1
   species: Prochlorococcus marinus
   strain: MIT9515
-  treatment_types: []
+  treatment_types:
+  - genomic_analysis
 - clade: LLI
   experiment_count: 2
   gene_count: 2221
   genus: Prochlorococcus
   ncbi_taxon_id: 167555
   omics_types:
+  - BIOINFORMATIC
   - RNASEQ
   organism_name: Prochlorococcus NATL1A
-  publication_count: 1
+  publication_count: 2
   species: Prochlorococcus marinus
   strain: NATL1A
   treatment_types:
+  - genomic_analysis
   - salt
 - clade: LLI
-  experiment_count: 17
+  experiment_count: 10
   gene_count: 2210
   genus: Prochlorococcus
   ncbi_taxon_id: 59920
   omics_types:
+  - BIOINFORMATIC
   - PROTEOMICS
   - RNASEQ
   organism_name: Prochlorococcus NATL2A
-  publication_count: 6
+  publication_count: 7
   species: Prochlorococcus marinus
   strain: NATL2A
   treatment_types:
   - coculture
   - darkness
-  - growth_phase
+  - genomic_analysis
   - phosphorus
   - plastic
 - clade: LLI
-  experiment_count: 0
+  experiment_count: 1
   gene_count: 2317
   genus: Prochlorococcus
   ncbi_taxon_id: 59924
-  omics_types: []
+  omics_types:
+  - BIOINFORMATIC
   organism_name: Prochlorococcus PAC1
-  publication_count: 0
+  publication_count: 1
   species: Prochlorococcus marinus
   strain: PAC1
-  treatment_types: []
+  treatment_types:
+  - genomic_analysis
 - clade: HLI
   experiment_count: 0
   gene_count: 1870
@@ -461,33 +799,89 @@ rows:
   strain: RSP50
   treatment_types: []
 - clade: HLII
-  experiment_count: 0
+  experiment_count: 1
   gene_count: 1950
   genus: Prochlorococcus
   ncbi_taxon_id: 59926
-  omics_types: []
+  omics_types:
+  - BIOINFORMATIC
   organism_name: Prochlorococcus SB
-  publication_count: 0
+  publication_count: 1
   species: Prochlorococcus marinus
   strain: SB
-  treatment_types: []
+  treatment_types:
+  - genomic_analysis
 - clade: LLII
-  experiment_count: 64
+  experiment_count: 1
+  gene_count: 2039
+  genus: Prochlorococcus
+  ncbi_taxon_id: 167552
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus SS2
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: SS2
+  treatment_types:
+  - genomic_analysis
+- clade: LLII
+  experiment_count: 1
+  gene_count: 2025
+  genus: Prochlorococcus
+  ncbi_taxon_id: 167553
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus SS35
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: SS35
+  treatment_types:
+  - genomic_analysis
+- clade: LLII
+  experiment_count: 1
+  gene_count: 2030
+  genus: Prochlorococcus
+  ncbi_taxon_id: 167554
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus SS51
+  publication_count: 1
+  species: Prochlorococcus marinus
+  strain: SS51
+  treatment_types:
+  - genomic_analysis
+- clade: LLII
+  experiment_count: 1
+  gene_count: 2041
+  genus: Prochlorococcus
+  ncbi_taxon_id: 1499501
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus SS52
+  publication_count: 1
+  species: null
+  strain: SS52
+  treatment_types:
+  - genomic_analysis
+- clade: LLII
+  experiment_count: 7
   gene_count: 1959
   genus: Prochlorococcus
   ncbi_taxon_id: 167539
   omics_types:
+  - BIOINFORMATIC
   - PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  publication_count: 3
+  publication_count: 4
   species: Prochlorococcus marinus
   strain: SS120
   treatment_types:
   - carbon
+  - genomic_analysis
   - nitrogen
   - phosphorus
 - clade: null
-  experiment_count: 4
+  experiment_count: 2
   gene_count: 5487
   genus: Pseudomonas
   ncbi_taxon_id: 160488
@@ -501,7 +895,7 @@ rows:
   treatment_types:
   - coculture
 - clade: null
-  experiment_count: 9
+  experiment_count: 5
   gene_count: 4368
   genus: Ruegeria
   ncbi_taxon_id: 89184
@@ -515,7 +909,7 @@ rows:
   treatment_types:
   - coculture
 - clade: null
-  experiment_count: 6
+  experiment_count: 3
   gene_count: 4058
   genus: Shewanella
   ncbi_taxon_id: 351745
@@ -528,22 +922,374 @@ rows:
   treatment_types:
   - carbon
   - coculture
+- clade: WPC1
+  experiment_count: 1
+  gene_count: 2876
+  genus: Synechococcus
+  ncbi_taxon_id: 1050624
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A15-127
+  publication_count: 1
+  species: null
+  strain: A15-127
+  treatment_types:
+  - genomic_analysis
+- clade: III
+  experiment_count: 1
+  gene_count: 2764
+  genus: Synechococcus
+  ncbi_taxon_id: 1050635
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A15-24
+  publication_count: 1
+  species: null
+  strain: A15-24
+  treatment_types:
+  - genomic_analysis
+- clade: III
+  experiment_count: 1
+  gene_count: 2814
+  genus: Synechococcus
+  ncbi_taxon_id: 1050638
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A15-28
+  publication_count: 1
+  species: null
+  strain: A15-28
+  treatment_types:
+  - genomic_analysis
+- clade: II
+  experiment_count: 1
+  gene_count: 3209
+  genus: Synechococcus
+  ncbi_taxon_id: 1050646
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A15-44
+  publication_count: 1
+  species: null
+  strain: A15-44
+  treatment_types:
+  - genomic_analysis
+- clade: VII
+  experiment_count: 1
+  gene_count: 3084
+  genus: Synechococcus
+  ncbi_taxon_id: 1050655
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A15-60
+  publication_count: 1
+  species: null
+  strain: A15-60
+  treatment_types:
+  - genomic_analysis
+- clade: II
+  experiment_count: 1
+  gene_count: 2826
+  genus: Synechococcus
+  ncbi_taxon_id: 1050657
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A15-62
+  publication_count: 1
+  species: null
+  strain: A15-62
+  treatment_types:
+  - genomic_analysis
+- clade: VII
+  experiment_count: 1
+  gene_count: 3051
+  genus: Synechococcus
+  ncbi_taxon_id: 1866938
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A18-25c
+  publication_count: 1
+  species: null
+  strain: A18-25c
+  treatment_types:
+  - genomic_analysis
+- clade: III
+  experiment_count: 1
+  gene_count: 2831
+  genus: Synechococcus
+  ncbi_taxon_id: 1866939
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A18-40
+  publication_count: 1
+  species: null
+  strain: A18-40
+  treatment_types:
+  - genomic_analysis
+- clade: III
+  experiment_count: 1
+  gene_count: 2956
+  genus: Synechococcus
+  ncbi_taxon_id: 1866940
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A18-46.1
+  publication_count: 1
+  species: null
+  strain: A18-46.1
+  treatment_types:
+  - genomic_analysis
+- clade: CRD1
+  experiment_count: 1
+  gene_count: 4456
+  genus: Synechococcus
+  ncbi_taxon_id: 1400864
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus BIOS-E4-1
+  publication_count: 1
+  species: null
+  strain: BIOS-E4-1
+  treatment_types:
+  - genomic_analysis
+- clade: CRD1
+  experiment_count: 1
+  gene_count: 3460
+  genus: Synechococcus
+  ncbi_taxon_id: 1400865
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus BIOS-U3-1
+  publication_count: 1
+  species: null
+  strain: BIOS-U3-1
+  treatment_types:
+  - genomic_analysis
+- clade: V
+  experiment_count: 1
+  gene_count: 3096
+  genus: Synechococcus
+  ncbi_taxon_id: 1442551
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus BMK-MC-1
+  publication_count: 1
+  species: null
+  strain: BMK-MC-1
+  treatment_types:
+  - genomic_analysis
+- clade: III
+  experiment_count: 1
+  gene_count: 2789
+  genus: Synechococcus
+  ncbi_taxon_id: 1442552
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus BOUM118
+  publication_count: 1
+  species: null
+  strain: BOUM118
+  treatment_types:
+  - genomic_analysis
+- clade: '5.2'
+  experiment_count: 1
+  gene_count: 3056
+  genus: Synechococcus
+  ncbi_taxon_id: 232348
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus CB0101
+  publication_count: 1
+  species: null
+  strain: CB0101
+  treatment_types:
+  - genomic_analysis
+- clade: '5.2'
+  experiment_count: 1
+  gene_count: 2799
+  genus: Synechococcus
+  ncbi_taxon_id: 232363
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus CB0205
+  publication_count: 1
+  species: null
+  strain: CB0205
+  treatment_types:
+  - genomic_analysis
 - clade: I
-  experiment_count: 11
+  experiment_count: 2
   gene_count: 3038
   genus: Synechococcus
   ncbi_taxon_id: 64471
   omics_types:
+  - BIOINFORMATIC
   - RNASEQ
   organism_name: Synechococcus CC9311
-  publication_count: 1
+  publication_count: 2
   species: null
   strain: CC9311
   treatment_types:
   - carbon
-  - coculture
+  - genomic_analysis
+- clade: II
+  experiment_count: 1
+  gene_count: 2919
+  genus: Synechococcus
+  ncbi_taxon_id: 110662
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus CC9605
+  publication_count: 1
+  species: null
+  strain: CC9605
+  treatment_types:
+  - genomic_analysis
+- clade: EnvC
+  experiment_count: 1
+  gene_count: 3272
+  genus: Synechococcus
+  ncbi_taxon_id: 110663
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus CC9616
+  publication_count: 1
+  species: null
+  strain: CC9616
+  treatment_types:
+  - genomic_analysis
+- clade: IV
+  experiment_count: 1
+  gene_count: 2463
+  genus: Synechococcus
+  ncbi_taxon_id: 316279
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus CC9902
+  publication_count: 1
+  species: null
+  strain: CC9902
+  treatment_types:
+  - genomic_analysis
+- clade: UC-A
+  experiment_count: 1
+  gene_count: 3116
+  genus: Synechococcus
+  ncbi_taxon_id: 1280380
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus KORDI-100
+  publication_count: 1
+  species: null
+  strain: KORDI-100
+  treatment_types:
+  - genomic_analysis
+- clade: WPC1
+  experiment_count: 1
+  gene_count: 2722
+  genus: Synechococcus
+  ncbi_taxon_id: 585423
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus KORDI-49
+  publication_count: 1
+  species: null
+  strain: KORDI-49
+  treatment_types:
+  - genomic_analysis
+- clade: II
+  experiment_count: 1
+  gene_count: 2896
+  genus: Synechococcus
+  ncbi_taxon_id: 585425
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus KORDI-52
+  publication_count: 1
+  species: null
+  strain: KORDI-52
+  treatment_types:
+  - genomic_analysis
+- clade: II
+  experiment_count: 1
+  gene_count: 2543
+  genus: Synechococcus
+  ncbi_taxon_id: 1442553
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus M16.1
+  publication_count: 1
+  species: null
+  strain: M16.1
+  treatment_types:
+  - genomic_analysis
+- clade: VI
+  experiment_count: 1
+  gene_count: 2750
+  genus: Synechococcus
+  ncbi_taxon_id: 1442554
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus MEDNS5
+  publication_count: 1
+  species: null
+  strain: MEDNS5
+  treatment_types:
+  - genomic_analysis
+- clade: '5.3'
+  experiment_count: 1
+  gene_count: 2709
+  genus: Synechococcus
+  ncbi_taxon_id: 221341
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus MINOS11
+  publication_count: 1
+  species: null
+  strain: MINOS11
+  treatment_types:
+  - genomic_analysis
+- clade: CRD1
+  experiment_count: 1
+  gene_count: 3080
+  genus: Synechococcus
+  ncbi_taxon_id: 166309
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus MITS9220
+  publication_count: 1
+  species: null
+  strain: MITS9220
+  treatment_types:
+  - genomic_analysis
+- clade: I
+  experiment_count: 1
+  gene_count: 3047
+  genus: Synechococcus
+  ncbi_taxon_id: 1386941
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus MVIR-18-1
+  publication_count: 1
+  species: null
+  strain: MVIR-18-1
+  treatment_types:
+  - genomic_analysis
+- clade: VII
+  experiment_count: 1
+  gene_count: 2949
+  genus: Synechococcus
+  ncbi_taxon_id: 1442555
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus NOUM97013
+  publication_count: 1
+  species: null
+  strain: NOUM97013
+  treatment_types:
+  - genomic_analysis
 - clade: null
-  experiment_count: 6
+  experiment_count: 3
   gene_count: 3207
   genus: Picosynechococcus
   ncbi_taxon_id: 32049
@@ -556,57 +1302,296 @@ rows:
   treatment_types:
   - carbon
   - coculture
+- clade: VI
+  experiment_count: 1
+  gene_count: 2865
+  genus: Synechococcus
+  ncbi_taxon_id: 1442556
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus PROS-7-1
+  publication_count: 1
+  species: null
+  strain: PROS-7-1
+  treatment_types:
+  - genomic_analysis
+- clade: I
+  experiment_count: 1
+  gene_count: 2771
+  genus: Synechococcus
+  ncbi_taxon_id: 1968775
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus PROS-9-1
+  publication_count: 1
+  species: null
+  strain: PROS-9-1
+  treatment_types:
+  - genomic_analysis
+- clade: II
+  experiment_count: 1
+  gene_count: 3147
+  genus: Synechococcus
+  ncbi_taxon_id: 1400866
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus PROS-U-1
+  publication_count: 1
+  species: null
+  strain: PROS-U-1
+  treatment_types:
+  - genomic_analysis
+- clade: '5.3'
+  experiment_count: 1
+  gene_count: 2575
+  genus: Synechococcus
+  ncbi_taxon_id: 316278
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus RCC307
+  publication_count: 1
+  species: null
+  strain: RCC307
+  treatment_types:
+  - genomic_analysis
+- clade: I
+  experiment_count: 1
+  gene_count: 3787
+  genus: Synechococcus
+  ncbi_taxon_id: 1442557
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus ROS8604
+  publication_count: 1
+  species: null
+  strain: ROS8604
+  treatment_types:
+  - genomic_analysis
+- clade: II
+  experiment_count: 1
+  gene_count: 2983
+  genus: Synechococcus
+  ncbi_taxon_id: 221345
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus RS9902
+  publication_count: 1
+  species: null
+  strain: RS9902
+  treatment_types:
+  - genomic_analysis
+- clade: II
+  experiment_count: 1
+  gene_count: 3004
+  genus: Synechococcus
+  ncbi_taxon_id: 221350
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus RS9907
+  publication_count: 1
+  species: null
+  strain: RS9907
+  treatment_types:
+  - genomic_analysis
+- clade: VIII
+  experiment_count: 1
+  gene_count: 2849
+  genus: Synechococcus
+  ncbi_taxon_id: 221352
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus RS9909
+  publication_count: 1
+  species: null
+  strain: RS9909
+  treatment_types:
+  - genomic_analysis
+- clade: III
+  experiment_count: 1
+  gene_count: 2902
+  genus: Synechococcus
+  ncbi_taxon_id: 221358
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus RS9915
+  publication_count: 1
+  species: null
+  strain: RS9915
+  treatment_types:
+  - genomic_analysis
+- clade: IX
+  experiment_count: 1
+  gene_count: 2926
+  genus: Synechococcus
+  ncbi_taxon_id: 221359
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus RS9916
+  publication_count: 1
+  species: null
+  strain: RS9916
+  treatment_types:
+  - genomic_analysis
+- clade: VIII
+  experiment_count: 1
+  gene_count: 2799
+  genus: Synechococcus
+  ncbi_taxon_id: 221360
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus RS9917
+  publication_count: 1
+  species: null
+  strain: RS9917
+  treatment_types:
+  - genomic_analysis
+- clade: I
+  experiment_count: 1
+  gene_count: 3416
+  genus: Synechococcus
+  ncbi_taxon_id: 1050714
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus SYN20
+  publication_count: 1
+  species: null
+  strain: SYN20
+  treatment_types:
+  - genomic_analysis
+- clade: II
+  experiment_count: 1
+  gene_count: 2700
+  genus: Synechococcus
+  ncbi_taxon_id: 1442558
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus TAK9802
+  publication_count: 1
+  species: null
+  strain: TAK9802
+  treatment_types:
+  - genomic_analysis
+- clade: '5.2'
+  experiment_count: 1
+  gene_count: 3353
+  genus: Synechococcus
+  ncbi_taxon_id: 69042
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus WH5701
+  publication_count: 1
+  species: null
+  strain: WH5701
+  treatment_types:
+  - genomic_analysis
 - clade: V
-  experiment_count: 73
+  experiment_count: 11
   gene_count: 2590
   genus: Synechococcus
   ncbi_taxon_id: 32051
   omics_types:
+  - BIOINFORMATIC
   - EXOPROTEOMICS
   - MICROARRAY
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus WH7803
-  publication_count: 6
+  publication_count: 7
   species: null
   strain: WH7803
   treatment_types:
   - carbon
   - coculture
+  - genomic_analysis
   - viral
+- clade: VI
+  experiment_count: 1
+  gene_count: 2909
+  genus: Synechococcus
+  ncbi_taxon_id: 59931
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus WH7805
+  publication_count: 1
+  species: null
+  strain: WH7805
+  treatment_types:
+  - genomic_analysis
+- clade: I
+  experiment_count: 1
+  gene_count: 3067
+  genus: Synechococcus
+  ncbi_taxon_id: 166318
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus WH8016
+  publication_count: 1
+  species: null
+  strain: WH8016
+  treatment_types:
+  - genomic_analysis
+- clade: VIII
+  experiment_count: 1
+  gene_count: 2938
+  genus: Synechococcus
+  ncbi_taxon_id: 59932
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus WH8101
+  publication_count: 1
+  species: null
+  strain: WH8101
+  treatment_types:
+  - genomic_analysis
 - clade: III
-  experiment_count: 77
+  experiment_count: 8
   gene_count: 2830
   genus: Parasynechococcus
   ncbi_taxon_id: 84588
   omics_types:
-  - EXOPROTEOMICS
+  - BIOINFORMATIC
   - MICROARRAY
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus WH8102
-  publication_count: 5
+  publication_count: 6
   species: Parasynechococcus marenigrum
   strain: WH8102
   treatment_types:
   - carbon
   - coculture
+  - genomic_analysis
   - viral
+- clade: III
+  experiment_count: 1
+  gene_count: 2876
+  genus: Synechococcus
+  ncbi_taxon_id: 29410
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus WH8103
+  publication_count: 1
+  species: null
+  strain: WH8103
+  treatment_types:
+  - genomic_analysis
 - clade: II
-  experiment_count: 3
+  experiment_count: 2
   gene_count: 2681
   genus: Synechococcus
   ncbi_taxon_id: 166314
   omics_types:
+  - BIOINFORMATIC
   - MICROARRAY
   organism_name: Synechococcus WH8109
-  publication_count: 1
+  publication_count: 2
   species: null
   strain: WH8109
   treatment_types:
+  - genomic_analysis
   - viral
 - clade: null
-  experiment_count: 4
+  experiment_count: 2
   gene_count: 2717
   genus: Synechococcus
   ncbi_taxon_id: 1140
@@ -634,18 +1619,20 @@ rows:
   treatment_types:
   - coculture
 - clade: IV
-  experiment_count: 60
+  experiment_count: 5
   gene_count: 2567
   genus: Synechococcus
   ncbi_taxon_id: 313625
   omics_types:
+  - BIOINFORMATIC
   - PROTEOMICS
   organism_name: Synechococcus sp. BL107
-  publication_count: 1
+  publication_count: 2
   species: Synechococcus sp.
   strain: BL107
   treatment_types:
   - carbon
+  - genomic_analysis
 - clade: null
   experiment_count: 1
   gene_count: 2449
@@ -661,15 +1648,13 @@ rows:
   - light
   - oxygen
 - clade: null
-  experiment_count: 1
+  experiment_count: 0
   gene_count: 0
   genus: Vibrio
   ncbi_taxon_id: 670
-  omics_types:
-  - MICROARRAY
+  omics_types: []
   organism_name: Vibrio parahaemolyticus
   publication_count: 1
   species: null
   strain: null
-  treatment_types:
-  - coculture
+  treatment_types: []

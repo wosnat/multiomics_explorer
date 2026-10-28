@@ -1,7 +1,11 @@
 case_id: resolve_gene_by_protein_id
-row_count: 1
+row_count: 2
 rows:
 - gene_name: ctaCI
   locus_tag: PMM0446
   organism_name: Prochlorococcus MED4
+  product: cytochrome c oxidase subunit II
+- gene_name: ctaCI
+  locus_tag: PROCH_1710
+  organism_name: Prochlorococcus EQPAC1
   product: cytochrome c oxidase subunit II

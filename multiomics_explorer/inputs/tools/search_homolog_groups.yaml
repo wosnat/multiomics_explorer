@@ -7,39 +7,39 @@ examples:
     call: search_homolog_groups(search_text="photosynthesis")
     response: |
       {
-        "total_entries": 48972,
-        "total_matching": 1212,
-        "by_source": [{"source": "eggnog", "count": 1684}, {"source": "cyanorak", "count": 430}],
+        "total_entries": 70426,
+        "total_matching": 1369,
+        "by_source": [{"source": "eggnog", "count": 1939}, {"source": "cyanorak", "count": 487}],
         "by_level": [
-          {"taxonomic_level": "Cyanobacteria", "count": 559},
-          {"taxonomic_level": "curated", "count": 430},
-          {"taxonomic_level": "Prochloraceae", "count": 400},
-          {"taxonomic_level": "Synechococcus", "count": 370},
-          {"taxonomic_level": "Bacteria", "count": 352},
+          {"taxonomic_level": "Cyanobacteria", "count": 678},
+          {"taxonomic_level": "curated", "count": 487},
+          {"taxonomic_level": "Bacteria", "count": 443},
+          {"taxonomic_level": "Synechococcus", "count": 413},
+          {"taxonomic_level": "Prochloraceae", "count": 402},
           ...
         ],
-        "score_max": 6.6423540115356445,
-        "score_median": 1.0682822465896606,
+        "score_max": 6.71530294418335,
+        "score_median": 1.0955063104629517,
         "top_cyanorak_roles": [
-          {"id": "cyanorak.role:J.8", "name": "Photosynthesis and respiration > Photosystem II", "count": 247},
+          {"id": "cyanorak.role:G.2", "name": "Energy metabolism > Electron transport", "count": 276},
           {
             "id": "cyanorak.role:D.1.2",
             "name": "Cellular processes > Adaptation/acclimation to atypical conditions and detoxification > Light",
-            "count": 242
+            "count": 274
           },
-          {"id": "cyanorak.role:G.2", "name": "Energy metabolism > Electron transport", "count": 241},
-          {"id": "cyanorak.role:J.2", "name": "Photosynthesis and respiration > CO2 fixation", "count": 180},
-          {"id": "cyanorak.role:J", "name": "Photosynthesis and respiration", "count": 170}
+          {"id": "cyanorak.role:J.8", "name": "Photosynthesis and respiration > Photosystem II", "count": 268},
+          {"id": "cyanorak.role:J.2", "name": "Photosynthesis and respiration > CO2 fixation", "count": 201},
+          {"id": "cyanorak.role:J", "name": "Photosynthesis and respiration", "count": 195}
         ],
         "top_cog_categories": [
-          {"id": "cog.category:S", "name": "Function unknown", "count": 796},
-          {"id": "cog.category:C", "name": "Energy production and conversion", "count": 681},
-          {"id": "cog.category:G", "name": "Carbohydrate transport and metabolism", "count": 100},
-          {"id": "cog.category:H", "name": "Coenzyme transport and metabolism", "count": 92},
+          {"id": "cog.category:S", "name": "Function unknown", "count": 872},
+          {"id": "cog.category:C", "name": "Energy production and conversion", "count": 830},
+          {"id": "cog.category:H", "name": "Coenzyme transport and metabolism", "count": 110},
+          {"id": "cog.category:G", "name": "Carbohydrate transport and metabolism", "count": 101},
           {
             "id": "cog.category:U",
             "name": "Intracellular trafficking, secretion, and vesicular transport",
-            "count": 69
+            "count": 78
           }
         ],
         "returned": 5,
@@ -54,9 +54,9 @@ examples:
             "source": "eggnog",
             "taxonomic_level": "Bacteria",
             "specificity_rank": 3,
-            "member_count": 19,
-            "organism_count": 19,
-            "score": 6.6423540115356445
+            "member_count": 47,
+            "organism_count": 47,
+            "score": 6.71530294418335
           },
           {
             "group_id": "eggnog:31GDS@2",
@@ -66,9 +66,9 @@ examples:
             "source": "eggnog",
             "taxonomic_level": "Bacteria",
             "specificity_rank": 3,
-            "member_count": 27,
-            "organism_count": 27,
-            "score": 6.6423540115356445
+            "member_count": 95,
+            "organism_count": 95,
+            "score": 6.71530294418335
           },
           {
             "group_id": "eggnog:32YIH@2",
@@ -78,9 +78,9 @@ examples:
             "source": "eggnog",
             "taxonomic_level": "Bacteria",
             "specificity_rank": 3,
-            "member_count": 28,
-            "organism_count": 27,
-            "score": 6.6423540115356445
+            "member_count": 107,
+            "organism_count": 101,
+            "score": 6.71530294418335
           },
           ...
         ]

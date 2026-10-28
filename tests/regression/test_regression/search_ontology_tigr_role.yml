@@ -1,328 +1,328 @@
 case_id: search_ontology_tigr_role
 row_count: 36
 rows:
-- gene_count: 281
+- gene_count: 912
   id: tigr.role:100
   is_informative: true
   level: 1
   name: Central intermediary metabolism / Amino sugars
-  organism_count: 43
+  organism_count: 117
   score: 0.6138
   tree: null
   tree_code: null
-- gene_count: 192
+- gene_count: 659
   id: tigr.role:102
   is_informative: true
   level: 1
   name: Central intermediary metabolism / Other
-  organism_count: 43
+  organism_count: 117
   score: 0.6667
   tree: null
   tree_code: null
-- gene_count: 297
+- gene_count: 1301
   id: tigr.role:103
   is_informative: true
   level: 1
   name: Central intermediary metabolism / Phosphorus compounds
-  organism_count: 42
+  organism_count: 116
   score: 0.6138
   tree: null
   tree_code: null
-- gene_count: 91
+- gene_count: 240
   id: tigr.role:104
   is_informative: true
   level: 1
   name: Central intermediary metabolism / Polyamine biosynthesis
-  organism_count: 43
+  organism_count: 117
   score: 0.6138
   tree: null
   tree_code: null
-- gene_count: 379
+- gene_count: 1570
   id: tigr.role:105
   is_informative: true
   level: 1
   name: Energy metabolism / Biosynthesis and degradation of polysaccharides
-  organism_count: 42
+  organism_count: 116
   score: 0.5298
   tree: null
   tree_code: null
-- gene_count: 306
+- gene_count: 1206
   id: tigr.role:106
   is_informative: true
   level: 1
   name: Central intermediary metabolism / Sulfur metabolism
-  organism_count: 41
+  organism_count: 115
   score: 0.8385
   tree: null
   tree_code: null
-- gene_count: 33
+- gene_count: 164
   id: tigr.role:108
   is_informative: true
   level: 1
   name: Energy metabolism / Aerobic
-  organism_count: 23
+  organism_count: 97
   score: 0.7296
   tree: null
   tree_code: null
-- gene_count: 542
+- gene_count: 1316
   id: tigr.role:109
   is_informative: true
   level: 1
   name: Energy metabolism / Amino acids and amines
-  organism_count: 43
+  organism_count: 117
   score: 0.5687
   tree: null
   tree_code: null
-- gene_count: 25
+- gene_count: 26
   id: tigr.role:110
   is_informative: true
   level: 1
   name: Energy metabolism / Anaerobic
-  organism_count: 14
+  organism_count: 15
   score: 0.7296
   tree: null
   tree_code: null
-- gene_count: 370
+- gene_count: 1110
   id: tigr.role:111
   is_informative: true
   level: 1
   name: Energy metabolism / ATP-proton motive force interconversion
-  organism_count: 41
+  organism_count: 115
   score: 0.5298
   tree: null
   tree_code: null
-- gene_count: 1747
+- gene_count: 6739
   id: tigr.role:112
   is_informative: true
   level: 1
   name: Energy metabolism / Electron transport
-  organism_count: 43
+  organism_count: 117
   score: 0.6667
   tree: null
   tree_code: null
-- gene_count: 82
+- gene_count: 302
   id: tigr.role:113
   is_informative: true
   level: 1
   name: Energy metabolism / Entner-Doudoroff
-  organism_count: 36
+  organism_count: 110
   score: 0.6667
   tree: null
   tree_code: null
-- gene_count: 50
+- gene_count: 120
   id: tigr.role:114
   is_informative: true
   level: 1
   name: Energy metabolism / Fermentation
-  organism_count: 21
+  organism_count: 58
   score: 0.7296
   tree: null
   tree_code: null
-- gene_count: 617
+- gene_count: 2165
   id: tigr.role:116
   is_informative: true
   level: 1
   name: Energy metabolism / Glycolysis/gluconeogenesis
-  organism_count: 43
+  organism_count: 117
   score: 0.6667
   tree: null
   tree_code: null
-- gene_count: 497
+- gene_count: 1731
   id: tigr.role:117
   is_informative: true
   level: 1
   name: Energy metabolism / Pentose phosphate pathway
-  organism_count: 43
+  organism_count: 117
   score: 0.6138
   tree: null
   tree_code: null
-- gene_count: 132
+- gene_count: 506
   id: tigr.role:118
   is_informative: true
   level: 1
   name: Energy metabolism / Pyruvate dehydrogenase
-  organism_count: 42
+  organism_count: 116
   score: 0.6667
   tree: null
   tree_code: null
-- gene_count: 572
+- gene_count: 2456
   id: tigr.role:119
   is_informative: true
   level: 1
   name: Energy metabolism / Sugars
-  organism_count: 43
+  organism_count: 117
   score: 0.7296
   tree: null
   tree_code: null
-- gene_count: 376
+- gene_count: 1089
   id: tigr.role:120
   is_informative: true
   level: 1
   name: Energy metabolism / TCA cycle
-  organism_count: 43
+  organism_count: 117
   score: 0.6667
   tree: null
   tree_code: null
-- gene_count: 127
+- gene_count: 617
   id: tigr.role:121
   is_informative: true
   level: 1
   name: Fatty acid and phospholipid metabolism / Other
-  organism_count: 23
+  organism_count: 97
   score: 0.5687
   tree: null
   tree_code: null
-- gene_count: 202
+- gene_count: 677
   id: tigr.role:123
   is_informative: true
   level: 1
   name: Purines, pyrimidines, nucleosides, and nucleotides / 2^-Deoxyribonucleotide
     metabolism
-  organism_count: 43
+  organism_count: 117
   score: 0.4958
   tree: null
   tree_code: null
-- gene_count: 36
+- gene_count: 142
   id: tigr.role:130
   is_informative: true
   level: 1
   name: DNA metabolism / Other
-  organism_count: 29
+  organism_count: 102
   score: 0.7296
   tree: null
   tree_code: null
-- gene_count: 60
+- gene_count: 206
   id: tigr.role:131
   is_informative: true
   level: 1
   name: DNA metabolism / Degradation of DNA
-  organism_count: 30
+  organism_count: 90
   score: 0.6138
   tree: null
   tree_code: null
-- gene_count: 2390
+- gene_count: 7810
   id: tigr.role:132
   is_informative: true
   level: 1
   name: DNA metabolism / DNA replication, recombination, and repair
-  organism_count: 43
+  organism_count: 117
   score: 0.5298
   tree: null
   tree_code: null
-- gene_count: 22
+- gene_count: 96
   id: tigr.role:159
   is_informative: true
   level: 1
   name: Energy metabolism / Methanogenesis
-  organism_count: 22
+  organism_count: 96
   score: 0.7296
   tree: null
   tree_code: null
-- gene_count: 212
+- gene_count: 875
   id: tigr.role:160
   is_informative: true
   level: 1
   name: Central intermediary metabolism / Nitrogen metabolism
-  organism_count: 40
+  organism_count: 114
   score: 0.8385
   tree: null
   tree_code: null
-- gene_count: 3244
+- gene_count: 15174
   id: tigr.role:164
   is_informative: true
   level: 1
   name: Energy metabolism / Photosynthesis
-  organism_count: 28
+  organism_count: 102
   score: 0.7296
   tree: null
   tree_code: null
-- gene_count: 103
+- gene_count: 327
   id: tigr.role:170
   is_informative: true
   level: 1
   name: DNA metabolism / Chromosome-associated proteins
-  organism_count: 43
+  organism_count: 117
   score: 0.6138
   tree: null
   tree_code: null
-- gene_count: 884
+- gene_count: 2843
   id: tigr.role:176
   is_informative: true
   level: 1
   name: Fatty acid and phospholipid metabolism / Biosynthesis
-  organism_count: 43
+  organism_count: 117
   score: 0.5687
   tree: null
   tree_code: null
-- gene_count: 224
+- gene_count: 827
   id: tigr.role:177
   is_informative: true
   level: 1
   name: Fatty acid and phospholipid metabolism / Degradation
-  organism_count: 35
+  organism_count: 109
   score: 0.5687
   tree: null
   tree_code: null
-- gene_count: 62
+- gene_count: 258
   id: tigr.role:183
   is_informative: true
   level: 1
   name: DNA metabolism / Restriction/modification
-  organism_count: 25
+  organism_count: 87
   score: 0.6667
   tree: null
   tree_code: null
-- gene_count: 199
+- gene_count: 435
   id: tigr.role:184
   is_informative: true
   level: 1
   name: Energy metabolism / Other
-  organism_count: 42
+  organism_count: 111
   score: 0.7296
   tree: null
   tree_code: null
-- gene_count: 138
+- gene_count: 508
   id: tigr.role:698
   is_informative: true
   level: 1
   name: Central intermediary metabolism / One-carbon metabolism
-  organism_count: 43
+  organism_count: 117
   score: 0.7954
   tree: null
   tree_code: null
-- gene_count: 1517
+- gene_count: 5693
   id: tigr.role:central_intermediary_metabolism
   is_informative: true
   level: 0
   name: Central intermediary metabolism
-  organism_count: 43
+  organism_count: 117
   score: 0.7296
   tree: null
   tree_code: null
-- gene_count: 2629
+- gene_count: 8648
   id: tigr.role:dna_metabolism
   is_informative: true
   level: 0
   name: DNA metabolism
-  organism_count: 43
+  organism_count: 117
   score: 0.8056
   tree: null
   tree_code: null
-- gene_count: 7353
+- gene_count: 28235
   id: tigr.role:energy_metabolism
   is_informative: true
   level: 0
   name: Energy metabolism
-  organism_count: 43
+  organism_count: 117
   score: 0.8056
   tree: null
   tree_code: null
-- gene_count: 1139
+- gene_count: 3897
   id: tigr.role:fatty_acid_and_phospholipid_metabolism
   is_informative: true
   level: 0
   name: Fatty acid and phospholipid metabolism
-  organism_count: 43
+  organism_count: 117
   score: 0.6138
   tree: null
   tree_code: null

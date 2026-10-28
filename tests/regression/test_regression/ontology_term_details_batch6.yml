@@ -125,10 +125,10 @@ results:
   children_total: 97
   children_truncated: true
   description: null
-  direct_gene_count: 649
+  direct_gene_count: 1640
   direction: unknown
   direction_basis: null
-  gene_count: 3933
+  gene_count: 9107
   is_informative: true
   label: TcdbFamily
   level: 2
@@ -169,7 +169,7 @@ results:
   member_count: 97
   name: The ATP-binding Cassette (ABC) Superfamily
   ontology: tcdb
-  organism_count: 43
+  organism_count: 117
   parents:
   - '{''id'': ''tcdb:3.A'', ''level'': 1, ''name'': ''P-P-bond-hydrolysis-driven transporters''}'
   proteins: null
@@ -189,9 +189,9 @@ results:
   cleavage_summary: cleaves after Met (44%) / Leu (22%) / Gly (11%) - 27 known cleavages
     (0% physiological)
   description: null
-  direct_gene_count: 129
+  direct_gene_count: 425
   family_class: peptidase
-  gene_count: 129
+  gene_count: 425
   is_informative: true
   known_cleavage_count: 27
   label: MeropsFamily
@@ -205,11 +205,11 @@ results:
   merops_id: S14
   name: ClpP endopeptidase
   ontology: merops
-  organism_count: 42
+  organism_count: 116
   parents:
   - '{''id'': ''merops.clan:SK'', ''level'': 0, ''name'': ''SK''}'
-  peptidase_gene_count: 129
-  peptidase_organism_count: 42
+  peptidase_gene_count: 425
+  peptidase_organism_count: 116
   term_id: merops.family:S14
 - children:
   - '{''id'': ''interpro:IPR004708'', ''level'': 1, ''name'': ''Aspartate ammonia-lyase''}'
@@ -225,8 +225,8 @@ results:
     is a substrate, have been shown to share a short conserved sequence around a methionine
     which is probably involved in the catalytic activity of this type of enzymes.
     The following are examples of members of this family:'
-  direct_gene_count: 135
-  gene_count: 135
+  direct_gene_count: 357
+  gene_count: 357
   interpro_id: IPR000362
   interpro_type: FAMILY
   is_informative: true
@@ -252,7 +252,7 @@ results:
   member_count: 4
   name: Fumarate lyase family
   ontology: interpro
-  organism_count: 43
+  organism_count: 117
   parents: []
   term_id: interpro:IPR000362
 - children: []
@@ -282,8 +282,8 @@ results:
   children_total: 3
   children_truncated: false
   description: null
-  direct_gene_count: 875
-  gene_count: 1067
+  direct_gene_count: 1944
+  gene_count: 2324
   is_informative: true
   label: BiologicalProcess
   level: 3
@@ -291,7 +291,7 @@ results:
   links_out: []
   name: response to oxidative stress
   ontology: go_bp
-  organism_count: 43
+  organism_count: 117
   parents:
   - '{''id'': ''go:0006950'', ''level'': 2, ''name'': ''response to stress''}'
   term_id: go:0006979

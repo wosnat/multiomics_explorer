@@ -43,8 +43,8 @@ run_cypher(query="MATCH (g:Gene) RETURN g.organism_name AS strain, count(g) AS g
   "warnings": [],
   "results": [
     {"strain": "Pseudomonas putida KT2440", "gene_count": 5487},
+    {"strain": "Synechococcus BIOS-E4-1", "gene_count": 4456},
     {"strain": "Ruegeria pomeroyi DSS-3", "gene_count": 4368},
-    {"strain": "Alteromonas (MarRef v6)", "gene_count": 4305},
     ...
   ]
 }
@@ -67,8 +67,8 @@ run_cypher(query="MATCH (g:Gene)-[:HAS_FUNCTION]->(f:Function) RETURN g.locus_ta
   "returned": 0,
   "truncated": false,
   "warnings": [
-    "One of the labels in your query is not available in the database, make sure you didn't misspell it or that the label ...",
-    "One of the relationship types in your query is not available in the database, make sure you didn't misspell it or tha..."
+    "One of the relationship types in your query is not available in the database, make sure you didn't misspell it or tha...",
+    "One of the labels in your query is not available in the database, make sure you didn't misspell it or that the label ..."
   ],
   "results": []
 }

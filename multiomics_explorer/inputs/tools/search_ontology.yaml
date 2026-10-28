@@ -8,19 +8,19 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 3322,
-        "total_matching": 31,
-        "score_max": 2.656532049179077,
-        "score_median": 1.913879156112671,
+        "total_entries": 3411,
+        "total_matching": 32,
+        "score_max": 2.654890298843384,
+        "score_median": 1.9133362770080566,
         "returned": 5,
         "offset": 0,
         "truncated": true,
         "by_ontology": [
           {
             "ontology": "go_bp",
-            "total_entries": 3322,
-            "total_matching": 31,
-            "score_max": 2.656532049179077,
+            "total_entries": 3411,
+            "total_matching": 32,
+            "score_max": 2.654890298843384,
             "returned": 5,
             "truncated": true
           }
@@ -35,27 +35,27 @@ examples:
             "id": "go:0006260",
             "name": "DNA replication",
             "ontology_type": "go_bp",
-            "score": 2.656532049179077,
+            "score": 2.654890298843384,
             "level": 6,
             "is_informative": true,
-            "gene_count": 1340,
-            "organism_count": 43
+            "gene_count": 3197,
+            "organism_count": 117
           },
           {
             "id": "go:0006270",
             "name": "DNA replication initiation",
             "ontology_type": "go_bp",
-            "score": 2.352276563644409,
+            "score": 2.3511452674865723,
             "level": 6,
             "is_informative": true,
-            "gene_count": 124,
-            "organism_count": 43
+            "gene_count": 271,
+            "organism_count": 117
           },
           {
             "id": "go:0006274",
             "name": "DNA replication termination",
             "ontology_type": "go_bp",
-            "score": 2.352276563644409,
+            "score": 2.3511452674865723,
             "level": 6,
             "is_informative": true,
             "gene_count": 7,
@@ -70,8 +70,8 @@ examples:
     response: |
       {
         "mode": "browse",
-        "total_entries": 155,
-        "total_matching": 97,
+        "total_entries": 170,
+        "total_matching": 107,
         "score_max": null,
         "score_median": null,
         "returned": 5,
@@ -80,14 +80,14 @@ examples:
         "by_ontology": [
           {
             "ontology": "merops",
-            "total_entries": 155,
-            "total_matching": 97,
+            "total_entries": 170,
+            "total_matching": 107,
             "score_max": null,
             "returned": 5,
             "truncated": true
           }
         ],
-        "by_level": [{"level": 1, "count": 97}],
+        "by_level": [{"level": 1, "count": 107}],
         "by_interpro_type": [],
         "by_family_type": [],
         "skipped_ontologies": [],
@@ -100,18 +100,8 @@ examples:
             "score": null,
             "level": 1,
             "is_informative": true,
-            "gene_count": 417,
-            "organism_count": 43
-          },
-          {
-            "id": "merops.family:S09",
-            "name": "prolyl oligopeptidase",
-            "ontology_type": "merops",
-            "score": null,
-            "level": 1,
-            "is_informative": true,
-            "gene_count": 300,
-            "organism_count": 43
+            "gene_count": 852,
+            "organism_count": 117
           },
           {
             "id": "merops.family:C26",
@@ -120,8 +110,18 @@ examples:
             "score": null,
             "level": 1,
             "is_informative": true,
-            "gene_count": 278,
-            "organism_count": 43
+            "gene_count": 704,
+            "organism_count": 117
+          },
+          {
+            "id": "merops.family:S09",
+            "name": "prolyl oligopeptidase",
+            "ontology_type": "merops",
+            "score": null,
+            "level": 1,
+            "is_informative": true,
+            "gene_count": 497,
+            "organism_count": 117
           },
           ...
         ]
@@ -133,7 +133,7 @@ examples:
     response: |
       {
         "mode": "browse",
-        "total_entries": 9368,
+        "total_entries": 9725,
         "total_matching": 8,
         "score_max": null,
         "score_median": null,
@@ -143,7 +143,7 @@ examples:
         "by_ontology": [
           {
             "ontology": "tcdb",
-            "total_entries": 9368,
+            "total_entries": 9725,
             "total_matching": 8,
             "score_max": null,
             "returned": 5,
@@ -163,8 +163,8 @@ examples:
             "score": null,
             "level": 2,
             "is_informative": true,
-            "gene_count": 3933,
-            "organism_count": 43,
+            "gene_count": 9107,
+            "organism_count": 117,
             "organism_gene_count": 52
           },
           {
@@ -174,8 +174,8 @@ examples:
             "score": null,
             "level": 2,
             "is_informative": true,
-            "gene_count": 597,
-            "organism_count": 43,
+            "gene_count": 1949,
+            "organism_count": 117,
             "organism_gene_count": 17
           },
           {
@@ -185,8 +185,8 @@ examples:
             "score": null,
             "level": 2,
             "is_informative": true,
-            "gene_count": 383,
-            "organism_count": 32,
+            "gene_count": 1509,
+            "organism_count": 106,
             "organism_gene_count": 11
           },
           ...
@@ -199,8 +199,8 @@ examples:
     response: |
       {
         "mode": "browse",
-        "total_entries": 3322,
-        "total_matching": 3322,
+        "total_entries": 3411,
+        "total_matching": 3411,
         "score_max": null,
         "score_median": null,
         "returned": 3,
@@ -209,8 +209,8 @@ examples:
         "by_ontology": [
           {
             "ontology": "go_bp",
-            "total_entries": 3322,
-            "total_matching": 3322,
+            "total_entries": 3411,
+            "total_matching": 3411,
             "score_max": null,
             "returned": 3,
             "truncated": true
@@ -219,9 +219,9 @@ examples:
         "by_level": [
           {"level": 0, "count": 1},
           {"level": 1, "count": 16},
-          {"level": 2, "count": 111},
-          {"level": 3, "count": 323},
-          {"level": 4, "count": 667},
+          {"level": 2, "count": 115},
+          {"level": 3, "count": 338},
+          {"level": 4, "count": 686},
           ...
         ],
         "by_interpro_type": [],
@@ -238,8 +238,8 @@ examples:
             "score": null,
             "level": 0,
             "is_informative": false,
-            "gene_count": 67458,
-            "organism_count": 43
+            "gene_count": 162041,
+            "organism_count": 117
           },
           {
             "id": "go:0009987",
@@ -248,8 +248,8 @@ examples:
             "score": null,
             "level": 1,
             "is_informative": true,
-            "gene_count": 61172,
-            "organism_count": 43
+            "gene_count": 148760,
+            "organism_count": 117
           },
           {
             "id": "go:0008152",
@@ -258,8 +258,8 @@ examples:
             "score": null,
             "level": 2,
             "is_informative": true,
-            "gene_count": 48567,
-            "organism_count": 43
+            "gene_count": 123459,
+            "organism_count": 117
           }
         ]
       }
@@ -270,8 +270,8 @@ examples:
     response: |
       {
         "mode": "browse",
-        "total_entries": 5112,
-        "total_matching": 4998,
+        "total_entries": 5212,
+        "total_matching": 5088,
         "score_max": null,
         "score_median": null,
         "returned": 6,
@@ -280,16 +280,16 @@ examples:
         "by_ontology": [
           {
             "ontology": "ncbifam",
-            "total_entries": 4957,
-            "total_matching": 4957,
+            "total_entries": 5042,
+            "total_matching": 5042,
             "score_max": null,
             "returned": 3,
             "truncated": true
           },
           {
             "ontology": "merops",
-            "total_entries": 155,
-            "total_matching": 41,
+            "total_entries": 170,
+            "total_matching": 46,
             "score_max": null,
             "returned": 3,
             "truncated": true
@@ -302,34 +302,34 @@ examples:
         "warnings": [],
         "results": [
           {
-            "id": "ncbifam:TIGR00254",
-            "name": "diguanylate cyclase",
-            "ontology_type": "ncbifam",
-            "score": null,
-            "level": 0,
-            "is_informative": true,
-            "gene_count": 696,
-            "organism_count": 20
-          },
-          {
             "id": "ncbifam:TIGR00231",
             "name": "GTP-binding protein",
             "ontology_type": "ncbifam",
             "score": null,
             "level": 0,
             "is_informative": true,
-            "gene_count": 475,
-            "organism_count": 43
+            "gene_count": 1219,
+            "organism_count": 117
           },
           {
-            "id": "ncbifam:TIGR00229",
-            "name": "PAS domain S-box protein",
+            "id": "ncbifam:TIGR02937",
+            "name": "sigma-70 family RNA polymerase sigma factor",
             "ontology_type": "ncbifam",
             "score": null,
             "level": 0,
             "is_informative": true,
-            "gene_count": 403,
-            "organism_count": 32
+            "gene_count": 975,
+            "organism_count": 117
+          },
+          {
+            "id": "ncbifam:TIGR03798",
+            "name": "Nif11-like leader peptide family RiPP precursor",
+            "ontology_type": "ncbifam",
+            "score": null,
+            "level": 0,
+            "is_informative": true,
+            "gene_count": 793,
+            "organism_count": 97
           },
           ...
         ]
@@ -340,27 +340,27 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 12690,
-        "total_matching": 850,
-        "score_max": 7.3615570068359375,
-        "score_median": 3.394239902496338,
+        "total_entries": 13136,
+        "total_matching": 859,
+        "score_max": 7.366277694702148,
+        "score_median": 3.3912983536720276,
         "returned": 10,
         "offset": 0,
         "truncated": true,
         "by_ontology": [
           {
             "ontology": "go_bp",
-            "total_entries": 3322,
-            "total_matching": 324,
-            "score_max": 1.5236425399780273,
+            "total_entries": 3411,
+            "total_matching": 332,
+            "score_max": 1.5253678560256958,
             "returned": 5,
             "truncated": true
           },
           {
             "ontology": "tcdb",
-            "total_entries": 9368,
-            "total_matching": 526,
-            "score_max": 7.3615570068359375,
+            "total_entries": 9725,
+            "total_matching": 527,
+            "score_max": 7.366277694702148,
             "returned": 5,
             "truncated": true
           }
@@ -375,31 +375,31 @@ examples:
             "id": "go:0006810",
             "name": "transport",
             "ontology_type": "go_bp",
-            "score": 1.5236425399780273,
+            "score": 1.5253678560256958,
             "level": 3,
             "is_informative": true,
-            "gene_count": 10992,
-            "organism_count": 43
+            "gene_count": 23853,
+            "organism_count": 117
           },
           {
             "id": "go:0015990",
             "name": "electron transport coupled proton transport",
             "ontology_type": "go_bp",
-            "score": 1.3548328876495361,
+            "score": 1.356764793395996,
             "level": 7,
             "is_informative": true,
-            "gene_count": 155,
-            "organism_count": 43
+            "gene_count": 239,
+            "organism_count": 116
           },
           {
             "id": "go:0006821",
             "name": "chloride transport",
             "ontology_type": "go_bp",
-            "score": 1.3265666961669922,
+            "score": 1.3283048868179321,
             "level": 5,
             "is_informative": true,
-            "gene_count": 57,
-            "organism_count": 43
+            "gene_count": 209,
+            "organism_count": 117
           },
           ...
         ]
@@ -410,9 +410,9 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 56674,
-        "total_matching": 205,
-        "score_max": 11.322080612182617,
+        "total_entries": 58176,
+        "total_matching": 207,
+        "score_max": 11.335722923278809,
         "score_median": 3.41845965385437,
         "returned": 19,
         "offset": 0,
@@ -420,25 +420,25 @@ examples:
         "by_ontology": [
           {
             "ontology": "go_bp",
-            "total_entries": 3322,
+            "total_entries": 3411,
             "total_matching": 6,
-            "score_max": 3.556473731994629,
+            "score_max": 3.5730364322662354,
             "returned": 2,
             "truncated": true
           },
           {
             "ontology": "go_mf",
-            "total_entries": 2890,
-            "total_matching": 6,
-            "score_max": 3.241783857345581,
+            "total_entries": 2951,
+            "total_matching": 7,
+            "score_max": 3.17476224899292,
             "returned": 2,
             "truncated": true
           },
           {
             "ontology": "go_cc",
-            "total_entries": 451,
+            "total_entries": 466,
             "total_matching": 1,
-            "score_max": 2.700234889984131,
+            "score_max": 2.717869997024536,
             "returned": 1,
             "truncated": false
           },
@@ -452,9 +452,9 @@ examples:
           },
           {
             "ontology": "kegg",
-            "total_entries": 4940,
+            "total_entries": 5107,
             "total_matching": 20,
-            "score_max": 2.7988977432250977,
+            "score_max": 2.817457675933838,
             "returned": 2,
             "truncated": true
           },
@@ -470,31 +470,31 @@ examples:
             "id": "go:0042128",
             "name": "nitrate assimilation",
             "ontology_type": "go_bp",
-            "score": 3.556473731994629,
+            "score": 3.5730364322662354,
             "level": 4,
             "is_informative": true,
-            "gene_count": 88,
-            "organism_count": 32
+            "gene_count": 366,
+            "organism_count": 101
           },
           {
             "id": "go:1902025",
             "name": "nitrate import",
             "ontology_type": "go_bp",
-            "score": 3.556473731994629,
+            "score": 3.5730364322662354,
             "level": 5,
             "is_informative": true,
-            "gene_count": 54,
-            "organism_count": 25
+            "gene_count": 125,
+            "organism_count": 71
           },
           {
             "id": "go:0008940",
             "name": "nitrate reductase activity",
             "ontology_type": "go_mf",
-            "score": 3.241783857345581,
+            "score": 3.17476224899292,
             "level": 4,
             "is_informative": true,
-            "gene_count": 23,
-            "organism_count": 10
+            "gene_count": 103,
+            "organism_count": 51
           },
           ...
         ]
@@ -508,19 +508,19 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 2681,
+        "total_entries": 2767,
         "total_matching": 2,
-        "score_max": 2.494616985321045,
-        "score_median": 2.1319267749786377,
+        "score_max": 2.515202283859253,
+        "score_median": 2.1506364345550537,
         "returned": 2,
         "offset": 0,
         "truncated": false,
         "by_ontology": [
           {
             "ontology": "brite",
-            "total_entries": 2681,
+            "total_entries": 2767,
             "total_matching": 2,
-            "score_max": 2.494616985321045,
+            "score_max": 2.515202283859253,
             "returned": 2,
             "truncated": false
           }
@@ -535,25 +535,25 @@ examples:
             "id": "kegg.brite:ko02000.A2.B2.C3",
             "name": "Arabinogalactan oligomer/maltooligosaccharide transport system",
             "ontology_type": "brite",
-            "score": 2.494616985321045,
+            "score": 2.515202283859253,
             "level": 2,
             "is_informative": true,
             "tree": "transporters",
             "tree_code": "ko02000",
-            "gene_count": 37,
-            "organism_count": 17
+            "gene_count": 139,
+            "organism_count": 68
           },
           {
             "id": "kegg.brite:ko02000.A6.B6",
             "name": "Accessory factors involved in transport [TC:8]",
             "ontology_type": "brite",
-            "score": 2.1319267749786377,
+            "score": 2.1506364345550537,
             "level": 1,
             "is_informative": true,
             "tree": "transporters",
             "tree_code": "ko02000",
-            "gene_count": 215,
-            "organism_count": 23
+            "gene_count": 270,
+            "organism_count": 53
           }
         ]
       }
@@ -567,19 +567,19 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 9368,
+        "total_entries": 9725,
         "total_matching": 35,
-        "score_max": 9.365047454833984,
-        "score_median": 4.339223861694336,
+        "score_max": 9.35278034210205,
+        "score_median": 4.326177597045898,
         "returned": 5,
         "offset": 0,
         "truncated": true,
         "by_ontology": [
           {
             "ontology": "tcdb",
-            "total_entries": 9368,
+            "total_entries": 9725,
             "total_matching": 35,
-            "score_max": 9.365047454833984,
+            "score_max": 9.35278034210205,
             "returned": 5,
             "truncated": true
           }
@@ -594,7 +594,7 @@ examples:
             "id": "tcdb:2.A.2.4.17",
             "name": "High affinity sucrose transporter of 617 aas and 12 TMSs, Sut1B.",
             "ontology_type": "tcdb",
-            "score": 9.365047454833984,
+            "score": 9.35278034210205,
             "level": 4,
             "is_informative": true,
             "gene_count": 0,
@@ -604,7 +604,7 @@ examples:
             "id": "tcdb:3.A.1.1.8",
             "name": "Sucrose/maltose/trehalose porter (sucrose-inducible)",
             "ontology_type": "tcdb",
-            "score": 8.554240226745605,
+            "score": 8.559282302856445,
             "level": 4,
             "is_informative": true,
             "gene_count": 3,
@@ -614,7 +614,7 @@ examples:
             "id": "tcdb:4.A.1.2.1",
             "name": "Sucrose porter IIBCScr (ScrA) of 456 aas and 10 or 11 TMSs.",
             "ontology_type": "tcdb",
-            "score": 8.547380447387695,
+            "score": 8.534334182739258,
             "level": 4,
             "is_informative": true,
             "gene_count": 0,
@@ -630,7 +630,7 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 9368,
+        "total_entries": 9725,
         "total_matching": 2,
         "score_max": 3.453925609588623,
         "score_median": 3.2717318534851074,
@@ -640,7 +640,7 @@ examples:
         "by_ontology": [
           {
             "ontology": "tcdb",
-            "total_entries": 9368,
+            "total_entries": 9725,
             "total_matching": 2,
             "score_max": 3.453925609588623,
             "returned": 2,
@@ -660,11 +660,11 @@ examples:
             "score": 3.453925609588623,
             "level": 4,
             "is_informative": true,
-            "gene_count": 143,
-            "organism_count": 28,
+            "gene_count": 462,
+            "organism_count": 92,
             "description": "The high-affinity (<1 μM) urea porter",
             "level_kind": "tc_system",
-            "direct_gene_count": 143,
+            "direct_gene_count": 462,
             "superfamily": "ArsA ATPase (ArsA) Superfamily",
             "tcdb_substrate_count": 1,
             "direction": "uptake",
@@ -677,11 +677,11 @@ examples:
             "score": 3.2717318534851074,
             "level": 4,
             "is_informative": true,
-            "gene_count": 143,
-            "organism_count": 28,
+            "gene_count": 462,
+            "organism_count": 92,
             "description": "The high affinity urea/thiourea/hydroxyurea porter (Beckers et al., 2004)",
             "level_kind": "tc_system",
-            "direct_gene_count": 143,
+            "direct_gene_count": 462,
             "superfamily": "ArsA ATPase (ArsA) Superfamily",
             "tcdb_substrate_count": 3,
             "direction": "uptake",
@@ -695,19 +695,19 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 13000,
-        "total_matching": 49,
-        "score_max": 9.800861358642578,
-        "score_median": 1.573620319366455,
+        "total_entries": 13343,
+        "total_matching": 50,
+        "score_max": 9.802618980407715,
+        "score_median": 1.5768532752990723,
         "returned": 5,
         "offset": 0,
         "truncated": true,
         "by_ontology": [
           {
             "ontology": "interpro",
-            "total_entries": 13000,
-            "total_matching": 49,
-            "score_max": 9.800861358642578,
+            "total_entries": 13343,
+            "total_matching": 50,
+            "score_max": 9.802618980407715,
             "returned": 5,
             "truncated": true
           }
@@ -722,29 +722,29 @@ examples:
             "id": "interpro:IPR027417",
             "name": "P-loop containing nucleoside triphosphate hydrolase",
             "ontology_type": "interpro",
-            "score": 9.800861358642578,
+            "score": 9.802618980407715,
             "level": 0,
             "is_informative": true,
             "interpro_type": "HOMOLOGOUS_SUPERFAMILY",
-            "gene_count": 7045,
-            "organism_count": 43
+            "gene_count": 17886,
+            "organism_count": 117
           },
           {
             "id": "interpro:IPR008250",
             "name": "P-type ATPase, A domain superfamily",
             "ontology_type": "interpro",
-            "score": 5.831203460693359,
+            "score": 5.829111576080322,
             "level": 0,
             "is_informative": true,
             "interpro_type": "HOMOLOGOUS_SUPERFAMILY",
-            "gene_count": 94,
-            "organism_count": 42
+            "gene_count": 229,
+            "organism_count": 114
           },
           {
             "id": "interpro:IPR023534",
             "name": "Rof/RNase P-like",
             "ontology_type": "interpro",
-            "score": 4.432365417480469,
+            "score": 4.443747520446777,
             "level": 0,
             "is_informative": true,
             "interpro_type": "HOMOLOGOUS_SUPERFAMILY",
@@ -760,43 +760,33 @@ examples:
     response: |
       {
         "mode": "browse",
-        "total_entries": 4957,
-        "total_matching": 4,
+        "total_entries": 5042,
+        "total_matching": 13,
         "score_max": null,
         "score_median": null,
-        "returned": 4,
+        "returned": 5,
         "offset": 0,
-        "truncated": false,
+        "truncated": true,
         "by_ontology": [
           {
             "ontology": "ncbifam",
-            "total_entries": 4957,
-            "total_matching": 4,
+            "total_entries": 5042,
+            "total_matching": 13,
             "score_max": null,
-            "returned": 4,
-            "truncated": false
+            "returned": 5,
+            "truncated": true
           }
         ],
-        "by_level": [{"level": 0, "count": 4}],
+        "by_level": [{"level": 0, "count": 13}],
         "by_interpro_type": [],
-        "by_family_type": [{"family_type": "domain", "count": 3}, {"family_type": "superfamily", "count": 1}],
+        "by_family_type": [
+          {"family_type": "domain", "count": 3},
+          {"family_type": "superfamily", "count": 1},
+          {"family_type": "subfamily", "count": 1}
+        ],
         "skipped_ontologies": [],
         "warnings": [],
         "results": [
-          {
-            "id": "ncbifam:TIGR00254",
-            "name": "diguanylate cyclase",
-            "ontology_type": "ncbifam",
-            "score": null,
-            "level": 0,
-            "is_informative": true,
-            "gene_count": 696,
-            "organism_count": 20,
-            "description": "The GGDEF domain is named for the motif GG[DE]EF shared by many proteins carrying the domain. There is evidence that ...",
-            "level_kind": null,
-            "family_type": "domain",
-            "gene_symbol": null
-          },
           {
             "id": "ncbifam:TIGR00231",
             "name": "GTP-binding protein",
@@ -804,25 +794,39 @@ examples:
             "score": null,
             "level": 0,
             "is_informative": true,
-            "gene_count": 475,
-            "organism_count": 43,
+            "gene_count": 1219,
+            "organism_count": 117,
             "description": "Proteins with a small GTP-binding domain recognized by this model include Ras, RhoA, Rab11, translation elongation fa...",
             "level_kind": null,
             "family_type": "domain",
             "gene_symbol": null
           },
           {
-            "id": "ncbifam:TIGR00229",
-            "name": "PAS domain S-box protein",
+            "id": "ncbifam:TIGR02937",
+            "name": "sigma-70 family RNA polymerase sigma factor",
             "ontology_type": "ncbifam",
             "score": null,
             "level": 0,
             "is_informative": true,
-            "gene_count": 403,
-            "organism_count": 32,
-            "description": "The PAS domain was previously described. This sensory box, or S-box domain occupies the central portion of the PAS do...",
+            "gene_count": 975,
+            "organism_count": 117,
+            "description": "This model encompasses all varieties of the sigma-70 type sigma factors including the ECF subfamily. A number of sigm...",
             "level_kind": null,
-            "family_type": "domain",
+            "family_type": "superfamily",
+            "gene_symbol": null
+          },
+          {
+            "id": "ncbifam:TIGR03798",
+            "name": "Nif11-like leader peptide family RiPP precursor",
+            "ontology_type": "ncbifam",
+            "score": null,
+            "level": 0,
+            "is_informative": true,
+            "gene_count": 793,
+            "organism_count": 97,
+            "description": "This model describes a conserved, fairly long (about 65 residue) leader peptide region for a family of ribosomally sy...",
+            "level_kind": null,
+            "family_type": "subfamily",
             "gene_symbol": null
           },
           ...
@@ -834,19 +838,19 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 155,
-        "total_matching": 19,
-        "score_max": 1.636549949645996,
-        "score_median": 0.5249618291854858,
+        "total_entries": 170,
+        "total_matching": 20,
+        "score_max": 1.653455376625061,
+        "score_median": 0.5445544719696045,
         "returned": 5,
         "offset": 0,
         "truncated": true,
         "by_ontology": [
           {
             "ontology": "merops",
-            "total_entries": 155,
-            "total_matching": 19,
-            "score_max": 1.636549949645996,
+            "total_entries": 170,
+            "total_matching": 20,
+            "score_max": 1.653455376625061,
             "returned": 5,
             "truncated": true
           }
@@ -861,31 +865,31 @@ examples:
             "id": "merops.family:M50",
             "name": "S2P protease",
             "ontology_type": "merops",
-            "score": 1.636549949645996,
+            "score": 1.653455376625061,
             "level": 1,
             "is_informative": true,
-            "gene_count": 87,
-            "organism_count": 43
+            "gene_count": 232,
+            "organism_count": 117
           },
           {
             "id": "merops.family:S16",
             "name": "lon protease",
             "ontology_type": "merops",
-            "score": 1.636549949645996,
+            "score": 1.653455376625061,
             "level": 1,
             "is_informative": true,
-            "gene_count": 82,
-            "organism_count": 43
+            "gene_count": 160,
+            "organism_count": 117
           },
           {
             "id": "merops.family:S49",
             "name": "protease IV",
             "ontology_type": "merops",
-            "score": 1.636549949645996,
+            "score": 1.653455376625061,
             "level": 1,
             "is_informative": true,
-            "gene_count": 89,
-            "organism_count": 43
+            "gene_count": 221,
+            "organism_count": 117
           },
           ...
         ]
@@ -926,8 +930,8 @@ examples:
             "score": 0.5361359119415283,
             "level": 0,
             "is_informative": true,
-            "gene_count": 2097,
-            "organism_count": 43
+            "gene_count": 3221,
+            "organism_count": 117
           }
         ]
       }
@@ -938,19 +942,19 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 4940,
-        "total_matching": 327,
-        "score_max": 1.7353379726409912,
-        "score_median": 1.1521457433700562,
+        "total_entries": 5107,
+        "total_matching": 331,
+        "score_max": 1.7493276596069336,
+        "score_median": 1.1619808673858643,
         "returned": 5,
         "offset": 0,
         "truncated": true,
         "by_ontology": [
           {
             "ontology": "kegg",
-            "total_entries": 4940,
-            "total_matching": 327,
-            "score_max": 1.7353379726409912,
+            "total_entries": 5107,
+            "total_matching": 331,
+            "score_max": 1.7493276596069336,
             "returned": 5,
             "truncated": true
           }
@@ -965,34 +969,34 @@ examples:
             "id": "kegg.subcategory:09131",
             "name": "Membrane transport",
             "ontology_type": "kegg",
-            "score": 1.7353379726409912,
+            "score": 1.7493276596069336,
             "level": 1,
             "is_informative": true,
             "discussed_by_n_publications": 0,
-            "gene_count": 3358,
-            "organism_count": 43
+            "gene_count": 7439,
+            "organism_count": 117
           },
           {
             "id": "kegg.subcategory:09141",
             "name": "Transport and catabolism",
             "ontology_type": "kegg",
-            "score": 1.6003291606903076,
+            "score": 1.6134060621261597,
             "level": 1,
             "is_informative": true,
             "discussed_by_n_publications": 0,
-            "gene_count": 399,
-            "organism_count": 43
+            "gene_count": 785,
+            "organism_count": 117
           },
           {
-            "id": "kegg.orthology:K06197",
-            "name": "chaB; cation transport regulator",
+            "id": "kegg.orthology:K03322",
+            "name": "mntH; manganese transport protein",
             "ontology_type": "kegg",
-            "score": 1.4848110675811768,
+            "score": 1.4970839023590088,
             "level": 3,
             "is_informative": true,
             "discussed_by_n_publications": 0,
-            "gene_count": 1,
-            "organism_count": 1
+            "gene_count": 3,
+            "organism_count": 3
           },
           ...
         ]
@@ -1003,19 +1007,19 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 4940,
+        "total_entries": 5107,
         "total_matching": 1,
-        "score_max": 4.1332902908325195,
-        "score_median": 4.1332902908325195,
+        "score_max": 4.152606964111328,
+        "score_median": 4.152606964111328,
         "returned": 1,
         "offset": 0,
         "truncated": false,
         "by_ontology": [
           {
             "ontology": "kegg",
-            "total_entries": 4940,
+            "total_entries": 5107,
             "total_matching": 1,
-            "score_max": 4.1332902908325195,
+            "score_max": 4.152606964111328,
             "returned": 1,
             "truncated": false
           }
@@ -1030,12 +1034,12 @@ examples:
             "id": "kegg.pathway:ko00710",
             "name": "Carbon fixation by Calvin cycle",
             "ontology_type": "kegg",
-            "score": 4.1332902908325195,
+            "score": 4.152606964111328,
             "level": 2,
             "is_informative": true,
             "discussed_by_n_publications": 24,
-            "gene_count": 714,
-            "organism_count": 43
+            "gene_count": 1847,
+            "organism_count": 117
           }
         ]
       }

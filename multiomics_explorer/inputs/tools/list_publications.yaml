@@ -7,14 +7,14 @@ examples:
     call: list_publications()
     response: |
       {
-        "total_entries": 49,
-        "total_matching": 49,
+        "total_entries": 50,
+        "total_matching": 50,
         "by_organism": [
-          {"organism_name": "Prochlorococcus MED4", "count": 20},
-          {"organism_name": "Prochlorococcus MIT9313", "count": 10},
-          {"organism_name": "Prochlorococcus NATL2A", "count": 6},
-          {"organism_name": "Synechococcus WH7803", "count": 6},
-          {"organism_name": "Prochlorococcus MIT9312", "count": 5},
+          {"organism_name": "Prochlorococcus MED4", "count": 21},
+          {"organism_name": "Prochlorococcus MIT9313", "count": 11},
+          {"organism_name": "Prochlorococcus NATL2A", "count": 7},
+          {"organism_name": "Synechococcus WH7803", "count": 7},
+          {"organism_name": "Prochlorococcus MIT9312", "count": 6},
           ...
         ],
         "by_organism_truncated": true,
@@ -52,7 +52,7 @@ examples:
         "by_value_kind": [
           {"value_kind": "boolean", "count": 7},
           {"value_kind": "numeric", "count": 7},
-          {"value_kind": "categorical", "count": 5}
+          {"value_kind": "categorical", "count": 6}
         ],
         "by_metric_type": [
           {"metric_type": "expression_change_high_light_shock", "count": 1},
@@ -64,12 +64,12 @@ examples:
         ],
         "by_metric_type_truncated": true,
         "by_compartment": [
-          {"compartment": "whole_cell", "count": 45},
+          {"compartment": "whole_cell", "count": 46},
           {"compartment": "vesicle", "count": 3},
           {"compartment": "exoproteome", "count": 3},
           {"compartment": "extracellular", "count": 1}
         ],
-        "by_discusses_coverage": {"has_discusses": 45, "no_discusses": 4},
+        "by_discusses_coverage": {"has_discusses": 46, "no_discusses": 4},
         "returned": 5,
         "offset": 0,
         "truncated": true,
@@ -173,7 +173,7 @@ examples:
     call: list_publications(compartment="vesicle")
     response: |
       {
-        "total_entries": 49,
+        "total_entries": 50,
         "total_matching": 3,
         "by_organism": [
           {"organism_name": "Prochlorococcus MIT9313", "count": 2},
@@ -318,7 +318,7 @@ examples:
     call: list_publications(publication_dois=["10.1128/msystems.01261-22", "10.1073/pnas.2213271120", "10.1111/1462-2920.15834"])
     response: |
       {
-        "total_entries": 49,
+        "total_entries": 50,
         "total_matching": 3,
         "by_organism": [
           {"organism_name": "Prochlorococcus MIT9313", "count": 3},
@@ -419,7 +419,7 @@ examples:
             "metabolite_count": 96,
             "metabolite_assay_count": 8,
             "metabolite_compartments": ["whole_cell", "extracellular"],
-            "discussed_gene_count": 6,
+            "discussed_gene_count": 9,
             "discussed_pathway_count": 4
           },
           {
@@ -453,14 +453,14 @@ examples:
     call: list_publications()
     response: |
       {
-        "total_entries": 49,
-        "total_matching": 49,
+        "total_entries": 50,
+        "total_matching": 50,
         "by_organism": [
-          {"organism_name": "Prochlorococcus MED4", "count": 20},
-          {"organism_name": "Prochlorococcus MIT9313", "count": 10},
-          {"organism_name": "Prochlorococcus NATL2A", "count": 6},
-          {"organism_name": "Synechococcus WH7803", "count": 6},
-          {"organism_name": "Prochlorococcus MIT9312", "count": 5},
+          {"organism_name": "Prochlorococcus MED4", "count": 21},
+          {"organism_name": "Prochlorococcus MIT9313", "count": 11},
+          {"organism_name": "Prochlorococcus NATL2A", "count": 7},
+          {"organism_name": "Synechococcus WH7803", "count": 7},
+          {"organism_name": "Prochlorococcus MIT9312", "count": 6},
           ...
         ],
         "by_organism_truncated": true,
@@ -498,7 +498,7 @@ examples:
         "by_value_kind": [
           {"value_kind": "boolean", "count": 7},
           {"value_kind": "numeric", "count": 7},
-          {"value_kind": "categorical", "count": 5}
+          {"value_kind": "categorical", "count": 6}
         ],
         "by_metric_type": [
           {"metric_type": "expression_change_high_light_shock", "count": 1},
@@ -510,12 +510,12 @@ examples:
         ],
         "by_metric_type_truncated": true,
         "by_compartment": [
-          {"compartment": "whole_cell", "count": 45},
+          {"compartment": "whole_cell", "count": 46},
           {"compartment": "vesicle", "count": 3},
           {"compartment": "exoproteome", "count": 3},
           {"compartment": "extracellular", "count": 1}
         ],
-        "by_discusses_coverage": {"has_discusses": 45, "no_discusses": 4},
+        "by_discusses_coverage": {"has_discusses": 46, "no_discusses": 4},
         "returned": 5,
         "offset": 0,
         "truncated": true,

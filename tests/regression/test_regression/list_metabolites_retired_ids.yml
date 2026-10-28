@@ -37,7 +37,7 @@ resolved_aliases:
   chebi:14654:
   - kegg.compound:C00244
 results:
-- catalyst_gene_count: 33
+- catalyst_gene_count: 77
   chebi_id: '48107'
   elements:
   - H
@@ -48,7 +48,7 @@ results:
   - metabolism
   - transport
   formula: HNO3
-  go_transport_organism_count: 26
+  go_transport_organism_count: 72
   go_transport_organism_names:
   - Alteromonas (MarRef v6)
   - Alteromonas macleodii AD45
@@ -60,17 +60,63 @@ results:
   - Alteromonas macleodii MIT1002
   - Alteromonas mediterranea AltDE
   - Alteromonas mediterranea AltDE1
+  - Cyanobium NS01
+  - Cyanobium PCC6307
+  - Cyanobium PCC7001
   - Marinobacter (MarRef v6)
   - Meiothermus ruber
+  - Prochlorococcus EQPAC1
   - Prochlorococcus MED4
   - Prochlorococcus MIT0604
+  - Prochlorococcus MIT9314
   - Prochlorococcus PAC1
   - Prochlorococcus SB
   - Pseudomonas putida KT2440
+  - Synechococcus A15-127
+  - Synechococcus A15-24
+  - Synechococcus A15-28
+  - Synechococcus A15-44
+  - Synechococcus A15-60
+  - Synechococcus A15-62
+  - Synechococcus A18-25c
+  - Synechococcus A18-40
+  - Synechococcus A18-46.1
+  - Synechococcus BIOS-E4-1
+  - Synechococcus BIOS-U3-1
+  - Synechococcus BMK-MC-1
+  - Synechococcus BOUM118
+  - Synechococcus CB0101
+  - Synechococcus CB0205
   - Synechococcus CC9311
+  - Synechococcus CC9605
+  - Synechococcus CC9616
+  - Synechococcus CC9902
+  - Synechococcus KORDI-100
+  - Synechococcus KORDI-49
+  - Synechococcus KORDI-52
+  - Synechococcus M16.1
+  - Synechococcus MEDNS5
+  - Synechococcus MINOS11
+  - Synechococcus NOUM97013
   - Synechococcus PCC 7002
+  - Synechococcus PROS-9-1
+  - Synechococcus PROS-U-1
+  - Synechococcus RCC307
+  - Synechococcus ROS8604
+  - Synechococcus RS9902
+  - Synechococcus RS9907
+  - Synechococcus RS9909
+  - Synechococcus RS9915
+  - Synechococcus RS9916
+  - Synechococcus SYN20
+  - Synechococcus TAK9802
+  - Synechococcus WH5701
   - Synechococcus WH7803
+  - Synechococcus WH7805
+  - Synechococcus WH8016
+  - Synechococcus WH8101
   - Synechococcus WH8102
+  - Synechococcus WH8103
   - Synechococcus WH8109
   - Synechococcus elongatus PCC 7942
   - Synechococcus elongatus UTEX 2973
@@ -83,7 +129,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00244
   name: Nitrate
-  organism_count: 27
+  organism_count: 73
   pathway_count: 6
   pathway_ids:
   - kegg.pathway:ko00910
@@ -94,7 +140,7 @@ results:
   - kegg.pathway:ko02020
   structure_kind: defined
   transporter_count: 5
-  transporter_gene_count: 88
+  transporter_gene_count: 165
 returned: 1
 row_count: 1
 score_max: null
@@ -139,7 +185,7 @@ top_organisms:
   organism_name: Alteromonas mediterranea AltDE1
 - count: 1
   organism_name: Alteromonas (MarRef v6)
-total_entries: 3178
+total_entries: 3251
 total_matching: 1
 truncated: false
 warnings:

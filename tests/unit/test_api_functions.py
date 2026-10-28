@@ -11722,7 +11722,7 @@ class TestListFilterValuesPhase1Plumbing:
     evidence_source (spec §6.5)."""
 
     def test_dispatches_omics_type(self, mock_conn):
-        """omics_type returns canonical OMICS_TYPE enum (8 values)."""
+        """omics_type returns canonical OMICS_TYPE enum (9 values)."""
         # Mock returns 7 of 8 values present in KG; the function must merge
         # canonical METABOLOMICS even at count=0.
         mock_conn.execute_query.return_value = [
@@ -11737,12 +11737,12 @@ class TestListFilterValuesPhase1Plumbing:
         ]
         result = api.list_filter_values(filter_type="omics_type", conn=mock_conn)
         assert result["filter_type"] == "omics_type"
-        # 8 distinct OMICS_TYPE enum values per spec §6.5.
+        # 9 distinct OMICS_TYPE enum values per spec §6.5.
         values = {r["value"] for r in result["results"]}
         assert "METABOLOMICS" in values
         assert "RNASEQ" in values
         assert "PROTEOMICS" in values
-        assert len(values) == 8
+        assert len(values) == 9
 
     def test_omics_type_includes_metabolomics_even_when_zero(self, mock_conn):
         """Spec §6.5 — METABOLOMICS must appear even when no Experiment carries it.

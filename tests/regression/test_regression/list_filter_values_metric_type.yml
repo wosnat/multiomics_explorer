@@ -1,6 +1,10 @@
 case_id: list_filter_values_metric_type
-row_count: 53
+row_count: 55
 rows:
+- count: 95
+  value: sbp_nutrient_class
+- count: 95
+  value: sbp_predicted_substrate
 - count: 6
   value: log2_mv_cell_enrichment
 - count: 6

@@ -1,26 +1,26 @@
 by_evidence_source:
-- count: 2221
+- count: 2287
   evidence_source: metabolism
-- count: 1282
+- count: 1311
   evidence_source: transport
-- count: 212
+- count: 218
   evidence_source: go_transport
 - count: 135
   evidence_source: metabolomics
 by_kegg_brite_class:
-- count: 249
+- count: 257
   kegg_brite_class: 'Lipids: Fatty acyls'
-- count: 134
+- count: 140
   kegg_brite_class: 'Lipids: Prenol lipids'
-- count: 54
+- count: 55
   kegg_brite_class: 'Phytochemical compounds: Terpenoids'
-- count: 36
+- count: 38
   kegg_brite_class: 'Lipids: Sterol lipids'
-- count: 34
+- count: 37
   kegg_brite_class: 'Lipids: Polyketides'
 - count: 34
   kegg_brite_class: 'Phytochemical compounds: Alkaloids'
-- count: 29
+- count: 30
   kegg_brite_class: 'Pesticides: Pesticides'
 - count: 25
   kegg_brite_class: 'Lipids: Glycerophospholipids'
@@ -44,7 +44,7 @@ by_kegg_brite_class:
   kegg_brite_class: 'Phytochemical compounds: Amino acid related compounds'
 - count: 7
   kegg_brite_class: 'Lipids: Sphingolipids'
-- count: 5
+- count: 6
   kegg_brite_class: 'Endocrine disrupting compounds: Pesticides and herbicides'
 - count: 5
   kegg_brite_class: 'Pesticides: Obsolete pesticides'
@@ -63,7 +63,7 @@ by_kegg_brite_class:
 - count: 1
   kegg_brite_class: 'Phytochemical compounds: Shikimate / acetate-malonate pathway
     derived compounds'
-- count: 2544
+- count: 2597
   kegg_brite_class: not classified
 by_kegg_functional_category:
 - count: 64
@@ -72,11 +72,11 @@ by_kegg_functional_category:
   kegg_functional_category: Peptides
 - count: 47
   kegg_functional_category: Nucleic acids
-- count: 39
+- count: 40
   kegg_functional_category: Vitamins and cofactors
 - count: 37
   kegg_functional_category: Lipids
-- count: 31
+- count: 35
   kegg_functional_category: Organic acids
 - count: 28
   kegg_functional_category: Antibiotics
@@ -84,7 +84,7 @@ by_kegg_functional_category:
   kegg_functional_category: Hormones and transmitters
 - count: 14
   kegg_functional_category: Steroids
-- count: 2857
+- count: 2925
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment:
@@ -95,7 +95,7 @@ by_measurement_coverage:
   - compartment: whole_cell
     count: 135
   by_paper_count:
-  - count: 3043
+  - count: 3116
     paper_count: 0
   - count: 93
     paper_count: 1
@@ -104,16 +104,16 @@ by_measurement_coverage:
   - count: 5
     paper_count: 3
 by_structure_kind:
-- count: 2531
+- count: 2584
   structure_kind: defined
-- count: 622
+- count: 641
   structure_kind: generic
-- count: 25
+- count: 26
   structure_kind: polymer
 case_id: list_metabolites_all
 mass_stats:
   mass_max: 5227.103
-  mass_median: 244.179
+  mass_median: 245.21
   mass_min: 1.00794
 not_found:
   elements: []
@@ -123,7 +123,7 @@ not_found:
 offset: 0
 resolved_aliases: {}
 results:
-- catalyst_gene_count: 10249
+- catalyst_gene_count: 24955
   chebi_id: '15377'
   elements:
   - H
@@ -133,13 +133,18 @@ results:
   - metabolism
   - transport
   formula: H2O
-  go_transport_organism_count: 5
+  go_transport_organism_count: 10
   go_transport_organism_names:
+  - Cyanobium NS01
+  - Cyanobium PCC6307
+  - Cyanobium PCC7001
   - Meiothermus ruber
   - Pseudomonas putida KT2440
   - Ruegeria pomeroyi DSS-3
   - Shewanella sp. W3-18-1
+  - Synechococcus BMK-MC-1
   - Synechococcus PCC 7002
+  - Synechococcus WH5701
   mass: 18.015
   measured_assay_count: 0
   measured_compartments: []
@@ -147,7 +152,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00001
   name: H2O
-  organism_count: 43
+  organism_count: 117
   pathway_count: 4
   pathway_ids:
   - kegg.pathway:ko00190
@@ -156,8 +161,8 @@ results:
   - kegg.pathway:ko01100
   structure_kind: defined
   transporter_count: 3
-  transporter_gene_count: 10
-- catalyst_gene_count: 6041
+  transporter_gene_count: 22
+- catalyst_gene_count: 15995
   chebi_id: '15422'
   elements:
   - C
@@ -183,7 +188,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00002
   name: ATP
-  organism_count: 43
+  organism_count: 117
   pathway_count: 18
   pathway_ids:
   - kegg.pathway:ko00190
@@ -207,7 +212,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 5776
+- catalyst_gene_count: 14214
   chebi_id: '15378'
   elements:
   - H
@@ -223,7 +228,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00080
   name: H+
-  organism_count: 43
+  organism_count: 117
   pathway_count: 6
   pathway_ids:
   - kegg.pathway:ko00190
@@ -235,7 +240,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 4325
+- catalyst_gene_count: 11502
   chebi_id: '29888'
   elements:
   - H
@@ -254,14 +259,14 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00013
   name: Diphosphate
-  organism_count: 43
+  organism_count: 117
   pathway_count: 1
   pathway_ids:
   - kegg.pathway:ko00190
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 4069
+- catalyst_gene_count: 10602
   chebi_id: '26078'
   elements:
   - H
@@ -272,7 +277,7 @@ results:
   - metabolism
   - transport
   formula: HO4P
-  go_transport_organism_count: 43
+  go_transport_organism_count: 117
   go_transport_organism_names:
   - Alteromonas (MarRef v6)
   - Alteromonas macleodii AD45
@@ -284,34 +289,108 @@ results:
   - Alteromonas macleodii MIT1002
   - Alteromonas mediterranea AltDE
   - Alteromonas mediterranea AltDE1
+  - Cyanobium NS01
+  - Cyanobium PCC6307
+  - Cyanobium PCC7001
   - Marinobacter (MarRef v6)
   - Meiothermus ruber
   - Prochlorococcus AS9601
+  - Prochlorococcus EQPAC1
+  - Prochlorococcus GP2
+  - Prochlorococcus HNLC1
+  - Prochlorococcus HNLC2
+  - Prochlorococcus LG
   - Prochlorococcus MED4
+  - Prochlorococcus MIT0601
+  - Prochlorococcus MIT0602
+  - Prochlorococcus MIT0603
   - Prochlorococcus MIT0604
+  - Prochlorococcus MIT0701
+  - Prochlorococcus MIT0702
+  - Prochlorococcus MIT0703
   - Prochlorococcus MIT0801
   - Prochlorococcus MIT1314
   - Prochlorococcus MIT1327
+  - Prochlorococcus MIT9107
+  - Prochlorococcus MIT9116
+  - Prochlorococcus MIT9123
+  - Prochlorococcus MIT9201
   - Prochlorococcus MIT9202
+  - Prochlorococcus MIT9211
   - Prochlorococcus MIT9215
   - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9302
   - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9311
   - Prochlorococcus MIT9312
   - Prochlorococcus MIT9313
+  - Prochlorococcus MIT9314
+  - Prochlorococcus MIT9321
+  - Prochlorococcus MIT9322
+  - Prochlorococcus MIT9401
   - Prochlorococcus MIT9515
   - Prochlorococcus NATL1A
   - Prochlorococcus NATL2A
   - Prochlorococcus PAC1
   - Prochlorococcus RSP50
   - Prochlorococcus SB
+  - Prochlorococcus SS2
+  - Prochlorococcus SS35
+  - Prochlorococcus SS51
+  - Prochlorococcus SS52
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   - Pseudomonas putida KT2440
   - Ruegeria pomeroyi DSS-3
   - Shewanella sp. W3-18-1
+  - Synechococcus A15-127
+  - Synechococcus A15-24
+  - Synechococcus A15-28
+  - Synechococcus A15-44
+  - Synechococcus A15-60
+  - Synechococcus A15-62
+  - Synechococcus A18-25c
+  - Synechococcus A18-40
+  - Synechococcus A18-46.1
+  - Synechococcus BIOS-E4-1
+  - Synechococcus BIOS-U3-1
+  - Synechococcus BMK-MC-1
+  - Synechococcus BOUM118
+  - Synechococcus CB0101
+  - Synechococcus CB0205
   - Synechococcus CC9311
+  - Synechococcus CC9605
+  - Synechococcus CC9616
+  - Synechococcus CC9902
+  - Synechococcus KORDI-100
+  - Synechococcus KORDI-49
+  - Synechococcus KORDI-52
+  - Synechococcus M16.1
+  - Synechococcus MEDNS5
+  - Synechococcus MINOS11
+  - Synechococcus MITS9220
+  - Synechococcus MVIR-18-1
+  - Synechococcus NOUM97013
   - Synechococcus PCC 7002
+  - Synechococcus PROS-7-1
+  - Synechococcus PROS-9-1
+  - Synechococcus PROS-U-1
+  - Synechococcus RCC307
+  - Synechococcus ROS8604
+  - Synechococcus RS9902
+  - Synechococcus RS9907
+  - Synechococcus RS9909
+  - Synechococcus RS9915
+  - Synechococcus RS9916
+  - Synechococcus RS9917
+  - Synechococcus SYN20
+  - Synechococcus TAK9802
+  - Synechococcus WH5701
   - Synechococcus WH7803
+  - Synechococcus WH7805
+  - Synechococcus WH8016
+  - Synechococcus WH8101
   - Synechococcus WH8102
+  - Synechococcus WH8103
   - Synechococcus WH8109
   - Synechococcus elongatus PCC 7942
   - Synechococcus elongatus UTEX 2973
@@ -324,7 +403,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00009
   name: Orthophosphate
-  organism_count: 43
+  organism_count: 117
   pathway_count: 6
   pathway_ids:
   - kegg.pathway:ko00190
@@ -341,19 +420,19 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 1606
+- count: 1643
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 615
+- count: 637
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
-- count: 589
+- count: 603
   metabolite_pathway_id: kegg.pathway:ko01120
   metabolite_pathway_name: Microbial metabolism in diverse environments
-- count: 284
+- count: 286
   metabolite_pathway_id: kegg.pathway:ko01240
   metabolite_pathway_name: Biosynthesis of cofactors
-- count: 145
+- count: 148
   metabolite_pathway_id: kegg.pathway:ko01220
   metabolite_pathway_name: Degradation of aromatic compounds
 - count: 125
@@ -362,7 +441,7 @@ top_metabolite_pathways:
 - count: 121
   metabolite_pathway_id: kegg.pathway:ko02010
   metabolite_pathway_name: ABC transporters
-- count: 105
+- count: 113
   metabolite_pathway_id: kegg.pathway:ko01250
   metabolite_pathway_name: Biosynthesis of nucleotide sugars
 - count: 104
@@ -392,11 +471,11 @@ top_organisms:
   organism_name: Alteromonas macleodii HOT1A3
 - count: 1461
   organism_name: Alteromonas mediterranea AltDE1
-total_entries: 3178
-total_matching: 3178
+total_entries: 3251
+total_matching: 3251
 truncated: true
 warnings: []
 xref_coverage:
-  with_chebi: 3054
-  with_hmdb: 1463
-  with_mnxm: 3155
+  with_chebi: 3114
+  with_hmdb: 1481
+  with_mnxm: 3228

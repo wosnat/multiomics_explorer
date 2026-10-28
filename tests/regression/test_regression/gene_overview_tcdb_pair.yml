@@ -69,9 +69,10 @@ results:
   catalyzed_metabolite_count: 6
   cazy_family_count: 0
   closest_ortholog_genera:
+  - Cyanobium
   - Prochlorococcus
   - Synechococcus
-  closest_ortholog_group_size: 22
+  closest_ortholog_group_size: 97
   cluster_membership_count: 2
   cluster_types:
   - decay_pattern
@@ -129,9 +130,10 @@ results:
   catalyzed_metabolite_count: 0
   cazy_family_count: 0
   closest_ortholog_genera:
+  - Cyanobium
   - Prochlorococcus
   - Synechococcus
-  closest_ortholog_group_size: 22
+  closest_ortholog_group_size: 96
   cluster_membership_count: 1
   cluster_types:
   - diel

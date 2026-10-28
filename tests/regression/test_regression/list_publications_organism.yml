@@ -1,5 +1,5 @@
 case_id: list_publications_organism
-row_count: 20
+row_count: 21
 rows:
 - authors:
   - Jordan Rozum
@@ -160,6 +160,137 @@ rows:
   treatment_types:
   - salt
   year: 2022
+- authors:
+  - Benjamin A. Ford
+  - Bhumika S. Shah
+  - Bridget C. Mabbutt
+  - Deepa Varkey
+  - Geraldine J. Sullivan
+  - Hannah Zhu
+  - Ian T. Paulsen
+  - Lisa Moore
+  - Martin Ostrowski
+  background_factors: []
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 190
+  derived_metric_value_kinds:
+  - categorical
+  discussed_gene_count: 629
+  discussed_pathway_count: 4
+  doi: 10.1042/BST20200244
+  experiment_count: 95
+  growth_phases: []
+  journal: Biochemical Society Transactions
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - BIOINFORMATIC
+  organisms:
+  - Cyanobium NS01
+  - Cyanobium PCC6307
+  - Cyanobium PCC7001
+  - Prochlorococcus AS9601
+  - Prochlorococcus EQPAC1
+  - Prochlorococcus GP2
+  - Prochlorococcus HNLC1
+  - Prochlorococcus HNLC2
+  - Prochlorococcus LG
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT0601
+  - Prochlorococcus MIT0602
+  - Prochlorococcus MIT0603
+  - Prochlorococcus MIT0604
+  - Prochlorococcus MIT0701
+  - Prochlorococcus MIT0702
+  - Prochlorococcus MIT0703
+  - Prochlorococcus MIT0801
+  - Prochlorococcus MIT9107
+  - Prochlorococcus MIT9116
+  - Prochlorococcus MIT9123
+  - Prochlorococcus MIT9201
+  - Prochlorococcus MIT9202
+  - Prochlorococcus MIT9211
+  - Prochlorococcus MIT9215
+  - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9302
+  - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9311
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9313
+  - Prochlorococcus MIT9314
+  - Prochlorococcus MIT9321
+  - Prochlorococcus MIT9322
+  - Prochlorococcus MIT9401
+  - Prochlorococcus MIT9515
+  - Prochlorococcus NATL1A
+  - Prochlorococcus NATL2A
+  - Prochlorococcus PAC1
+  - Prochlorococcus SB
+  - Prochlorococcus SS2
+  - Prochlorococcus SS35
+  - Prochlorococcus SS51
+  - Prochlorococcus SS52
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  - Synechococcus A15-127
+  - Synechococcus A15-24
+  - Synechococcus A15-28
+  - Synechococcus A15-44
+  - Synechococcus A15-60
+  - Synechococcus A15-62
+  - Synechococcus A18-25c
+  - Synechococcus A18-40
+  - Synechococcus A18-46.1
+  - Synechococcus BIOS-E4-1
+  - Synechococcus BIOS-U3-1
+  - Synechococcus BMK-MC-1
+  - Synechococcus BOUM118
+  - Synechococcus CB0101
+  - Synechococcus CB0205
+  - Synechococcus CC9311
+  - Synechococcus CC9605
+  - Synechococcus CC9616
+  - Synechococcus CC9902
+  - Synechococcus KORDI-100
+  - Synechococcus KORDI-49
+  - Synechococcus KORDI-52
+  - Synechococcus M16.1
+  - Synechococcus MEDNS5
+  - Synechococcus MINOS11
+  - Synechococcus MITS9220
+  - Synechococcus MVIR-18-1
+  - Synechococcus NOUM97013
+  - Synechococcus PROS-7-1
+  - Synechococcus PROS-9-1
+  - Synechococcus PROS-U-1
+  - Synechococcus RCC307
+  - Synechococcus ROS8604
+  - Synechococcus RS9902
+  - Synechococcus RS9907
+  - Synechococcus RS9909
+  - Synechococcus RS9915
+  - Synechococcus RS9916
+  - Synechococcus RS9917
+  - Synechococcus SYN20
+  - Synechococcus TAK9802
+  - Synechococcus WH5701
+  - Synechococcus WH7803
+  - Synechococcus WH7805
+  - Synechococcus WH8016
+  - Synechococcus WH8101
+  - Synechococcus WH8102
+  - Synechococcus WH8103
+  - Synechococcus WH8109
+  - Synechococcus sp. BL107
+  study_type: Review
+  title: Functional characterisation of substrate-binding proteins to address nutrient
+    uptake in marine picocyanobacteria
+  treatment_types:
+  - genomic_analysis
+  year: 2021
 - authors:
   - Andres Cubillos-Ruiz
   - Iva Neveux

@@ -27,7 +27,7 @@ ordered `tcdb_gate`: `direct` (a rank-1 best hit at tier 1-2, a tier-1
 call, or an eggNOG call onto a system; always onto a system), `annotated`
 (other eggNOG calls, tier-2 calls) or `below_gate` (tier-3 calls,
 near-tie best hits, best hits under 40% identity); KG-wide that is
-11,158 direct, 19,866 annotated and 44,799 below-gate edges, so most
+24,650 direct, 46,811 annotated and 100,084 below-gate edges, so most
 edges are weak hits. Every gene-side tool
 reads gated edges only (`direct` + `annotated`); the transport arm reads
 `direct` only. Trust axes are `sources`, `evidence` and `tier` (null on

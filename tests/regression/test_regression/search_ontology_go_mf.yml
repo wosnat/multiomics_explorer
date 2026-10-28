@@ -1,22 +1,22 @@
 case_id: search_ontology_go_mf
-row_count: 298
+row_count: 309
 rows:
-- gene_count: 52
+- gene_count: 130
   id: go:0000035
   is_informative: true
   level: 3
   name: acyl binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 835
+- gene_count: 1891
   id: go:0000049
   is_informative: true
   level: 4
   name: tRNA binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 16
@@ -25,43 +25,43 @@ rows:
   level: 4
   name: fatty-acyl-CoA binding
   organism_count: 15
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 17144
+- gene_count: 39524
   id: go:0000166
   is_informative: true
   level: 3
   name: nucleotide binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 44
+- gene_count: 47
   id: go:0000217
   is_informative: true
   level: 4
   name: DNA secondary structure binding
-  organism_count: 20
-  score: 1.0945
+  organism_count: 23
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 2130
+- gene_count: 4353
   id: go:0000287
   is_informative: true
   level: 6
   name: magnesium ion binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 37
+- gene_count: 38
   id: go:0000400
   is_informative: true
   level: 5
   name: four-way junction DNA binding
-  organism_count: 18
-  score: 1.001
+  organism_count: 19
+  score: 0.9934
   tree: null
   tree_code: null
 - gene_count: 1
@@ -70,7 +70,7 @@ rows:
   level: 5
   name: Y-form DNA binding
   organism_count: 1
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 38
@@ -79,16 +79,16 @@ rows:
   level: 3
   name: mRNA regulatory element binding translation repressor activity
   organism_count: 13
-  score: 0.8551
+  score: 0.8484
   tree: null
   tree_code: null
-- gene_count: 1164
+- gene_count: 1987
   id: go:0000976
   is_informative: true
   level: 4
   name: transcription cis-regulatory region binding
-  organism_count: 43
-  score: 1.001
+  organism_count: 117
+  score: 0.9934
   tree: null
   tree_code: null
 - gene_count: 76
@@ -97,7 +97,7 @@ rows:
   level: 5
   name: cis-regulatory region sequence-specific DNA binding
   organism_count: 18
-  score: 0.8551
+  score: 0.8484
   tree: null
   tree_code: null
 - gene_count: 56
@@ -106,7 +106,7 @@ rows:
   level: 6
   name: bacterial-type RNA polymerase core enzyme binding
   organism_count: 13
-  score: 0.8551
+  score: 0.8484
   tree: null
   tree_code: null
 - gene_count: 28
@@ -115,16 +115,16 @@ rows:
   level: 5
   name: core promoter sequence-specific DNA binding
   organism_count: 13
-  score: 0.9223
+  score: 0.9152
   tree: null
   tree_code: null
-- gene_count: 1164
+- gene_count: 1987
   id: go:0001067
   is_informative: true
   level: 3
   name: transcription regulatory region nucleic acid binding
-  organism_count: 43
-  score: 0.9223
+  organism_count: 117
+  score: 0.9152
   tree: null
   tree_code: null
 - gene_count: 28
@@ -133,7 +133,7 @@ rows:
   level: 2
   name: transcription antitermination factor activity, RNA binding
   organism_count: 12
-  score: 0.9223
+  score: 0.9152
   tree: null
   tree_code: null
 - gene_count: 16
@@ -142,7 +142,7 @@ rows:
   level: 2
   name: transcription antitermination factor activity, DNA binding
   organism_count: 13
-  score: 0.9223
+  score: 0.9152
   tree: null
   tree_code: null
 - gene_count: 26
@@ -151,70 +151,79 @@ rows:
   level: 5
   name: bacterial-type RNA polymerase holo enzyme binding
   organism_count: 13
-  score: 0.8551
+  score: 0.8484
   tree: null
   tree_code: null
-- gene_count: 270
+- gene_count: 345
   id: go:0001216
   is_informative: true
   level: 3
   name: DNA-binding transcription activator activity
-  organism_count: 40
-  score: 1.001
+  organism_count: 112
+  score: 0.9934
   tree: null
   tree_code: null
-- gene_count: 257
+- gene_count: 331
   id: go:0001217
   is_informative: true
   level: 3
   name: DNA-binding transcription repressor activity
-  organism_count: 41
-  score: 1.001
+  organism_count: 113
+  score: 0.9934
   tree: null
   tree_code: null
-- gene_count: 43
+- gene_count: 50
   id: go:0001530
   is_informative: true
   level: 3
   name: lipopolysaccharide binding
-  organism_count: 19
-  score: 1.3457
+  organism_count: 26
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 359
+- gene_count: 2
+  id: go:0001540
+  is_informative: true
+  level: 3
+  name: amyloid-beta binding
+  organism_count: 2
+  score: 1.1983
+  tree: null
+  tree_code: null
+- gene_count: 654
   id: go:0001882
   is_informative: true
   level: 3
   name: nucleoside binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 271
+- gene_count: 419
   id: go:0001883
   is_informative: true
   level: 4
   name: purine nucleoside binding
-  organism_count: 42
-  score: 1.2072
+  organism_count: 116
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 44
+- gene_count: 118
   id: go:0001884
   is_informative: true
   level: 4
   name: pyrimidine nucleoside binding
-  organism_count: 40
-  score: 1.2072
+  organism_count: 114
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 11
+- gene_count: 22
   id: go:0001968
   is_informative: true
   level: 3
   name: fibronectin binding
-  organism_count: 11
-  score: 1.3457
+  organism_count: 22
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 14
@@ -223,7 +232,7 @@ rows:
   level: 4
   name: protease binding
   organism_count: 13
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 6
@@ -232,7 +241,7 @@ rows:
   level: 4
   name: nucleobase binding
   organism_count: 6
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 4
@@ -241,7 +250,7 @@ rows:
   level: 6
   name: adenine binding
   organism_count: 4
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -250,7 +259,7 @@ rows:
   level: 6
   name: guanine binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -259,7 +268,7 @@ rows:
   level: 6
   name: uracil binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 5
@@ -268,7 +277,7 @@ rows:
   level: 5
   name: purine nucleobase binding
   organism_count: 5
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 1
@@ -277,43 +286,43 @@ rows:
   level: 5
   name: pyrimidine nucleobase binding
   organism_count: 1
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 34
+- gene_count: 108
   id: go:0002134
   is_informative: true
   level: 5
   name: UTP binding
-  organism_count: 31
-  score: 1.3457
+  organism_count: 105
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 13783
+- gene_count: 31583
   id: go:0003676
   is_informative: true
   level: 2
   name: nucleic acid binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 8095
+- gene_count: 16642
   id: go:0003677
   is_informative: true
   level: 3
   name: DNA binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 6
+- gene_count: 8
   id: go:0003680
   is_informative: true
   level: 5
   name: minor groove of adenine-thymine-rich DNA binding
-  organism_count: 5
-  score: 0.7969
+  organism_count: 7
+  score: 0.7907
   tree: null
   tree_code: null
 - gene_count: 40
@@ -322,7 +331,7 @@ rows:
   level: 4
   name: bent DNA binding
   organism_count: 14
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 4
@@ -331,70 +340,70 @@ rows:
   level: 2
   name: chromatin binding
   organism_count: 4
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 323
+- gene_count: 833
   id: go:0003684
   is_informative: true
   level: 4
   name: damaged DNA binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 76
+- gene_count: 219
   id: go:0003688
   is_informative: true
   level: 6
   name: DNA replication origin binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 1425
+- gene_count: 2572
   id: go:0003690
   is_informative: true
   level: 4
   name: double-stranded DNA binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 344
+- gene_count: 796
   id: go:0003697
   is_informative: true
   level: 4
   name: single-stranded DNA binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 3017
+- gene_count: 5057
   id: go:0003700
   is_informative: true
   level: 2
   name: DNA-binding transcription factor activity
-  organism_count: 43
-  score: 1.001
+  organism_count: 117
+  score: 0.9934
   tree: null
   tree_code: null
-- gene_count: 4912
+- gene_count: 13013
   id: go:0003723
   is_informative: true
   level: 3
   name: RNA binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 144
+- gene_count: 280
   id: go:0003725
   is_informative: true
   level: 4
   name: double-stranded RNA binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 66
@@ -403,25 +412,25 @@ rows:
   level: 4
   name: single-stranded RNA binding
   organism_count: 20
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 491
+- gene_count: 924
   id: go:0003729
   is_informative: true
   level: 4
   name: mRNA binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 62
+- gene_count: 134
   id: go:0003730
   is_informative: true
   level: 5
   name: mRNA 3^-UTR binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 115
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 12
@@ -430,16 +439,16 @@ rows:
   level: 4
   name: actin binding
   organism_count: 8
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 45
+- gene_count: 116
   id: go:0005047
   is_informative: true
   level: 4
   name: signal recognition particle binding
-  organism_count: 41
-  score: 1.0945
+  organism_count: 110
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 1
@@ -448,25 +457,34 @@ rows:
   level: 6
   name: protein kinase C binding
   organism_count: 1
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 46047
+- gene_count: 2
+  id: go:0005102
+  is_informative: true
+  level: 3
+  name: signaling receptor binding
+  organism_count: 2
+  score: 1.1983
+  tree: null
+  tree_code: null
+- gene_count: 106055
   id: go:0005488
   is_informative: true
   level: 1
   name: binding
-  organism_count: 43
-  score: 1.5202
+  organism_count: 117
+  score: 1.5095
   tree: null
   tree_code: null
-- gene_count: 2
+- gene_count: 10
   id: go:0005496
   is_informative: true
   level: 3
   name: steroid binding
-  organism_count: 2
-  score: 1.3457
+  organism_count: 7
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 42
@@ -475,70 +493,70 @@ rows:
   level: 3
   name: fatty acid binding
   organism_count: 14
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 1113
+- gene_count: 2486
   id: go:0005506
   is_informative: true
   level: 7
   name: iron ion binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 367
+- gene_count: 721
   id: go:0005507
   is_informative: true
   level: 7
   name: copper ion binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 334
+- gene_count: 1036
   id: go:0005509
   is_informative: true
   level: 6
   name: calcium ion binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 7174
+- gene_count: 14928
   id: go:0005515
   is_informative: true
   level: 2
   name: protein binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 9
+- gene_count: 67
   id: go:0005516
   is_informative: true
   level: 3
   name: calmodulin binding
-  organism_count: 8
-  score: 1.3457
+  organism_count: 56
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 10305
+- gene_count: 24154
   id: go:0005524
   is_informative: true
   level: 4
   name: ATP binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 1517
+- gene_count: 3356
   id: go:0005525
   is_informative: true
   level: 4
   name: GTP binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 12
@@ -547,7 +565,7 @@ rows:
   level: 2
   name: macrolide binding
   organism_count: 12
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 12
@@ -556,7 +574,7 @@ rows:
   level: 3
   name: FK506 binding
   organism_count: 12
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -565,52 +583,52 @@ rows:
   level: 4
   name: galactose binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 42
+- gene_count: 115
   id: go:0005536
   is_informative: true
   level: 4
   name: D-glucose binding
-  organism_count: 40
-  score: 1.2072
+  organism_count: 113
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 150
+- gene_count: 280
   id: go:0005539
   is_informative: true
   level: 3
   name: glycosaminoglycan binding
-  organism_count: 27
-  score: 1.3457
+  organism_count: 75
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 49
+- gene_count: 118
   id: go:0005542
   is_informative: true
   level: 3
   name: folic acid binding
-  organism_count: 36
-  score: 1.2072
+  organism_count: 105
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 100
+- gene_count: 181
   id: go:0005543
   is_informative: true
   level: 3
   name: phospholipid binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 3
+- gene_count: 27
   id: go:0008061
   is_informative: true
   level: 3
   name: chitin binding
-  organism_count: 3
-  score: 1.3457
+  organism_count: 25
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 15
@@ -619,34 +637,34 @@ rows:
   level: 3
   name: cytoskeletal protein binding
   organism_count: 9
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 70
+- gene_count: 144
   id: go:0008097
   is_informative: true
   level: 5
   name: 5S rRNA binding
-  organism_count: 42
-  score: 1.2072
+  organism_count: 116
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 184
+- gene_count: 212
   id: go:0008134
   is_informative: true
   level: 3
   name: transcription factor binding
-  organism_count: 22
-  score: 1.2072
+  organism_count: 45
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 356
+- gene_count: 707
   id: go:0008135
   is_informative: true
   level: 2
   name: translation factor activity, RNA binding
-  organism_count: 43
-  score: 1.001
+  organism_count: 117
+  score: 0.9934
   tree: null
   tree_code: null
 - gene_count: 11
@@ -655,7 +673,7 @@ rows:
   level: 6
   name: poly(A) binding
   organism_count: 11
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 3
@@ -664,43 +682,43 @@ rows:
   level: 4
   name: adenylate cyclase binding
   organism_count: 3
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 229
+- gene_count: 449
   id: go:0008198
   is_informative: true
   level: 8
   name: ferrous iron binding
-  organism_count: 40
-  score: 1.2072
+  organism_count: 104
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 115
+- gene_count: 248
   id: go:0008199
   is_informative: true
   level: 8
   name: ferric iron binding
-  organism_count: 42
-  score: 1.2072
+  organism_count: 110
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 2494
+- gene_count: 5306
   id: go:0008270
   is_informative: true
   level: 7
   name: zinc ion binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 321
+- gene_count: 424
   id: go:0008289
   is_informative: true
   level: 2
   name: lipid binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 26
@@ -709,16 +727,16 @@ rows:
   level: 4
   name: DNA binding, bending
   organism_count: 13
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 53
+- gene_count: 125
   id: go:0008312
   is_informative: true
   level: 4
   name: 7S RNA binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 115
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 3
@@ -727,34 +745,34 @@ rows:
   level: 3
   name: selenium binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 191
+- gene_count: 521
   id: go:0008658
   is_informative: true
   level: 3
   name: penicillin binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 14
+- gene_count: 16
   id: go:0009374
   is_informative: true
   level: 3
   name: biotin binding
-  organism_count: 14
-  score: 1.3457
+  organism_count: 16
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 796
+- gene_count: 1482
   id: go:0010181
   is_informative: true
   level: 4
   name: FMN binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 10
@@ -763,16 +781,25 @@ rows:
   level: 5
   name: double-stranded methylated DNA binding
   organism_count: 10
-  score: 1.001
+  score: 0.9934
   tree: null
   tree_code: null
-- gene_count: 15
+- gene_count: 1
+  id: go:0015485
+  is_informative: true
+  level: 4
+  name: cholesterol binding
+  organism_count: 1
+  score: 1.336
+  tree: null
+  tree_code: null
+- gene_count: 16
   id: go:0015643
   is_informative: true
   level: 2
   name: toxic substance binding
-  organism_count: 13
-  score: 1.2072
+  organism_count: 14
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 1
@@ -781,43 +808,43 @@ rows:
   level: 2
   name: cyclosporin A binding
   organism_count: 1
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 309
+- gene_count: 924
   id: go:0016151
   is_informative: true
   level: 7
   name: nickel cation binding
-  organism_count: 42
-  score: 1.2072
+  organism_count: 116
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 405
+- gene_count: 1565
   id: go:0016168
   is_informative: true
   level: 3
   name: chlorophyll binding
-  organism_count: 28
-  score: 1.3457
+  organism_count: 102
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 100
+- gene_count: 241
   id: go:0016208
   is_informative: true
   level: 5
   name: AMP binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 115
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 14
+- gene_count: 15
   id: go:0016594
   is_informative: true
   level: 3
   name: glycine binding
-  organism_count: 13
-  score: 1.3457
+  organism_count: 14
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -826,25 +853,25 @@ rows:
   level: 3
   name: glutamate binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 442
+- gene_count: 1264
   id: go:0016597
   is_informative: true
   level: 2
   name: amino acid binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 14139
+- gene_count: 32780
   id: go:0017076
   is_informative: true
   level: 4
   name: purine nucleotide binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 11
@@ -853,16 +880,16 @@ rows:
   level: 4
   name: DEAD/H-box RNA helicase binding
   organism_count: 11
-  score: 0.9223
+  score: 0.9152
   tree: null
   tree_code: null
-- gene_count: 1648
+- gene_count: 3539
   id: go:0019001
   is_informative: true
   level: 5
   name: guanyl nucleotide binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 61
@@ -871,16 +898,16 @@ rows:
   level: 5
   name: GDP binding
   organism_count: 13
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 35
+- gene_count: 109
   id: go:0019103
   is_informative: true
   level: 4
   name: pyrimidine nucleotide binding
-  organism_count: 31
-  score: 1.2072
+  organism_count: 105
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 29
@@ -889,7 +916,7 @@ rows:
   level: 3
   name: polyamine binding
   organism_count: 15
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -898,7 +925,7 @@ rows:
   level: 4
   name: spermidine binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 2
@@ -907,34 +934,34 @@ rows:
   level: 4
   name: putrescine binding
   organism_count: 2
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 38
+- gene_count: 44
   id: go:0019825
   is_informative: true
   level: 3
   name: oxygen binding
-  organism_count: 18
-  score: 1.3457
+  organism_count: 24
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 1987
+- gene_count: 4761
   id: go:0019842
   is_informative: true
   level: 3
   name: vitamin binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 1803
+- gene_count: 5590
   id: go:0019843
   is_informative: true
   level: 4
   name: rRNA binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 3
@@ -943,34 +970,34 @@ rows:
   level: 4
   name: kinesin binding
   organism_count: 2
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 374
+- gene_count: 449
   id: go:0019899
   is_informative: true
   level: 3
   name: enzyme binding
-  organism_count: 38
-  score: 1.3457
+  organism_count: 107
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 23
+- gene_count: 24
   id: go:0019900
   is_informative: true
   level: 4
   name: kinase binding
-  organism_count: 14
-  score: 1.3457
+  organism_count: 15
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 23
+- gene_count: 24
   id: go:0019901
   is_informative: true
   level: 5
   name: protein kinase binding
-  organism_count: 14
-  score: 1.2072
+  organism_count: 15
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 123
@@ -979,7 +1006,7 @@ rows:
   level: 3
   name: protein domain specific binding
   organism_count: 13
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 1
@@ -988,61 +1015,61 @@ rows:
   level: 3
   name: diacylglycerol binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 1056
+- gene_count: 2115
   id: go:0020037
   is_informative: true
   level: 3
   name: heme binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 536
+- gene_count: 1055
   id: go:0030145
   is_informative: true
   level: 7
   name: manganese ion binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 93
+- gene_count: 115
   id: go:0030151
   is_informative: true
   level: 7
   name: molybdenum ion binding
-  organism_count: 23
-  score: 1.2072
+  organism_count: 36
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 1427
+- gene_count: 3553
   id: go:0030170
   is_informative: true
   level: 5
   name: pyridoxal phosphate binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 321
+- gene_count: 765
   id: go:0030246
   is_informative: true
   level: 2
   name: carbohydrate binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 5
+- gene_count: 69
   id: go:0030247
   is_informative: true
   level: 3
   name: polysaccharide binding
-  organism_count: 3
-  score: 1.3457
+  organism_count: 35
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 2
@@ -1051,61 +1078,61 @@ rows:
   level: 5
   name: lactose binding
   organism_count: 2
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 6
+- gene_count: 9
   id: go:0030544
   is_informative: true
   level: 4
   name: Hsp70 protein binding
-  organism_count: 4
-  score: 1.2072
+  organism_count: 6
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 214
+- gene_count: 513
   id: go:0030551
   is_informative: true
   level: 4
   name: cyclic nucleotide binding
-  organism_count: 42
-  score: 1.2072
+  organism_count: 110
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 92
+- gene_count: 270
   id: go:0030552
   is_informative: true
   level: 5
   name: cAMP binding
-  organism_count: 39
-  score: 1.3457
+  organism_count: 104
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 12626
+- gene_count: 29559
   id: go:0030554
   is_informative: true
   level: 5
   name: adenyl nucleotide binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 115
+- gene_count: 194
   id: go:0030955
   is_informative: true
   level: 7
   name: potassium ion binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 20
+- gene_count: 23
   id: go:0030973
   is_informative: true
   level: 5
   name: molybdate ion binding
-  organism_count: 18
-  score: 1.2072
+  organism_count: 21
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 8
@@ -1114,16 +1141,16 @@ rows:
   level: 3
   name: thiamine binding
   organism_count: 3
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 192
+- gene_count: 400
   id: go:0030976
   is_informative: true
   level: 3
   name: thiamine pyrophosphate binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1132,34 +1159,34 @@ rows:
   level: 4
   name: taurine binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 103
+- gene_count: 247
   id: go:0030983
   is_informative: true
   level: 5
   name: mismatched DNA binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 49
+- gene_count: 126
   id: go:0031072
   is_informative: true
   level: 3
   name: heat shock protein binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 58
+- gene_count: 135
   id: go:0031177
   is_informative: true
   level: 3
   name: phosphopantetheine binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 13
@@ -1168,7 +1195,7 @@ rows:
   level: 5
   name: small GTPase binding
   organism_count: 12
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 47
@@ -1177,7 +1204,7 @@ rows:
   level: 7
   name: sodium ion binding
   organism_count: 13
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 11
@@ -1186,16 +1213,16 @@ rows:
   level: 7
   name: lithium ion binding
   organism_count: 11
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 9
+- gene_count: 43
   id: go:0031404
   is_informative: true
   level: 5
   name: chloride ion binding
-  organism_count: 9
-  score: 1.2072
+  organism_count: 42
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 42
@@ -1204,61 +1231,70 @@ rows:
   level: 3
   name: lipoic acid binding
   organism_count: 14
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 646
+- gene_count: 1350
   id: go:0031406
   is_informative: true
   level: 4
   name: carboxylic acid binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 49
+- gene_count: 342
   id: go:0031409
   is_informative: true
   level: 2
   name: pigment binding
-  organism_count: 12
-  score: 1.3457
+  organism_count: 69
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 87
+- gene_count: 168
   id: go:0031418
   is_informative: true
   level: 4
   name: L-ascorbic acid binding
-  organism_count: 39
-  score: 1.0945
+  organism_count: 101
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 132
+- gene_count: 346
   id: go:0031419
   is_informative: true
   level: 3
   name: cobalamin binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 115
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 158
+- gene_count: 237
   id: go:0031420
   is_informative: true
   level: 6
   name: alkali metal ion binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 11
+- gene_count: 12
   id: go:0031593
   is_informative: true
   level: 4
   name: polyubiquitin modification-dependent protein binding
-  organism_count: 11
-  score: 1.001
+  organism_count: 12
+  score: 0.9934
+  tree: null
+  tree_code: null
+- gene_count: 1
+  id: go:0031625
+  is_informative: true
+  level: 5
+  name: ubiquitin protein ligase binding
+  organism_count: 1
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 3
@@ -1267,7 +1303,7 @@ rows:
   level: 3
   name: G-protein beta/gamma-subunit complex binding
   organism_count: 3
-  score: 0.8551
+  score: 0.8484
   tree: null
   tree_code: null
 - gene_count: 4
@@ -1276,7 +1312,7 @@ rows:
   level: 5
   name: alkylated DNA binding
   organism_count: 4
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 2
@@ -1285,7 +1321,7 @@ rows:
   level: 6
   name: DNA insertion or deletion binding
   organism_count: 2
-  score: 1.001
+  score: 0.9934
   tree: null
   tree_code: null
 - gene_count: 13
@@ -1294,52 +1330,52 @@ rows:
   level: 6
   name: adenine/cytosine mispair binding
   organism_count: 13
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 10
+- gene_count: 11
   id: go:0032356
   is_informative: true
   level: 5
   name: oxidized DNA binding
-  organism_count: 10
-  score: 1.2072
+  organism_count: 11
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 10
+- gene_count: 11
   id: go:0032357
   is_informative: true
   level: 6
   name: oxidized purine DNA binding
-  organism_count: 10
-  score: 1.0945
+  organism_count: 11
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 347
+- gene_count: 642
   id: go:0032549
   is_informative: true
   level: 4
   name: ribonucleoside binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 271
+- gene_count: 419
   id: go:0032550
   is_informative: true
   level: 5
   name: purine ribonucleoside binding
-  organism_count: 42
-  score: 1.2072
+  organism_count: 116
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 34
+- gene_count: 108
   id: go:0032551
   is_informative: true
   level: 5
   name: pyrimidine ribonucleoside binding
-  organism_count: 31
-  score: 1.2072
+  organism_count: 105
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1348,16 +1384,16 @@ rows:
   level: 2
   name: deoxyribonucleotide binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 12838
+- gene_count: 29500
   id: go:0032553
   is_informative: true
   level: 3
   name: ribonucleotide binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1366,16 +1402,16 @@ rows:
   level: 3
   name: purine deoxyribonucleotide binding
   organism_count: 1
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 12008
+- gene_count: 27910
   id: go:0032555
   is_informative: true
   level: 4
   name: purine ribonucleotide binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1384,16 +1420,16 @@ rows:
   level: 3
   name: pyrimidine deoxyribonucleotide binding
   organism_count: 1
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 34
+- gene_count: 108
   id: go:0032557
   is_informative: true
   level: 4
   name: pyrimidine ribonucleotide binding
-  organism_count: 31
-  score: 1.2072
+  organism_count: 105
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1402,16 +1438,16 @@ rows:
   level: 4
   name: adenyl deoxyribonucleotide binding
   organism_count: 1
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 10495
+- gene_count: 24689
   id: go:0032559
   is_informative: true
   level: 5
   name: adenyl ribonucleotide binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1420,16 +1456,16 @@ rows:
   level: 4
   name: guanyl deoxyribonucleotide binding
   organism_count: 1
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 1647
+- gene_count: 3538
   id: go:0032561
   is_informative: true
   level: 5
   name: guanyl ribonucleotide binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1438,7 +1474,7 @@ rows:
   level: 5
   name: dATP binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1447,7 +1483,7 @@ rows:
   level: 5
   name: dGTP binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 2
@@ -1456,7 +1492,7 @@ rows:
   level: 6
   name: lead ion binding
   organism_count: 2
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 13
@@ -1465,25 +1501,34 @@ rows:
   level: 3
   name: GTPase activating protein binding
   organism_count: 13
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 2
+- gene_count: 10
   id: go:0032934
   is_informative: true
   level: 4
   name: sterol binding
-  organism_count: 2
-  score: 1.3457
+  organism_count: 7
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 29
+- gene_count: 1
+  id: go:0033130
+  is_informative: true
+  level: 4
+  name: acetylcholine receptor binding
+  organism_count: 1
+  score: 1.1983
+  tree: null
+  tree_code: null
+- gene_count: 90
   id: go:0033219
   is_informative: true
   level: 3
   name: urea binding
-  organism_count: 27
-  score: 1.3457
+  organism_count: 82
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 2
@@ -1492,7 +1537,7 @@ rows:
   level: 4
   name: xylose binding
   organism_count: 2
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1501,7 +1546,7 @@ rows:
   level: 3
   name: 2-aminoethylphosphonate binding
   organism_count: 1
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 3
@@ -1510,16 +1555,16 @@ rows:
   level: 5
   name: choline binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 248
+- gene_count: 580
   id: go:0033293
   is_informative: true
   level: 5
   name: monocarboxylic acid binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1528,7 +1573,7 @@ rows:
   level: 4
   name: ectoine binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1537,7 +1582,7 @@ rows:
   level: 4
   name: hydroxyectoine binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1546,7 +1591,7 @@ rows:
   level: 4
   name: protein kinase A catalytic subunit binding
   organism_count: 1
-  score: 0.9223
+  score: 0.9152
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1555,7 +1600,7 @@ rows:
   level: 4
   name: protein kinase A regulatory subunit binding
   organism_count: 1
-  score: 0.9223
+  score: 0.9152
   tree: null
   tree_code: null
 - gene_count: 12
@@ -1564,16 +1609,16 @@ rows:
   level: 4
   name: misfolded RNA binding
   organism_count: 12
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 55
+- gene_count: 130
   id: go:0034618
   is_informative: true
   level: 3
   name: arginine binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1582,34 +1627,34 @@ rows:
   level: 5
   name: selenocysteine insertion sequence binding
   organism_count: 1
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 116
+- gene_count: 168
   id: go:0035438
   is_informative: true
   level: 5
   name: cyclic-di-GMP binding
-  organism_count: 19
-  score: 1.0945
+  organism_count: 57
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 10
+- gene_count: 11
   id: go:0035485
   is_informative: true
   level: 6
   name: adenine/guanine mispair binding
-  organism_count: 10
-  score: 1.0945
+  organism_count: 11
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 11693
+- gene_count: 27196
   id: go:0035639
   is_informative: true
   level: 3
   name: purine ribonucleoside triphosphate binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 5
@@ -1618,16 +1663,16 @@ rows:
   level: 6
   name: mRNA 3^-UTR AU-rich region binding
   organism_count: 3
-  score: 0.8551
+  score: 0.8484
   tree: null
   tree_code: null
-- gene_count: 33263
+- gene_count: 75815
   id: go:0036094
   is_informative: true
   level: 2
   name: small molecule binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 2
@@ -1636,115 +1681,124 @@ rows:
   level: 3
   name: thiosulfate binding
   organism_count: 2
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 84
+- gene_count: 86
   id: go:0042277
   is_informative: true
   level: 2
   name: peptide binding
-  organism_count: 16
-  score: 1.3457
+  organism_count: 18
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 113
+- gene_count: 362
   id: go:0042301
   is_informative: true
   level: 5
   name: phosphate ion binding
-  organism_count: 42
-  score: 1.2072
+  organism_count: 116
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 3596
+- gene_count: 1
+  id: go:0042314
+  is_informative: true
+  level: 4
+  name: bacteriochlorophyll binding
+  organism_count: 1
+  score: 1.336
+  tree: null
+  tree_code: null
+- gene_count: 6061
   id: go:0042802
   is_informative: true
   level: 3
   name: identical protein binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 150
+- gene_count: 280
   id: go:0042834
   is_informative: true
   level: 4
   name: peptidoglycan binding
-  organism_count: 27
-  score: 1.3457
+  organism_count: 75
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 854
+- gene_count: 1810
   id: go:0043021
   is_informative: true
   level: 3
   name: ribonucleoprotein complex binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 797
+- gene_count: 1682
   id: go:0043022
   is_informative: true
   level: 4
   name: ribosome binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 206
+- gene_count: 377
   id: go:0043023
   is_informative: true
   level: 5
   name: ribosomal large subunit binding
-  organism_count: 41
-  score: 1.0945
+  organism_count: 113
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 173
+- gene_count: 260
   id: go:0043024
   is_informative: true
   level: 5
   name: ribosomal small subunit binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 28165
+- gene_count: 62967
   id: go:0043167
   is_informative: true
   level: 3
   name: ion binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 17392
+- gene_count: 39920
   id: go:0043168
   is_informative: true
   level: 4
   name: anion binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 14393
+- gene_count: 30216
   id: go:0043169
   is_informative: true
   level: 4
   name: cation binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 90
+- gene_count: 160
   id: go:0043175
   is_informative: true
   level: 5
   name: RNA polymerase core enzyme binding
-  organism_count: 34
-  score: 1.001
+  organism_count: 103
+  score: 0.9934
   tree: null
   tree_code: null
 - gene_count: 29
@@ -1753,25 +1807,25 @@ rows:
   level: 2
   name: amine binding
   organism_count: 15
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 652
+- gene_count: 1372
   id: go:0043177
   is_informative: true
   level: 3
   name: organic acid binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 9
+- gene_count: 10
   id: go:0043178
   is_informative: true
   level: 3
   name: alcohol binding
-  organism_count: 3
-  score: 1.3457
+  organism_count: 4
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 4
@@ -1780,7 +1834,7 @@ rows:
   level: 3
   name: sulfate binding
   organism_count: 3
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1789,52 +1843,52 @@ rows:
   level: 3
   name: alkanesulfonate binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 64
+- gene_count: 126
   id: go:0043295
   is_informative: true
   level: 3
   name: glutathione binding
-  organism_count: 39
-  score: 1.3457
+  organism_count: 101
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 21
+- gene_count: 22
   id: go:0043424
   is_informative: true
   level: 6
   name: protein histidine kinase binding
-  organism_count: 12
-  score: 1.0945
+  organism_count: 13
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 134
+- gene_count: 271
   id: go:0043531
   is_informative: true
   level: 5
   name: ADP binding
-  organism_count: 37
-  score: 1.3457
+  organism_count: 106
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 126
+- gene_count: 176
   id: go:0043546
   is_informative: true
   level: 2
   name: molybdopterin cofactor binding
-  organism_count: 27
-  score: 1.2072
+  organism_count: 71
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 1984
+- gene_count: 3454
   id: go:0043565
   is_informative: true
   level: 4
   name: sequence-specific DNA binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 13
@@ -1843,16 +1897,25 @@ rows:
   level: 5
   name: sequence-specific DNA binding, bending
   organism_count: 13
-  score: 1.001
+  score: 0.9934
   tree: null
   tree_code: null
-- gene_count: 52
+- gene_count: 1
+  id: go:0044389
+  is_informative: true
+  level: 4
+  name: ubiquitin-like protein ligase binding
+  organism_count: 1
+  score: 0.9934
+  tree: null
+  tree_code: null
+- gene_count: 145
   id: go:0044620
   is_informative: true
   level: 3
   name: ACP phosphopantetheine attachment site binding
-  organism_count: 43
-  score: 1.001
+  organism_count: 117
+  score: 0.9934
   tree: null
   tree_code: null
 - gene_count: 10
@@ -1861,16 +1924,16 @@ rows:
   level: 5
   name: hemi-methylated DNA-binding
   organism_count: 10
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 901
+- gene_count: 1859
   id: go:0044877
   is_informative: true
   level: 2
   name: protein-containing complex binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1879,16 +1942,16 @@ rows:
   level: 4
   name: DNA end binding
   organism_count: 1
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 45
+- gene_count: 117
   id: go:0045152
   is_informative: true
   level: 3
   name: antisigma factor binding
-  organism_count: 31
-  score: 1.2072
+  organism_count: 92
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 33
@@ -1897,7 +1960,7 @@ rows:
   level: 7
   name: mercury ion binding
   organism_count: 10
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 11
@@ -1906,7 +1969,7 @@ rows:
   level: 3
   name: virion binding
   organism_count: 11
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 11
@@ -1915,7 +1978,7 @@ rows:
   level: 7
   name: cadmium ion binding
   organism_count: 11
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 1
@@ -1924,52 +1987,52 @@ rows:
   level: 3
   name: N-acetylgalactosamine binding
   organism_count: 1
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 13355
+- gene_count: 27609
   id: go:0046872
   is_informative: true
   level: 5
   name: metal ion binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 1619
+- gene_count: 4053
   id: go:0046906
   is_informative: true
   level: 2
   name: tetrapyrrole binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 4783
+- gene_count: 10439
   id: go:0046914
   is_informative: true
   level: 6
   name: transition metal ion binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 97
+- gene_count: 157
   id: go:0048027
   is_informative: true
   level: 5
   name: mRNA 5^-UTR binding
-  organism_count: 32
-  score: 1.0945
+  organism_count: 92
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 143
+- gene_count: 297
   id: go:0048029
   is_informative: true
   level: 3
   name: monosaccharide binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 11
@@ -1978,70 +2041,70 @@ rows:
   level: 4
   name: disaccharide binding
   organism_count: 7
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 564
+- gene_count: 1962
   id: go:0048038
   is_informative: true
   level: 3
   name: quinone binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 64
+- gene_count: 65
   id: go:0048039
   is_informative: true
   level: 4
   name: ubiquinone binding
-  organism_count: 26
-  score: 1.3457
+  organism_count: 27
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 47
+- gene_count: 133
   id: go:0050656
   is_informative: true
   level: 3
   name: 3^-phosphoadenosine 5^-phosphosulfate binding
-  organism_count: 23
-  score: 1.001
+  organism_count: 74
+  score: 0.9934
   tree: null
   tree_code: null
-- gene_count: 1627
+- gene_count: 3552
   id: go:0050660
   is_informative: true
   level: 4
   name: flavin adenine dinucleotide binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 1092
+- gene_count: 2604
   id: go:0050661
   is_informative: true
   level: 6
   name: NADP binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 55
+- gene_count: 57
   id: go:0050897
   is_informative: true
   level: 7
   name: cobalt ion binding
-  organism_count: 21
-  score: 1.2072
+  organism_count: 23
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 193
+- gene_count: 401
   id: go:0050997
   is_informative: true
   level: 3
   name: quaternary ammonium group binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 11
@@ -2050,7 +2113,7 @@ rows:
   level: 3
   name: actin filament binding
   organism_count: 7
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 2
@@ -2059,7 +2122,7 @@ rows:
   level: 3
   name: protein kinase A binding
   organism_count: 2
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 26
@@ -2068,34 +2131,34 @@ rows:
   level: 4
   name: GTPase binding
   organism_count: 14
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 130
+- gene_count: 208
   id: go:0051087
   is_informative: true
   level: 3
   name: protein-folding chaperone binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 59
+- gene_count: 62
   id: go:0051117
   is_informative: true
   level: 4
   name: ATPase binding
-  organism_count: 30
-  score: 1.3457
+  organism_count: 31
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 52
+- gene_count: 145
   id: go:0051192
   is_informative: true
   level: 2
   name: prosthetic group binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 1
@@ -2104,34 +2167,34 @@ rows:
   level: 3
   name: phosphoprotein binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 1295
+- gene_count: 2928
   id: go:0051287
   is_informative: true
   level: 6
   name: NAD binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 2411
+- gene_count: 5993
   id: go:0051536
   is_informative: true
   level: 4
   name: iron-sulfur cluster binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 623
+- gene_count: 1545
   id: go:0051537
   is_informative: true
   level: 5
   name: 2 iron, 2 sulfur cluster binding
-  organism_count: 43
-  score: 0.9223
+  organism_count: 117
+  score: 0.9152
   tree: null
   tree_code: null
 - gene_count: 57
@@ -2140,34 +2203,34 @@ rows:
   level: 5
   name: 3 iron, 4 sulfur cluster binding
   organism_count: 28
-  score: 0.9223
+  score: 0.9152
   tree: null
   tree_code: null
-- gene_count: 1313
+- gene_count: 3014
   id: go:0051539
   is_informative: true
   level: 5
   name: 4 iron, 4 sulfur cluster binding
-  organism_count: 43
-  score: 0.9223
+  organism_count: 117
+  score: 0.9152
   tree: null
   tree_code: null
-- gene_count: 2425
+- gene_count: 6007
   id: go:0051540
   is_informative: true
   level: 3
   name: metal cluster binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 6
+- gene_count: 7
   id: go:0051787
   is_informative: true
   level: 3
   name: misfolded protein binding
-  organism_count: 5
-  score: 1.2072
+  organism_count: 6
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 13
@@ -2176,7 +2239,7 @@ rows:
   level: 4
   name: methotrexate binding
   organism_count: 13
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 13
@@ -2185,25 +2248,25 @@ rows:
   level: 3
   name: dihydrofolic acid binding
   organism_count: 13
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 2
+- gene_count: 4
   id: go:0051879
   is_informative: true
   level: 4
   name: Hsp90 protein binding
-  organism_count: 1
-  score: 1.2072
+  organism_count: 2
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 7
+- gene_count: 13
   id: go:0070025
   is_informative: true
   level: 3
   name: carbon monoxide binding
-  organism_count: 7
-  score: 1.2072
+  organism_count: 13
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 1
@@ -2212,25 +2275,34 @@ rows:
   level: 3
   name: nitric oxide binding
   organism_count: 1
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 140
+- gene_count: 1
+  id: go:0070051
+  is_informative: true
+  level: 3
+  name: fibrinogen binding
+  organism_count: 1
+  score: 1.336
+  tree: null
+  tree_code: null
+- gene_count: 210
   id: go:0070063
   is_informative: true
   level: 4
   name: RNA polymerase binding
-  organism_count: 36
-  score: 1.2072
+  organism_count: 105
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 11
+- gene_count: 30
   id: go:0070064
   is_informative: true
   level: 3
   name: proline-rich region binding
-  organism_count: 7
-  score: 1.0945
+  organism_count: 26
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 5
@@ -2239,25 +2311,25 @@ rows:
   level: 3
   name: fructose-6-phosphate binding
   organism_count: 4
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 125
+- gene_count: 200
   id: go:0070180
   is_informative: true
   level: 5
   name: large ribosomal subunit rRNA binding
-  organism_count: 43
-  score: 1.001
+  organism_count: 117
+  score: 0.9934
   tree: null
   tree_code: null
-- gene_count: 139
+- gene_count: 270
   id: go:0070181
   is_informative: true
   level: 5
   name: small ribosomal subunit rRNA binding
-  organism_count: 43
-  score: 1.001
+  organism_count: 117
+  score: 0.9934
   tree: null
   tree_code: null
 - gene_count: 1
@@ -2266,16 +2338,25 @@ rows:
   level: 5
   name: phosphatidylinositol-4-phosphate binding
   organism_count: 1
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 1427
+- gene_count: 3553
   id: go:0070279
   is_informative: true
   level: 4
   name: vitamin B6 binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
+  tree: null
+  tree_code: null
+- gene_count: 1
+  id: go:0070325
+  is_informative: true
+  level: 4
+  name: lipoprotein particle receptor binding
+  organism_count: 1
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 1
@@ -2284,43 +2365,43 @@ rows:
   level: 3
   name: aspartate binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 112
+- gene_count: 189
   id: go:0070401
   is_informative: true
   level: 5
   name: NADP+ binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 116
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 134
+- gene_count: 282
   id: go:0070402
   is_informative: true
   level: 5
   name: NADPH binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 116
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 383
+- gene_count: 696
   id: go:0070403
   is_informative: true
   level: 5
   name: NAD+ binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 16
+- gene_count: 20
   id: go:0070404
   is_informative: true
   level: 5
   name: NADH binding
-  organism_count: 16
-  score: 1.3457
+  organism_count: 20
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 2
@@ -2329,7 +2410,7 @@ rows:
   level: 5
   name: ammonium ion binding
   organism_count: 2
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 12
@@ -2338,7 +2419,7 @@ rows:
   level: 3
   name: oligosaccharide binding
   organism_count: 8
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 11
@@ -2347,16 +2428,16 @@ rows:
   level: 5
   name: poly-purine tract binding
   organism_count: 11
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
-- gene_count: 65
+- gene_count: 134
   id: go:0070905
   is_informative: true
   level: 3
   name: serine binding
-  organism_count: 42
-  score: 1.3457
+  organism_count: 111
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 2
@@ -2365,16 +2446,16 @@ rows:
   level: 3
   name: coenzyme F420 binding
   organism_count: 2
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 39
+- gene_count: 43
   id: go:0070968
   is_informative: true
   level: 4
   name: pyrroloquinoline quinone binding
-  organism_count: 16
-  score: 1.2072
+  organism_count: 20
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 22
@@ -2383,7 +2464,7 @@ rows:
   level: 3
   name: lipopeptide binding
   organism_count: 13
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -2392,25 +2473,25 @@ rows:
   level: 5
   name: bicarbonate binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 641
+- gene_count: 1362
   id: go:0071949
   is_informative: true
   level: 5
   name: FAD binding
-  organism_count: 43
-  score: 1.3457
+  organism_count: 117
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 171
+- gene_count: 379
   id: go:0072341
   is_informative: true
   level: 2
   name: modified amino acid binding
-  organism_count: 43
-  score: 1.0945
+  organism_count: 117
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 3
@@ -2419,7 +2500,7 @@ rows:
   level: 3
   name: ADP-D-ribose binding
   organism_count: 3
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 1
@@ -2428,7 +2509,7 @@ rows:
   level: 3
   name: scaffold protein binding
   organism_count: 1
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 59
@@ -2437,16 +2518,16 @@ rows:
   level: 5
   name: guanosine tetraphosphate binding
   organism_count: 14
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 13278
+- gene_count: 30392
   id: go:0097367
   is_informative: true
   level: 2
   name: carbohydrate derivative binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 35
@@ -2455,7 +2536,7 @@ rows:
   level: 4
   name: disordered domain specific binding
   organism_count: 13
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 3
@@ -2464,16 +2545,16 @@ rows:
   level: 5
   name: sequence-specific single stranded DNA binding
   organism_count: 3
-  score: 0.9223
+  score: 0.9152
   tree: null
   tree_code: null
-- gene_count: 27
+- gene_count: 39
   id: go:0120225
   is_informative: true
   level: 3
   name: coenzyme A binding
-  organism_count: 20
-  score: 1.2072
+  organism_count: 31
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 16
@@ -2482,16 +2563,16 @@ rows:
   level: 3
   name: acyl-CoA binding
   organism_count: 15
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 13
+- gene_count: 14
   id: go:0140030
   is_informative: true
   level: 3
   name: modification-dependent protein binding
-  organism_count: 13
-  score: 1.0945
+  organism_count: 14
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 2
@@ -2500,7 +2581,7 @@ rows:
   level: 4
   name: glycosylation-dependent protein binding
   organism_count: 2
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 9
@@ -2509,25 +2590,25 @@ rows:
   level: 4
   name: DNA-binding transcription factor binding
   organism_count: 9
-  score: 1.3895
+  score: 1.3793
   tree: null
   tree_code: null
-- gene_count: 64
+- gene_count: 126
   id: go:1900750
   is_informative: true
   level: 2
   name: oligopeptide binding
-  organism_count: 39
-  score: 1.3457
+  organism_count: 101
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 17184
+- gene_count: 39576
   id: go:1901265
   is_informative: true
   level: 2
   name: nucleoside phosphate binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 5
@@ -2536,16 +2617,16 @@ rows:
   level: 5
   name: tungstate binding
   organism_count: 5
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 21639
+- gene_count: 48951
   id: go:1901363
   is_informative: true
   level: 3
   name: heterocyclic compound binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 16
@@ -2554,7 +2635,7 @@ rows:
   level: 3
   name: fatty acid derivative binding
   organism_count: 15
-  score: 1.0945
+  score: 1.0863
   tree: null
   tree_code: null
 - gene_count: 15
@@ -2563,7 +2644,7 @@ rows:
   level: 4
   name: phosphatidylglycerol binding
   organism_count: 13
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -2572,16 +2653,16 @@ rows:
   level: 5
   name: cardiolipin binding
   organism_count: 1
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 1518
+- gene_count: 3490
   id: go:1901681
   is_informative: true
   level: 2
   name: sulfur compound binding
-  organism_count: 43
-  score: 1.2072
+  organism_count: 117
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 3
@@ -2590,7 +2671,7 @@ rows:
   level: 3
   name: proline binding
   organism_count: 3
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -2599,7 +2680,7 @@ rows:
   level: 4
   name: phosphatidylinositol phosphate binding
   organism_count: 1
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 9
@@ -2608,7 +2689,7 @@ rows:
   level: 5
   name: maltose binding
   organism_count: 5
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 24
@@ -2617,7 +2698,7 @@ rows:
   level: 4
   name: riboflavin binding
   organism_count: 12
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 1
@@ -2626,7 +2707,7 @@ rows:
   level: 3
   name: carbon dioxide binding
   organism_count: 1
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 1
@@ -2635,16 +2716,25 @@ rows:
   level: 8
   name: cuprous ion binding
   organism_count: 1
-  score: 1.2072
+  score: 1.1983
   tree: null
   tree_code: null
-- gene_count: 857
+- gene_count: 2052
   id: go:1904047
   is_informative: true
   level: 3
   name: S-adenosyl-L-methionine binding
-  organism_count: 43
-  score: 1.001
+  organism_count: 117
+  score: 0.9934
+  tree: null
+  tree_code: null
+- gene_count: 1
+  id: go:1904288
+  is_informative: true
+  level: 3
+  name: BAT3 complex binding
+  organism_count: 1
+  score: 1.1983
   tree: null
   tree_code: null
 - gene_count: 12
@@ -2653,7 +2743,7 @@ rows:
   level: 4
   name: preribosome binding
   organism_count: 12
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
 - gene_count: 14
@@ -2662,16 +2752,16 @@ rows:
   level: 4
   name: deaminase binding
   organism_count: 8
-  score: 1.3457
+  score: 1.336
   tree: null
   tree_code: null
-- gene_count: 1240
+- gene_count: 2206
   id: go:1990837
   is_informative: true
   level: 5
   name: sequence-specific double-stranded DNA binding
-  organism_count: 43
-  score: 0.9223
+  organism_count: 117
+  score: 0.9152
   tree: null
   tree_code: null
 - gene_count: 14
@@ -2680,6 +2770,15 @@ rows:
   level: 5
   name: methionyl-initiator methionine tRNA binding
   organism_count: 13
-  score: 1.001
+  score: 0.9934
+  tree: null
+  tree_code: null
+- gene_count: 11
+  id: go:2001070
+  is_informative: true
+  level: 4
+  name: starch binding
+  organism_count: 11
+  score: 1.336
   tree: null
   tree_code: null

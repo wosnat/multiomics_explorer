@@ -1,5 +1,5 @@
 case_id: resolve_gene_by_name
-row_count: 43
+row_count: 118
 rows:
 - gene_name: dnaN
   locus_tag: A9601_00001
@@ -30,9 +30,73 @@ rows:
   organism_name: Prochlorococcus RSP50
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
+  locus_tag: CB0101_RS0114805
+  organism_name: Synechococcus CB0101
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: CB0205_RS0102985
+  organism_name: Synechococcus CB0205
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: CPCC7001_2452
+  organism_name: Cyanobium PCC7001
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: CyaNS01_00001
+  organism_name: Cyanobium NS01
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: Cyagr_2391
+  organism_name: Cyanobium PCC6307
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
   locus_tag: DEH24_01275
   organism_name: Alteromonas (MarRef v6)
   product: DNA polymerase III subunit beta
+- gene_name: dnaN
+  locus_tag: EU91_1882
+  organism_name: Prochlorococcus GP2
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EU92_1999
+  organism_name: Prochlorococcus MIT9107
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EU93_0440
+  organism_name: Prochlorococcus MIT9116
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EU94_0035
+  organism_name: Prochlorococcus MIT9123
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EU95_1560
+  organism_name: Prochlorococcus MIT9201
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EU96_0783
+  organism_name: Prochlorococcus MIT9302
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EU97_1186
+  organism_name: Prochlorococcus MIT9311
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EU98_1517
+  organism_name: Prochlorococcus MIT9314
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EU99_1485
+  organism_name: Prochlorococcus MIT9321
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EV00_0371
+  organism_name: Prochlorococcus MIT9322
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EV01_1849
+  organism_name: Prochlorococcus MIT9401
+  product: DNA polymerase III, beta subunit
 - gene_name: dnaN
   locus_tag: EV02_1236
   organism_name: Prochlorococcus SB
@@ -40,6 +104,50 @@ rows:
 - gene_name: dnaN
   locus_tag: EV03_1138
   organism_name: Prochlorococcus PAC1
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EV04_0060
+  organism_name: Prochlorococcus LG
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EV05_0416
+  organism_name: Prochlorococcus MIT0601
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EV06_1553
+  organism_name: Prochlorococcus MIT0602
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EV07_2047
+  organism_name: Prochlorococcus MIT0603
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EV08_1129
+  organism_name: Prochlorococcus SS2
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EV09_0422
+  organism_name: Prochlorococcus SS35
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EV10_0823
+  organism_name: Prochlorococcus SS51
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EV11_0317
+  organism_name: Prochlorococcus SS52
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EV12_2415
+  organism_name: Prochlorococcus MIT0701
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EV13_2627
+  organism_name: Prochlorococcus MIT0702
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: EV14_2456
+  organism_name: Prochlorococcus MIT0703
   product: DNA polymerase III, beta subunit
 - gene_name: dnaN
   locus_tag: EW14_0001
@@ -61,6 +169,22 @@ rows:
   locus_tag: HP15_3703
   organism_name: Marinobacter (MarRef v6)
   product: DNA polymerase III subunit beta
+- gene_name: dnaN
+  locus_tag: KR100_00820
+  organism_name: Synechococcus KORDI-100
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: KR49_08915
+  organism_name: Synechococcus KORDI-49
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: KR52_02465
+  organism_name: Synechococcus KORDI-52
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: KS100_00030600
+  organism_name: Synechococcus KORDI-100
+  product: DNA polymerase III, beta subunit
 - gene_name: dnaN
   locus_tag: M744_03100
   organism_name: Synechococcus elongatus UTEX 2973
@@ -88,6 +212,10 @@ rows:
 - gene_name: dnaN
   locus_tag: P9202_979
   organism_name: Prochlorococcus MIT9202
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: P9211_00001
+  organism_name: Prochlorococcus MIT9211
   product: DNA polymerase III, beta subunit
 - gene_name: dnaN
   locus_tag: P9215_00001
@@ -126,8 +254,28 @@ rows:
   organism_name: Prochlorococcus MIT9312
   product: DNA polymerase III, beta subunit
 - gene_name: dnaN
+  locus_tag: PROCH_1271
+  organism_name: Prochlorococcus EQPAC1
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
   locus_tag: Pro0001
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: RH83_RS07150
+  organism_name: Prochlorococcus HNLC2
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: RH84_RS06375
+  organism_name: Prochlorococcus HNLC1
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: RS9916_37537
+  organism_name: Synechococcus RS9916
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: RS9917_05795
+  organism_name: Synechococcus RS9917
   product: DNA polymerase III, beta subunit
 - gene_name: dnaN
   locus_tag: SOI86_RS06580
@@ -142,6 +290,10 @@ rows:
   organism_name: Meiothermus ruber
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
+  locus_tag: SYN9616_RS0111610
+  organism_name: Synechococcus CC9616
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
   locus_tag: SYNPCC7002_A1263
   organism_name: Synechococcus PCC 7002
   product: DNA polymerase III subunit beta
@@ -154,12 +306,160 @@ rows:
   organism_name: Shewanella sp. W3-18-1
   product: DNA polymerase III subunit beta
 - gene_name: dnaN
+  locus_tag: Syn8016DRAFT_2824
+  organism_name: Synechococcus WH8016
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynA15127_00001
+  organism_name: Synechococcus A15-127
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynA1524_00001
+  organism_name: Synechococcus A15-24
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynA1528_00001
+  organism_name: Synechococcus A15-28
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynA1544_00001
+  organism_name: Synechococcus A15-44
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynA1560_00001
+  organism_name: Synechococcus A15-60
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynA1562_00001
+  organism_name: Synechococcus A15-62
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynA1825c_00001
+  organism_name: Synechococcus A18-25c
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynA1840_00001
+  organism_name: Synechococcus A18-40
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynA18461_00001
+  organism_name: Synechococcus A18-46.1
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynBIOSE41_00001
+  organism_name: Synechococcus BIOS-E4-1
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynBIOSU31_00001
+  organism_name: Synechococcus BIOS-U3-1
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynBMKMC1_00001
+  organism_name: Synechococcus BMK-MC-1
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynBOUM118_00001
+  organism_name: Synechococcus BOUM118
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynM161_00001
+  organism_name: Synechococcus M16.1
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynMEDNS5_00001
+  organism_name: Synechococcus MEDNS5
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynMINOS11_00001
+  organism_name: Synechococcus MINOS11
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynMITS9220_00001
+  organism_name: Synechococcus MITS9220
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynMVIR181_00001
+  organism_name: Synechococcus MVIR-18-1
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynNOUM97013_00001
+  organism_name: Synechococcus NOUM97013
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynPROS71_00001
+  organism_name: Synechococcus PROS-7-1
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynPROS91_00001
+  organism_name: Synechococcus PROS-9-1
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynPROSU1_00001
+  organism_name: Synechococcus PROS-U-1
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynRCC2555_00001
+  organism_name: Synechococcus WH8101
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynRCC307_0001
+  organism_name: Synechococcus RCC307
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynROS8604_00001
+  organism_name: Synechococcus ROS8604
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynRS9902_00001
+  organism_name: Synechococcus RS9902
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynRS9907_00001
+  organism_name: Synechococcus RS9907
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynRS9909_00001
+  organism_name: Synechococcus RS9909
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynRS9915_00001
+  organism_name: Synechococcus RS9915
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynSYN20_00001
+  organism_name: Synechococcus SYN20
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: SynTAK9802_00001
+  organism_name: Synechococcus TAK9802
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
   locus_tag: SynWH7803_0001
   organism_name: Synechococcus WH7803
   product: DNA polymerase III, beta subunit
 - gene_name: dnaN
+  locus_tag: SynWH8103_00001
+  organism_name: Synechococcus WH8103
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
   locus_tag: Syncc8109_0001
   organism_name: Synechococcus WH8109
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: Syncc9605_0001
+  organism_name: Synechococcus CC9605
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: Syncc9902_0001
+  organism_name: Synechococcus CC9902
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: WH5701_02719
+  organism_name: Synechococcus WH5701
+  product: DNA polymerase III, beta subunit
+- gene_name: dnaN
+  locus_tag: WH7805_09434
+  organism_name: Synechococcus WH7805
   product: DNA polymerase III, beta subunit
 - gene_name: dnaN
   locus_tag: amad1_00015

@@ -4,36 +4,36 @@ rows:
 - by_level:
   - '{''count'': 1, ''item'': ''Alteromonadaceae''}'
   - '{''count'': 2, ''item'': ''Proteobacteria''}'
-  - '{''count'': 352, ''item'': ''Bacteria''}'
-  - '{''count'': 370, ''item'': ''Synechococcus''}'
-  - '{''count'': 400, ''item'': ''Prochloraceae''}'
-  - '{''count'': 430, ''item'': ''curated''}'
-  - '{''count'': 559, ''item'': ''Cyanobacteria''}'
+  - '{''count'': 402, ''item'': ''Prochloraceae''}'
+  - '{''count'': 413, ''item'': ''Synechococcus''}'
+  - '{''count'': 443, ''item'': ''Bacteria''}'
+  - '{''count'': 487, ''item'': ''curated''}'
+  - '{''count'': 678, ''item'': ''Cyanobacteria''}'
   by_source:
-  - '{''count'': 1684, ''item'': ''eggnog''}'
-  - '{''count'': 430, ''item'': ''cyanorak''}'
-  score_max: 6.6424
-  score_median: 1.0683
+  - '{''count'': 1939, ''item'': ''eggnog''}'
+  - '{''count'': 487, ''item'': ''cyanorak''}'
+  score_max: 6.7153
+  score_median: 1.0955
   top_cog_categories:
-  - '{''id'': ''cog.category:C'', ''count'': 681, ''name'': ''Energy production and
+  - '{''id'': ''cog.category:C'', ''count'': 830, ''name'': ''Energy production and
     conversion''}'
-  - '{''id'': ''cog.category:G'', ''count'': 100, ''name'': ''Carbohydrate transport
+  - '{''id'': ''cog.category:G'', ''count'': 101, ''name'': ''Carbohydrate transport
     and metabolism''}'
-  - '{''id'': ''cog.category:H'', ''count'': 92, ''name'': ''Coenzyme transport and
+  - '{''id'': ''cog.category:H'', ''count'': 110, ''name'': ''Coenzyme transport and
     metabolism''}'
-  - '{''id'': ''cog.category:S'', ''count'': 796, ''name'': ''Function unknown''}'
-  - '{''id'': ''cog.category:U'', ''count'': 69, ''name'': ''Intracellular trafficking,
+  - '{''id'': ''cog.category:S'', ''count'': 872, ''name'': ''Function unknown''}'
+  - '{''id'': ''cog.category:U'', ''count'': 78, ''name'': ''Intracellular trafficking,
     secretion, and vesicular transport''}'
   top_cyanorak_roles:
-  - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 242, ''name'': ''Cellular processes
+  - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 274, ''name'': ''Cellular processes
     > Adaptation/acclimation to atypical conditions and detoxification > Light''}'
-  - '{''id'': ''cyanorak.role:G.2'', ''count'': 241, ''name'': ''Energy metabolism
+  - '{''id'': ''cyanorak.role:G.2'', ''count'': 276, ''name'': ''Energy metabolism
     > Electron transport''}'
-  - '{''id'': ''cyanorak.role:J'', ''count'': 170, ''name'': ''Photosynthesis and
+  - '{''id'': ''cyanorak.role:J'', ''count'': 195, ''name'': ''Photosynthesis and
     respiration''}'
-  - '{''id'': ''cyanorak.role:J.2'', ''count'': 180, ''name'': ''Photosynthesis and
+  - '{''id'': ''cyanorak.role:J.2'', ''count'': 201, ''name'': ''Photosynthesis and
     respiration > CO2 fixation''}'
-  - '{''id'': ''cyanorak.role:J.8'', ''count'': 247, ''name'': ''Photosynthesis and
+  - '{''id'': ''cyanorak.role:J.8'', ''count'': 268, ''name'': ''Photosynthesis and
     respiration > Photosystem II''}'
-  total_entries: 48972
-  total_matching: 1212
+  total_entries: 70426
+  total_matching: 1369

@@ -52,7 +52,7 @@ not_found:
 offset: 0
 resolved_aliases: {}
 results:
-- catalyst_gene_count: 2386
+- catalyst_gene_count: 5988
   chebi_id: '16526'
   elements:
   - C
@@ -70,7 +70,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00011
   name: CO2
-  organism_count: 43
+  organism_count: 117
   pathway_count: 17
   pathway_ids:
   - kegg.pathway:ko00220
@@ -92,8 +92,8 @@ results:
   - kegg.pathway:ko01230
   structure_kind: defined
   transporter_count: 5
-  transporter_gene_count: 37
-- catalyst_gene_count: 2106
+  transporter_gene_count: 110
+- catalyst_gene_count: 5082
   chebi_id: '16134'
   elements:
   - H
@@ -103,7 +103,7 @@ results:
   - metabolism
   - transport
   formula: H4N
-  go_transport_organism_count: 43
+  go_transport_organism_count: 117
   go_transport_organism_names:
   - Alteromonas (MarRef v6)
   - Alteromonas macleodii AD45
@@ -115,34 +115,108 @@ results:
   - Alteromonas macleodii MIT1002
   - Alteromonas mediterranea AltDE
   - Alteromonas mediterranea AltDE1
+  - Cyanobium NS01
+  - Cyanobium PCC6307
+  - Cyanobium PCC7001
   - Marinobacter (MarRef v6)
   - Meiothermus ruber
   - Prochlorococcus AS9601
+  - Prochlorococcus EQPAC1
+  - Prochlorococcus GP2
+  - Prochlorococcus HNLC1
+  - Prochlorococcus HNLC2
+  - Prochlorococcus LG
   - Prochlorococcus MED4
+  - Prochlorococcus MIT0601
+  - Prochlorococcus MIT0602
+  - Prochlorococcus MIT0603
   - Prochlorococcus MIT0604
+  - Prochlorococcus MIT0701
+  - Prochlorococcus MIT0702
+  - Prochlorococcus MIT0703
   - Prochlorococcus MIT0801
   - Prochlorococcus MIT1314
   - Prochlorococcus MIT1327
+  - Prochlorococcus MIT9107
+  - Prochlorococcus MIT9116
+  - Prochlorococcus MIT9123
+  - Prochlorococcus MIT9201
   - Prochlorococcus MIT9202
+  - Prochlorococcus MIT9211
   - Prochlorococcus MIT9215
   - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9302
   - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9311
   - Prochlorococcus MIT9312
   - Prochlorococcus MIT9313
+  - Prochlorococcus MIT9314
+  - Prochlorococcus MIT9321
+  - Prochlorococcus MIT9322
+  - Prochlorococcus MIT9401
   - Prochlorococcus MIT9515
   - Prochlorococcus NATL1A
   - Prochlorococcus NATL2A
   - Prochlorococcus PAC1
   - Prochlorococcus RSP50
   - Prochlorococcus SB
+  - Prochlorococcus SS2
+  - Prochlorococcus SS35
+  - Prochlorococcus SS51
+  - Prochlorococcus SS52
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   - Pseudomonas putida KT2440
   - Ruegeria pomeroyi DSS-3
   - Shewanella sp. W3-18-1
+  - Synechococcus A15-127
+  - Synechococcus A15-24
+  - Synechococcus A15-28
+  - Synechococcus A15-44
+  - Synechococcus A15-60
+  - Synechococcus A15-62
+  - Synechococcus A18-25c
+  - Synechococcus A18-40
+  - Synechococcus A18-46.1
+  - Synechococcus BIOS-E4-1
+  - Synechococcus BIOS-U3-1
+  - Synechococcus BMK-MC-1
+  - Synechococcus BOUM118
+  - Synechococcus CB0101
+  - Synechococcus CB0205
   - Synechococcus CC9311
+  - Synechococcus CC9605
+  - Synechococcus CC9616
+  - Synechococcus CC9902
+  - Synechococcus KORDI-100
+  - Synechococcus KORDI-49
+  - Synechococcus KORDI-52
+  - Synechococcus M16.1
+  - Synechococcus MEDNS5
+  - Synechococcus MINOS11
+  - Synechococcus MITS9220
+  - Synechococcus MVIR-18-1
+  - Synechococcus NOUM97013
   - Synechococcus PCC 7002
+  - Synechococcus PROS-7-1
+  - Synechococcus PROS-9-1
+  - Synechococcus PROS-U-1
+  - Synechococcus RCC307
+  - Synechococcus ROS8604
+  - Synechococcus RS9902
+  - Synechococcus RS9907
+  - Synechococcus RS9909
+  - Synechococcus RS9915
+  - Synechococcus RS9916
+  - Synechococcus RS9917
+  - Synechococcus SYN20
+  - Synechococcus TAK9802
+  - Synechococcus WH5701
   - Synechococcus WH7803
+  - Synechococcus WH7805
+  - Synechococcus WH8016
+  - Synechococcus WH8101
   - Synechococcus WH8102
+  - Synechococcus WH8103
   - Synechococcus WH8109
   - Synechococcus elongatus PCC 7942
   - Synechococcus elongatus UTEX 2973
@@ -155,7 +229,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00014
   name: Ammonia
-  organism_count: 43
+  organism_count: 117
   pathway_count: 14
   pathway_ids:
   - kegg.pathway:ko00220
@@ -174,8 +248,8 @@ results:
   - kegg.pathway:ko01310
   structure_kind: defined
   transporter_count: 7
-  transporter_gene_count: 54
-- catalyst_gene_count: 1905
+  transporter_gene_count: 135
+- catalyst_gene_count: 4781
   chebi_id: '16015'
   elements:
   - C
@@ -188,32 +262,78 @@ results:
   - metabolomics
   - transport
   formula: C5H8NO4
-  go_transport_organism_count: 27
+  go_transport_organism_count: 73
   go_transport_organism_names:
+  - Cyanobium NS01
+  - Cyanobium PCC6307
+  - Cyanobium PCC7001
   - Prochlorococcus AS9601
+  - Prochlorococcus EQPAC1
+  - Prochlorococcus GP2
+  - Prochlorococcus HNLC2
+  - Prochlorococcus LG
   - Prochlorococcus MED4
+  - Prochlorococcus MIT0601
+  - Prochlorococcus MIT0602
+  - Prochlorococcus MIT0603
   - Prochlorococcus MIT0604
+  - Prochlorococcus MIT0701
+  - Prochlorococcus MIT0702
+  - Prochlorococcus MIT0703
   - Prochlorococcus MIT0801
   - Prochlorococcus MIT1314
   - Prochlorococcus MIT1327
+  - Prochlorococcus MIT9107
+  - Prochlorococcus MIT9116
+  - Prochlorococcus MIT9123
+  - Prochlorococcus MIT9201
   - Prochlorococcus MIT9202
+  - Prochlorococcus MIT9211
   - Prochlorococcus MIT9215
   - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9302
   - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9311
   - Prochlorococcus MIT9312
   - Prochlorococcus MIT9313
+  - Prochlorococcus MIT9314
+  - Prochlorococcus MIT9321
+  - Prochlorococcus MIT9322
+  - Prochlorococcus MIT9401
   - Prochlorococcus MIT9515
   - Prochlorococcus NATL1A
   - Prochlorococcus NATL2A
   - Prochlorococcus PAC1
   - Prochlorococcus RSP50
   - Prochlorococcus SB
+  - Prochlorococcus SS2
+  - Prochlorococcus SS35
+  - Prochlorococcus SS51
+  - Prochlorococcus SS52
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   - Pseudomonas putida KT2440
   - Ruegeria pomeroyi DSS-3
   - Shewanella sp. W3-18-1
+  - Synechococcus A15-60
+  - Synechococcus A15-62
+  - Synechococcus A18-25c
+  - Synechococcus BMK-MC-1
+  - Synechococcus BOUM118
+  - Synechococcus CB0101
+  - Synechococcus CB0205
+  - Synechococcus CC9616
+  - Synechococcus KORDI-52
+  - Synechococcus MEDNS5
+  - Synechococcus MINOS11
+  - Synechococcus NOUM97013
   - Synechococcus PCC 7002
+  - Synechococcus PROS-7-1
+  - Synechococcus PROS-U-1
+  - Synechococcus RCC307
+  - Synechococcus RS9915
+  - Synechococcus WH5701
   - Synechococcus WH7803
+  - Synechococcus WH7805
   - Synechococcus WH8102
   - Synechococcus sp. BL107
   - Thermosynechococcus vestitus BP-1
@@ -234,7 +354,7 @@ results:
   measured_paper_count: 2
   metabolite_id: kegg.compound:C00025
   name: L-Glutamate
-  organism_count: 43
+  organism_count: 117
   pathway_count: 31
   pathway_ids:
   - kegg.pathway:ko00220
@@ -269,16 +389,16 @@ results:
   - kegg.pathway:ko04082
   - kegg.pathway:ko04216
   stereo_relatives:
-  - '{''transporter_gene_count'': 132, ''metabolite_id'': ''kegg.compound:C00302'',
-    ''name'': ''Glutamate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
-    69}'
   - '{''transporter_gene_count'': 2, ''metabolite_id'': ''kegg.compound:C00217'',
     ''name'': ''D-Glutamate'', ''relation'': ''enantiomer'', ''catalyst_gene_count'':
-    101}'
+    257}'
+  - '{''transporter_gene_count'': 390, ''metabolite_id'': ''kegg.compound:C00302'',
+    ''name'': ''Glutamate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
+    165}'
   structure_kind: defined
   transporter_count: 1
   transporter_gene_count: 2
-- catalyst_gene_count: 1374
+- catalyst_gene_count: 3271
   chebi_id: '15379'
   elements:
   - O
@@ -309,7 +429,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00007
   name: Oxygen
-  organism_count: 43
+  organism_count: 117
   pathway_count: 9
   pathway_ids:
   - kegg.pathway:ko00190
@@ -323,8 +443,8 @@ results:
   - kegg.pathway:ko04066
   structure_kind: defined
   transporter_count: 2
-  transporter_gene_count: 74
-- catalyst_gene_count: 1096
+  transporter_gene_count: 285
+- catalyst_gene_count: 2912
   chebi_id: '18050'
   elements:
   - C
@@ -354,7 +474,7 @@ results:
   measured_paper_count: 2
   metabolite_id: kegg.compound:C00064
   name: L-Glutamine
-  organism_count: 43
+  organism_count: 117
   pathway_count: 17
   pathway_ids:
   - kegg.pathway:ko00220
@@ -377,14 +497,14 @@ results:
   stereo_relatives:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00819'',
     ''name'': ''D-Glutamine'', ''relation'': ''enantiomer'', ''catalyst_gene_count'':
-    13}'
-  - '{''transporter_gene_count'': 128, ''metabolite_id'': ''kegg.compound:C00303'',
+    22}'
+  - '{''transporter_gene_count'': 422, ''metabolite_id'': ''kegg.compound:C00303'',
     ''name'': ''Glutamine'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
     0}'
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 463
+- catalyst_gene_count: 1153
   chebi_id: '17544'
   elements:
   - C
@@ -395,15 +515,66 @@ results:
   - metabolism
   - transport
   formula: CHO3
-  go_transport_organism_count: 12
+  go_transport_organism_count: 63
   go_transport_organism_names:
+  - Cyanobium NS01
+  - Cyanobium PCC6307
+  - Cyanobium PCC7001
+  - Prochlorococcus MIT0701
+  - Prochlorococcus MIT0702
+  - Prochlorococcus MIT0703
   - Prochlorococcus MIT1327
   - Prochlorococcus MIT9303
   - Prochlorococcus MIT9313
+  - Synechococcus A15-127
+  - Synechococcus A15-24
+  - Synechococcus A15-28
+  - Synechococcus A15-44
+  - Synechococcus A15-60
+  - Synechococcus A15-62
+  - Synechococcus A18-25c
+  - Synechococcus A18-40
+  - Synechococcus A18-46.1
+  - Synechococcus BIOS-E4-1
+  - Synechococcus BIOS-U3-1
+  - Synechococcus BMK-MC-1
+  - Synechococcus BOUM118
+  - Synechococcus CB0101
+  - Synechococcus CB0205
   - Synechococcus CC9311
+  - Synechococcus CC9605
+  - Synechococcus CC9616
+  - Synechococcus CC9902
+  - Synechococcus KORDI-100
+  - Synechococcus KORDI-49
+  - Synechococcus KORDI-52
+  - Synechococcus M16.1
+  - Synechococcus MEDNS5
+  - Synechococcus MINOS11
+  - Synechococcus MITS9220
+  - Synechococcus MVIR-18-1
+  - Synechococcus NOUM97013
   - Synechococcus PCC 7002
+  - Synechococcus PROS-7-1
+  - Synechococcus PROS-9-1
+  - Synechococcus PROS-U-1
+  - Synechococcus RCC307
+  - Synechococcus ROS8604
+  - Synechococcus RS9902
+  - Synechococcus RS9907
+  - Synechococcus RS9909
+  - Synechococcus RS9915
+  - Synechococcus RS9916
+  - Synechococcus RS9917
+  - Synechococcus SYN20
+  - Synechococcus TAK9802
+  - Synechococcus WH5701
   - Synechococcus WH7803
+  - Synechococcus WH7805
+  - Synechococcus WH8016
+  - Synechococcus WH8101
   - Synechococcus WH8102
+  - Synechococcus WH8103
   - Synechococcus WH8109
   - Synechococcus elongatus PCC 7942
   - Synechococcus elongatus UTEX 2973
@@ -416,7 +587,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00288
   name: HCO3-
-  organism_count: 43
+  organism_count: 117
   pathway_count: 10
   pathway_ids:
   - kegg.pathway:ko00220
@@ -431,8 +602,8 @@ results:
   - kegg.pathway:ko04113
   structure_kind: defined
   transporter_count: 9
-  transporter_gene_count: 66
-- catalyst_gene_count: 373
+  transporter_gene_count: 155
+- catalyst_gene_count: 898
   chebi_id: '30751'
   elements:
   - C
@@ -443,7 +614,7 @@ results:
   - metabolism
   - transport
   formula: CHO2
-  go_transport_organism_count: 18
+  go_transport_organism_count: 52
   go_transport_organism_names:
   - Alteromonas macleodii AD45
   - Alteromonas macleodii ATCC27126
@@ -454,14 +625,48 @@ results:
   - Alteromonas macleodii MIT1002
   - Alteromonas mediterranea AltDE
   - Alteromonas mediterranea AltDE1
+  - Cyanobium NS01
+  - Cyanobium PCC7001
   - Marinobacter (MarRef v6)
+  - Prochlorococcus MIT0703
   - Prochlorococcus MIT0801
   - Prochlorococcus MIT9313
   - Pseudomonas putida KT2440
   - Ruegeria pomeroyi DSS-3
   - Shewanella sp. W3-18-1
+  - Synechococcus A15-127
+  - Synechococcus A15-44
+  - Synechococcus A15-60
+  - Synechococcus A15-62
+  - Synechococcus A18-25c
+  - Synechococcus BIOS-E4-1
+  - Synechococcus BMK-MC-1
+  - Synechococcus CB0205
   - Synechococcus CC9311
+  - Synechococcus CC9605
+  - Synechococcus CC9902
+  - Synechococcus KORDI-49
+  - Synechococcus KORDI-52
+  - Synechococcus M16.1
+  - Synechococcus MEDNS5
+  - Synechococcus MITS9220
+  - Synechococcus MVIR-18-1
+  - Synechococcus NOUM97013
   - Synechococcus PCC 7002
+  - Synechococcus PROS-7-1
+  - Synechococcus PROS-9-1
+  - Synechococcus PROS-U-1
+  - Synechococcus ROS8604
+  - Synechococcus RS9902
+  - Synechococcus RS9907
+  - Synechococcus RS9909
+  - Synechococcus RS9916
+  - Synechococcus RS9917
+  - Synechococcus SYN20
+  - Synechococcus TAK9802
+  - Synechococcus WH7805
+  - Synechococcus WH8016
+  - Synechococcus WH8101
   - Synechococcus WH8109
   kegg_brite_classes:
   - 'Lipids: Fatty acyls'
@@ -474,7 +679,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00058
   name: Formate
-  organism_count: 43
+  organism_count: 117
   pathway_count: 11
   pathway_ids:
   - kegg.pathway:ko00440
@@ -491,7 +696,7 @@ results:
   structure_kind: defined
   transporter_count: 1
   transporter_gene_count: 12
-- catalyst_gene_count: 183
+- catalyst_gene_count: 515
   chebi_id: '17672'
   elements:
   - C
@@ -511,7 +716,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00169
   name: Carbamoyl phosphate
-  organism_count: 43
+  organism_count: 117
   pathway_count: 11
   pathway_ids:
   - kegg.pathway:ko00220
@@ -528,7 +733,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 129
+- catalyst_gene_count: 323
   chebi_id: '28616'
   elements:
   - C
@@ -547,7 +752,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C01563
   name: Carbamate
-  organism_count: 43
+  organism_count: 117
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00240
@@ -556,7 +761,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 98
+- catalyst_gene_count: 193
   chebi_id: '25567'
   elements:
   - N
@@ -566,10 +771,15 @@ results:
   - metabolism
   - transport
   formula: NO2
-  go_transport_organism_count: 17
+  go_transport_organism_count: 66
   go_transport_organism_names:
   - Alteromonas (MarRef v6)
+  - Cyanobium NS01
+  - Cyanobium PCC7001
   - Prochlorococcus MIT0604
+  - Prochlorococcus MIT0701
+  - Prochlorococcus MIT0702
+  - Prochlorococcus MIT0703
   - Prochlorococcus MIT0801
   - Prochlorococcus MIT1327
   - Prochlorococcus MIT9303
@@ -579,10 +789,54 @@ results:
   - Prochlorococcus PAC1
   - Prochlorococcus SB
   - Pseudomonas putida KT2440
+  - Synechococcus A15-127
+  - Synechococcus A15-24
+  - Synechococcus A15-28
+  - Synechococcus A15-44
+  - Synechococcus A15-60
+  - Synechococcus A15-62
+  - Synechococcus A18-25c
+  - Synechococcus A18-40
+  - Synechococcus A18-46.1
+  - Synechococcus BIOS-E4-1
+  - Synechococcus BIOS-U3-1
+  - Synechococcus BMK-MC-1
+  - Synechococcus BOUM118
+  - Synechococcus CB0101
+  - Synechococcus CB0205
   - Synechococcus CC9311
+  - Synechococcus CC9605
+  - Synechococcus CC9616
+  - Synechococcus CC9902
+  - Synechococcus KORDI-100
+  - Synechococcus KORDI-49
+  - Synechococcus KORDI-52
+  - Synechococcus M16.1
+  - Synechococcus MEDNS5
+  - Synechococcus MINOS11
+  - Synechococcus MITS9220
+  - Synechococcus MVIR-18-1
+  - Synechococcus NOUM97013
   - Synechococcus PCC 7002
+  - Synechococcus PROS-7-1
+  - Synechococcus PROS-9-1
+  - Synechococcus PROS-U-1
+  - Synechococcus RCC307
+  - Synechococcus ROS8604
+  - Synechococcus RS9902
+  - Synechococcus RS9907
+  - Synechococcus RS9909
+  - Synechococcus RS9915
+  - Synechococcus RS9916
+  - Synechococcus RS9917
+  - Synechococcus SYN20
+  - Synechococcus TAK9802
   - Synechococcus WH7803
+  - Synechococcus WH7805
+  - Synechococcus WH8016
+  - Synechococcus WH8101
   - Synechococcus WH8102
+  - Synechococcus WH8103
   - Synechococcus WH8109
   - Synechococcus sp. BL107
   mass: 46.005
@@ -592,7 +846,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00088
   name: Nitrite
-  organism_count: 35
+  organism_count: 88
   pathway_count: 8
   pathway_ids:
   - kegg.pathway:ko00910
@@ -605,8 +859,8 @@ results:
   - kegg.pathway:ko02020
   structure_kind: defined
   transporter_count: 6
-  transporter_gene_count: 88
-- catalyst_gene_count: 26
+  transporter_gene_count: 168
+- catalyst_gene_count: 72
   chebi_id: '28024'
   elements:
   - C
@@ -617,10 +871,18 @@ results:
   - metabolism
   - transport
   formula: CNO
-  go_transport_organism_count: 3
+  go_transport_organism_count: 11
   go_transport_organism_names:
+  - Prochlorococcus EQPAC1
   - Prochlorococcus MED4
+  - Prochlorococcus MIT9314
   - Prochlorococcus SB
+  - Synechococcus A15-24
+  - Synechococcus A15-28
+  - Synechococcus A18-40
+  - Synechococcus A18-46.1
+  - Synechococcus BOUM118
+  - Synechococcus RS9915
   - Synechococcus WH8102
   mass: 42.017
   measured_assay_count: 0
@@ -629,7 +891,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C01417
   name: Cyanate
-  organism_count: 28
+  organism_count: 78
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00910
@@ -637,8 +899,8 @@ results:
   - kegg.pathway:ko02010
   structure_kind: defined
   transporter_count: 2
-  transporter_gene_count: 61
-- catalyst_gene_count: 33
+  transporter_gene_count: 99
+- catalyst_gene_count: 77
   chebi_id: '48107'
   elements:
   - H
@@ -649,7 +911,7 @@ results:
   - metabolism
   - transport
   formula: HNO3
-  go_transport_organism_count: 26
+  go_transport_organism_count: 72
   go_transport_organism_names:
   - Alteromonas (MarRef v6)
   - Alteromonas macleodii AD45
@@ -661,17 +923,63 @@ results:
   - Alteromonas macleodii MIT1002
   - Alteromonas mediterranea AltDE
   - Alteromonas mediterranea AltDE1
+  - Cyanobium NS01
+  - Cyanobium PCC6307
+  - Cyanobium PCC7001
   - Marinobacter (MarRef v6)
   - Meiothermus ruber
+  - Prochlorococcus EQPAC1
   - Prochlorococcus MED4
   - Prochlorococcus MIT0604
+  - Prochlorococcus MIT9314
   - Prochlorococcus PAC1
   - Prochlorococcus SB
   - Pseudomonas putida KT2440
+  - Synechococcus A15-127
+  - Synechococcus A15-24
+  - Synechococcus A15-28
+  - Synechococcus A15-44
+  - Synechococcus A15-60
+  - Synechococcus A15-62
+  - Synechococcus A18-25c
+  - Synechococcus A18-40
+  - Synechococcus A18-46.1
+  - Synechococcus BIOS-E4-1
+  - Synechococcus BIOS-U3-1
+  - Synechococcus BMK-MC-1
+  - Synechococcus BOUM118
+  - Synechococcus CB0101
+  - Synechococcus CB0205
   - Synechococcus CC9311
+  - Synechococcus CC9605
+  - Synechococcus CC9616
+  - Synechococcus CC9902
+  - Synechococcus KORDI-100
+  - Synechococcus KORDI-49
+  - Synechococcus KORDI-52
+  - Synechococcus M16.1
+  - Synechococcus MEDNS5
+  - Synechococcus MINOS11
+  - Synechococcus NOUM97013
   - Synechococcus PCC 7002
+  - Synechococcus PROS-9-1
+  - Synechococcus PROS-U-1
+  - Synechococcus RCC307
+  - Synechococcus ROS8604
+  - Synechococcus RS9902
+  - Synechococcus RS9907
+  - Synechococcus RS9909
+  - Synechococcus RS9915
+  - Synechococcus RS9916
+  - Synechococcus SYN20
+  - Synechococcus TAK9802
+  - Synechococcus WH5701
   - Synechococcus WH7803
+  - Synechococcus WH7805
+  - Synechococcus WH8016
+  - Synechococcus WH8101
   - Synechococcus WH8102
+  - Synechococcus WH8103
   - Synechococcus WH8109
   - Synechococcus elongatus PCC 7942
   - Synechococcus elongatus UTEX 2973
@@ -684,7 +992,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00244
   name: Nitrate
-  organism_count: 27
+  organism_count: 73
   pathway_count: 6
   pathway_ids:
   - kegg.pathway:ko00910
@@ -695,8 +1003,8 @@ results:
   - kegg.pathway:ko02020
   structure_kind: defined
   transporter_count: 5
-  transporter_gene_count: 88
-- catalyst_gene_count: 20
+  transporter_gene_count: 165
+- catalyst_gene_count: 40
   chebi_id: '18379'
   elements:
   - C
@@ -713,7 +1021,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00726
   name: Nitrile
-  organism_count: 19
+  organism_count: 39
   pathway_count: 2
   pathway_ids:
   - kegg.pathway:ko00910
@@ -721,7 +1029,7 @@ results:
   structure_kind: generic
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 18
+- catalyst_gene_count: 38
   chebi_id: '16397'
   elements:
   - C
@@ -741,7 +1049,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00488
   name: Formamide
-  organism_count: 14
+  organism_count: 26
   pathway_count: 4
   pathway_ids:
   - kegg.pathway:ko00460
@@ -927,7 +1235,7 @@ top_organisms:
   organism_name: Alteromonas mediterranea AltDE1
 - count: 14
   organism_name: Alteromonas macleodii BGP6
-total_entries: 3178
+total_entries: 3251
 total_matching: 18
 truncated: false
 warnings: []

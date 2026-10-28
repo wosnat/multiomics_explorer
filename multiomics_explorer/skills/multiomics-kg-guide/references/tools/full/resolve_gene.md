@@ -80,13 +80,13 @@ resolve_gene(identifier="dnaN")
 
 ```example-response
 {
-  "total_matching": 43,
+  "total_matching": 118,
   "by_organism": [
+    {"organism_name": "Synechococcus KORDI-100", "count": 2},
     {"organism_name": "Alteromonas (MarRef v6)", "count": 1},
     {"organism_name": "Alteromonas macleodii AD45", "count": 1},
     {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
     {"organism_name": "Alteromonas macleodii BGP6", "count": 1},
-    {"organism_name": "Alteromonas macleodii BS11", "count": 1},
     ...
   ],
   "by_organism_truncated": true,

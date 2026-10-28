@@ -1,12 +1,12 @@
 by_evidence_source:
-- count: 332
+- count: 349
   evidence_source: metabolism
-- count: 296
+- count: 298
   evidence_source: transport
-- count: 78
+- count: 82
   evidence_source: go_transport
 by_kegg_brite_class:
-- count: 34
+- count: 39
   kegg_brite_class: 'Lipids: Fatty acyls'
 - count: 24
   kegg_brite_class: 'Lipids: Glycerophospholipids'
@@ -16,22 +16,22 @@ by_kegg_brite_class:
   kegg_brite_class: 'Lipids: Sphingolipids'
 - count: 1
   kegg_brite_class: 'Lipids: Sterol lipids'
-- count: 551
+- count: 565
   kegg_brite_class: not classified
 by_kegg_functional_category:
 - count: 19
   kegg_functional_category: Lipids
 - count: 2
   kegg_functional_category: Antibiotics
-- count: 601
+- count: 620
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment: []
   by_paper_count:
-  - count: 622
+  - count: 641
     paper_count: 0
 by_structure_kind:
-- count: 622
+- count: 641
   structure_kind: generic
 case_id: list_metabolites_structure_kind_generic
 mass_stats:
@@ -51,18 +51,18 @@ row_count: 0
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 145
+- count: 156
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
+- count: 44
+  metabolite_pathway_id: kegg.pathway:ko01110
+  metabolite_pathway_name: Biosynthesis of secondary metabolites
 - count: 42
   metabolite_pathway_id: kegg.pathway:ko00061
   metabolite_pathway_name: Fatty acid biosynthesis
 - count: 35
   metabolite_pathway_id: kegg.pathway:ko01212
   metabolite_pathway_name: Fatty acid metabolism
-- count: 34
-  metabolite_pathway_id: kegg.pathway:ko01110
-  metabolite_pathway_name: Biosynthesis of secondary metabolites
 - count: 25
   metabolite_pathway_id: kegg.pathway:ko00970
   metabolite_pathway_name: Aminoacyl-tRNA biosynthesis
@@ -102,11 +102,11 @@ top_organisms:
   organism_name: Alteromonas mediterranea AltDE
 - count: 301
   organism_name: Alteromonas macleodii BS11
-total_entries: 3178
-total_matching: 622
+total_entries: 3251
+total_matching: 641
 truncated: true
 warnings: []
 xref_coverage:
-  with_chebi: 539
+  with_chebi: 554
   with_hmdb: 2
-  with_mnxm: 620
+  with_mnxm: 639

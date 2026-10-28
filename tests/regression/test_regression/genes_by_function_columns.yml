@@ -1,5 +1,5 @@
 case_id: genes_by_function_columns
-row_count: 75
+row_count: 298
 rows:
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
@@ -7,522 +7,2083 @@ rows:
   locus_tag: A9601_01911
   organism_name: Prochlorococcus AS9601
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.6606
+  score: 4.5418
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: A9601_01941
   organism_name: Prochlorococcus AS9601
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.637
+  score: 4.5113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: A9601_06641
   organism_name: Prochlorococcus AS9601
   product: naphthoate synthase
-  score: 7.363
+  score: 7.1113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: BL107_07744
   organism_name: Synechococcus sp. BL107
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.9037
+  score: 4.7687
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: BL107_07759
   organism_name: Synechococcus sp. BL107
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.6606
+  score: 4.5418
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: BL107_12156
   organism_name: Synechococcus sp. BL107
   product: naphthoate synthase
-  score: 7.6086
+  score: 7.3316
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: BSR22_03960
   organism_name: Prochlorococcus RSP50
   product: acyl-CoA thioesterase
-  score: 5.8812
+  score: 5.6776
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: CB0101_RS0103140
+  organism_name: Synechococcus CB0101
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: CB0101_RS0103160
+  organism_name: Synechococcus CB0101
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 5.9529
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: CB0101_RS0106055
+  organism_name: Synechococcus CB0101
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: CB0205_RS0101300
+  organism_name: Synechococcus CB0205
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: CB0205_RS0101325
+  organism_name: Synechococcus CB0205
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: CB0205_RS0109340
+  organism_name: Synechococcus CB0205
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: CPCC7001_1355
+  organism_name: Cyanobium PCC7001
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: CPCC7001_2214
+  organism_name: Cyanobium PCC7001
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: CPCC7001_460
+  organism_name: Cyanobium PCC7001
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: CyaNS01_00333
+  organism_name: Cyanobium NS01
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: CyaNS01_00338
+  organism_name: Cyanobium NS01
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: CyaNS01_01534
+  organism_name: Cyanobium NS01
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: Cyagr_0375
+  organism_name: Cyanobium PCC6307
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: Cyagr_2842
+  organism_name: Cyanobium PCC6307
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: Cyagr_2847
+  organism_name: Cyanobium PCC6307
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: DEH24_11355
   organism_name: Alteromonas (MarRef v6)
   product: 1,4-dihydroxy-2-naphthoate prenyltransferase
-  score: 8.6963
+  score: 8.2816
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EU91_0103
+  organism_name: Prochlorococcus GP2
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EU91_0343
+  organism_name: Prochlorococcus GP2
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EU91_0346
+  organism_name: Prochlorococcus GP2
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EU92_0741
+  organism_name: Prochlorococcus MIT9107
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EU92_1788
+  organism_name: Prochlorococcus MIT9107
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EU92_1791
+  organism_name: Prochlorococcus MIT9107
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EU93_0812
+  organism_name: Prochlorococcus MIT9116
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EU93_1852
+  organism_name: Prochlorococcus MIT9116
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EU93_1855
+  organism_name: Prochlorococcus MIT9116
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EU94_0134
+  organism_name: Prochlorococcus MIT9123
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EU94_0137
+  organism_name: Prochlorococcus MIT9123
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EU94_1533
+  organism_name: Prochlorococcus MIT9123
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EU95_1252
+  organism_name: Prochlorococcus MIT9201
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EU95_1820
+  organism_name: Prochlorococcus MIT9201
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EU95_1823
+  organism_name: Prochlorococcus MIT9201
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EU96_0848
+  organism_name: Prochlorococcus MIT9302
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EU96_0851
+  organism_name: Prochlorococcus MIT9302
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EU96_1267
+  organism_name: Prochlorococcus MIT9302
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EU97_1294
+  organism_name: Prochlorococcus MIT9311
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EU97_1297
+  organism_name: Prochlorococcus MIT9311
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EU97_1927
+  organism_name: Prochlorococcus MIT9311
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EU98_0118
+  organism_name: Prochlorococcus MIT9314
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EU98_1052
+  organism_name: Prochlorococcus MIT9314
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EU98_1055
+  organism_name: Prochlorococcus MIT9314
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EU99_0684
+  organism_name: Prochlorococcus MIT9321
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EU99_0687
+  organism_name: Prochlorococcus MIT9321
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EU99_1129
+  organism_name: Prochlorococcus MIT9321
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EV00_0557
+  organism_name: Prochlorococcus MIT9322
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EV00_0560
+  organism_name: Prochlorococcus MIT9322
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EV00_1717
+  organism_name: Prochlorococcus MIT9322
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EV01_0665
+  organism_name: Prochlorococcus MIT9401
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EV01_0668
+  organism_name: Prochlorococcus MIT9401
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EV01_1706
+  organism_name: Prochlorococcus MIT9401
+  product: naphthoate synthase
+  score: 7.3316
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: EV02_0588
   organism_name: Prochlorococcus SB
   product: naphthoate synthase
-  score: 7.363
+  score: 7.1113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: EV02_1047
   organism_name: Prochlorococcus SB
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.637
+  score: 4.5113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: EV02_1050
   organism_name: Prochlorococcus SB
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 5.403
+  score: 5.2711
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: EV03_0409
   organism_name: Prochlorococcus PAC1
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.637
+  score: 4.5113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: EV03_0412
   organism_name: Prochlorococcus PAC1
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 5.403
+  score: 5.2711
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: EV03_1828
   organism_name: Prochlorococcus PAC1
   product: naphthoate synthase
-  score: 7.363
+  score: 7.1113
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EV04_0379
+  organism_name: Prochlorococcus LG
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EV04_1009
+  organism_name: Prochlorococcus LG
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EV04_1012
+  organism_name: Prochlorococcus LG
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EV05_0875
+  organism_name: Prochlorococcus MIT0601
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EV05_0878
+  organism_name: Prochlorococcus MIT0601
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EV05_1514
+  organism_name: Prochlorococcus MIT0601
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EV06_0603
+  organism_name: Prochlorococcus MIT0602
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EV06_0606
+  organism_name: Prochlorococcus MIT0602
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EV06_1249
+  organism_name: Prochlorococcus MIT0602
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EV07_0178
+  organism_name: Prochlorococcus MIT0603
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EV07_0181
+  organism_name: Prochlorococcus MIT0603
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EV07_1096
+  organism_name: Prochlorococcus MIT0603
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EV08_1514
+  organism_name: Prochlorococcus SS2
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EV08_1806
+  organism_name: Prochlorococcus SS2
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EV08_1809
+  organism_name: Prochlorococcus SS2
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EV09_1057
+  organism_name: Prochlorococcus SS35
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EV09_1573
+  organism_name: Prochlorococcus SS35
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EV09_1576
+  organism_name: Prochlorococcus SS35
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EV10_1025
+  organism_name: Prochlorococcus SS51
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EV10_1028
+  organism_name: Prochlorococcus SS51
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EV10_1446
+  organism_name: Prochlorococcus SS51
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EV11_0376
+  organism_name: Prochlorococcus SS52
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EV11_0379
+  organism_name: Prochlorococcus SS52
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EV11_0468
+  organism_name: Prochlorococcus SS52
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EV12_1003
+  organism_name: Prochlorococcus MIT0701
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EV12_1387
+  organism_name: Prochlorococcus MIT0701
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EV12_1391
+  organism_name: Prochlorococcus MIT0701
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EV13_0799
+  organism_name: Prochlorococcus MIT0702
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EV13_1411
+  organism_name: Prochlorococcus MIT0702
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EV13_1415
+  organism_name: Prochlorococcus MIT0702
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: EV14_0109
+  organism_name: Prochlorococcus MIT0703
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: EV14_0113
+  organism_name: Prochlorococcus MIT0703
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: EV14_1645
+  organism_name: Prochlorococcus MIT0703
+  product: naphthoate synthase
+  score: 7.3316
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: EW14_0216
   organism_name: Prochlorococcus MIT0604
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.5647
+  score: 4.4496
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: EW14_0219
   organism_name: Prochlorococcus MIT0604
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.9037
+  score: 4.7687
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: EW14_0653
   organism_name: Prochlorococcus MIT0604
   product: naphthoate synthase
-  score: 7.6086
+  score: 7.3316
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: EW15_0262
   organism_name: Prochlorococcus MIT0801
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.5647
+  score: 4.4496
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: EW15_0265
   organism_name: Prochlorococcus MIT0801
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.9037
+  score: 4.7687
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: EW15_0706
   organism_name: Prochlorococcus MIT0801
   product: naphthoate synthase
-  score: 7.6086
+  score: 7.3316
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: H6G84_RS04270
   locus_tag: H6G84_04270
   organism_name: Synechococcus elongatus PCC 7942
   product: acyl-CoA thioesterase
-  score: 5.7316
+  score: 5.5408
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: KR100_07935
+  organism_name: Synechococcus KORDI-100
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: KR100_15030
+  organism_name: Synechococcus KORDI-100
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: KR100_15045
+  organism_name: Synechococcus KORDI-100
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: KR49_03315
+  organism_name: Synechococcus KORDI-49
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: KR49_07770
+  organism_name: Synechococcus KORDI-49
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: KR49_07785
+  organism_name: Synechococcus KORDI-49
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: KR52_03885
+  organism_name: Synechococcus KORDI-52
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: KR52_03900
+  organism_name: Synechococcus KORDI-52
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: KR52_11015
+  organism_name: Synechococcus KORDI-52
+  product: naphthoate synthase
+  score: 7.3316
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: M744_07760
   organism_name: Synechococcus elongatus UTEX 2973
   product: acyl-CoA thioesterase
-  score: 5.7801
+  score: 5.5861
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: NATL1_02481
   organism_name: Prochlorococcus NATL1A
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.6606
+  score: 4.5418
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: NATL1_02511
   organism_name: Prochlorococcus NATL1A
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.637
+  score: 4.5113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: NATL1_06641
   organism_name: Prochlorococcus NATL1A
   product: naphthoate synthase
-  score: 7.363
+  score: 7.1113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: P9202_1854
   organism_name: Prochlorococcus MIT9202
   product: naphthoate synthase
-  score: 7.6086
+  score: 7.3316
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: P9202_548
   organism_name: Prochlorococcus MIT9202
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.9037
+  score: 4.7687
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: P9202_597
   organism_name: Prochlorococcus MIT9202
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.6606
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: P9211_01911
+  organism_name: Prochlorococcus MIT9211
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: P9211_01941
+  organism_name: Prochlorococcus MIT9211
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.5113
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: P9211_10421
+  organism_name: Prochlorococcus MIT9211
+  product: naphthoate synthase
+  score: 7.3316
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: fcbC
   locus_tag: P9215_01911
   organism_name: Prochlorococcus MIT9215
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.5218
+  score: 4.4096
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: P9215_01941
   organism_name: Prochlorococcus MIT9215
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.637
+  score: 4.5113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: P9215_06901
   organism_name: Prochlorococcus MIT9215
   product: naphthoate synthase
-  score: 7.363
+  score: 7.1113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: P9301_01931
   organism_name: Prochlorococcus MIT9301
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.6606
+  score: 4.5418
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: P9301_01961
   organism_name: Prochlorococcus MIT9301
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.637
+  score: 4.5113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: P9301_06341
   organism_name: Prochlorococcus MIT9301
   product: naphthoate synthase
-  score: 7.363
+  score: 7.1113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: P9303_18811
   organism_name: Prochlorococcus MIT9303
   product: naphthoate synthase
-  score: 7.363
+  score: 7.1113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: P9303_27301
   organism_name: Prochlorococcus MIT9303
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.6606
+  score: 4.5418
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: P9303_27341
   organism_name: Prochlorococcus MIT9303
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.637
+  score: 4.5113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: P9515_02021
   organism_name: Prochlorococcus MIT9515
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.6606
+  score: 4.5418
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: P9515_02051
   organism_name: Prochlorococcus MIT9515
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.637
+  score: 4.5113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: P9515_06731
   organism_name: Prochlorococcus MIT9515
   product: naphthoate synthase
-  score: 7.363
+  score: 7.1113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: PMIT1327_00122
   organism_name: Prochlorococcus MIT1327
   product: naphthoate synthase
-  score: 7.9835
+  score: 7.6631
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: PMIT1327_02313
   organism_name: Prochlorococcus MIT1327
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 6.0102
+  score: 5.8327
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: PMIT1327_02317
   organism_name: Prochlorococcus MIT1327
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 7.1108
+  score: 6.8472
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: PMM0173
   organism_name: Prochlorococcus MED4
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.6606
+  score: 4.5418
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: PMM0176
   organism_name: Prochlorococcus MED4
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.637
+  score: 4.5113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: PMM0608
   organism_name: Prochlorococcus MED4
   product: naphthoate synthase
-  score: 7.363
+  score: 7.1113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: PMN2A_0044
   organism_name: Prochlorococcus NATL2A
   product: naphthoate synthase
-  score: 7.363
+  score: 7.1113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: PMN2A_RS01100
   locus_tag: PMN2A_1541
   organism_name: Prochlorococcus NATL2A
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.5218
+  score: 4.4096
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: PMN2A_1544
   organism_name: Prochlorococcus NATL2A
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.637
+  score: 4.5113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: PMT0405
   organism_name: Prochlorococcus MIT9313
   product: naphthoate synthase
-  score: 7.363
+  score: 7.1113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: PMT2055
   organism_name: Prochlorococcus MIT9313
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.6606
+  score: 4.5418
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: PMT2059
   organism_name: Prochlorococcus MIT9313
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.637
+  score: 4.5113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: PMT9312_0175
   organism_name: Prochlorococcus MIT9312
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.5647
+  score: 4.4496
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: PMT9312_0178
   organism_name: Prochlorococcus MIT9312
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.637
+  score: 4.5113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: PMT9312_0608
   organism_name: Prochlorococcus MIT9312
   product: naphthoate synthase
-  score: 7.363
+  score: 7.1113
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: PROCH_0242
+  organism_name: Prochlorococcus EQPAC1
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: PROCH_0245
+  organism_name: Prochlorococcus EQPAC1
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: PROCH_1546
+  organism_name: Prochlorococcus EQPAC1
+  product: naphthoate synthase
+  score: 7.3316
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: fcbC
   locus_tag: Pro0198
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.6176
+  score: 4.5017
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: Pro0201
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.637
+  score: 4.5113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: Pro1053
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: naphthoate synthase
-  score: 7.363
+  score: 7.1113
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: RH83_RS03540
+  organism_name: Prochlorococcus HNLC2
+  product: naphthoate synthase
+  score: 7.4101
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: RH83_RS05290
+  organism_name: Prochlorococcus HNLC2
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: RH83_RS05305
+  organism_name: Prochlorococcus HNLC2
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 5.9529
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: RH84_RS00745
+  organism_name: Prochlorococcus HNLC1
+  product: naphthoate synthase
+  score: 7.4101
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: RH84_RS04980
+  organism_name: Prochlorococcus HNLC1
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: RH84_RS04995
+  organism_name: Prochlorococcus HNLC1
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 5.9529
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: RS9916_28554
+  organism_name: Synechococcus RS9916
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: RS9916_36127
+  organism_name: Synechococcus RS9916
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: RS9916_36157
+  organism_name: Synechococcus RS9916
+  product: hypothetical protein
+  score: 5.9765
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: RS9916_36182
+  organism_name: Synechococcus RS9916
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: RS9917_06885
+  organism_name: Synechococcus RS9917
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: RS9917_06905
+  organism_name: Synechococcus RS9917
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: RS9917_11345
+  organism_name: Synechococcus RS9917
+  product: naphthoate synthase
+  score: 7.3316
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: SOI86_RS07530
   organism_name: Prochlorococcus MIT1314
   product: acyl-CoA thioesterase
-  score: 5.7801
+  score: 5.5861
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: mqnD
   locus_tag: SY28_07690
   organism_name: Meiothermus ruber
   product: menaquinone biosynthesis family protein
-  score: 5.8855
+  score: 5.6799
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SYN9616_RS0103600
+  organism_name: Synechococcus CC9616
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SYN9616_RS0110295
+  organism_name: Synechococcus CC9616
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SYN9616_RS0110310
+  organism_name: Synechococcus CC9616
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: SYNPCC7002_A1284
   organism_name: Synechococcus PCC 7002
   product: thioesterase family protein
-  score: 5.8812
+  score: 5.6776
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: SYNW0998
   organism_name: Synechococcus WH8102
   product: naphthoate synthase
-  score: 7.363
+  score: 7.1113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: SYNW2301
   organism_name: Synechococcus WH8102
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.6606
+  score: 4.5418
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: SYNW2307
   organism_name: Synechococcus WH8102
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.637
+  score: 4.5113
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: Sputw3181_2299
   organism_name: Shewanella sp. W3-18-1
   product: 1,4-dihydroxy-2-naphthoate polyprenyltransferase
-  score: 9.0182
+  score: 8.5786
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: Syn8016DRAFT_0639
+  organism_name: Synechococcus WH8016
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: SYN8016DRAFT_RS08885
+  locus_tag: Syn8016DRAFT_1894
+  organism_name: Synechococcus WH8016
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5017
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: Syn8016DRAFT_1899
+  organism_name: Synechococcus WH8016
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynA15127_01690
+  organism_name: Synechococcus A15-127
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynA15127_02644
+  organism_name: Synechococcus A15-127
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynA15127_02647
+  organism_name: Synechococcus A15-127
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynA1524_01066
+  organism_name: Synechococcus A15-24
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynA1524_02514
+  organism_name: Synechococcus A15-24
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynA1524_02519
+  organism_name: Synechococcus A15-24
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynA1528_01027
+  organism_name: Synechococcus A15-28
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynA1528_02553
+  organism_name: Synechococcus A15-28
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynA1528_02558
+  organism_name: Synechococcus A15-28
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynA1544_01276
+  organism_name: Synechococcus A15-44
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynA1544_02985
+  organism_name: Synechococcus A15-44
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynA1544_02988
+  organism_name: Synechococcus A15-44
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynA1560_02048
+  organism_name: Synechococcus A15-60
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynA1560_02795
+  organism_name: Synechococcus A15-60
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynA1560_02800
+  organism_name: Synechococcus A15-60
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynA1562_01150
+  organism_name: Synechococcus A15-62
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynA1562_02601
+  organism_name: Synechococcus A15-62
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynA1562_02604
+  organism_name: Synechococcus A15-62
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynA1825c_02029
+  organism_name: Synechococcus A18-25c
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: SynA1825c_RS12130
+  locus_tag: SynA1825c_02763
+  organism_name: Synechococcus A18-25c
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4096
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynA1825c_02768
+  organism_name: Synechococcus A18-25c
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynA1840_01051
+  organism_name: Synechococcus A18-40
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynA1840_02582
+  organism_name: Synechococcus A18-40
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynA1840_02594
+  organism_name: Synechococcus A18-40
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynA18461_01126
+  organism_name: Synechococcus A18-46.1
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynA18461_02678
+  organism_name: Synechococcus A18-46.1
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynA18461_02686
+  organism_name: Synechococcus A18-46.1
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynBIOSE41_01769
+  organism_name: Synechococcus BIOS-E4-1
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynBIOSE41_04164
+  organism_name: Synechococcus BIOS-E4-1
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynBIOSE41_04174
+  organism_name: Synechococcus BIOS-E4-1
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynBIOSU31_01910
+  organism_name: Synechococcus BIOS-U3-1
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynBIOSU31_03217
+  organism_name: Synechococcus BIOS-U3-1
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynBIOSU31_03226
+  organism_name: Synechococcus BIOS-U3-1
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynBMKMC1_01302
+  organism_name: Synechococcus BMK-MC-1
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynBMKMC1_02885
+  organism_name: Synechococcus BMK-MC-1
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynBMKMC1_02888
+  organism_name: Synechococcus BMK-MC-1
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynBOUM118_01068
+  organism_name: Synechococcus BOUM118
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynBOUM118_02540
+  organism_name: Synechococcus BOUM118
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynBOUM118_02548
+  organism_name: Synechococcus BOUM118
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynM161_01075
+  organism_name: Synechococcus M16.1
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynM161_02351
+  organism_name: Synechococcus M16.1
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynM161_02354
+  organism_name: Synechococcus M16.1
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynMEDNS5_01074
+  organism_name: Synechococcus MEDNS5
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynMEDNS5_02556
+  organism_name: Synechococcus MEDNS5
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynMEDNS5_02559
+  organism_name: Synechococcus MEDNS5
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynMINOS11_01247
+  organism_name: Synechococcus MINOS11
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynMINOS11_02428
+  organism_name: Synechococcus MINOS11
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynMINOS11_02431
+  organism_name: Synechococcus MINOS11
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynMITS9220_01713
+  organism_name: Synechococcus MITS9220
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynMITS9220_02862
+  organism_name: Synechococcus MITS9220
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynMITS9220_02871
+  organism_name: Synechococcus MITS9220
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynMVIR181_01623
+  organism_name: Synechococcus MVIR-18-1
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynMVIR181_02831
+  organism_name: Synechococcus MVIR-18-1
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynMVIR181_02834
+  organism_name: Synechococcus MVIR-18-1
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynNOUM97013_01148
+  organism_name: Synechococcus NOUM97013
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynNOUM97013_02695
+  organism_name: Synechococcus NOUM97013
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynNOUM97013_02700
+  organism_name: Synechococcus NOUM97013
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynPROS71_01191
+  organism_name: Synechococcus PROS-7-1
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynPROS71_02618
+  organism_name: Synechococcus PROS-7-1
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynPROS71_02621
+  organism_name: Synechococcus PROS-7-1
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynPROS91_01448
+  organism_name: Synechococcus PROS-9-1
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynPROS91_02610
+  organism_name: Synechococcus PROS-9-1
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynPROS91_02613
+  organism_name: Synechococcus PROS-9-1
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynPROSU1_01324
+  organism_name: Synechococcus PROS-U-1
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynPROSU1_02904
+  organism_name: Synechococcus PROS-U-1
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynPROSU1_02907
+  organism_name: Synechococcus PROS-U-1
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynRCC2555_01752
+  organism_name: Synechococcus WH8101
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynRCC2555_02711
+  organism_name: Synechococcus WH8101
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynRCC2555_02716
+  organism_name: Synechococcus WH8101
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynRCC307_1141
+  organism_name: Synechococcus RCC307
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynRCC307_2253
+  organism_name: Synechococcus RCC307
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynRCC307_2256
+  organism_name: Synechococcus RCC307
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynROS8604_02061
+  organism_name: Synechococcus ROS8604
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynROS8604_03492
+  organism_name: Synechococcus ROS8604
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynROS8604_03497
+  organism_name: Synechococcus ROS8604
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynRS9902_01883
+  organism_name: Synechococcus RS9902
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynRS9902_02751
+  organism_name: Synechococcus RS9902
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynRS9902_02756
+  organism_name: Synechococcus RS9902
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynRS9907_01228
+  organism_name: Synechococcus RS9907
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynRS9907_02788
+  organism_name: Synechococcus RS9907
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynRS9907_02791
+  organism_name: Synechococcus RS9907
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynRS9909_01728
+  organism_name: Synechococcus RS9909
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynRS9909_02611
+  organism_name: Synechococcus RS9909
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynRS9909_02615
+  organism_name: Synechococcus RS9909
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynRS9915_01141
+  organism_name: Synechococcus RS9915
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynRS9915_02648
+  organism_name: Synechococcus RS9915
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynRS9915_02655
+  organism_name: Synechococcus RS9915
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynSYN20_01911
+  organism_name: Synechococcus SYN20
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynSYN20_03161
+  organism_name: Synechococcus SYN20
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynSYN20_03164
+  organism_name: Synechococcus SYN20
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynTAK9802_01546
+  organism_name: Synechococcus TAK9802
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynTAK9802_02460
+  organism_name: Synechococcus TAK9802
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynTAK9802_02463
+  organism_name: Synechococcus TAK9802
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: SynWH7803_1022
   organism_name: Synechococcus WH7803
   product: naphthoate synthase
-  score: 7.6086
+  score: 7.3316
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: SynWH7803_2315
   organism_name: Synechococcus WH7803
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.5647
+  score: 4.4496
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: SynWH7803_2318
   organism_name: Synechococcus WH7803
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.9037
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: SynWH8103_01129
+  organism_name: Synechococcus WH8103
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: SynWH8103_02641
+  organism_name: Synechococcus WH8103
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: SynWH8103_02649
+  organism_name: Synechococcus WH8103
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: Syncc8109_1565
   organism_name: Synechococcus WH8109
   product: naphthoate synthase
-  score: 5.5078
+  score: 5.3367
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: Syncc8109_2544
   organism_name: Synechococcus WH8109
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.7647
+  score: 4.6412
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: Syncc8109_2548
   organism_name: Synechococcus WH8109
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.9037
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: Syncc9605_1123
+  organism_name: Synechococcus CC9605
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: Syncc9605_2435
+  organism_name: Synechococcus CC9605
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.4496
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: Syncc9605_2438
+  organism_name: Synechococcus CC9605
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: Syncc9902_1333
+  organism_name: Synechococcus CC9902
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: Syncc9902_2116
+  organism_name: Synechococcus CC9902
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: Syncc9902_2119
+  organism_name: Synechococcus CC9902
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: WH5701_05380
+  organism_name: Synechococcus WH5701
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: WH5701_05410
+  organism_name: Synechococcus WH5701
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: WH5701_12693
+  organism_name: Synechococcus WH5701
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menB
+  locus_tag: WH7805_01807
+  organism_name: Synechococcus WH7805
+  product: naphthoate synthase
+  score: 7.3316
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: menA
+  locus_tag: WH7805_10858
+  organism_name: Synechococcus WH7805
+  product: 1,4-dihydroxy-2-naphthoate phytyltransferase
+  score: 4.7687
+- annotation_quality: 3
+  gene_category: Coenzyme metabolism
+  gene_name: null
+  locus_tag: WH7805_10883
+  organism_name: Synechococcus WH7805
+  product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
+  score: 4.5418
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menB
   locus_tag: sync_1527
   organism_name: Synechococcus CC9311
   product: naphthoate synthase
-  score: 7.6086
+  score: 7.3316
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
   locus_tag: sync_2650
   organism_name: Synechococcus CC9311
   product: 1,4-dihydroxy-2-naphthoyl-CoA hydrolase
-  score: 4.6606
+  score: 4.5418
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: menA
   locus_tag: sync_2655
   organism_name: Synechococcus CC9311
   product: 1,4-dihydroxy-2-naphthoate phytyltransferase
-  score: 4.9037
+  score: 4.7687
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
   locus_tag: tll0488
   organism_name: Thermosynechococcus vestitus BP-1
   product: acyl-CoA thioesterase
-  score: 5.5945
+  score: 5.4167

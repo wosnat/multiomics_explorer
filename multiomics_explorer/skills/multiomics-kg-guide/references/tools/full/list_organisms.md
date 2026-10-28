@@ -59,14 +59,14 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 | clade | string \| None (optional) | Ecotype clade, Prochlorococcus-specific (e.g. 'HLI', 'LLIV'). |
 | ncbi_taxon_id | int \| None (optional) | NCBI Taxonomy ID for cross-referencing external databases. |
 | gene_count | int | Number of genes in the KG for this organism. |
-| publication_count | int | Number of publications studying this organism. |
-| experiment_count | int | Total experiments across all publications. |
-| treatment_types | list[string] (optional) | Distinct treatment types studied (e.g. ['coculture', 'nitrogen', 'light']). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
-| background_factors | list[string] (optional) | Distinct background factors across experiments (e.g. ['axenic', 'light', 'diel']). Live vocabulary: list_experiments(summary=True). |
-| omics_types | list[string] (optional) | Distinct omics types available (e.g. ['RNASEQ', 'PROTEOMICS']). |
+| publication_count | int | Number of publications naming this organism, including as a coculture partner. |
+| experiment_count | int | Experiments profiling this organism (Experiment.organism_name), including BIOINFORMATIC annotation surveys. Experiments where it is only the coculture partner are not counted — list them with list_experiments(coculture_partner=...). |
+| treatment_types | list[string] (optional) | Distinct treatment types across this organism's own experiments (e.g. ['coculture', 'nitrogen', 'light']). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
+| background_factors | list[string] (optional) | Distinct background factors across this organism's own experiments (e.g. ['axenic', 'light', 'diel']). Live vocabulary: list_experiments(summary=True). |
+| omics_types | list[string] (optional) | Distinct omics types across this organism's own experiments (e.g. ['RNASEQ', 'PROTEOMICS']; 'BIOINFORMATIC' = annotation-only). |
 | clustering_analysis_count | int (optional) | Number of clustering analyses for this organism. |
 | cluster_types | list[string] (optional) | Distinct cluster types (e.g. ['condition_comparison', 'diel']). |
-| growth_phases | list[string] (optional) | Distinct growth phases across experiments (e.g. ['exponential', 'nutrient_limited']). Timepoint-level condition, not gene-specific. |
+| growth_phases | list[string] (optional) | Distinct growth phases across this organism's own experiments (e.g. ['exponential', 'nutrient_limited']). Timepoint-level condition, not gene-specific. |
 | derived_metric_count | int (optional) | Total DerivedMetric annotations on this organism's experiments. 0 when none. |
 | derived_metric_value_kinds | list[string] (optional) | Subset of {numeric, boolean, categorical} present across this organism's DMs. Use to route to genes_by_{numeric,boolean,categorical}_metric. |
 | compartments | list[string] (optional) | Wet-lab compartments measured for this organism (e.g. ['whole_cell', 'vesicle']). |
@@ -107,8 +107,8 @@ list_organisms()
 
 ```example-response
 {
-  "total_entries": 47,
-  "total_matching": 47,
+  "total_entries": 121,
+  "total_matching": 121,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 11},
     {"cluster_type": "time_course", "count": 3},
@@ -117,27 +117,27 @@ list_organisms()
     {"cluster_type": "decay_pattern", "count": 1}
   ],
   "by_organism_type": [
-    {"organism_type": "genome_strain", "count": 41},
+    {"organism_type": "genome_strain", "count": 115},
     {"organism_type": "treatment", "count": 4},
     {"organism_type": "reference_proteome_match", "count": 2}
   ],
   "by_value_kind": [
+    {"value_kind": "categorical", "count": 96},
     {"value_kind": "numeric", "count": 10},
-    {"value_kind": "boolean", "count": 5},
-    {"value_kind": "categorical", "count": 4}
+    {"value_kind": "boolean", "count": 5}
   ],
   "by_metric_type": [
+    {"metric_type": "sbp_nutrient_class", "count": 95},
+    {"metric_type": "sbp_predicted_substrate", "count": 95},
     {"metric_type": "log2_mv_cell_enrichment", "count": 6},
     {"metric_type": "prop_abund_cells_percent", "count": 6},
     {"metric_type": "prop_abund_mvs_percent", "count": 6},
-    {"metric_type": "antisense_tss_count", "count": 2},
-    {"metric_type": "has_primary_tss", "count": 2},
     ...
   ],
   "by_metric_type_truncated": true,
   "by_compartment": [
+    {"compartment": "whole_cell", "count": 97},
     {"compartment": "vesicle", "count": 9},
-    {"compartment": "whole_cell", "count": 5},
     {"compartment": "exoproteome", "count": 2}
   ],
   "top_metabolic_capability": [
@@ -223,7 +223,7 @@ list_organisms()
     ...
   ],
   "top_annotation_capability_truncated": true,
-  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 42},
+  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 116},
   "returned": 5,
   "offset": 0,
   "truncated": true,
@@ -270,7 +270,7 @@ list_organisms()
       "ncbi_taxon_id": 232,
       "gene_count": 4305,
       "publication_count": 1,
-      "experiment_count": 60,
+      "experiment_count": 20,
       "treatment_types": ["carbon"],
       "background_factors": ["coculture", "darkness", "light"],
       "omics_types": ["PROTEOMICS"],
@@ -302,7 +302,7 @@ list_organisms()
       "ncbi_taxon_id": 1004787,
       "gene_count": 3929,
       "publication_count": 1,
-      "experiment_count": 6,
+      "experiment_count": 1,
       "treatment_types": ["compartment"],
       "background_factors": ["axenic", "darkness"],
       "omics_types": ["VESICLE_PROTEOMICS"],
@@ -335,8 +335,8 @@ list_organisms(summary=True)
 
 ```example-response
 {
-  "total_entries": 47,
-  "total_matching": 47,
+  "total_entries": 121,
+  "total_matching": 121,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 11},
     {"cluster_type": "time_course", "count": 3},
@@ -345,27 +345,27 @@ list_organisms(summary=True)
     {"cluster_type": "decay_pattern", "count": 1}
   ],
   "by_organism_type": [
-    {"organism_type": "genome_strain", "count": 41},
+    {"organism_type": "genome_strain", "count": 115},
     {"organism_type": "treatment", "count": 4},
     {"organism_type": "reference_proteome_match", "count": 2}
   ],
   "by_value_kind": [
+    {"value_kind": "categorical", "count": 96},
     {"value_kind": "numeric", "count": 10},
-    {"value_kind": "boolean", "count": 5},
-    {"value_kind": "categorical", "count": 4}
+    {"value_kind": "boolean", "count": 5}
   ],
   "by_metric_type": [
+    {"metric_type": "sbp_nutrient_class", "count": 95},
+    {"metric_type": "sbp_predicted_substrate", "count": 95},
     {"metric_type": "log2_mv_cell_enrichment", "count": 6},
     {"metric_type": "prop_abund_cells_percent", "count": 6},
     {"metric_type": "prop_abund_mvs_percent", "count": 6},
-    {"metric_type": "antisense_tss_count", "count": 2},
-    {"metric_type": "has_primary_tss", "count": 2},
     ...
   ],
   "by_metric_type_truncated": null,
   "by_compartment": [
+    {"compartment": "whole_cell", "count": 97},
     {"compartment": "vesicle", "count": 9},
-    {"compartment": "whole_cell", "count": 5},
     {"compartment": "exoproteome", "count": 2}
   ],
   "top_metabolic_capability": [
@@ -451,7 +451,7 @@ list_organisms(summary=True)
     ...
   ],
   "top_annotation_capability_truncated": null,
-  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 42},
+  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 116},
   "returned": 0,
   "offset": 0,
   "truncated": true,
@@ -469,7 +469,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
 
 ```example-response
 {
-  "total_entries": 47,
+  "total_entries": 121,
   "total_matching": 2,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 1},
@@ -546,13 +546,13 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
       "ncbi_taxon_id": 28108,
       "gene_count": 4028,
       "publication_count": 4,
-      "experiment_count": 14,
-      "treatment_types": ["coculture", "growth_phase", "darkness", "compartment"],
-      "background_factors": ["coculture", "light", "axenic", "diel", "darkness"],
+      "experiment_count": 5,
+      "treatment_types": ["compartment", "darkness", "growth_phase"],
+      "background_factors": ["axenic", "coculture", "darkness", "diel", "light"],
       "omics_types": ["RNASEQ", "VESICLE_PROTEOMICS"],
       "clustering_analysis_count": 0,
       "cluster_types": [],
-      "growth_phases": ["exponential", "unknown", "darkness", "diel"],
+      "growth_phases": ["darkness", "diel", "unknown"],
       "derived_metric_count": 5,
       "derived_metric_value_kinds": ["boolean", "numeric"],
       "compartments": ["vesicle", "whole_cell"],
@@ -575,15 +575,15 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
       "clade": "HLI",
       "ncbi_taxon_id": 59919,
       "gene_count": 1973,
-      "publication_count": 20,
-      "experiment_count": 118,
-      "treatment_types": ["coculture", "carbon", "compartment", "salt", "viral", ...],
-      "background_factors": ["light", "axenic", "chemical", "darkness", "viral", ...],
-      "omics_types": ["RNASEQ", "MICROARRAY", "VESICLE_DNASEQ", "VESICLE_PROTEOMICS", "PROTEOMICS", ...],
+      "publication_count": 21,
+      "experiment_count": 45,
+      "treatment_types": ["carbon", "coculture", "compartment", "darkness", "diel", ...],
+      "background_factors": ["axenic", "chemical", "coculture", "darkness", "diel", ...],
+      "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", "PROTEOMICS", "RNASEQ", ...],
       "clustering_analysis_count": 6,
       "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
-      "growth_phases": ["exponential", "acute_stress", "acclimated_steady_state", "infected", "nutrient_limited", ...],
-      "derived_metric_count": 26,
+      "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", "death", "diel", ...],
+      "derived_metric_count": 28,
       "derived_metric_value_kinds": ["boolean", "categorical", "numeric"],
       "compartments": ["vesicle", "whole_cell"],
       "reaction_count": 943,
@@ -614,7 +614,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
 
 ```example-response
 {
-  "total_entries": 47,
+  "total_entries": 121,
   "total_matching": 2,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 2},
@@ -625,20 +625,20 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
   ],
   "by_organism_type": [{"organism_type": "genome_strain", "count": 2}],
   "by_value_kind": [
+    {"value_kind": "categorical", "count": 2},
     {"value_kind": "boolean", "count": 1},
-    {"value_kind": "categorical", "count": 1},
     {"value_kind": "numeric", "count": 1}
   ],
   "by_metric_type": [
+    {"metric_type": "sbp_nutrient_class", "count": 2},
+    {"metric_type": "sbp_predicted_substrate", "count": 2},
     {"metric_type": "antisense_tss_count", "count": 1},
     {"metric_type": "damping_ratio", "count": 1},
     {"metric_type": "diel_amplitude_protein_log2", "count": 1},
-    {"metric_type": "diel_amplitude_transcript_log2", "count": 1},
-    {"metric_type": "expressed_above_background", "count": 1},
     ...
   ],
   "by_metric_type_truncated": true,
-  "by_compartment": [{"compartment": "vesicle", "count": 1}, {"compartment": "whole_cell", "count": 1}],
+  "by_compartment": [{"compartment": "whole_cell", "count": 2}, {"compartment": "vesicle", "count": 1}],
   "top_metabolic_capability": [
     {
       "organism_name": "Prochlorococcus MIT9301",
@@ -691,15 +691,15 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
       "clade": "HLI",
       "ncbi_taxon_id": 59919,
       "gene_count": 1973,
-      "publication_count": 20,
-      "experiment_count": 118,
-      "treatment_types": ["coculture", "carbon", "compartment", "salt", "viral", ...],
-      "background_factors": ["light", "axenic", "chemical", "darkness", "viral", ...],
-      "omics_types": ["RNASEQ", "MICROARRAY", "VESICLE_DNASEQ", "VESICLE_PROTEOMICS", "PROTEOMICS", ...],
+      "publication_count": 21,
+      "experiment_count": 45,
+      "treatment_types": ["carbon", "coculture", "compartment", "darkness", "diel", ...],
+      "background_factors": ["axenic", "chemical", "coculture", "darkness", "diel", ...],
+      "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", "PROTEOMICS", "RNASEQ", ...],
       "clustering_analysis_count": 6,
       "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
-      "growth_phases": ["exponential", "acute_stress", "acclimated_steady_state", "infected", "nutrient_limited", ...],
-      "derived_metric_count": 26,
+      "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", "death", "diel", ...],
+      "derived_metric_count": 28,
       "derived_metric_value_kinds": ["boolean", "categorical", "numeric"],
       "compartments": ["vesicle", "whole_cell"],
       "reaction_count": 943,
@@ -721,17 +721,17 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
       "clade": "HLII",
       "ncbi_taxon_id": 167546,
       "gene_count": 1926,
-      "publication_count": 3,
-      "experiment_count": 8,
-      "treatment_types": ["growth_phase", "temperature", "phosphorus"],
-      "background_factors": ["axenic", "light", "diel"],
-      "omics_types": ["RNASEQ", "METABOLOMICS"],
+      "publication_count": 4,
+      "experiment_count": 5,
+      "treatment_types": ["genomic_analysis", "growth_phase", "phosphorus", "temperature"],
+      "background_factors": ["axenic", "diel", "light"],
+      "omics_types": ["BIOINFORMATIC", "METABOLOMICS", "RNASEQ"],
       "clustering_analysis_count": 2,
       "cluster_types": ["genomic_island", "condition_comparison"],
       "growth_phases": ["exponential"],
-      "derived_metric_count": 0,
-      "derived_metric_value_kinds": [],
-      "compartments": [],
+      "derived_metric_count": 2,
+      "derived_metric_value_kinds": ["categorical"],
+      "compartments": ["whole_cell"],
       "reaction_count": 945,
       "catalyzed_metabolite_count": 1052,
       "transported_metabolite_count": 36,
@@ -767,7 +767,7 @@ list_organisms(compartment="vesicle")
 
 ```example-response
 {
-  "total_entries": 47,
+  "total_entries": 121,
   "total_matching": 9,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 3},
@@ -779,18 +779,18 @@ list_organisms(compartment="vesicle")
   "by_value_kind": [
     {"value_kind": "numeric", "count": 9},
     {"value_kind": "boolean", "count": 3},
-    {"value_kind": "categorical", "count": 2}
+    {"value_kind": "categorical", "count": 3}
   ],
   "by_metric_type": [
     {"metric_type": "log2_mv_cell_enrichment", "count": 6},
     {"metric_type": "prop_abund_cells_percent", "count": 6},
     {"metric_type": "prop_abund_mvs_percent", "count": 6},
-    {"metric_type": "antisense_tss_count", "count": 2},
-    {"metric_type": "has_primary_tss", "count": 2},
+    {"metric_type": "sbp_nutrient_class", "count": 3},
+    {"metric_type": "sbp_predicted_substrate", "count": 3},
     ...
   ],
   "by_metric_type_truncated": true,
-  "by_compartment": [{"compartment": "vesicle", "count": 9}, {"compartment": "whole_cell", "count": 3}],
+  "by_compartment": [{"compartment": "vesicle", "count": 9}, {"compartment": "whole_cell", "count": 4}],
   "top_metabolic_capability": [
     {
       "organism_name": "Alteromonas macleodii MIT1002",
@@ -891,7 +891,7 @@ list_organisms(compartment="vesicle")
       "ncbi_taxon_id": 1004787,
       "gene_count": 3929,
       "publication_count": 1,
-      "experiment_count": 6,
+      "experiment_count": 1,
       "treatment_types": ["compartment"],
       "background_factors": ["axenic", "darkness"],
       "omics_types": ["VESICLE_PROTEOMICS"],
@@ -921,7 +921,7 @@ list_organisms(compartment="vesicle")
       "ncbi_taxon_id": 529120,
       "gene_count": 3834,
       "publication_count": 1,
-      "experiment_count": 6,
+      "experiment_count": 1,
       "treatment_types": ["compartment"],
       "background_factors": ["axenic", "darkness"],
       "omics_types": ["VESICLE_PROTEOMICS"],
@@ -951,7 +951,7 @@ list_organisms(compartment="vesicle")
       "ncbi_taxon_id": 28108,
       "gene_count": 4063,
       "publication_count": 1,
-      "experiment_count": 6,
+      "experiment_count": 1,
       "treatment_types": ["compartment"],
       "background_factors": ["axenic", "darkness"],
       "omics_types": ["VESICLE_PROTEOMICS"],
@@ -984,8 +984,8 @@ list_organisms(summary=True)
 
 ```example-response
 {
-  "total_entries": 47,
-  "total_matching": 47,
+  "total_entries": 121,
+  "total_matching": 121,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 11},
     {"cluster_type": "time_course", "count": 3},
@@ -994,27 +994,27 @@ list_organisms(summary=True)
     {"cluster_type": "decay_pattern", "count": 1}
   ],
   "by_organism_type": [
-    {"organism_type": "genome_strain", "count": 41},
+    {"organism_type": "genome_strain", "count": 115},
     {"organism_type": "treatment", "count": 4},
     {"organism_type": "reference_proteome_match", "count": 2}
   ],
   "by_value_kind": [
+    {"value_kind": "categorical", "count": 96},
     {"value_kind": "numeric", "count": 10},
-    {"value_kind": "boolean", "count": 5},
-    {"value_kind": "categorical", "count": 4}
+    {"value_kind": "boolean", "count": 5}
   ],
   "by_metric_type": [
+    {"metric_type": "sbp_nutrient_class", "count": 95},
+    {"metric_type": "sbp_predicted_substrate", "count": 95},
     {"metric_type": "log2_mv_cell_enrichment", "count": 6},
     {"metric_type": "prop_abund_cells_percent", "count": 6},
     {"metric_type": "prop_abund_mvs_percent", "count": 6},
-    {"metric_type": "antisense_tss_count", "count": 2},
-    {"metric_type": "has_primary_tss", "count": 2},
     ...
   ],
   "by_metric_type_truncated": null,
   "by_compartment": [
+    {"compartment": "whole_cell", "count": 97},
     {"compartment": "vesicle", "count": 9},
-    {"compartment": "whole_cell", "count": 5},
     {"compartment": "exoproteome", "count": 2}
   ],
   "top_metabolic_capability": [
@@ -1100,7 +1100,7 @@ list_organisms(summary=True)
     ...
   ],
   "top_annotation_capability_truncated": null,
-  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 42},
+  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 116},
   "returned": 0,
   "offset": 0,
   "truncated": true,
@@ -1118,8 +1118,8 @@ list_organisms(summary=True)
 
 ```example-response
 {
-  "total_entries": 47,
-  "total_matching": 47,
+  "total_entries": 121,
+  "total_matching": 121,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 11},
     {"cluster_type": "time_course", "count": 3},
@@ -1128,27 +1128,27 @@ list_organisms(summary=True)
     {"cluster_type": "decay_pattern", "count": 1}
   ],
   "by_organism_type": [
-    {"organism_type": "genome_strain", "count": 41},
+    {"organism_type": "genome_strain", "count": 115},
     {"organism_type": "treatment", "count": 4},
     {"organism_type": "reference_proteome_match", "count": 2}
   ],
   "by_value_kind": [
+    {"value_kind": "categorical", "count": 96},
     {"value_kind": "numeric", "count": 10},
-    {"value_kind": "boolean", "count": 5},
-    {"value_kind": "categorical", "count": 4}
+    {"value_kind": "boolean", "count": 5}
   ],
   "by_metric_type": [
+    {"metric_type": "sbp_nutrient_class", "count": 95},
+    {"metric_type": "sbp_predicted_substrate", "count": 95},
     {"metric_type": "log2_mv_cell_enrichment", "count": 6},
     {"metric_type": "prop_abund_cells_percent", "count": 6},
     {"metric_type": "prop_abund_mvs_percent", "count": 6},
-    {"metric_type": "antisense_tss_count", "count": 2},
-    {"metric_type": "has_primary_tss", "count": 2},
     ...
   ],
   "by_metric_type_truncated": null,
   "by_compartment": [
+    {"compartment": "whole_cell", "count": 97},
     {"compartment": "vesicle", "count": 9},
-    {"compartment": "whole_cell", "count": 5},
     {"compartment": "exoproteome", "count": 2}
   ],
   "top_metabolic_capability": [
@@ -1234,7 +1234,7 @@ list_organisms(summary=True)
     ...
   ],
   "top_annotation_capability_truncated": null,
-  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 42},
+  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 116},
   "returned": 0,
   "offset": 0,
   "truncated": true,
@@ -1254,7 +1254,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Pseudomonas putida KT244
 
 ```example-response
 {
-  "total_entries": 47,
+  "total_entries": 121,
   "total_matching": 2,
   "by_cluster_type": [
     {"cluster_type": "genomic_island", "count": 1},
@@ -1330,15 +1330,15 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Pseudomonas putida KT244
       "clade": "HLI",
       "ncbi_taxon_id": 59919,
       "gene_count": 1973,
-      "publication_count": 20,
-      "experiment_count": 118,
-      "treatment_types": ["coculture", "carbon", "compartment", "salt", "viral", ...],
-      "background_factors": ["light", "axenic", "chemical", "darkness", "viral", ...],
-      "omics_types": ["RNASEQ", "MICROARRAY", "VESICLE_DNASEQ", "VESICLE_PROTEOMICS", "PROTEOMICS", ...],
+      "publication_count": 21,
+      "experiment_count": 45,
+      "treatment_types": ["carbon", "coculture", "compartment", "darkness", "diel", ...],
+      "background_factors": ["axenic", "chemical", "coculture", "darkness", "diel", ...],
+      "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", "PROTEOMICS", "RNASEQ", ...],
       "clustering_analysis_count": 6,
       "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
-      "growth_phases": ["exponential", "acute_stress", "acclimated_steady_state", "infected", "nutrient_limited", ...],
-      "derived_metric_count": 26,
+      "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", "death", "diel", ...],
+      "derived_metric_count": 28,
       "derived_metric_value_kinds": ["boolean", "categorical", "numeric"],
       "compartments": ["vesicle", "whole_cell"],
       "reaction_count": 943,
@@ -1361,7 +1361,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Pseudomonas putida KT244
       "ncbi_taxon_id": 160488,
       "gene_count": 5487,
       "publication_count": 1,
-      "experiment_count": 4,
+      "experiment_count": 2,
       "treatment_types": ["coculture"],
       "background_factors": ["light"],
       "omics_types": ["PROTEOMICS", "RNASEQ"],

@@ -49,7 +49,9 @@ from multiple modalities and compartments simultaneously.
 **Omics modality.** `Experiment.omics_type` names the measurement
 technology — `RNASEQ`, `MICROARRAY`, `PROTEOMICS`, `METABOLOMICS`, plus
 compartment-specific and paired variants (`VESICLE_PROTEOMICS`,
-`EXOPROTEOMICS`, `PAIRED_RNASEQ_PROTEOME`, ...). Read the live set with
+`EXOPROTEOMICS`, `PAIRED_RNASEQ_PROTEOME`, ...), and `BIOINFORMATIC` for
+annotation-only experiments computed from genome sequence (no sample; they
+carry DerivedMetrics, never expression). Read the live set with
 `list_filter_values(filter_type='omics_type')`.
 
 - A gene with RNAseq DE in one experiment and proteomics DE in another

@@ -456,6 +456,11 @@ top_gene_categories:
   gene_count: 1
 top_metabolite_pathways:
 - gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko01057
+  metabolite_pathway_name: Biosynthesis of type II polyketide products
+  pathway_metabolite_count: 13
+  pathway_reaction_count: 3
+- gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko00740
   metabolite_pathway_name: Riboflavin metabolism
   pathway_metabolite_count: 19
@@ -463,7 +468,7 @@ top_metabolite_pathways:
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko00780
   metabolite_pathway_name: Biotin metabolism
-  pathway_metabolite_count: 22
+  pathway_metabolite_count: 23
   pathway_reaction_count: 18
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko00670
@@ -478,7 +483,7 @@ top_metabolite_pathways:
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko00998
   metabolite_pathway_name: Biosynthesis of various antibiotics
-  pathway_metabolite_count: 40
+  pathway_metabolite_count: 41
   pathway_reaction_count: 5
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko00790
@@ -488,23 +493,19 @@ top_metabolite_pathways:
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko00270
   metabolite_pathway_name: Cysteine and methionine metabolism
-  pathway_metabolite_count: 61
-  pathway_reaction_count: 63
+  pathway_metabolite_count: 62
+  pathway_reaction_count: 64
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko01240
   metabolite_pathway_name: Biosynthesis of cofactors
-  pathway_metabolite_count: 284
-  pathway_reaction_count: 223
+  pathway_metabolite_count: 286
+  pathway_reaction_count: 224
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
-  pathway_metabolite_count: 615
-  pathway_reaction_count: 536
-- gene_count: 1
-  metabolite_pathway_id: kegg.pathway:ko01100
-  metabolite_pathway_name: Metabolic pathways
-  pathway_metabolite_count: 1606
-  pathway_reaction_count: 1718
+  pathway_metabolite_count: 637
+  pathway_reaction_count: 556
+top_metabolite_pathways_truncated: true
 top_metabolites:
 - formula: null
   gene_count: 1

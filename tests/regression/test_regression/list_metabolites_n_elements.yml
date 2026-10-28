@@ -1,20 +1,20 @@
 by_evidence_source:
-- count: 1231
+- count: 1262
   evidence_source: metabolism
-- count: 628
+- count: 646
   evidence_source: transport
 - count: 101
   evidence_source: metabolomics
-- count: 89
+- count: 91
   evidence_source: go_transport
 by_kegg_brite_class:
-- count: 117
+- count: 118
   kegg_brite_class: 'Lipids: Fatty acyls'
 - count: 34
   kegg_brite_class: 'Phytochemical compounds: Alkaloids'
 - count: 22
   kegg_brite_class: 'Glycosides: N-glycosides'
-- count: 19
+- count: 20
   kegg_brite_class: 'Pesticides: Pesticides'
 - count: 18
   kegg_brite_class: 'Lipids: Saccharolipids'
@@ -23,9 +23,9 @@ by_kegg_brite_class:
 - count: 14
   kegg_brite_class: 'Lipids: Glycerophospholipids'
 - count: 12
-  kegg_brite_class: 'Lipids: Sterol lipids'
-- count: 11
   kegg_brite_class: 'Lipids: Prenol lipids'
+- count: 12
+  kegg_brite_class: 'Lipids: Sterol lipids'
 - count: 8
   kegg_brite_class: 'Phytochemical compounds: Amino acid related compounds'
 - count: 7
@@ -37,9 +37,9 @@ by_kegg_brite_class:
 - count: 5
   kegg_brite_class: 'Glycosides: O-glycosides'
 - count: 3
-  kegg_brite_class: 'Glycosides: S-glycosides'
-- count: 2
   kegg_brite_class: 'Endocrine disrupting compounds: Pesticides and herbicides'
+- count: 3
+  kegg_brite_class: 'Glycosides: S-glycosides'
 - count: 2
   kegg_brite_class: 'Natural toxins: Fungal toxins'
 - count: 2
@@ -50,7 +50,7 @@ by_kegg_brite_class:
   kegg_brite_class: 'Natural toxins: Marine biotoxins'
 - count: 1
   kegg_brite_class: 'Phytochemical compounds: Terpenoids'
-- count: 1391
+- count: 1421
   kegg_brite_class: not classified
 by_kegg_functional_category:
 - count: 59
@@ -69,7 +69,7 @@ by_kegg_functional_category:
   kegg_functional_category: Lipids
 - count: 2
   kegg_functional_category: Steroids
-- count: 1481
+- count: 1514
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment:
@@ -80,7 +80,7 @@ by_measurement_coverage:
   - compartment: whole_cell
     count: 101
   by_paper_count:
-  - count: 1572
+  - count: 1605
     paper_count: 0
   - count: 68
     paper_count: 1
@@ -89,18 +89,18 @@ by_measurement_coverage:
   - count: 1
     paper_count: 3
 by_structure_kind:
-- count: 1423
+- count: 1447
   structure_kind: defined
-- count: 245
+- count: 254
   structure_kind: generic
 - count: 5
   structure_kind: polymer
 case_id: list_metabolites_n_elements
 mass_stats:
   mass_max: 5227.103
-  mass_median: 322.799
+  mass_median: 324.424
   mass_min: 18.039
-no_formula_excluded: 237
+no_formula_excluded: 240
 not_found:
   elements: []
   metabolite_ids: []
@@ -109,7 +109,7 @@ not_found:
 offset: 0
 resolved_aliases: {}
 results:
-- catalyst_gene_count: 6041
+- catalyst_gene_count: 15995
   chebi_id: '15422'
   elements:
   - C
@@ -135,7 +135,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00002
   name: ATP
-  organism_count: 43
+  organism_count: 117
   pathway_count: 18
   pathway_ids:
   - kegg.pathway:ko00190
@@ -159,7 +159,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 3564
+- catalyst_gene_count: 9346
   chebi_id: '16761'
   elements:
   - C
@@ -189,7 +189,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00008
   name: ADP
-  organism_count: 43
+  organism_count: 117
   pathway_count: 13
   pathway_ids:
   - kegg.pathway:ko00190
@@ -208,7 +208,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 3302
+- catalyst_gene_count: 7821
   chebi_id: '15846'
   elements:
   - C
@@ -237,7 +237,7 @@ results:
   measured_paper_count: 2
   metabolite_id: kegg.compound:C00003
   name: NAD+
-  organism_count: 43
+  organism_count: 117
   pathway_count: 8
   pathway_ids:
   - kegg.pathway:ko00190
@@ -251,7 +251,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 3017
+- catalyst_gene_count: 7078
   chebi_id: '16908'
   elements:
   - C
@@ -278,7 +278,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00004
   name: NADH
-  organism_count: 43
+  organism_count: 117
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00190
@@ -287,7 +287,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 2464
+- catalyst_gene_count: 6235
   chebi_id: '16027'
   elements:
   - C
@@ -298,6 +298,7 @@ results:
   evidence_sources:
   - metabolism
   - metabolomics
+  - transport
   formula: C10H12N5O7P
   go_transport_organism_count: null
   go_transport_organism_names: null
@@ -319,7 +320,7 @@ results:
   measured_paper_count: 2
   metabolite_id: kegg.compound:C00020
   name: AMP
-  organism_count: 43
+  organism_count: 117
   pathway_count: 12
   pathway_ids:
   - kegg.pathway:ko00230
@@ -342,13 +343,13 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 893
+- count: 911
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 327
+- count: 337
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
-- count: 203
+- count: 205
   metabolite_pathway_id: kegg.pathway:ko01120
   metabolite_pathway_name: Microbial metabolism in diverse environments
 - count: 182
@@ -357,7 +358,7 @@ top_metabolite_pathways:
 - count: 87
   metabolite_pathway_id: kegg.pathway:ko00860
   metabolite_pathway_name: Porphyrin metabolism
-- count: 79
+- count: 87
   metabolite_pathway_id: kegg.pathway:ko01250
   metabolite_pathway_name: Biosynthesis of nucleotide sugars
 - count: 78
@@ -393,14 +394,14 @@ top_organisms:
   organism_name: Alteromonas macleodii ATCC27126
 - count: 871
   organism_name: Alteromonas macleodii BGP6
-total_entries: 3178
-total_matching: 1673
+total_entries: 3251
+total_matching: 1706
 truncated: true
 warnings:
-- 237 metabolites have no formula and can never match an element filter (often generic
+- 240 metabolites have no formula and can never match an element filter (often generic
   classes such as 'amino acid' or 'dipeptide'). Re-run without elements to inspect
   them.
 xref_coverage:
-  with_chebi: 1605
-  with_hmdb: 876
-  with_mnxm: 1659
+  with_chebi: 1630
+  with_hmdb: 881
+  with_mnxm: 1692

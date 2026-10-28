@@ -7,30 +7,31 @@ examples:
     call: genes_by_function(search_text="photosystem")
     response: |
       {
-        "total_search_hits": 2039,
-        "total_matching": 2039,
+        "total_search_hits": 7648,
+        "total_matching": 7648,
         "by_organism": [
+          {"organism_name": "Synechococcus BIOS-U3-1", "count": 93},
+          {"organism_name": "Synechococcus CC9616", "count": 92},
+          {"organism_name": "Synechococcus KORDI-100", "count": 88},
           {"organism_name": "Prochlorococcus MIT9303", "count": 87},
-          {"organism_name": "Synechococcus CC9311", "count": 82},
-          {"organism_name": "Synechococcus sp. BL107", "count": 79},
-          {"organism_name": "Synechococcus WH7803", "count": 78},
-          {"organism_name": "Prochlorococcus MIT9313", "count": 78},
+          {"organism_name": "Synechococcus ROS8604", "count": 84},
           ...
         ],
         "by_organism_truncated": true,
         "by_category": [
-          {"category": "Photosynthesis", "count": 1001},
-          {"category": "Stress response and adaptation", "count": 274},
-          {"category": "Unknown", "count": 247},
-          {"category": "Energy production", "count": 234},
-          {"category": "Post-translational modification", "count": 87},
+          {"category": "Photosynthesis", "count": 4484},
+          {"category": "Stress response and adaptation", "count": 1302},
+          {"category": "Energy production", "count": 464},
+          {"category": "Unknown", "count": 411},
+          {"category": "Post-translational modification", "count": 352},
           ...
         ],
-        "score_max": 6.588601112365723,
-        "score_median": 4.331913948059082,
+        "score_max": 6.004168510437012,
+        "score_median": 4.013857841491699,
         "returned": 5,
         "offset": 0,
         "truncated": true,
+        "warnings": [],
         "results": [
           {
             "locus_tag": "H6G84_06320",
@@ -39,7 +40,7 @@ examples:
             "organism_name": "Synechococcus elongatus PCC 7942",
             "gene_category": "Unknown",
             "annotation_quality": 3,
-            "score": 6.588601112365723
+            "score": 6.004168510437012
           },
           {
             "locus_tag": "M744_01545",
@@ -48,7 +49,7 @@ examples:
             "organism_name": "Synechococcus elongatus UTEX 2973",
             "gene_category": "Unknown",
             "annotation_quality": 3,
-            "score": 6.588601112365723
+            "score": 6.004168510437012
           },
           {
             "locus_tag": "SYNPCC7002_A0269",
@@ -57,7 +58,7 @@ examples:
             "organism_name": "Synechococcus PCC 7002",
             "gene_category": "Unknown",
             "annotation_quality": 3,
-            "score": 6.588601112365723
+            "score": 6.004168510437012
           },
           ...
         ]
@@ -70,30 +71,31 @@ examples:
     call: genes_by_function(search_text="chaperone", summary=True)
     response: |
       {
-        "total_search_hits": 1428,
-        "total_matching": 1428,
+        "total_search_hits": 3567,
+        "total_matching": 3567,
         "by_organism": [
           {"organism_name": "Pseudomonas putida KT2440", "count": 62},
           {"organism_name": "Shewanella sp. W3-18-1", "count": 54},
           {"organism_name": "Marinobacter (MarRef v6)", "count": 54},
           {"organism_name": "Alteromonas (MarRef v6)", "count": 48},
-          {"organism_name": "Alteromonas macleodii HOT1A3", "count": 42},
+          {"organism_name": "Synechococcus WH5701", "count": 44},
           ...
         ],
         "by_organism_truncated": null,
         "by_category": [
-          {"category": "Post-translational modification", "count": 641},
-          {"category": "Stress response and adaptation", "count": 199},
-          {"category": "Unknown", "count": 167},
-          {"category": "Coenzyme metabolism", "count": 119},
-          {"category": "Cell motility", "count": 72},
+          {"category": "Post-translational modification", "count": 1536},
+          {"category": "Stress response and adaptation", "count": 898},
+          {"category": "Coenzyme metabolism", "count": 383},
+          {"category": "Unknown", "count": 262},
+          {"category": "Cell wall and membrane", "count": 88},
           ...
         ],
-        "score_max": 7.583498001098633,
-        "score_median": 4.1626152992248535,
+        "score_max": 7.704005718231201,
+        "score_median": 4.193265914916992,
         "returned": 0,
         "offset": 0,
         "truncated": true,
+        "warnings": [],
         "results": []
       }
 

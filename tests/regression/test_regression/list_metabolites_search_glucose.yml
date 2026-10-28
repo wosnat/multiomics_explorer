@@ -1,5 +1,5 @@
 by_evidence_source:
-- count: 20
+- count: 23
   evidence_source: metabolism
 - count: 8
   evidence_source: transport
@@ -8,14 +8,14 @@ by_evidence_source:
 - count: 1
   evidence_source: go_transport
 by_kegg_brite_class:
-- count: 23
+- count: 26
   kegg_brite_class: not classified
 by_kegg_functional_category:
 - count: 2
   kegg_functional_category: Carbohydrates
 - count: 1
   kegg_functional_category: Vitamins and cofactors
-- count: 20
+- count: 23
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment:
@@ -26,19 +26,19 @@ by_measurement_coverage:
   - compartment: whole_cell
     count: 3
   by_paper_count:
-  - count: 20
+  - count: 23
     paper_count: 0
   - count: 2
     paper_count: 1
   - count: 1
     paper_count: 3
 by_structure_kind:
-- count: 23
+- count: 26
   structure_kind: defined
 case_id: list_metabolites_search_glucose
 mass_stats:
   mass_max: 587.328
-  mass_median: 422.276
+  mass_median: 514.341
   mass_min: 164.157
 not_found:
   elements: []
@@ -66,18 +66,18 @@ results:
   measured_paper_count: 0
   metabolite_id: chebi:17234
   name: glucose
-  organism_count: 26
+  organism_count: 77
   pathway_count: 0
   pathway_ids: []
-  score: 3.067
+  score: 3.0994
   stereo_relatives:
   - '{''transporter_gene_count'': 16, ''metabolite_id'': ''kegg.compound:C00031'',
     ''name'': ''D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
-    284}'
+    733}'
   structure_kind: defined
   transporter_count: 12
-  transporter_gene_count: 61
-- catalyst_gene_count: 303
+  transporter_gene_count: 133
+- catalyst_gene_count: 898
   chebi_id: '18066'
   elements:
   - C
@@ -105,7 +105,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00029
   name: UDP-glucose
-  organism_count: 43
+  organism_count: 117
   pathway_count: 17
   pathway_ids:
   - kegg.pathway:ko00040
@@ -125,11 +125,11 @@ results:
   - kegg.pathway:ko01240
   - kegg.pathway:ko01250
   - kegg.pathway:ko04082
-  score: 2.5827
+  score: 2.6314
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 284
+- catalyst_gene_count: 733
   chebi_id: '4167'
   elements:
   - C
@@ -140,7 +140,7 @@ results:
   - metabolism
   - transport
   formula: C6H12O6
-  go_transport_organism_count: 32
+  go_transport_organism_count: 101
   go_transport_organism_names:
   - Alteromonas (MarRef v6)
   - Alteromonas macleodii AD45
@@ -152,25 +152,94 @@ results:
   - Alteromonas macleodii MIT1002
   - Alteromonas mediterranea AltDE
   - Alteromonas mediterranea AltDE1
+  - Cyanobium NS01
+  - Cyanobium PCC6307
+  - Cyanobium PCC7001
   - Prochlorococcus AS9601
+  - Prochlorococcus EQPAC1
+  - Prochlorococcus GP2
+  - Prochlorococcus LG
   - Prochlorococcus MED4
+  - Prochlorococcus MIT0601
+  - Prochlorococcus MIT0602
+  - Prochlorococcus MIT0603
   - Prochlorococcus MIT0604
+  - Prochlorococcus MIT0701
+  - Prochlorococcus MIT0702
+  - Prochlorococcus MIT0703
   - Prochlorococcus MIT0801
   - Prochlorococcus MIT1327
+  - Prochlorococcus MIT9107
+  - Prochlorococcus MIT9116
+  - Prochlorococcus MIT9123
+  - Prochlorococcus MIT9201
   - Prochlorococcus MIT9202
+  - Prochlorococcus MIT9211
   - Prochlorococcus MIT9215
   - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9302
   - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9311
   - Prochlorococcus MIT9312
   - Prochlorococcus MIT9313
+  - Prochlorococcus MIT9314
+  - Prochlorococcus MIT9321
+  - Prochlorococcus MIT9322
+  - Prochlorococcus MIT9401
   - Prochlorococcus MIT9515
   - Prochlorococcus NATL1A
   - Prochlorococcus NATL2A
   - Prochlorococcus PAC1
   - Prochlorococcus SB
+  - Prochlorococcus SS2
+  - Prochlorococcus SS35
+  - Prochlorococcus SS51
+  - Prochlorococcus SS52
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   - Shewanella sp. W3-18-1
+  - Synechococcus A15-127
+  - Synechococcus A15-24
+  - Synechococcus A15-28
+  - Synechococcus A15-44
+  - Synechococcus A15-60
+  - Synechococcus A15-62
+  - Synechococcus A18-25c
+  - Synechococcus A18-40
+  - Synechococcus A18-46.1
+  - Synechococcus BIOS-E4-1
+  - Synechococcus BIOS-U3-1
+  - Synechococcus BMK-MC-1
+  - Synechococcus BOUM118
+  - Synechococcus CB0205
   - Synechococcus CC9311
+  - Synechococcus CC9605
+  - Synechococcus CC9616
+  - Synechococcus CC9902
+  - Synechococcus KORDI-100
+  - Synechococcus KORDI-49
+  - Synechococcus KORDI-52
+  - Synechococcus M16.1
+  - Synechococcus MEDNS5
+  - Synechococcus MINOS11
+  - Synechococcus MITS9220
+  - Synechococcus MVIR-18-1
+  - Synechococcus NOUM97013
+  - Synechococcus PROS-7-1
+  - Synechococcus PROS-9-1
+  - Synechococcus PROS-U-1
+  - Synechococcus ROS8604
+  - Synechococcus RS9902
+  - Synechococcus RS9907
+  - Synechococcus RS9909
+  - Synechococcus RS9915
+  - Synechococcus RS9916
+  - Synechococcus RS9917
+  - Synechococcus SYN20
+  - Synechococcus TAK9802
+  - Synechococcus WH5701
+  - Synechococcus WH7805
+  - Synechococcus WH8016
+  - Synechococcus WH8101
   - Synechococcus WH8102
   - Synechococcus WH8109
   - Synechococcus sp. BL107
@@ -183,7 +252,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00031
   name: D-Glucose
-  organism_count: 43
+  organism_count: 117
   pathway_count: 21
   pathway_ids:
   - kegg.pathway:ko00010
@@ -207,20 +276,20 @@ results:
   - kegg.pathway:ko04148
   - kegg.pathway:ko04152
   - kegg.pathway:ko05111
-  score: 2.5827
+  score: 2.6314
   stereo_relatives:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00221'',
     ''name'': ''beta-D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
-    192}'
+    492}'
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00267'',
     ''name'': ''alpha-D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
-    183}'
-  - '{''transporter_gene_count'': 61, ''metabolite_id'': ''chebi:17234'', ''name'':
+    508}'
+  - '{''transporter_gene_count'': 133, ''metabolite_id'': ''chebi:17234'', ''name'':
     ''glucose'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'': 0}'
   structure_kind: defined
   transporter_count: 2
   transporter_gene_count: 16
-- catalyst_gene_count: 198
+- catalyst_gene_count: 635
   chebi_id: '15700'
   elements:
   - C
@@ -241,7 +310,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00842
   name: dTDP-glucose
-  organism_count: 43
+  organism_count: 117
   pathway_count: 9
   pathway_ids:
   - kegg.pathway:ko00520
@@ -253,11 +322,11 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 2.5827
+  score: 2.6314
   structure_kind: defined
   transporter_count: 1
   transporter_gene_count: 9
-- catalyst_gene_count: 89
+- catalyst_gene_count: 240
   chebi_id: '15751'
   elements:
   - C
@@ -277,7 +346,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00498
   name: ADP-glucose
-  organism_count: 42
+  organism_count: 116
   pathway_count: 5
   pathway_ids:
   - kegg.pathway:ko00500
@@ -285,11 +354,11 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 2.5827
+  score: 2.6314
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 18
+- catalyst_gene_count: 67
   chebi_id: '28942'
   elements:
   - C
@@ -309,7 +378,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00501
   name: CDP-glucose
-  organism_count: 10
+  organism_count: 34
   pathway_count: 5
   pathway_ids:
   - kegg.pathway:ko00500
@@ -317,11 +386,11 @@ results:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 2.5827
+  score: 2.6314
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 192
+- catalyst_gene_count: 492
   chebi_id: '15903'
   elements:
   - C
@@ -339,7 +408,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00221
   name: beta-D-Glucose
-  organism_count: 43
+  organism_count: 117
   pathway_count: 6
   pathway_ids:
   - kegg.pathway:ko00010
@@ -348,15 +417,15 @@ results:
   - kegg.pathway:ko01110
   - kegg.pathway:ko01120
   - kegg.pathway:ko01200
-  score: 2.2305
+  score: 2.2861
   stereo_relatives:
   - '{''transporter_gene_count'': 16, ''metabolite_id'': ''kegg.compound:C00031'',
     ''name'': ''D-Glucose'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
-    284}'
+    733}'
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 183
+- catalyst_gene_count: 508
   chebi_id: '17925'
   elements:
   - C
@@ -374,7 +443,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00267
   name: alpha-D-Glucose
-  organism_count: 43
+  organism_count: 117
   pathway_count: 9
   pathway_ids:
   - kegg.pathway:ko00010
@@ -386,15 +455,15 @@ results:
   - kegg.pathway:ko01120
   - kegg.pathway:ko01200
   - kegg.pathway:ko01250
-  score: 2.2305
+  score: 2.2861
   stereo_relatives:
   - '{''transporter_gene_count'': 16, ''metabolite_id'': ''kegg.compound:C00031'',
     ''name'': ''D-Glucose'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
-    284}'
+    733}'
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 196
+- catalyst_gene_count: 600
   chebi_id: '4170'
   elements:
   - C
@@ -423,7 +492,7 @@ results:
   measured_paper_count: 3
   metabolite_id: kegg.compound:C00092
   name: D-Glucose 6-phosphate
-  organism_count: 43
+  organism_count: 117
   pathway_count: 10
   pathway_ids:
   - kegg.pathway:ko00500
@@ -436,18 +505,18 @@ results:
   - kegg.pathway:ko02020
   - kegg.pathway:ko02060
   - kegg.pathway:ko05111
-  score: 1.9628
+  score: 2.021
   stereo_relatives:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00668'',
     ''name'': ''alpha-D-Glucose 6-phosphate'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
-    175}'
+    462}'
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C01172'',
     ''name'': ''beta-D-Glucose 6-phosphate'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
-    188}'
+    526}'
   structure_kind: defined
   transporter_count: 1
   transporter_gene_count: 5
-- catalyst_gene_count: 287
+- catalyst_gene_count: 672
   chebi_id: '29042'
   elements:
   - C
@@ -471,7 +540,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00103
   name: D-Glucose 1-phosphate
-  organism_count: 43
+  organism_count: 117
   pathway_count: 16
   pathway_ids:
   - kegg.pathway:ko00010
@@ -490,7 +559,7 @@ results:
   - kegg.pathway:ko01120
   - kegg.pathway:ko01240
   - kegg.pathway:ko01250
-  score: 1.9628
+  score: 2.021
   stereo_relatives:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''chebi:16077'', ''name'':
     ''D-glucopyranose 1-phosphate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
@@ -521,11 +590,11 @@ results:
   organism_count: 0
   pathway_count: 0
   pathway_ids: []
-  score: 1.9628
+  score: 2.021
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 175
+- catalyst_gene_count: 462
   chebi_id: '17665'
   elements:
   - C
@@ -544,7 +613,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00668
   name: alpha-D-Glucose 6-phosphate
-  organism_count: 43
+  organism_count: 117
   pathway_count: 11
   pathway_ids:
   - kegg.pathway:ko00010
@@ -558,15 +627,15 @@ results:
   - kegg.pathway:ko01240
   - kegg.pathway:ko01250
   - kegg.pathway:ko04152
-  score: 1.7525
+  score: 1.8109
   stereo_relatives:
   - '{''transporter_gene_count'': 5, ''metabolite_id'': ''kegg.compound:C00092'',
     ''name'': ''D-Glucose 6-phosphate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
-    196}'
+    600}'
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 188
+- catalyst_gene_count: 526
   chebi_id: '17719'
   elements:
   - C
@@ -586,7 +655,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C01172
   name: beta-D-Glucose 6-phosphate
-  organism_count: 43
+  organism_count: 117
   pathway_count: 7
   pathway_ids:
   - kegg.pathway:ko00010
@@ -596,15 +665,15 @@ results:
   - kegg.pathway:ko01120
   - kegg.pathway:ko01200
   - kegg.pathway:ko04152
-  score: 1.7525
+  score: 1.8109
   stereo_relatives:
   - '{''transporter_gene_count'': 5, ''metabolite_id'': ''kegg.compound:C00092'',
     ''name'': ''D-Glucose 6-phosphate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
-    196}'
+    600}'
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 20
+- catalyst_gene_count: 73
   chebi_id: '16218'
   elements:
   - C
@@ -623,11 +692,11 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00663
   name: beta-D-Glucose 1-phosphate
-  organism_count: 19
+  organism_count: 72
   pathway_count: 1
   pathway_ids:
   - kegg.pathway:ko00500
-  score: 1.7525
+  score: 1.8109
   stereo_relatives:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''chebi:16077'', ''name'':
     ''D-glucopyranose 1-phosphate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
@@ -635,7 +704,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 1
+- catalyst_gene_count: 9
   chebi_id: '70802'
   elements:
   - C
@@ -655,13 +724,13 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C03598
   name: CDP-3,6-dideoxy-D-glucose
-  organism_count: 1
+  organism_count: 8
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.7525
+  score: 1.8109
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -686,11 +755,11 @@ results:
   organism_count: 0
   pathway_count: 0
   pathway_ids: []
-  score: 1.7525
+  score: 1.8109
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 137
+- catalyst_gene_count: 429
   chebi_id: '16128'
   elements:
   - C
@@ -710,7 +779,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C11907
   name: dTDP-4-oxo-6-deoxy-D-glucose
-  organism_count: 42
+  organism_count: 116
   pathway_count: 8
   pathway_ids:
   - kegg.pathway:ko00521
@@ -721,11 +790,11 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.4432
+  score: 1.4993
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 32
+- catalyst_gene_count: 78
   chebi_id: '139396'
   elements:
   - C
@@ -745,17 +814,17 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C01219
   name: CDP-4-dehydro-6-deoxy-D-glucose
-  organism_count: 23
+  organism_count: 51
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.4432
+  score: 1.4993
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 24
+- catalyst_gene_count: 45
   chebi_id: '70800'
   elements:
   - C
@@ -775,17 +844,17 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C04297
   name: CDP-4-dehydro-3,6-dideoxy-D-glucose
-  organism_count: 21
+  organism_count: 42
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00541
   - kegg.pathway:ko01100
   - kegg.pathway:ko01250
-  score: 1.4432
+  score: 1.4993
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 1
+- catalyst_gene_count: 14
   chebi_id: '15952'
   elements:
   - C
@@ -805,7 +874,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C04268
   name: dTDP-4-amino-4,6-dideoxy-D-glucose
-  organism_count: 1
+  organism_count: 14
   pathway_count: 6
   pathway_ids:
   - kegg.pathway:ko00523
@@ -814,7 +883,97 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.4432
+  score: 1.4993
+  structure_kind: defined
+  transporter_count: 0
+  transporter_gene_count: 0
+- catalyst_gene_count: 1
+  chebi_id: '63264'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C16H26N3O14P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
+  mass: 546.339
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
+  metabolite_id: kegg.compound:C11925
+  name: dTDP-3-amino-3,6-dideoxy-D-glucose
+  organism_count: 1
+  pathway_count: 5
+  pathway_ids:
+  - kegg.pathway:ko00523
+  - kegg.pathway:ko00541
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01250
+  score: 1.4993
+  structure_kind: defined
+  transporter_count: 0
+  transporter_gene_count: 0
+- catalyst_gene_count: 1
+  chebi_id: '81462'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C16H26N3O12P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
+  mass: 514.341
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
+  metabolite_id: kegg.compound:C18033
+  name: dTDP-4-amino-2,3,4,6-tetradeoxy-D-glucose
+  organism_count: 1
+  pathway_count: 4
+  pathway_ids:
+  - kegg.pathway:ko00523
+  - kegg.pathway:ko01100
+  - kegg.pathway:ko01110
+  - kegg.pathway:ko01250
+  score: 1.4993
+  structure_kind: defined
+  transporter_count: 0
+  transporter_gene_count: 0
+- catalyst_gene_count: 1
+  chebi_id: '131522'
+  elements:
+  - C
+  - H
+  - N
+  - O
+  - P
+  evidence_sources:
+  - metabolism
+  formula: C17H28N3O12P2
+  go_transport_organism_count: null
+  go_transport_organism_names: null
+  mass: 528.368
+  measured_assay_count: 0
+  measured_compartments: []
+  measured_organisms: []
+  measured_paper_count: 0
+  metabolite_id: kegg.compound:C21395
+  name: dTDP-4-(methylamino)-2,3,4,6-tetradeoxy-D-glucose
+  organism_count: 1
+  pathway_count: 0
+  pathway_ids: []
+  score: 1.4993
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -842,7 +1001,7 @@ results:
   pathway_ids:
   - kegg.pathway:ko00500
   - kegg.pathway:ko02060
-  score: 1.3262
+  score: 1.3805
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
@@ -875,11 +1034,11 @@ results:
   - kegg.pathway:ko01100
   - kegg.pathway:ko01110
   - kegg.pathway:ko01250
-  score: 1.2267
+  score: 1.2792
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 33
+- catalyst_gene_count: 104
   chebi_id: '27387'
   elements:
   - C
@@ -897,30 +1056,30 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C05404
   name: D-Gal alpha 1->6D-Gal alpha 1->6D-Glucose
-  organism_count: 33
+  organism_count: 104
   pathway_count: 2
   pathway_ids:
   - kegg.pathway:ko00052
   - kegg.pathway:ko01100
-  score: 1.1412
+  score: 1.1917
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-returned: 23
-row_count: 23
-score_max: 3.0670156478881836
-score_median: 1.752516269683838
+returned: 26
+row_count: 26
+score_max: 3.0994019508361816
+score_median: 1.8109498023986816
 top_metabolite_pathways:
-- count: 18
+- count: 20
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 13
-  metabolite_pathway_id: kegg.pathway:ko01250
-  metabolite_pathway_name: Biosynthesis of nucleotide sugars
-- count: 13
+- count: 15
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
-- count: 9
+- count: 15
+  metabolite_pathway_id: kegg.pathway:ko01250
+  metabolite_pathway_name: Biosynthesis of nucleotide sugars
+- count: 10
   metabolite_pathway_id: kegg.pathway:ko00541
   metabolite_pathway_name: Biosynthesis of various nucleotide sugars
 - count: 8
@@ -929,44 +1088,44 @@ top_metabolite_pathways:
 - count: 8
   metabolite_pathway_id: kegg.pathway:ko00500
   metabolite_pathway_name: Starch and sucrose metabolism
-- count: 6
-  metabolite_pathway_id: kegg.pathway:ko00010
-  metabolite_pathway_name: Glycolysis / Gluconeogenesis
+- count: 7
+  metabolite_pathway_id: kegg.pathway:ko00523
+  metabolite_pathway_name: Polyketide sugar unit biosynthesis
 - count: 6
   metabolite_pathway_id: kegg.pathway:ko00052
   metabolite_pathway_name: Galactose metabolism
 - count: 6
   metabolite_pathway_id: kegg.pathway:ko01120
   metabolite_pathway_name: Microbial metabolism in diverse environments
-- count: 5
-  metabolite_pathway_id: kegg.pathway:ko00521
-  metabolite_pathway_name: Streptomycin biosynthesis
+- count: 6
+  metabolite_pathway_id: kegg.pathway:ko00010
+  metabolite_pathway_name: Glycolysis / Gluconeogenesis
 top_organisms:
+- count: 18
+  organism_name: Cyanobium PCC6307
+- count: 18
+  organism_name: Synechococcus ROS8604
+- count: 18
+  organism_name: Synechococcus MVIR-18-1
+- count: 18
+  organism_name: Synechococcus NOUM97013
+- count: 18
+  organism_name: Synechococcus PROS-7-1
 - count: 17
-  organism_name: Prochlorococcus MED4
+  organism_name: Synechococcus PROS-9-1
 - count: 17
-  organism_name: Synechococcus elongatus UTEX 2973
-- count: 17
-  organism_name: Synechococcus elongatus PCC 7942
+  organism_name: Synechococcus CC9616
 - count: 17
   organism_name: Prochlorococcus MIT9303
-- count: 16
-  organism_name: Synechococcus sp. BL107
-- count: 16
-  organism_name: Synechococcus WH8102
-- count: 16
-  organism_name: Prochlorococcus MIT1327
-- count: 16
-  organism_name: Meiothermus ruber
-- count: 16
-  organism_name: Synechococcus CC9311
-- count: 16
-  organism_name: Prochlorococcus MIT9515
-total_entries: 3178
-total_matching: 23
+- count: 17
+  organism_name: Synechococcus BMK-MC-1
+- count: 17
+  organism_name: Synechococcus RS9907
+total_entries: 3251
+total_matching: 26
 truncated: false
 warnings: []
 xref_coverage:
-  with_chebi: 23
+  with_chebi: 26
   with_hmdb: 11
-  with_mnxm: 23
+  with_mnxm: 26

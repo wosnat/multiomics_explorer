@@ -66,7 +66,7 @@ results:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 60
+  experiment_count: 20
   gene_count: 4305
   genus: Alteromonas
   go_transport_metabolite_count: 75
@@ -92,12 +92,7 @@ results:
   transported_metabolite_count: 128
   treatment_types:
   - carbon
-- background_factors:
-  - axenic
-  - darkness
-  - diel
-  - light
-  - viral
+- background_factors: []
   catalyzed_metabolite_count: 0
   clade: null
   cluster_types: []
@@ -105,21 +100,17 @@ results:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 9
+  experiment_count: 0
   gene_count: 0
   genus: null
   go_transport_metabolite_count: 0
-  growth_phases:
-  - acute_stress
-  - infected
+  growth_phases: []
   interpro_gene_count: 0
   measured_metabolite_count: 0
   ncbi_taxon_id: 10239
   ncbifam_gene_count: 0
   nonpeptidase_homolog_gene_count: 0
-  omics_types:
-  - MICROARRAY
-  - RNASEQ
+  omics_types: []
   organism_name: Phage
   organism_type: treatment
   peptidase_gene_count: 0
@@ -128,9 +119,7 @@ results:
   species: null
   strain: null
   transported_metabolite_count: 0
-  treatment_types:
-  - light
-  - viral
+  treatment_types: []
 - background_factors:
   - axenic
   - chemical
@@ -150,12 +139,12 @@ results:
   compartments:
   - vesicle
   - whole_cell
-  derived_metric_count: 26
+  derived_metric_count: 28
   derived_metric_value_kinds:
   - boolean
   - categorical
   - numeric
-  experiment_count: 118
+  experiment_count: 45
   gene_count: 1973
   genus: Prochlorococcus
   go_transport_metabolite_count: 46
@@ -175,6 +164,7 @@ results:
   ncbifam_gene_count: 744
   nonpeptidase_homolog_gene_count: 8
   omics_types:
+  - BIOINFORMATIC
   - MICROARRAY
   - PAIRED_RNASEQ_PROTEOME
   - PROTEOMICS
@@ -184,7 +174,7 @@ results:
   organism_name: Prochlorococcus MED4
   organism_type: genome_strain
   peptidase_gene_count: 50
-  publication_count: 20
+  publication_count: 21
   reaction_count: 943
   species: Prochlorococcus marinus
   strain: MED4
@@ -195,6 +185,7 @@ results:
   - compartment
   - darkness
   - diel
+  - genomic_analysis
   - growth_phase
   - iron
   - light
@@ -230,7 +221,7 @@ top_metabolic_capability:
   organism_name: Prochlorococcus MED4
   reaction_count: 943
   transported_metabolite_count: 39
-total_entries: 47
+total_entries: 121
 total_matching: 3
 truncated: false
 warnings: []

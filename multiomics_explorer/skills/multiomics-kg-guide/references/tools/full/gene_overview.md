@@ -153,8 +153,8 @@ gene_overview(locus_tags=["PMM1428"])
       "expression_edge_count": 41,
       "significant_up_count": 4,
       "significant_down_count": 2,
-      "closest_ortholog_group_size": 22,
-      "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+      "closest_ortholog_group_size": 95,
+      "closest_ortholog_genera": ["Cyanobium", "Prochlorococcus", "Synechococcus"],
       "cluster_membership_count": 2,
       "cluster_types": ["diel", "time_course"],
       "derived_metric_count": 9,
@@ -339,8 +339,8 @@ gene_overview(locus_tags=["PMM0372", "PMM0001"])
       "expression_edge_count": 37,
       "significant_up_count": 5,
       "significant_down_count": 2,
-      "closest_ortholog_group_size": 22,
-      "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+      "closest_ortholog_group_size": 97,
+      "closest_ortholog_genera": ["Cyanobium", "Prochlorococcus", "Synechococcus"],
       "cluster_membership_count": 2,
       "cluster_types": ["decay_pattern", "diel"],
       "derived_metric_count": 17,
@@ -371,7 +371,7 @@ gene_overview(locus_tags=["PMM0372", "PMM0001"])
       "expression_edge_count": 30,
       "significant_up_count": 12,
       "significant_down_count": 1,
-      "closest_ortholog_group_size": 3,
+      "closest_ortholog_group_size": 12,
       "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
       "cluster_membership_count": 4,
       "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
@@ -686,6 +686,11 @@ gene_overview(locus_tags=["PMM0533", "PMM0970"])
       "doi": "10.1038/msb4100087",
       "title": "Global gene expression of Prochlorococcus ecotypes in response to changes in nitrogen availability",
       "n_genes": 1
+    },
+    {
+      "doi": "10.1042/BST20200244",
+      "title": "Functional characterisation of substrate-binding proteins to address nutrient uptake in marine picocyanobacteria",
+      "n_genes": 1
     }
   ],
   "has_ncbifam": 2,
@@ -711,8 +716,8 @@ gene_overview(locus_tags=["PMM0533", "PMM0970"])
       "expression_edge_count": 33,
       "significant_up_count": 0,
       "significant_down_count": 8,
-      "closest_ortholog_group_size": 23,
-      "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+      "closest_ortholog_group_size": 97,
+      "closest_ortholog_genera": ["Cyanobium", "Prochlorococcus", "Synechococcus"],
       "cluster_membership_count": 2,
       "cluster_types": ["decay_pattern", "diel"],
       "derived_metric_count": 11,
@@ -743,11 +748,11 @@ gene_overview(locus_tags=["PMM0533", "PMM0970"])
       "expression_edge_count": 53,
       "significant_up_count": 17,
       "significant_down_count": 10,
-      "closest_ortholog_group_size": 21,
-      "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+      "closest_ortholog_group_size": 99,
+      "closest_ortholog_genera": ["Cyanobium", "Prochlorococcus", "Synechococcus"],
       "cluster_membership_count": 5,
       "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
-      "derived_metric_count": 11,
+      "derived_metric_count": 13,
       "derived_metric_value_kinds": ["numeric", "boolean", "categorical"],
       "reaction_count": 0,
       "catalyzed_metabolite_count": 0,
@@ -760,7 +765,7 @@ gene_overview(locus_tags=["PMM0533", "PMM0970"])
       "tcdb_assignment_count": 2,
       "cazy_family_count": 0,
       "merops_evidence_score_max": null,
-      "discussed_in_publication_count": 2
+      "discussed_in_publication_count": 3
     }
   ]
 }
@@ -810,6 +815,11 @@ gene_overview(locus_tags=["PMM0372", "PMM0970", "PMM0974"])
       "n_genes": 1
     },
     {
+      "doi": "10.1042/BST20200244",
+      "title": "Functional characterisation of substrate-binding proteins to address nutrient uptake in marine picocyanobacteria",
+      "n_genes": 1
+    },
+    {
       "doi": "10.64898/2026.04.15.718746",
       "title": "Extreme genome reduction selectively retains modular regulatory architecture in Prochlorococcus MED4: conserved trans...",
       "n_genes": 1
@@ -838,7 +848,7 @@ gene_overview(locus_tags=["PMM0372", "PMM0970", "PMM0974"])
       "expression_edge_count": 30,
       "significant_up_count": 12,
       "significant_down_count": 1,
-      "closest_ortholog_group_size": 3,
+      "closest_ortholog_group_size": 12,
       "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
       "cluster_membership_count": 4,
       "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
@@ -870,11 +880,11 @@ gene_overview(locus_tags=["PMM0372", "PMM0970", "PMM0974"])
       "expression_edge_count": 53,
       "significant_up_count": 17,
       "significant_down_count": 10,
-      "closest_ortholog_group_size": 21,
-      "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+      "closest_ortholog_group_size": 99,
+      "closest_ortholog_genera": ["Cyanobium", "Prochlorococcus", "Synechococcus"],
       "cluster_membership_count": 5,
       "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
-      "derived_metric_count": 11,
+      "derived_metric_count": 13,
       "derived_metric_value_kinds": ["numeric", "boolean", "categorical"],
       "reaction_count": 0,
       "catalyzed_metabolite_count": 0,
@@ -887,7 +897,7 @@ gene_overview(locus_tags=["PMM0372", "PMM0970", "PMM0974"])
       "tcdb_assignment_count": 2,
       "cazy_family_count": 0,
       "merops_evidence_score_max": null,
-      "discussed_in_publication_count": 2
+      "discussed_in_publication_count": 3
     },
     {
       "locus_tag": "PMM0974",
@@ -902,8 +912,8 @@ gene_overview(locus_tags=["PMM0372", "PMM0970", "PMM0974"])
       "expression_edge_count": 34,
       "significant_up_count": 8,
       "significant_down_count": 1,
-      "closest_ortholog_group_size": 19,
-      "closest_ortholog_genera": ["Prochlorococcus", "Synechococcus"],
+      "closest_ortholog_group_size": 81,
+      "closest_ortholog_genera": ["Cyanobium", "Prochlorococcus", "Synechococcus"],
       "cluster_membership_count": 2,
       "cluster_types": ["genomic_island", "diel"],
       "derived_metric_count": 12,

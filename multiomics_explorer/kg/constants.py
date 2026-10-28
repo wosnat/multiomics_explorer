@@ -36,6 +36,7 @@ VALID_CLUSTER_TYPES: set[str] = {
 }
 
 VALID_OMICS_TYPES: set[str] = {
+    "BIOINFORMATIC",
     "EXOPROTEOMICS",
     "METABOLOMICS",
     "MICROARRAY",
@@ -80,12 +81,13 @@ VALID_OMICS_TYPES: set[str] = {
 # scov}, TcdbFamily.{direction, direction_basis, tcdb_substrate_count},
 # level_kind tc_specificity -> tc_system, Gene.tcdb_family_count ->
 # tcdb_assignment_count, MEROPS qcov declared percent, stereo_assignment and
-# direction descriptions reworded, built 2026-10-24T17:33Z). The recipe lives KG-side (docs/kg-changes/
+# direction descriptions reworded, built 2026-10-24T17:33Z; + Ford 2021 SBP
+# survey: new Experiment.omics_type BIOINFORMATIC, built 2026-10-28T05:04Z). The recipe lives KG-side (docs/kg-changes/
 # vocabulary-contract.md). A mismatch means baked docs / parameter descriptions
 # may list stale values — filters still validate live. Must equal the live
 # KG's value at release cut.
 EXPECTED_CONTROLLED_VOCABULARIES_HASH: str = (
-    "sha256:7e2ada529d49f19b64ddd3fb6eef9332150e64160d5ba4256cccc48b7720e190"
+    "sha256:e4dd72ef7f4a3eff2e62fca9c4ab99ea8e332d19384445390c5f0949223204d8"
 )
 
 EXPECTED_KG_SHAPE: dict[str, tuple[str, ...] | str] = {

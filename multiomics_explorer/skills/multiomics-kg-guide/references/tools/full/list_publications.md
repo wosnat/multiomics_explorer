@@ -48,7 +48,7 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 - **by_metric_type** (list[PubMetricTypeBreakdown]): DerivedMetric type frequency rollup across matched publications.
 - **by_metric_type_truncated** (bool | None): True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown.
 - **by_compartment** (list[PubCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched publications.
-- **by_discusses_coverage** (PubDiscussesCoverageBreakdown): Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (45 vs 4 in the current KG).
+- **by_discusses_coverage** (PubDiscussesCoverageBreakdown): Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (46 vs 4 in the current KG).
 - **returned** (int): Publications in this response (0 when summary=True).
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.
@@ -103,14 +103,14 @@ list_publications()
 
 ```example-response
 {
-  "total_entries": 49,
-  "total_matching": 49,
+  "total_entries": 50,
+  "total_matching": 50,
   "by_organism": [
-    {"organism_name": "Prochlorococcus MED4", "count": 20},
-    {"organism_name": "Prochlorococcus MIT9313", "count": 10},
-    {"organism_name": "Prochlorococcus NATL2A", "count": 6},
-    {"organism_name": "Synechococcus WH7803", "count": 6},
-    {"organism_name": "Prochlorococcus MIT9312", "count": 5},
+    {"organism_name": "Prochlorococcus MED4", "count": 21},
+    {"organism_name": "Prochlorococcus MIT9313", "count": 11},
+    {"organism_name": "Prochlorococcus NATL2A", "count": 7},
+    {"organism_name": "Synechococcus WH7803", "count": 7},
+    {"organism_name": "Prochlorococcus MIT9312", "count": 6},
     ...
   ],
   "by_organism_truncated": true,
@@ -148,7 +148,7 @@ list_publications()
   "by_value_kind": [
     {"value_kind": "boolean", "count": 7},
     {"value_kind": "numeric", "count": 7},
-    {"value_kind": "categorical", "count": 5}
+    {"value_kind": "categorical", "count": 6}
   ],
   "by_metric_type": [
     {"metric_type": "expression_change_high_light_shock", "count": 1},
@@ -160,12 +160,12 @@ list_publications()
   ],
   "by_metric_type_truncated": true,
   "by_compartment": [
-    {"compartment": "whole_cell", "count": 45},
+    {"compartment": "whole_cell", "count": 46},
     {"compartment": "vesicle", "count": 3},
     {"compartment": "exoproteome", "count": 3},
     {"compartment": "extracellular", "count": 1}
   ],
-  "by_discusses_coverage": {"has_discusses": 45, "no_discusses": 4},
+  "by_discusses_coverage": {"has_discusses": 46, "no_discusses": 4},
   "returned": 5,
   "offset": 0,
   "truncated": true,
@@ -282,7 +282,7 @@ list_publications(compartment="vesicle")
 
 ```example-response
 {
-  "total_entries": 49,
+  "total_entries": 50,
   "total_matching": 3,
   "by_organism": [
     {"organism_name": "Prochlorococcus MIT9313", "count": 2},
@@ -432,7 +432,7 @@ list_publications(publication_dois=["10.1128/msystems.01261-22", "10.1073/pnas.2
 
 ```example-response
 {
-  "total_entries": 49,
+  "total_entries": 50,
   "total_matching": 3,
   "by_organism": [
     {"organism_name": "Prochlorococcus MIT9313", "count": 3},
@@ -533,7 +533,7 @@ list_publications(publication_dois=["10.1128/msystems.01261-22", "10.1073/pnas.2
       "metabolite_count": 96,
       "metabolite_assay_count": 8,
       "metabolite_compartments": ["whole_cell", "extracellular"],
-      "discussed_gene_count": 6,
+      "discussed_gene_count": 9,
       "discussed_pathway_count": 4
     },
     {
@@ -572,14 +572,14 @@ list_publications()
 
 ```example-response
 {
-  "total_entries": 49,
-  "total_matching": 49,
+  "total_entries": 50,
+  "total_matching": 50,
   "by_organism": [
-    {"organism_name": "Prochlorococcus MED4", "count": 20},
-    {"organism_name": "Prochlorococcus MIT9313", "count": 10},
-    {"organism_name": "Prochlorococcus NATL2A", "count": 6},
-    {"organism_name": "Synechococcus WH7803", "count": 6},
-    {"organism_name": "Prochlorococcus MIT9312", "count": 5},
+    {"organism_name": "Prochlorococcus MED4", "count": 21},
+    {"organism_name": "Prochlorococcus MIT9313", "count": 11},
+    {"organism_name": "Prochlorococcus NATL2A", "count": 7},
+    {"organism_name": "Synechococcus WH7803", "count": 7},
+    {"organism_name": "Prochlorococcus MIT9312", "count": 6},
     ...
   ],
   "by_organism_truncated": true,
@@ -617,7 +617,7 @@ list_publications()
   "by_value_kind": [
     {"value_kind": "boolean", "count": 7},
     {"value_kind": "numeric", "count": 7},
-    {"value_kind": "categorical", "count": 5}
+    {"value_kind": "categorical", "count": 6}
   ],
   "by_metric_type": [
     {"metric_type": "expression_change_high_light_shock", "count": 1},
@@ -629,12 +629,12 @@ list_publications()
   ],
   "by_metric_type_truncated": true,
   "by_compartment": [
-    {"compartment": "whole_cell", "count": 45},
+    {"compartment": "whole_cell", "count": 46},
     {"compartment": "vesicle", "count": 3},
     {"compartment": "exoproteome", "count": 3},
     {"compartment": "extracellular", "count": 1}
   ],
-  "by_discusses_coverage": {"has_discusses": 45, "no_discusses": 4},
+  "by_discusses_coverage": {"has_discusses": 46, "no_discusses": 4},
   "returned": 5,
   "offset": 0,
   "truncated": true,

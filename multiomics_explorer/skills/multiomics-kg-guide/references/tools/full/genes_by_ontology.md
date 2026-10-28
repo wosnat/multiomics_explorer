@@ -185,8 +185,8 @@ genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
   "by_evidence": [{"count": 30, "evidence": "curated"}],
   "by_tier": [],
   "by_sources": [
-    {"count": 16, "source": "cyanorak"},
-    {"count": 15, "source": "uniprot"},
+    {"count": 18, "source": "cyanorak"},
+    {"count": 13, "source": "uniprot"},
     {"count": 11, "source": "ncbi"},
     {"count": 10, "source": "interproscan"},
     {"count": 5, "source": "eggnog"}

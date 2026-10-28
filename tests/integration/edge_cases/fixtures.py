@@ -8,10 +8,11 @@ and the fixture must be re-pinned using the discovery cypher in its comment.
 
 # --- Organisms by data-layer population -----------------------------------
 
-# experiment_count == 0, genes present. 11 such strains as of 2026-06-15.
+# experiment_count == 0, genes present. 5 such strains as of 2026-10-28 (Ford
+# 2021 gave every Cyanorak genome a BIOINFORMATIC experiment; MIT9515 left).
 # MATCH (o:OrganismTaxon) WHERE coalesce(o.experiment_count,0)=0
 #   AND coalesce(o.gene_count,0)>0 RETURN o.preferred_name LIMIT 1
-GENOME_ONLY_ORGANISM = "Prochlorococcus MIT9515"
+GENOME_ONLY_ORGANISM = "Prochlorococcus RSP50"
 
 # Has Experiment nodes but METABOLOMICS-only — no transcriptomic / DE layer
 # (0 Changes_expression_of edges).

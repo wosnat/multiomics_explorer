@@ -456,6 +456,13 @@ metabolites_by_gene(locus_tags=["PMM0065"], organism="Prochlorococcus MED4", evi
       "pathway_metabolite_count": 11
     },
     {
+      "metabolite_pathway_id": "kegg.pathway:ko01057",
+      "metabolite_pathway_name": "Biosynthesis of type II polyketide products",
+      "gene_count": 1,
+      "pathway_reaction_count": 3,
+      "pathway_metabolite_count": 13
+    },
+    {
       "metabolite_pathway_id": "kegg.pathway:ko01055",
       "metabolite_pathway_name": "Biosynthesis of vancomycin group antibiotics",
       "gene_count": 1,
@@ -468,13 +475,6 @@ metabolites_by_gene(locus_tags=["PMM0065"], organism="Prochlorococcus MED4", evi
       "gene_count": 1,
       "pathway_reaction_count": 24,
       "pathway_metabolite_count": 18
-    },
-    {
-      "metabolite_pathway_id": "kegg.pathway:ko00450",
-      "metabolite_pathway_name": "Selenocompound metabolism",
-      "gene_count": 1,
-      "pathway_reaction_count": 13,
-      "pathway_metabolite_count": 19
     },
     ...
   ],
@@ -616,7 +616,7 @@ metabolites_by_gene(locus_tags=["PMM0970"], organism="Prochlorococcus MED4")
       "metabolite_pathway_name": "Biotin metabolism",
       "gene_count": 1,
       "pathway_reaction_count": 18,
-      "pathway_metabolite_count": 22
+      "pathway_metabolite_count": 23
     },
     {
       "metabolite_pathway_id": "kegg.pathway:ko00220",
@@ -630,7 +630,7 @@ metabolites_by_gene(locus_tags=["PMM0970"], organism="Prochlorococcus MED4")
       "metabolite_pathway_name": "Biosynthesis of various antibiotics",
       "gene_count": 1,
       "pathway_reaction_count": 5,
-      "pathway_metabolite_count": 40
+      "pathway_metabolite_count": 41
     },
     {
       "metabolite_pathway_id": "kegg.pathway:ko00240",
@@ -1055,7 +1055,7 @@ metabolites_by_gene(locus_tags=["PMM0970", "PMM0971", "PMM0974"], organism="Proc
       "metabolite_pathway_name": "Biotin metabolism",
       "gene_count": 3,
       "pathway_reaction_count": 18,
-      "pathway_metabolite_count": 22
+      "pathway_metabolite_count": 23
     },
     {
       "metabolite_pathway_id": "kegg.pathway:ko00220",
@@ -1069,7 +1069,7 @@ metabolites_by_gene(locus_tags=["PMM0970", "PMM0971", "PMM0974"], organism="Proc
       "metabolite_pathway_name": "Biosynthesis of various antibiotics",
       "gene_count": 3,
       "pathway_reaction_count": 5,
-      "pathway_metabolite_count": 40
+      "pathway_metabolite_count": 41
     },
     {
       "metabolite_pathway_id": "kegg.pathway:ko00240",

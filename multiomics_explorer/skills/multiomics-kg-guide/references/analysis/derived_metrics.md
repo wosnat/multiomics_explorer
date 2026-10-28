@@ -7,8 +7,9 @@ to drill into gene-level annotations across the three value kinds (numeric,
 boolean, categorical). Every Python block below runs as written against the
 live KG.
 
-> Counts here are a live snapshot (83 DMs: 46 numeric, 27 boolean, 10
-> categorical) and drift with each KG rebuild. `list_derived_metrics` and
+> Counts here are a live snapshot (273 DMs: 46 numeric, 27 boolean, 200
+> categorical — 190 of the categorical are Ford 2021's per-genome SBP
+> annotation calls on `BIOINFORMATIC` experiments) and drift with each KG rebuild. `list_derived_metrics` and
 > `list_filter_values` are the current source.
 
 ---
@@ -26,10 +27,10 @@ Key properties on a `DerivedMetric` node:
 - `metric_type` — free-text tag, e.g. `damping_ratio`,
   `diel_amplitude_transcript_log2`, `vesicle_proteome_member`,
   `darkness_survival_class`. Enumerate with
-  `list_filter_values(filter_type="metric_type")` (53 values live) — the tag is
+  `list_filter_values(filter_type="metric_type")` (55 values live) — the tag is
   the paper's column name, so guess nothing.
 - `value_kind` — `numeric`, `boolean`, `categorical`.
-- `compartment` — wet-lab fraction. DMs use `whole_cell` (45), `vesicle` (31)
+- `compartment` — wet-lab fraction. DMs use `whole_cell` (235), `vesicle` (31)
   and `exoproteome` (7). The vocabulary
   (`list_filter_values(filter_type="compartment")`) also carries
   `extracellular`, which only metabolite assays use.

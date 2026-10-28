@@ -2189,7 +2189,7 @@ def list_filter_values(
       - ``value_kind``: DerivedMetric.value_kind enum.
       - ``compartment``: Experiment.compartment values.
       - ``omics_type``: Experiment.omics_type values; result merges the
-        canonical OMICS_TYPE enum (8 values) so METABOLOMICS surfaces with
+        canonical OMICS_TYPE enum (9 values) so METABOLOMICS surfaces with
         count=0 even when no experiments of that type exist.
       - ``evidence_source``: Metabolite.evidence_sources buckets
         (metabolism / transport / metabolomics).

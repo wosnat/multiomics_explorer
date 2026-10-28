@@ -1,5 +1,5 @@
 case_id: list_organisms
-row_count: 47
+row_count: 121
 rows:
 - background_factors: []
   catalyzed_metabolite_count: 0
@@ -42,7 +42,7 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 60
+  experiment_count: 20
   gene_count: 4305
   genus: Alteromonas
   go_transport_metabolite_count: 75
@@ -80,7 +80,7 @@ rows:
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
-  experiment_count: 6
+  experiment_count: 1
   gene_count: 3929
   genus: Alteromonas
   go_transport_metabolite_count: 85
@@ -116,7 +116,7 @@ rows:
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
-  experiment_count: 6
+  experiment_count: 1
   gene_count: 3834
   genus: Alteromonas
   go_transport_metabolite_count: 89
@@ -152,7 +152,7 @@ rows:
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
-  experiment_count: 6
+  experiment_count: 1
   gene_count: 4063
   genus: Alteromonas
   go_transport_metabolite_count: 96
@@ -188,7 +188,7 @@ rows:
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
-  experiment_count: 6
+  experiment_count: 1
   gene_count: 3741
   genus: Alteromonas
   go_transport_metabolite_count: 83
@@ -226,7 +226,7 @@ rows:
   derived_metric_count: 14
   derived_metric_value_kinds:
   - boolean
-  experiment_count: 16
+  experiment_count: 12
   gene_count: 4136
   genus: Alteromonas
   go_transport_metabolite_count: 101
@@ -270,12 +270,11 @@ rows:
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
-  experiment_count: 21
+  experiment_count: 8
   gene_count: 4028
   genus: Alteromonas
   go_transport_metabolite_count: 88
   growth_phases:
-  - death
   - exponential
   - nutrient_limited
   interpro_gene_count: 3563
@@ -318,14 +317,13 @@ rows:
   derived_metric_value_kinds:
   - boolean
   - numeric
-  experiment_count: 14
+  experiment_count: 5
   gene_count: 4028
   genus: Alteromonas
   go_transport_metabolite_count: 91
   growth_phases:
   - darkness
   - diel
-  - exponential
   - unknown
   interpro_gene_count: 3584
   measured_metabolite_count: 0
@@ -346,7 +344,6 @@ rows:
   strain: MIT1002
   transported_metabolite_count: 142
   treatment_types:
-  - coculture
   - compartment
   - darkness
   - growth_phase
@@ -410,8 +407,109 @@ rows:
   strain: AltDE1
   transported_metabolite_count: 148
   treatment_types: []
-- background_factors:
-  - light
+- background_factors: []
+  catalyzed_metabolite_count: 1172
+  clade: '5.2'
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2975
+  genus: Cyanobium
+  go_transport_metabolite_count: 48
+  growth_phases: []
+  interpro_gene_count: 2354
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 261284
+  ncbifam_gene_count: 989
+  nonpeptidase_homolog_gene_count: 11
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Cyanobium NS01
+  organism_type: genome_strain
+  peptidase_gene_count: 74
+  publication_count: 1
+  reaction_count: 1037
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: NS01
+  transported_metabolite_count: 69
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1183
+  clade: '5.2'
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3425
+  genus: Cyanobium
+  go_transport_metabolite_count: 48
+  growth_phases: []
+  interpro_gene_count: 2800
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 292564
+  ncbifam_gene_count: 1060
+  nonpeptidase_homolog_gene_count: 14
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Cyanobium PCC6307
+  organism_type: genome_strain
+  peptidase_gene_count: 82
+  publication_count: 1
+  reaction_count: 1043
+  reference_database: null
+  reference_proteome: null
+  species: Cyanobium gracile
+  strain: PCC6307
+  transported_metabolite_count: 76
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1170
+  clade: '5.2'
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2929
+  genus: Cyanobium
+  go_transport_metabolite_count: 46
+  growth_phases: []
+  interpro_gene_count: 2396
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 180281
+  ncbifam_gene_count: 978
+  nonpeptidase_homolog_gene_count: 13
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Cyanobium PCC7001
+  organism_type: genome_strain
+  peptidase_gene_count: 72
+  publication_count: 1
+  reaction_count: 1030
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: PCC7001
+  transported_metabolite_count: 76
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
   catalyzed_metabolite_count: 0
   clade: null
   cluster_types: []
@@ -419,20 +517,17 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 2
+  experiment_count: 0
   gene_count: 0
   genus: Escherichia
   go_transport_metabolite_count: 0
-  growth_phases:
-  - exponential
+  growth_phases: []
   interpro_gene_count: 0
   measured_metabolite_count: 0
   ncbi_taxon_id: 562
   ncbifam_gene_count: 0
   nonpeptidase_homolog_gene_count: 0
-  omics_types:
-  - PROTEOMICS
-  - RNASEQ
+  omics_types: []
   organism_name: Escherichia coli
   organism_type: treatment
   peptidase_gene_count: 0
@@ -443,8 +538,7 @@ rows:
   species: null
   strain: null
   transported_metabolite_count: 0
-  treatment_types:
-  - coculture
+  treatment_types: []
 - background_factors:
   - coculture
   - darkness
@@ -456,7 +550,7 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 60
+  experiment_count: 20
   gene_count: 4240
   genus: Marinobacter
   go_transport_metabolite_count: 106
@@ -482,8 +576,7 @@ rows:
   transported_metabolite_count: 161
   treatment_types:
   - carbon
-- background_factors:
-  - coculture
+- background_factors: []
   catalyzed_metabolite_count: 1214
   clade: null
   cluster_types:
@@ -492,7 +585,7 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 1
+  experiment_count: 0
   gene_count: 2884
   genus: Meiothermus
   go_transport_metabolite_count: 65
@@ -502,8 +595,7 @@ rows:
   ncbi_taxon_id: 172827
   ncbifam_gene_count: 951
   nonpeptidase_homolog_gene_count: 26
-  omics_types:
-  - RNASEQ
+  omics_types: []
   organism_name: Meiothermus ruber
   organism_type: genome_strain
   peptidase_gene_count: 99
@@ -514,15 +606,8 @@ rows:
   species: null
   strain: MruberA
   transported_metabolite_count: 117
-  treatment_types:
-  - light
-  - oxygen
-- background_factors:
-  - axenic
-  - darkness
-  - diel
-  - light
-  - viral
+  treatment_types: []
+- background_factors: []
   catalyzed_metabolite_count: 0
   clade: null
   cluster_types: []
@@ -530,21 +615,17 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 9
+  experiment_count: 0
   gene_count: 0
   genus: null
   go_transport_metabolite_count: 0
-  growth_phases:
-  - acute_stress
-  - infected
+  growth_phases: []
   interpro_gene_count: 0
   measured_metabolite_count: 0
   ncbi_taxon_id: 10239
   ncbifam_gene_count: 0
   nonpeptidase_homolog_gene_count: 0
-  omics_types:
-  - MICROARRAY
-  - RNASEQ
+  omics_types: []
   organism_name: Phage
   organism_type: treatment
   peptidase_gene_count: 0
@@ -555,9 +636,7 @@ rows:
   species: null
   strain: null
   transported_metabolite_count: 0
-  treatment_types:
-  - light
-  - viral
+  treatment_types: []
 - background_factors:
   - axenic
   - light
@@ -566,10 +645,12 @@ rows:
   cluster_types:
   - genomic_island
   clustering_analysis_count: 1
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 1
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 2
   gene_count: 1945
   genus: Prochlorococcus
   go_transport_metabolite_count: 42
@@ -581,11 +662,12 @@ rows:
   ncbifam_gene_count: 758
   nonpeptidase_homolog_gene_count: 8
   omics_types:
+  - BIOINFORMATIC
   - RNASEQ
   organism_name: Prochlorococcus AS9601
   organism_type: genome_strain
   peptidase_gene_count: 49
-  publication_count: 1
+  publication_count: 2
   reaction_count: 924
   reference_database: null
   reference_proteome: null
@@ -593,7 +675,178 @@ rows:
   strain: AS9601
   transported_metabolite_count: 35
   treatment_types:
+  - genomic_analysis
   - salt
+- background_factors: []
+  catalyzed_metabolite_count: 1039
+  clade: HLI
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 1990
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 39
+  growth_phases: []
+  interpro_gene_count: 1537
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 190047
+  ncbifam_gene_count: 742
+  nonpeptidase_homolog_gene_count: 8
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus EQPAC1
+  organism_type: genome_strain
+  peptidase_gene_count: 50
+  publication_count: 1
+  reaction_count: 942
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: EQPAC1
+  transported_metabolite_count: 39
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 994
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 1913
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 36
+  growth_phases: []
+  interpro_gene_count: 1502
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 59925
+  ncbifam_gene_count: 752
+  nonpeptidase_homolog_gene_count: 10
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus GP2
+  organism_type: genome_strain
+  peptidase_gene_count: 48
+  publication_count: 1
+  reaction_count: 907
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: GP2
+  transported_metabolite_count: 43
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 848
+  clade: HLIV
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2137
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 16
+  growth_phases: []
+  interpro_gene_count: 1172
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1041938
+  ncbifam_gene_count: 588
+  nonpeptidase_homolog_gene_count: 9
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus HNLC1
+  organism_type: genome_strain
+  peptidase_gene_count: 32
+  publication_count: 1
+  reaction_count: 733
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: HNLC1
+  transported_metabolite_count: 39
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 914
+  clade: HLIII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 1886
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 19
+  growth_phases: []
+  interpro_gene_count: 1233
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1041939
+  ncbifam_gene_count: 634
+  nonpeptidase_homolog_gene_count: 7
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus HNLC2
+  organism_type: genome_strain
+  peptidase_gene_count: 45
+  publication_count: 1
+  reaction_count: 783
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: HNLC2
+  transported_metabolite_count: 35
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1046
+  clade: LLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2027
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 34
+  growth_phases: []
+  interpro_gene_count: 1533
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 167556
+  ncbifam_gene_count: 778
+  nonpeptidase_homolog_gene_count: 9
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus LG
+  organism_type: genome_strain
+  peptidase_gene_count: 49
+  publication_count: 1
+  reaction_count: 919
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: LG
+  transported_metabolite_count: 43
+  treatment_types:
+  - genomic_analysis
 - background_factors:
   - axenic
   - chemical
@@ -613,12 +866,12 @@ rows:
   compartments:
   - vesicle
   - whole_cell
-  derived_metric_count: 26
+  derived_metric_count: 28
   derived_metric_value_kinds:
   - boolean
   - categorical
   - numeric
-  experiment_count: 118
+  experiment_count: 45
   gene_count: 1973
   genus: Prochlorococcus
   go_transport_metabolite_count: 46
@@ -638,6 +891,7 @@ rows:
   ncbifam_gene_count: 744
   nonpeptidase_homolog_gene_count: 8
   omics_types:
+  - BIOINFORMATIC
   - MICROARRAY
   - PAIRED_RNASEQ_PROTEOME
   - PROTEOMICS
@@ -647,7 +901,7 @@ rows:
   organism_name: Prochlorococcus MED4
   organism_type: genome_strain
   peptidase_gene_count: 50
-  publication_count: 20
+  publication_count: 21
   reaction_count: 943
   reference_database: null
   reference_proteome: null
@@ -660,6 +914,7 @@ rows:
   - compartment
   - darkness
   - diel
+  - genomic_analysis
   - growth_phase
   - iron
   - light
@@ -669,16 +924,120 @@ rows:
   - salt
   - tss_mapping
   - viral
+- background_factors: []
+  catalyzed_metabolite_count: 1016
+  clade: LLIII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 1956
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 30
+  growth_phases: []
+  interpro_gene_count: 1510
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1499498
+  ncbifam_gene_count: 771
+  nonpeptidase_homolog_gene_count: 11
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT0601
+  organism_type: genome_strain
+  peptidase_gene_count: 47
+  publication_count: 1
+  reaction_count: 893
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: MIT0601
+  transported_metabolite_count: 32
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1056
+  clade: LLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2026
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 32
+  growth_phases: []
+  interpro_gene_count: 1526
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1499499
+  ncbifam_gene_count: 765
+  nonpeptidase_homolog_gene_count: 8
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT0602
+  organism_type: genome_strain
+  peptidase_gene_count: 51
+  publication_count: 1
+  reaction_count: 927
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: MIT0602
+  transported_metabolite_count: 44
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1056
+  clade: LLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2047
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 35
+  growth_phases: []
+  interpro_gene_count: 1532
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1499500
+  ncbifam_gene_count: 770
+  nonpeptidase_homolog_gene_count: 8
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT0603
+  organism_type: genome_strain
+  peptidase_gene_count: 52
+  publication_count: 1
+  reaction_count: 927
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: MIT0603
+  transported_metabolite_count: 44
+  treatment_types:
+  - genomic_analysis
 - background_factors:
   - axenic
   catalyzed_metabolite_count: 1022
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 3
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 4
   gene_count: 2111
   genus: Prochlorococcus
   go_transport_metabolite_count: 35
@@ -690,11 +1049,12 @@ rows:
   ncbifam_gene_count: 770
   nonpeptidase_homolog_gene_count: 8
   omics_types:
+  - BIOINFORMATIC
   - RNASEQ
   organism_name: Prochlorococcus MIT0604
   organism_type: genome_strain
   peptidase_gene_count: 50
-  publication_count: 1
+  publication_count: 2
   reaction_count: 930
   reference_database: null
   reference_proteome: null
@@ -703,17 +1063,122 @@ rows:
   transported_metabolite_count: 36
   treatment_types:
   - chemical
+  - genomic_analysis
   - light
+- background_factors: []
+  catalyzed_metabolite_count: 1090
+  clade: LLIV
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3203
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 47
+  growth_phases: []
+  interpro_gene_count: 1945
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1499502
+  ncbifam_gene_count: 868
+  nonpeptidase_homolog_gene_count: 10
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT0701
+  organism_type: genome_strain
+  peptidase_gene_count: 73
+  publication_count: 1
+  reaction_count: 969
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: MIT0701
+  transported_metabolite_count: 81
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1089
+  clade: LLIV
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3189
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 47
+  growth_phases: []
+  interpro_gene_count: 1941
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1499503
+  ncbifam_gene_count: 869
+  nonpeptidase_homolog_gene_count: 10
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT0702
+  organism_type: genome_strain
+  peptidase_gene_count: 73
+  publication_count: 1
+  reaction_count: 971
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: MIT0702
+  transported_metabolite_count: 81
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1090
+  clade: LLIV
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3185
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 44
+  growth_phases: []
+  interpro_gene_count: 1937
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1499504
+  ncbifam_gene_count: 867
+  nonpeptidase_homolog_gene_count: 10
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT0703
+  organism_type: genome_strain
+  peptidase_gene_count: 71
+  publication_count: 1
+  reaction_count: 971
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: MIT0703
+  transported_metabolite_count: 80
+  treatment_types:
+  - genomic_analysis
 - background_factors:
   - axenic
   catalyzed_metabolite_count: 1036
   clade: LLI
   cluster_types: []
   clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 6
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 3
   gene_count: 2330
   genus: Prochlorococcus
   go_transport_metabolite_count: 38
@@ -724,11 +1189,12 @@ rows:
   ncbifam_gene_count: 793
   nonpeptidase_homolog_gene_count: 11
   omics_types:
+  - BIOINFORMATIC
   - METABOLOMICS
   organism_name: Prochlorococcus MIT0801
   organism_type: genome_strain
   peptidase_gene_count: 52
-  publication_count: 1
+  publication_count: 2
   reaction_count: 934
   reference_database: null
   reference_proteome: null
@@ -736,8 +1202,8 @@ rows:
   strain: MIT0801
   transported_metabolite_count: 44
   treatment_types:
+  - genomic_analysis
   - growth_phase
-  - phosphorus
 - background_factors: []
   catalyzed_metabolite_count: 1027
   clade: HLII
@@ -800,14 +1266,152 @@ rows:
   transported_metabolite_count: 76
   treatment_types: []
 - background_factors: []
+  catalyzed_metabolite_count: 1034
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2010
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 33
+  growth_phases: []
+  interpro_gene_count: 1537
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 59921
+  ncbifam_gene_count: 749
+  nonpeptidase_homolog_gene_count: 8
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9107
+  organism_type: genome_strain
+  peptidase_gene_count: 48
+  publication_count: 1
+  reaction_count: 945
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9107
+  transported_metabolite_count: 34
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1036
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 1997
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 33
+  growth_phases: []
+  interpro_gene_count: 1535
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 167544
+  ncbifam_gene_count: 746
+  nonpeptidase_homolog_gene_count: 8
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9116
+  organism_type: genome_strain
+  peptidase_gene_count: 49
+  publication_count: 1
+  reaction_count: 946
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9116
+  transported_metabolite_count: 34
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1036
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2031
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 33
+  growth_phases: []
+  interpro_gene_count: 1547
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 167545
+  ncbifam_gene_count: 749
+  nonpeptidase_homolog_gene_count: 8
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9123
+  organism_type: genome_strain
+  peptidase_gene_count: 48
+  publication_count: 1
+  reaction_count: 946
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9123
+  transported_metabolite_count: 34
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1007
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2028
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 39
+  growth_phases: []
+  interpro_gene_count: 1539
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 93057
+  ncbifam_gene_count: 754
+  nonpeptidase_homolog_gene_count: 10
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9201
+  organism_type: genome_strain
+  peptidase_gene_count: 46
+  publication_count: 1
+  reaction_count: 919
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9201
+  transported_metabolite_count: 34
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
   catalyzed_metabolite_count: 1014
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
   gene_count: 2005
   genus: Prochlorococcus
   go_transport_metabolite_count: 39
@@ -817,27 +1421,65 @@ rows:
   ncbi_taxon_id: 93058
   ncbifam_gene_count: 756
   nonpeptidase_homolog_gene_count: 11
-  omics_types: []
+  omics_types:
+  - BIOINFORMATIC
   organism_name: Prochlorococcus MIT9202
   organism_type: genome_strain
   peptidase_gene_count: 48
-  publication_count: 0
+  publication_count: 1
   reaction_count: 921
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9202
   transported_metabolite_count: 34
-  treatment_types: []
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1028
+  clade: LLIII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 1888
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 41
+  growth_phases: []
+  interpro_gene_count: 1522
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 93059
+  ncbifam_gene_count: 779
+  nonpeptidase_homolog_gene_count: 9
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9211
+  organism_type: genome_strain
+  peptidase_gene_count: 47
+  publication_count: 1
+  reaction_count: 901
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9211
+  transported_metabolite_count: 42
+  treatment_types:
+  - genomic_analysis
 - background_factors: []
   catalyzed_metabolite_count: 1048
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
   gene_count: 2022
   genus: Prochlorococcus
   go_transport_metabolite_count: 42
@@ -847,18 +1489,20 @@ rows:
   ncbi_taxon_id: 93060
   ncbifam_gene_count: 770
   nonpeptidase_homolog_gene_count: 10
-  omics_types: []
+  omics_types:
+  - BIOINFORMATIC
   organism_name: Prochlorococcus MIT9215
   organism_type: genome_strain
   peptidase_gene_count: 50
-  publication_count: 0
+  publication_count: 1
   reaction_count: 950
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9215
   transported_metabolite_count: 35
-  treatment_types: []
+  treatment_types:
+  - genomic_analysis
 - background_factors:
   - axenic
   - diel
@@ -869,10 +1513,12 @@ rows:
   - condition_comparison
   - genomic_island
   clustering_analysis_count: 2
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 8
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 5
   gene_count: 1926
   genus: Prochlorococcus
   go_transport_metabolite_count: 46
@@ -884,12 +1530,13 @@ rows:
   ncbifam_gene_count: 774
   nonpeptidase_homolog_gene_count: 10
   omics_types:
+  - BIOINFORMATIC
   - METABOLOMICS
   - RNASEQ
   organism_name: Prochlorococcus MIT9301
   organism_type: genome_strain
   peptidase_gene_count: 49
-  publication_count: 3
+  publication_count: 4
   reaction_count: 945
   reference_database: null
   reference_proteome: null
@@ -897,9 +1544,44 @@ rows:
   strain: MIT9301
   transported_metabolite_count: 36
   treatment_types:
+  - genomic_analysis
   - growth_phase
   - phosphorus
   - temperature
+- background_factors: []
+  catalyzed_metabolite_count: 1042
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2047
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 36
+  growth_phases: []
+  interpro_gene_count: 1579
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 74545
+  ncbifam_gene_count: 767
+  nonpeptidase_homolog_gene_count: 8
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9302
+  organism_type: genome_strain
+  peptidase_gene_count: 49
+  publication_count: 1
+  reaction_count: 940
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9302
+  transported_metabolite_count: 38
+  treatment_types:
+  - genomic_analysis
 - background_factors:
   - axenic
   - light
@@ -908,10 +1590,12 @@ rows:
   cluster_types:
   - genomic_island
   clustering_analysis_count: 1
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 4
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 3
   gene_count: 3091
   genus: Prochlorococcus
   go_transport_metabolite_count: 53
@@ -923,12 +1607,13 @@ rows:
   ncbifam_gene_count: 895
   nonpeptidase_homolog_gene_count: 13
   omics_types:
+  - BIOINFORMATIC
   - METABOLOMICS
   - RNASEQ
   organism_name: Prochlorococcus MIT9303
   organism_type: genome_strain
   peptidase_gene_count: 72
-  publication_count: 1
+  publication_count: 2
   reaction_count: 993
   reference_database: null
   reference_proteome: null
@@ -937,6 +1622,41 @@ rows:
   transported_metabolite_count: 76
   treatment_types:
   - carbon
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1045
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2019
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 38
+  growth_phases: []
+  interpro_gene_count: 1564
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 167547
+  ncbifam_gene_count: 758
+  nonpeptidase_homolog_gene_count: 9
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9311
+  organism_type: genome_strain
+  peptidase_gene_count: 50
+  publication_count: 1
+  reaction_count: 942
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9311
+  transported_metabolite_count: 42
+  treatment_types:
+  - genomic_analysis
 - background_factors:
   - axenic
   - coculture
@@ -949,10 +1669,12 @@ rows:
   clustering_analysis_count: 1
   compartments:
   - vesicle
-  derived_metric_count: 3
+  - whole_cell
+  derived_metric_count: 5
   derived_metric_value_kinds:
+  - categorical
   - numeric
-  experiment_count: 27
+  experiment_count: 9
   gene_count: 1970
   genus: Prochlorococcus
   go_transport_metabolite_count: 45
@@ -967,6 +1689,7 @@ rows:
   ncbifam_gene_count: 759
   nonpeptidase_homolog_gene_count: 9
   omics_types:
+  - BIOINFORMATIC
   - METABOLOMICS
   - PROTEOMICS
   - RNASEQ
@@ -974,7 +1697,7 @@ rows:
   organism_name: Prochlorococcus MIT9312
   organism_type: genome_strain
   peptidase_gene_count: 50
-  publication_count: 5
+  publication_count: 6
   reaction_count: 943
   reference_database: null
   reference_proteome: null
@@ -983,8 +1706,8 @@ rows:
   transported_metabolite_count: 42
   treatment_types:
   - carbon
-  - coculture
   - compartment
+  - genomic_analysis
   - phosphorus
   - plastic
 - background_factors:
@@ -999,12 +1722,12 @@ rows:
   compartments:
   - vesicle
   - whole_cell
-  derived_metric_count: 11
+  derived_metric_count: 13
   derived_metric_value_kinds:
   - boolean
   - categorical
   - numeric
-  experiment_count: 39
+  experiment_count: 19
   gene_count: 2906
   genus: Prochlorococcus
   go_transport_metabolite_count: 54
@@ -1019,15 +1742,15 @@ rows:
   ncbifam_gene_count: 905
   nonpeptidase_homolog_gene_count: 11
   omics_types:
+  - BIOINFORMATIC
   - METABOLOMICS
   - MICROARRAY
   - RNASEQ
-  - VESICLE_DNASEQ
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9313
   organism_type: genome_strain
   peptidase_gene_count: 60
-  publication_count: 10
+  publication_count: 11
   reaction_count: 953
   reference_database: null
   reference_proteome: null
@@ -1038,20 +1761,159 @@ rows:
   - carbon
   - coculture
   - compartment
+  - genomic_analysis
   - growth_phase
   - iron
   - nitrogen
   - phosphorus
   - tss_mapping
 - background_factors: []
+  catalyzed_metabolite_count: 1044
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2017
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 37
+  growth_phases: []
+  interpro_gene_count: 1576
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 167548
+  ncbifam_gene_count: 776
+  nonpeptidase_homolog_gene_count: 10
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9314
+  organism_type: genome_strain
+  peptidase_gene_count: 48
+  publication_count: 1
+  reaction_count: 952
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9314
+  transported_metabolite_count: 38
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1036
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 1984
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 34
+  growth_phases: []
+  interpro_gene_count: 1532
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 167549
+  ncbifam_gene_count: 758
+  nonpeptidase_homolog_gene_count: 10
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9321
+  organism_type: genome_strain
+  peptidase_gene_count: 46
+  publication_count: 1
+  reaction_count: 935
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9321
+  transported_metabolite_count: 33
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1036
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 1988
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 34
+  growth_phases: []
+  interpro_gene_count: 1532
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 167550
+  ncbifam_gene_count: 761
+  nonpeptidase_homolog_gene_count: 10
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9322
+  organism_type: genome_strain
+  peptidase_gene_count: 46
+  publication_count: 1
+  reaction_count: 936
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9322
+  transported_metabolite_count: 33
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1036
+  clade: HLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2004
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 34
+  growth_phases: []
+  interpro_gene_count: 1542
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 167551
+  ncbifam_gene_count: 761
+  nonpeptidase_homolog_gene_count: 9
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus MIT9401
+  organism_type: genome_strain
+  peptidase_gene_count: 48
+  publication_count: 1
+  reaction_count: 936
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: MIT9401
+  transported_metabolite_count: 33
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
   catalyzed_metabolite_count: 1018
   clade: HLI
   cluster_types: []
   clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
   gene_count: 1945
   genus: Prochlorococcus
   go_transport_metabolite_count: 41
@@ -1061,18 +1923,20 @@ rows:
   ncbi_taxon_id: 167542
   ncbifam_gene_count: 744
   nonpeptidase_homolog_gene_count: 8
-  omics_types: []
+  omics_types:
+  - BIOINFORMATIC
   organism_name: Prochlorococcus MIT9515
   organism_type: genome_strain
   peptidase_gene_count: 50
-  publication_count: 0
+  publication_count: 1
   reaction_count: 926
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: MIT9515
   transported_metabolite_count: 41
-  treatment_types: []
+  treatment_types:
+  - genomic_analysis
 - background_factors:
   - axenic
   - light
@@ -1081,9 +1945,11 @@ rows:
   cluster_types:
   - genomic_island
   clustering_analysis_count: 1
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
   experiment_count: 2
   gene_count: 2221
   genus: Prochlorococcus
@@ -1096,11 +1962,12 @@ rows:
   ncbifam_gene_count: 777
   nonpeptidase_homolog_gene_count: 12
   omics_types:
+  - BIOINFORMATIC
   - RNASEQ
   organism_name: Prochlorococcus NATL1A
   organism_type: genome_strain
   peptidase_gene_count: 49
-  publication_count: 1
+  publication_count: 2
   reaction_count: 935
   reference_database: null
   reference_proteome: null
@@ -1108,6 +1975,7 @@ rows:
   strain: NATL1A
   transported_metabolite_count: 44
   treatment_types:
+  - genomic_analysis
   - salt
 - background_factors:
   - axenic
@@ -1123,11 +1991,11 @@ rows:
   clustering_analysis_count: 3
   compartments:
   - whole_cell
-  derived_metric_count: 5
+  derived_metric_count: 7
   derived_metric_value_kinds:
   - boolean
   - categorical
-  experiment_count: 17
+  experiment_count: 10
   gene_count: 2210
   genus: Prochlorococcus
   go_transport_metabolite_count: 45
@@ -1139,20 +2007,19 @@ rows:
   - infected
   - nutrient_limited
   - recovery
-  - stationary
-  - unknown
   interpro_gene_count: 1567
   measured_metabolite_count: 0
   ncbi_taxon_id: 59920
   ncbifam_gene_count: 775
   nonpeptidase_homolog_gene_count: 10
   omics_types:
+  - BIOINFORMATIC
   - PROTEOMICS
   - RNASEQ
   organism_name: Prochlorococcus NATL2A
   organism_type: genome_strain
   peptidase_gene_count: 50
-  publication_count: 6
+  publication_count: 7
   reaction_count: 927
   reference_database: null
   reference_proteome: null
@@ -1162,7 +2029,7 @@ rows:
   treatment_types:
   - coculture
   - darkness
-  - growth_phase
+  - genomic_analysis
   - phosphorus
   - plastic
 - background_factors: []
@@ -1170,10 +2037,12 @@ rows:
   clade: LLI
   cluster_types: []
   clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
   gene_count: 2317
   genus: Prochlorococcus
   go_transport_metabolite_count: 40
@@ -1183,18 +2052,20 @@ rows:
   ncbi_taxon_id: 59924
   ncbifam_gene_count: 771
   nonpeptidase_homolog_gene_count: 10
-  omics_types: []
+  omics_types:
+  - BIOINFORMATIC
   organism_name: Prochlorococcus PAC1
   organism_type: genome_strain
   peptidase_gene_count: 50
-  publication_count: 0
+  publication_count: 1
   reaction_count: 959
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: PAC1
   transported_metabolite_count: 44
-  treatment_types: []
+  treatment_types:
+  - genomic_analysis
 - background_factors: []
   catalyzed_metabolite_count: 1043
   clade: HLI
@@ -1231,10 +2102,12 @@ rows:
   clade: HLII
   cluster_types: []
   clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
   gene_count: 1950
   genus: Prochlorococcus
   go_transport_metabolite_count: 44
@@ -1244,18 +2117,156 @@ rows:
   ncbi_taxon_id: 59926
   ncbifam_gene_count: 760
   nonpeptidase_homolog_gene_count: 8
-  omics_types: []
+  omics_types:
+  - BIOINFORMATIC
   organism_name: Prochlorococcus SB
   organism_type: genome_strain
   peptidase_gene_count: 51
-  publication_count: 0
+  publication_count: 1
   reaction_count: 931
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
   strain: SB
   transported_metabolite_count: 39
-  treatment_types: []
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1046
+  clade: LLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2039
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 33
+  growth_phases: []
+  interpro_gene_count: 1532
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 167552
+  ncbifam_gene_count: 778
+  nonpeptidase_homolog_gene_count: 9
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus SS2
+  organism_type: genome_strain
+  peptidase_gene_count: 49
+  publication_count: 1
+  reaction_count: 919
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: SS2
+  transported_metabolite_count: 40
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1046
+  clade: LLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2025
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 33
+  growth_phases: []
+  interpro_gene_count: 1532
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 167553
+  ncbifam_gene_count: 778
+  nonpeptidase_homolog_gene_count: 9
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus SS35
+  organism_type: genome_strain
+  peptidase_gene_count: 49
+  publication_count: 1
+  reaction_count: 919
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: SS35
+  transported_metabolite_count: 43
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1046
+  clade: LLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2030
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 34
+  growth_phases: []
+  interpro_gene_count: 1531
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 167554
+  ncbifam_gene_count: 778
+  nonpeptidase_homolog_gene_count: 9
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus SS51
+  organism_type: genome_strain
+  peptidase_gene_count: 49
+  publication_count: 1
+  reaction_count: 919
+  reference_database: null
+  reference_proteome: null
+  species: Prochlorococcus marinus
+  strain: SS51
+  transported_metabolite_count: 40
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1046
+  clade: LLII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2041
+  genus: Prochlorococcus
+  go_transport_metabolite_count: 33
+  growth_phases: []
+  interpro_gene_count: 1536
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1499501
+  ncbifam_gene_count: 779
+  nonpeptidase_homolog_gene_count: 9
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Prochlorococcus SS52
+  organism_type: genome_strain
+  peptidase_gene_count: 49
+  publication_count: 1
+  reaction_count: 919
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: SS52
+  transported_metabolite_count: 43
+  treatment_types:
+  - genomic_analysis
 - background_factors:
   - axenic
   - coculture
@@ -1267,10 +2278,12 @@ rows:
   cluster_types:
   - genomic_island
   clustering_analysis_count: 1
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 64
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 7
   gene_count: 1959
   genus: Prochlorococcus
   go_transport_metabolite_count: 38
@@ -1285,11 +2298,12 @@ rows:
   ncbifam_gene_count: 778
   nonpeptidase_homolog_gene_count: 9
   omics_types:
+  - BIOINFORMATIC
   - PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   organism_type: genome_strain
   peptidase_gene_count: 49
-  publication_count: 3
+  publication_count: 4
   reaction_count: 919
   reference_database: null
   reference_proteome: null
@@ -1298,6 +2312,7 @@ rows:
   transported_metabolite_count: 43
   treatment_types:
   - carbon
+  - genomic_analysis
   - nitrogen
   - phosphorus
 - background_factors:
@@ -1309,7 +2324,7 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 4
+  experiment_count: 2
   gene_count: 5487
   genus: Pseudomonas
   go_transport_metabolite_count: 147
@@ -1347,15 +2362,13 @@ rows:
   derived_metric_value_kinds:
   - categorical
   - numeric
-  experiment_count: 9
+  experiment_count: 5
   gene_count: 4368
   genus: Ruegeria
   go_transport_metabolite_count: 83
   growth_phases:
   - acclimated_steady_state
   - exponential
-  - nutrient_limited
-  - stationary
   interpro_gene_count: 3953
   measured_metabolite_count: 0
   ncbi_taxon_id: 89184
@@ -1385,7 +2398,7 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 6
+  experiment_count: 3
   gene_count: 4058
   genus: Shewanella
   go_transport_metabolite_count: 110
@@ -1411,18 +2424,529 @@ rows:
   treatment_types:
   - carbon
   - coculture
+- background_factors: []
+  catalyzed_metabolite_count: 1158
+  clade: WPC1
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2876
+  genus: Synechococcus
+  go_transport_metabolite_count: 48
+  growth_phases: []
+  interpro_gene_count: 2133
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1050624
+  ncbifam_gene_count: 915
+  nonpeptidase_homolog_gene_count: 11
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A15-127
+  organism_type: genome_strain
+  peptidase_gene_count: 68
+  publication_count: 1
+  reaction_count: 1064
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: A15-127
+  transported_metabolite_count: 70
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1140
+  clade: III
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2764
+  genus: Synechococcus
+  go_transport_metabolite_count: 46
+  growth_phases: []
+  interpro_gene_count: 2085
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1050635
+  ncbifam_gene_count: 903
+  nonpeptidase_homolog_gene_count: 12
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A15-24
+  organism_type: genome_strain
+  peptidase_gene_count: 64
+  publication_count: 1
+  reaction_count: 1043
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: A15-24
+  transported_metabolite_count: 80
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1117
+  clade: III
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2814
+  genus: Synechococcus
+  go_transport_metabolite_count: 46
+  growth_phases: []
+  interpro_gene_count: 2118
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1050638
+  ncbifam_gene_count: 903
+  nonpeptidase_homolog_gene_count: 11
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A15-28
+  organism_type: genome_strain
+  peptidase_gene_count: 64
+  publication_count: 1
+  reaction_count: 1030
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: A15-28
+  transported_metabolite_count: 66
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1114
+  clade: II
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3209
+  genus: Synechococcus
+  go_transport_metabolite_count: 41
+  growth_phases: []
+  interpro_gene_count: 2244
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1050646
+  ncbifam_gene_count: 943
+  nonpeptidase_homolog_gene_count: 12
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A15-44
+  organism_type: genome_strain
+  peptidase_gene_count: 64
+  publication_count: 1
+  reaction_count: 1029
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: A15-44
+  transported_metabolite_count: 73
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1152
+  clade: VII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3084
+  genus: Synechococcus
+  go_transport_metabolite_count: 40
+  growth_phases: []
+  interpro_gene_count: 2186
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1050655
+  ncbifam_gene_count: 951
+  nonpeptidase_homolog_gene_count: 13
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A15-60
+  organism_type: genome_strain
+  peptidase_gene_count: 74
+  publication_count: 1
+  reaction_count: 1051
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: A15-60
+  transported_metabolite_count: 64
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1100
+  clade: II
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2826
+  genus: Synechococcus
+  go_transport_metabolite_count: 41
+  growth_phases: []
+  interpro_gene_count: 2032
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1050657
+  ncbifam_gene_count: 894
+  nonpeptidase_homolog_gene_count: 11
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A15-62
+  organism_type: genome_strain
+  peptidase_gene_count: 65
+  publication_count: 1
+  reaction_count: 1015
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: A15-62
+  transported_metabolite_count: 62
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1148
+  clade: VII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3051
+  genus: Synechococcus
+  go_transport_metabolite_count: 40
+  growth_phases: []
+  interpro_gene_count: 2180
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1866938
+  ncbifam_gene_count: 957
+  nonpeptidase_homolog_gene_count: 14
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A18-25c
+  organism_type: genome_strain
+  peptidase_gene_count: 72
+  publication_count: 1
+  reaction_count: 1047
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: A18-25c
+  transported_metabolite_count: 66
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1118
+  clade: III
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2831
+  genus: Synechococcus
+  go_transport_metabolite_count: 42
+  growth_phases: []
+  interpro_gene_count: 2086
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1866939
+  ncbifam_gene_count: 904
+  nonpeptidase_homolog_gene_count: 12
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A18-40
+  organism_type: genome_strain
+  peptidase_gene_count: 59
+  publication_count: 1
+  reaction_count: 1028
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: A18-40
+  transported_metabolite_count: 79
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1121
+  clade: III
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2956
+  genus: Synechococcus
+  go_transport_metabolite_count: 42
+  growth_phases: []
+  interpro_gene_count: 2133
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1866940
+  ncbifam_gene_count: 929
+  nonpeptidase_homolog_gene_count: 12
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus A18-46.1
+  organism_type: genome_strain
+  peptidase_gene_count: 59
+  publication_count: 1
+  reaction_count: 1033
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: A18-46.1
+  transported_metabolite_count: 74
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1138
+  clade: CRD1
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 4456
+  genus: Synechococcus
+  go_transport_metabolite_count: 46
+  growth_phases: []
+  interpro_gene_count: 2579
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1400864
+  ncbifam_gene_count: 1141
+  nonpeptidase_homolog_gene_count: 16
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus BIOS-E4-1
+  organism_type: genome_strain
+  peptidase_gene_count: 75
+  publication_count: 1
+  reaction_count: 1039
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: BIOS-E4-1
+  transported_metabolite_count: 81
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1120
+  clade: CRD1
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3460
+  genus: Synechococcus
+  go_transport_metabolite_count: 44
+  growth_phases: []
+  interpro_gene_count: 2204
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1400865
+  ncbifam_gene_count: 940
+  nonpeptidase_homolog_gene_count: 13
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus BIOS-U3-1
+  organism_type: genome_strain
+  peptidase_gene_count: 71
+  publication_count: 1
+  reaction_count: 1035
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: BIOS-U3-1
+  transported_metabolite_count: 77
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1169
+  clade: V
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3096
+  genus: Synechococcus
+  go_transport_metabolite_count: 49
+  growth_phases: []
+  interpro_gene_count: 2304
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1442551
+  ncbifam_gene_count: 943
+  nonpeptidase_homolog_gene_count: 14
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus BMK-MC-1
+  organism_type: genome_strain
+  peptidase_gene_count: 63
+  publication_count: 1
+  reaction_count: 1067
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: BMK-MC-1
+  transported_metabolite_count: 74
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1120
+  clade: III
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2789
+  genus: Synechococcus
+  go_transport_metabolite_count: 44
+  growth_phases: []
+  interpro_gene_count: 2056
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1442552
+  ncbifam_gene_count: 894
+  nonpeptidase_homolog_gene_count: 13
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus BOUM118
+  organism_type: genome_strain
+  peptidase_gene_count: 57
+  publication_count: 1
+  reaction_count: 1031
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: BOUM118
+  transported_metabolite_count: 79
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1106
+  clade: '5.2'
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3056
+  genus: Synechococcus
+  go_transport_metabolite_count: 32
+  growth_phases: []
+  interpro_gene_count: 2352
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 232348
+  ncbifam_gene_count: 976
+  nonpeptidase_homolog_gene_count: 15
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus CB0101
+  organism_type: genome_strain
+  peptidase_gene_count: 64
+  publication_count: 1
+  reaction_count: 998
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: CB0101
+  transported_metabolite_count: 67
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1100
+  clade: '5.2'
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2799
+  genus: Synechococcus
+  go_transport_metabolite_count: 43
+  growth_phases: []
+  interpro_gene_count: 2148
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 232363
+  ncbifam_gene_count: 914
+  nonpeptidase_homolog_gene_count: 15
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus CB0205
+  organism_type: genome_strain
+  peptidase_gene_count: 71
+  publication_count: 1
+  reaction_count: 1002
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: CB0205
+  transported_metabolite_count: 70
+  treatment_types:
+  - genomic_analysis
 - background_factors:
-  - axenic
   - coculture
   - diel
   catalyzed_metabolite_count: 1128
   clade: I
   cluster_types: []
   clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 11
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 2
   gene_count: 3038
   genus: Synechococcus
   go_transport_metabolite_count: 39
@@ -1434,11 +2958,12 @@ rows:
   ncbifam_gene_count: 909
   nonpeptidase_homolog_gene_count: 17
   omics_types:
+  - BIOINFORMATIC
   - RNASEQ
   organism_name: Synechococcus CC9311
   organism_type: genome_strain
   peptidase_gene_count: 70
-  publication_count: 1
+  publication_count: 2
   reaction_count: 1039
   reference_database: null
   reference_proteome: null
@@ -1447,7 +2972,415 @@ rows:
   transported_metabolite_count: 83
   treatment_types:
   - carbon
-  - coculture
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1160
+  clade: II
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2919
+  genus: Synechococcus
+  go_transport_metabolite_count: 42
+  growth_phases: []
+  interpro_gene_count: 2119
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 110662
+  ncbifam_gene_count: 908
+  nonpeptidase_homolog_gene_count: 14
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus CC9605
+  organism_type: genome_strain
+  peptidase_gene_count: 62
+  publication_count: 1
+  reaction_count: 1049
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: CC9605
+  transported_metabolite_count: 74
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1168
+  clade: EnvC
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3272
+  genus: Synechococcus
+  go_transport_metabolite_count: 45
+  growth_phases: []
+  interpro_gene_count: 2208
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 110663
+  ncbifam_gene_count: 928
+  nonpeptidase_homolog_gene_count: 11
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus CC9616
+  organism_type: genome_strain
+  peptidase_gene_count: 75
+  publication_count: 1
+  reaction_count: 1060
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: CC9616
+  transported_metabolite_count: 78
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1081
+  clade: IV
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2463
+  genus: Synechococcus
+  go_transport_metabolite_count: 37
+  growth_phases: []
+  interpro_gene_count: 1962
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 316279
+  ncbifam_gene_count: 878
+  nonpeptidase_homolog_gene_count: 11
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus CC9902
+  organism_type: genome_strain
+  peptidase_gene_count: 59
+  publication_count: 1
+  reaction_count: 1003
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: CC9902
+  transported_metabolite_count: 69
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1154
+  clade: UC-A
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3116
+  genus: Synechococcus
+  go_transport_metabolite_count: 42
+  growth_phases: []
+  interpro_gene_count: 2281
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1280380
+  ncbifam_gene_count: 937
+  nonpeptidase_homolog_gene_count: 11
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus KORDI-100
+  organism_type: genome_strain
+  peptidase_gene_count: 75
+  publication_count: 1
+  reaction_count: 1055
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: KORDI-100
+  transported_metabolite_count: 72
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1164
+  clade: WPC1
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2722
+  genus: Synechococcus
+  go_transport_metabolite_count: 44
+  growth_phases: []
+  interpro_gene_count: 2117
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 585423
+  ncbifam_gene_count: 900
+  nonpeptidase_homolog_gene_count: 10
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus KORDI-49
+  organism_type: genome_strain
+  peptidase_gene_count: 67
+  publication_count: 1
+  reaction_count: 1066
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: KORDI-49
+  transported_metabolite_count: 79
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1124
+  clade: II
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2896
+  genus: Synechococcus
+  go_transport_metabolite_count: 43
+  growth_phases: []
+  interpro_gene_count: 2124
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 585425
+  ncbifam_gene_count: 915
+  nonpeptidase_homolog_gene_count: 14
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus KORDI-52
+  organism_type: genome_strain
+  peptidase_gene_count: 65
+  publication_count: 1
+  reaction_count: 1033
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: KORDI-52
+  transported_metabolite_count: 64
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1098
+  clade: II
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2543
+  genus: Synechococcus
+  go_transport_metabolite_count: 39
+  growth_phases: []
+  interpro_gene_count: 1903
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1442553
+  ncbifam_gene_count: 868
+  nonpeptidase_homolog_gene_count: 13
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus M16.1
+  organism_type: genome_strain
+  peptidase_gene_count: 57
+  publication_count: 1
+  reaction_count: 1013
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: M16.1
+  transported_metabolite_count: 71
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1144
+  clade: VI
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2750
+  genus: Synechococcus
+  go_transport_metabolite_count: 46
+  growth_phases: []
+  interpro_gene_count: 2111
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1442554
+  ncbifam_gene_count: 894
+  nonpeptidase_homolog_gene_count: 12
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus MEDNS5
+  organism_type: genome_strain
+  peptidase_gene_count: 68
+  publication_count: 1
+  reaction_count: 1047
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: MEDNS5
+  transported_metabolite_count: 72
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1136
+  clade: '5.3'
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2709
+  genus: Synechococcus
+  go_transport_metabolite_count: 47
+  growth_phases: []
+  interpro_gene_count: 2039
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 221341
+  ncbifam_gene_count: 900
+  nonpeptidase_homolog_gene_count: 14
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus MINOS11
+  organism_type: genome_strain
+  peptidase_gene_count: 65
+  publication_count: 1
+  reaction_count: 1023
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: MINOS11
+  transported_metabolite_count: 68
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1105
+  clade: CRD1
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3080
+  genus: Synechococcus
+  go_transport_metabolite_count: 39
+  growth_phases: []
+  interpro_gene_count: 2048
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 166309
+  ncbifam_gene_count: 871
+  nonpeptidase_homolog_gene_count: 14
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus MITS9220
+  organism_type: genome_strain
+  peptidase_gene_count: 64
+  publication_count: 1
+  reaction_count: 1024
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: MITS9220
+  transported_metabolite_count: 72
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1132
+  clade: I
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3047
+  genus: Synechococcus
+  go_transport_metabolite_count: 41
+  growth_phases: []
+  interpro_gene_count: 2092
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1386941
+  ncbifam_gene_count: 907
+  nonpeptidase_homolog_gene_count: 16
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus MVIR-18-1
+  organism_type: genome_strain
+  peptidase_gene_count: 62
+  publication_count: 1
+  reaction_count: 1040
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: MVIR-18-1
+  transported_metabolite_count: 76
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1159
+  clade: VII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2949
+  genus: Synechococcus
+  go_transport_metabolite_count: 41
+  growth_phases: []
+  interpro_gene_count: 2178
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1442555
+  ncbifam_gene_count: 925
+  nonpeptidase_homolog_gene_count: 14
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus NOUM97013
+  organism_type: genome_strain
+  peptidase_gene_count: 72
+  publication_count: 1
+  reaction_count: 1055
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: NOUM97013
+  transported_metabolite_count: 74
+  treatment_types:
+  - genomic_analysis
 - background_factors:
   - light
   catalyzed_metabolite_count: 1104
@@ -1457,7 +3390,7 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 6
+  experiment_count: 3
   gene_count: 3207
   genus: Picosynechococcus
   go_transport_metabolite_count: 48
@@ -1483,6 +3416,482 @@ rows:
   treatment_types:
   - carbon
   - coculture
+- background_factors: []
+  catalyzed_metabolite_count: 1167
+  clade: VI
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2865
+  genus: Synechococcus
+  go_transport_metabolite_count: 46
+  growth_phases: []
+  interpro_gene_count: 2236
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1442556
+  ncbifam_gene_count: 936
+  nonpeptidase_homolog_gene_count: 16
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus PROS-7-1
+  organism_type: genome_strain
+  peptidase_gene_count: 72
+  publication_count: 1
+  reaction_count: 1065
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: PROS-7-1
+  transported_metabolite_count: 75
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1093
+  clade: I
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2771
+  genus: Synechococcus
+  go_transport_metabolite_count: 39
+  growth_phases: []
+  interpro_gene_count: 1938
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1968775
+  ncbifam_gene_count: 870
+  nonpeptidase_homolog_gene_count: 13
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus PROS-9-1
+  organism_type: genome_strain
+  peptidase_gene_count: 57
+  publication_count: 1
+  reaction_count: 1012
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: PROS-9-1
+  transported_metabolite_count: 78
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1156
+  clade: II
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3147
+  genus: Synechococcus
+  go_transport_metabolite_count: 42
+  growth_phases: []
+  interpro_gene_count: 2162
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1400866
+  ncbifam_gene_count: 923
+  nonpeptidase_homolog_gene_count: 13
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus PROS-U-1
+  organism_type: genome_strain
+  peptidase_gene_count: 69
+  publication_count: 1
+  reaction_count: 1064
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: PROS-U-1
+  transported_metabolite_count: 75
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1126
+  clade: '5.3'
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2575
+  genus: Synechococcus
+  go_transport_metabolite_count: 28
+  growth_phases: []
+  interpro_gene_count: 1995
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 316278
+  ncbifam_gene_count: 883
+  nonpeptidase_homolog_gene_count: 12
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus RCC307
+  organism_type: genome_strain
+  peptidase_gene_count: 64
+  publication_count: 1
+  reaction_count: 1013
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: RCC307
+  transported_metabolite_count: 66
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1202
+  clade: I
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3787
+  genus: Synechococcus
+  go_transport_metabolite_count: 44
+  growth_phases: []
+  interpro_gene_count: 2355
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1442557
+  ncbifam_gene_count: 933
+  nonpeptidase_homolog_gene_count: 14
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus ROS8604
+  organism_type: genome_strain
+  peptidase_gene_count: 66
+  publication_count: 1
+  reaction_count: 1090
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: ROS8604
+  transported_metabolite_count: 85
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1107
+  clade: II
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2983
+  genus: Synechococcus
+  go_transport_metabolite_count: 41
+  growth_phases: []
+  interpro_gene_count: 2081
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 221345
+  ncbifam_gene_count: 902
+  nonpeptidase_homolog_gene_count: 11
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus RS9902
+  organism_type: genome_strain
+  peptidase_gene_count: 67
+  publication_count: 1
+  reaction_count: 1023
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: RS9902
+  transported_metabolite_count: 74
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1110
+  clade: II
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3004
+  genus: Synechococcus
+  go_transport_metabolite_count: 41
+  growth_phases: []
+  interpro_gene_count: 2160
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 221350
+  ncbifam_gene_count: 928
+  nonpeptidase_homolog_gene_count: 12
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus RS9907
+  organism_type: genome_strain
+  peptidase_gene_count: 66
+  publication_count: 1
+  reaction_count: 1030
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: RS9907
+  transported_metabolite_count: 73
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1129
+  clade: VIII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2849
+  genus: Synechococcus
+  go_transport_metabolite_count: 44
+  growth_phases: []
+  interpro_gene_count: 2269
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 221352
+  ncbifam_gene_count: 962
+  nonpeptidase_homolog_gene_count: 17
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus RS9909
+  organism_type: genome_strain
+  peptidase_gene_count: 60
+  publication_count: 1
+  reaction_count: 1020
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: RS9909
+  transported_metabolite_count: 76
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1112
+  clade: III
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2902
+  genus: Synechococcus
+  go_transport_metabolite_count: 47
+  growth_phases: []
+  interpro_gene_count: 2096
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 221358
+  ncbifam_gene_count: 909
+  nonpeptidase_homolog_gene_count: 13
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus RS9915
+  organism_type: genome_strain
+  peptidase_gene_count: 59
+  publication_count: 1
+  reaction_count: 1027
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: RS9915
+  transported_metabolite_count: 75
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1175
+  clade: IX
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2926
+  genus: Synechococcus
+  go_transport_metabolite_count: 41
+  growth_phases: []
+  interpro_gene_count: 2166
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 221359
+  ncbifam_gene_count: 939
+  nonpeptidase_homolog_gene_count: 14
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus RS9916
+  organism_type: genome_strain
+  peptidase_gene_count: 70
+  publication_count: 1
+  reaction_count: 1039
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: RS9916
+  transported_metabolite_count: 72
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1120
+  clade: VIII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2799
+  genus: Synechococcus
+  go_transport_metabolite_count: 42
+  growth_phases: []
+  interpro_gene_count: 2244
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 221360
+  ncbifam_gene_count: 950
+  nonpeptidase_homolog_gene_count: 14
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus RS9917
+  organism_type: genome_strain
+  peptidase_gene_count: 61
+  publication_count: 1
+  reaction_count: 1012
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: RS9917
+  transported_metabolite_count: 72
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1127
+  clade: I
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3416
+  genus: Synechococcus
+  go_transport_metabolite_count: 43
+  growth_phases: []
+  interpro_gene_count: 2197
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1050714
+  ncbifam_gene_count: 916
+  nonpeptidase_homolog_gene_count: 15
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus SYN20
+  organism_type: genome_strain
+  peptidase_gene_count: 64
+  publication_count: 1
+  reaction_count: 1036
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: SYN20
+  transported_metabolite_count: 89
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1081
+  clade: II
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2700
+  genus: Synechococcus
+  go_transport_metabolite_count: 41
+  growth_phases: []
+  interpro_gene_count: 1935
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 1442558
+  ncbifam_gene_count: 883
+  nonpeptidase_homolog_gene_count: 13
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus TAK9802
+  organism_type: genome_strain
+  peptidase_gene_count: 60
+  publication_count: 1
+  reaction_count: 993
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: TAK9802
+  transported_metabolite_count: 72
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1156
+  clade: '5.2'
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3353
+  genus: Synechococcus
+  go_transport_metabolite_count: 49
+  growth_phases: []
+  interpro_gene_count: 2664
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 69042
+  ncbifam_gene_count: 1071
+  nonpeptidase_homolog_gene_count: 14
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus WH5701
+  organism_type: genome_strain
+  peptidase_gene_count: 74
+  publication_count: 1
+  reaction_count: 1046
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: WH5701
+  transported_metabolite_count: 73
+  treatment_types:
+  - genomic_analysis
 - background_factors:
   - coculture
   - darkness
@@ -1493,10 +3902,12 @@ rows:
   cluster_types:
   - time_course
   clustering_analysis_count: 1
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 73
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 11
   gene_count: 2590
   genus: Synechococcus
   go_transport_metabolite_count: 30
@@ -1513,6 +3924,7 @@ rows:
   ncbifam_gene_count: 884
   nonpeptidase_homolog_gene_count: 9
   omics_types:
+  - BIOINFORMATIC
   - EXOPROTEOMICS
   - MICROARRAY
   - PROTEOMICS
@@ -1520,7 +3932,7 @@ rows:
   organism_name: Synechococcus WH7803
   organism_type: genome_strain
   peptidase_gene_count: 68
-  publication_count: 6
+  publication_count: 7
   reaction_count: 1045
   reference_database: null
   reference_proteome: null
@@ -1530,9 +3942,111 @@ rows:
   treatment_types:
   - carbon
   - coculture
+  - genomic_analysis
   - viral
+- background_factors: []
+  catalyzed_metabolite_count: 1161
+  clade: VI
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2909
+  genus: Synechococcus
+  go_transport_metabolite_count: 47
+  growth_phases: []
+  interpro_gene_count: 2177
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 59931
+  ncbifam_gene_count: 904
+  nonpeptidase_homolog_gene_count: 14
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus WH7805
+  organism_type: genome_strain
+  peptidase_gene_count: 61
+  publication_count: 1
+  reaction_count: 1058
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: WH7805
+  transported_metabolite_count: 85
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1157
+  clade: I
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 3067
+  genus: Synechococcus
+  go_transport_metabolite_count: 42
+  growth_phases: []
+  interpro_gene_count: 2216
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 166318
+  ncbifam_gene_count: 914
+  nonpeptidase_homolog_gene_count: 12
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus WH8016
+  organism_type: genome_strain
+  peptidase_gene_count: 69
+  publication_count: 1
+  reaction_count: 1062
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: WH8016
+  transported_metabolite_count: 86
+  treatment_types:
+  - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 1161
+  clade: VIII
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2938
+  genus: Synechococcus
+  go_transport_metabolite_count: 45
+  growth_phases: []
+  interpro_gene_count: 2284
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 59932
+  ncbifam_gene_count: 993
+  nonpeptidase_homolog_gene_count: 13
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus WH8101
+  organism_type: genome_strain
+  peptidase_gene_count: 69
+  publication_count: 1
+  reaction_count: 1044
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: WH8101
+  transported_metabolite_count: 81
+  treatment_types:
+  - genomic_analysis
 - background_factors:
-  - axenic
   - coculture
   - darkness
   - diel
@@ -1541,10 +4055,12 @@ rows:
   clade: III
   cluster_types: []
   clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 77
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 8
   gene_count: 2830
   genus: Parasynechococcus
   go_transport_metabolite_count: 62
@@ -1558,14 +4074,14 @@ rows:
   ncbifam_gene_count: 908
   nonpeptidase_homolog_gene_count: 13
   omics_types:
-  - EXOPROTEOMICS
+  - BIOINFORMATIC
   - MICROARRAY
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus WH8102
   organism_type: genome_strain
   peptidase_gene_count: 61
-  publication_count: 5
+  publication_count: 6
   reaction_count: 1027
   reference_database: null
   reference_proteome: null
@@ -1575,17 +4091,54 @@ rows:
   treatment_types:
   - carbon
   - coculture
+  - genomic_analysis
   - viral
+- background_factors: []
+  catalyzed_metabolite_count: 1101
+  clade: III
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 1
+  gene_count: 2876
+  genus: Synechococcus
+  go_transport_metabolite_count: 27
+  growth_phases: []
+  interpro_gene_count: 2076
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 29410
+  ncbifam_gene_count: 913
+  nonpeptidase_homolog_gene_count: 14
+  omics_types:
+  - BIOINFORMATIC
+  organism_name: Synechococcus WH8103
+  organism_type: genome_strain
+  peptidase_gene_count: 58
+  publication_count: 1
+  reaction_count: 1018
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: WH8103
+  transported_metabolite_count: 77
+  treatment_types:
+  - genomic_analysis
 - background_factors:
   - diel
   catalyzed_metabolite_count: 1058
   clade: II
   cluster_types: []
   clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 3
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 2
   gene_count: 2681
   genus: Synechococcus
   go_transport_metabolite_count: 38
@@ -1597,11 +4150,12 @@ rows:
   ncbifam_gene_count: 858
   nonpeptidase_homolog_gene_count: 12
   omics_types:
+  - BIOINFORMATIC
   - MICROARRAY
   organism_name: Synechococcus WH8109
   organism_type: genome_strain
   peptidase_gene_count: 60
-  publication_count: 1
+  publication_count: 2
   reaction_count: 983
   reference_database: null
   reference_proteome: null
@@ -1609,6 +4163,7 @@ rows:
   strain: WH8109
   transported_metabolite_count: 68
   treatment_types:
+  - genomic_analysis
   - viral
 - background_factors:
   - light
@@ -1619,7 +4174,7 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 4
+  experiment_count: 2
   gene_count: 2717
   genus: Synechococcus
   go_transport_metabolite_count: 58
@@ -1688,10 +4243,12 @@ rows:
   clade: IV
   cluster_types: []
   clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 60
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 5
   gene_count: 2567
   genus: Synechococcus
   go_transport_metabolite_count: 38
@@ -1704,11 +4261,12 @@ rows:
   ncbifam_gene_count: 884
   nonpeptidase_homolog_gene_count: 10
   omics_types:
+  - BIOINFORMATIC
   - PROTEOMICS
   organism_name: Synechococcus sp. BL107
   organism_type: genome_strain
   peptidase_gene_count: 61
-  publication_count: 1
+  publication_count: 2
   reaction_count: 989
   reference_database: null
   reference_proteome: null
@@ -1717,6 +4275,7 @@ rows:
   transported_metabolite_count: 62
   treatment_types:
   - carbon
+  - genomic_analysis
 - background_factors:
   - coculture
   catalyzed_metabolite_count: 1003
@@ -1752,8 +4311,7 @@ rows:
   treatment_types:
   - light
   - oxygen
-- background_factors:
-  - light
+- background_factors: []
   catalyzed_metabolite_count: 0
   clade: null
   cluster_types: []
@@ -1761,19 +4319,17 @@ rows:
   compartments: []
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  experiment_count: 1
+  experiment_count: 0
   gene_count: 0
   genus: Vibrio
   go_transport_metabolite_count: 0
-  growth_phases:
-  - exponential
+  growth_phases: []
   interpro_gene_count: 0
   measured_metabolite_count: 0
   ncbi_taxon_id: 670
   ncbifam_gene_count: 0
   nonpeptidase_homolog_gene_count: 0
-  omics_types:
-  - MICROARRAY
+  omics_types: []
   organism_name: Vibrio parahaemolyticus
   organism_type: treatment
   peptidase_gene_count: 0
@@ -1784,5 +4340,4 @@ rows:
   species: null
   strain: null
   transported_metabolite_count: 0
-  treatment_types:
-  - coculture
+  treatment_types: []

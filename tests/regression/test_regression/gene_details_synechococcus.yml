@@ -63,9 +63,10 @@ rows:
   categorical_metric_types_observed: []
   cazy_family_count: 0
   closest_ortholog_genera:
+  - Cyanobium
   - Prochlorococcus
   - Synechococcus
-  closest_ortholog_group_size: 22
+  closest_ortholog_group_size: 96
   cluster_membership_count: 0
   cluster_types: []
   compartments_observed: []

@@ -35,7 +35,7 @@ not_found:
 offset: 0
 resolved_aliases: {}
 results:
-- catalyst_gene_count: 284
+- catalyst_gene_count: 733
   chebi_id: '4167'
   elements:
   - C
@@ -46,7 +46,7 @@ results:
   - metabolism
   - transport
   formula: C6H12O6
-  go_transport_organism_count: 32
+  go_transport_organism_count: 101
   go_transport_organism_names:
   - Alteromonas (MarRef v6)
   - Alteromonas macleodii AD45
@@ -58,25 +58,94 @@ results:
   - Alteromonas macleodii MIT1002
   - Alteromonas mediterranea AltDE
   - Alteromonas mediterranea AltDE1
+  - Cyanobium NS01
+  - Cyanobium PCC6307
+  - Cyanobium PCC7001
   - Prochlorococcus AS9601
+  - Prochlorococcus EQPAC1
+  - Prochlorococcus GP2
+  - Prochlorococcus LG
   - Prochlorococcus MED4
+  - Prochlorococcus MIT0601
+  - Prochlorococcus MIT0602
+  - Prochlorococcus MIT0603
   - Prochlorococcus MIT0604
+  - Prochlorococcus MIT0701
+  - Prochlorococcus MIT0702
+  - Prochlorococcus MIT0703
   - Prochlorococcus MIT0801
   - Prochlorococcus MIT1327
+  - Prochlorococcus MIT9107
+  - Prochlorococcus MIT9116
+  - Prochlorococcus MIT9123
+  - Prochlorococcus MIT9201
   - Prochlorococcus MIT9202
+  - Prochlorococcus MIT9211
   - Prochlorococcus MIT9215
   - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9302
   - Prochlorococcus MIT9303
+  - Prochlorococcus MIT9311
   - Prochlorococcus MIT9312
   - Prochlorococcus MIT9313
+  - Prochlorococcus MIT9314
+  - Prochlorococcus MIT9321
+  - Prochlorococcus MIT9322
+  - Prochlorococcus MIT9401
   - Prochlorococcus MIT9515
   - Prochlorococcus NATL1A
   - Prochlorococcus NATL2A
   - Prochlorococcus PAC1
   - Prochlorococcus SB
+  - Prochlorococcus SS2
+  - Prochlorococcus SS35
+  - Prochlorococcus SS51
+  - Prochlorococcus SS52
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   - Shewanella sp. W3-18-1
+  - Synechococcus A15-127
+  - Synechococcus A15-24
+  - Synechococcus A15-28
+  - Synechococcus A15-44
+  - Synechococcus A15-60
+  - Synechococcus A15-62
+  - Synechococcus A18-25c
+  - Synechococcus A18-40
+  - Synechococcus A18-46.1
+  - Synechococcus BIOS-E4-1
+  - Synechococcus BIOS-U3-1
+  - Synechococcus BMK-MC-1
+  - Synechococcus BOUM118
+  - Synechococcus CB0205
   - Synechococcus CC9311
+  - Synechococcus CC9605
+  - Synechococcus CC9616
+  - Synechococcus CC9902
+  - Synechococcus KORDI-100
+  - Synechococcus KORDI-49
+  - Synechococcus KORDI-52
+  - Synechococcus M16.1
+  - Synechococcus MEDNS5
+  - Synechococcus MINOS11
+  - Synechococcus MITS9220
+  - Synechococcus MVIR-18-1
+  - Synechococcus NOUM97013
+  - Synechococcus PROS-7-1
+  - Synechococcus PROS-9-1
+  - Synechococcus PROS-U-1
+  - Synechococcus ROS8604
+  - Synechococcus RS9902
+  - Synechococcus RS9907
+  - Synechococcus RS9909
+  - Synechococcus RS9915
+  - Synechococcus RS9916
+  - Synechococcus RS9917
+  - Synechococcus SYN20
+  - Synechococcus TAK9802
+  - Synechococcus WH5701
+  - Synechococcus WH7805
+  - Synechococcus WH8016
+  - Synechococcus WH8101
   - Synechococcus WH8102
   - Synechococcus WH8109
   - Synechococcus sp. BL107
@@ -89,7 +158,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00031
   name: D-Glucose
-  organism_count: 43
+  organism_count: 117
   pathway_count: 21
   pathway_ids:
   - kegg.pathway:ko00010
@@ -116,11 +185,11 @@ results:
   stereo_relatives:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00221'',
     ''name'': ''beta-D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
-    192}'
+    492}'
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00267'',
     ''name'': ''alpha-D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
-    183}'
-  - '{''transporter_gene_count'': 61, ''metabolite_id'': ''chebi:17234'', ''name'':
+    508}'
+  - '{''transporter_gene_count'': 133, ''metabolite_id'': ''chebi:17234'', ''name'':
     ''glucose'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'': 0}'
   structure_kind: defined
   transporter_count: 2
@@ -181,7 +250,7 @@ top_organisms:
   organism_name: Alteromonas mediterranea AltDE1
 - count: 1
   organism_name: Alteromonas (MarRef v6)
-total_entries: 3178
+total_entries: 3251
 total_matching: 1
 truncated: false
 warnings: []

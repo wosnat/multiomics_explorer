@@ -1,11 +1,11 @@
 by_evidence_source:
 - count: 616
   evidence_source: metabolism
-- count: 134
+- count: 147
   evidence_source: transport
 - count: 74
   evidence_source: metabolomics
-- count: 47
+- count: 49
   evidence_source: go_transport
 by_kegg_brite_class:
 - count: 24
@@ -77,7 +77,7 @@ not_found:
 offset: 0
 resolved_aliases: {}
 results:
-- catalyst_gene_count: 6041
+- catalyst_gene_count: 15995
   chebi_id: '15422'
   elements:
   - C
@@ -103,7 +103,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00002
   name: ATP
-  organism_count: 43
+  organism_count: 117
   pathway_count: 18
   pathway_ids:
   - kegg.pathway:ko00190
@@ -127,7 +127,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 3564
+- catalyst_gene_count: 9346
   chebi_id: '16761'
   elements:
   - C
@@ -157,7 +157,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00008
   name: ADP
-  organism_count: 43
+  organism_count: 117
   pathway_count: 13
   pathway_ids:
   - kegg.pathway:ko00190
@@ -176,7 +176,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 3302
+- catalyst_gene_count: 7821
   chebi_id: '15846'
   elements:
   - C
@@ -205,7 +205,7 @@ results:
   measured_paper_count: 2
   metabolite_id: kegg.compound:C00003
   name: NAD+
-  organism_count: 43
+  organism_count: 117
   pathway_count: 8
   pathway_ids:
   - kegg.pathway:ko00190
@@ -219,7 +219,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 3017
+- catalyst_gene_count: 7078
   chebi_id: '16908'
   elements:
   - C
@@ -246,7 +246,7 @@ results:
   measured_paper_count: 1
   metabolite_id: kegg.compound:C00004
   name: NADH
-  organism_count: 43
+  organism_count: 117
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00190
@@ -255,7 +255,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 2464
+- catalyst_gene_count: 6235
   chebi_id: '16027'
   elements:
   - C
@@ -266,6 +266,7 @@ results:
   evidence_sources:
   - metabolism
   - metabolomics
+  - transport
   formula: C10H12N5O7P
   go_transport_organism_count: null
   go_transport_organism_names: null
@@ -287,7 +288,7 @@ results:
   measured_paper_count: 2
   metabolite_id: kegg.compound:C00020
   name: AMP
-  organism_count: 43
+  organism_count: 117
   pathway_count: 12
   pathway_ids:
   - kegg.pathway:ko00230
@@ -343,6 +344,16 @@ top_metabolite_pathways:
 top_organisms:
 - count: 630
   organism_name: Prochlorococcus MED4
+- count: 628
+  organism_name: Prochlorococcus EQPAC1
+- count: 618
+  organism_name: Prochlorococcus MIT9314
+- count: 615
+  organism_name: Prochlorococcus MIT9116
+- count: 615
+  organism_name: Prochlorococcus MIT9107
+- count: 615
+  organism_name: Prochlorococcus MIT9123
 - count: 606
   organism_name: Prochlorococcus MIT9515
 - count: 605
@@ -351,17 +362,7 @@ top_organisms:
   organism_name: Prochlorococcus SB
 - count: 603
   organism_name: Prochlorococcus MIT9215
-- count: 601
-  organism_name: Prochlorococcus MIT9301
-- count: 601
-  organism_name: Prochlorococcus MIT9303
-- count: 601
-  organism_name: Prochlorococcus MIT1327
-- count: 601
-  organism_name: Prochlorococcus MIT0801
-- count: 601
-  organism_name: Prochlorococcus MIT9312
-total_entries: 3178
+total_entries: 3251
 total_matching: 630
 truncated: true
 warnings:

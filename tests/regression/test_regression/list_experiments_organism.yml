@@ -1,5 +1,5 @@
 case_id: list_experiments_organism
-row_count: 44
+row_count: 45
 rows:
 - authors:
   - Jordan Rozum
@@ -744,6 +744,53 @@ rows:
   - '1953'
   treatment_type:
   - salt
+- authors:
+  - Benjamin A. Ford
+  - Bhumika S. Shah
+  - Bridget C. Mabbutt
+  - Deepa Varkey
+  - Geraldine J. Sullivan
+  - Hannah Zhu
+  - Ian T. Paulsen
+  - Lisa Moore
+  - Martin Ostrowski
+  background_factors: []
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: null
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1042/BST20200244_med4_sbp_annotation
+  experiment_name: Prochlorococcus MED4 ABC substrate-binding protein annotation survey
+    (Ford 2021)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: BIOINFORMATIC
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1042/BST20200244
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: null
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - genomic_analysis
 - authors:
   - Andres Cubillos-Ruiz
   - Iva Neveux

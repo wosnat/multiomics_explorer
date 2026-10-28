@@ -260,8 +260,10 @@ even on `matched` (it may be a growth-state match).
 no perturbation names *what was measured* instead (`rna_decay`,
 `tss_mapping`, `genomic_analysis`); filter on those to isolate
 characterization studies, never test for `[]`. `background_factors` is
-likewise dense on `Experiment`; `[]` only on sequence-only clustering
-analyses. **`growth_phases` is an open vocabulary** — enumerate live via
+never null on `Experiment` and non-empty on every wet-lab experiment; `[]`
+only on annotation-only `genomic_analysis` experiments
+(`omics_type='BIOINFORMATIC'`, no sample or culture) and on sequence-only
+clustering analyses. **`growth_phases` is an open vocabulary** — enumerate live via
 `list_filter_values(filter_type='growth_phase')`; `treatment_type`,
 `cluster_type` and the trust vocabularies are closed.
 
@@ -518,8 +520,8 @@ additionally accepts an exact `preferred_name` for gene-less taxa;
 `list_metabolites(organism_names=[...])` is exact, case-insensitive on
 `preferred_name` only.
 
-Enumerate with `list_organisms()` (47 `OrganismTaxon` nodes, 47 distinct
-names, 43 with genes). In `run_cypher`, join genes to organisms via
+Enumerate with `list_organisms()` (121 `OrganismTaxon` nodes, 121 distinct
+names, 117 with genes). In `run_cypher`, join genes to organisms via
 `Gene_belongs_to_organism`.
 
 `organism=` filters the **profiled organism only** (`list_experiments`,

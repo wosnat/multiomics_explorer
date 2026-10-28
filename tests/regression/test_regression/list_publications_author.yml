@@ -151,7 +151,7 @@ rows:
   - whole_cell
   derived_metric_count: 0
   derived_metric_value_kinds: []
-  discussed_gene_count: 6
+  discussed_gene_count: 9
   discussed_pathway_count: 4
   doi: 10.1128/msystems.01261-22
   experiment_count: 6

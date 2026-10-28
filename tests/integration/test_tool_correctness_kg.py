@@ -252,7 +252,7 @@ class TestGeneOverviewCorrectnessKG:
             "MATCH (og)<-[:Gene_in_ortholog_group]-(m:Gene) RETURN count(m)", lt="PMM1428")
         assert closest_size >= 14
         assert r["closest_ortholog_group_size"] == closest_size
-        assert set(r["closest_ortholog_genera"]) == {"Prochlorococcus", "Synechococcus"}
+        assert set(r["closest_ortholog_genera"]) == {"Cyanobium", "Prochlorococcus", "Synechococcus"}
 
     def test_single_gene_alt(self, conn):
         """EZ55_00275: empty annotation_types, no expression, small ortholog group."""
@@ -956,8 +956,8 @@ class TestSearchOntologyBrowseCorrectnessKG:
             ontology="merops", search_text=None, level=1, limit=5)
         rows = conn.execute_query(cypher, **params)
         assert [r["id"] for r in rows] == [
-            "merops.family:S33", "merops.family:S09", "merops.family:C26",
-            "merops.family:M38", "merops.family:C44",
+            "merops.family:S33", "merops.family:C26", "merops.family:S09",
+            "merops.family:C44", "merops.family:S14",
         ]
         live = {x["id"]: x["gc"] for x in run_query(
             "MATCH (t:MeropsFamily) WHERE t.id IN $ids RETURN t.id AS id, t.gene_count AS gc",

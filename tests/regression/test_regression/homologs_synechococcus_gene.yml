@@ -25,8 +25,8 @@ rows:
   source: eggnog
   specificity_rank: 2
   taxonomic_level: Cyanobacteria
-- consensus_gene_name: ftsH
-  consensus_product: ATP-dependent zinc metalloprotease FtsH
+- consensus_gene_name: ftsH2
+  consensus_product: possible photosystem II D1 repair protein FtsH3
   group_id: eggnog:COG0465@2
   locus_tag: SYNW0305
   organism_name: Synechococcus WH8102

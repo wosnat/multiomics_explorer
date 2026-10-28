@@ -1,60 +1,60 @@
 case_id: search_ontology_cyanorak_role
 row_count: 12
 rows:
-- gene_count: 1560
+- gene_count: 7355
   id: cyanorak.role:F
   is_informative: true
   level: 0
   name: DNA metabolism
-  organism_count: 22
+  organism_count: 96
   score: 1.6618
   tree: null
   tree_code: null
-- gene_count: 1470
+- gene_count: 6897
   id: cyanorak.role:F.1
   is_informative: true
   level: 1
   name: DNA metabolism > DNA replication, recombination, and repair
-  organism_count: 22
+  organism_count: 96
   score: 1.5978
   tree: null
   tree_code: null
-- gene_count: 110
+- gene_count: 480
   id: cyanorak.role:F.1.1
   is_informative: true
   level: 2
   name: DNA metabolism > DNA replication, recombination, and repair > Base excision
     repair
-  organism_count: 22
+  organism_count: 96
   score: 1.4145
   tree: null
   tree_code: null
-- gene_count: 88
+- gene_count: 394
   id: cyanorak.role:F.1.2
   is_informative: true
   level: 2
   name: DNA metabolism > DNA replication, recombination, and repair > Nucleotide excision
     repair
-  organism_count: 22
+  organism_count: 96
   score: 1.4145
   tree: null
   tree_code: null
-- gene_count: 54
+- gene_count: 258
   id: cyanorak.role:F.1.3
   is_informative: true
   level: 2
   name: DNA metabolism > DNA replication, recombination, and repair > Mismatch excision
     repair
-  organism_count: 22
+  organism_count: 96
   score: 1.4145
   tree: null
   tree_code: null
-- gene_count: 311
+- gene_count: 1410
   id: cyanorak.role:F.1.4
   is_informative: true
   level: 2
   name: DNA metabolism > DNA replication, recombination, and repair > Homologous recombination
-  organism_count: 22
+  organism_count: 96
   score: 1.4708
   tree: null
   tree_code: null
@@ -68,49 +68,49 @@ rows:
   score: 1.3625
   tree: null
   tree_code: null
-- gene_count: 41
+- gene_count: 257
   id: cyanorak.role:F.1.6
   is_informative: true
   level: 2
   name: DNA metabolism > DNA replication, recombination, and repair > Reversal of
     damage
-  organism_count: 18
+  organism_count: 80
   score: 1.4145
   tree: null
   tree_code: null
-- gene_count: 80
+- gene_count: 379
   id: cyanorak.role:F.2
   is_informative: true
   level: 1
   name: DNA metabolism > Restriction/modification
-  organism_count: 20
+  organism_count: 87
   score: 1.4087
   tree: null
   tree_code: null
-- gene_count: 36
+- gene_count: 205
   id: cyanorak.role:F.3
   is_informative: true
   level: 1
   name: DNA metabolism > Other
-  organism_count: 18
+  organism_count: 80
   score: 1.5248
   tree: null
   tree_code: null
-- gene_count: 458
+- gene_count: 2447
   id: cyanorak.role:N.1
   is_informative: true
   level: 1
   name: Regulatory functions > DNA interactions
-  organism_count: 22
+  organism_count: 96
   score: 1.4087
   tree: null
   tree_code: null
-- gene_count: 190
+- gene_count: 968
   id: cyanorak.role:P.2
   is_informative: true
   level: 1
   name: Transcription > DNA-dependent RNA polymerase
-  organism_count: 22
+  organism_count: 96
   score: 1.3091
   tree: null
   tree_code: null

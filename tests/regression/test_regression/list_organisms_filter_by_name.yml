@@ -20,12 +20,12 @@ rows:
   compartments:
   - vesicle
   - whole_cell
-  derived_metric_count: 26
+  derived_metric_count: 28
   derived_metric_value_kinds:
   - boolean
   - categorical
   - numeric
-  experiment_count: 118
+  experiment_count: 45
   gene_count: 1973
   genus: Prochlorococcus
   go_transport_metabolite_count: 46
@@ -45,6 +45,7 @@ rows:
   ncbifam_gene_count: 744
   nonpeptidase_homolog_gene_count: 8
   omics_types:
+  - BIOINFORMATIC
   - MICROARRAY
   - PAIRED_RNASEQ_PROTEOME
   - PROTEOMICS
@@ -54,7 +55,7 @@ rows:
   organism_name: Prochlorococcus MED4
   organism_type: genome_strain
   peptidase_gene_count: 50
-  publication_count: 20
+  publication_count: 21
   reaction_count: 943
   reference_database: null
   reference_proteome: null
@@ -67,6 +68,7 @@ rows:
   - compartment
   - darkness
   - diel
+  - genomic_analysis
   - growth_phase
   - iron
   - light
@@ -86,10 +88,12 @@ rows:
   - condition_comparison
   - genomic_island
   clustering_analysis_count: 2
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 8
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 5
   gene_count: 1926
   genus: Prochlorococcus
   go_transport_metabolite_count: 46
@@ -101,12 +105,13 @@ rows:
   ncbifam_gene_count: 774
   nonpeptidase_homolog_gene_count: 10
   omics_types:
+  - BIOINFORMATIC
   - METABOLOMICS
   - RNASEQ
   organism_name: Prochlorococcus MIT9301
   organism_type: genome_strain
   peptidase_gene_count: 49
-  publication_count: 3
+  publication_count: 4
   reaction_count: 945
   reference_database: null
   reference_proteome: null
@@ -114,6 +119,7 @@ rows:
   strain: MIT9301
   transported_metabolite_count: 36
   treatment_types:
+  - genomic_analysis
   - growth_phase
   - phosphorus
   - temperature

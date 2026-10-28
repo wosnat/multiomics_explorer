@@ -94,9 +94,9 @@ list_filter_values(filter_type="gene_category")
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "Unknown", "count": 41682},
-    {"value": "Amino acid metabolism", "count": 7709},
-    {"value": "Translation", "count": 7180},
+    {"value": "Unknown", "count": 113921},
+    {"value": "Stress response and adaptation", "count": 23297},
+    {"value": "Coenzyme metabolism", "count": 21174},
     ...
   ]
 }
@@ -118,7 +118,7 @@ list_filter_values(filter_type="brite_tree")
   "warnings": [],
   "results": [
     {"value": "chaperones", "count": 27, "tree_code": "ko03110"},
-    {"value": "defense", "count": 43, "tree_code": "ko02048"},
+    {"value": "defense", "count": 44, "tree_code": "ko02048"},
     {"value": "dna_replication", "count": 23, "tree_code": "ko03032"},
     ...
   ]
@@ -158,14 +158,14 @@ list_filter_values(filter_type="metric_type")
 {
   "filter_type": "metric_type",
   "description": null,
-  "total_entries": 53,
-  "returned": 53,
+  "total_entries": 55,
+  "returned": 55,
   "truncated": false,
   "warnings": [],
   "results": [
+    {"value": "sbp_nutrient_class", "count": 95},
+    {"value": "sbp_predicted_substrate", "count": 95},
     {"value": "log2_mv_cell_enrichment", "count": 6},
-    {"value": "prop_abund_cells_percent", "count": 6},
-    {"value": "prop_abund_mvs_percent", "count": 6},
     ...
   ]
 }
@@ -186,9 +186,9 @@ list_filter_values(filter_type="value_kind")
   "truncated": false,
   "warnings": [],
   "results": [
+    {"value": "categorical", "count": 200},
     {"value": "numeric", "count": 46},
-    {"value": "boolean", "count": 27},
-    {"value": "categorical", "count": 10}
+    {"value": "boolean", "count": 27}
   ]
 }
 ```
@@ -208,7 +208,7 @@ list_filter_values(filter_type="compartment")
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "whole_cell", "count": 185},
+    {"value": "whole_cell", "count": 280},
     {"value": "vesicle", "count": 13},
     {"value": "exoproteome", "count": 7},
     ...
@@ -226,14 +226,14 @@ list_filter_values(filter_type="omics_type")
 {
   "filter_type": "omics_type",
   "description": null,
-  "total_entries": 8,
-  "returned": 8,
+  "total_entries": 9,
+  "returned": 9,
   "truncated": false,
   "warnings": [],
   "results": [
+    {"value": "BIOINFORMATIC", "count": 95},
     {"value": "EXOPROTEOMICS", "count": 7},
     {"value": "METABOLOMICS", "count": 12},
-    {"value": "MICROARRAY", "count": 29},
     ...
   ]
 }
@@ -277,9 +277,9 @@ list_filter_values(filter_type="evidence_source")
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "metabolism", "count": 2221},
-    {"value": "transport", "count": 1282},
-    {"value": "go_transport", "count": 212},
+    {"value": "metabolism", "count": 2287},
+    {"value": "transport", "count": 1311},
+    {"value": "go_transport", "count": 218},
     ...
   ]
 }

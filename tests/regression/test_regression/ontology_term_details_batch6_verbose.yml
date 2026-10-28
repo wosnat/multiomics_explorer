@@ -125,53 +125,127 @@ results:
   children_total: 97
   children_truncated: true
   description: null
-  direct_gene_count: 649
+  direct_gene_count: 1640
   direction: unknown
   direction_basis: null
-  gene_count: 3933
+  gene_count: 9107
   genes_by_organism:
   - '{''gene_count'': 104, ''organism'': ''Synechococcus elongatus PCC 7942''}'
   - '{''gene_count'': 105, ''organism'': ''Synechococcus elongatus UTEX 2973''}'
   - '{''gene_count'': 106, ''organism'': ''Alteromonas (MarRef v6)''}'
   - '{''gene_count'': 107, ''organism'': ''Thermosynechococcus vestitus BP-1''}'
   - '{''gene_count'': 110, ''organism'': ''Shewanella sp. W3-18-1''}'
+  - '{''gene_count'': 112, ''organism'': ''Cyanobium PCC6307''}'
+  - '{''gene_count'': 112, ''organism'': ''Synechococcus WH5701''}'
   - '{''gene_count'': 134, ''organism'': ''Synechococcus PCC 7002''}'
   - '{''gene_count'': 222, ''organism'': ''Marinobacter (MarRef v6)''}'
   - '{''gene_count'': 234, ''organism'': ''Meiothermus ruber''}'
   - '{''gene_count'': 301, ''organism'': ''Pseudomonas putida KT2440''}'
   - '{''gene_count'': 315, ''organism'': ''Ruegeria pomeroyi DSS-3''}'
+  - '{''gene_count'': 41, ''organism'': ''Prochlorococcus MIT0601''}'
+  - '{''gene_count'': 44, ''organism'': ''Prochlorococcus HNLC1''}'
+  - '{''gene_count'': 45, ''organism'': ''Prochlorococcus HNLC2''}'
+  - '{''gene_count'': 45, ''organism'': ''Prochlorococcus MIT9211''}'
+  - '{''gene_count'': 46, ''organism'': ''Prochlorococcus MIT9107''}'
+  - '{''gene_count'': 46, ''organism'': ''Prochlorococcus MIT9116''}'
+  - '{''gene_count'': 46, ''organism'': ''Prochlorococcus MIT9123''}'
   - '{''gene_count'': 46, ''organism'': ''Prochlorococcus MIT9515''}'
   - '{''gene_count'': 47, ''organism'': ''Prochlorococcus MIT1314''}'
   - '{''gene_count'': 47, ''organism'': ''Prochlorococcus MIT9202''}'
   - '{''gene_count'': 47, ''organism'': ''Prochlorococcus marinus subsp. marinus CCMP1375
     (SS120)''}'
+  - '{''gene_count'': 48, ''organism'': ''Prochlorococcus LG''}'
   - '{''gene_count'': 48, ''organism'': ''Prochlorococcus MIT0604''}'
   - '{''gene_count'': 48, ''organism'': ''Prochlorococcus MIT9215''}'
+  - '{''gene_count'': 48, ''organism'': ''Prochlorococcus MIT9321''}'
+  - '{''gene_count'': 48, ''organism'': ''Prochlorococcus MIT9322''}'
+  - '{''gene_count'': 48, ''organism'': ''Prochlorococcus MIT9401''}'
+  - '{''gene_count'': 48, ''organism'': ''Prochlorococcus SS2''}'
+  - '{''gene_count'': 48, ''organism'': ''Prochlorococcus SS35''}'
+  - '{''gene_count'': 48, ''organism'': ''Prochlorococcus SS51''}'
+  - '{''gene_count'': 48, ''organism'': ''Prochlorococcus SS52''}'
   - '{''gene_count'': 49, ''organism'': ''Prochlorococcus AS9601''}'
+  - '{''gene_count'': 49, ''organism'': ''Prochlorococcus MIT0602''}'
+  - '{''gene_count'': 49, ''organism'': ''Prochlorococcus MIT0603''}'
+  - '{''gene_count'': 50, ''organism'': ''Prochlorococcus MIT9201''}'
   - '{''gene_count'': 51, ''organism'': ''Prochlorococcus MIT9301''}'
+  - '{''gene_count'': 52, ''organism'': ''Prochlorococcus EQPAC1''}'
+  - '{''gene_count'': 52, ''organism'': ''Prochlorococcus GP2''}'
   - '{''gene_count'': 52, ''organism'': ''Prochlorococcus MED4''}'
+  - '{''gene_count'': 52, ''organism'': ''Prochlorococcus MIT9311''}'
   - '{''gene_count'': 52, ''organism'': ''Prochlorococcus MIT9312''}'
   - '{''gene_count'': 52, ''organism'': ''Prochlorococcus SB''}'
+  - '{''gene_count'': 53, ''organism'': ''Prochlorococcus MIT9302''}'
+  - '{''gene_count'': 53, ''organism'': ''Prochlorococcus MIT9314''}'
   - '{''gene_count'': 55, ''organism'': ''Prochlorococcus NATL1A''}'
   - '{''gene_count'': 55, ''organism'': ''Prochlorococcus NATL2A''}'
   - '{''gene_count'': 56, ''organism'': ''Prochlorococcus MIT0801''}'
   - '{''gene_count'': 56, ''organism'': ''Prochlorococcus PAC1''}'
   - '{''gene_count'': 58, ''organism'': ''Prochlorococcus RSP50''}'
+  - '{''gene_count'': 64, ''organism'': ''Synechococcus MINOS11''}'
+  - '{''gene_count'': 65, ''organism'': ''Synechococcus RCC307''}'
+  - '{''gene_count'': 67, ''organism'': ''Synechococcus PROS-9-1''}'
+  - '{''gene_count'': 69, ''organism'': ''Synechococcus CC9902''}'
+  - '{''gene_count'': 69, ''organism'': ''Synechococcus M16.1''}'
   - '{''gene_count'': 69, ''organism'': ''Synechococcus sp. BL107''}'
+  - '{''gene_count'': 70, ''organism'': ''Synechococcus MITS9220''}'
   - '{''gene_count'': 70, ''organism'': ''Synechococcus WH8109''}'
   - '{''gene_count'': 71, ''organism'': ''Synechococcus CC9311''}'
+  - '{''gene_count'': 71, ''organism'': ''Synechococcus TAK9802''}'
+  - '{''gene_count'': 72, ''organism'': ''Synechococcus CB0205''}'
+  - '{''gene_count'': 73, ''organism'': ''Synechococcus A15-62''}'
+  - '{''gene_count'': 73, ''organism'': ''Synechococcus MEDNS5''}'
   - '{''gene_count'': 75, ''organism'': ''Alteromonas macleodii BS11''}'
+  - '{''gene_count'': 75, ''organism'': ''Synechococcus MVIR-18-1''}'
+  - '{''gene_count'': 75, ''organism'': ''Synechococcus PROS-U-1''}'
+  - '{''gene_count'': 76, ''organism'': ''Synechococcus RS9902''}'
+  - '{''gene_count'': 76, ''organism'': ''Synechococcus RS9917''}'
   - '{''gene_count'': 76, ''organism'': ''Synechococcus WH7803''}'
+  - '{''gene_count'': 77, ''organism'': ''Prochlorococcus MIT0701''}'
+  - '{''gene_count'': 77, ''organism'': ''Prochlorococcus MIT0702''}'
+  - '{''gene_count'': 77, ''organism'': ''Prochlorococcus MIT0703''}'
+  - '{''gene_count'': 77, ''organism'': ''Synechococcus BIOS-U3-1''}'
+  - '{''gene_count'': 77, ''organism'': ''Synechococcus CC9605''}'
+  - '{''gene_count'': 77, ''organism'': ''Synechococcus NOUM97013''}'
+  - '{''gene_count'': 77, ''organism'': ''Synechococcus RS9909''}'
+  - '{''gene_count'': 77, ''organism'': ''Synechococcus WH8016''}'
+  - '{''gene_count'': 78, ''organism'': ''Cyanobium NS01''}'
   - '{''gene_count'': 78, ''organism'': ''Prochlorococcus MIT1327''}'
+  - '{''gene_count'': 78, ''organism'': ''Synechococcus KORDI-52''}'
+  - '{''gene_count'': 78, ''organism'': ''Synechococcus RS9916''}'
   - '{''gene_count'': 79, ''organism'': ''Prochlorococcus MIT9313''}'
+  - '{''gene_count'': 79, ''organism'': ''Synechococcus RS9907''}'
+  - '{''gene_count'': 79, ''organism'': ''Synechococcus SYN20''}'
   - '{''gene_count'': 80, ''organism'': ''Prochlorococcus MIT9303''}'
+  - '{''gene_count'': 80, ''organism'': ''Synechococcus A15-44''}'
+  - '{''gene_count'': 80, ''organism'': ''Synechococcus BMK-MC-1''}'
+  - '{''gene_count'': 80, ''organism'': ''Synechococcus KORDI-49''}'
+  - '{''gene_count'': 80, ''organism'': ''Synechococcus WH8101''}'
+  - '{''gene_count'': 81, ''organism'': ''Synechococcus A15-60''}'
+  - '{''gene_count'': 81, ''organism'': ''Synechococcus KORDI-100''}'
+  - '{''gene_count'': 81, ''organism'': ''Synechococcus ROS8604''}'
   - '{''gene_count'': 82, ''organism'': ''Alteromonas macleodii AD45''}'
+  - '{''gene_count'': 82, ''organism'': ''Cyanobium PCC7001''}'
+  - '{''gene_count'': 82, ''organism'': ''Synechococcus CB0101''}'
+  - '{''gene_count'': 83, ''organism'': ''Synechococcus A18-25c''}'
+  - '{''gene_count'': 83, ''organism'': ''Synechococcus WH7805''}'
   - '{''gene_count'': 84, ''organism'': ''Alteromonas macleodii MIT1002''}'
   - '{''gene_count'': 84, ''organism'': ''Alteromonas mediterranea AltDE1''}'
+  - '{''gene_count'': 84, ''organism'': ''Synechococcus A15-127''}'
+  - '{''gene_count'': 84, ''organism'': ''Synechococcus A15-24''}'
+  - '{''gene_count'': 84, ''organism'': ''Synechococcus A18-40''}'
+  - '{''gene_count'': 84, ''organism'': ''Synechococcus BOUM118''}'
   - '{''gene_count'': 85, ''organism'': ''Alteromonas macleodii BGP6''}'
   - '{''gene_count'': 85, ''organism'': ''Alteromonas macleodii EZ55''}'
+  - '{''gene_count'': 85, ''organism'': ''Synechococcus PROS-7-1''}'
   - '{''gene_count'': 86, ''organism'': ''Alteromonas macleodii ATCC27126''}'
+  - '{''gene_count'': 86, ''organism'': ''Synechococcus WH8103''}'
   - '{''gene_count'': 87, ''organism'': ''Alteromonas macleodii HOT1A3''}'
+  - '{''gene_count'': 87, ''organism'': ''Synechococcus BIOS-E4-1''}'
+  - '{''gene_count'': 88, ''organism'': ''Synechococcus A15-28''}'
+  - '{''gene_count'': 88, ''organism'': ''Synechococcus A18-46.1''}'
+  - '{''gene_count'': 88, ''organism'': ''Synechococcus CC9616''}'
+  - '{''gene_count'': 89, ''organism'': ''Synechococcus RS9915''}'
   - '{''gene_count'': 90, ''organism'': ''Synechococcus WH8102''}'
   - '{''gene_count'': 95, ''organism'': ''Alteromonas mediterranea AltDE''}'
   is_informative: true
@@ -226,19 +300,19 @@ results:
   member_count: 97
   name: The ATP-binding Cassette (ABC) Superfamily
   ontology: tcdb
-  organism_count: 43
+  organism_count: 117
   parents:
   - '{''id'': ''tcdb:3.A'', ''level'': 1, ''name'': ''P-P-bond-hydrolysis-driven transporters''}'
   properties:
-    direct_gene_count: 649
+    direct_gene_count: 1640
     direction: unknown
-    gene_count: 3933
+    gene_count: 9107
     id: tcdb:3.A.1
     level: 2
     level_kind: tc_family
     member_count: 97
     name: The ATP-binding Cassette (ABC) Superfamily
-    organism_count: 43
+    organism_count: 117
     preferred_id: tcdb
     superfamily: ArsA ATPase (ArsA) Superfamily
     tc_class_id: tcdb:3
@@ -261,9 +335,9 @@ results:
   cleavage_summary: cleaves after Met (44%) / Leu (22%) / Gly (11%) - 27 known cleavages
     (0% physiological)
   description: null
-  direct_gene_count: 129
+  direct_gene_count: 425
   family_class: peptidase
-  gene_count: 129
+  gene_count: 425
   genes_by_organism:
   - '{''gene_count'': 1, ''organism'': ''Alteromonas macleodii AD45''}'
   - '{''gene_count'': 1, ''organism'': ''Alteromonas macleodii ATCC27126''}'
@@ -280,30 +354,104 @@ results:
   - '{''gene_count'': 2, ''organism'': ''Pseudomonas putida KT2440''}'
   - '{''gene_count'': 2, ''organism'': ''Shewanella sp. W3-18-1''}'
   - '{''gene_count'': 3, ''organism'': ''Thermosynechococcus vestitus BP-1''}'
+  - '{''gene_count'': 4, ''organism'': ''Cyanobium NS01''}'
+  - '{''gene_count'': 4, ''organism'': ''Cyanobium PCC6307''}'
+  - '{''gene_count'': 4, ''organism'': ''Cyanobium PCC7001''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus AS9601''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus EQPAC1''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus GP2''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus HNLC1''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus HNLC2''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus LG''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MED4''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT0601''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT0602''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT0603''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT0604''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT0701''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT0702''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT0703''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT0801''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT1314''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT1327''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9107''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9116''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9123''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9201''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9202''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9211''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9215''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9301''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9302''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9303''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9311''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9312''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9313''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9314''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9321''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9322''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9401''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus MIT9515''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus NATL1A''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus NATL2A''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus PAC1''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus RSP50''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus SB''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus SS2''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus SS35''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus SS51''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus SS52''}'
   - '{''gene_count'': 4, ''organism'': ''Prochlorococcus marinus subsp. marinus CCMP1375
     (SS120)''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus A15-127''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus A15-24''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus A15-28''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus A15-44''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus A15-60''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus A15-62''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus A18-25c''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus A18-40''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus A18-46.1''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus BIOS-E4-1''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus BIOS-U3-1''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus BMK-MC-1''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus BOUM118''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus CB0101''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus CB0205''}'
   - '{''gene_count'': 4, ''organism'': ''Synechococcus CC9311''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus CC9605''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus CC9616''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus CC9902''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus KORDI-100''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus KORDI-49''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus KORDI-52''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus M16.1''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus MEDNS5''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus MINOS11''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus MITS9220''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus MVIR-18-1''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus NOUM97013''}'
   - '{''gene_count'': 4, ''organism'': ''Synechococcus PCC 7002''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus PROS-7-1''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus PROS-9-1''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus PROS-U-1''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus RCC307''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus ROS8604''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus RS9902''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus RS9907''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus RS9909''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus RS9915''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus RS9916''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus RS9917''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus SYN20''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus TAK9802''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus WH5701''}'
   - '{''gene_count'': 4, ''organism'': ''Synechococcus WH7803''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus WH7805''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus WH8016''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus WH8101''}'
   - '{''gene_count'': 4, ''organism'': ''Synechococcus WH8102''}'
+  - '{''gene_count'': 4, ''organism'': ''Synechococcus WH8103''}'
   - '{''gene_count'': 4, ''organism'': ''Synechococcus WH8109''}'
   - '{''gene_count'': 4, ''organism'': ''Synechococcus elongatus PCC 7942''}'
   - '{''gene_count'': 4, ''organism'': ''Synechococcus elongatus UTEX 2973''}'
@@ -322,11 +470,11 @@ results:
   merops_id: S14
   name: ClpP endopeptidase
   ontology: merops
-  organism_count: 42
+  organism_count: 116
   parents:
   - '{''id'': ''merops.clan:SK'', ''level'': 0, ''name'': ''SK''}'
-  peptidase_gene_count: 129
-  peptidase_organism_count: 42
+  peptidase_gene_count: 425
+  peptidase_organism_count: 116
   properties:
     catalytic_type: serine
     cleavage_p1_residues:
@@ -335,9 +483,9 @@ results:
     - Gly
     cleavage_summary: cleaves after Met (44%) / Leu (22%) / Gly (11%) - 27 known cleavages
       (0% physiological)
-    direct_gene_count: 129
+    direct_gene_count: 425
     family_class: peptidase
-    gene_count: 129
+    gene_count: 425
     id: merops.family:S14
     known_cleavage_count: 27
     level: 1
@@ -345,9 +493,9 @@ results:
     member_count: 0
     merops_id: S14
     name: ClpP endopeptidase
-    organism_count: 42
-    peptidase_gene_count: 129
-    peptidase_organism_count: 42
+    organism_count: 116
+    peptidase_gene_count: 425
+    peptidase_organism_count: 116
     preferred_id: merops.family
   term_id: merops.family:S14
 - children:
@@ -364,8 +512,8 @@ results:
     is a substrate, have been shown to share a short conserved sequence around a methionine
     which is probably involved in the catalytic activity of this type of enzymes.
     The following are examples of members of this family:'
-  direct_gene_count: 135
-  gene_count: 135
+  direct_gene_count: 357
+  gene_count: 357
   genes_by_organism:
   - '{''gene_count'': 2, ''organism'': ''Alteromonas (MarRef v6)''}'
   - '{''gene_count'': 3, ''organism'': ''Alteromonas macleodii AD45''}'
@@ -377,32 +525,106 @@ results:
   - '{''gene_count'': 3, ''organism'': ''Alteromonas macleodii MIT1002''}'
   - '{''gene_count'': 3, ''organism'': ''Alteromonas mediterranea AltDE''}'
   - '{''gene_count'': 3, ''organism'': ''Alteromonas mediterranea AltDE1''}'
+  - '{''gene_count'': 3, ''organism'': ''Cyanobium NS01''}'
+  - '{''gene_count'': 3, ''organism'': ''Cyanobium PCC6307''}'
+  - '{''gene_count'': 3, ''organism'': ''Cyanobium PCC7001''}'
   - '{''gene_count'': 3, ''organism'': ''Marinobacter (MarRef v6)''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus AS9601''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus EQPAC1''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus GP2''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus HNLC1''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus HNLC2''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus LG''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MED4''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT0601''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT0602''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT0603''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT0604''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT0701''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT0702''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT0703''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT0801''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT1314''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT1327''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9107''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9116''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9123''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9201''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9202''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9211''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9215''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9301''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9302''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9303''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9311''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9312''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9313''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9314''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9321''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9322''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9401''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus MIT9515''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus NATL1A''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus NATL2A''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus PAC1''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus RSP50''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus SB''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus SS2''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus SS35''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus SS51''}'
+  - '{''gene_count'': 3, ''organism'': ''Prochlorococcus SS52''}'
   - '{''gene_count'': 3, ''organism'': ''Prochlorococcus marinus subsp. marinus CCMP1375
     (SS120)''}'
   - '{''gene_count'': 3, ''organism'': ''Shewanella sp. W3-18-1''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus A15-127''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus A15-24''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus A15-28''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus A15-44''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus A15-60''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus A15-62''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus A18-25c''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus A18-40''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus A18-46.1''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus BIOS-E4-1''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus BIOS-U3-1''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus BMK-MC-1''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus BOUM118''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus CB0101''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus CB0205''}'
   - '{''gene_count'': 3, ''organism'': ''Synechococcus CC9311''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus CC9605''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus CC9616''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus CC9902''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus KORDI-100''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus KORDI-49''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus KORDI-52''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus M16.1''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus MEDNS5''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus MINOS11''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus MITS9220''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus MVIR-18-1''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus NOUM97013''}'
   - '{''gene_count'': 3, ''organism'': ''Synechococcus PCC 7002''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus PROS-7-1''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus PROS-9-1''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus PROS-U-1''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus RCC307''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus ROS8604''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus RS9902''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus RS9907''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus RS9909''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus RS9915''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus RS9916''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus RS9917''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus SYN20''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus TAK9802''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus WH5701''}'
   - '{''gene_count'': 3, ''organism'': ''Synechococcus WH7803''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus WH7805''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus WH8016''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus WH8101''}'
   - '{''gene_count'': 3, ''organism'': ''Synechococcus WH8102''}'
+  - '{''gene_count'': 3, ''organism'': ''Synechococcus WH8103''}'
   - '{''gene_count'': 3, ''organism'': ''Synechococcus WH8109''}'
   - '{''gene_count'': 3, ''organism'': ''Synechococcus elongatus PCC 7942''}'
   - '{''gene_count'': 3, ''organism'': ''Synechococcus elongatus UTEX 2973''}'
@@ -441,22 +663,22 @@ results:
   member_count: 4
   name: Fumarate lyase family
   ontology: interpro
-  organism_count: 43
+  organism_count: 117
   parents: []
   properties:
     description: 'A number of enzymes, belonging to the lyase class, for which fumarate
       is a substrate, have been shown to share a short conserved sequence around a
       methionine which is probably involved in the catalytic activity of this type
       of enzymes. The following are examples of members of this family:'
-    direct_gene_count: 135
-    gene_count: 135
+    direct_gene_count: 357
+    gene_count: 357
     id: interpro:IPR000362
     interpro_id: IPR000362
     interpro_type: FAMILY
     level: 0
     member_count: 4
     name: Fumarate lyase family
-    organism_count: 43
+    organism_count: 117
     preferred_id: interpro
   term_id: interpro:IPR000362
 - children: []
@@ -509,40 +731,111 @@ results:
   children_total: 3
   children_truncated: false
   description: null
-  direct_gene_count: 875
-  gene_count: 1067
+  direct_gene_count: 1944
+  gene_count: 2324
   genes_by_organism:
   - '{''gene_count'': 10, ''organism'': ''Prochlorococcus MIT1314''}'
+  - '{''gene_count'': 10, ''organism'': ''Synechococcus CB0101''}'
   - '{''gene_count'': 11, ''organism'': ''Prochlorococcus RSP50''}'
   - '{''gene_count'': 11, ''organism'': ''Synechococcus PCC 7002''}'
+  - '{''gene_count'': 13, ''organism'': ''Prochlorococcus SS2''}'
+  - '{''gene_count'': 13, ''organism'': ''Prochlorococcus SS51''}'
+  - '{''gene_count'': 13, ''organism'': ''Prochlorococcus SS52''}'
   - '{''gene_count'': 13, ''organism'': ''Synechococcus elongatus UTEX 2973''}'
   - '{''gene_count'': 13, ''organism'': ''Thermosynechococcus vestitus BP-1''}'
+  - '{''gene_count'': 14, ''organism'': ''Prochlorococcus LG''}'
+  - '{''gene_count'': 14, ''organism'': ''Prochlorococcus MIT0601''}'
+  - '{''gene_count'': 14, ''organism'': ''Prochlorococcus MIT0602''}'
+  - '{''gene_count'': 14, ''organism'': ''Prochlorococcus MIT0603''}'
+  - '{''gene_count'': 14, ''organism'': ''Prochlorococcus SS35''}'
+  - '{''gene_count'': 15, ''organism'': ''Prochlorococcus EQPAC1''}'
+  - '{''gene_count'': 15, ''organism'': ''Prochlorococcus GP2''}'
   - '{''gene_count'': 15, ''organism'': ''Prochlorococcus MIT0604''}'
+  - '{''gene_count'': 15, ''organism'': ''Prochlorococcus MIT9107''}'
+  - '{''gene_count'': 15, ''organism'': ''Prochlorococcus MIT9116''}'
+  - '{''gene_count'': 15, ''organism'': ''Prochlorococcus MIT9123''}'
+  - '{''gene_count'': 15, ''organism'': ''Prochlorococcus MIT9201''}'
   - '{''gene_count'': 15, ''organism'': ''Prochlorococcus MIT9202''}'
+  - '{''gene_count'': 15, ''organism'': ''Prochlorococcus MIT9311''}'
+  - '{''gene_count'': 15, ''organism'': ''Prochlorococcus MIT9314''}'
+  - '{''gene_count'': 15, ''organism'': ''Prochlorococcus MIT9321''}'
+  - '{''gene_count'': 15, ''organism'': ''Prochlorococcus MIT9322''}'
   - '{''gene_count'': 16, ''organism'': ''Prochlorococcus MIT0801''}'
+  - '{''gene_count'': 16, ''organism'': ''Prochlorococcus MIT9302''}'
+  - '{''gene_count'': 16, ''organism'': ''Prochlorococcus MIT9401''}'
+  - '{''gene_count'': 16, ''organism'': ''Synechococcus A15-44''}'
   - '{''gene_count'': 17, ''organism'': ''Prochlorococcus MIT9215''}'
   - '{''gene_count'': 17, ''organism'': ''Prochlorococcus MIT9312''}'
   - '{''gene_count'': 17, ''organism'': ''Prochlorococcus MIT9515''}'
   - '{''gene_count'': 17, ''organism'': ''Prochlorococcus PAC1''}'
   - '{''gene_count'': 17, ''organism'': ''Prochlorococcus marinus subsp. marinus CCMP1375
     (SS120)''}'
+  - '{''gene_count'': 17, ''organism'': ''Synechococcus CB0205''}'
   - '{''gene_count'': 18, ''organism'': ''Prochlorococcus AS9601''}'
   - '{''gene_count'': 18, ''organism'': ''Prochlorococcus MED4''}'
+  - '{''gene_count'': 18, ''organism'': ''Prochlorococcus MIT0703''}'
   - '{''gene_count'': 18, ''organism'': ''Prochlorococcus MIT1327''}'
+  - '{''gene_count'': 18, ''organism'': ''Prochlorococcus MIT9211''}'
   - '{''gene_count'': 18, ''organism'': ''Prochlorococcus SB''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus A15-127''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus A15-62''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus A18-40''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus A18-46.1''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus BMK-MC-1''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus BOUM118''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus KORDI-49''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus MEDNS5''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus MITS9220''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus PROS-7-1''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus RS9902''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus RS9907''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus RS9909''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus RS9915''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus RS9916''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus RS9917''}'
+  - '{''gene_count'': 18, ''organism'': ''Synechococcus TAK9802''}'
   - '{''gene_count'': 18, ''organism'': ''Synechococcus WH8109''}'
+  - '{''gene_count'': 19, ''organism'': ''Prochlorococcus MIT0701''}'
+  - '{''gene_count'': 19, ''organism'': ''Prochlorococcus MIT0702''}'
   - '{''gene_count'': 19, ''organism'': ''Prochlorococcus MIT9301''}'
   - '{''gene_count'': 19, ''organism'': ''Prochlorococcus NATL1A''}'
   - '{''gene_count'': 19, ''organism'': ''Prochlorococcus NATL2A''}'
+  - '{''gene_count'': 19, ''organism'': ''Synechococcus BIOS-E4-1''}'
+  - '{''gene_count'': 19, ''organism'': ''Synechococcus BIOS-U3-1''}'
+  - '{''gene_count'': 19, ''organism'': ''Synechococcus CC9605''}'
+  - '{''gene_count'': 19, ''organism'': ''Synechococcus CC9902''}'
+  - '{''gene_count'': 19, ''organism'': ''Synechococcus KORDI-52''}'
+  - '{''gene_count'': 19, ''organism'': ''Synechococcus M16.1''}'
+  - '{''gene_count'': 19, ''organism'': ''Synechococcus MINOS11''}'
+  - '{''gene_count'': 19, ''organism'': ''Synechococcus MVIR-18-1''}'
+  - '{''gene_count'': 19, ''organism'': ''Synechococcus PROS-9-1''}'
+  - '{''gene_count'': 19, ''organism'': ''Synechococcus WH5701''}'
+  - '{''gene_count'': 19, ''organism'': ''Synechococcus WH7805''}'
   - '{''gene_count'': 19, ''organism'': ''Synechococcus sp. BL107''}'
   - '{''gene_count'': 20, ''organism'': ''Prochlorococcus MIT9303''}'
   - '{''gene_count'': 20, ''organism'': ''Prochlorococcus MIT9313''}'
+  - '{''gene_count'': 20, ''organism'': ''Synechococcus A15-24''}'
+  - '{''gene_count'': 20, ''organism'': ''Synechococcus A15-28''}'
+  - '{''gene_count'': 20, ''organism'': ''Synechococcus A15-60''}'
+  - '{''gene_count'': 20, ''organism'': ''Synechococcus A18-25c''}'
   - '{''gene_count'': 20, ''organism'': ''Synechococcus CC9311''}'
+  - '{''gene_count'': 20, ''organism'': ''Synechococcus CC9616''}'
+  - '{''gene_count'': 20, ''organism'': ''Synechococcus NOUM97013''}'
+  - '{''gene_count'': 20, ''organism'': ''Synechococcus PROS-U-1''}'
+  - '{''gene_count'': 20, ''organism'': ''Synechococcus ROS8604''}'
+  - '{''gene_count'': 20, ''organism'': ''Synechococcus WH8016''}'
+  - '{''gene_count'': 20, ''organism'': ''Synechococcus WH8101''}'
+  - '{''gene_count'': 21, ''organism'': ''Cyanobium PCC6307''}'
+  - '{''gene_count'': 21, ''organism'': ''Synechococcus KORDI-100''}'
   - '{''gene_count'': 21, ''organism'': ''Synechococcus WH8102''}'
+  - '{''gene_count'': 22, ''organism'': ''Cyanobium NS01''}'
+  - '{''gene_count'': 22, ''organism'': ''Cyanobium PCC7001''}'
   - '{''gene_count'': 22, ''organism'': ''Ruegeria pomeroyi DSS-3''}'
+  - '{''gene_count'': 22, ''organism'': ''Synechococcus SYN20''}'
   - '{''gene_count'': 22, ''organism'': ''Synechococcus elongatus PCC 7942''}'
   - '{''gene_count'': 36, ''organism'': ''Alteromonas (MarRef v6)''}'
   - '{''gene_count'': 38, ''organism'': ''Marinobacter (MarRef v6)''}'
+  - '{''gene_count'': 4, ''organism'': ''Prochlorococcus HNLC2''}'
   - '{''gene_count'': 40, ''organism'': ''Alteromonas mediterranea AltDE1''}'
   - '{''gene_count'': 42, ''organism'': ''Alteromonas macleodii BS11''}'
   - '{''gene_count'': 43, ''organism'': ''Alteromonas macleodii AD45''}'
@@ -554,7 +847,10 @@ results:
   - '{''gene_count'': 47, ''organism'': ''Pseudomonas putida KT2440''}'
   - '{''gene_count'': 48, ''organism'': ''Alteromonas macleodii EZ55''}'
   - '{''gene_count'': 48, ''organism'': ''Alteromonas macleodii MIT1002''}'
+  - '{''gene_count'': 5, ''organism'': ''Prochlorococcus HNLC1''}'
+  - '{''gene_count'': 8, ''organism'': ''Synechococcus WH8103''}'
   - '{''gene_count'': 9, ''organism'': ''Meiothermus ruber''}'
+  - '{''gene_count'': 9, ''organism'': ''Synechococcus RCC307''}'
   - '{''gene_count'': 9, ''organism'': ''Synechococcus WH7803''}'
   is_informative: true
   label: BiologicalProcess
@@ -563,16 +859,16 @@ results:
   links_out: []
   name: response to oxidative stress
   ontology: go_bp
-  organism_count: 43
+  organism_count: 117
   parents:
   - '{''id'': ''go:0006950'', ''level'': 2, ''name'': ''response to stress''}'
   properties:
-    direct_gene_count: 875
-    gene_count: 1067
+    direct_gene_count: 1944
+    gene_count: 2324
     id: go:0006979
     level: 3
     name: response to oxidative stress
-    organism_count: 43
+    organism_count: 117
     preferred_id: go
   term_id: go:0006979
 returned: 5

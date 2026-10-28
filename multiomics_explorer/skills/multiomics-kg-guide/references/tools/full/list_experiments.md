@@ -133,26 +133,26 @@ list_experiments(summary=True)
 
 ```example-response
 {
-  "total_entries": 208,
-  "total_matching": 208,
+  "total_entries": 303,
+  "total_matching": 303,
   "returned": 0,
   "offset": 0,
   "truncated": true,
   "by_organism": [
-    {"organism_name": "Prochlorococcus MED4", "count": 44},
+    {"organism_name": "Prochlorococcus MED4", "count": 45},
     {"organism_name": "Alteromonas (MarRef v6)", "count": 20},
     {"organism_name": "Marinobacter (MarRef v6)", "count": 20},
-    {"organism_name": "Prochlorococcus MIT9313", "count": 18},
+    {"organism_name": "Prochlorococcus MIT9313", "count": 19},
     {"organism_name": "Alteromonas macleodii EZ55", "count": 12},
     ...
   ],
   "by_organism_truncated": null,
   "by_treatment_type": [
+    {"treatment_type": "genomic_analysis", "count": 95},
     {"treatment_type": "carbon", "count": 79},
     {"treatment_type": "coculture", "count": 36},
     {"treatment_type": "compartment", "count": 17},
     {"treatment_type": "nitrogen", "count": 16},
-    {"treatment_type": "light", "count": 13},
     ...
   ],
   "by_treatment_type_truncated": null,
@@ -166,19 +166,19 @@ list_experiments(summary=True)
   ],
   "by_background_factors_truncated": null,
   "by_omics_type": [
+    {"omics_type": "BIOINFORMATIC", "count": 95},
     {"omics_type": "PROTEOMICS", "count": 77},
     {"omics_type": "RNASEQ", "count": 71},
     {"omics_type": "MICROARRAY", "count": 29},
     {"omics_type": "METABOLOMICS", "count": 12},
-    {"omics_type": "VESICLE_PROTEOMICS", "count": 10},
     ...
   ],
   "by_publication": [
+    {"publication_doi": "10.1042/BST20200244", "count": 95},
     {"publication_doi": "10.1128/spectrum.03275-22", "count": 60},
     {"publication_doi": "10.1038/s43705-022-00197-2", "count": 11},
     {"publication_doi": "10.1101/2025.11.24.690089", "count": 10},
     {"publication_doi": "10.1111/1462-2920.15834", "count": 6},
-    {"publication_doi": "10.1128/JB.01097-06", "count": 6},
     ...
   ],
   "by_publication_truncated": null,
@@ -209,21 +209,21 @@ list_experiments(summary=True)
     ...
   ],
   "by_value_kind": [
+    {"value_kind": "categorical", "count": 103},
     {"value_kind": "numeric", "count": 17},
-    {"value_kind": "boolean", "count": 13},
-    {"value_kind": "categorical", "count": 8}
+    {"value_kind": "boolean", "count": 13}
   ],
   "by_metric_type": [
+    {"metric_type": "sbp_nutrient_class", "count": 95},
+    {"metric_type": "sbp_predicted_substrate", "count": 95},
     {"metric_type": "log2_mv_cell_enrichment", "count": 6},
     {"metric_type": "prop_abund_cells_percent", "count": 6},
     {"metric_type": "prop_abund_mvs_percent", "count": 6},
-    {"metric_type": "mascot_identification_probability", "count": 2},
-    {"metric_type": "predicted_subcellular_localization", "count": 2},
     ...
   ],
   "by_metric_type_truncated": null,
   "by_compartment": [
-    {"compartment": "whole_cell", "count": 185},
+    {"compartment": "whole_cell", "count": 280},
     {"compartment": "vesicle", "count": 13},
     {"compartment": "exoproteome", "count": 7},
     {"compartment": "extracellular", "count": 3}
@@ -278,7 +278,7 @@ list_experiments(control_timing=["baseline", "mixed"], summary=True)
 
 ```example-response
 {
-  "total_entries": 208,
+  "total_entries": 303,
   "total_matching": 22,
   "returned": 0,
   "offset": 0,
@@ -396,7 +396,7 @@ list_experiments(compartment="vesicle", limit=2)
 
 ```example-response
 {
-  "total_entries": 208,
+  "total_entries": 303,
   "total_matching": 13,
   "returned": 2,
   "offset": 0,
@@ -541,7 +541,7 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
 
 ```example-response
 {
-  "total_entries": 208,
+  "total_entries": 303,
   "total_matching": 2,
   "returned": 2,
   "offset": 0,
@@ -698,7 +698,7 @@ list_filter_values(filter_type='partner_role') → list_experiments(coculture_ro
 
 - treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or a summary=True call's by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical.
 
-- `treatment_type` is dense and never empty on Experiment — a non-empty list is the marker of a real experiment. A characterization study with no perturbation names what was measured: `rna_decay` (mRNA half-life survey), `tss_mapping` (promoter / TSS survey), `growth_phase` (growth-curve profiling), `compartment` (vesicle vs whole-cell fractionation). Filter on those values to list characterization experiments; do not look for `treatment_type == []`. (`genomic_analysis` exists only on ClusteringAnalysis nodes, not on experiments.) `background_factors` is likewise dense and never empty on Experiment (every experiment has a held-constant context); it is `[]` only on the sequence-only genomic-island clustering analyses.
+- `treatment_type` is dense and never empty on Experiment — a non-empty list is the marker of a real experiment. A characterization study with no perturbation names what was measured: `rna_decay` (mRNA half-life survey), `tss_mapping` (promoter / TSS survey), `growth_phase` (growth-curve profiling), `compartment` (vesicle vs whole-cell fractionation). Filter on those values to list characterization experiments; do not look for `treatment_type == []`. `genomic_analysis` marks annotation-only experiments (`omics_type='BIOINFORMATIC'`: computed from genome sequence or annotation, no sample, no culture — e.g. Ford 2021's per-genome SBP survey, which carries categorical DMs and no expression). `background_factors` is never null on Experiment and is non-empty on every wet-lab experiment; it is `[]` only on these `BIOINFORMATIC` / `genomic_analysis` experiments (and on the sequence-only genomic-island clustering analyses). Pass `omics_type=[...]` without `BIOINFORMATIC` to list wet-lab experiments only.
 
 - `growth_phase` values (on `timepoints[].growth_phase` and the `growth_phases` filter) are an OPEN vocabulary — new papers add new labels. Enumerate live from the data rather than assuming a fixed set.
 
