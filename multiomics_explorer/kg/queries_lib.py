@@ -856,6 +856,14 @@ def _best_edge_rebind_cypher(
     # with the same score. Levels are always in the map.
     entries.append("attachment_level: l2.level")
     sort_keys.append("attachment_level")
+    # Final tie-break (KG ask A6, 2026-10-28): edges still tied fell back to
+    # storage order, which changes per import, so `sources` flipped between
+    # builds. Leaf id, then sources, both ascending.
+    entries.append("attachment_id: l2.id")
+    entries.append(
+        "sources_key: apoc.text.join(coalesce(r2.sources, []), ',')"
+    )
+    sort_keys.extend(["^attachment_id", "^sources_key"])
     edge_map = "{" + ", ".join(entries) + "}"
     edge_where = _and_join(
         "" if include_weak or not gate else _gate_pass_predicate(gate, "r2"),

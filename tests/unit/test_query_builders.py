@@ -11671,6 +11671,20 @@ class TestOneEdgePerGeneTermRebind:
         assert "apoc.coll.sortMulti(" in cypher
         assert "'confidence_score'" in cypher
 
+    def test_rebind_breaks_ties_deterministically(self):
+        """KG ask A6 (2026-10-28): edges tied on rank key and attachment level
+        fell back to storage order, so `sources` flipped between imports.
+        The last sort keys are the leaf term id, then the joined sources —
+        both ascending (`^`)."""
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="go_bp", organism="Prochlorococcus MED4", level=3,
+        )
+        assert "attachment_id: l2.id" in cypher
+        assert "'attachment_level', '^attachment_id', '^sources_key']" in cypher
+
     def test_hierarchical_trust_ontology_uses_the_rebind(self):
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
