@@ -1,6 +1,6 @@
 # Working with metabolites
 
-LLM-facing decision-tree guide for metabolite questions. The KG models metabolites via three distinct source pipelines (metabolism, transport, metabolomics), each answering a different question class; transport evidence has two routes, TCDB `transport` and GO `go_transport` (`docs://analysis/transport`). **Read the disambiguation table first; pick the right row before drilling.**
+Read before any metabolite question: which pipeline answers it, then the drill. The KG models metabolites via three distinct source pipelines (metabolism, transport, metabolomics), each answering a different question class; transport evidence has two routes, TCDB `transport` and GO `go_transport` (`docs://analysis/transport`). **Read the disambiguation table first; pick the right row before drilling.**
 
 Runnable companion: `docs://examples/metabolites.py` (7 scenarios).
 
@@ -15,13 +15,12 @@ Runnable companion: `docs://examples/metabolites.py` (7 scenarios).
 |---|---|---|---|---|
 | `metabolism` | `Gene → Reaction → Metabolite` (KEGG-derived) | "Which metabolites is this gene's reaction involved in?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['metabolism']`) | KO inference may be putative; `Reaction_has_metabolite` is undirected — upstream KEGG direction is unreliable, so the convention is permanent: use "involved in" framing, never "produces"/"consumes"; promiscuous enzymes inflate counts |
 | `transport` | `Gene → TcdbFamily (tc_system) → Metabolite` (TCDB-derived; a gene's `transport` tag also counts systems curated only with chemical roles, e.g. 'drug') | "Which metabolites does this gene transport, through a TCDB system it is directly assigned to?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['transport']`) | Default rows need a `direct` system call; genes TCDB placed only at family or subfamily level need `include_tcdb_family_substrates=True` (family rows, a recall expansion); TCDB curation can be narrow (Pst → triphosphate only); direction is node-level (`tcdb_direction`), not per gene |
-| `metabolomics` | `MetaboliteAssay → Metabolite` (mass-spec) | "Which metabolites were measured under this condition?" | `list_metabolite_assays` (discovery), `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay` (per-arm drill-down), `assays_by_metabolite` (reverse lookup) — see Track B | No gene anchor; `Assay_quantifies` (concentration/intensity) ≠ `Assay_flags` (qualitative detection); compartment matters (`whole_cell` / `extracellular` / `vesicle`); ~149 of ~3.3k metabolites measured (~95% are annotation-only); 3 papers, 14 assays (12 numeric + 2 boolean), 12 experiments; replicate / normalisation conventions vary by paper |
+| `go_transport` | `Gene → GO term → Metabolite / ChemicalRole` (GO term's primary input) | "Does a GO term this gene carries define it as moving the compound?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['go_transport']`); `list_metabolites(evidence_sources=['go_transport'])` (~220 metabolites) | A term definition, not a gene fact; molecular-function and biological-process terms mean different things; kept apart from TCDB (`organism_count`, `transporter_gene_count`, `catalyst_gene_count` ignore it); GO rows carry `go_term_id`, `go_namespace`, `go_evidence`, `go_term_depth`, `target_kind`. How to read it: `docs://analysis/transport` |
+| `metabolomics` | `MetaboliteAssay → Metabolite` (mass-spec) | "Which metabolites were measured under this condition?" | `list_metabolite_assays` (discovery), `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay` (per-arm drill-down), `assays_by_metabolite` (reverse lookup) — see Track B | No gene anchor; `Assay_quantifies` (concentration/intensity) ≠ `Assay_flags` (qualitative detection); compartment matters (`whole_cell` / `extracellular` / `vesicle`); ~135 of ~3.25k metabolites measured (~96% are annotation-only); 3 papers, 14 assays (12 numeric + 2 boolean), 12 experiments; replicate / normalisation conventions vary by paper |
 
-The `metabolism` and `transport` rows share tools — the `evidence_source` field on result rows is the discriminator, and `tcdb_route ∈ {direct, family}`, `tcdb_identity` and `tcdb_calls` further qualify transport rows (see "Direct vs family substrates" under Track A2). The `metabolomics` row has dedicated tools — see Track B.
+The `metabolism`, `transport` and `go_transport` rows share tools — the `evidence_source` field on result rows is the discriminator, and `tcdb_route ∈ {direct, family}`, `tcdb_identity` and `tcdb_calls` further qualify transport rows (see "Direct vs family substrates" under Track A2). The `metabolomics` row has dedicated tools — see Track B.
 
-The `Metabolite.evidence_sources` list field on each Metabolite node already indicates which of the three pipelines contribute (e.g., `['metabolism', 'transport', 'metabolomics']`); read this to route quickly. It is metabolite-level: `transport` means some TCDB system lists the compound, not that any given organism reaches it. For one organism's reach by a route, pass both filters: `list_metabolites(organism_names=[...], evidence_sources=['transport'])` keeps only compounds the listed organism's own genes reach by that route.
-
-A fourth value, `go_transport`, marks the 208 metabolites that a GO transport term names as its primary input (GO's `has primary input` axiom; edges `Molecular_function_transports_metabolite` / `Biological_process_transports_metabolite` from the GO term). It is a term definition, not a gene fact, and it is kept apart from `transport` (TCDB): `organism_count`, `transporter_gene_count` and `catalyst_gene_count` ignore it. It is surfaced in `genes_by_metabolite` and `metabolites_by_gene` (`evidence_sources` accepts `go_transport`; GO rows carry `go_term_id`, `go_namespace`, `go_evidence`, `go_term_depth`, `target_kind`), in `gene_overview` (`evidence_sources` tag) and in `list_metabolites` (`go_transport_organism_names`). How to read the three transport-relevant routes side by side, what an empty GO answer means, and the Cypher examples: `docs://analysis/transport`.
+The `Metabolite.evidence_sources` list field on each Metabolite node already indicates which routes contribute (e.g., `['metabolism', 'transport', 'go_transport', 'metabolomics']`); read this to route quickly. It is metabolite-level: `transport` means some TCDB system lists the compound, not that any given organism reaches it. For one organism's reach by a route, pass both filters: `list_metabolites(organism_names=[...], evidence_sources=['transport'])` keeps only compounds the listed organism's own genes reach by that route.
 
 **Metabolite ID forms.** Canonical `Metabolite.id` carries a namespace prefix: `kegg.compound:C00064`
 (KEGG-keyed, the large majority) or `chebi:17234` (ChEBI-only, mostly TCDB substrates). Each
@@ -49,18 +48,21 @@ metabolomics tools (`list_metabolites`, `genes_by_metabolite`, `metabolites_by_g
    the canonical ids, so mixed forms across `metabolite_ids` and `exclude_metabolite_ids`
    still overlap correctly.
 
-Three inputs stay verbatim and land in `not_found`:
+Three kinds of input do not resolve to a metabolite:
 
-- **A removed compound** whose paper measurements were moved to a different compound — e.g.
+- **A removed compound** (stays verbatim in `not_found`) whose paper measurements were moved to a different compound — e.g.
   `kegg.compound:C00525` (D-tryptophan), whose rows now sit on L-tryptophan
   `kegg.compound:C00078`. A `warnings` entry names the new id. It is not resolved, because the
   two are different compounds; pass the new id yourself if the paper's stereo call is not the
   point.
 - **A chemical-role id** — `chebi:10004` or `chebi.role:33229` ('vitamin (role)'). Roles
-  (vitamin, siderophore, antibiotic, …) are `ChemicalRole` nodes, not metabolites; a
-  `warnings` entry names the role. See "Chemical roles" under Track A f for the route to the
-  TCDB families that transport them.
-- **Anything else unknown** — a name such as `glutamate` (resolve names with
+  (vitamin, siderophore, antibiotic, …) are `ChemicalRole` nodes, not metabolites.
+  `genes_by_metabolite` and `metabolites_by_gene` resolve them (`chebi:10004` →
+  `chebi.role:33229` in `resolved_aliases`) and return TCDB / GO role rows
+  (`target_kind='chemical_role'`); a role with no edges in the organism lands in
+  `not_matched`. `list_metabolites` and the four metabolomics tools keep the id verbatim in
+  `not_found` with a `warnings` entry naming the role. See "Chemical roles" under Track A f.
+- **Anything else unknown** (stays in `not_found`) — a name such as `glutamate` (resolve names with
   `list_metabolites(search_text=...)` first), or an id the KG never carried.
 
 `list_metabolites`' xref filters (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`)
@@ -74,7 +76,7 @@ retired ids match too. They are filters, not resolution: they report nothing in
 placeholder (`C2H4NO2*` for 'Amino acid'), whose element set still feeds the `elements`
 filter. Filter `structure_kind=['defined']` when a question is about specific molecules.
 
-**Row schema is unified across both annotation arms.** `genes_by_metabolite` and `metabolites_by_gene` rows carry the full cross-arm key set — every row has `evidence_source`, `reaction_id`, `reaction_name`, `ec_numbers`, `mass_balance`, `tcdb_route`, `tcdb_family_id`, `tcdb_family_name`, `tcdb_calls`, `tcdb_identity`, `tcdb_direction`, with explicit `None` on the fields belonging to the other arm. Code against `evidence_source` to discriminate (or `tcdb_route is not None` for TCDB rows); the cross-arm `None`s mean every row has identical keys, no `KeyError` branching.
+**One row schema across the three arms.** `genes_by_metabolite` and `metabolites_by_gene` rows from all three arms share one schema. Fields that belong to another arm are `None`: `tcdb_*` on KEGG and GO rows; `reaction_*`, `ec_numbers` and `mass_balance` on TCDB and GO rows; `go_*` on KEGG and TCDB rows. Every row carries `evidence_source` and `metabolite_structure_kind` (`defined` / `generic` / `polymer`; null on role targets). Null optional fields (`gene_name`; formula / mass / chebi on role rows) can be left out of a row entirely, so read them with `row.get(...)`. Branch on `evidence_source`.
 
 ## Stereo forms: generic vs specific nodes
 
@@ -295,9 +297,10 @@ For the chemistry the gene's reaction is involved in via curated KEGG annotation
 
 KEGG reactions are stored in the KG **without substrate-vs-product
 direction** — KEGG equation order is unreliable upstream, so we do not
-encode it. Joins through `Reaction_has_metabolite` and
-`Tcdb_family_transports_metabolite` return both produced and
-consumed metabolites identically.
+encode it. Joins through `Reaction_has_metabolite` return both produced
+and consumed metabolites identically. TCDB rows carry only a node-level
+`tcdb_direction` hint (`uptake` / `export` / `unknown`, stated by TCDB),
+not a per-gene direction.
 
 To distinguish directionality, layer:
 
@@ -436,7 +439,7 @@ Scale in MED4: 203 genes carry a gate-passing TCDB call, 56 reach a substrate di
 
 Workflows that cross both reaction and transport arms, or that consume the annotation-side results downstream.
 
-### d — Cross-feeding bridge (Workflow B′)
+### d — Cross-feeding bridge
 
 **When:** "what could MED4 produce that ALT might consume?" — between-organism metabolic coupling.
 
@@ -624,7 +627,7 @@ Four native tools cover the measurement layer (no `run_cypher` needed):
 - **No gene anchor.** A metabolite measurement says nothing about which gene produced/consumed it.
 - **`Assay_quantifies` vs `Assay_flags`.** Quantifies = concentration/intensity (with `value`, `value_sd`, `n_replicates`, `metric_percentile`, `rank_by_metric`); Flags = qualitative detection (with `flag_value`, `n_positive`, `n_replicates`). Their downstream interpretation differs — split per DM convention into two drill-down tools.
 - **Compartment matters.** `whole_cell` measures pool; `extracellular` measures excretion / uptake / spent media; `vesicle` measures cargo packaged into extracellular vesicles. Filter via the `compartment=` kwarg on every Track-B tool.
-- **Targeted panel ≠ full metabolome.** Absence in measurement ≠ absence in cell. The current KG covers ~135 distinct metabolites across 14 assays in 3 papers — out of ~3.2k metabolites total, so ~96% have no measurement coverage.
+- **Targeted panel ≠ full metabolome.** Absence in measurement ≠ absence in cell. The current KG covers ~135 distinct metabolites across 14 assays in 3 papers — out of ~3.25k metabolites total, so ~96% have no measurement coverage.
 - **Stereo form may be the KG's call, not the paper's.** Every measurement row carries
   `stereo_assignment`: `as_reported` (the paper named the form, or the compound has no stereo
   variant) or `dominant_form_assumed` (the paper gave no form — e.g. 'Alanine' — and the KG
@@ -761,7 +764,8 @@ User asks about a metabolite or chemistry
 ├─ "Find metabolite by name → metabolite_id" → list_metabolites(search_text="...")  ← name-search hook; precedes any compound-anchored chain
 ├─ "Find metabolites by element / pathway / mass" → list_metabolites
 ├─ "Which metabolites are lipids / sugars / vitamins?" → list_metabolites(kegg_functional_categories=… / kegg_brite_classes=…) — partial, see KEGG compound categories
-├─ "Which transporters carry siderophores / vitamins (a chemical role)?" → run_cypher ChemicalRole route (Track A f)
+├─ "Which genes transport siderophores / vitamins (a chemical role)?" → genes_by_metabolite(metabolite_ids=['chebi.role:…']); run_cypher only for which TCDB systems carry a role (Track A f)
+├─ "GO vs TCDB transport, which routes agree, empty transport answer" → docs://analysis/transport
 ├─ "Cross-feeding between organisms" → Track A d — Cross-feeding bridge
 ├─ "N-source / chemistry-filtered DE" → Track A e — N-source / nutrient-class workflow
 ├─ "Genes that transport substrate X" → Track A2 b2 (metabolite-anchored; see also Track A f — Ontology bridges)

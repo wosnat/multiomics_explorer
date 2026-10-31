@@ -1,9 +1,9 @@
 """Example: working with metabolites in the KG.
 
-Demonstrates the three Metabolite-source pipelines (transport / gene reaction /
-metabolomics) and the workflow patterns for each. See
-docs://analysis/metabolites for the LLM-facing guide; this script is its
-runnable companion.
+Demonstrates the three Metabolite-source pipelines (gene reaction / transport,
+with its TCDB and GO routes / metabolomics) and the workflow patterns for each.
+See docs://analysis/metabolites for the guide (docs://analysis/transport for the
+transport routes); this script is its runnable companion.
 
 Each scenario function names the source(s) it touches and the metabolite-source
 caveat it surfaces. Print intermediate envelope state to teach the LLM how to
@@ -19,8 +19,9 @@ Notes:
   `resolved_aliases`; the canonical prefixed form skips coercion.
 - evidence_sources filter is needed to narrow at-scale; per-row schema is union
   (metabolism rows have reaction_id/ec_numbers; TCDB transport rows have
-  tcdb_route/tcdb_family_id/tcdb_identity/tcdb_calls; cross-arm fields default to
-  explicit None).
+  tcdb_route/tcdb_family_id/tcdb_identity/tcdb_calls; GO rows have
+  go_term_id/go_evidence; cross-arm fields are None). Read optional fields with
+  row.get(...).
 - TCDB transport rows are direct by default (the gene's own call onto a TCDB
   system). include_tcdb_family_substrates=True adds family-level rows for
   genes TCDB could not place in a system (a recall expansion).
@@ -747,7 +748,7 @@ def scenario_measurement() -> None:
     print("    detection_status='not_detected' / flag_value=False rows are biology,")
     print("    kept by default; missing rows are unmeasured.")
     print("  - Targeted panel — absence in measurement is not absence in cell.")
-    print("  - 149 of ~3.3k metabolites measured; 3 papers; 14 assays (12 numeric + 2 boolean).")
+    print("  - ~135 of ~3.25k metabolites measured; 3 papers; 14 assays (12 numeric + 2 boolean).")
 
 
 SCENARIOS: dict[str, Callable[[], None]] = {

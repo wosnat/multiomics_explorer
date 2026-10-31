@@ -37,7 +37,7 @@ Plus five orthogonal helpers:
 
 - **`kg_release_info`** — release identity + compatibility verdict. Call it first (see above).
 - **`kg_schema`** — node labels, relationship types, properties. Read this before reaching for `run_cypher`.
-- **`list_filter_values`** — canonical values for every closed vocabulary (gene categories, growth phases, `cluster_type`, `table_scope`, and the annotation-trust vocabularies), each with a `count` and, where stored, a `description`. Full enum: `docs://tools/list_filter_values/full`.
+- **`list_filter_values`** — canonical values for every closed vocabulary (gene, expression, DM, chemistry, trust), with counts and descriptions where stored. Full enum: `docs://tools/list_filter_values/full`.
 - **`list_organisms`** — organism taxonomy plus per-organism capability rollups (gene/expression/DM/chemistry/metabolomics/annotation counts).
 - **`run_cypher`** — read-only Cypher escape hatch for the rare question no tool covers; validate against `kg_schema` first.
 
@@ -47,7 +47,7 @@ Plus five orthogonal helpers:
 
 ### "What does gene X do? / Show me everything about gene X."
 1. `resolve_gene(identifier="X")` if the input is a name or partial label.
-2. `gene_overview(locus_tags=[...])` — identity + data-availability rollup; routing fields (`expression_edge_count`, `derived_metric_count`, `evidence_sources`, `tcdb_assignment_count`, `discussed_in_publication_count`, ...) say which drill-downs have evidence. Full list: `docs://tools/gene_overview/full`.
+2. `gene_overview(locus_tags=[...])` — identity + data-availability rollup; routing fields (`expression_edge_count`, `evidence_sources`, `tcdb_assignment_count`, ...) say which drill-downs have evidence. Full list: `docs://tools/gene_overview/full`.
 3. Drill into the non-zero signals: `differential_expression_by_gene`, `gene_clusters_by_gene`, `gene_derived_metrics`, `gene_ontology_terms`, `metabolites_by_gene`, `gene_homologs`. `gene_details` for the raw property dump.
 
 ### "Find genes related to {keyword / function}."
@@ -58,7 +58,7 @@ Plus five orthogonal helpers:
 ### "What pathways / functional categories are enriched in my DE set?"
 0. **Step 0, always:** `ontology_landscape(organism=..., experiment_ids=[...])` — pick a defensible (ontology, level) before enrichment, or risk an oversized or uninformative term set.
 1. `pathway_enrichment(experiment_ids=[...], organism=..., ontology=..., level=...)`. Methodology, background semantics, `informative_only` default: `docs://analysis/enrichment`.
-2. Trust filters (`sources=`, `evidence=`, `max_tier=`, `min_evidence_score=`, `call_class=`) shape TERM2GENE and background identically; `interpro_type=` is **required** for `ontology='interpro'`.
+2. Trust filters (`sources=`, `evidence=`, `max_tier=`, `min_evidence_score=`, `call_class=`, `tcdb_call=`) shape TERM2GENE and background identically; `interpro_type=` is **required** for `ontology='interpro'`.
 
 ### "What do experiments in this KG measure?"
 1. `list_experiments(summary=True)` — orientation breakdowns by organism / treatment / omics / table_scope.
@@ -81,13 +81,13 @@ Plus five orthogonal helpers:
 3. One gene's full DM profile: `gene_derived_metrics(locus_tags=[...], organism=...)`.
 
 ### "What metabolites does this gene catalyse / transport?"
-1. `gene_overview(locus_tags=[...])` first — `evidence_sources` tells you whether `metabolism` and/or `transport` apply.
-2. `metabolites_by_gene(locus_tags=[...], organism=...)`. Inspect per-row `evidence_source`; TCDB rows carry `tcdb_route` (`direct`; `family` only with `include_tcdb_family_substrates=True` — see the warning), `tcdb_identity`, `tcdb_calls`.
+1. `gene_overview(locus_tags=[...])` first — `evidence_sources` tells you which routes apply (`metabolism`, `transport` (TCDB), `go_transport` (GO)).
+2. `metabolites_by_gene(locus_tags=[...], organism=...)`. Inspect per-row `evidence_source`; TCDB rows are direct systems (`family` rows only with `include_tcdb_family_substrates=True` — see the warning), ranked by `tcdb_identity`. GO rows are term definitions, not transporter calls (`docs://analysis/transport`).
 3. Reaction direction is **never** in the KG (KEGG reactions are undirected; `tcdb_direction` is a node-level hint) — layer DE direction to tell produced from consumed. Full tree: `docs://analysis/metabolites`.
 
 ### "What genes catalyse / transport / measure metabolite Y?"
-1. `list_metabolites(search_text="Y")` or `list_metabolites(metabolite_ids=[...])` to confirm it exists and check organism reach. Bare and xref IDs (`C00064`, `CHEBI:17234`, `HMDB…`, `MNXM…`) work on every `metabolite_ids` (echoed in `resolved_aliases`).
-2. `genes_by_metabolite(metabolite_ids=[...], organism=...)` for catalysts/transporters in one organism; `exclude_metabolite_ids=[...]` strips currency cofactors.
+1. `list_metabolites(search_text="Y")` or `list_metabolites(metabolite_ids=[...])` to confirm it exists and check organism reach. Any id form (`C00064`, `CHEBI:17234`, `HMDB…`) works, echoed in `resolved_aliases`.
+2. `genes_by_metabolite(metabolite_ids=[...], organism=...)` for catalysts/transporters in one organism; `exclude_metabolite_ids=[...]` strips currency cofactors. Routes: `docs://analysis/transport`.
 
 ### "Which metabolites were measured under condition Z?"
 1. `list_metabolite_assays(experiment_ids=[...], compartment=..., value_kind=...)` — discovers MetaboliteAssay nodes for that slice; tested-absent metabolites are real biology (`docs://guide/conventions`).
@@ -96,14 +96,14 @@ Plus five orthogonal helpers:
 
 ### "Which metabolites can organism A make that organism B can take up?"
 This is **cross-feeding**: pair one organism's production with another's uptake capability.
-1. `list_metabolites(organism_names=["A"], evidence_sources=["metabolism"])` — both filters = A's route (row gene counts: all organisms).
+1. `list_metabolites(organism_names=["A"], evidence_sources=["metabolism"])` — both filters = A's route (gene counts: KG-wide).
 2. Same: `["B"]` + `["transport"]`; intersect by `metabolite_id`, then `genes_by_metabolite(metabolite_ids=[...], organism="B", evidence_sources=['transport'])`.
 3. Compare the two gene sets per metabolite. Full tree + the undirected-reaction caveat: `docs://analysis/metabolites`.
 
 ### "Which genes belong to BRITE category / TCDB family / CAZy family / InterPro entry / MEROPS clan X?"
 - `genes_by_ontology(ontology=..., term_ids=[...], organism=...)` builds the TERM2GENE for any of the 17 ontologies. BRITE: scope with `tree=` (`list_filter_values(filter_type='brite_tree')`).
 - **Substrate-anchored TCDB** ("which genes transport metabolite Y", not "which genes are in family X")? Use `genes_by_metabolite` instead.
-- Trust filters (`sources=`, `evidence=`, `max_tier=`, `min_evidence_score=`, `call_class=`, `interpro_type=`) on 15 of the 17; rank-vs-filter rule + per-ontology axes: `docs://analysis/annotation_evidence`.
+- Trust filters (`sources=`, `evidence=`, `max_tier=`, `min_evidence_score=`, `call_class=` (MEROPS), `tcdb_call=` (TCDB), `interpro_type=`) on 15 of the 17; rank-vs-filter rule + per-ontology axes: `docs://analysis/annotation_evidence`.
 - No term ID yet? `search_ontology(ontology=['tcdb'], level=2)` browses by size. Have the ID? `ontology_term_details(term_ids=[...])`. Per-ontology semantics: `docs://ontologies/{key}`.
 
 ### "Are transporters as a class responding to this condition?"
@@ -126,7 +126,7 @@ This is **bridge walking**: `ontology_term_details(term_ids=[...]).links_out[]` 
 - `gene_aa_sequence(locus_tags=[...], fasta=True)` — returns amino-acid sequences (no nucleotide). `fasta=True` gives one multi-FASTA blob ready to paste into an external aligner / search tool.
 
 ### "What genes sit next to X on the genome / is X in an operon?"
-- `gene_neighbors(locus_tags=["X"], window=5)` — genes flanking the anchor on the same contig, with `rank_offset`, `bp_gap`, and `same_strand`. Positional only — co-regulation must be confirmed via the expression tools, not inferred from adjacency.
+- `gene_neighbors(locus_tags=["X"], window=5)` — genes flanking the anchor on the same contig, with `rank_offset`, `bp_gap`, and `same_strand`. Positional only — confirm co-regulation with the expression tools.
 
 ### "What does paper Y discuss? / Which papers discuss gene or pathway X?"
 The **literature index** — a recall-biased index of genes and KEGG pathways each paper names in prose (`prominence` + an `evidence` quote); not exhaustive, not expression data (`differential_expression_by_gene` for DE).
@@ -164,8 +164,9 @@ drill-down has no data for the row. Full rule: `docs://guide/conventions`.
 
 Every served page — guides, per-tool briefs and `/full` pages,
 per-ontology references, analysis methodology, runnable examples — is
-listed with size and a one-line "read when" at `docs://index`. Worth
+listed with size at `docs://index` (guide / analysis / example rows add
+a "read when"). Worth
 knowing by name: `docs://guide/concepts` (entity model),
 `docs://guide/conventions` (cross-tool semantics), and the methodology
 pages behind the workflows above: `docs://analysis/{enrichment,
-metabolites,derived_metrics,annotation_evidence,expression}`.
+metabolites,transport,derived_metrics,annotation_evidence,expression}`.

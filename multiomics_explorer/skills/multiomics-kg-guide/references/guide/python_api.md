@@ -11,8 +11,8 @@ code beyond what this guide covers):
 
 - `docs://analysis/enrichment` — pathway enrichment with `EnrichmentResult`,
   background semantics, `informative_only` rationale, custom TERM2GENE.
-- `docs://analysis/metabolites` — chemistry layer (3 source pipelines)
-  with track-by-track decision tree.
+- `docs://analysis/metabolites` — chemistry layer (metabolism, transport —
+  TCDB and GO routes, metabolomics) with a track-by-track decision tree.
 - `docs://analysis/transport` — the three transport routes (KEGG, TCDB, GO)
   side by side: biases, agreement, what an empty answer means.
 - `docs://analysis/derived_metrics` — DerivedMetric family (numeric /
@@ -24,8 +24,7 @@ code beyond what this guide covers):
 
 - `docs://examples/pathway_enrichment.py` — `EnrichmentResult` accessors,
   custom term2gene, `informative_only` side-by-side comparison.
-- `docs://examples/metabolites.py` — 7 worked scenarios spanning the 3
-  metabolite source pipelines.
+- `docs://examples/metabolites.py` — 7 worked metabolite scenarios.
 - `docs://examples/annotation_evidence.py` — annotation-trust filters,
   rank-vs-filter, MEROPS `call_class`, InterPro enrichment (4 scenarios).
 - `docs://examples/ontology_terms.py` — browse, multi-ontology search, term
@@ -113,8 +112,8 @@ return types:
 ```python
 result = list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"])
 # {
-#   "total_matching": 1563,
-#   "by_organism": [...],
+#   "total_matching": 630,
+#   "top_organisms": [...],
 #   "top_metabolite_pathways": [...],
 #   "results": [ {...}, {...}, ... ],
 #   "not_found": {...},
@@ -265,14 +264,7 @@ Every API function accepts `conn: GraphConnection | None = None` as a
 **keyword-only** argument (`conn=conn`; passing it positionally raises
 `TypeError`), including `kg_release_info()` / `kg_release_info(conn=conn)`.
 When `conn=None` (the default), the function creates a fresh
-`GraphConnection` per call:
-
-```python
-def _default_conn(conn: GraphConnection | None) -> GraphConnection:
-    if conn is None:
-        return GraphConnection()
-    return conn
-```
+`GraphConnection` per call.
 
 `GraphConnection` is lazy — the underlying Neo4j driver is created on
 first use. For one-off scripts the default is fine; the connection
@@ -385,12 +377,9 @@ with GraphConnection() as conn:
         conn=conn,
     )
     df_genes = to_dataframe(drill)
-
-# Both DataFrames closed-form for plotting / CSV.
 ```
 
-For the chemistry-specific worked examples (3 source pipelines × 7
-scenarios) see `docs://examples/metabolites.py`.
+For the chemistry-specific worked examples see `docs://examples/metabolites.py`.
 
 ---
 
@@ -401,7 +390,7 @@ scenarios) see `docs://examples/metabolites.py`.
 - `docs://guide/conventions` — filter semantics, response shapes, gotchas that apply across tools.
 - `docs://analysis/enrichment` — `EnrichmentResult` accessors, custom
   TERM2GENE, background semantics, `informative_only` rationale.
-- `docs://analysis/metabolites` — chemistry layer (3 source pipelines).
+- `docs://analysis/metabolites` — chemistry layer and decision tree.
 - `docs://analysis/transport` — transport routes (KEGG, TCDB, GO) compared.
 - `docs://analysis/derived_metrics` — DerivedMetric family in Python.
 - `docs://analysis/expression` — DE-family tools, `response_matrix`,

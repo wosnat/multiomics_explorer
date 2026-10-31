@@ -1,8 +1,10 @@
 # KG concepts — what each node and edge means
 
-The knowledge graph integrates Prochlorococcus and Alteromonas multi-omics
-data: genomes, transcriptomes, proteomes, metabolomes, ortholog groups,
-ontologies, and curated reaction / transport chemistry. This page is a
+Read when an entity in a tool output is unfamiliar: what each node and
+edge means (Gene, Experiment, DerivedMetric, Metabolite, ontology terms)
+and how they connect. The knowledge graph integrates Prochlorococcus and
+Alteromonas genomes, transcriptomes, proteomes, metabolomes, ortholog
+groups, ontologies, and curated reaction / transport chemistry. This page is a
 short orientation to the entities you will see in tool outputs and a map
 of how they connect. For a tool-by-tool index see `docs://guide/start_here`.
 
@@ -64,13 +66,13 @@ carry DerivedMetrics, never expression). Read the live set with
   layer — anchored on Metabolite, not Gene.
 
 **Compartment.** Where in the cell the measurement was sampled.
-Carried on `Experiment.compartment` (proteomics + metabolomics),
+Carried on `Experiment.compartment` (every wet-lab experiment; RNAseq
+is always `whole_cell`, with no fractionation),
 `DerivedMetric.compartment`, and `MetaboliteAssay.compartment`.
 The vocabulary declares four values (`whole_cell`, `vesicle`,
 `exoproteome`, `extracellular`) — `list_filter_values('compartment')`
 returns the declared set with per-value counts, so read it before
-filtering. RNAseq experiments are uniformly `whole_cell` (no
-fractionation). The same gene may have proteomics DE in `whole_cell`
+filtering. The same gene may have proteomics DE in `whole_cell`
 and `vesicle` simultaneously — distinct rows. Filter via
 `compartment=...` on `list_experiments`, `list_derived_metrics`,
 `list_metabolite_assays`, and `list_organisms`.
@@ -89,7 +91,7 @@ and `vesicle` simultaneously — distinct rows. Filter via
   naming"). Not every node has genes — genus-level, phage and
   treatment-only taxa exist for experiment metadata and never resolve
   as an `organism=` value.
-- **`Gene`** (~127k nodes across all organisms) — anchored by
+- **`Gene`** — anchored by
   `locus_tag` and `organism_name`. Carries pre-computed routing
   rollups: `expression_edge_count`, `numeric_metric_count` /
   `boolean_metric_count` / `categorical_metric_count`,
@@ -166,8 +168,10 @@ and `vesicle` simultaneously — distinct rows. Filter via
   compounds, mostly TCDB substrates). Carries
   cross-refs (`chebi_id`, `hmdb_id`, `mnxm_id`), `formula`, `elements`
   (presence list, never substring), `mass`, and a precomputed
-  `evidence_sources` list — subset of {`metabolism`, `transport`,
-  `metabolomics`} indicating which pipelines reach this compound. The
+  `evidence_sources` list — subset of {`metabolism`, `transport` (TCDB),
+  `go_transport` (a GO transport term names it — a term definition, not
+  a gene fact), `metabolomics`} — which routes reach this compound,
+  KG-wide (not per organism). The
   first-class chemistry node: query directly with `list_metabolites`,
   drill in via `genes_by_metabolite` / `metabolites_by_gene`. Every
   `metabolite_ids` parameter accepts any id form, bare or prefixed
@@ -184,23 +188,20 @@ and `vesicle` simultaneously — distinct rows. Filter via
   `metabolites_by_gene`. They are stored undirected — KEGG equation
   order is unreliable upstream, so the KG does not encode substrate
   vs product.
-- **`TcdbFamily`** — TCDB's transporter hierarchy, five levels: class →
-  subclass → family → subfamily → system (`level_kind` `tc_system`, a
-  5-part TC number such as `tcdb:3.A.1.4.4`). Substrates attach to
-  **systems only**, through `Tcdb_family_transports_metabolite` /
-  `Tcdb_family_transports_chemical_role`, as TCDB curates them; a
-  family's range is the union of its systems' substrates
-  (`tcdb_substrate_count`). Nodes also carry a TCDB-stated `direction`
-  (`uptake` / `export` / `unknown`). Many nodes are range-only
-  (`gene_count = 0`): they exist so a family's full TCDB range is
-  reachable. Genes connect via `Gene_has_tcdb_family`, one edge per
-  source (`tcdb_call`: `diamond_best_hit`, `diamond_tier`, `eggnog`),
-  each stamped with a gate (`tcdb_gate`: `direct` onto a system,
-  `annotated`, or `below_gate` for weak hits). Transport rows use
-  `direct` edges; annotation rows, `tcdb_assignment_count` and
-  enrichment use `direct` + `annotated`. Genes carry
-  `tcdb_assignment_count` and `transported_metabolite_count` — see
-  `docs://analysis/transport` and `docs://analysis/metabolites`.
+- **`TcdbFamily`** — TCDB's transporter hierarchy (class → subclass →
+  family → subfamily → system; a system is a 5-part TC number such as
+  `tcdb:3.A.1.4.4`, `level_kind` `tc_system`). Substrates (`Metabolite`
+  / `ChemicalRole`) attach to **systems only**; many nodes are
+  range-only (`gene_count = 0`). Genes connect through
+  `Gene_has_tcdb_family`, one gated edge per source (`tcdb_call`,
+  `tcdb_gate`). How rows use the gate: `docs://ontologies/tcdb`; reading
+  a transport row: `docs://analysis/transport`.
+- **`ChemicalRole`** — a ChEBI role class (`chebi.role:<n>`, e.g.
+  'siderophore', 'drug', 'vitamin (role)') that TCDB systems and GO
+  transport terms name as a substrate. Not a metabolite:
+  `list_metabolites` never returns one, but `genes_by_metabolite` /
+  `metabolites_by_gene` accept role ids and return role rows
+  (`target_kind='chemical_role'`).
 
 ### Ontology nodes (17 ontologies)
 
@@ -314,6 +315,9 @@ or every named entity and are not used by tools directly.
                                                                                   ^
                                                                                   |
    Gene ──[Gene_has_tcdb_family]──► TcdbFamily ──[Tcdb_family_transports_metabolite]
+   Gene ──[Gene_enables_molecular_function / Gene_involved_in_biological_process]──► GO term
+          ──[{Molecular_function,Biological_process}_transports_metabolite]──► Metabolite   (go_transport)
+   TcdbFamily / GO term ──[*_transports_chemical_role]──► ChemicalRole
                                                                                   
    MetaboliteAssay ─[Assay_{quantifies,flags}_metabolite]─► Metabolite
 
@@ -338,10 +342,11 @@ for functional classification, cross-linked by the bridge edges.
 
 ---
 
-## Three metabolite source pipelines
+## Metabolite source pipelines
 
-The same Metabolite node may carry evidence from up to three
-independent pipelines, indicated by `Metabolite.evidence_sources`:
+The same Metabolite node may carry evidence from three independent
+pipelines, indicated by `Metabolite.evidence_sources`; transport has two
+routes, so the list has four values:
 
 1. **`metabolism`** — `Gene → Reaction → Metabolite` from KEGG. Catalysis
    evidence; direction-agnostic (KEGG equation order is unreliable, so
@@ -350,6 +355,11 @@ independent pipelines, indicated by `Metabolite.evidence_sources`:
    Transport substrate evidence; direct rows by default (the gene's own
    system call), family-level rows with `include_tcdb_family_substrates=True`;
    `tcdb_identity` and `tcdb_calls` qualify each row.
+   **`go_transport`** is the second transport route — `Gene → GO term →
+   Metabolite / ChemicalRole`, where the GO term's definition names the
+   compound (a term definition, not a gene fact). It runs by default in
+   `genes_by_metabolite` / `metabolites_by_gene` and is never merged with
+   TCDB.
 3. **`metabolomics`** — `MetaboliteAssay → Metabolite`. Mass-spec
    measurement evidence; *no gene anchor* — the measurement is on the
    compound, not the gene.
@@ -358,16 +368,16 @@ Because these pipelines are independent, `genes_by_metabolite`,
 `metabolites_by_gene`, and `list_metabolites` carry an `evidence_source`
 discriminator on each row (or in filters / rollups), and the
 `metabolomics` arm has its own dedicated tool family. See
-`docs://analysis/metabolites` for the full decision tree.
+`docs://analysis/metabolites` (decision tree) and
+`docs://analysis/transport` (the transport routes side by side).
 
 ---
 
 ## Cardinalities
 
 Exact counts are intentionally **not** listed on this page — they change
-with every KG rebuild and a table reads as ground truth. The few orders
-of magnitude above (~127k genes) are there only to
-set scale. To get current cardinalities, call the tools that compute
+with every KG rebuild and a table reads as ground truth. Where a page
+quotes a figure, it is there only to set scale. To get current cardinalities, call the tools that compute
 them live:
 
 - **`kg_release_info`** — headline gene / experiment / paper / organism
