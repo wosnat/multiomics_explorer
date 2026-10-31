@@ -1291,8 +1291,10 @@ mistakes:
     genes, and the walk adds phnC/D/E and PMM0717 through subfamily
     tcdb:3.A.1.9. `tcdb_family_substrates_skipped` lists genes whose only call
     is on a superfamily curated with over 200 substrates (ABC tcdb:3.A.1, MFS
-    tcdb:2.A.1). The same genes recur across many compounds: read them as
-    "substrate unknown", not "candidate for this compound". See `docs://analysis/transport`.
+    tcdb:2.A.1) and whose superfamily carries the queried compound in at
+    least one system. ABC tcdb:3.A.1 carries hundreds of substrates, so its genes
+    recur across many compounds: read them as "substrate unknown", not
+    "candidate for this compound". See `docs://analysis/transport`.
   - >-
     A `go_transport` row is a GO term definition, not a gene fact. GO defines
     the term (for example go:0033221 "ATPase-coupled urea transmembrane

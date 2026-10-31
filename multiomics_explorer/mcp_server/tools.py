@@ -1243,10 +1243,10 @@ class GenesByMetaboliteResponse(BaseModel):
         "concluding 'no transporter'.")
     tcdb_family_substrates_skipped: list[TcdbFamilySubstrateSkipped] = Field(
         default_factory=list,
-        description="Genes whose family-walk start was removed by the "
-        "200-substrate breadth cap (superfamily call, e.g. ABC 3.A.1). "
-        "Always computed; the same genes recur across many compounds. "
-        "Read as 'substrate unknown', not as candidates for this one.")
+        description="Genes whose family-walk start (e.g. ABC 3.A.1) was "
+        "removed by the 200-substrate breadth cap and carries a queried "
+        "metabolite. ABC genes recur for most compounds: read as 'substrate "
+        "unknown', not as candidates for this one.")
     rows_by_go_term_depth: list[RowsByGoTermDepth] | None = Field(
         default=None,
         description="GO route rows per `go_term_depth`, sorted by depth "
@@ -1663,7 +1663,8 @@ class MetabolitesByGeneResponse(BaseModel):
         default_factory=list,
         description="Genes whose family-walk start was removed by the "
         "200-substrate breadth cap (superfamily call, substrate unknown), "
-        "e.g. ABC 3.A.1. Always computed.")
+        "e.g. ABC 3.A.1. Always computed. With a metabolite filter, only "
+        "starts whose systems carry a matching metabolite.")
     rows_by_go_term_depth: list[RowsByGoTermDepth] | None = Field(
         default=None,
         description="GO route rows per `go_term_depth`, sorted by depth "
@@ -2200,12 +2201,12 @@ def register_tools(mcp: FastMCP):
         by_organism_type: list[OrgTypeBreakdown] = Field(default_factory=list, description="Organism counts per type over the matched set, sorted desc.")
         by_value_kind: list[OrgValueKindBreakdown] = Field(default_factory=list, description="DM value_kind frequency rollup across matched organisms.")
         by_metric_type: list[OrgMetricTypeBreakdown] = Field(default_factory=list, description="DM metric_type frequency rollup across matched organisms.")
-        by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
+        by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 (detail and summary calls alike).")
         by_compartment: list[OrgCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched organisms.")
-        top_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms by catalyzed_metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites. `summary=True` returns the full ranked list.")
-        top_metabolic_capability_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
-        top_annotation_capability: list[OrgAnnotationCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms (within matched set) by peptidase_gene_count desc, then preferred_name. Carries all four annotation counts; excludes organisms with all four = 0. [] when none. Coverage ranking for reading, not a filter. `summary=True` returns the full ranked list.")
-        top_annotation_capability_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
+        top_metabolic_capability: list[OrgMetabolicCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms by catalyzed_metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites. Capped at 10 in summary mode too; every organism's counts are on its row.")
+        top_metabolic_capability_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 (detail and summary calls alike).")
+        top_annotation_capability: list[OrgAnnotationCapabilityBreakdown] = Field(default_factory=list, description="Top 10 organisms (within matched set) by peptidase_gene_count desc, then preferred_name. Carries all four annotation counts; excludes organisms with all four = 0. [] when none. Coverage ranking for reading, not a filter. Capped at 10 in summary mode too; every organism's counts are on its row.")
+        top_annotation_capability_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 (detail and summary calls alike).")
         by_measurement_capability: OrgMeasurementCapability = Field(default_factory=OrgMeasurementCapability, description="Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics} (tool-specific deviation from list_/by_-style frequency rollups elsewhere — exactly two keys).")
         returned: int = Field(description="Number of results returned.")
         offset: int = Field(default=0, description="Offset into full result set.")
@@ -2241,7 +2242,7 @@ def register_tools(mcp: FastMCP):
         Use to pick an organism or check what data it carries before scoping another tool; for gene lookup use `resolve_gene`.
         Filters: organism_names, compartment.
         Returns: by_organism_type, top_metabolic_capability, top_annotation_capability, by_measurement_capability, not_found; one row = one OrganismTaxon.
-        docs://tools/list_organisms; summary=True is uncapped (larger than the default call).
+        docs://tools/list_organisms; summary=True caps the same rollups at 10 (smaller than the default call).
         """
         await ctx.info(
             f"list_organisms organism_names={organism_names} compartment={compartment} "
@@ -2317,7 +2318,7 @@ def register_tools(mcp: FastMCP):
     class ResolveGeneResponse(BaseModel):
         total_matching: int = Field(description="Total genes matching identifier + organism filter.")
         by_organism: list[ResolveOrganismBreakdown] = Field(description="Match counts per organism, sorted desc.")
-        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown, or organism= to narrow.")
+        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 (detail and summary calls alike) — pass organism= to narrow.")
         returned: int = Field(description="Genes in this response (0 when summary=True).")
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True if total_matching > returned.")
@@ -2344,7 +2345,7 @@ def register_tools(mcp: FastMCP):
         Use when the input is an exact name, locus tag or alias (no partial matching); for partial / free-text use `genes_by_function`, for what a gene does `gene_overview`.
         Filters: identifier, organism.
         Returns: total_matching, by_organism; one row = one Gene match (locus_tag, gene_name, product, organism_name).
-        docs://tools/resolve_gene; summary=True returns by_organism uncapped (larger than the default call).
+        docs://tools/resolve_gene; summary=True caps by_organism at 10 too (smaller than the default call).
         """
         await ctx.info(f"resolve_gene identifier={identifier} organism={organism} offset={offset} summary={summary}")
         try:
@@ -4029,14 +4030,14 @@ def register_tools(mcp: FastMCP):
         total_entries: int = Field(description="Total publications in KG (unfiltered).")
         total_matching: int = Field(description="Publications matching filters.")
         by_organism: list[PubOrganismBreakdown] = Field(description="Publication counts per organism, sorted desc.")
-        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown.")
+        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 (detail and summary calls alike).")
         by_treatment_type: list[PubTreatmentTypeBreakdown] = Field(description="Publication counts per treatment type, sorted desc.")
         by_background_factors: list[PubBackgroundFactorBreakdown] = Field(description="Publication counts per background factor, sorted desc.")
         by_omics_type: list[PubOmicsTypeBreakdown] = Field(description="Publication counts per omics platform, sorted desc.")
         by_cluster_type: list[PubClusterTypeBreakdown] = Field(default_factory=list, description="Publication counts per cluster type, sorted desc.")
         by_value_kind: list[PubValueKindBreakdown] = Field(default_factory=list, description="DerivedMetric value kind frequency rollup across matched publications.")
         by_metric_type: list[PubMetricTypeBreakdown] = Field(default_factory=list, description="DerivedMetric type frequency rollup across matched publications.")
-        by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown.")
+        by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 (detail and summary calls alike).")
         by_compartment: list[PubCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched publications.")
         by_discusses_coverage: PubDiscussesCoverageBreakdown = Field(default_factory=PubDiscussesCoverageBreakdown, description="Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (56 vs 4 in the current KG).")
         returned: int = Field(description="Publications in this response (0 when summary=True).")
@@ -4076,7 +4077,7 @@ def register_tools(mcp: FastMCP):
         Use as the study-level discovery entry point; for per-experiment detail use `list_experiments(publication_dois=[...])`, for the entities a paper names `discussed_by_publication`.
         Filters: organism, search_text, author, publication_dois, compartment, plus the condition filters.
         Returns: by_organism, by_treatment_type, by_omics_type, by_compartment, by_discusses_coverage, not_found; one row = one publication.
-        docs://tools/list_publications; summary=True is uncapped (larger than the default call).
+        docs://tools/list_publications; summary=True caps the same rollups (smaller than the default call).
         """
         await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
                        f"growth_phases={growth_phases} search_text={search_text} author={author} "
@@ -4261,21 +4262,21 @@ def register_tools(mcp: FastMCP):
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True if results were truncated by limit or summary=true.")
         by_organism: list[OrganismBreakdown] = Field(description="Experiment counts per organism, sorted desc.")
-        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
+        by_organism_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 (detail and summary calls alike).")
         by_treatment_type: list[TreatmentTypeBreakdown] = Field(description="Experiment counts per treatment type, sorted desc.")
         by_treatment_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         by_background_factors: list[BackgroundFactorBreakdown] = Field(description="Experiment counts per background factor, sorted desc.")
         by_background_factors_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
         by_omics_type: list[OmicsTypeBreakdown] = Field(description="Experiment counts per omics platform, sorted desc.")
         by_publication: list[PublicationBreakdown] = Field(description="Experiment counts per publication, sorted desc.")
-        by_publication_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
+        by_publication_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 (detail and summary calls alike).")
         by_table_scope: list[TableScopeBreakdown] = Field(description="Experiment counts per table scope, sorted desc.")
         by_control_timing: list[ControlTimingBreakdown] = Field(default_factory=list, description="Experiment counts per control_timing, sorted desc. Experiments without DE (null control_timing) are not counted.")
         by_cluster_type: list[ClusterTypeBreakdown] = Field(default_factory=list, description="Experiment counts per cluster type, sorted desc.")
         by_growth_phase: list[GrowthPhaseBreakdown] = Field(default_factory=list, description="Experiment counts per growth phase, sorted desc.")
         by_value_kind: list[ExpValueKindBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric value_kind across matching experiments.")
         by_metric_type: list[ExpMetricTypeBreakdown] = Field(default_factory=list, description="Experiment counts by DerivedMetric metric_type across matching experiments.")
-        by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
+        by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 (detail and summary calls alike).")
         by_compartment: list[ExpCompartmentBreakdown] = Field(default_factory=list, description="Experiment counts per wet-lab compartment.")
         by_coculture_role: list[CocultureRoleBreakdown] = Field(default_factory=list, description="Matching experiments per coculture partner role, sorted desc. An experiment counts once per distinct role among its partners; axenic experiments count in none, so the sum need not equal total_matching.")
         time_course_count: int = Field(description="Number of time-course experiments in matching set.")

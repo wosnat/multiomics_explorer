@@ -301,8 +301,10 @@ _TRUST_AXIS_DESCRIPTIONS: dict[str, str] = {
     "evidence_score": "Composite trust score in 0..1 — the only numeric "
                       "cutoff (min_evidence_score) and the within-ontology "
                       "sort key.",
-    "tier": "Diamond-truncation depth 1..3; null means the edge was never "
-            "truncated (for TCDB, an eggNOG call).",
+    "tier": "Confidence band 1..3. TCDB: consensus tier on diamond_tier "
+            "edges, identity band on diamond_best_hit edges (never compare "
+            "across call kinds), null on eggNOG calls. MEROPS: diamond "
+            "truncation depth.",
 }
 
 # Cached ControlledVocabulary reads, keyed by (applies_to, property). The
@@ -1530,9 +1532,9 @@ def resolve_gene(
     truncated, results.
     Per result: locus_tag, gene_name, product, organism_name.
 
-    by_organism is capped to 10 entries on detail calls
-    (`by_organism_truncated: True` when trimmed); summary=True returns it
-    uncapped with results=[], returned=0, truncated = total_matching > 0.
+    by_organism is capped to 10 entries on every call, summary=True included
+    (`by_organism_truncated: True` when trimmed); summary=True returns
+    results=[], returned=0, truncated = total_matching > 0.
     """
     if not identifier or not identifier.strip():
         logger.debug("resolve_gene: empty identifier")
@@ -1565,7 +1567,9 @@ def resolve_gene(
         "truncated": (total > 0) if summary else (total > offset + len(results)),
         "results": results,
     }
-    return _cap_breakdowns(envelope, ("by_organism",), summary=summary)
+    # backlog 2d.2: capped on summary calls too, so summary=True stays smaller
+    # than a default page.
+    return _cap_breakdowns(envelope, ("by_organism",), summary=False)
 
 
 @listify_bare_str
@@ -2465,9 +2469,8 @@ def list_organisms(
     organism for MEROPS / InterPro / NCBIfam questions — there is no filter
     on these counts.
     top_metabolic_capability / top_annotation_capability / by_metric_type
-    are capped to the first 10 entries on detail calls (summary=False, the
-    default), with a sparse `<key>_truncated=True` flag when capped;
-    summary=True returns each list in full.
+    are capped to the first 10 entries on every call (summary=True
+    included), with a sparse `<key>_truncated=True` flag when capped.
     """
     conn = _default_conn(conn)
     if summary:
@@ -2560,7 +2563,7 @@ def list_organisms(
     # in the matched set; excludes zero-chemistry rows. transported_metabolite_count
     # and go_transport_metabolite_count ride along as columns (ranking
     # unchanged — catalysis arm). Capped to
-    # top 10 on detail calls by _cap_breakdowns below.
+    # top 10 on every call by _cap_breakdowns below.
     chemistry_capable = [
         {
             "organism_name": r["organism_name"],
@@ -2578,15 +2581,15 @@ def list_organisms(
     chemistry_capable.sort(
         key=lambda r: r["catalyzed_metabolite_count"], reverse=True,
     )
-    # Full sorted list; _cap_breakdowns below caps to top 10 on detail calls
+    # Full sorted list; _cap_breakdowns below caps to top 10 on every call
     # and keeps the full list when summary=True.
     top_metabolic_capability = chemistry_capable
 
     # top_annotation_capability (slice 4 §3.3): organisms ranked by
     # peptidase_gene_count desc then preferred_name; all-four-zero rows
     # excluded. Ranked api-side from the full matched capability rows (same
-    # set in both detail and summary mode) so summary=True can carry the
-    # full ranking; _cap_breakdowns caps to top 10 on detail calls.
+    # set in both detail and summary mode); the ranking is identical
+    # in both modes; _cap_breakdowns caps to top 10 on every call.
     top_annotation_capability = _rank_annotation_capability(capability_rows)
 
     # not_found: input names that didn't match any OrganismTaxon
@@ -2633,10 +2636,12 @@ def list_organisms(
         "warnings": warnings,
         "results": results,
     }
+    # backlog 2d.2: capped on summary calls too (uncapped they were ~5x a
+    # default page); the per-organism counts are on the rows themselves.
     return _cap_breakdowns(
         envelope,
         ("by_metric_type", "top_annotation_capability", "top_metabolic_capability"),
-        summary=summary,
+        summary=False,
     )
 
 
@@ -2651,8 +2656,7 @@ def _rank_annotation_capability(rows: list[dict]) -> list[dict]:
 
     Sort key: peptidase_gene_count desc, then preferred_name (== organism_name
     on the row projection). Rows with all four counts at 0 are dropped.
-    Callers cap to the top 10 (see `_cap_breakdowns`); summary callers keep
-    the full ranking.
+    The caller caps to the top 10 (see `_cap_breakdowns`) on every call.
     """
     entries = []
     for r in rows:
@@ -2693,9 +2697,9 @@ def list_publications(
     by_omics_type, by_cluster_type, by_value_kind, by_metric_type,
     by_compartment, by_discusses_coverage, not_found, warnings, results.
 
-    summary=True: results=[], returned=0, truncated = total_matching > 0,
-    and every by_* rollup is returned uncapped (detail calls cap
-    by_organism / by_metric_type to 10 with a `<key>_truncated` flag).
+    summary=True: results=[], returned=0, truncated = total_matching > 0.
+    by_organism / by_metric_type are capped to 10 with a `<key>_truncated`
+    flag on every call, summary=True included.
     The detail Cypher is skipped entirely.
 
     warnings: a closed-vocabulary filter value (treatment_type /
@@ -2832,8 +2836,24 @@ def list_publications(
         "warnings": warnings,
         "results": results,
     }
+    # backlog 2d.2: capped on summary calls too, so summary=True stays smaller
+    # than a default page.
     return _cap_breakdowns(
-        envelope, ("by_metric_type", "by_organism"), summary=summary_flag,
+        envelope, ("by_metric_type", "by_organism"), summary=False,
+    )
+
+
+def _cap_list_experiments_breakdowns(envelope: dict, *, summary: bool) -> dict:
+    """by_publication / by_metric_type / by_organism are capped on every call
+    (backlog 2d.2 — uncapped they made summary=True larger than a default
+    page); the short vocabulary rollups stay uncapped on summary calls."""
+    _cap_breakdowns(
+        envelope, ("by_publication", "by_metric_type", "by_organism"),
+        summary=False,
+    )
+    return _cap_breakdowns(
+        envelope, ("by_treatment_type", "by_background_factors"),
+        summary=summary,
     )
 
 
@@ -2886,6 +2906,9 @@ def list_experiments(
 
     summary=True is sugar for limit=0: results is empty list,
     returned=0, truncated=True.
+    by_organism / by_publication / by_metric_type are capped to 10 with a
+    `<key>_truncated` flag on every call; by_treatment_type /
+    by_background_factors are capped on detail calls only.
     When summary=False (default): results populated with experiments.
     Per result (compact): experiment_id, experiment_name, publication_doi,
     authors, organism_name, treatment_type, background_factors, coculture_partner,
@@ -3085,12 +3108,7 @@ def list_experiments(
         envelope["offset"] = offset
         envelope["truncated"] = envelope["total_matching"] > 0
         envelope["results"] = []
-        return _cap_breakdowns(
-            envelope,
-            ("by_publication", "by_metric_type", "by_organism",
-             "by_treatment_type", "by_background_factors"),
-            summary=summary,
-        )
+        return _cap_list_experiments_breakdowns(envelope, summary=summary)
 
     # Detail: run detail query
     try:
@@ -3176,12 +3194,7 @@ def list_experiments(
     envelope["offset"] = offset
     envelope["truncated"] = envelope["total_matching"] > offset + len(processed)
     envelope["results"] = processed
-    return _cap_breakdowns(
-        envelope,
-        ("by_publication", "by_metric_type", "by_organism",
-         "by_treatment_type", "by_background_factors"),
-        summary=summary,
-    )
+    return _cap_list_experiments_breakdowns(envelope, summary=summary)
 
 
 _SEARCH_ONTOLOGY_NARROWING = ("level", "tree", "interpro_type", "min_gene_count", "organism")
@@ -3954,7 +3967,8 @@ def genes_by_ontology(
     - ``sources``: keep edges asserted by any of the named pipelines.
     - ``evidence``: keep edges on the named rungs of the strength ladder
       (curated > signature > homology > family_inferred > domain_inferred).
-    - ``max_tier``: keep edges at or above this truncation depth. Edges with
+    - ``max_tier``: keep edges at or above this confidence band (tier 1..3;
+      see the ``tier`` trust axis for its per-ontology meaning). Edges with
       no tier are kept and counted in the ``by_tier`` null bucket.
     - ``min_evidence_score``: the one numeric cutoff. Sets
       ``evidence_score_signals`` in the envelope.
@@ -9446,7 +9460,8 @@ def genes_by_metabolite(
       - `tcdb_family_substrates_skipped` (list of `{locus_tag, tcdb_id,
         tcdb_substrate_count}`): genes whose walk start was removed by the
         200-substrate cap — a superfamily-level call, substrate unknown.
-        Always computed.
+        Always computed; scoped to superfamilies whose systems carry a
+        queried metabolite.
       - `by_metabolite[]` entries carry `tcdb_direct_rows` /
         `tcdb_family_rows`; `top_genes[]` entries carry `tcdb_direct_rows`,
         `tcdb_family_rows` and `tcdb_assignment_count` (KG precompute,
@@ -10274,7 +10289,8 @@ def metabolites_by_gene(
       - `tcdb_family_substrates_skipped` (list of `{locus_tag, tcdb_id,
         tcdb_substrate_count}`): genes whose walk start was removed by the
         200-substrate cap — a superfamily-level call, substrate unknown.
-        Always computed.
+        Always computed; with a metabolite filter, scoped to superfamilies
+        whose systems carry a matching metabolite.
       - `by_gene[]` entries carry `tcdb_direct_rows`, `tcdb_family_rows`
         and `tcdb_assignment_count` (KG precompute, distinct gated TCDB
         targets of the gene); `top_tcdb_families[]` entries carry
@@ -10824,8 +10840,14 @@ def metabolites_by_gene(
     walkable = [g_["locus_tag"] for g_ in no_direct if g_.get("walkable")]
     skipped_tags = {s.get("locus_tag") for s in hint["skipped"]}
     not_walkable = [g_["locus_tag"] for g_ in no_direct if not g_.get("walkable")]
-    capped = [lt for lt in not_walkable if lt in skipped_tags]
-    no_range = [lt for lt in not_walkable if lt not in skipped_tags]
+    # `capped` is the per-gene flag (unscoped by metabolite filters, backlog
+    # 2d.6); fall back to the skipped list for hint rows without it.
+    capped_tags = {
+        g_["locus_tag"] for g_ in no_direct
+        if g_.get("capped", g_["locus_tag"] in skipped_tags)
+    }
+    capped = [lt for lt in not_walkable if lt in capped_tags]
+    no_range = [lt for lt in not_walkable if lt not in capped_tags]
     if walkable and not walk_on:
         warnings.append(
             f"No direct TCDB system call for {_name_list(walkable)}: their "
@@ -10836,8 +10858,9 @@ def metabolites_by_gene(
     if capped:
         warnings.append(
             f"No direct TCDB system call for {_name_list(capped)}: the TCDB "
-            "call is superfamily-level, so the substrate is unknown "
-            "(see tcdb_family_substrates_skipped)."
+            "call is superfamily-level, so the substrate is unknown"
+            + (" (see tcdb_family_substrates_skipped)."
+               if any(lt in skipped_tags for lt in capped) else ".")
         )
     if no_range:
         warnings.append(

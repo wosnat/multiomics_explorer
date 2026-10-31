@@ -18146,12 +18146,13 @@ class TestResolveGeneBreakdownCap:
         assert len(result["by_organism"]) == 5
         assert "by_organism_truncated" not in result
 
-    def test_summary_true_returns_full_by_organism_and_no_rows(self, mock_conn):
-        """backlog 2b.7: summary=True uncaps by_organism; results empty."""
+    def test_summary_true_caps_by_organism_and_no_rows(self, mock_conn):
+        """backlog 2d.2: summary=True caps by_organism too (summary must stay
+        smaller than a default page); results empty."""
         mock_conn.execute_query.return_value = self._genes(12)
         result = api.resolve_gene("PMM", summary=True, conn=mock_conn)
-        assert len(result["by_organism"]) == 12
-        assert "by_organism_truncated" not in result
+        assert len(result["by_organism"]) == 10
+        assert result["by_organism_truncated"] is True
         assert result["results"] == []
         assert result["returned"] == 0
         assert result["total_matching"] == 12
@@ -18218,13 +18219,13 @@ class TestListPublicationsBreakdownCap:
         assert result["by_organism_truncated"] is True
         assert result["by_organism"][0]["organism_name"] == "Organism 00"
 
-    def test_summary_true_skips_detail_query_and_uncaps(self, mock_conn):
-        """backlog 2b.7: summary=True runs only the summary Cypher, returns
-        by_organism uncapped and no rows."""
+    def test_summary_true_skips_detail_query_and_caps(self, mock_conn):
+        """backlog 2b.7 + 2d.2: summary=True runs only the summary Cypher,
+        returns by_organism capped at 10 and no rows."""
         mock_conn.execute_query.side_effect = [[self._summary_row(12)]]
         result = api.list_publications(summary=True, conn=mock_conn)
-        assert len(result["by_organism"]) == 12
-        assert "by_organism_truncated" not in result
+        assert len(result["by_organism"]) == 10
+        assert result["by_organism_truncated"] is True
         assert result["results"] == [] and result["returned"] == 0
         assert result["truncated"] is True
         assert mock_conn.execute_query.call_count == 1
@@ -18257,15 +18258,16 @@ class TestListExperimentsBreakdownCap:
         assert result["by_publication_truncated"] is True
         assert result["by_publication"][0]["publication_doi"] == "10.1234/p00"
 
-    def test_by_publication_full_list_on_summary_true(self, mock_conn):
+    def test_by_publication_capped_on_summary_true(self, mock_conn):
+        """backlog 2d.2: summary=True caps too."""
         pub_freq = [{"item": f"10.1234/p{i:02d}", "count": 12 - i} for i in range(12)]
         mock_conn.execute_query.side_effect = [
             self._summary_result(pub_freq),
             self._summary_result(pub_freq),
         ]
         result = api.list_experiments(summary=True, conn=mock_conn)
-        assert len(result["by_publication"]) == 12
-        assert "by_publication_truncated" not in result
+        assert len(result["by_publication"]) == 10
+        assert result["by_publication_truncated"] is True
 
 
 class TestListOrganismsBreakdownCap:
@@ -18296,12 +18298,13 @@ class TestListOrganismsBreakdownCap:
         assert result["by_metric_type_truncated"] is True
         assert result["by_metric_type"][0]["metric_type"] == "metric_00"
 
-    def test_by_metric_type_full_list_on_summary_true(self, mock_conn):
+    def test_by_metric_type_capped_on_summary_true(self, mock_conn):
+        """backlog 2d.2: summary=True caps too."""
         freq = [{"item": f"metric_{i:02d}", "count": 12 - i} for i in range(12)]
         self._wire(mock_conn, freq)
         result = api.list_organisms(summary=True, conn=mock_conn)
-        assert len(result["by_metric_type"]) == 12
-        assert "by_metric_type_truncated" not in result
+        assert len(result["by_metric_type"]) == 10
+        assert result["by_metric_type_truncated"] is True
 
     def test_top_annotation_capability_capped_and_ranked(self, mock_conn):
         """top_annotation_capability is ranked api-side over the matched
@@ -18341,8 +18344,9 @@ class TestListOrganismsBreakdownCap:
 
         mock_conn.execute_query.side_effect = _exec
         summary_result = api.list_organisms(summary=True, conn=mock_conn)
-        assert len(summary_result["top_annotation_capability"]) == 12
-        assert "top_annotation_capability_truncated" not in summary_result
+        # backlog 2d.2: summary=True caps too.
+        assert len(summary_result["top_annotation_capability"]) == 10
+        assert summary_result["top_annotation_capability_truncated"] is True
 
 
 class TestDifferentialExpressionByGeneBreakdownCap:
@@ -23287,6 +23291,20 @@ class TestMetabolitesByGeneTcdbCleanup:
         assert "curates no substrates" in ws[0]
         assert "superfamily" not in ws[0].lower()
 
+    def test_capped_flag_wins_over_scoped_skipped_list(self, monkeypatch):
+        """backlog 2d.6: with a metabolite filter the skipped list is scoped,
+        so a capped gene may be absent from it — the per-gene `capped` flag
+        still routes it to the superfamily warning, not 'curates no
+        substrates'."""
+        out, _ = self._run(monkeypatch, hint=_tcdb_hint(
+            skipped=[],
+            no_direct=[{"locus_tag": "PMM0234", "walkable": False,
+                        "capped": True}]))
+        ws = [w for w in out["warnings"] if "PMM0234" in w]
+        assert len(ws) == 1, out["warnings"]
+        assert "superfamily" in ws[0].lower()
+        assert "curates no substrates" not in ws[0]
+
     def test_one_breadth_cap_warning(self, monkeypatch):
         out, _ = self._run(monkeypatch, hint=_tcdb_hint(
             skipped=[_ABC_SKIP, _MFS_SKIP], no_direct=[]))
@@ -24104,3 +24122,16 @@ class TestReleasePrepListMetabolitesRouteScopedApi:
         assert list(kw["edge_sources"]) == ["transport"]
         assert kw["want_go"] is False
         assert "Organism_has_metabolite" in summary_calls[0].args[0]
+
+
+class TestTrustAxisTierDescription:
+    """backlog E6: the `tier` trust-axis description must not call a null
+    TCDB tier 'never truncated' — on TCDB tier is a consensus tier
+    (diamond_tier) or identity band (diamond_best_hit), null on eggNOG."""
+
+    def test_tier_description_names_tcdb_call_kinds(self):
+        desc = api._TRUST_AXIS_DESCRIPTIONS["tier"]
+        assert "never truncated" not in desc
+        for s in ("diamond_tier", "diamond_best_hit", "identity band",
+                  "eggNOG", "MEROPS"):
+            assert s in desc, s

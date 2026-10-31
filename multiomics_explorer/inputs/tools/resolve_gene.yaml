@@ -88,4 +88,4 @@ mistakes:
   - wrong: "genes_by_function(search_text='PMM0001')  # wrong tool for ID lookup"
     right: "resolve_gene(identifier='PMM0001')  # exact identity resolution"
   - "The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works, as does 'Prochlorococcus MED4'. A genus word alone ('Prochlorococcus') matches every strain of that genus — here that just widens the result set (this tool never raises on ambiguity; the single-organism expression tools do)."
-  - "`summary=True` returns `by_organism` uncapped with no `results` — on a name shared by many strains that is larger than the default call (which caps the rollup); use it when you need every organism."
+  - "`by_organism` is capped at 10 entries on every call, `summary=True` included (`by_organism_truncated: true` when trimmed). On a name shared by many strains, pass `organism=` or page the rows to see the rest."
