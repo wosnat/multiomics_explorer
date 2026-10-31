@@ -1909,7 +1909,7 @@ class TestGenesByOntologySizeFilteredContract:
         assert r["size_filtered_genes"] == 41
         assert r["warnings"], r
         assert any(
-            "min_gene_set_size=1, max_gene_set_size=None" in w
+            "min_gene_set_size=1 and a large max_gene_set_size" in w
             for w in r["warnings"]
         ), r["warnings"]
 
@@ -1921,7 +1921,7 @@ class TestGenesByOntologySizeFilteredContract:
         assert r["size_filtered_terms"] == 0
         assert r["size_filtered_genes"] == 0
         assert not any(
-            "min_gene_set_size=1, max_gene_set_size=None" in w
+            "min_gene_set_size=1 and a large max_gene_set_size" in w
             for w in r["warnings"]
         )
 

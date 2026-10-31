@@ -108,7 +108,7 @@ examples:
           {"organism_name": "Prochlorococcus MIT0801", "count": 2},
           {"organism_name": "Prochlorococcus MIT9303", "count": 2}
         ],
-        "by_compartment": [{"compartment": "whole_cell", "count": 14}, {"compartment": "extracellular", "count": 6}],
+        "by_compartment": [{"compartment": "whole_cell", "count": 13}, {"compartment": "extracellular", "count": 7}],
         "by_assay": [
           {
             "assay_id": "metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration",
@@ -197,7 +197,11 @@ examples:
           {"organism_name": "Prochlorococcus MIT9312", "count": 2},
           {"organism_name": "Prochlorococcus MIT9301", "count": 2}
         ],
-        "by_compartment": [{"compartment": "whole_cell", "count": 4}, {"compartment": "vesicle", "count": 2}],
+        "by_compartment": [
+          {"compartment": "whole_cell", "count": 3},
+          {"compartment": "vesicle", "count": 2},
+          {"compartment": "extracellular", "count": 1}
+        ],
         "by_assay": [
           {
             "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_vesicles_mit9313:relative_peak_area_biovolume_normalized",
@@ -216,7 +220,7 @@ examples:
             "count": 1
           },
           {
-            "assay_id": "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular",
+            "assay_id": "metabolite_assay:msystems.01261-22:presence_flags_table_s2_extracellular:presence_flag_extracellular",
             "count": 1
           },
           ...

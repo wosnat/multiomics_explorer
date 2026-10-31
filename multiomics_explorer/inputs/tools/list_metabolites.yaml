@@ -242,7 +242,7 @@ examples:
         "by_measurement_coverage": {
           "by_paper_count": [{"paper_count": 0, "count": 33}, {"paper_count": 1, "count": 14}, {"paper_count": 2, "count": 12}],
           "by_compartment": [
-            {"compartment": "extracellular", "count": 19},
+            {"compartment": "extracellular", "count": 20},
             {"compartment": "vesicle", "count": 18},
             {"compartment": "whole_cell", "count": 26}
           ]
@@ -876,7 +876,7 @@ examples:
         "by_measurement_coverage": {
           "by_paper_count": [{"paper_count": 1, "count": 93}, {"paper_count": 2, "count": 37}, {"paper_count": 3, "count": 5}],
           "by_compartment": [
-            {"compartment": "extracellular", "count": 92},
+            {"compartment": "extracellular", "count": 96},
             {"compartment": "vesicle", "count": 70},
             {"compartment": "whole_cell", "count": 135}
           ]

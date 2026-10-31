@@ -43,7 +43,7 @@ rows:
   padj: 0.0
   rank: 459
   rank_down: null
-  rank_up: 188
+  rank_up: 184
   timepoint: day 14
   timepoint_hours: 336.0
   timepoint_order: 1
@@ -58,7 +58,7 @@ rows:
   log2fc: -1.2476
   padj: 0.0005
   rank: 583
-  rank_down: 226
+  rank_down: 222
   rank_up: null
   timepoint: day 18
   timepoint_hours: 432.0
@@ -211,7 +211,7 @@ rows:
   - nitrogen
 - control_timing: matched
   experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
-  expression_status: not_significant
+  expression_status: significant_up
   gene_name: dnaN
   growth_phase: diel
   locus_tag: PMM0001
@@ -219,7 +219,7 @@ rows:
   padj: 0.0002
   rank: 605
   rank_down: null
-  rank_up: null
+  rank_up: 318
   timepoint: 2h
   timepoint_hours: 2.0
   timepoint_order: 1
@@ -227,7 +227,7 @@ rows:
   - darkness
 - control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  expression_status: not_significant
+  expression_status: significant_up
   gene_name: dnaN
   growth_phase: nutrient_limited
   locus_tag: PMM0001
@@ -235,7 +235,7 @@ rows:
   padj: 0.036
   rank: 211
   rank_down: null
-  rank_up: null
+  rank_up: 70
   timepoint: day 18
   timepoint_hours: 432.0
   timepoint_order: 1
@@ -259,7 +259,7 @@ rows:
   - coculture
 - control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  expression_status: not_significant
+  expression_status: significant_up
   gene_name: dnaN
   growth_phase: nutrient_limited
   locus_tag: PMM0001
@@ -267,7 +267,7 @@ rows:
   padj: 0.028
   rank: 574
   rank_down: null
-  rank_up: null
+  rank_up: 225
   timepoint: day 89
   timepoint_hours: 2136.0
   timepoint_order: 4
@@ -275,7 +275,7 @@ rows:
   - nitrogen
 - control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  expression_status: not_significant
+  expression_status: significant_up
   gene_name: dnaN
   growth_phase: nutrient_limited
   locus_tag: PMM0001
@@ -283,7 +283,7 @@ rows:
   padj: 0.0135
   rank: 549
   rank_down: null
-  rank_up: null
+  rank_up: 234
   timepoint: days 60+89
   timepoint_hours: null
   timepoint_order: 5
@@ -291,7 +291,7 @@ rows:
   - nitrogen
 - control_timing: baseline
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
-  expression_status: not_significant
+  expression_status: significant_up
   gene_name: dnaN
   growth_phase: nutrient_limited
   locus_tag: PMM0001
@@ -299,7 +299,7 @@ rows:
   padj: 0.0484
   rank: 570
   rank_down: null
-  rank_up: null
+  rank_up: 208
   timepoint: day 60
   timepoint_hours: 1440.0
   timepoint_order: 3
@@ -313,7 +313,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.5111
   padj: 1.0
-  rank: 723
+  rank: 722
   rank_down: null
   rank_up: null
   timepoint: 6h
@@ -409,7 +409,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.2121
   padj: 1.0
-  rank: 937
+  rank: 936
   rank_down: null
   rank_up: null
   timepoint: steady state
@@ -425,7 +425,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.1577
   padj: 1.0
-  rank: 1300
+  rank: 1299
   rank_down: null
   rank_up: null
   timepoint: 0h
@@ -441,7 +441,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.1564
   padj: 1.0
-  rank: 1276
+  rank: 1275
   rank_down: null
   rank_up: null
   timepoint: 3h

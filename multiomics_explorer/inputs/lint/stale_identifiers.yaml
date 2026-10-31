@@ -153,3 +153,7 @@
 - pattern: '"experiment_ids": \[\], "publication_doi": \['
   reason: "not_found.publication_doi renamed to publication_dois on the three metabolite-assay tools (backlog 2.15)"
   replacement: "\"publication_dois\": [...]"
+
+- pattern: 'presence_flags_table_s2:presence_flag_extracellular'
+  reason: Kujawinski 2023 extracellular presence-flag assay re-keyed in the 2026-10-31T19:34Z rebuild (moved off whole_cell; docs-review K2)
+  replacement: 'metabolite_assay:msystems.01261-22:presence_flags_table_s2_extracellular:presence_flag_extracellular'

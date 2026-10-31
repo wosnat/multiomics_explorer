@@ -85,12 +85,14 @@ VALID_OMICS_TYPES: set[str] = {
 # direction descriptions reworded, built 2026-10-24T17:33Z; + Ford 2021 SBP
 # survey: new Experiment.omics_type BIOINFORMATIC, built 2026-10-28T05:04Z; + paper batch
 # 2026-10-28: new treatment_type values mutant and essentiality on all four
-# treatment_type vocabularies, built 2026-10-31T08:59Z). The recipe lives KG-side (docs/kg-changes/
+# treatment_type vocabularies, built 2026-10-31T08:59Z; + docs-review K3: new
+# ClusteringAnalysis.omics_type vocabulary (genomic_island analyses ''
+# -> BIOINFORMATIC), built 2026-10-31T19:34Z). The recipe lives KG-side (docs/kg-changes/
 # vocabulary-contract.md). A mismatch means baked docs / parameter descriptions
 # may list stale values — filters still validate live. Must equal the live
 # KG's value at release cut.
 EXPECTED_CONTROLLED_VOCABULARIES_HASH: str = (
-    "sha256:c252bef2fbbfa2c01fb7a5c85c7930ed302ece7674387b96a4ed479e4f722ea2"
+    "sha256:e3147f37fd9b798230b18a9f4a378346dbef00c55ae10c4edfb85f80659a15d9"
 )
 
 EXPECTED_KG_SHAPE: dict[str, tuple[str, ...] | str] = {

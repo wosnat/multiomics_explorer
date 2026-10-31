@@ -3195,7 +3195,9 @@ class TestListMetaboliteAssays:
     def test_compartment_extracellular(self, conn):
         from multiomics_explorer.api import list_metabolite_assays
         result = list_metabolite_assays(compartment="extracellular", conn=conn)
-        assert result["total_matching"] == 3
+        # 4 since the 2026-10-31T19:34Z rebuild: the Kujawinski extracellular
+        # presence-flag assay moved off whole_cell (docs-review K2).
+        assert result["total_matching"] == 4
         for r in result["results"]:
             assert r["compartment"] == "extracellular"
 
@@ -4762,7 +4764,7 @@ class TestListExperimentsCocultureRole:
 # ---------------------------------------------------------------------------
 
 _MIS_MSYSTEMS_FLAG_ASSAYS = [
-    "metabolite_assay:msystems.01261-22:presence_flags_table_s2:"
+    "metabolite_assay:msystems.01261-22:presence_flags_table_s2_extracellular:"
     "presence_flag_extracellular",
     "metabolite_assay:msystems.01261-22:presence_flags_table_s2:"
     "presence_flag_intracellular",

@@ -4,8 +4,8 @@ rows:
 - by_assay:
   - '{''count'': 1, ''item'': ''metabolite_assay:msystems.01261-22:metabolites_kegg_export_0801_extracellular:extracellular_concentration''}'
   - '{''count'': 1, ''item'': ''metabolite_assay:msystems.01261-22:metabolites_kegg_export_0801_intracellular:cellular_concentration''}'
-  - '{''count'': 1, ''item'': ''metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular''}'
   - '{''count'': 1, ''item'': ''metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular''}'
+  - '{''count'': 1, ''item'': ''metabolite_assay:msystems.01261-22:presence_flags_table_s2_extracellular:presence_flag_extracellular''}'
   - '{''count'': 2, ''item'': ''metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_extracellular:extracellular_concentration''}'
   - '{''count'': 2, ''item'': ''metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_intracellular:cellular_concentration''}'
   - '{''count'': 2, ''item'': ''metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9303:cellular_concentration''}'
@@ -13,8 +13,8 @@ rows:
   - '{''count'': 3, ''item'': ''metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration''}'
   - '{''count'': 4, ''item'': ''metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration''}'
   by_compartment:
-  - '{''count'': 14, ''item'': ''whole_cell''}'
-  - '{''count'': 6, ''item'': ''extracellular''}'
+  - '{''count'': 13, ''item'': ''whole_cell''}'
+  - '{''count'': 7, ''item'': ''extracellular''}'
   by_detection_status:
   - '{''count'': 12, ''item'': ''not_detected''}'
   - '{''count'': 3, ''item'': ''detected''}'

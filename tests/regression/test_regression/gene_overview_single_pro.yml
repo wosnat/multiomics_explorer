@@ -40,7 +40,7 @@ rows:
   product: EVE domain protein
   reaction_count: 0
   significant_down_count: 2
-  significant_up_count: 4
+  significant_up_count: 7
   tcdb_assignment_count: 0
   tcdb_best_hit_identity: null
   transported_metabolite_count: 0

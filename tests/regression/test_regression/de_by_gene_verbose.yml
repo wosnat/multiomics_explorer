@@ -75,7 +75,7 @@ rows:
   product: DNA polymerase III, beta subunit
   rank: 459
   rank_down: null
-  rank_up: 188
+  rank_up: 184
   table_scope: all_detected_genes
   table_scope_detail: ''
   timepoint: day 14
@@ -101,7 +101,7 @@ rows:
   padj: 0.0005
   product: DNA polymerase III, beta subunit
   rank: 583
-  rank_down: 226
+  rank_down: 222
   rank_up: null
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -370,7 +370,7 @@ rows:
   control_timing: matched
   experiment_id: 10.64898/2026.04.15.718746_extended_darkness_med4
   experiment_name: MED4 extended darkness past dawn vs normal light period (RNA-seq)
-  expression_status: not_significant
+  expression_status: significant_up
   gene_category: Replication and repair
   gene_name: dnaN
   growth_phase: diel
@@ -381,7 +381,7 @@ rows:
   product: DNA polymerase III, beta subunit
   rank: 605
   rank_down: null
-  rank_up: null
+  rank_up: 318
   table_scope: all_detected_genes
   table_scope_detail: ''
   timepoint: 2h
@@ -400,7 +400,7 @@ rows:
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
     PRO99-lowN exponential growth (PROTEOMICS)
-  expression_status: not_significant
+  expression_status: significant_up
   gene_category: Replication and repair
   gene_name: dnaN
   growth_phase: nutrient_limited
@@ -411,7 +411,7 @@ rows:
   product: DNA polymerase III, beta subunit
   rank: 211
   rank_down: null
-  rank_up: null
+  rank_up: 70
   table_scope: all_detected_genes
   table_scope_detail: ''
   timepoint: day 18
@@ -456,7 +456,7 @@ rows:
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
     PRO99-lowN exponential growth (PROTEOMICS)
-  expression_status: not_significant
+  expression_status: significant_up
   gene_category: Replication and repair
   gene_name: dnaN
   growth_phase: nutrient_limited
@@ -467,7 +467,7 @@ rows:
   product: DNA polymerase III, beta subunit
   rank: 574
   rank_down: null
-  rank_up: null
+  rank_up: 225
   table_scope: all_detected_genes
   table_scope_detail: ''
   timepoint: day 89
@@ -485,7 +485,7 @@ rows:
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
     PRO99-lowN exponential growth (PROTEOMICS)
-  expression_status: not_significant
+  expression_status: significant_up
   gene_category: Replication and repair
   gene_name: dnaN
   growth_phase: nutrient_limited
@@ -496,7 +496,7 @@ rows:
   product: DNA polymerase III, beta subunit
   rank: 549
   rank_down: null
-  rank_up: null
+  rank_up: 234
   table_scope: all_detected_genes
   table_scope_detail: ''
   timepoint: days 60+89
@@ -514,7 +514,7 @@ rows:
   experiment_id: 10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture
   experiment_name: MED4 in coculture with HOT1A3, PRO99-lowN nutrient starvation vs
     PRO99-lowN exponential growth (PROTEOMICS)
-  expression_status: not_significant
+  expression_status: significant_up
   gene_category: Replication and repair
   gene_name: dnaN
   growth_phase: nutrient_limited
@@ -525,7 +525,7 @@ rows:
   product: DNA polymerase III, beta subunit
   rank: 570
   rank_down: null
-  rank_up: null
+  rank_up: 208
   table_scope: all_detected_genes
   table_scope_detail: ''
   timepoint: day 60
@@ -551,7 +551,7 @@ rows:
   omics_type: MICROARRAY
   padj: 1.0
   product: DNA polymerase III, beta subunit
-  rank: 723
+  rank: 722
   rank_down: null
   rank_up: null
   table_scope: all_detected_genes
@@ -721,7 +721,7 @@ rows:
   omics_type: MICROARRAY
   padj: 1.0
   product: DNA polymerase III, beta subunit
-  rank: 937
+  rank: 936
   rank_down: null
   rank_up: null
   table_scope: all_detected_genes
@@ -749,7 +749,7 @@ rows:
   omics_type: MICROARRAY
   padj: 1.0
   product: DNA polymerase III, beta subunit
-  rank: 1300
+  rank: 1299
   rank_down: null
   rank_up: null
   table_scope: all_detected_genes
@@ -777,7 +777,7 @@ rows:
   omics_type: MICROARRAY
   padj: 1.0
   product: DNA polymerase III, beta subunit
-  rank: 1276
+  rank: 1275
   rank_down: null
   rank_up: null
   table_scope: all_detected_genes

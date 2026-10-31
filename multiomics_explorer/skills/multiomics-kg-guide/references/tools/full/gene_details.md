@@ -66,7 +66,7 @@ gene_details(locus_tags=["PMM0001"])
       "numeric_metric_count": 13,
       "catalyzed_metabolite_count": 6,
       "contig": "NC_005072.1",
-      "significant_up_count": 5,
+      "significant_up_count": 10,
       "merops_classes": [],
       "numeric_metric_types_observed": [
         "antisense_tss_count",

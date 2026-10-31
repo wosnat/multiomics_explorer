@@ -38,7 +38,7 @@ rows:
   product: MarR family winged helix-turn-helix transcriptional regulator
   reaction_count: 0
   significant_down_count: 0
-  significant_up_count: 2
+  significant_up_count: 4
   tcdb_assignment_count: 0
   tcdb_best_hit_identity: null
   transported_metabolite_count: 0

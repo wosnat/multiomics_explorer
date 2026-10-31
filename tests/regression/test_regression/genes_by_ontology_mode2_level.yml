@@ -16317,7 +16317,7 @@ trust_axes:
   - evidence
 warnings:
 - 41 terms (53 genes not otherwise covered) fell outside min_gene_set_size=5 / max_gene_set_size=500
-  and were dropped. The defaults suit enrichment; to enumerate every gene pass min_gene_set_size=1,
-  max_gene_set_size=None.
+  and were dropped. The defaults suit enrichment; to enumerate every gene pass min_gene_set_size=1
+  and a large max_gene_set_size (e.g. 100000 via MCP; None from Python).
 wrong_level: []
 wrong_ontology: []

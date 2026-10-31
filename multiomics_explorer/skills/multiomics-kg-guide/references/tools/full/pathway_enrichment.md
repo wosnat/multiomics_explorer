@@ -229,7 +229,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
       "experiment_id": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq",
       "name": "MIT1002 Dark-tolerant co-culture under 13:11 diel light:dark cycle vs Parental co-culture under 13:11 diel light:dark...",
       "omics_type": "RNASEQ",
-      "table_scope": "significant_any_timepoint",
+      "table_scope": "all_detected_genes",
       "treatment_type": ["darkness"],
       "background_factors": ["coculture", "diel"],
       "is_time_course": true,
@@ -266,7 +266,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
       "timepoint_order": 2,
       "direction": "down",
       "omics_type": "RNASEQ",
-      "table_scope": "significant_any_timepoint",
+      "table_scope": "all_detected_genes",
       "treatment_type": ["darkness"],
       "background_factors": ["coculture", "diel"],
       "is_time_course": true,
@@ -284,7 +284,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
       "timepoint_order": 6,
       "direction": "down",
       "omics_type": "RNASEQ",
-      "table_scope": "significant_any_timepoint",
+      "table_scope": "all_detected_genes",
       "treatment_type": ["darkness"],
       "background_factors": ["coculture", "diel"],
       "is_time_course": true,
@@ -302,7 +302,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
       "timepoint_order": 5,
       "direction": "down",
       "omics_type": "RNASEQ",
-      "table_scope": "significant_any_timepoint",
+      "table_scope": "all_detected_genes",
       "treatment_type": ["darkness"],
       "background_factors": ["coculture", "diel"],
       "is_time_course": true,
@@ -320,7 +320,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
       "timepoint_order": 1,
       "direction": "down",
       "omics_type": "RNASEQ",
-      "table_scope": "significant_any_timepoint",
+      "table_scope": "all_detected_genes",
       "treatment_type": ["darkness"],
       "background_factors": ["coculture", "diel"],
       "is_time_course": true,
@@ -338,7 +338,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
       "timepoint_order": 3,
       "direction": "down",
       "omics_type": "RNASEQ",
-      "table_scope": "significant_any_timepoint",
+      "table_scope": "all_detected_genes",
       "treatment_type": ["darkness"],
       "background_factors": ["coculture", "diel"],
       "is_time_course": true,
@@ -435,7 +435,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
       "timepoint_order": 2,
       "direction": "down",
       "omics_type": "RNASEQ",
-      "table_scope": "significant_any_timepoint",
+      "table_scope": "all_detected_genes",
       "treatment_type": ["darkness"],
       "background_factors": ["coculture", "diel"],
       "is_time_course": true,
@@ -465,7 +465,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
       "timepoint_order": 6,
       "direction": "down",
       "omics_type": "RNASEQ",
-      "table_scope": "significant_any_timepoint",
+      "table_scope": "all_detected_genes",
       "treatment_type": ["darkness"],
       "background_factors": ["coculture", "diel"],
       "is_time_course": true,
@@ -495,7 +495,7 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
       "timepoint_order": 5,
       "direction": "down",
       "omics_type": "RNASEQ",
-      "table_scope": "significant_any_timepoint",
+      "table_scope": "all_detected_genes",
       "treatment_type": ["darkness"],
       "background_factors": ["coculture", "diel"],
       "is_time_course": true,
@@ -588,7 +588,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "n_tests": 8,
       "n_significant": 3,
       "universe_size": 1849,
-      "min_padj": 0.0005465780049868374
+      "min_padj": 0.0004830036897397715
     },
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|up",
@@ -606,44 +606,44 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "n_tests": 8,
       "n_significant": 1,
       "universe_size": 1849,
-      "min_padj": 0.038137553774065545
+      "min_padj": 0.0046282318134565955
     }
   ],
   "top_pathways_by_padj": [
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
-      "term_id": "tcdb:5.B.4",
-      "term_name": "The Plant Photosystem I Supercomplex (PSI) Family",
-      "p_adjust": 0.0005465780049868374,
-      "signed_score": -3.2623478488691946
+      "term_id": "tcdb:3.E.2",
+      "term_name": "The Photosynthetic Reaction Center (PRC) Family",
+      "p_adjust": 0.0004830036897397715,
+      "signed_score": -3.3160495515932045
     },
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
-      "term_id": "tcdb:3.E.2",
-      "term_name": "The Photosynthetic Reaction Center (PRC) Family",
-      "p_adjust": 0.00057264398830115,
-      "signed_score": -3.2421152942070224
+      "term_id": "tcdb:5.B.4",
+      "term_name": "The Plant Photosystem I Supercomplex (PSI) Family",
+      "p_adjust": 0.0010573213057366237,
+      "signed_score": -2.975793016378565
     },
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
       "term_id": "tcdb:3.A.2",
       "term_name": "The H+- or Na+-translocating F-type, V-type and A-type ATPase (F-ATPase) Superfamily",
-      "p_adjust": 0.0007205602740992426,
-      "signed_score": -3.1423296850597833
+      "p_adjust": 0.0022952216330654855,
+      "signed_score": -2.639175371403444
     },
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|up",
       "term_id": "tcdb:3.D.1",
       "term_name": "The H+ or Na+-translocating NADH Dehydrogenase (NDH) Family",
-      "p_adjust": 0.038137553774065545,
-      "signed_score": 1.4186471669925789
+      "p_adjust": 0.0046282318134565955,
+      "signed_score": 2.334584896741953
     },
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
       "term_id": "tcdb:3.D.3",
       "term_name": "The Proton-translocating Quinol:Cytochrome c Reductase (QCR) Superfamily",
-      "p_adjust": 0.0590300149954393,
-      "signed_score": -1.2289271064546359
+      "p_adjust": 0.13027578388471775,
+      "signed_score": -0.8851363049523497
     },
     ...
   ],
@@ -701,21 +701,21 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "background_factors": ["axenic", "light"],
       "is_time_course": false,
       "growth_phase": "death",
-      "term_id": "tcdb:5.B.4",
-      "term_name": "The Plant Photosystem I Supercomplex (PSI) Family",
+      "term_id": "tcdb:3.E.2",
+      "term_name": "The Photosynthetic Reaction Center (PRC) Family",
       "level": 2,
       "is_informative": true,
-      "gene_ratio": "7/472",
-      "gene_ratio_numeric": 0.014830508474576272,
-      "bg_ratio": "7/1849",
-      "bg_ratio_numeric": 0.0037858301784748512,
-      "rich_factor": 1.0,
-      "fold_enrichment": 3.9173728813559325,
-      "pvalue": 6.832225062335467e-05,
-      "p_adjust": 0.0005465780049868374,
-      "count": 7,
-      "bg_count": 7,
-      "signed_score": -3.2623478488691946
+      "gene_ratio": "10/572",
+      "gene_ratio_numeric": 0.017482517482517484,
+      "bg_ratio": "11/1849",
+      "bg_ratio_numeric": 0.005949161709031909,
+      "rich_factor": 0.9090909090909091,
+      "fold_enrichment": 2.938652256834075,
+      "pvalue": 6.037546121747144e-05,
+      "p_adjust": 0.0004830036897397715,
+      "count": 10,
+      "bg_count": 11,
+      "signed_score": -3.3160495515932045
     },
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
@@ -731,21 +731,21 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "background_factors": ["axenic", "light"],
       "is_time_course": false,
       "growth_phase": "death",
-      "term_id": "tcdb:3.E.2",
-      "term_name": "The Photosynthetic Reaction Center (PRC) Family",
+      "term_id": "tcdb:5.B.4",
+      "term_name": "The Plant Photosystem I Supercomplex (PSI) Family",
       "level": 2,
       "is_informative": true,
-      "gene_ratio": "9/472",
-      "gene_ratio_numeric": 0.019067796610169493,
-      "bg_ratio": "11/1849",
-      "bg_ratio_numeric": 0.005949161709031909,
-      "rich_factor": 0.8181818181818182,
-      "fold_enrichment": 3.2051232665639446,
-      "pvalue": 0.0001431609970752875,
-      "p_adjust": 0.00057264398830115,
-      "count": 9,
-      "bg_count": 11,
-      "signed_score": -3.2421152942070224
+      "gene_ratio": "7/572",
+      "gene_ratio_numeric": 0.012237762237762238,
+      "bg_ratio": "7/1849",
+      "bg_ratio_numeric": 0.0037858301784748512,
+      "rich_factor": 1.0,
+      "fold_enrichment": 3.2325174825174825,
+      "pvalue": 0.0002643303264341559,
+      "p_adjust": 0.0010573213057366237,
+      "count": 7,
+      "bg_count": 7,
+      "signed_score": -2.975793016378565
     },
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
@@ -765,17 +765,17 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "term_name": "The H+- or Na+-translocating F-type, V-type and A-type ATPase (F-ATPase) Superfamily",
       "level": 2,
       "is_informative": true,
-      "gene_ratio": "6/472",
-      "gene_ratio_numeric": 0.012711864406779662,
+      "gene_ratio": "6/572",
+      "gene_ratio_numeric": 0.01048951048951049,
       "bg_ratio": "6/1849",
       "bg_ratio_numeric": 0.003244997295835587,
       "rich_factor": 1.0,
-      "fold_enrichment": 3.9173728813559325,
-      "pvalue": 0.00027021010278721597,
-      "p_adjust": 0.0007205602740992426,
+      "fold_enrichment": 3.2325174825174825,
+      "pvalue": 0.0008607081123995571,
+      "p_adjust": 0.0022952216330654855,
       "count": 6,
       "bg_count": 6,
-      "signed_score": -3.1423296850597833
+      "signed_score": -2.639175371403444
     },
     ...
   ]
@@ -849,7 +849,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "n_tests": 67,
       "n_significant": 7,
       "universe_size": 1849,
-      "min_padj": 5.3663275155925714e-12
+      "min_padj": 5.10897928140805e-14
     },
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|up",
@@ -867,7 +867,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "n_tests": 67,
       "n_significant": 2,
       "universe_size": 1849,
-      "min_padj": 0.01470841266606779
+      "min_padj": 0.040984080388401734
     }
   ],
   "top_pathways_by_padj": [
@@ -875,36 +875,36 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
       "term_id": "cyanorak.role:K.2",
       "term_name": "Protein synthesis > Ribosomal proteins: synthesis and modification",
-      "p_adjust": 5.3663275155925714e-12,
-      "signed_score": -11.270322825165014
-    },
-    {
-      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
-      "term_id": "cyanorak.role:J.1",
-      "term_name": "Photosynthesis and respiration > ATP synthase",
-      "p_adjust": 2.9595955733190235e-05,
-      "signed_score": -4.528767630926161
-    },
-    {
-      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
-      "term_id": "cyanorak.role:J.7",
-      "term_name": "Photosynthesis and respiration > Photosystem I",
-      "p_adjust": 2.9595955733190235e-05,
-      "signed_score": -4.528767630926161
+      "p_adjust": 5.10897928140805e-14,
+      "signed_score": -13.291665858521181
     },
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
       "term_id": "cyanorak.role:J.8",
       "term_name": "Photosynthesis and respiration > Photosystem II",
-      "p_adjust": 0.00019818076445685364,
-      "signed_score": -3.702938500686508
+      "p_adjust": 6.038588701939688e-05,
+      "signed_score": -4.219064549885155
+    },
+    {
+      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
+      "term_id": "cyanorak.role:J.1",
+      "term_name": "Photosynthesis and respiration > ATP synthase",
+      "p_adjust": 0.00016973650268072902,
+      "signed_score": -3.7702247504456174
+    },
+    {
+      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
+      "term_id": "cyanorak.role:J.7",
+      "term_name": "Photosynthesis and respiration > Photosystem I",
+      "p_adjust": 0.0002757287138003251,
+      "signed_score": -3.559518005037858
     },
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
       "term_id": "cyanorak.role:J.2",
       "term_name": "Photosynthesis and respiration > CO2 fixation",
-      "p_adjust": 0.0057441260269212304,
-      "signed_score": -2.2407760401800956
+      "p_adjust": 0.001961794968180273,
+      "signed_score": -2.707346383725117
     },
     ...
   ],

@@ -40,8 +40,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.64898/2026.04.15.718746
-  significant_down_count: 469
-  significant_up_count: 556
+  significant_down_count: 1101
+  significant_up_count: 1120
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 2
@@ -58,11 +58,11 @@ rows:
   - '1'
   - '2'
   time_point_significant_down:
-  - '203'
-  - '266'
+  - '482'
+  - '619'
   time_point_significant_up:
-  - '248'
-  - '308'
+  - '487'
+  - '633'
   time_point_totals:
   - '1876'
   - '1876'
@@ -107,8 +107,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.64898/2026.04.15.718746
-  significant_down_count: 331
-  significant_up_count: 439
+  significant_down_count: 642
+  significant_up_count: 652
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 2
@@ -125,11 +125,11 @@ rows:
   - '1'
   - '2'
   time_point_significant_down:
-  - '269'
+  - '580'
   - '62'
   time_point_significant_up:
-  - '367'
-  - '72'
+  - '579'
+  - '73'
   time_point_totals:
   - '1875'
   - '1876'
@@ -168,8 +168,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 321
-  significant_up_count: 465
+  significant_down_count: 446
+  significant_up_count: 551
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 2
@@ -186,11 +186,11 @@ rows:
   - '1'
   - '2'
   time_point_significant_down:
-  - '3'
-  - '318'
+  - '2'
+  - '444'
   time_point_significant_up:
-  - '406'
-  - '59'
+  - '30'
+  - '521'
   time_point_totals:
   - '1849'
   - '1849'
@@ -227,8 +227,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 556
-  significant_up_count: 599
+  significant_down_count: 822
+  significant_up_count: 954
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 3
@@ -249,13 +249,13 @@ rows:
   - '2'
   - '3'
   time_point_significant_down:
-  - '204'
-  - '257'
-  - '95'
+  - '149'
+  - '316'
+  - '357'
   time_point_significant_up:
-  - '264'
-  - '295'
-  - '40'
+  - '422'
+  - '435'
+  - '97'
   time_point_totals:
   - '1424'
   - '1424'
@@ -293,8 +293,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 472
-  significant_up_count: 405
+  significant_down_count: 572
+  significant_up_count: 551
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -307,9 +307,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '472'
+  - '572'
   time_point_significant_up:
-  - '405'
+  - '551'
   time_point_totals:
   - '1849'
   treatment_type:
@@ -346,8 +346,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 394
-  significant_up_count: 609
+  significant_down_count: 1038
+  significant_up_count: 1087
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 5
@@ -376,17 +376,17 @@ rows:
   - '4'
   - '5'
   time_point_significant_down:
-  - '137'
-  - '14'
-  - '74'
-  - '77'
-  - '92'
+  - '203'
+  - '251'
+  - '263'
+  - '271'
+  - '50'
   time_point_significant_up:
-  - '111'
-  - '145'
-  - '157'
-  - '161'
-  - '35'
+  - '106'
+  - '225'
+  - '241'
+  - '242'
+  - '273'
   time_point_totals:
   - '1424'
   - '1424'
@@ -427,8 +427,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 834
-  significant_up_count: 553
+  significant_down_count: 1142
+  significant_up_count: 857
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 5
@@ -457,17 +457,17 @@ rows:
   - '4'
   - '5'
   time_point_significant_down:
-  - '159'
-  - '169'
-  - '226'
-  - '235'
-  - '45'
+  - '15'
+  - '229'
+  - '278'
+  - '309'
+  - '311'
   time_point_significant_up:
-  - '108'
-  - '116'
-  - '134'
-  - '156'
-  - '39'
+  - '172'
+  - '206'
+  - '22'
+  - '221'
+  - '236'
   time_point_totals:
   - '1849'
   - '1849'
@@ -509,8 +509,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
+  significant_down_count: 9
+  significant_up_count: 10
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -523,9 +523,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '9'
   time_point_significant_up:
-  - '0'
+  - '10'
   time_point_totals:
   - '327'
   treatment_type:
@@ -563,8 +563,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 8
-  significant_up_count: 7
+  significant_down_count: 9
+  significant_up_count: 12
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -577,9 +577,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '8'
+  - '9'
   time_point_significant_up:
-  - '7'
+  - '12'
   time_point_totals:
   - '327'
   treatment_type:
@@ -617,8 +617,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
+  significant_down_count: 1
+  significant_up_count: 3
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -631,9 +631,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '1'
   time_point_significant_up:
-  - '0'
+  - '3'
   time_point_totals:
   - '327'
   treatment_type:
@@ -671,8 +671,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 18
-  significant_up_count: 8
+  significant_down_count: 23
+  significant_up_count: 13
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -685,9 +685,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '18'
+  - '23'
   time_point_significant_up:
-  - '8'
+  - '13'
   time_point_totals:
   - '327'
   treatment_type:
@@ -824,8 +824,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2017.88
-  significant_down_count: 326
-  significant_up_count: 271
+  significant_down_count: 318
+  significant_up_count: 263
   table_scope: filtered_subset
   table_scope_detail: Top 50% of genes by expression level
   time_point_count: 3
@@ -846,13 +846,13 @@ rows:
   - '2'
   - '3'
   time_point_significant_down:
-  - '126'
-  - '166'
-  - '34'
+  - '125'
+  - '160'
+  - '33'
   time_point_significant_up:
-  - '115'
-  - '67'
-  - '89'
+  - '111'
+  - '65'
+  - '87'
   time_point_totals:
   - '840'
   - '841'
@@ -1686,8 +1686,8 @@ rows:
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2011.49
-  significant_down_count: 66
-  significant_up_count: 40
+  significant_down_count: 60
+  significant_up_count: 38
   table_scope: significant_any_timepoint
   table_scope_detail: ''
   time_point_count: 1
@@ -1700,9 +1700,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '66'
+  - '60'
   time_point_significant_up:
-  - '40'
+  - '38'
   time_point_totals:
   - '112'
   treatment_type:
@@ -1740,8 +1740,8 @@ rows:
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/ismej.2011.49
-  significant_down_count: 67
-  significant_up_count: 150
+  significant_down_count: 18
+  significant_up_count: 81
   table_scope: significant_any_timepoint
   table_scope_detail: ''
   time_point_count: 3
@@ -1762,13 +1762,13 @@ rows:
   - '2'
   - '3'
   time_point_significant_down:
-  - '13'
-  - '22'
-  - '32'
+  - '12'
+  - '3'
+  - '3'
   time_point_significant_up:
-  - '39'
-  - '51'
-  - '60'
+  - '18'
+  - '19'
+  - '44'
   time_point_totals:
   - '112'
   - '112'
@@ -2016,8 +2016,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1021/pr060460c
-  significant_down_count: 5
-  significant_up_count: 11
+  significant_down_count: 3
+  significant_up_count: 3
   table_scope: all_detected_genes
   table_scope_detail: All proteins quantified in either iTRAQ1 or iTRAQ2 are reported
     (~184 unique proteins; ~11% of MED4 coding genes); only ~15 reach the paper^s
@@ -2032,9 +2032,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '5'
+  - '3'
   time_point_significant_up:
-  - '11'
+  - '3'
   time_point_totals:
   - '179'
   treatment_type:
@@ -2067,8 +2067,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1021/pr060460c
-  significant_down_count: 6
-  significant_up_count: 12
+  significant_down_count: 4
+  significant_up_count: 6
   table_scope: all_detected_genes
   table_scope_detail: All proteins quantified in either iTRAQ1 or iTRAQ2 are reported
     (~184 unique proteins; ~11% of MED4 coding genes).
@@ -2082,9 +2082,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '6'
+  - '4'
   time_point_significant_up:
-  - '12'
+  - '6'
   time_point_totals:
   - '178'
   treatment_type:
@@ -2268,11 +2268,11 @@ rows:
     source vs log-phase cultures on ammonium (exponential). Methods do not state that
     both arms were harvested on the same day; matched by growth state, assumed from
     the acclimated parallel-culture design.'
-  distinct_gene_count: 1697
+  distinct_gene_count: 1696
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_cyanate_as_med4_microarray
   experiment_name: MED4 Growth on cyanate as sole N source (MED4) vs N-replete Pro99
     medium (MED4) (MICROARRAY)
-  gene_count: 1697
+  gene_count: 1696
   growth_phases:
   - exponential
   is_time_course: single_time_point
@@ -2282,8 +2282,8 @@ rows:
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
-  significant_down_count: 23
-  significant_up_count: 20
+  significant_down_count: 5
+  significant_up_count: 14
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2296,11 +2296,11 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '23'
+  - '5'
   time_point_significant_up:
-  - '20'
+  - '14'
   time_point_totals:
-  - '1697'
+  - '1696'
   treatment_type:
   - nitrogen
 - authors:
@@ -2326,11 +2326,11 @@ rows:
     source vs log-phase cultures on ammonium (exponential). Methods do not state that
     both arms were harvested on the same day; matched by growth state, assumed from
     the acclimated parallel-culture design.'
-  distinct_gene_count: 1697
+  distinct_gene_count: 1696
   experiment_id: 10.1038/msb4100087_growth_medium_growth_on_urea_as_med4_microarray
   experiment_name: MED4 Growth on urea as sole N source (MED4) vs N-replete Pro99
     medium (MED4) (MICROARRAY)
-  gene_count: 1697
+  gene_count: 1696
   growth_phases:
   - exponential
   is_time_course: single_time_point
@@ -2340,8 +2340,8 @@ rows:
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
-  significant_down_count: 14
-  significant_up_count: 18
+  significant_down_count: 5
+  significant_up_count: 14
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2354,11 +2354,11 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '14'
+  - '5'
   time_point_significant_up:
-  - '18'
+  - '14'
   time_point_totals:
-  - '1697'
+  - '1696'
   treatment_type:
   - nitrogen
 - authors:
@@ -2434,11 +2434,11 @@ rows:
   derived_metric_count: 0
   derived_metric_value_kinds: []
   design_notes: null
-  distinct_gene_count: 1697
+  distinct_gene_count: 1696
   experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
   experiment_name: MED4 Nitrogen deprivation (MED4) vs N-replete Pro99 medium (MED4)
     (MICROARRAY)
-  gene_count: 10182
+  gene_count: 10176
   growth_phases:
   - acute_stress
   - nutrient_limited
@@ -2449,8 +2449,8 @@ rows:
   omics_type: MICROARRAY
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1038/msb4100087
-  significant_down_count: 476
-  significant_up_count: 392
+  significant_down_count: 366
+  significant_up_count: 253
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 6
@@ -2484,25 +2484,25 @@ rows:
   - '6'
   time_point_significant_down:
   - '0'
-  - '123'
-  - '141'
-  - '162'
-  - '42'
-  - '8'
+  - '108'
+  - '129'
+  - '2'
+  - '32'
+  - '95'
   time_point_significant_up:
-  - '113'
-  - '145'
-  - '48'
-  - '5'
+  - '0'
+  - '35'
+  - '39'
   - '6'
-  - '75'
+  - '81'
+  - '92'
   time_point_totals:
-  - '1697'
-  - '1697'
-  - '1697'
-  - '1697'
-  - '1697'
-  - '1697'
+  - '1696'
+  - '1696'
+  - '1696'
+  - '1696'
+  - '1696'
+  - '1696'
   treatment_type:
   - nitrogen
 - authors:

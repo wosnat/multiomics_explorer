@@ -123,8 +123,8 @@ list_metabolite_assays(summary=True)
   ],
   "by_value_kind": [{"value_kind": "numeric", "count": 12}, {"value_kind": "boolean", "count": 2}],
   "by_compartment": [
-    {"compartment": "whole_cell", "count": 9},
-    {"compartment": "extracellular", "count": 3},
+    {"compartment": "whole_cell", "count": 8},
+    {"compartment": "extracellular", "count": 4},
     {"compartment": "vesicle", "count": 2}
   ],
   "top_metric_types": [

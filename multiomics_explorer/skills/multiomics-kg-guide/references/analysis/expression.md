@@ -28,6 +28,12 @@ Both DE tools take `treatment_type=` / `background_factors=` /
 `growth_phases=` directly (case-insensitive; a gene whose edges all fail
 the filters lands in `filtered_out`, never `no_expression`), so a
 treatment-shaped question does not need a `list_experiments` hop.
+
+`significant` / `expression_status` follow each paper's own DE criterion
+(its p / q cutoff and its fold cutoff, or none), not a KG-wide threshold — so
+a \|log2FC\| of 0.5 can be significant in one paper and not in another.
+Filter on `log2fc` yourself when the question needs a common effect size.
+An edge with `log2_fold_change = 0` has no direction and reads `not_significant`.
 Use `gene_response_profile` to see which treatments a gene set responds to
 without per-timepoint log2FC; for the numbers behind a response, drop back to
 `differential_expression_by_gene`.

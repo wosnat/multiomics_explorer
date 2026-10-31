@@ -106,10 +106,10 @@ differential_expression_by_gene(organism="MED4", summary=True)
 {
   "organism_name": "Prochlorococcus MED4",
   "matching_genes": 1967,
-  "total_matching": 58163,
-  "rows_by_status": {"significant_up": 5337, "significant_down": 5398, "not_significant": 47428},
-  "median_abs_log2fc": 1.593186188959271,
-  "max_abs_log2fc": 162.295,
+  "total_matching": 58155,
+  "rows_by_status": {"significant_up": 7264, "significant_down": 7596, "not_significant": 43295},
+  "median_abs_log2fc": 1.2377848844721449,
+  "max_abs_log2fc": 15.38872366,
   "experiment_count": 37,
   "rows_by_treatment_type": {
     "coculture": 5412,
@@ -119,12 +119,12 @@ differential_expression_by_gene(organism="MED4", summary=True)
     "phosphorus": 170,
     "light": 5396,
     "iron": 448,
-    "nitrogen": 38596,
+    "nitrogen": 38588,
     "darkness": 3752
   },
   "rows_by_background_factors": {
-    "light": 48332,
-    "axenic": 34606,
+    "light": 48324,
+    "axenic": 34598,
     "chemical": 198,
     "viral": 51,
     "darkness": 683,
@@ -132,52 +132,30 @@ differential_expression_by_gene(organism="MED4", summary=True)
     "diel": 7860
   },
   "rows_by_growth_phase": {
-    "exponential": 7645,
-    "acute_stress": 10739,
+    "exponential": 7643,
+    "acute_stress": 10735,
     "acclimated_steady_state": 2310,
     "infected": 472,
-    "nutrient_limited": 22607,
+    "nutrient_limited": 22605,
     "recovery": 112,
     "death": 6121,
     "darkness": 654,
     "diel": 7503
   },
   "by_table_scope": {
-    "all_detected_genes": 52595,
+    "all_detected_genes": 52587,
     "filtered_subset": 4599,
     "significant_only": 521,
     "significant_any_timepoint": 448
   },
   "top_categories": [
-    {"category": "Unknown", "total_genes": 647, "significant_genes": 573},
-    {"category": "Stress response and adaptation", "total_genes": 197, "significant_genes": 189},
-    {"category": "Coenzyme metabolism", "total_genes": 177, "significant_genes": 157},
-    {"category": "Translation", "total_genes": 141, "significant_genes": 127},
-    {"category": "Amino acid metabolism", "total_genes": 100, "significant_genes": 93}
+    {"category": "Unknown", "total_genes": 647, "significant_genes": 584},
+    {"category": "Stress response and adaptation", "total_genes": 197, "significant_genes": 196},
+    {"category": "Coenzyme metabolism", "total_genes": 177, "significant_genes": 177},
+    {"category": "Translation", "total_genes": 141, "significant_genes": 139},
+    {"category": "Amino acid metabolism", "total_genes": 100, "significant_genes": 99}
   ],
   "experiments": [
-    {
-      "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture",
-      "treatment_type": ["nitrogen"],
-      "omics_type": "RNASEQ",
-      "is_time_course": "time_course",
-      "table_scope": "all_detected_genes",
-      "control_timing": "baseline",
-      "design_notes": "Each timepoint (day 18, day 31, day 60, day 89) is coculture MED4 vs the same coculture series sampled on day 11 (exp...",
-      "matching_genes": 1849,
-      "rows_by_status": {"significant_up": 553, "significant_down": 834, "not_significant": 7858}
-    },
-    {
-      "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic",
-      "treatment_type": ["nitrogen"],
-      "omics_type": "PROTEOMICS",
-      "is_time_course": "time_course",
-      "table_scope": "all_detected_genes",
-      "control_timing": "baseline",
-      "design_notes": "day 14, day 31 and day 89: axenic MED4 vs axenic MED4 sampled on day 7 (exponential). Day 7 and day 14 come from the ...",
-      "matching_genes": 1424,
-      "rows_by_status": {"significant_up": 599, "significant_down": 556, "not_significant": 3117}
-    },
     {
       "experiment_id": "10.64898/2026.04.15.718746_extended_darkness_med4",
       "treatment_type": ["darkness"],
@@ -187,7 +165,7 @@ differential_expression_by_gene(organism="MED4", summary=True)
       "control_timing": "matched",
       "design_notes": "Control for 2h and 4h is the normal-diel circadian time-course sample at the same ZT (ZT 2 and ZT 4, lights on, diel)...",
       "matching_genes": 1876,
-      "rows_by_status": {"significant_up": 556, "significant_down": 469, "not_significant": 2727}
+      "rows_by_status": {"significant_up": 1120, "significant_down": 1101, "not_significant": 1531}
     },
     {
       "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_coculture",
@@ -198,18 +176,40 @@ differential_expression_by_gene(organism="MED4", summary=True)
       "control_timing": "baseline",
       "design_notes": "Each timepoint (day 18, day 31, day 60, day 89, days 60+89) is coculture MED4 vs the same coculture series sampled on...",
       "matching_genes": 1424,
-      "rows_by_status": {"significant_up": 609, "significant_down": 394, "not_significant": 6117}
+      "rows_by_status": {"significant_up": 1087, "significant_down": 1038, "not_significant": 4995}
     },
     {
-      "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
+      "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_coculture",
       "treatment_type": ["nitrogen"],
       "omics_type": "RNASEQ",
-      "is_time_course": "single_time_point",
+      "is_time_course": "time_course",
       "table_scope": "all_detected_genes",
       "control_timing": "baseline",
-      "design_notes": "day 14: axenic MED4 vs the same axenic series sampled on day 7 (exponential); axenic MED4 was a separate repeat exper...",
+      "design_notes": "Each timepoint (day 18, day 31, day 60, day 89) is coculture MED4 vs the same coculture series sampled on day 11 (exp...",
       "matching_genes": 1849,
-      "rows_by_status": {"significant_up": 405, "significant_down": 472, "not_significant": 972}
+      "rows_by_status": {"significant_up": 857, "significant_down": 1142, "not_significant": 7246}
+    },
+    {
+      "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_proteomics_axenic",
+      "treatment_type": ["nitrogen"],
+      "omics_type": "PROTEOMICS",
+      "is_time_course": "time_course",
+      "table_scope": "all_detected_genes",
+      "control_timing": "baseline",
+      "design_notes": "day 14, day 31 and day 89: axenic MED4 vs axenic MED4 sampled on day 7 (exponential). Day 7 and day 14 come from the ...",
+      "matching_genes": 1424,
+      "rows_by_status": {"significant_up": 954, "significant_down": 822, "not_significant": 2496}
+    },
+    {
+      "experiment_id": "10.64898/2026.04.15.718746_extended_light_med4",
+      "treatment_type": ["light"],
+      "omics_type": "RNASEQ",
+      "is_time_course": "time_course",
+      "table_scope": "all_detected_genes",
+      "control_timing": "matched",
+      "design_notes": "Control for 14h and 16h is the normal-diel circadian time-course sample at the same ZT (ZT 14 and ZT 16, lights off, ...",
+      "matching_genes": 1876,
+      "rows_by_status": {"significant_up": 652, "significant_down": 642, "not_significant": 2457}
     },
     ...
   ],

@@ -292,9 +292,9 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   growth_phase: acute_stress
-  not_significant: 0
+  not_significant: 1
   organism_name: Prochlorococcus MED4
-  significant_down: 1
+  significant_down: 0
   significant_up: 0
   timepoint: 12h
   timepoint_hours: 12.0
@@ -762,9 +762,9 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   growth_phase: diel
-  not_significant: 1
+  not_significant: 0
   organism_name: Prochlorococcus MED4
-  significant_down: 0
+  significant_down: 1
   significant_up: 0
   timepoint: 16h
   timepoint_hours: 16.0
@@ -781,9 +781,9 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   growth_phase: acute_stress
-  not_significant: 1
+  not_significant: 0
   organism_name: Prochlorococcus MIT0604
-  significant_down: 0
+  significant_down: 1
   significant_up: 0
   timepoint: 2h
   timepoint_hours: 2.0
@@ -800,9 +800,9 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   growth_phase: acute_stress
-  not_significant: 1
+  not_significant: 0
   organism_name: Prochlorococcus MIT0604
-  significant_down: 0
+  significant_down: 1
   significant_up: 0
   timepoint: endpoint
   timepoint_hours: null
@@ -819,10 +819,10 @@ rows:
   genes_with_expression: 1
   group_id: cyanorak:CK_00000570
   growth_phase: acute_stress
-  not_significant: 1
+  not_significant: 0
   organism_name: Prochlorococcus MIT0604
   significant_down: 0
-  significant_up: 0
+  significant_up: 1
   timepoint: 1h post-shock
   timepoint_hours: 1.0
   timepoint_order: 1

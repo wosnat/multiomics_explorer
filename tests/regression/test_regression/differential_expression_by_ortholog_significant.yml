@@ -1,5 +1,5 @@
 case_id: differential_expression_by_ortholog_significant
-row_count: 52
+row_count: 55
 rows:
 - background_factors:
   - axenic
@@ -61,26 +61,6 @@ rows:
   timepoint_order: 1
   treatment_type:
   - carbon
-- background_factors:
-  - axenic
-  - light
-  coculture_partner: []
-  consensus_gene_name: psbB
-  consensus_product: photosystem II chlorophyll-binding protein CP47
-  control_timing: matched
-  experiment_id: 10.1038/msb4100087_nitrogen_nitrogen_deprivation_med4_med4_microarray
-  genes_with_expression: 1
-  group_id: cyanorak:CK_00000570
-  growth_phase: acute_stress
-  not_significant: 0
-  organism_name: Prochlorococcus MED4
-  significant_down: 1
-  significant_up: 0
-  timepoint: 12h
-  timepoint_hours: 12.0
-  timepoint_order: 4
-  treatment_type:
-  - nitrogen
 - background_factors:
   - axenic
   - light
@@ -306,6 +286,83 @@ rows:
   timepoint_order: 3
   treatment_type:
   - nitrogen
+- background_factors:
+  - axenic
+  - diel
+  coculture_partner: []
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
+  experiment_id: 10.64898/2026.04.15.718746_extended_light_med4
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: diel
+  not_significant: 0
+  organism_name: Prochlorococcus MED4
+  significant_down: 1
+  significant_up: 0
+  timepoint: 16h
+  timepoint_hours: 16.0
+  timepoint_order: 2
+  treatment_type:
+  - light
+- background_factors:
+  - axenic
+  coculture_partner: []
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
+  experiment_id: 10.1016/j.cell.2022.12.006_mmc_dna_damage_mit0604
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: acute_stress
+  not_significant: 0
+  organism_name: Prochlorococcus MIT0604
+  significant_down: 1
+  significant_up: 0
+  timepoint: 2h
+  timepoint_hours: 2.0
+  timepoint_order: 1
+  treatment_type:
+  - chemical
+- background_factors:
+  - axenic
+  coculture_partner: []
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
+  experiment_id: 10.1016/j.cell.2022.12.006_mmc_vs_uv_mit0604
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: acute_stress
+  not_significant: 0
+  organism_name: Prochlorococcus MIT0604
+  significant_down: 1
+  significant_up: 0
+  timepoint: endpoint
+  timepoint_hours: null
+  timepoint_order: 1
+  treatment_type:
+  - chemical
+- background_factors:
+  - axenic
+  coculture_partner: []
+  consensus_gene_name: psbB
+  consensus_product: photosystem II chlorophyll-binding protein CP47
+  control_timing: matched
+  experiment_id: 10.1016/j.cell.2022.12.006_uv_dna_damage_mit0604
+  genes_with_expression: 1
+  group_id: cyanorak:CK_00000570
+  growth_phase: acute_stress
+  not_significant: 0
+  organism_name: Prochlorococcus MIT0604
+  significant_down: 0
+  significant_up: 1
+  timepoint: 1h post-shock
+  timepoint_hours: 1.0
+  timepoint_order: 1
+  treatment_type:
+  - light
 - background_factors:
   - axenic
   - light

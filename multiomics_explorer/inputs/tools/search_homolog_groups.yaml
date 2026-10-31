@@ -9,38 +9,38 @@ examples:
       {
         "total_entries": 70426,
         "total_matching": 1369,
-        "by_source": [{"source": "eggnog", "count": 1939}, {"source": "cyanorak", "count": 487}],
+        "by_source": [{"source": "eggnog", "count": 1095}, {"source": "cyanorak", "count": 274}],
         "by_level": [
-          {"taxonomic_level": "Cyanobacteria", "count": 678},
-          {"taxonomic_level": "curated", "count": 487},
-          {"taxonomic_level": "Bacteria", "count": 443},
-          {"taxonomic_level": "Synechococcus", "count": 413},
-          {"taxonomic_level": "Prochloraceae", "count": 402},
+          {"taxonomic_level": "Cyanobacteria", "count": 373},
+          {"taxonomic_level": "curated", "count": 274},
+          {"taxonomic_level": "Bacteria", "count": 260},
+          {"taxonomic_level": "Synechococcus", "count": 236},
+          {"taxonomic_level": "Prochloraceae", "count": 223},
           ...
         ],
         "score_max": 6.71514892578125,
-        "score_median": 1.0953537225723267,
+        "score_median": 1.142105221748352,
         "top_cyanorak_roles": [
-          {"id": "cyanorak.role:G.2", "name": "Energy metabolism > Electron transport", "count": 276},
           {
             "id": "cyanorak.role:D.1.2",
             "name": "Cellular processes > Adaptation/acclimation to atypical conditions and detoxification > Light",
-            "count": 274
+            "count": 270
           },
-          {"id": "cyanorak.role:J.8", "name": "Photosynthesis and respiration > Photosystem II", "count": 268},
-          {"id": "cyanorak.role:J.2", "name": "Photosynthesis and respiration > CO2 fixation", "count": 201},
-          {"id": "cyanorak.role:J", "name": "Photosynthesis and respiration", "count": 195}
+          {"id": "cyanorak.role:G.2", "name": "Energy metabolism > Electron transport", "count": 267},
+          {"id": "cyanorak.role:J.8", "name": "Photosynthesis and respiration > Photosystem II", "count": 264},
+          {"id": "cyanorak.role:J", "name": "Photosynthesis and respiration", "count": 191},
+          {"id": "cyanorak.role:J.2", "name": "Photosynthesis and respiration > CO2 fixation", "count": 173}
         ],
         "top_cog_categories": [
-          {"id": "cog.category:S", "name": "Function unknown", "count": 872},
-          {"id": "cog.category:C", "name": "Energy production and conversion", "count": 830},
-          {"id": "cog.category:H", "name": "Coenzyme transport and metabolism", "count": 110},
-          {"id": "cog.category:G", "name": "Carbohydrate transport and metabolism", "count": 101},
+          {"id": "cog.category:S", "name": "Function unknown", "count": 495},
+          {"id": "cog.category:C", "name": "Energy production and conversion", "count": 470},
+          {"id": "cog.category:H", "name": "Coenzyme transport and metabolism", "count": 83},
           {
             "id": "cog.category:U",
             "name": "Intracellular trafficking, secretion, and vesicular transport",
-            "count": 78
-          }
+            "count": 63
+          },
+          {"id": "cog.category:G", "name": "Carbohydrate transport and metabolism", "count": 59}
         ],
         "returned": 5,
         "offset": 0,

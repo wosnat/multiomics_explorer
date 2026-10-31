@@ -187,15 +187,15 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
 ### Example 5: Cross-assay — both boolean assays at once (intracellular + extracellular)
 
 ```example-call
-metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular", "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular"])
+metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular", "metabolite_assay:msystems.01261-22:presence_flags_table_s2_extracellular:presence_flag_extracellular"])
 ```
 
-*`by_assay` carries one row per assay (intracellular vs extracellular flags). Read the compartment from the assay's metric_type (`presence_flag_extracellular`): both assays currently carry compartment='whole_cell', so `by_compartment` does not split them. Useful for asking "does this metabolite show up inside the cell, outside, or both?" on the msystems panel.*
+*`by_assay` carries one row per assay (intracellular vs extracellular flags). `by_compartment` splits them (`whole_cell` vs `extracellular`). Useful for asking "does this metabolite show up inside the cell, outside, or both?" on the msystems panel.*
 
 ### Example 6: Metabolite-anchored — does PEP show up at all on the boolean assays?
 
 ```example-call
-metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular", "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular"], metabolite_ids=["kegg.compound:C00074"])
+metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular", "metabolite_assay:msystems.01261-22:presence_flags_table_s2_extracellular:presence_flag_extracellular"], metabolite_ids=["kegg.compound:C00074"])
 ```
 
 ### Example 7: Paper-stated stereo forms only — drop rows whose form the KG assumed

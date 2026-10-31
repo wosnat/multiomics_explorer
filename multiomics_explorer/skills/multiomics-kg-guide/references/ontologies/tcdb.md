@@ -70,8 +70,9 @@ secretion read as export). Direction is conservative: family and
 subfamily names never set it, so every family, and every subfamily outside
 the ABC uptake range, reads `unknown`; hedged, organelle or two-way names
 and a curated override list also leave `unknown`. `superfamily` is TCDB's
-own label, copied as is and unreliable for whole groups (most ABC
-`3.A.1.*` systems read "ArsA ATPase (ArsA) Superfamily"). The ABC
+own superfamily grouping, copied verbatim onto every family, subfamily and
+system under it (never on class / subclass). TCDB's groupings are broad:
+ABC (`3.A.1`) sits under "ArsA ATPase (ArsA) Superfamily". The ABC
 superfamily has 97 children, so `ontology_term_details` truncates its
 `children[]` (`children_total: 97`, `children_truncated: true`).
 

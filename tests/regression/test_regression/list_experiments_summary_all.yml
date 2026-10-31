@@ -290,11 +290,11 @@ rows:
   - '{''count'': 60, ''item'': ''10.1128/spectrum.03275-22''}'
   - '{''count'': 95, ''item'': ''10.1042/BST20200244''}'
   by_table_scope:
-  - '{''count'': 12, ''item'': ''significant_any_timepoint''}'
-  - '{''count'': 125, ''item'': ''all_detected_genes''}'
-  - '{''count'': 30, ''item'': ''filtered_subset''}'
-  - '{''count'': 46, ''item'': ''significant_only''}'
+  - '{''count'': 129, ''item'': ''all_detected_genes''}'
+  - '{''count'': 34, ''item'': ''filtered_subset''}'
+  - '{''count'': 41, ''item'': ''significant_only''}'
   - '{''count'': 7, ''item'': ''top_n''}'
+  - '{''count'': 9, ''item'': ''significant_any_timepoint''}'
   by_treatment_type:
   - '{''count'': 1, ''item'': ''essentiality''}'
   - '{''count'': 1, ''item'': ''oxygen''}'

@@ -74,7 +74,7 @@ by_kegg_functional_category:
 by_measurement_coverage:
   by_compartment:
   - compartment: extracellular
-    count: 73
+    count: 76
   - compartment: vesicle
     count: 54
   - compartment: whole_cell
@@ -228,6 +228,7 @@ results:
   mass: 662.422
   measured_assay_count: 6
   measured_compartments:
+  - extracellular
   - vesicle
   - whole_cell
   measured_organisms:

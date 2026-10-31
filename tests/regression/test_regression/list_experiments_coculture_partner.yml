@@ -35,7 +35,7 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 8
+  significant_down_count: 12
   significant_up_count: 3
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -49,7 +49,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '8'
+  - '12'
   time_point_significant_up:
   - '3'
   time_point_totals:
@@ -91,7 +91,7 @@ rows:
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 10
-  significant_up_count: 1
+  significant_up_count: 2
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -106,7 +106,7 @@ rows:
   time_point_significant_down:
   - '10'
   time_point_significant_up:
-  - '1'
+  - '2'
   time_point_totals:
   - '82'
   treatment_type:
@@ -145,7 +145,7 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 10
+  significant_down_count: 12
   significant_up_count: 2
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -159,7 +159,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '10'
+  - '12'
   time_point_significant_up:
   - '2'
   time_point_totals:
@@ -200,8 +200,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 7
-  significant_up_count: 1
+  significant_down_count: 8
+  significant_up_count: 2
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -214,9 +214,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '7'
+  - '8'
   time_point_significant_up:
-  - '1'
+  - '2'
   time_point_totals:
   - '82'
   treatment_type:
@@ -255,8 +255,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
+  significant_down_count: 12
+  significant_up_count: 3
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -269,9 +269,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '12'
   time_point_significant_up:
-  - '0'
+  - '3'
   time_point_totals:
   - '342'
   treatment_type:
@@ -310,8 +310,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 17
-  significant_up_count: 43
+  significant_down_count: 18
+  significant_up_count: 50
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -324,9 +324,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '17'
+  - '18'
   time_point_significant_up:
-  - '43'
+  - '50'
   time_point_totals:
   - '342'
   treatment_type:
@@ -365,8 +365,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 6
-  significant_up_count: 3
+  significant_down_count: 10
+  significant_up_count: 14
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -379,9 +379,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '6'
+  - '10'
   time_point_significant_up:
-  - '3'
+  - '14'
   time_point_totals:
   - '342'
   treatment_type:
@@ -419,8 +419,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 7
-  significant_up_count: 34
+  significant_down_count: 10
+  significant_up_count: 44
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -433,9 +433,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '7'
+  - '10'
   time_point_significant_up:
-  - '34'
+  - '44'
   time_point_totals:
   - '342'
   treatment_type:
@@ -475,7 +475,7 @@ rows:
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 2
-  significant_up_count: 1
+  significant_up_count: 18
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -490,7 +490,7 @@ rows:
   time_point_significant_down:
   - '2'
   time_point_significant_up:
-  - '1'
+  - '18'
   time_point_totals:
   - '195'
   treatment_type:
@@ -529,8 +529,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 12
-  significant_up_count: 74
+  significant_down_count: 14
+  significant_up_count: 78
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -543,9 +543,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '12'
+  - '14'
   time_point_significant_up:
-  - '74'
+  - '78'
   time_point_totals:
   - '195'
   treatment_type:
@@ -584,7 +584,7 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 6
+  significant_down_count: 11
   significant_up_count: 2
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -598,7 +598,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '6'
+  - '11'
   time_point_significant_up:
   - '2'
   time_point_totals:
@@ -639,7 +639,7 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 19
+  significant_down_count: 21
   significant_up_count: 44
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -653,7 +653,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '19'
+  - '21'
   time_point_significant_up:
   - '44'
   time_point_totals:
@@ -694,8 +694,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 2
-  significant_up_count: 1
+  significant_down_count: 8
+  significant_up_count: 6
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -708,9 +708,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '2'
+  - '8'
   time_point_significant_up:
-  - '1'
+  - '6'
   time_point_totals:
   - '146'
   treatment_type:
@@ -749,8 +749,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 2
-  significant_up_count: 16
+  significant_down_count: 5
+  significant_up_count: 17
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -763,9 +763,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '2'
+  - '5'
   time_point_significant_up:
-  - '16'
+  - '17'
   time_point_totals:
   - '145'
   treatment_type:
@@ -804,7 +804,7 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
+  significant_down_count: 5
   significant_up_count: 0
   table_scope: all_detected_genes
   table_scope_detail: ''
@@ -818,7 +818,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '5'
   time_point_significant_up:
   - '0'
   time_point_totals:
@@ -860,7 +860,7 @@ rows:
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
   significant_down_count: 3
-  significant_up_count: 9
+  significant_up_count: 12
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -875,7 +875,7 @@ rows:
   time_point_significant_down:
   - '3'
   time_point_significant_up:
-  - '9'
+  - '12'
   time_point_totals:
   - '146'
   treatment_type:
@@ -914,8 +914,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 24
-  significant_up_count: 5
+  significant_down_count: 40
+  significant_up_count: 21
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -928,9 +928,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '24'
+  - '40'
   time_point_significant_up:
-  - '5'
+  - '21'
   time_point_totals:
   - '483'
   treatment_type:
@@ -970,8 +970,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 3
-  significant_up_count: 24
+  significant_down_count: 10
+  significant_up_count: 47
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -984,9 +984,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '3'
+  - '10'
   time_point_significant_up:
-  - '24'
+  - '47'
   time_point_totals:
   - '484'
   treatment_type:
@@ -1025,8 +1025,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 7
-  significant_up_count: 6
+  significant_down_count: 13
+  significant_up_count: 22
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -1039,9 +1039,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '7'
+  - '13'
   time_point_significant_up:
-  - '6'
+  - '22'
   time_point_totals:
   - '484'
   treatment_type:
@@ -1080,8 +1080,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Marinobacter (MarRef v6)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 32
-  significant_up_count: 54
+  significant_down_count: 39
+  significant_up_count: 72
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -1094,9 +1094,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '32'
+  - '39'
   time_point_significant_up:
-  - '54'
+  - '72'
   time_point_totals:
   - '484'
   treatment_type:
@@ -1134,8 +1134,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 321
-  significant_up_count: 465
+  significant_down_count: 446
+  significant_up_count: 551
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 2
@@ -1152,11 +1152,11 @@ rows:
   - '1'
   - '2'
   time_point_significant_down:
-  - '3'
-  - '318'
+  - '2'
+  - '444'
   time_point_significant_up:
-  - '406'
-  - '59'
+  - '30'
+  - '521'
   time_point_totals:
   - '1849'
   - '1849'
@@ -1194,8 +1194,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 394
-  significant_up_count: 609
+  significant_down_count: 1038
+  significant_up_count: 1087
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 5
@@ -1224,17 +1224,17 @@ rows:
   - '4'
   - '5'
   time_point_significant_down:
-  - '137'
-  - '14'
-  - '74'
-  - '77'
-  - '92'
+  - '203'
+  - '251'
+  - '263'
+  - '271'
+  - '50'
   time_point_significant_up:
-  - '111'
-  - '145'
-  - '157'
-  - '161'
-  - '35'
+  - '106'
+  - '225'
+  - '241'
+  - '242'
+  - '273'
   time_point_totals:
   - '1424'
   - '1424'
@@ -1275,8 +1275,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 834
-  significant_up_count: 553
+  significant_down_count: 1142
+  significant_up_count: 857
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 5
@@ -1305,17 +1305,17 @@ rows:
   - '4'
   - '5'
   time_point_significant_down:
-  - '159'
-  - '169'
-  - '226'
-  - '235'
-  - '45'
+  - '15'
+  - '229'
+  - '278'
+  - '309'
+  - '311'
   time_point_significant_up:
-  - '108'
-  - '116'
-  - '134'
-  - '156'
-  - '39'
+  - '172'
+  - '206'
+  - '22'
+  - '221'
+  - '236'
   time_point_totals:
   - '1849'
   - '1849'
@@ -1357,8 +1357,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
+  significant_down_count: 9
+  significant_up_count: 10
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -1371,9 +1371,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '9'
   time_point_significant_up:
-  - '0'
+  - '10'
   time_point_totals:
   - '327'
   treatment_type:
@@ -1411,8 +1411,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 8
-  significant_up_count: 7
+  significant_down_count: 9
+  significant_up_count: 12
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -1425,9 +1425,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '8'
+  - '9'
   time_point_significant_up:
-  - '7'
+  - '12'
   time_point_totals:
   - '327'
   treatment_type:
@@ -1465,8 +1465,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 0
+  significant_down_count: 1
+  significant_up_count: 3
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -1479,9 +1479,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '1'
   time_point_significant_up:
-  - '0'
+  - '3'
   time_point_totals:
   - '327'
   treatment_type:
@@ -1519,8 +1519,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 18
-  significant_up_count: 8
+  significant_down_count: 23
+  significant_up_count: 13
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -1533,9 +1533,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '18'
+  - '23'
   time_point_significant_up:
-  - '8'
+  - '13'
   time_point_totals:
   - '327'
   treatment_type:
@@ -1679,8 +1679,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MIT9312
   publication_doi: 10.1038/ismej.2017.189
-  significant_down_count: 50
-  significant_up_count: 52
+  significant_down_count: 14
+  significant_up_count: 12
   table_scope: significant_only
   table_scope_detail: ''
   time_point_count: 1
@@ -1693,9 +1693,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '50'
+  - '14'
   time_point_significant_up:
-  - '52'
+  - '12'
   time_point_totals:
   - '102'
   treatment_type:
@@ -2097,8 +2097,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 1
-  significant_up_count: 1
+  significant_down_count: 11
+  significant_up_count: 34
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2111,9 +2111,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '1'
+  - '11'
   time_point_significant_up:
-  - '1'
+  - '34'
   time_point_totals:
   - '930'
   treatment_type:
@@ -2151,8 +2151,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 43
-  significant_up_count: 198
+  significant_down_count: 78
+  significant_up_count: 260
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2165,9 +2165,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '43'
+  - '78'
   time_point_significant_up:
-  - '198'
+  - '260'
   time_point_totals:
   - '929'
   treatment_type:
@@ -2205,8 +2205,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 1
-  significant_up_count: 0
+  significant_down_count: 15
+  significant_up_count: 20
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2219,9 +2219,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '1'
+  - '15'
   time_point_significant_up:
-  - '0'
+  - '20'
   time_point_totals:
   - '930'
   treatment_type:
@@ -2259,8 +2259,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 56
-  significant_up_count: 136
+  significant_down_count: 90
+  significant_up_count: 179
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2273,9 +2273,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '56'
+  - '90'
   time_point_significant_up:
-  - '136'
+  - '179'
   time_point_totals:
   - '928'
   treatment_type:
@@ -2367,8 +2367,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 2
-  significant_up_count: 0
+  significant_down_count: 7
+  significant_up_count: 22
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2381,9 +2381,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '2'
+  - '7'
   time_point_significant_up:
-  - '0'
+  - '22'
   time_point_totals:
   - '359'
   treatment_type:
@@ -2421,8 +2421,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 2
-  significant_up_count: 25
+  significant_down_count: 11
+  significant_up_count: 58
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2435,9 +2435,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '2'
+  - '11'
   time_point_significant_up:
-  - '25'
+  - '58'
   time_point_totals:
   - '359'
   treatment_type:
@@ -2475,8 +2475,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 1
+  significant_down_count: 25
+  significant_up_count: 15
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2489,9 +2489,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '25'
   time_point_significant_up:
-  - '1'
+  - '15'
   time_point_totals:
   - '359'
   treatment_type:
@@ -2529,8 +2529,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH7803
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 4
-  significant_up_count: 21
+  significant_down_count: 14
+  significant_up_count: 60
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2543,9 +2543,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '4'
+  - '14'
   time_point_significant_up:
-  - '21'
+  - '60'
   time_point_totals:
   - '359'
   treatment_type:
@@ -2583,8 +2583,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH8102
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 22
-  significant_up_count: 10
+  significant_down_count: 54
+  significant_up_count: 30
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2597,9 +2597,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '22'
+  - '54'
   time_point_significant_up:
-  - '10'
+  - '30'
   time_point_totals:
   - '895'
   treatment_type:
@@ -2637,8 +2637,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH8102
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 12
-  significant_up_count: 90
+  significant_down_count: 21
+  significant_up_count: 189
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2651,9 +2651,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '12'
+  - '21'
   time_point_significant_up:
-  - '90'
+  - '189'
   time_point_totals:
   - '895'
   treatment_type:
@@ -2691,8 +2691,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH8102
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 4
-  significant_up_count: 4
+  significant_down_count: 24
+  significant_up_count: 66
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2705,9 +2705,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '4'
+  - '24'
   time_point_significant_up:
-  - '4'
+  - '66'
   time_point_totals:
   - '894'
   treatment_type:
@@ -2745,8 +2745,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus WH8102
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 16
-  significant_up_count: 72
+  significant_down_count: 25
+  significant_up_count: 134
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2759,9 +2759,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '16'
+  - '25'
   time_point_significant_up:
-  - '72'
+  - '134'
   time_point_totals:
   - '895'
   treatment_type:
@@ -2853,8 +2853,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus sp. BL107
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 3
-  significant_up_count: 4
+  significant_down_count: 5
+  significant_up_count: 5
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2867,9 +2867,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '3'
+  - '5'
   time_point_significant_up:
-  - '4'
+  - '5'
   time_point_totals:
   - '163'
   treatment_type:
@@ -2907,8 +2907,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus sp. BL107
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 0
-  significant_up_count: 29
+  significant_down_count: 2
+  significant_up_count: 43
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2921,9 +2921,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '2'
   time_point_significant_up:
-  - '29'
+  - '43'
   time_point_totals:
   - '163'
   treatment_type:
@@ -2961,8 +2961,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus sp. BL107
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 6
-  significant_up_count: 6
+  significant_down_count: 10
+  significant_up_count: 8
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -2975,9 +2975,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '6'
+  - '10'
   time_point_significant_up:
-  - '6'
+  - '8'
   time_point_totals:
   - '163'
   treatment_type:
@@ -3015,8 +3015,8 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus sp. BL107
   publication_doi: 10.1128/spectrum.03275-22
-  significant_down_count: 1
-  significant_up_count: 26
+  significant_down_count: 3
+  significant_up_count: 41
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 1
@@ -3029,9 +3029,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '1'
+  - '3'
   time_point_significant_up:
-  - '26'
+  - '41'
   time_point_totals:
   - '162'
   treatment_type:

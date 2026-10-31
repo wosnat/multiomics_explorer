@@ -2,7 +2,7 @@
 # Live ControlledVocabulary values for the properties the docs quote.
 # tests/unit/test_docs_lint.py reads this offline; the -m kg test in
 # tests/integration/test_docs_kg_claims.py asserts it matches the live KG.
-kg_built_at: '2026-10-31T14:01:03.604Z'
+kg_built_at: '2026-10-31T19:34:27.203Z'
 vocabularies:
   background_factors:
     ClusteringAnalysis:
@@ -212,6 +212,19 @@ vocabularies:
       - Steroids
       - Vitamins and cofactors
   omics_type:
+    ClusteringAnalysis:
+      closed: true
+      values:
+      - BIOINFORMATIC
+      - DNASEQ
+      - EXOPROTEOMICS
+      - METABOLOMICS
+      - MICROARRAY
+      - PAIRED_RNASEQ_PROTEOME
+      - PROTEOMICS
+      - RNASEQ
+      - VESICLE_DNASEQ
+      - VESICLE_PROTEOMICS
     Experiment:
       closed: true
       values:

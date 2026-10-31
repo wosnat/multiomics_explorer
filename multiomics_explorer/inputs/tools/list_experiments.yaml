@@ -57,10 +57,10 @@ examples:
         ],
         "by_publication_truncated": null,
         "by_table_scope": [
-          {"table_scope": "all_detected_genes", "count": 125},
-          {"table_scope": "significant_only", "count": 46},
-          {"table_scope": "filtered_subset", "count": 30},
-          {"table_scope": "significant_any_timepoint", "count": 12},
+          {"table_scope": "all_detected_genes", "count": 129},
+          {"table_scope": "significant_only", "count": 41},
+          {"table_scope": "filtered_subset", "count": 34},
+          {"table_scope": "significant_any_timepoint", "count": 9},
           {"table_scope": "top_n", "count": 7}
         ],
         "by_control_timing": [
@@ -177,9 +177,9 @@ examples:
         "by_publication_truncated": null,
         "by_table_scope": [
           {"table_scope": "all_detected_genes", "count": 17},
-          {"table_scope": "significant_any_timepoint", "count": 5},
-          {"table_scope": "significant_only", "count": 3},
-          {"table_scope": "filtered_subset", "count": 1}
+          {"table_scope": "filtered_subset", "count": 4},
+          {"table_scope": "significant_any_timepoint", "count": 3},
+          {"table_scope": "significant_only", "count": 2}
         ],
         "by_control_timing": [{"control_timing": "baseline", "count": 22}, {"control_timing": "mixed", "count": 4}],
         "by_cluster_type": [{"cluster_type": "time_course", "count": 6}],
@@ -443,7 +443,7 @@ examples:
             "derived_metric_value_kinds": [],
             "compartment": "whole_cell",
             "metabolite_count": 96,
-            "metabolite_assay_count": 3,
+            "metabolite_assay_count": 2,
             "metabolite_compartments": ["whole_cell"]
           },
           {

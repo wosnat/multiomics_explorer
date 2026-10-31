@@ -390,8 +390,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Alteromonas macleodii HOT1A3
   publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 548
-  significant_up_count: 518
+  significant_down_count: 629
+  significant_up_count: 643
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 3
@@ -412,13 +412,13 @@ rows:
   - '2'
   - '3'
   time_point_significant_down:
-  - '163'
-  - '175'
-  - '210'
+  - '166'
+  - '229'
+  - '234'
   time_point_significant_up:
-  - '111'
-  - '179'
+  - '115'
   - '228'
+  - '300'
   time_point_totals:
   - '3947'
   - '3947'
@@ -440,12 +440,12 @@ rows:
   derived_metric_value_kinds: []
   design_notes: Both arms are 20 h HOT1A3 cocultures with MIT9313, differing only
     in the HOT1A3 inoculum (high vs 0.5x10^6 cells/ml).
-  distinct_gene_count: 1879
+  distinct_gene_count: 1848
   experiment_id: 10.1038/ismej.2016.70_coculture_prochlorococcus_mit9313_high_alteromonas_hot1a3_rnaseq
   experiment_name: HOT1A3 Coculture with Prochlorococcus MIT9313 (high Alteromonas
     inoculum, 5x10^6 cells/ml) vs coculture with MIT9313 at low Alteromonas inoculum
     (0.5x10^6 cells/ml) (RNASEQ)
-  gene_count: 1879
+  gene_count: 1848
   growth_phases:
   - exponential
   is_time_course: single_time_point
@@ -473,7 +473,7 @@ rows:
   time_point_significant_up:
   - '188'
   time_point_totals:
-  - '1879'
+  - '1848'
   treatment_type:
   - coculture
 - authors:
@@ -560,8 +560,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Prochlorococcus MED4
   publication_doi: 10.1101/2025.11.24.690089
-  significant_down_count: 321
-  significant_up_count: 465
+  significant_down_count: 446
+  significant_up_count: 551
   table_scope: all_detected_genes
   table_scope_detail: ''
   time_point_count: 2
@@ -578,11 +578,11 @@ rows:
   - '1'
   - '2'
   time_point_significant_down:
-  - '3'
-  - '318'
+  - '2'
+  - '444'
   time_point_significant_up:
-  - '406'
-  - '59'
+  - '30'
+  - '521'
   time_point_totals:
   - '1849'
   - '1849'
@@ -977,8 +977,8 @@ rows:
   omics_type: RNASEQ
   organism_name: Ruegeria pomeroyi DSS-3
   publication_doi: 10.1038/s41396-020-00811-y
-  significant_down_count: 343
-  significant_up_count: 392
+  significant_down_count: 360
+  significant_up_count: 408
   table_scope: all_detected_genes
   table_scope_detail: All 4,277 DSS-3 genes in Table S5 (DESeq2 output)
   time_point_count: 1
@@ -991,9 +991,9 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '343'
+  - '360'
   time_point_significant_up:
-  - '392'
+  - '408'
   time_point_totals:
   - '4224'
   treatment_type:
@@ -1435,10 +1435,10 @@ rows:
     successive steady states of one chemostat (axenic, then lactate coculture, then
     HCO3- coculture), each sampled after at least five volume changes under steady-state
     conditions.'
-  distinct_gene_count: 1295
+  distinct_gene_count: 1330
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_axenic_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture (HCO3-) vs axenic (SOLiD RNA-seq)
-  gene_count: 1295
+  gene_count: 1330
   growth_phases:
   - acclimated_steady_state
   is_time_course: single_time_point
@@ -1448,7 +1448,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Shewanella sp. W3-18-1
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 805
+  significant_down_count: 840
   significant_up_count: 490
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs axenic control
@@ -1462,11 +1462,11 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '805'
+  - '840'
   time_point_significant_up:
   - '490'
   time_point_totals:
-  - '1295'
+  - '1330'
   treatment_type:
   - coculture
 - authors:
@@ -1563,11 +1563,11 @@ rows:
     successive steady states of one chemostat (axenic, then lactate coculture, then
     HCO3- coculture), each sampled after at least five volume changes under steady-state
     conditions.'
-  distinct_gene_count: 1226
+  distinct_gene_count: 1266
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_lactate_shew_w3181_rnaseq
   experiment_name: Shewanella W3-18-1 coculture HCO3- vs coculture lactate (SOLiD
     RNA-seq)
-  gene_count: 1226
+  gene_count: 1266
   growth_phases:
   - acclimated_steady_state
   is_time_course: single_time_point
@@ -1577,7 +1577,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Shewanella sp. W3-18-1
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 751
+  significant_down_count: 791
   significant_up_count: 475
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs lactate co-culture
@@ -1591,11 +1591,11 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '751'
+  - '791'
   time_point_significant_up:
   - '475'
   time_point_totals:
-  - '1226'
+  - '1266'
   treatment_type:
   - carbon
   - coculture
@@ -1629,10 +1629,10 @@ rows:
     successive steady states of one chemostat (axenic, then lactate coculture, then
     HCO3- coculture), each sampled after at least five volume changes under steady-state
     conditions.'
-  distinct_gene_count: 670
+  distinct_gene_count: 671
   experiment_id: 10.1038/ismej.2014.69_coculture_hco3_vs_axenic_syn7002_rnaseq
   experiment_name: Synechococcus 7002 coculture (HCO3-) vs axenic (SOLiD RNA-seq)
-  gene_count: 670
+  gene_count: 671
   growth_phases:
   - acclimated_steady_state
   is_time_course: single_time_point
@@ -1642,7 +1642,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Synechococcus PCC 7002
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 342
+  significant_down_count: 343
   significant_up_count: 328
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in HCO3- co-culture vs axenic control
@@ -1656,11 +1656,11 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '342'
+  - '343'
   time_point_significant_up:
   - '328'
   time_point_totals:
-  - '670'
+  - '671'
   treatment_type:
   - coculture
 - authors:
@@ -1693,10 +1693,10 @@ rows:
     successive steady states of one chemostat (axenic, then lactate coculture, then
     HCO3- coculture), each sampled after at least five volume changes under steady-state
     conditions.'
-  distinct_gene_count: 1143
+  distinct_gene_count: 1158
   experiment_id: 10.1038/ismej.2014.69_coculture_lactate_vs_axenic_syn7002_rnaseq
   experiment_name: Synechococcus 7002 coculture (lactate) vs axenic (SOLiD RNA-seq)
-  gene_count: 1143
+  gene_count: 1158
   growth_phases:
   - acclimated_steady_state
   is_time_course: single_time_point
@@ -1706,7 +1706,7 @@ rows:
   omics_type: RNASEQ
   organism_name: Synechococcus PCC 7002
   publication_doi: 10.1038/ismej.2014.69
-  significant_down_count: 626
+  significant_down_count: 641
   significant_up_count: 517
   table_scope: significant_only
   table_scope_detail: Genes with >=2-fold change in lactate co-culture vs axenic control
@@ -1720,11 +1720,11 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '626'
+  - '641'
   time_point_significant_up:
   - '517'
   time_point_totals:
-  - '1143'
+  - '1158'
   treatment_type:
   - coculture
 - authors:
@@ -2187,8 +2187,8 @@ rows:
   omics_type: MICROARRAY
   organism_name: Synechococcus WH8102
   publication_doi: 10.1111/j.1462-2920.2009.01997.x
-  significant_down_count: 54
-  significant_up_count: 45
+  significant_down_count: 294
+  significant_up_count: 280
   table_scope: significant_only
   table_scope_detail: ''
   time_point_count: 2
@@ -2206,10 +2206,10 @@ rows:
   - '2'
   time_point_significant_down:
   - '0'
-  - '54'
+  - '294'
   time_point_significant_up:
   - '0'
-  - '45'
+  - '280'
   time_point_totals:
   - '280'
   - '294'
@@ -2421,7 +2421,7 @@ rows:
   omics_type: PROTEOMICS
   organism_name: Synechococcus elongatus UTEX 2973
   publication_doi: 10.1186/s13068-022-02163-5
-  significant_down_count: 0
+  significant_down_count: 10
   significant_up_count: 24
   table_scope: significant_only
   table_scope_detail: Table S4 lists selected DE proteins (fold change > 1.2, P <
@@ -2436,7 +2436,7 @@ rows:
   time_point_orders:
   - '1'
   time_point_significant_down:
-  - '0'
+  - '10'
   time_point_significant_up:
   - '24'
   time_point_totals:

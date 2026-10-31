@@ -1,5 +1,12 @@
 # KG asks from the explorer docs review (2026-10-31)
 
+**Status (KG answer + rebuild 2026-10-31T19:34:27Z, absorbed same day):** K1 not a bug — TCDB's own
+grouping; `superfamily` now set on 257 families / 986 subfamilies / 6,025 systems, never class / subclass
+(tcdb ontology page reworded). K2 fixed (new id `…:presence_flags_table_s2_extracellular:presence_flag_extracellular`,
+`compartment='extracellular'`). K3 fixed (BIOINFORMATIC 11 / RNASEQ 8 / MICROARRAY 7; new vocab entry, hash
+re-pinned `e3147f37…`). K4 intended (bacterial-relevance pruning). K5 not reproduced (no empty `metric_type`).
+K6 open.
+
 Origin: explorer Phase 1b docs review before the release after v0.1.0-alpha.5.
 Live KG checked: built 2026-10-31T14:01:03Z (git b87b08ff, local-dev).
 

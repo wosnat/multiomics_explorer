@@ -100,9 +100,8 @@ Filed in chat 2026-08-28; the non-release set (B1–B3, new B5 rebuild-#3 ping, 
 - D8 (note): no KEGG reactions on di-/tripeptides; KO coverage gaps on transporters (`amt1`, `focA`). These are annotation limits, no ask yet.
 - ~~D9~~ landed in the 2026-10-31T11:20:55Z rebuild (KG `d3020457`: the 38 retired InterPro accessions are dropped — `InterproEntry` 13,352 → 13,314, `Gene_has_interpro_entry` −1,665; B2 CHANGELOG notes added). The 2 held goldens regenerated in that absorb.
 
-**E — docs review 2026-10-31** (`docs/kg-specs/2026-10-31-docs-review-kg-asks.md`)
-- E1. `TcdbFamily.superfamily` names the wrong superfamily (ABC → ArsA; P-ATPase → "Heavy Metal Binding Domain"). P1.
-- E2. `presence_flag_extracellular` assay has `compartment='whole_cell'`. E3. genomic_island `ClusteringAnalysis.omics_type=''`. E4. confirm KEGG level-count drop is intended. E5/E6 unverified (KG down at review time): empty `metric_type` on the MIT9313 PNAS assay; TCDB `tier` wording in the `trust_axes` vocab.
+**E — docs review 2026-10-31** (`docs/kg-specs/2026-10-31-docs-review-kg-asks.md`; K1–K5 closed by the 19:34Z rebuild)
+- E6. TCDB `tier` wording in the `trust_axes` vocab ("Diamond-truncation depth") should match the `Gene_has_tcdb_family.tier` edge description. P3.
 
 **C — notes, no action**: `expression_bin` declared but unused (drift test checks in-use ⊆ declared); `direct_gene_count` absent on PfamClan / BriteCategory (documented); 4 publications without `discusses` edges (pre-existing extraction gaps).
 

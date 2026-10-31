@@ -110,7 +110,7 @@ results:
   product: DNA polymerase III, beta subunit
   reaction_count: 4
   significant_down_count: 2
-  significant_up_count: 5
+  significant_up_count: 10
   tcdb_assignment_count: 0
   tcdb_best_hit_identity: null
   transported_metabolite_count: 0
@@ -165,8 +165,8 @@ results:
   organism_name: Prochlorococcus MED4
   product: transmembrane component of ECF transporter energizing module
   reaction_count: 0
-  significant_down_count: 1
-  significant_up_count: 0
+  significant_down_count: 2
+  significant_up_count: 1
   tcdb_assignment_count: 7
   tcdb_best_hit_identity: 25.5
   transported_metabolite_count: 0

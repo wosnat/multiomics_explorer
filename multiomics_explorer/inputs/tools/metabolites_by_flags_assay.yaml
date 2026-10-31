@@ -106,11 +106,11 @@ examples:
     # by_detection_status here (that field exists only on numeric edges).
 
   - title: Cross-assay — both boolean assays at once (intracellular + extracellular)
-    call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular", "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular"])
-    note: "`by_assay` carries one row per assay (intracellular vs extracellular flags). Read the compartment from the assay's metric_type (`presence_flag_extracellular`): both assays currently carry compartment='whole_cell', so `by_compartment` does not split them. Useful for asking \"does this metabolite show up inside the cell, outside, or both?\" on the msystems panel."
+    call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular", "metabolite_assay:msystems.01261-22:presence_flags_table_s2_extracellular:presence_flag_extracellular"])
+    note: "`by_assay` carries one row per assay (intracellular vs extracellular flags). `by_compartment` splits them (`whole_cell` vs `extracellular`). Useful for asking \"does this metabolite show up inside the cell, outside, or both?\" on the msystems panel."
 
   - title: Metabolite-anchored — does PEP show up at all on the boolean assays?
-    call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular", "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular"], metabolite_ids=["kegg.compound:C00074"])
+    call: metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular", "metabolite_assay:msystems.01261-22:presence_flags_table_s2_extracellular:presence_flag_extracellular"], metabolite_ids=["kegg.compound:C00074"])
     # 2 rows total (1 per assay) — both flag_value=false. Most PEP
     # measurements across the metabolomics layer are tested-absent. Pair
     # with metabolites_by_quantifies_assay for the numeric-arm edges.

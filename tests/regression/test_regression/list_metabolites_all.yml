@@ -89,7 +89,7 @@ by_kegg_functional_category:
 by_measurement_coverage:
   by_compartment:
   - compartment: extracellular
-    count: 92
+    count: 96
   - compartment: vesicle
     count: 70
   - compartment: whole_cell
