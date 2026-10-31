@@ -18,14 +18,12 @@ examples:
           {"id": "kegg.pathway:ko00010", "name": "Glycolysis / Gluconeogenesis", "n": 1},
           {"id": "kegg.pathway:ko00710", "name": "Carbon fixation by Calvin cycle", "n": 1},
           {"id": "kegg.pathway:ko00030", "name": "Pentose phosphate pathway", "n": 1},
-          {"id": "kegg.pathway:ko00061", "name": "Fatty acid biosynthesis", "n": 1},
-          {"id": "kegg.pathway:ko00860", "name": "Porphyrin metabolism", "n": 1},
           ...
         ],
         "top_publications": [
           {
             "doi": "10.1038/ismej.2016.70",
-            "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences between strains and ...",
+            "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences ...",
             "n": 37
           }
         ],
@@ -78,14 +76,12 @@ examples:
           {"id": "kegg.pathway:ko00010", "name": "Glycolysis / Gluconeogenesis", "n": 1},
           {"id": "kegg.pathway:ko00710", "name": "Carbon fixation by Calvin cycle", "n": 1},
           {"id": "kegg.pathway:ko00030", "name": "Pentose phosphate pathway", "n": 1},
-          {"id": "kegg.pathway:ko00061", "name": "Fatty acid biosynthesis", "n": 1},
-          {"id": "kegg.pathway:ko00860", "name": "Porphyrin metabolism", "n": 1},
           ...
         ],
         "top_publications": [
           {
             "doi": "10.1038/ismej.2016.70",
-            "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences between strains and ...",
+            "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences ...",
             "n": 8
           }
         ],
@@ -144,14 +140,12 @@ examples:
           {"id": "kegg.pathway:ko00010", "name": "Glycolysis / Gluconeogenesis", "n": 1},
           {"id": "kegg.pathway:ko00710", "name": "Carbon fixation by Calvin cycle", "n": 1},
           {"id": "kegg.pathway:ko00030", "name": "Pentose phosphate pathway", "n": 1},
-          {"id": "kegg.pathway:ko00061", "name": "Fatty acid biosynthesis", "n": 1},
-          {"id": "kegg.pathway:ko00860", "name": "Porphyrin metabolism", "n": 1},
           ...
         ],
         "top_publications": [
           {
             "doi": "10.1038/ismej.2016.70",
-            "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences between strains and ...",
+            "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences ...",
             "n": 8
           }
         ],
@@ -165,7 +159,7 @@ examples:
             "entity_name": "Photosynthesis",
             "organism": null,
             "prominence": "central",
-            "evidence": "expression of genes involved in photosynthesis ... decreased in MED4 and increased in MIT9313 (Abstract, p1; Results,..."
+            "evidence": "expression of genes involved in photosynthesis ... decreased in MED4 and increased in MIT9313 (Ab..."
           },
           {
             "doi": "10.1038/ismej.2016.70",
@@ -174,7 +168,7 @@ examples:
             "entity_name": "Biosynthesis of amino acids",
             "organism": null,
             "prominence": "central",
-            "evidence": "genes involved in the biosynthesis of amino acids ... less abundantly expressed in MED4+1A3 (p6, Results)"
+            "evidence": "genes involved in the biosynthesis of amino acids ... less abundantly expressed in MED4+1A3 (p6, ..."
           },
           {
             "doi": "10.1038/ismej.2016.70",

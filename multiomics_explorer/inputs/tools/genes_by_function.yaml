@@ -13,8 +13,6 @@ examples:
           {"organism_name": "Synechococcus BIOS-U3-1", "count": 93},
           {"organism_name": "Synechococcus CC9616", "count": 92},
           {"organism_name": "Synechococcus KORDI-100", "count": 88},
-          {"organism_name": "Prochlorococcus MIT9303", "count": 87},
-          {"organism_name": "Synechococcus ROS8604", "count": 84},
           ...
         ],
         "by_organism_truncated": true,
@@ -22,8 +20,6 @@ examples:
           {"category": "Photosynthesis", "count": 4484},
           {"category": "Stress response and adaptation", "count": 1302},
           {"category": "Energy production", "count": 464},
-          {"category": "Unknown", "count": 414},
-          {"category": "Post-translational modification", "count": 352},
           ...
         ],
         "score_max": 6.025513648986816,
@@ -77,8 +73,6 @@ examples:
           {"organism_name": "Pseudomonas putida KT2440", "count": 62},
           {"organism_name": "Shewanella sp. W3-18-1", "count": 54},
           {"organism_name": "Marinobacter (MarRef v6)", "count": 54},
-          {"organism_name": "Alteromonas (MarRef v6)", "count": 48},
-          {"organism_name": "Synechococcus WH5701", "count": 44},
           ...
         ],
         "by_organism_truncated": null,
@@ -86,8 +80,6 @@ examples:
           {"category": "Post-translational modification", "count": 1554},
           {"category": "Stress response and adaptation", "count": 898},
           {"category": "Coenzyme metabolism", "count": 385},
-          {"category": "Unknown", "count": 267},
-          {"category": "Cell wall and membrane", "count": 91},
           ...
         ],
         "score_max": 7.707810401916504,

@@ -70,9 +70,7 @@ examples:
             }
           }
         },
-        "relationships": {},
-        "not_found_labels": [],
-        "not_found_relationship_types": []
+        "...": "3 empty fields omitted (relationships, not_found_labels, not_found_relationship_types)"
       }
 
   - title: Scope the relationship section to one type
@@ -80,11 +78,11 @@ examples:
     illustrative: false
     response: |
       {
-        "nodes": {},
+        "...": "3 empty fields omitted (nodes, not_found_labels, not_found_relationship_types)",
         "relationships": {
           "Changes_expression_of": {
             "source_labels": ["Experiment", "InvestigativeProcess"],
-            "target_labels": ["BiologicalEntity", "Entity", "Gene", "NamedThing"],
+            "target_labels": ["BiologicalEntity", "Entity", "Gene", ...],
             "properties": {
               "adjusted_p_value": "float",
               "expression_direction": "string",
@@ -93,15 +91,14 @@ examples:
               "id": "string",
               "log2_fold_change": "float",
               "rank_by_effect": "int",
+              "rank_up": "int",
               "significant": "string",
               "time_point": "string",
               "time_point_hours": "float",
               "time_point_order": "int"
             }
           }
-        },
-        "not_found_labels": [],
-        "not_found_relationship_types": []
+        }
       }
 
   - title: GO transport edges — scope to one relationship type and read its caveat
@@ -110,17 +107,15 @@ examples:
     note: "The edge description carries the reading rule: GO defines the term as a transporter activity whose primary input is the compound (a term definition, not a gene fact), only the term's own axiom is stated, and filtered targets return empty by curation. The four GO edge types and `Tcdb_family_transports_chemical_role` are listed together under `section='relationships'`."
     response: |
       {
-        "nodes": {},
+        "...": "3 empty fields omitted (nodes, not_found_labels, not_found_relationship_types)",
         "relationships": {
           "Molecular_function_transports_metabolite": {
-            "source_labels": ["BiologicalEntity", "BiologicalProcessOrActivity", "Entity", "MolecularFunction", "NamedThing"],
+            "source_labels": ["BiologicalEntity", "BiologicalProcessOrActivity", "Entity", ...],
             "target_labels": ["Entity", "Metabolite", "NamedThing"],
             "properties": {"go_chebi_ids": "list"},
-            "description": "GO defines this molecular-function term as a transporter activity whose primary input (RO:0004009) is this compound. ..."
+            "description": "GO defines this molecular-function term as a transporter activity whose primary input (RO:0004009..."
           }
-        },
-        "not_found_labels": [],
-        "not_found_relationship_types": []
+        }
       }
 
 chaining:

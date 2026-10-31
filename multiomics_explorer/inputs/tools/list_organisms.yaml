@@ -13,8 +13,7 @@ examples:
           {"cluster_type": "genomic_island", "count": 11},
           {"cluster_type": "time_course", "count": 3},
           {"cluster_type": "condition_comparison", "count": 3},
-          {"cluster_type": "diel", "count": 2},
-          {"cluster_type": "decay_pattern", "count": 1}
+          ...
         ],
         "by_organism_type": [
           {"organism_type": "genome_strain", "count": 116},
@@ -30,8 +29,6 @@ examples:
           {"metric_type": "sbp_nutrient_class", "count": 95},
           {"metric_type": "sbp_predicted_substrate", "count": 95},
           {"metric_type": "exoproteome_avg_pct_nsaf", "count": 9},
-          {"metric_type": "exoproteome_detection_status", "count": 9},
-          {"metric_type": "log2_mv_cell_enrichment", "count": 6},
           ...
         ],
         "by_metric_type_truncated": true,
@@ -62,20 +59,6 @@ examples:
             "transported_metabolite_count": 147,
             "go_transport_metabolite_count": 101
           },
-          {
-            "organism_name": "Alteromonas (MarRef v6)",
-            "reaction_count": 1263,
-            "catalyzed_metabolite_count": 1356,
-            "transported_metabolite_count": 128,
-            "go_transport_metabolite_count": 75
-          },
-          {
-            "organism_name": "Alteromonas macleodii MIT1002",
-            "reaction_count": 1288,
-            "catalyzed_metabolite_count": 1352,
-            "transported_metabolite_count": 142,
-            "go_transport_metabolite_count": 91
-          },
           ...
         ],
         "top_metabolic_capability_truncated": true,
@@ -104,22 +87,6 @@ examples:
             "interpro_gene_count": 3636,
             "ncbifam_gene_count": 1853
           },
-          {
-            "preferred_name": "Alteromonas macleodii 83-1",
-            "organism_name": "Alteromonas macleodii 83-1",
-            "peptidase_gene_count": 127,
-            "nonpeptidase_homolog_gene_count": 33,
-            "interpro_gene_count": 3605,
-            "ncbifam_gene_count": 1656
-          },
-          {
-            "preferred_name": "Alteromonas macleodii BGP6",
-            "organism_name": "Alteromonas macleodii BGP6",
-            "peptidase_gene_count": 127,
-            "nonpeptidase_homolog_gene_count": 33,
-            "interpro_gene_count": 3608,
-            "ncbifam_gene_count": 1656
-          },
           ...
         ],
         "top_annotation_capability_truncated": true,
@@ -134,9 +101,6 @@ examples:
             "organism_name": "Alteromonas",
             "organism_type": "treatment",
             "genus": "Alteromonas",
-            "species": null,
-            "strain": null,
-            "clade": null,
             "ncbi_taxon_id": 28108,
             "gene_count": 0,
             "publication_count": 0,
@@ -159,7 +123,8 @@ examples:
             "peptidase_gene_count": 0,
             "nonpeptidase_homolog_gene_count": 0,
             "interpro_gene_count": 0,
-            "ncbifam_gene_count": 0
+            "ncbifam_gene_count": 0,
+            "...": "3 null fields omitted (species, strain, clade)"
           },
           {
             "organism_name": "Alteromonas (MarRef v6)",
@@ -239,8 +204,7 @@ examples:
           {"cluster_type": "genomic_island", "count": 11},
           {"cluster_type": "time_course", "count": 3},
           {"cluster_type": "condition_comparison", "count": 3},
-          {"cluster_type": "diel", "count": 2},
-          {"cluster_type": "decay_pattern", "count": 1}
+          ...
         ],
         "by_organism_type": [
           {"organism_type": "genome_strain", "count": 116},
@@ -256,11 +220,9 @@ examples:
           {"metric_type": "sbp_nutrient_class", "count": 95},
           {"metric_type": "sbp_predicted_substrate", "count": 95},
           {"metric_type": "exoproteome_avg_pct_nsaf", "count": 9},
-          {"metric_type": "exoproteome_detection_status", "count": 9},
-          {"metric_type": "log2_mv_cell_enrichment", "count": 6},
           ...
         ],
-        "by_metric_type_truncated": null,
+        "...": "4 empty fields omitted (by_metric_type_truncated, top_metabolic_capability_truncated, top_annotation_capability_truncated, warnings)",
         "by_compartment": [
           {"compartment": "whole_cell", "count": 102},
           {"compartment": "exoproteome", "count": 10},
@@ -288,23 +250,8 @@ examples:
             "transported_metabolite_count": 147,
             "go_transport_metabolite_count": 101
           },
-          {
-            "organism_name": "Alteromonas (MarRef v6)",
-            "reaction_count": 1263,
-            "catalyzed_metabolite_count": 1356,
-            "transported_metabolite_count": 128,
-            "go_transport_metabolite_count": 75
-          },
-          {
-            "organism_name": "Alteromonas macleodii MIT1002",
-            "reaction_count": 1288,
-            "catalyzed_metabolite_count": 1352,
-            "transported_metabolite_count": 142,
-            "go_transport_metabolite_count": 91
-          },
           ...
         ],
-        "top_metabolic_capability_truncated": null,
         "top_annotation_capability": [
           {
             "preferred_name": "Alteromonas (MarRef v6)",
@@ -330,31 +277,13 @@ examples:
             "interpro_gene_count": 3636,
             "ncbifam_gene_count": 1853
           },
-          {
-            "preferred_name": "Alteromonas macleodii 83-1",
-            "organism_name": "Alteromonas macleodii 83-1",
-            "peptidase_gene_count": 127,
-            "nonpeptidase_homolog_gene_count": 33,
-            "interpro_gene_count": 3605,
-            "ncbifam_gene_count": 1656
-          },
-          {
-            "preferred_name": "Alteromonas macleodii BGP6",
-            "organism_name": "Alteromonas macleodii BGP6",
-            "peptidase_gene_count": 127,
-            "nonpeptidase_homolog_gene_count": 33,
-            "interpro_gene_count": 3608,
-            "ncbifam_gene_count": 1656
-          },
           ...
         ],
-        "top_annotation_capability_truncated": null,
         "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 118},
         "returned": 0,
         "offset": 0,
         "truncated": true,
         "not_found": [],
-        "warnings": [],
         "results": []
       }
 
@@ -368,7 +297,7 @@ examples:
           {"cluster_type": "genomic_island", "count": 1},
           {"cluster_type": "decay_pattern", "count": 1},
           {"cluster_type": "diel", "count": 1},
-          {"cluster_type": "time_course", "count": 1}
+          ...
         ],
         "by_organism_type": [{"organism_type": "genome_strain", "count": 2}],
         "by_value_kind": [
@@ -380,8 +309,6 @@ examples:
           {"metric_type": "antisense_tss_count", "count": 1},
           {"metric_type": "damping_ratio", "count": 1},
           {"metric_type": "diel_amplitude_protein_log2", "count": 1},
-          {"metric_type": "diel_amplitude_transcript_log2", "count": 1},
-          {"metric_type": "expressed_above_background", "count": 1},
           ...
         ],
         "by_metric_type_truncated": true,
@@ -402,7 +329,7 @@ examples:
             "go_transport_metabolite_count": 46
           }
         ],
-        "top_metabolic_capability_truncated": null,
+        "...": "3 empty fields omitted (top_metabolic_capability_truncated, top_annotation_capability_truncated, warnings)",
         "top_annotation_capability": [
           {
             "preferred_name": "Alteromonas macleodii MIT1002",
@@ -421,13 +348,11 @@ examples:
             "ncbifam_gene_count": 744
           }
         ],
-        "top_annotation_capability_truncated": null,
         "by_measurement_capability": {"has_metabolomics": 0, "no_metabolomics": 2},
         "returned": 2,
         "offset": 0,
         "truncated": false,
         "not_found": [],
-        "warnings": [],
         "results": [
           {
             "organism_name": "Alteromonas macleodii MIT1002",
@@ -441,8 +366,8 @@ examples:
             "publication_count": 5,
             "experiment_count": 6,
             "partner_experiment_count": 3,
-            "treatment_types": ["compartment", "darkness", "genomic_analysis", "growth_phase"],
-            "background_factors": ["axenic", "coculture", "darkness", "diel", "light"],
+            "treatment_types": ["compartment", "darkness", "genomic_analysis", ...],
+            "background_factors": ["axenic", "coculture", "darkness", ...],
             "omics_types": ["BIOINFORMATIC", "RNASEQ", "VESICLE_PROTEOMICS"],
             "clustering_analysis_count": 0,
             "cluster_types": [],
@@ -472,12 +397,12 @@ examples:
             "publication_count": 21,
             "experiment_count": 45,
             "partner_experiment_count": 11,
-            "treatment_types": ["carbon", "coculture", "compartment", "darkness", "diel", ...],
-            "background_factors": ["axenic", "chemical", "coculture", "darkness", "diel", ...],
-            "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", "PROTEOMICS", "RNASEQ", ...],
+            "treatment_types": ["carbon", "coculture", "compartment", ...],
+            "background_factors": ["axenic", "chemical", "coculture", ...],
+            "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", ...],
             "clustering_analysis_count": 6,
-            "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
-            "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", "death", "diel", ...],
+            "cluster_types": ["genomic_island", "decay_pattern", "diel", ...],
+            "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", ...],
             "derived_metric_count": 28,
             "derived_metric_value_kinds": ["boolean", "categorical", "numeric"],
             "compartments": ["vesicle", "whole_cell"],
@@ -507,8 +432,7 @@ examples:
           {"cluster_type": "genomic_island", "count": 2},
           {"cluster_type": "decay_pattern", "count": 1},
           {"cluster_type": "diel", "count": 1},
-          {"cluster_type": "time_course", "count": 1},
-          {"cluster_type": "condition_comparison", "count": 1}
+          ...
         ],
         "by_organism_type": [{"organism_type": "genome_strain", "count": 2}],
         "by_value_kind": [
@@ -520,8 +444,6 @@ examples:
           {"metric_type": "sbp_nutrient_class", "count": 2},
           {"metric_type": "sbp_predicted_substrate", "count": 2},
           {"metric_type": "antisense_tss_count", "count": 1},
-          {"metric_type": "damping_ratio", "count": 1},
-          {"metric_type": "diel_amplitude_protein_log2", "count": 1},
           ...
         ],
         "by_metric_type_truncated": true,
@@ -542,7 +464,7 @@ examples:
             "go_transport_metabolite_count": 46
           }
         ],
-        "top_metabolic_capability_truncated": null,
+        "...": "3 empty fields omitted (top_metabolic_capability_truncated, top_annotation_capability_truncated, warnings)",
         "top_annotation_capability": [
           {
             "preferred_name": "Prochlorococcus MED4",
@@ -561,13 +483,11 @@ examples:
             "ncbifam_gene_count": 774
           }
         ],
-        "top_annotation_capability_truncated": null,
         "by_measurement_capability": {"has_metabolomics": 1, "no_metabolomics": 1},
         "returned": 2,
         "offset": 0,
         "truncated": false,
         "not_found": ["Bogus organism"],
-        "warnings": [],
         "results": [
           {
             "organism_name": "Prochlorococcus MED4",
@@ -581,12 +501,12 @@ examples:
             "publication_count": 21,
             "experiment_count": 45,
             "partner_experiment_count": 11,
-            "treatment_types": ["carbon", "coculture", "compartment", "darkness", "diel", ...],
-            "background_factors": ["axenic", "chemical", "coculture", "darkness", "diel", ...],
-            "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", "PROTEOMICS", "RNASEQ", ...],
+            "treatment_types": ["carbon", "coculture", "compartment", ...],
+            "background_factors": ["axenic", "chemical", "coculture", ...],
+            "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", ...],
             "clustering_analysis_count": 6,
-            "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
-            "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", "death", "diel", ...],
+            "cluster_types": ["genomic_island", "decay_pattern", "diel", ...],
+            "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", ...],
             "derived_metric_count": 28,
             "derived_metric_value_kinds": ["boolean", "categorical", "numeric"],
             "compartments": ["vesicle", "whole_cell"],
@@ -612,7 +532,7 @@ examples:
             "publication_count": 4,
             "experiment_count": 5,
             "partner_experiment_count": 0,
-            "treatment_types": ["genomic_analysis", "growth_phase", "phosphorus", "temperature"],
+            "treatment_types": ["genomic_analysis", "growth_phase", "phosphorus", ...],
             "background_factors": ["axenic", "diel", "light"],
             "omics_types": ["BIOINFORMATIC", "METABOLOMICS", "RNASEQ"],
             "clustering_analysis_count": 2,
@@ -655,7 +575,7 @@ examples:
           {"cluster_type": "genomic_island", "count": 3},
           {"cluster_type": "time_course", "count": 2},
           {"cluster_type": "decay_pattern", "count": 1},
-          {"cluster_type": "diel", "count": 1}
+          ...
         ],
         "by_organism_type": [{"organism_type": "genome_strain", "count": 9}],
         "by_value_kind": [
@@ -667,8 +587,6 @@ examples:
           {"metric_type": "log2_mv_cell_enrichment", "count": 6},
           {"metric_type": "prop_abund_cells_percent", "count": 6},
           {"metric_type": "prop_abund_mvs_percent", "count": 6},
-          {"metric_type": "strain_unique_gene_koch2020", "count": 4},
-          {"metric_type": "sbp_nutrient_class", "count": 3},
           ...
         ],
         "by_metric_type_truncated": true,
@@ -695,23 +613,9 @@ examples:
             "transported_metabolite_count": 142,
             "go_transport_metabolite_count": 88
           },
-          {
-            "organism_name": "Alteromonas macleodii AD45",
-            "reaction_count": 1259,
-            "catalyzed_metabolite_count": 1326,
-            "transported_metabolite_count": 144,
-            "go_transport_metabolite_count": 85
-          },
-          {
-            "organism_name": "Alteromonas macleodii ATCC27126",
-            "reaction_count": 1251,
-            "catalyzed_metabolite_count": 1307,
-            "transported_metabolite_count": 153,
-            "go_transport_metabolite_count": 89
-          },
           ...
         ],
-        "top_metabolic_capability_truncated": null,
+        "...": "3 empty fields omitted (top_metabolic_capability_truncated, top_annotation_capability_truncated, warnings)",
         "top_annotation_capability": [
           {
             "preferred_name": "Alteromonas macleodii AD45",
@@ -737,31 +641,13 @@ examples:
             "interpro_gene_count": 3456,
             "ncbifam_gene_count": 1598
           },
-          {
-            "preferred_name": "Alteromonas macleodii BS11",
-            "organism_name": "Alteromonas macleodii BS11",
-            "peptidase_gene_count": 123,
-            "nonpeptidase_homolog_gene_count": 29,
-            "interpro_gene_count": 3349,
-            "ncbifam_gene_count": 1577
-          },
-          {
-            "preferred_name": "Alteromonas macleodii MIT1002",
-            "organism_name": "Alteromonas macleodii MIT1002",
-            "peptidase_gene_count": 120,
-            "nonpeptidase_homolog_gene_count": 32,
-            "interpro_gene_count": 3584,
-            "ncbifam_gene_count": 1699
-          },
           ...
         ],
-        "top_annotation_capability_truncated": null,
         "by_measurement_capability": {"has_metabolomics": 2, "no_metabolomics": 7},
         "returned": 5,
         "offset": 0,
         "truncated": true,
         "not_found": [],
-        "warnings": [],
         "results": [
           {
             "organism_name": "Alteromonas macleodii AD45",
@@ -806,7 +692,7 @@ examples:
             "publication_count": 3,
             "experiment_count": 5,
             "partner_experiment_count": 0,
-            "treatment_types": ["carbon", "compartment", "genomic_analysis", "iron"],
+            "treatment_types": ["carbon", "compartment", "genomic_analysis", ...],
             "background_factors": ["axenic", "darkness"],
             "omics_types": ["BIOINFORMATIC", "RNASEQ", "VESICLE_PROTEOMICS"],
             "clustering_analysis_count": 0,
@@ -879,7 +765,7 @@ examples:
           {"cluster_type": "genomic_island", "count": 1},
           {"cluster_type": "decay_pattern", "count": 1},
           {"cluster_type": "diel", "count": 1},
-          {"cluster_type": "time_course", "count": 1}
+          ...
         ],
         "by_organism_type": [{"organism_type": "genome_strain", "count": 2}],
         "by_value_kind": [
@@ -891,8 +777,6 @@ examples:
           {"metric_type": "antisense_tss_count", "count": 1},
           {"metric_type": "damping_ratio", "count": 1},
           {"metric_type": "diel_amplitude_protein_log2", "count": 1},
-          {"metric_type": "diel_amplitude_transcript_log2", "count": 1},
-          {"metric_type": "expressed_above_background", "count": 1},
           ...
         ],
         "by_metric_type_truncated": true,
@@ -913,7 +797,7 @@ examples:
             "go_transport_metabolite_count": 46
           }
         ],
-        "top_metabolic_capability_truncated": null,
+        "...": "3 empty fields omitted (top_metabolic_capability_truncated, top_annotation_capability_truncated, warnings)",
         "top_annotation_capability": [
           {
             "preferred_name": "Pseudomonas putida KT2440",
@@ -932,13 +816,11 @@ examples:
             "ncbifam_gene_count": 744
           }
         ],
-        "top_annotation_capability_truncated": null,
         "by_measurement_capability": {"has_metabolomics": 0, "no_metabolomics": 2},
         "returned": 2,
         "offset": 0,
         "truncated": false,
         "not_found": [],
-        "warnings": [],
         "results": [
           {
             "organism_name": "Prochlorococcus MED4",
@@ -952,12 +834,12 @@ examples:
             "publication_count": 21,
             "experiment_count": 45,
             "partner_experiment_count": 11,
-            "treatment_types": ["carbon", "coculture", "compartment", "darkness", "diel", ...],
-            "background_factors": ["axenic", "chemical", "coculture", "darkness", "diel", ...],
-            "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", "PROTEOMICS", "RNASEQ", ...],
+            "treatment_types": ["carbon", "coculture", "compartment", ...],
+            "background_factors": ["axenic", "chemical", "coculture", ...],
+            "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", ...],
             "clustering_analysis_count": 6,
-            "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
-            "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", "death", "diel", ...],
+            "cluster_types": ["genomic_island", "decay_pattern", "diel", ...],
+            "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", ...],
             "derived_metric_count": 28,
             "derived_metric_value_kinds": ["boolean", "categorical", "numeric"],
             "compartments": ["vesicle", "whole_cell"],
