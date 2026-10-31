@@ -3424,7 +3424,8 @@ def build_list_organisms(
 
     RETURN keys (compact): organism_name, organism_type, genus, species,
     strain, clade, ncbi_taxon_id, gene_count, publication_count,
-    experiment_count, treatment_types, background_factors, omics_types,
+    experiment_count, partner_experiment_count, treatment_types,
+    background_factors, omics_types,
     clustering_analysis_count, cluster_types, derived_metric_count,
     derived_metric_value_kinds, compartments, reaction_count,
     catalyzed_metabolite_count, transported_metabolite_count,
@@ -3473,6 +3474,7 @@ def build_list_organisms(
         "       o.gene_count AS gene_count,\n"
         "       o.publication_count AS publication_count,\n"
         "       o.experiment_count AS experiment_count,\n"
+        "       coalesce(o.partner_experiment_count, 0) AS partner_experiment_count,\n"
         "       o.treatment_types AS treatment_types,\n"
         "       coalesce(o.background_factors, []) AS background_factors,\n"
         "       o.omics_types AS omics_types,\n"

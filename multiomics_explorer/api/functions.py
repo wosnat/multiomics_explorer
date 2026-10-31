@@ -2416,7 +2416,12 @@ def list_organisms(
     only — never changes which rows are returned.
     Per result (compact): organism_name, organism_type, genus, species,
     strain, clade, ncbi_taxon_id, gene_count, publication_count,
-    experiment_count, treatment_types, omics_types, clustering_analysis_count,
+    experiment_count (experiments that profile this organism),
+    partner_experiment_count (int, 0 default — experiments in which this
+    organism is the coculture partner, either coculture_role, rather than
+    the profiled organism; list them with
+    list_experiments(coculture_partner=organism_name)),
+    treatment_types, omics_types, clustering_analysis_count,
     cluster_types, derived_metric_count, derived_metric_value_kinds, compartments,
     reaction_count, catalyzed_metabolite_count, transported_metabolite_count
     (distinct substrates reached via the organism's genes' deepest TCDB

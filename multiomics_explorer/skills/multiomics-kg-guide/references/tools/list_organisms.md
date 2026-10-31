@@ -2,7 +2,7 @@
 
 ## What it does
 
-Every organism with taxonomy and per-organism capability rollups — gene, publication, experiment, DM, chemistry, metabolomics and annotation counts.
+Every organism with taxonomy and per-organism capability rollups — gene, publication, experiment (profiled and coculture-partner), DM, chemistry, metabolomics and annotation counts.
 
 Use to pick an organism or check what data it carries before scoping another tool; for gene lookup use `resolve_gene`.
 Filters: organism_names, compartment.
@@ -34,7 +34,7 @@ list_organisms()
 total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind, by_metric_type, by_compartment, top_metabolic_capability, top_annotation_capability, by_measurement_capability, returned, offset, truncated, not_found, warnings, results
 ```
 
-Result row: `organism_name, organism_type, genus, species, strain, clade, ncbi_taxon_id, gene_count, publication_count, experiment_count, treatment_types, background_factors, …`
+Result row: `organism_name, organism_type, genus, species, strain, clade, ncbi_taxon_id, gene_count, publication_count, experiment_count, partner_experiment_count, treatment_types, …`
 
 ## Common mistakes
 
@@ -57,5 +57,6 @@ Result row: `organism_name, organism_type, genus, species, strain, clade, ncbi_t
 - list_organisms → per-row interpro_gene_count / ncbifam_gene_count → ontology_landscape(organism=..., ontology=['interpro', 'ncbifam']) before enrichment on a domain ontology
 - list_organisms (per-row measured_metabolite_count > 0) → list_metabolite_assays(organism=...) for the metabolomics measurement layer
 - list_organisms → list_experiments(organism=...) to scope experiments to the chosen organism
+- list_organisms (per-row partner_experiment_count > 0) → list_experiments(coculture_partner=organism_name) for the experiments in which this organism is the coculture partner
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/list_organisms/full`

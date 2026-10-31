@@ -11642,6 +11642,68 @@ class TestListExperimentsPhase1Plumbing:
         assert r["metabolite_compartments"] == []
 
 
+class TestListOrganismsPartnerExperimentCount:
+    """list_organisms carries partner_experiment_count (coculture-partner
+    experiments, either role) as a compact per-row field: emitted by the
+    detail query and passed through on verbose=False rows."""
+
+    _SUMMARY_ROW = {
+        "total_entries": 2, "total_matching": 2,
+        "by_value_kind": [], "by_metric_type": [], "by_compartment": [],
+        "by_cluster_type": [], "by_organism_type": [{"item": "genome_strain", "count": 2}],
+    }
+    _ROWS = [
+        {"organism_name": "Prochlorococcus MED4", "organism_type": "genome_strain",
+         "genus": "Prochlorococcus", "species": "Prochlorococcus marinus",
+         "strain": "MED4", "clade": "HLI", "ncbi_taxon_id": 59919,
+         "gene_count": 1976, "publication_count": 11,
+         "experiment_count": 45, "partner_experiment_count": 11,
+         "treatment_types": ["coculture"], "omics_types": ["RNASEQ"],
+         "clustering_analysis_count": 0, "cluster_types": [],
+         "derived_metric_count": 0, "derived_metric_value_kinds": [],
+         "compartments": [], "background_factors": []},
+        {"organism_name": "Phage", "organism_type": "treatment",
+         "genus": None, "species": None, "strain": None, "clade": None,
+         "ncbi_taxon_id": None, "gene_count": 0, "publication_count": 1,
+         "experiment_count": 0, "partner_experiment_count": 7,
+         "treatment_types": [], "omics_types": [],
+         "clustering_analysis_count": 0, "cluster_types": [],
+         "derived_metric_count": 0, "derived_metric_value_kinds": [],
+         "compartments": [], "background_factors": []},
+    ]
+
+    def test_compact_detail_query_and_row_carry_partner_experiment_count(
+        self, mock_conn,
+    ):
+        mock_conn.execute_query.side_effect = [[self._SUMMARY_ROW], self._ROWS]
+        result = api.list_organisms(verbose=False, conn=mock_conn)
+        detail_cypher = mock_conn.execute_query.call_args_list[1][0][0]
+        assert "AS partner_experiment_count" in detail_cypher
+        by_name = {r["organism_name"]: r for r in result["results"]}
+        assert by_name["Prochlorococcus MED4"]["partner_experiment_count"] == 11
+        # Partner-only taxon: zero own experiments, non-zero partner count.
+        assert by_name["Phage"]["experiment_count"] == 0
+        assert by_name["Phage"]["partner_experiment_count"] == 7
+
+    def test_zero_partner_count_not_stripped(self, mock_conn):
+        rows = [{**r, "partner_experiment_count": 0} for r in self._ROWS]
+        mock_conn.execute_query.side_effect = [[self._SUMMARY_ROW], rows]
+        result = api.list_organisms(verbose=False, conn=mock_conn)
+        detail_cypher = mock_conn.execute_query.call_args_list[1][0][0]
+        assert "AS partner_experiment_count" in detail_cypher
+        for r in result["results"]:
+            assert r["partner_experiment_count"] == 0
+
+    def test_verbose_detail_query_carries_partner_experiment_count(
+        self, mock_conn,
+    ):
+        mock_conn.execute_query.side_effect = [[self._SUMMARY_ROW], self._ROWS]
+        result = api.list_organisms(verbose=True, conn=mock_conn)
+        detail_cypher = mock_conn.execute_query.call_args_list[1][0][0]
+        assert "AS partner_experiment_count" in detail_cypher
+        assert result["results"][0]["partner_experiment_count"] == 11
+
+
 class TestListOrganismsPhase1Plumbing:
     """list_organisms adds measured_metabolite_count per row + binary
     by_measurement_capability envelope (spec §6.4)."""

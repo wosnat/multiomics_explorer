@@ -8612,6 +8612,82 @@ class TestListExperimentsPhase1PlumbingWrapper:
         assert r.metabolite_compartments == []
 
 
+class TestListOrganismsPartnerExperimentCountWrapper:
+    """OrganismResult carries partner_experiment_count (int, default 0),
+    compact, placed right after experiment_count."""
+
+    _SAMPLE_ORG = {
+        "organism_name": "Phage", "organism_type": "treatment",
+        "genus": None, "species": None, "strain": None, "clade": None,
+        "ncbi_taxon_id": None, "gene_count": 0, "publication_count": 1,
+        "experiment_count": 0,
+        "treatment_types": [], "omics_types": [],
+    }
+
+    @staticmethod
+    def _envelope(row):
+        return {
+            "total_entries": 1, "total_matching": 1,
+            "returned": 1, "truncated": False,
+            "not_found": [], "results": [row],
+        }
+
+    @pytest.mark.asyncio
+    async def test_partner_experiment_count_forwarded(self, tool_fns, mock_ctx):
+        row = {**self._SAMPLE_ORG, "partner_experiment_count": 7}
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value=self._envelope(row),
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        org = result.results[0]
+        assert org.partner_experiment_count == 7
+        assert org.model_dump()["partner_experiment_count"] == 7
+
+    @pytest.mark.asyncio
+    async def test_partner_experiment_count_defaults_to_zero(
+        self, tool_fns, mock_ctx,
+    ):
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value=self._envelope(dict(self._SAMPLE_ORG)),
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        assert result.results[0].partner_experiment_count == 0
+
+    @pytest.mark.asyncio
+    async def test_zero_partner_count_on_wire(self, tool_fns, mock_ctx):
+        """Explicit 0 from the api is kept on the serialized row."""
+        row = {**self._SAMPLE_ORG, "partner_experiment_count": 0}
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value=self._envelope(row),
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        dumped = result.results[0].model_dump()
+        assert "partner_experiment_count" in dumped
+        assert dumped["partner_experiment_count"] == 0
+
+    @pytest.mark.asyncio
+    async def test_model_field_int_default_zero_after_experiment_count(
+        self, tool_fns, mock_ctx,
+    ):
+        with patch(
+            "multiomics_explorer.api.functions.list_organisms",
+            return_value=self._envelope(dict(self._SAMPLE_ORG)),
+        ):
+            result = await tool_fns["list_organisms"](mock_ctx)
+        fields = type(result.results[0]).model_fields
+        assert "partner_experiment_count" in fields
+        field = fields["partner_experiment_count"]
+        assert field.annotation is int
+        assert field.default == 0
+        names = list(fields)
+        assert names.index("partner_experiment_count") == (
+            names.index("experiment_count") + 1
+        )
+
+
 class TestListOrganismsPhase1PlumbingWrapper:
     """OrganismResult adds measured_metabolite_count per row;
     response adds by_measurement_capability binary envelope (spec §6.4)."""

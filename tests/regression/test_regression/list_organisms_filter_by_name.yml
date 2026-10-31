@@ -54,6 +54,7 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MED4
   organism_type: genome_strain
+  partner_experiment_count: 11
   peptidase_gene_count: 50
   publication_count: 21
   reaction_count: 943
@@ -110,6 +111,7 @@ rows:
   - RNASEQ
   organism_name: Prochlorococcus MIT9301
   organism_type: genome_strain
+  partner_experiment_count: 0
   peptidase_gene_count: 49
   publication_count: 4
   reaction_count: 945

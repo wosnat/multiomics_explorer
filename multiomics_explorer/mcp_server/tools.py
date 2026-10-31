@@ -2112,7 +2112,8 @@ def register_tools(mcp: FastMCP):
         ncbi_taxon_id: int | None = Field(default=None, description="NCBI Taxonomy ID for cross-referencing external databases.")
         gene_count: int = Field(description="Number of genes in the KG for this organism.")
         publication_count: int = Field(description="Number of publications naming this organism, including as a coculture partner.")
-        experiment_count: int = Field(description="Experiments profiling this organism (Experiment.organism_name), including BIOINFORMATIC annotation surveys. Experiments where it is only the coculture partner are not counted — list them with list_experiments(coculture_partner=...).")
+        experiment_count: int = Field(description="Experiments profiling this organism (Experiment.organism_name), including BIOINFORMATIC annotation surveys. Experiments where it is only the coculture partner are counted in partner_experiment_count instead.")
+        partner_experiment_count: int = Field(default=0, description="Experiments in which this organism is the coculture partner (either role), not the profiled organism. Disjoint from experiment_count. List them with list_experiments(coculture_partner=organism_name).")
         treatment_types: list[str] = Field(default_factory=list, description="Distinct treatment types across this organism's own experiments (e.g. ['coculture', 'nitrogen', 'light']). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True).")
         background_factors: list[str] = Field(default_factory=list, description="Distinct background factors across this organism's own experiments (e.g. ['axenic', 'light', 'diel']). Live vocabulary: list_experiments(summary=True).")
         omics_types: list[str] = Field(default_factory=list, description="Distinct omics types across this organism's own experiments (e.g. ['RNASEQ', 'PROTEOMICS']; 'BIOINFORMATIC' = annotation-only).")
@@ -2233,7 +2234,7 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> ListOrganismsResponse:
-        """Every organism with taxonomy and per-organism capability rollups — gene, publication, experiment, DM, chemistry, metabolomics and annotation counts.
+        """Every organism with taxonomy and per-organism capability rollups — gene, publication, experiment (profiled and coculture-partner), DM, chemistry, metabolomics and annotation counts.
 
         Use to pick an organism or check what data it carries before scoping another tool; for gene lookup use `resolve_gene`.
         Filters: organism_names, compartment.

@@ -82,6 +82,7 @@ results:
   - PROTEOMICS
   organism_name: Alteromonas (MarRef v6)
   organism_type: reference_proteome_match
+  partner_experiment_count: 40
   peptidase_gene_count: 148
   publication_count: 1
   reaction_count: 1263
@@ -113,6 +114,7 @@ results:
   omics_types: []
   organism_name: Phage
   organism_type: treatment
+  partner_experiment_count: 8
   peptidase_gene_count: 0
   publication_count: 5
   reaction_count: 0
@@ -173,6 +175,7 @@ results:
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MED4
   organism_type: genome_strain
+  partner_experiment_count: 11
   peptidase_gene_count: 50
   publication_count: 21
   reaction_count: 943

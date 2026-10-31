@@ -39,7 +39,7 @@
 - `docs://tools/list_filter_values` — ~1582 tok
 - `docs://tools/list_metabolite_assays` — ~1315 tok
 - `docs://tools/list_metabolites` — ~1997 tok
-- `docs://tools/list_organisms` — ~937 tok
+- `docs://tools/list_organisms` — ~991 tok
 - `docs://tools/list_publications` — ~1249 tok
 - `docs://tools/metabolites_by_flags_assay` — ~1553 tok
 - `docs://tools/metabolites_by_gene` — ~1739 tok
@@ -86,7 +86,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/list_filter_values/full` — ~7260 tok
 - `docs://tools/list_metabolite_assays/full` — ~3970 tok
 - `docs://tools/list_metabolites/full` — ~16272 tok
-- `docs://tools/list_organisms/full` — ~14677 tok
+- `docs://tools/list_organisms/full` — ~15009 tok
 - `docs://tools/list_publications/full` — ~8803 tok
 - `docs://tools/metabolites_by_flags_assay/full` — ~4799 tok
 - `docs://tools/metabolites_by_gene/full` — ~17327 tok

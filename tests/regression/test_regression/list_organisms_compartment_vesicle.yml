@@ -30,6 +30,7 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii AD45
   organism_type: genome_strain
+  partner_experiment_count: 0
   peptidase_gene_count: 129
   publication_count: 2
   reaction_count: 1259
@@ -73,6 +74,7 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii ATCC27126
   organism_type: genome_strain
+  partner_experiment_count: 0
   peptidase_gene_count: 125
   publication_count: 3
   reaction_count: 1251
@@ -112,6 +114,7 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii BGP6
   organism_type: genome_strain
+  partner_experiment_count: 0
   peptidase_gene_count: 127
   publication_count: 1
   reaction_count: 1275
@@ -148,6 +151,7 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii BS11
   organism_type: genome_strain
+  partner_experiment_count: 0
   peptidase_gene_count: 123
   publication_count: 1
   reaction_count: 1228
@@ -190,6 +194,7 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii HOT1A3
   organism_type: genome_strain
+  partner_experiment_count: 6
   peptidase_gene_count: 118
   publication_count: 3
   reaction_count: 1266
@@ -238,6 +243,7 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii MIT1002
   organism_type: genome_strain
+  partner_experiment_count: 3
   peptidase_gene_count: 120
   publication_count: 5
   reaction_count: 1288
@@ -304,6 +310,7 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MED4
   organism_type: genome_strain
+  partner_experiment_count: 11
   peptidase_gene_count: 50
   publication_count: 21
   reaction_count: 943
@@ -367,6 +374,7 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9312
   organism_type: genome_strain
+  partner_experiment_count: 4
   peptidase_gene_count: 50
   publication_count: 6
   reaction_count: 943
@@ -420,6 +428,7 @@ rows:
   - VESICLE_PROTEOMICS
   organism_name: Prochlorococcus MIT9313
   organism_type: genome_strain
+  partner_experiment_count: 2
   peptidase_gene_count: 60
   publication_count: 11
   reaction_count: 953

@@ -2,7 +2,7 @@
 
 ## What it does
 
-Every organism with taxonomy and per-organism capability rollups — gene, publication, experiment, DM, chemistry, metabolomics and annotation counts.
+Every organism with taxonomy and per-organism capability rollups — gene, publication, experiment (profiled and coculture-partner), DM, chemistry, metabolomics and annotation counts.
 
 Use to pick an organism or check what data it carries before scoping another tool; for gene lookup use `resolve_gene`.
 Filters: organism_names, compartment.
@@ -60,7 +60,8 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 | ncbi_taxon_id | int \| None (optional) | NCBI Taxonomy ID for cross-referencing external databases. |
 | gene_count | int | Number of genes in the KG for this organism. |
 | publication_count | int | Number of publications naming this organism, including as a coculture partner. |
-| experiment_count | int | Experiments profiling this organism (Experiment.organism_name), including BIOINFORMATIC annotation surveys. Experiments where it is only the coculture partner are not counted — list them with list_experiments(coculture_partner=...). |
+| experiment_count | int | Experiments profiling this organism (Experiment.organism_name), including BIOINFORMATIC annotation surveys. Experiments where it is only the coculture partner are counted in partner_experiment_count instead. |
+| partner_experiment_count | int (optional) | Experiments in which this organism is the coculture partner (either role), not the profiled organism. Disjoint from experiment_count. List them with list_experiments(coculture_partner=organism_name). |
 | treatment_types | list[string] (optional) | Distinct treatment types across this organism's own experiments (e.g. ['coculture', 'nitrogen', 'light']). Live vocabulary: list_filter_values(filter_type='treatment_type') or list_experiments(summary=True). |
 | background_factors | list[string] (optional) | Distinct background factors across this organism's own experiments (e.g. ['axenic', 'light', 'diel']). Live vocabulary: list_experiments(summary=True). |
 | omics_types | list[string] (optional) | Distinct omics types across this organism's own experiments (e.g. ['RNASEQ', 'PROTEOMICS']; 'BIOINFORMATIC' = annotation-only). |
@@ -241,6 +242,7 @@ list_organisms()
       "gene_count": 0,
       "publication_count": 0,
       "experiment_count": 0,
+      "partner_experiment_count": 0,
       "treatment_types": [],
       "background_factors": [],
       "omics_types": [],
@@ -271,6 +273,7 @@ list_organisms()
       "gene_count": 4305,
       "publication_count": 1,
       "experiment_count": 20,
+      "partner_experiment_count": 40,
       "treatment_types": ["carbon"],
       "background_factors": ["coculture", "darkness", "light"],
       "omics_types": ["PROTEOMICS"],
@@ -303,6 +306,7 @@ list_organisms()
       "gene_count": 4060,
       "publication_count": 2,
       "experiment_count": 6,
+      "partner_experiment_count": 0,
       "treatment_types": ["carbon", "genomic_analysis", "growth_phase"],
       "background_factors": ["axenic"],
       "omics_types": ["BIOINFORMATIC", "PROTEOMICS", "RNASEQ"],
@@ -547,6 +551,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
       "gene_count": 4028,
       "publication_count": 5,
       "experiment_count": 6,
+      "partner_experiment_count": 3,
       "treatment_types": ["compartment", "darkness", "genomic_analysis", "growth_phase"],
       "background_factors": ["axenic", "coculture", "darkness", "diel", "light"],
       "omics_types": ["BIOINFORMATIC", "RNASEQ", "VESICLE_PROTEOMICS"],
@@ -577,6 +582,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
       "gene_count": 1973,
       "publication_count": 21,
       "experiment_count": 45,
+      "partner_experiment_count": 11,
       "treatment_types": ["carbon", "coculture", "compartment", "darkness", "diel", ...],
       "background_factors": ["axenic", "chemical", "coculture", "darkness", "diel", ...],
       "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", "PROTEOMICS", "RNASEQ", ...],
@@ -693,6 +699,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
       "gene_count": 1973,
       "publication_count": 21,
       "experiment_count": 45,
+      "partner_experiment_count": 11,
       "treatment_types": ["carbon", "coculture", "compartment", "darkness", "diel", ...],
       "background_factors": ["axenic", "chemical", "coculture", "darkness", "diel", ...],
       "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", "PROTEOMICS", "RNASEQ", ...],
@@ -723,6 +730,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
       "gene_count": 1926,
       "publication_count": 4,
       "experiment_count": 5,
+      "partner_experiment_count": 0,
       "treatment_types": ["genomic_analysis", "growth_phase", "phosphorus", "temperature"],
       "background_factors": ["axenic", "diel", "light"],
       "omics_types": ["BIOINFORMATIC", "METABOLOMICS", "RNASEQ"],
@@ -892,6 +900,7 @@ list_organisms(compartment="vesicle")
       "gene_count": 3929,
       "publication_count": 2,
       "experiment_count": 2,
+      "partner_experiment_count": 0,
       "treatment_types": ["compartment", "genomic_analysis"],
       "background_factors": ["axenic", "darkness"],
       "omics_types": ["BIOINFORMATIC", "VESICLE_PROTEOMICS"],
@@ -922,6 +931,7 @@ list_organisms(compartment="vesicle")
       "gene_count": 3834,
       "publication_count": 3,
       "experiment_count": 5,
+      "partner_experiment_count": 0,
       "treatment_types": ["carbon", "compartment", "genomic_analysis", "iron"],
       "background_factors": ["axenic", "darkness"],
       "omics_types": ["BIOINFORMATIC", "RNASEQ", "VESICLE_PROTEOMICS"],
@@ -952,6 +962,7 @@ list_organisms(compartment="vesicle")
       "gene_count": 4063,
       "publication_count": 1,
       "experiment_count": 1,
+      "partner_experiment_count": 0,
       "treatment_types": ["compartment"],
       "background_factors": ["axenic", "darkness"],
       "omics_types": ["VESICLE_PROTEOMICS"],
@@ -1332,6 +1343,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Pseudomonas putida KT244
       "gene_count": 1973,
       "publication_count": 21,
       "experiment_count": 45,
+      "partner_experiment_count": 11,
       "treatment_types": ["carbon", "coculture", "compartment", "darkness", "diel", ...],
       "background_factors": ["axenic", "chemical", "coculture", "darkness", "diel", ...],
       "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", "PROTEOMICS", "RNASEQ", ...],
@@ -1362,6 +1374,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Pseudomonas putida KT244
       "gene_count": 5487,
       "publication_count": 1,
       "experiment_count": 2,
+      "partner_experiment_count": 2,
       "treatment_types": ["coculture"],
       "background_factors": ["light"],
       "omics_types": ["PROTEOMICS", "RNASEQ"],
@@ -1399,6 +1412,7 @@ list_organisms(summary=True) → top_annotation_capability → genes_by_ontology
 list_organisms → per-row interpro_gene_count / ncbifam_gene_count → ontology_landscape(organism=..., ontology=['interpro', 'ncbifam']) before enrichment on a domain ontology
 list_organisms (per-row measured_metabolite_count > 0) → list_metabolite_assays(organism=...) for the metabolomics measurement layer
 list_organisms → list_experiments(organism=...) to scope experiments to the chosen organism
+list_organisms (per-row partner_experiment_count > 0) → list_experiments(coculture_partner=organism_name) for the experiments in which this organism is the coculture partner
 ```
 
 ## Common mistakes
@@ -1408,6 +1422,8 @@ list_organisms → list_experiments(organism=...) to scope experiments to the ch
 - gene_count and publication_count are counts of data in the KG, not biological totals.
 
 - Organisms with gene_count=0 are the organism_type='treatment' taxa (non-genomic coculture partners / phage; some genus-level like 'Alteromonas', most strain-level).
+
+- `experiment_count` counts only experiments that profile this organism. experiment_count=0 on a treatment taxon (e.g. a phage or a coculture helper) does not mean it is absent from the experimental data — experiments where it is the coculture partner (either `coculture_role`) are counted in `partner_experiment_count` and listed via list_experiments(coculture_partner=organism_name). The two counts are disjoint; a profiled strain can carry both.
 
 - reference_database and reference_proteome are sparse — only present on reference_proteome_match organisms, absent from others.
 

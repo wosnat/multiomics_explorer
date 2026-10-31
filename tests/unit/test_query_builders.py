@@ -1240,6 +1240,40 @@ class TestBuildListOrganisms:
                 "AS catalyzed_metabolite_count") in cypher
 
 
+class TestBuildListOrganismsPartnerExperimentCount:
+    """list_organisms surfaces OrganismTaxon.partner_experiment_count
+    (experiments where the organism is the coculture partner, either role)
+    as a compact column right after experiment_count, coalesced to 0."""
+
+    _COL = "coalesce(o.partner_experiment_count, 0) AS partner_experiment_count"
+
+    def test_compact_returns_coalesced_column(self):
+        cypher, _ = build_list_organisms()
+        assert self._COL in cypher
+
+    def test_verbose_returns_coalesced_column(self):
+        cypher, _ = build_list_organisms(verbose=True)
+        assert self._COL in cypher
+
+    def test_column_follows_experiment_count(self):
+        cypher, _ = build_list_organisms()
+        exp_idx = cypher.index("o.experiment_count AS experiment_count")
+        partner_idx = cypher.index(self._COL)
+        assert partner_idx > exp_idx
+        # Immediately after: nothing but separator whitespace in between.
+        between = cypher[exp_idx + len("o.experiment_count AS experiment_count"):partner_idx]
+        assert between.strip() == ","
+
+    def test_summary_builder_untouched(self):
+        cypher, _ = build_list_organisms_summary()
+        assert "partner_experiment_count" not in cypher
+
+    def test_capability_builder_untouched(self):
+        from multiomics_explorer.kg.queries_lib import build_list_organisms_capability
+        cypher, _ = build_list_organisms_capability()
+        assert "partner_experiment_count" not in cypher
+
+
 class TestBuildListOrganismsCapability:
     """Small-projection builder used by api/list_organisms in summary mode
     so the top_metabolic_capability rollup doesn't drag the full detail
