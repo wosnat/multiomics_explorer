@@ -50,7 +50,7 @@ total_matching, by_value, by_stereo_assignment, by_assay, by_compartment, by_org
 - **excluded_assays** (list[string]): Always `[]` here (no gates apply). Kept for envelope-shape consistency with the numeric drill-down.
 - **warnings** (list[string]): No gate diagnostics here (no gates apply); metabolite-id notes (removed compound, chemical role), a count of dominant-form-assumed rows, and a sibling-tool notice when a requested assay_id exists as value_kind='numeric' (genuinely found, excluded from `not_found.assay_ids` — use `metabolites_by_quantifies_assay` instead). Otherwise `[]`.
 - **resolved_aliases** (object): Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.
-- **not_found** (MfaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_doi — bucket key is singular `publication_doi` regardless of the `publication_dois` input filter name). assay_ids is a real existence check — an assay_id that exists as the other value_kind is NOT here (see `warnings`).
+- **not_found** (MfaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_dois). assay_ids is a real existence check — an assay_id that exists as the other value_kind is NOT here (see `warnings`).
 - **returned** (int): Length of `results`.
 - **truncated** (bool): True when total_matching > offset + returned.
 - **offset** (int): Pagination offset used.
@@ -159,7 +159,7 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
     "29 of 93 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on L-Alanine); filter ..."
   ],
   "resolved_aliases": {},
-  "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
+  "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_dois": []},
   "returned": 5,
   "truncated": true,
   "offset": 0
@@ -225,7 +225,7 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
   "excluded_assays": [],
   "warnings": [],
   "resolved_aliases": {},
-  "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
+  "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_dois": []},
   "returned": 0,
   "truncated": true,
   "offset": 0
@@ -314,7 +314,7 @@ Expect not_found to be a flat list[str].
 
 ```correction
 Drill-downs use a structured NotFound (4 keys: assay_ids, metabolite_ids,
-experiment_ids, publication_doi) — multi-batch input → structured.
+experiment_ids, publication_dois) — multi-batch input → structured.
 Inspect each bucket separately to see which input was bad. Mirrors
 `MetNotFound` on `list_metabolites` and `GbmNotFound` on
 `genes_by_metabolite`.

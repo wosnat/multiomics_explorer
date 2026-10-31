@@ -135,3 +135,21 @@
 - pattern: '\bsource_agreement\b|\bgo_support\b'
   reason: "TCDB-only edge columns removed (TCDB cleanup)"
   replacement: "tcdb_calls (call kinds on the row's lineage)"
+
+- pattern: '\b(publication_doi|mass_min|mass_max|value_min|value_max|treatment_types)='
+  reason: "Python-API keyword aliases removed in the alpha.6 cleanup (backlog 2.15)"
+  replacement: "publication_dois= / min_mass= / max_mass= / min_value= / max_value= / treatment_type="
+  allow_in: '(?i)removed|renamed|raise'
+
+- pattern: '\b(metric_percentile_min|metric_percentile_max|rank_by_metric_max)\b'
+  reason: "Python-API keyword aliases removed in the alpha.6 cleanup (backlog 2.15)"
+  replacement: "min_percentile / max_percentile / max_rank"
+  allow_in: '(?i)removed|renamed|raise'
+
+- pattern: 'kg_release_info\(conn\)'
+  reason: "kg_release_info's conn is keyword-only since the alpha.6 cleanup (backlog 2.15)"
+  replacement: "kg_release_info() or kg_release_info(conn=conn)"
+
+- pattern: '"experiment_ids": \[\], "publication_doi": \['
+  reason: "not_found.publication_doi renamed to publication_dois on the three metabolite-assay tools (backlog 2.15)"
+  replacement: "\"publication_dois\": [...]"

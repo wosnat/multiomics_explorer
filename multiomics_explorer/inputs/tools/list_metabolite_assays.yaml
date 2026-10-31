@@ -48,7 +48,7 @@ examples:
         "returned": 0,
         "offset": 0,
         "truncated": true,
-        "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
+        "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_dois": []},
         "resolved_aliases": {},
         "warnings": [],
         "results": []

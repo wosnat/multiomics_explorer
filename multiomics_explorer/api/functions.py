@@ -26,7 +26,6 @@ from CyVer import PropertiesValidator, SchemaValidator, SyntaxValidator
 
 from neo4j.exceptions import ClientError as Neo4jClientError
 
-from multiomics_explorer.api._compat import deprecated_alias
 from multiomics_explorer.api._guards import listify_bare_str
 from multiomics_explorer.kg.connection import GraphConnection
 from multiomics_explorer.kg.constants import (
@@ -1565,7 +1564,6 @@ def genes_by_function(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
-    category: str | None = None,
 ) -> dict:
     """Search genes by functional annotation text.
 
@@ -1586,10 +1584,6 @@ def genes_by_function(
 
     Raises ValueError if search_text is empty.
     """
-    gene_categories = deprecated_alias(
-        old=category, new=gene_categories,
-        old_name="category", new_name="gene_categories", listify=True,
-    )
     if not search_text or not search_text.strip():
         raise ValueError("search_text must not be empty.")
     if summary:
@@ -2715,19 +2709,6 @@ def list_publications(
     shape on sibling list_* tools (list_experiments.experiment_ids).
     `not_found` in the envelope lists any provided DOIs that did not match.
     """
-    treatment_type = deprecated_alias(
-        old=None, new=treatment_type,
-        old_name="treatment_type", new_name="treatment_type", listify=True,
-    )
-    background_factors = deprecated_alias(
-        old=None, new=background_factors,
-        old_name="background_factors", new_name="background_factors",
-        listify=True,
-    )
-    growth_phases = deprecated_alias(
-        old=None, new=growth_phases,
-        old_name="growth_phases", new_name="growth_phases", listify=True,
-    )
     # `summary` is rebound to the summary *row* below — keep the flag apart.
     summary_flag = summary
     conn = _default_conn(conn)
@@ -2862,7 +2843,6 @@ def list_experiments(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
-    publication_doi: list[str] | None = None,
 ) -> dict:
     """List experiments with gene count statistics.
 
@@ -2973,10 +2953,6 @@ def list_experiments(
     regardless of timepoint. For non-time-course experiments the two are
     equal. Per-TP detail lives in ``timepoints[].gene_count``.
     """
-    publication_dois = deprecated_alias(
-        old=publication_doi, new=publication_dois,
-        old_name="publication_doi", new_name="publication_dois",
-    )
     if coculture_role is not None and coculture_role not in (
         "treatment", "background",
     ):
@@ -5323,7 +5299,6 @@ def gene_response_profile(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
-    treatment_types: list[str] | None = None,
 ) -> dict:
     """Cross-experiment gene-level response profile.
 
@@ -5354,10 +5329,6 @@ def gene_response_profile(
         by case from a real Gene.locus_tag (locus_tags are never
         case-normalised).
     """
-    treatment_type = deprecated_alias(
-        old=treatment_types, new=treatment_type,
-        old_name="treatment_types", new_name="treatment_type",
-    )
     if not locus_tags:
         raise ValueError(
             "locus_tags must not be empty. "
@@ -5538,7 +5509,6 @@ def list_clustering_analyses(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
-    publication_doi: list[str] | None = None,
 ) -> dict:
     """Browse, search, and filter clustering analyses.
 
@@ -5562,14 +5532,6 @@ def list_clustering_analyses(
     growth_phases: if provided, restricts to analyses whose growth_phases
     array contains any of the specified values (case-insensitive).
     """
-    publication_dois = deprecated_alias(
-        old=publication_doi, new=publication_dois,
-        old_name="publication_doi", new_name="publication_dois",
-    )
-    omics_type = deprecated_alias(
-        old=None, new=omics_type,
-        old_name="omics_type", new_name="omics_type", listify=True,
-    )
     if search_text is not None and not search_text.strip():
         raise ValueError("search_text must not be empty.")
     if summary:
@@ -5710,7 +5672,6 @@ def list_derived_metrics(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
-    publication_doi: list[str] | None = None,
 ) -> dict:
     """Browse, search, and filter DerivedMetric nodes.
 
@@ -5733,14 +5694,6 @@ def list_derived_metrics(
 
     summary=True: results=[], summary fields only.
     """
-    publication_dois = deprecated_alias(
-        old=publication_doi, new=publication_dois,
-        old_name="publication_doi", new_name="publication_dois",
-    )
-    omics_type = deprecated_alias(
-        old=None, new=omics_type,
-        old_name="omics_type", new_name="omics_type", listify=True,
-    )
     if search_text is not None and not search_text.strip():
         raise ValueError("search_text must not be empty.")
     if summary:
@@ -5858,7 +5811,6 @@ def gene_clusters_by_gene(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
-    publication_doi: list[str] | None = None,
 ) -> dict:
     """Gene-centric cluster lookup. Single organism enforced.
 
@@ -5886,10 +5838,6 @@ def gene_clusters_by_gene(
     Raises:
         ValueError: if locus_tags is empty or spans multiple organisms.
     """
-    publication_dois = deprecated_alias(
-        old=publication_doi, new=publication_dois,
-        old_name="publication_doi", new_name="publication_dois",
-    )
     if not locus_tags:
         raise ValueError("locus_tags must not be empty.")
     if summary:
@@ -5976,7 +5924,6 @@ def gene_derived_metrics(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
-    publication_doi: list[str] | None = None,
 ) -> dict:
     """Gene-centric DerivedMetric lookup. Single organism enforced.
 
@@ -6011,10 +5958,6 @@ def gene_derived_metrics(
         ValueError: locus_tags empty, or spans multiple organisms,
                     or organism arg conflicts with inferred organism.
     """
-    publication_dois = deprecated_alias(
-        old=publication_doi, new=publication_dois,
-        old_name="publication_doi", new_name="publication_dois",
-    )
     if not locus_tags:
         raise ValueError("locus_tags must not be empty.")
     if summary:
@@ -6174,8 +6117,6 @@ def genes_by_numeric_metric(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
-    publication_doi: list[str] | None = None,
-    bucket: list[str] | None = None,
 ) -> dict:
     """Numeric DerivedMetric drill-down. Cross-organism by design.
 
@@ -6220,14 +6161,6 @@ def genes_by_numeric_metric(
                     has_p_value-gated filter used and ALL selected DMs
                     has_p_value=False.
     """
-    publication_dois = deprecated_alias(
-        old=publication_doi, new=publication_dois,
-        old_name="publication_doi", new_name="publication_dois",
-    )
-    metric_bucket = deprecated_alias(
-        old=bucket, new=metric_bucket,
-        old_name="bucket", new_name="metric_bucket",
-    )
     # 1. Mutual exclusion check
     if derived_metric_ids is not None and metric_types is not None:
         raise ValueError(
@@ -6545,8 +6478,6 @@ def genes_by_boolean_metric(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
-    publication_doi: list[str] | None = None,
-    flag: bool | None = None,
 ) -> dict:
     """Boolean DerivedMetric drill-down. Cross-organism by design.
 
@@ -6595,14 +6526,6 @@ def genes_by_boolean_metric(
     Raises:
         ValueError: derived_metric_ids+metric_types both/neither set.
     """
-    publication_dois = deprecated_alias(
-        old=publication_doi, new=publication_dois,
-        old_name="publication_doi", new_name="publication_dois",
-    )
-    flag_value = deprecated_alias(
-        old=flag, new=flag_value,
-        old_name="flag", new_name="flag_value",
-    )
     # 1. Mutual exclusion check
     if derived_metric_ids is not None and metric_types is not None:
         raise ValueError(
@@ -6825,7 +6748,6 @@ def genes_by_categorical_metric(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
-    publication_doi: list[str] | None = None,
 ) -> dict:
     """Categorical DerivedMetric drill-down. Cross-organism by design.
 
@@ -6875,10 +6797,6 @@ def genes_by_categorical_metric(
                     categories includes value not in union of selected
                     DMs' allowed_categories.
     """
-    publication_dois = deprecated_alias(
-        old=publication_doi, new=publication_dois,
-        old_name="publication_doi", new_name="publication_dois",
-    )
     # 1. Mutual exclusion check
     if derived_metric_ids is not None and metric_types is not None:
         raise ValueError(
@@ -8491,8 +8409,6 @@ def list_metabolites(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
-    mass_min: float | None = None,
-    mass_max: float | None = None,
     structure_kind: list[str] | None = None,
     kegg_functional_categories: list[str] | None = None,
     kegg_brite_classes: list[str] | None = None,
@@ -8619,10 +8535,6 @@ def list_metabolites(
             contains values outside {"metabolism", "transport",
             "metabolomics", "go_transport"}.
     """
-    min_mass = deprecated_alias(
-        old=mass_min, new=min_mass, old_name="mass_min", new_name="min_mass")
-    max_mass = deprecated_alias(
-        old=mass_max, new=max_mass, old_name="mass_max", new_name="max_mass")
 
     # 1. Validate search_text (non-empty when provided)
     if search_text is not None and not search_text.strip():
@@ -11030,7 +10942,6 @@ def list_metabolite_assays(
     offset: int = 0,
     *,
     conn: GraphConnection | None = None,
-    publication_doi: list[str] | None = None,
 ) -> dict:
     """List MetaboliteAssay nodes — discovery surface for the metabolomics
     measurement layer. Mirrors `list_derived_metrics`.
@@ -11054,7 +10965,7 @@ def list_metabolite_assays(
 
     `not_found` is a structured dict, one bucket per batch input:
       {assay_ids: [...], metabolite_ids: [...], experiment_ids: [...],
-       publication_doi: [...]}. Empty per field
+       publication_dois: [...]}. Empty per field
       when all matched.
 
     summary=True forces limit=0 and skips the detail query.
@@ -11082,10 +10993,6 @@ def list_metabolite_assays(
     nodes — `"organism '<name>' has no metabolomics assays — organisms
     with assays: <names>"`, distinct from the unmatched-organism case).
     """
-    publication_dois = deprecated_alias(
-        old=publication_doi, new=publication_dois,
-        old_name="publication_doi", new_name="publication_dois",
-    )
     if search_text is not None and not search_text.strip():
         raise ValueError("search_text must not be empty if provided.")
 
@@ -11191,7 +11098,7 @@ def list_metabolite_assays(
         "assay_ids": [],
         "metabolite_ids": [],
         "experiment_ids": [],
-        "publication_doi": [],
+        "publication_dois": [],
     }
     if assay_ids:
         rows = conn.execute_query(
@@ -11228,7 +11135,7 @@ def list_metabolite_assays(
             ids=publication_dois,
         )
         found = set(rows[0]["found"]) if rows else set()
-        not_found["publication_doi"] = [
+        not_found["publication_dois"] = [
             x for x in publication_dois if x not in found
         ]
 
@@ -11383,12 +11290,6 @@ def metabolites_by_quantifies_assay(
     offset: int = 0,
     conn: GraphConnection | None = None,
     stereo_assignment: list[str] | None = None,
-    value_min: float | None = None,
-    value_max: float | None = None,
-    metric_percentile_min: float | None = None,
-    metric_percentile_max: float | None = None,
-    rank_by_metric_max: int | None = None,
-    publication_doi: list[str] | None = None,
 ) -> dict:
     """Drill into numeric MetaboliteAssay edges.
 
@@ -11404,7 +11305,7 @@ def metabolites_by_quantifies_assay(
     and `by_detection_status` rollups.
 
     `not_found` is a structured dict, one bucket per batch input
-    (`assay_ids`, `metabolite_ids`, `experiment_ids`, `publication_doi`).
+    (`assay_ids`, `metabolite_ids`, `experiment_ids`, `publication_dois`).
     An `assay_ids` entry that exists but as `value_kind='boolean'` is NOT
     in `not_found.assay_ids` (it's genuinely found) — it's silently
     excluded from this numeric-only dispatch and reported via a
@@ -11444,23 +11345,6 @@ def metabolites_by_quantifies_assay(
         contains invalid values; rankable-gated filter set with all
         selected assays non-rankable.
     """
-    publication_dois = deprecated_alias(
-        old=publication_doi, new=publication_dois,
-        old_name="publication_doi", new_name="publication_dois",
-    )
-    min_value = deprecated_alias(
-        old=value_min, new=min_value, old_name="value_min", new_name="min_value")
-    max_value = deprecated_alias(
-        old=value_max, new=max_value, old_name="value_max", new_name="max_value")
-    min_percentile = deprecated_alias(
-        old=metric_percentile_min, new=min_percentile,
-        old_name="metric_percentile_min", new_name="min_percentile")
-    max_percentile = deprecated_alias(
-        old=metric_percentile_max, new=max_percentile,
-        old_name="metric_percentile_max", new_name="max_percentile")
-    max_rank = deprecated_alias(
-        old=rank_by_metric_max, new=max_rank,
-        old_name="rank_by_metric_max", new_name="max_rank")
 
     conn = _default_conn(conn)
 
@@ -11575,7 +11459,7 @@ def metabolites_by_quantifies_assay(
                     conn, "Metabolite", "id", metabolite_ids or []),
                 "experiment_ids": _probe_existence(
                     conn, "Experiment", "id", experiment_ids or []),
-                "publication_doi": _probe_existence(
+                "publication_dois": _probe_existence(
                     conn, "Publication", "id", publication_dois or []),
             },
             "returned": 0,
@@ -11679,7 +11563,7 @@ def metabolites_by_quantifies_assay(
                 conn, "Metabolite", "id", metabolite_ids or []),
             "experiment_ids": _probe_existence(
                 conn, "Experiment", "id", experiment_ids or []),
-            "publication_doi": _probe_existence(
+            "publication_dois": _probe_existence(
                 conn, "Publication", "id", publication_dois or []),
         },
         "returned": len(results),
@@ -11708,7 +11592,6 @@ def metabolites_by_flags_assay(
     offset: int = 0,
     conn: GraphConnection | None = None,
     stereo_assignment: list[str] | None = None,
-    publication_doi: list[str] | None = None,
 ) -> dict:
     """Drill into boolean MetaboliteAssay edges.
 
@@ -11770,10 +11653,6 @@ def metabolites_by_flags_assay(
     Raises:
         ValueError: empty `assay_ids`.
     """
-    publication_dois = deprecated_alias(
-        old=publication_doi, new=publication_dois,
-        old_name="publication_doi", new_name="publication_dois",
-    )
     conn = _default_conn(conn)
 
     if not assay_ids:
@@ -11898,7 +11777,7 @@ def metabolites_by_flags_assay(
                 conn, "Metabolite", "id", metabolite_ids or []),
             "experiment_ids": _probe_existence(
                 conn, "Experiment", "id", experiment_ids or []),
-            "publication_doi": _probe_existence(
+            "publication_dois": _probe_existence(
                 conn, "Publication", "id", publication_dois or []),
         },
         "returned": len(results),
@@ -12578,7 +12457,7 @@ def _evaluate_version_compat(explorer_version: str, kg_min: str | None) -> dict:
     }
 
 
-def kg_release_info(conn: GraphConnection) -> dict:
+def kg_release_info(*, conn: GraphConnection | None = None) -> dict:
     """Compute the KG release identity + compatibility verdict.
 
     One Cypher round-trip; pure Python evaluation of EXPECTED_KG_SHAPE.
@@ -12601,6 +12480,7 @@ def kg_release_info(conn: GraphConnection) -> dict:
     for the TCDB substrate route; a superset of the GO list that adds
     placeholders such as molecule / cation / anion).
     """
+    conn = _default_conn(conn)
     cypher, params = build_kg_release_info()
     rows = conn.execute_query(cypher, **params)
     row = rows[0] if rows else {"schema_info": None, "labels": [], "rel_types": []}

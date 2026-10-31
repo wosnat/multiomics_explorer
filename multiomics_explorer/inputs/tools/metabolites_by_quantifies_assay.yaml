@@ -124,7 +124,7 @@ examples:
           "4 of 64 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on L-Alanine); filter s..."
         ],
         "resolved_aliases": {},
-        "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
+        "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_dois": []},
         "returned": 5,
         "truncated": true,
         "offset": 0
@@ -206,7 +206,7 @@ examples:
         "excluded_assays": [],
         "warnings": [],
         "resolved_aliases": {},
-        "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
+        "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_dois": []},
         "returned": 0,
         "truncated": true,
         "offset": 0
@@ -267,7 +267,7 @@ mistakes:
   - wrong: "Expect not_found to be a flat list[str]."
     right: |
       Drill-downs use a structured NotFound (4 keys: assay_ids, metabolite_ids,
-      experiment_ids, publication_doi) — multi-batch input → structured.
+      experiment_ids, publication_dois) — multi-batch input → structured.
       Inspect each bucket separately to see which input was bad. Mirrors
       `MetNotFound` on `list_metabolites` and `GbmNotFound` on
       `genes_by_metabolite`.

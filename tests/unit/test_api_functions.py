@@ -8939,14 +8939,9 @@ class TestListMetabolites:
         summary_call = conn.execute_query.call_args_list[0]
         assert summary_call.kwargs.get(builder_kwarg) == value
 
-        conn2 = self._mock_conn(self._SUMMARY_ROW, [self._DETAIL_ROW])
-        with pytest.warns(DeprecationWarning):
-            list_metabolites(conn=conn2, **{old_name: value})
-
-        with pytest.raises(ValueError):
-            list_metabolites(
-                conn=MagicMock(), **{new_name: value, old_name: value},
-            )
+        # alpha.6 (2.15): the deprecated alias is gone — old keyword raises.
+        with pytest.raises(TypeError, match=old_name):
+            list_metabolites(conn=MagicMock(), **{old_name: value})
 
 
 # ---------------------------------------------------------------------------
@@ -12484,7 +12479,7 @@ class TestListMetaboliteAssays:
         assert valid_assay_id not in result["not_found"]["assay_ids"]
         assert "metabolite_ids" in result["not_found"]
         assert "experiment_ids" in result["not_found"]
-        assert "publication_doi" in result["not_found"]
+        assert "publication_dois" in result["not_found"]
 
     def test_offset_echoed(self):
         from multiomics_explorer.api.functions import list_metabolite_assays
@@ -12890,22 +12885,10 @@ class TestMetabolitesByQuantifiesAssay:
         summary_call = mock_conn.execute_query.call_args_list[1]
         assert summary_call.kwargs.get(builder_kwarg) == value
 
-        mock_conn2 = MagicMock()
-        mock_conn2.execute_query.side_effect = [
-            self._diag_rankable(("a1",)), self._summary_row(), [],
-        ]
-        with pytest.warns(DeprecationWarning):
+        # alpha.6 (2.15): the deprecated alias is gone — old keyword raises.
+        with pytest.raises(TypeError, match=old_name):
             metabolites_by_quantifies_assay(
-                assay_ids=["a1"], summary=True, conn=mock_conn2,
-                **{old_name: value},
-            )
-        summary_call2 = mock_conn2.execute_query.call_args_list[1]
-        assert summary_call2.kwargs.get(builder_kwarg) == value
-
-        with pytest.raises(ValueError):
-            metabolites_by_quantifies_assay(
-                assay_ids=["a1"], conn=MagicMock(),
-                **{new_name: value, old_name: value},
+                assay_ids=["a1"], conn=MagicMock(), **{old_name: value},
             )
 
 
@@ -14121,7 +14104,7 @@ class TestKGReleaseInfo:
         from multiomics_explorer.api.functions import kg_release_info
         conn = self._make_conn(self._ok_schema_info(), self._ok_labels(), self._ok_rel_types())
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
 
         assert report["verdict"] == "ok"
         # 5 + 5 + 3 + 2 + 1 + 1 = 17 asserts (bucket 6, spec slice-4 §3.1)
@@ -14137,7 +14120,7 @@ class TestKGReleaseInfo:
         si = self._ok_schema_info(mcp_min_version="99.99.99")
         conn = self._make_conn(si, self._ok_labels(), self._ok_rel_types())
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
 
         assert report["verdict"] == "warn"
         version_assert = next(a for a in report["asserts"] if a["kind"] == "version_compat")
@@ -14150,7 +14133,7 @@ class TestKGReleaseInfo:
         labels = ["Schema_info", "Gene", "Experiment", "OrthologGroup"]  # Publication missing
         conn = self._make_conn(self._ok_schema_info(), labels, self._ok_rel_types())
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
 
         assert report["verdict"] == "warn"
         pub_assert = next(a for a in report["asserts"] if a["name"] == "node_label:Publication")
@@ -14160,7 +14143,7 @@ class TestKGReleaseInfo:
         from multiomics_explorer.api.functions import kg_release_info
         conn = self._make_conn(None, [], [])
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
 
         assert report["verdict"] == "unknown"
         assert report["kg"] == {}
@@ -14176,7 +14159,7 @@ class TestKGReleaseInfo:
         si["some_extra_prop"] = "should-not-appear"
         conn = self._make_conn(si, self._ok_labels(), self._ok_rel_types())
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
 
         assert "some_extra_prop" not in report["kg"]
         assert "version" in report["kg"]
@@ -14191,7 +14174,7 @@ class TestKGReleaseInfo:
         )
         conn = self._make_conn(si, self._ok_labels(), self._ok_rel_types())
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
 
         assert report["kg"]["release_highlights"] == "- Publication discusses-edges\n- +8 organisms"
         assert report["kg"]["breaking_changes"] == "- annotation_quality redefined to 0..3"
@@ -14202,7 +14185,7 @@ class TestKGReleaseInfo:
         # _ok_schema_info omits both keys, mirroring a dev build.
         conn = self._make_conn(self._ok_schema_info(), self._ok_labels(), self._ok_rel_types())
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
 
         assert report["kg"]["release_highlights"] is None
         assert report["kg"]["breaking_changes"] is None
@@ -14214,7 +14197,7 @@ class TestKGReleaseInfo:
         si = self._ok_schema_info(breaking_changes="- annotation_quality redefined")
         conn = self._make_conn(si, self._ok_labels(), self._ok_rel_types())
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
 
         assert "Breaking" in report["summary"]
         assert "kg.breaking_changes" in report["summary"]
@@ -14224,7 +14207,7 @@ class TestKGReleaseInfo:
         si = self._ok_schema_info(release_highlights="- Publication discusses-edges")
         conn = self._make_conn(si, self._ok_labels(), self._ok_rel_types())
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
 
         assert "kg.release_highlights" in report["summary"]
 
@@ -14234,7 +14217,7 @@ class TestKGReleaseInfo:
         si = self._ok_schema_info(deployment_role="production")
         conn = self._make_conn(si, self._ok_labels(), self._ok_rel_types())
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
 
         assert report["kg"]["deployment_role"] == "production"
 
@@ -14244,7 +14227,7 @@ class TestKGReleaseInfo:
         # _ok_schema_info omits deployment_role, mirroring a pre-2026-06 KG.
         conn = self._make_conn(self._ok_schema_info(), self._ok_labels(), self._ok_rel_types())
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
 
         assert report["kg"]["deployment_role"] is None
         assert report["verdict"] == "ok"  # absence is not a compat failure
@@ -16876,7 +16859,7 @@ class TestKGReleaseInfoVocabularyHash:
 
     def test_hash_match_yields_ok_and_a_passed_bucket(self):
         from multiomics_explorer.api.functions import kg_release_info
-        report = kg_release_info(self._conn(
+        report = kg_release_info(conn=self._conn(
             controlled_vocabularies_hash=self._pin()))
         assert report["verdict"] == "ok"
         b6 = self._bucket6(report)
@@ -16891,7 +16874,7 @@ class TestKGReleaseInfoVocabularyHash:
 
     def test_hash_mismatch_yields_warn_with_the_vocabulary_sentence(self):
         from multiomics_explorer.api.functions import kg_release_info
-        report = kg_release_info(self._conn(
+        report = kg_release_info(conn=self._conn(
             controlled_vocabularies_hash="sha256:" + "0" * 64))
         assert report["verdict"] == "warn"
         b6 = self._bucket6(report)
@@ -16905,7 +16888,7 @@ class TestKGReleaseInfoVocabularyHash:
     def test_hash_absent_yields_warn_and_predates_detail(self):
         from multiomics_explorer.api.functions import kg_release_info
         # Pre-SYNC-005 KG: no such property on Schema_info at all.
-        report = kg_release_info(self._conn(absent=True))
+        report = kg_release_info(conn=self._conn(absent=True))
         assert report["verdict"] == "warn"
         b6 = self._bucket6(report)
         assert b6["passed"] is False
@@ -16916,7 +16899,7 @@ class TestKGReleaseInfoVocabularyHash:
 
     def test_failed_bucket_never_worse_than_warn(self):
         from multiomics_explorer.api.functions import kg_release_info
-        report = kg_release_info(self._conn(
+        report = kg_release_info(conn=self._conn(
             controlled_vocabularies_hash="sha256:" + "f" * 64))
         assert report["verdict"] in ("ok", "warn")
         assert report["verdict"] != "unknown"
@@ -16929,7 +16912,7 @@ class TestKGReleaseInfoVocabularyHash:
         sentinel = "sha256:" + "a" * 64
         monkeypatch.setitem(
             constants.EXPECTED_KG_SHAPE, "controlled_vocabularies_hash", sentinel)
-        report = kg_release_info(self._conn(
+        report = kg_release_info(conn=self._conn(
             controlled_vocabularies_hash=sentinel))
         b6 = self._bucket6(report)
         assert b6["expected"] == sentinel
@@ -16938,13 +16921,13 @@ class TestKGReleaseInfoVocabularyHash:
 
     def test_kg_identity_surfaces_the_hash(self):
         from multiomics_explorer.api.functions import kg_release_info
-        report = kg_release_info(self._conn(
+        report = kg_release_info(conn=self._conn(
             controlled_vocabularies_hash=self._pin()))
         assert report["kg"]["controlled_vocabularies_hash"] == self._pin()
 
     def test_kg_identity_hash_is_none_when_absent(self):
         from multiomics_explorer.api.functions import kg_release_info
-        report = kg_release_info(self._conn(absent=True))
+        report = kg_release_info(conn=self._conn(absent=True))
         assert "controlled_vocabularies_hash" in report["kg"]
         assert report["kg"]["controlled_vocabularies_hash"] is None
 
@@ -16953,7 +16936,7 @@ class TestKGReleaseInfoVocabularyHash:
         base = TestKGReleaseInfo()
         si = base._ok_schema_info(mcp_min_version="99.99.99",
                                   controlled_vocabularies_hash="sha256:" + "1" * 64)
-        report = kg_release_info(base._make_conn(
+        report = kg_release_info(conn=base._make_conn(
             si, base._ok_labels(), base._ok_rel_types()))
         assert report["verdict"] == "warn"
         failed_kinds = {a["kind"] for a in report["asserts"] if not a["passed"]}
@@ -18758,26 +18741,6 @@ class TestR3PublicationDoisRename:
                    **extra_kwargs)
         assert builder_mock.call_args.kwargs.get("publication_doi") == ["10.1/x"]
 
-    @pytest.mark.parametrize("fn_name,builder_name,extra_kwargs,conn_rv", _CASES)
-    def test_deprecated_alias_warns_and_reaches_builder(
-        self, fn_name, builder_name, extra_kwargs, conn_rv,
-    ):
-        fn = getattr(api, fn_name)
-        with patch(f"multiomics_explorer.api.functions.{builder_name}",
-                    side_effect=_R3StopProbe) as builder_mock:
-            with pytest.warns(DeprecationWarning, match="publication_doi"):
-                with pytest.raises(_R3StopProbe):
-                    fn(publication_doi=["10.1/x"], conn=self._mock_conn(conn_rv),
-                       **extra_kwargs)
-        assert builder_mock.call_args.kwargs.get("publication_doi") == ["10.1/x"]
-
-    @pytest.mark.parametrize("fn_name,builder_name,extra_kwargs,conn_rv", _CASES)
-    def test_both_set_raises(self, fn_name, builder_name, extra_kwargs, conn_rv):
-        fn = getattr(api, fn_name)
-        with pytest.raises(ValueError):
-            fn(publication_dois=["a"], publication_doi=["b"],
-               conn=self._mock_conn(conn_rv), **extra_kwargs)
-
 
 # ---------------------------------------------------------------------------
 # R4 (llm-review 2b.5): filter params named after the row field they filter.
@@ -18823,29 +18786,6 @@ class TestR4NumericMetricBucketRename:
                 )
         assert builder_mock.call_args.kwargs.get("bucket") == ["top_decile"]
 
-    def test_deprecated_alias_warns_and_reaches_builder(self, diag_rankable):
-        mock_conn = MagicMock()
-        mock_conn.execute_query.side_effect = [diag_rankable]
-        with patch(
-            "multiomics_explorer.api.functions.build_genes_by_numeric_metric_summary",
-            side_effect=_R4StopProbe,
-        ) as builder_mock:
-            with pytest.warns(DeprecationWarning, match="bucket"):
-                with pytest.raises(_R4StopProbe):
-                    api.genes_by_numeric_metric(
-                        derived_metric_ids=["dm:dr"], bucket=["top_decile"],
-                        conn=mock_conn,
-                    )
-        assert builder_mock.call_args.kwargs.get("bucket") == ["top_decile"]
-
-    def test_both_set_raises(self):
-        with pytest.raises(ValueError):
-            api.genes_by_numeric_metric(
-                derived_metric_ids=["dm:dr"],
-                metric_bucket=["top_decile"], bucket=["top_decile"],
-                conn=MagicMock(),
-            )
-
 
 class TestR4BooleanMetricFlagRename:
     @pytest.fixture
@@ -18873,29 +18813,6 @@ class TestR4BooleanMetricFlagRename:
                 )
         assert builder_mock.call_args.kwargs.get("flag") is True
 
-    def test_deprecated_alias_warns_and_reaches_builder(self, diag_boolean):
-        mock_conn = MagicMock()
-        mock_conn.execute_query.side_effect = [diag_boolean]
-        with patch(
-            "multiomics_explorer.api.functions.build_genes_by_boolean_metric_summary",
-            side_effect=_R4StopProbe,
-        ) as builder_mock:
-            with pytest.warns(DeprecationWarning, match="flag"):
-                with pytest.raises(_R4StopProbe):
-                    api.genes_by_boolean_metric(
-                        derived_metric_ids=["dm:vp_med4"], flag=True,
-                        conn=mock_conn,
-                    )
-        assert builder_mock.call_args.kwargs.get("flag") is True
-
-    def test_both_set_raises(self):
-        with pytest.raises(ValueError):
-            api.genes_by_boolean_metric(
-                derived_metric_ids=["dm:vp_med4"],
-                flag_value=True, flag=True,
-                conn=MagicMock(),
-            )
-
 
 class TestR4GenesByFunctionGeneCategoriesRename:
     """Unlike bucket/flag, this rename also touches the query builder
@@ -18912,25 +18829,6 @@ class TestR4GenesByFunctionGeneCategoriesRename:
                     "urea", gene_categories=["transport"], conn=MagicMock(),
                 )
         assert builder_mock.call_args.kwargs.get("gene_categories") == ["transport"]
-
-    def test_category_alias_listifies_and_warns(self):
-        with patch(
-            "multiomics_explorer.api.functions.build_genes_by_function_summary",
-            side_effect=_R4StopProbe,
-        ) as builder_mock:
-            with pytest.warns(DeprecationWarning, match="category"):
-                with pytest.raises(_R4StopProbe):
-                    api.genes_by_function(
-                        "urea", category="transport", conn=MagicMock(),
-                    )
-        assert builder_mock.call_args.kwargs.get("gene_categories") == ["transport"]
-
-    def test_both_set_raises(self):
-        with pytest.raises(ValueError):
-            api.genes_by_function(
-                "urea", gene_categories=["transport"], category="metabolism",
-                conn=MagicMock(),
-            )
 
 
 class TestR4DifferentialExpressionByOrthologDirectionBoth:
@@ -19107,32 +19005,6 @@ class TestR2GeneResponseProfileTreatmentTypeRename:
                     conn=mock_conn,
                 )
         assert builder_mock.call_args.kwargs.get("treatment_types") == ["nitrogen"]
-
-    def test_deprecated_alias_warns_and_reaches_builder(self):
-        mock_conn = MagicMock()
-        mock_conn.execute_query.side_effect = [self._ORGANISM_ROW]
-        with patch(
-            "multiomics_explorer.api.functions._closed_vocab_warnings",
-            return_value=[],
-        ), patch(
-            "multiomics_explorer.api.functions.build_gene_response_profile_envelope",
-            side_effect=_R2StopProbe,
-        ) as builder_mock:
-            with pytest.warns(DeprecationWarning, match="treatment_types"):
-                with pytest.raises(_R2StopProbe):
-                    api.gene_response_profile(
-                        locus_tags=["PMM0370"], treatment_types=["nitrogen"],
-                        conn=mock_conn,
-                    )
-        assert builder_mock.call_args.kwargs.get("treatment_types") == ["nitrogen"]
-
-    def test_both_set_raises(self):
-        with pytest.raises(ValueError):
-            api.gene_response_profile(
-                locus_tags=["PMM0370"],
-                treatment_type=["nitrogen"], treatment_types=["coculture"],
-                conn=MagicMock(),
-            )
 
 
 # ---------------------------------------------------------------------------
@@ -22211,7 +22083,7 @@ class TestKgReleaseInfoGoExcludedTargets:
             },
             "labels": ["Schema_info"], "rel_types": [],
         }]
-        report = api.kg_release_info(conn)
+        report = api.kg_release_info(conn=conn)
         assert "go_transport_excluded_targets" in api._KG_IDENTITY_FIELDS
         assert report["kg"]["go_transport_excluded_targets"] == [
             "chebi:24834", "kegg.compound:C00080"]
@@ -22227,7 +22099,7 @@ class TestKgReleaseInfoGoExcludedTargets:
             },
             "labels": ["Schema_info"], "rel_types": [],
         }]
-        report = api.kg_release_info(conn)
+        report = api.kg_release_info(conn=conn)
         assert "tcdb_substrate_excluded_targets" in api._KG_IDENTITY_FIELDS
         assert report["kg"]["tcdb_substrate_excluded_targets"] == [
             "chebi:25367", "kegg.compound:C00080"]
@@ -23978,3 +23850,230 @@ class TestMetabolitesByGeneStructureKind:
     def test_tcdb_family_display_name_passes_through(self, monkeypatch):
         rows = _dn_by_lt(self._run(monkeypatch))
         assert rows["PMM0710"]["tcdb_family_name"] == _DN_SUBFAMILY_NAME
+
+
+
+# ===========================================================================
+# Release prep (RED) —
+# docs/tool-specs/release-prep-transport-reach-and-alpha6-cleanup.md
+#
+# 2.15  alpha.6 API cleanup: api/_compat.py removed, the 22 renamed keywords
+#       raise TypeError, the 5 same-name listify shims are covered by
+#       listify_bare_str, not_found.publication_doi -> publication_dois on the
+#       3 metabolomics-assay tools, kg_release_info(*, conn=None).
+# 2c.5  list_metabolites: the api passes organism + evidence filters to the
+#       builders, which emit the route-scoped $edge_sources / $want_go params.
+# ===========================================================================
+
+import importlib as _rp_importlib
+import inspect as _rp_inspect
+import sys as _rp_sys
+
+
+class TestReleasePrepCompatModuleRemoved:
+    def test_compat_module_import_raises(self):
+        _rp_sys.modules.pop("multiomics_explorer.api._compat", None)
+        with pytest.raises(ImportError):
+            _rp_importlib.import_module("multiomics_explorer.api._compat")
+
+    def test_functions_no_longer_reference_deprecated_alias(self):
+        assert not hasattr(api, "deprecated_alias")
+
+
+# (function, removed keyword, a value of the old type, required extra kwargs)
+_RP_REMOVED_KEYWORDS = [
+    ("genes_by_function", "category", "transport", {"search_text": "urea"}),
+    ("list_experiments", "publication_doi", ["10.1/x"], {}),
+    ("gene_response_profile", "treatment_types", ["nitrogen"],
+     {"locus_tags": ["PMM0370"]}),
+    ("list_clustering_analyses", "publication_doi", ["10.1/x"], {}),
+    ("list_derived_metrics", "publication_doi", ["10.1/x"], {}),
+    ("gene_clusters_by_gene", "publication_doi", ["10.1/x"],
+     {"locus_tags": ["PMM0001"]}),
+    ("gene_derived_metrics", "publication_doi", ["10.1/x"],
+     {"locus_tags": ["PMM0001"]}),
+    ("genes_by_numeric_metric", "publication_doi", ["10.1/x"],
+     {"derived_metric_ids": ["dm1"]}),
+    ("genes_by_numeric_metric", "bucket", ["top_decile"],
+     {"derived_metric_ids": ["dm1"]}),
+    ("genes_by_boolean_metric", "publication_doi", ["10.1/x"],
+     {"derived_metric_ids": ["dm1"]}),
+    ("genes_by_boolean_metric", "flag", True,
+     {"derived_metric_ids": ["dm1"]}),
+    ("genes_by_categorical_metric", "publication_doi", ["10.1/x"],
+     {"derived_metric_ids": ["dm1"]}),
+    ("list_metabolites", "mass_min", 100.0, {}),
+    ("list_metabolites", "mass_max", 500.0, {}),
+    ("list_metabolite_assays", "publication_doi", ["10.1/x"], {}),
+    ("metabolites_by_quantifies_assay", "publication_doi", ["10.1/x"],
+     {"assay_ids": ["a1"]}),
+    ("metabolites_by_quantifies_assay", "value_min", 0.1,
+     {"assay_ids": ["a1"]}),
+    ("metabolites_by_quantifies_assay", "value_max", 0.9,
+     {"assay_ids": ["a1"]}),
+    ("metabolites_by_quantifies_assay", "metric_percentile_min", 10.0,
+     {"assay_ids": ["a1"]}),
+    ("metabolites_by_quantifies_assay", "metric_percentile_max", 90.0,
+     {"assay_ids": ["a1"]}),
+    ("metabolites_by_quantifies_assay", "rank_by_metric_max", 5,
+     {"assay_ids": ["a1"]}),
+    ("metabolites_by_flags_assay", "publication_doi", ["10.1/x"],
+     {"assay_ids": ["a1"]}),
+]
+
+
+def _rp_kw_id(case):
+    return f"{case[0]}-{case[1]}"
+
+
+class TestReleasePrepRemovedKeywords:
+    """The 22 alpha.5-deprecated keywords are gone (spec §4.3.1)."""
+
+    def test_case_list_covers_all_22(self):
+        assert len(_RP_REMOVED_KEYWORDS) == 22
+        assert len({(f, k) for f, k, _, _ in _RP_REMOVED_KEYWORDS}) == 22
+
+    @pytest.mark.parametrize(
+        "fn_name,old_kw,value,extra", _RP_REMOVED_KEYWORDS,
+        ids=[_rp_kw_id(c) for c in _RP_REMOVED_KEYWORDS])
+    def test_old_keyword_not_in_signature(self, fn_name, old_kw, value, extra):
+        fn = _rp_inspect.unwrap(getattr(api, fn_name))
+        assert old_kw not in _rp_inspect.signature(fn).parameters
+
+    @pytest.mark.parametrize(
+        "fn_name,old_kw,value,extra", _RP_REMOVED_KEYWORDS,
+        ids=[_rp_kw_id(c) for c in _RP_REMOVED_KEYWORDS])
+    def test_old_keyword_raises_type_error(self, fn_name, old_kw, value, extra):
+        conn = MagicMock()
+        conn.execute_query.return_value = []
+        with pytest.raises(TypeError, match=old_kw):
+            getattr(api, fn_name)(conn=conn, **extra, **{old_kw: value})
+        conn.execute_query.assert_not_called()
+
+
+_RP_LISTIFY_SHIMS = [
+    ("list_publications", "treatment_type"),
+    ("list_publications", "background_factors"),
+    ("list_publications", "growth_phases"),
+    ("list_clustering_analyses", "omics_type"),
+    ("list_derived_metrics", "omics_type"),
+]
+
+
+class TestReleasePrepListifyShimsCoveredByGuard:
+    """The 5 same-name `deprecated_alias(listify=True)` shims go away; the
+    params must be in `listify_bare_str` scope so a bare str still becomes
+    a one-element list (behaviour: TestR2* classes above)."""
+
+    @pytest.mark.parametrize("fn_name,param", _RP_LISTIFY_SHIMS)
+    def test_param_in_listify_scope(self, fn_name, param):
+        from multiomics_explorer.api._guards import _list_only_params
+        fn = getattr(api, fn_name)
+        assert hasattr(fn, "__wrapped__"), f"{fn_name} not @listify_bare_str"
+        assert param in _list_only_params(_rp_inspect.unwrap(fn))
+
+
+class TestReleasePrepKgReleaseInfoSignature:
+    def test_conn_is_keyword_only_default_none(self):
+        sig = _rp_inspect.signature(_rp_inspect.unwrap(api.kg_release_info))
+        p = sig.parameters["conn"]
+        assert p.kind is _rp_inspect.Parameter.KEYWORD_ONLY
+        assert p.default is None
+
+    def test_positional_conn_raises_type_error(self):
+        with pytest.raises(TypeError, match="positional argument"):
+            api.kg_release_info(MagicMock())
+
+
+class _RPStubConn:
+    """Existence probes (`... AS found`) answer "nothing found"; every other
+    query pops the next queued result ([] once exhausted)."""
+
+    def __init__(self, queue):
+        self.queue = list(queue)
+        self.calls = []
+
+    def execute_query(self, cypher, **params):
+        self.calls.append((cypher, params))
+        if "AS found" in cypher:
+            return [{"found": []}]
+        return self.queue.pop(0) if self.queue else []
+
+
+_RP_BOGUS_DOI = "10.x/bogus"
+
+
+def _rp_assert_not_found_key(result):
+    nf = result["not_found"]
+    assert "publication_doi" not in nf, nf
+    assert nf["publication_dois"] == [_RP_BOGUS_DOI]
+
+
+class TestReleasePrepNotFoundPublicationDoisKey:
+    """not_found.publication_doi -> publication_dois (spec §4.3.2)."""
+
+    def test_list_metabolite_assays(self):
+        summary_row = [{
+            "total_entries": 10, "total_matching": 0,
+            "metabolite_count_total": 0,
+            "by_organism": [], "by_value_kind": [], "by_compartment": [],
+            "top_metric_types": [], "by_treatment_type": [],
+            "by_background_factors": [], "by_growth_phase": [],
+            "by_detection_status": [],
+        }]
+        conn = _RPStubConn([summary_row, []])
+        result = api.list_metabolite_assays(
+            publication_dois=[_RP_BOGUS_DOI], conn=conn)
+        _rp_assert_not_found_key(result)
+
+    def test_metabolites_by_quantifies_assay(self):
+        conn = _RPStubConn([
+            TestMetabolitesByQuantifiesAssay._diag_rankable(("a1",)),
+            TestMetabolitesByQuantifiesAssay._summary_row(),
+        ])
+        result = api.metabolites_by_quantifies_assay(
+            assay_ids=["a1"], publication_dois=[_RP_BOGUS_DOI],
+            summary=True, conn=conn)
+        _rp_assert_not_found_key(result)
+
+    def test_metabolites_by_quantifies_assay_early_return(self):
+        """No surviving assay → early-return envelope carries the same key."""
+        conn = _RPStubConn([[]])
+        result = api.metabolites_by_quantifies_assay(
+            assay_ids=["missing"], publication_dois=[_RP_BOGUS_DOI],
+            summary=True, conn=conn)
+        _rp_assert_not_found_key(result)
+
+    def test_metabolites_by_flags_assay(self):
+        conn = _RPStubConn([
+            [{"assay_id": "a1", "value_kind": "boolean"}],
+            [{"total_matching": 0, "by_value": [], "by_assay": [],
+              "by_compartment": [], "by_organism": []}],
+        ])
+        result = api.metabolites_by_flags_assay(
+            assay_ids=["a1"], publication_dois=[_RP_BOGUS_DOI],
+            summary=True, conn=conn)
+        _rp_assert_not_found_key(result)
+
+
+class TestReleasePrepListMetabolitesRouteScopedApi:
+    """2c.5 — the api passes both filters through; the summary query then
+    carries the route-scoped params."""
+
+    def test_both_filters_reach_summary_as_edge_sources(self):
+        conn = MagicMock()
+        conn.execute_query.side_effect = _resolver_aware(
+            [[TestListMetabolites._SUMMARY_ROW], []])
+        api.list_metabolites(
+            organism_names=["Prochlorococcus MED4"],
+            evidence_sources=["transport"], summary=True, conn=conn)
+        summary_calls = [
+            c for c in conn.execute_query.call_args_list
+            if "organism_names_lc" in c.kwargs
+        ]
+        assert summary_calls, conn.execute_query.call_args_list
+        kw = summary_calls[0].kwargs
+        assert kw["organism_names_lc"] == ["prochlorococcus med4"]
+        assert list(kw["edge_sources"]) == ["transport"]
+        assert kw["want_go"] is False
+        assert "Organism_has_metabolite" in summary_calls[0].args[0]

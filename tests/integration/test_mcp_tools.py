@@ -3834,7 +3834,7 @@ class TestOrganismResolverGenomeOnlyLive:
 def _ctx_with_kg_report(conn):
     """Build an AsyncMock Context with the real GraphConnection and a live
     kg_compat_report injected — mirrors what lifespan sets on KGContext."""
-    report = api.kg_release_info(conn)
+    report = api.kg_release_info(conn=conn)
     ctx = AsyncMock()
     ctx.request_context.lifespan_context.conn = conn
     ctx.request_context.lifespan_context.kg_compat_report = report
@@ -3846,7 +3846,7 @@ class TestKGReleaseInfoMCPSmoke:
     """Live-KG smoke through the MCP tool wrapper layer.
 
     The tool reads kg_compat_report from KGContext (cached at lifespan startup
-    in production). Here we mirror that by calling api.kg_release_info(conn)
+    in production). Here we mirror that by calling api.kg_release_info(conn=conn)
     directly and injecting the result — this exercises the Pydantic response
     model and the wrapper's KGReleaseInfoResponse(**report) path end-to-end.
     """
@@ -4297,7 +4297,7 @@ class TestKGReleaseInfoVocabularyHashLive:
     the KG's hash is surfaced in the identity block."""
 
     def test_verdict_ok_and_bucket_six_passed(self, conn):
-        report = api.kg_release_info(conn)
+        report = api.kg_release_info(conn=conn)
         b6 = [a for a in report["asserts"]
               if a["kind"] == "controlled_vocabularies_hash"]
         assert len(b6) == 1
@@ -4306,7 +4306,7 @@ class TestKGReleaseInfoVocabularyHashLive:
         assert report["verdict"] == "ok", report["summary"]
 
     def test_identity_surfaces_the_live_hash(self, conn):
-        report = api.kg_release_info(conn)
+        report = api.kg_release_info(conn=conn)
         live = conn.execute_query(
             "MATCH (s:Schema_info {id: 'schema_info'}) "
             "RETURN s.controlled_vocabularies_hash AS h")[0]["h"]
@@ -4319,7 +4319,7 @@ class TestKGReleaseInfoVocabularyHashLive:
         monkeypatch.setitem(
             constants.EXPECTED_KG_SHAPE, "controlled_vocabularies_hash",
             "sha256:" + "0" * 64)
-        report = api.kg_release_info(conn)
+        report = api.kg_release_info(conn=conn)
         assert report["verdict"] == "warn"
         b6 = next(a for a in report["asserts"]
                   if a["kind"] == "controlled_vocabularies_hash")
@@ -5760,7 +5760,7 @@ class TestGoTransportPassThroughs:
         both = api.list_metabolites(
             evidence_sources=["go_transport"], organism_names=[_GOT_MED4],
             summary=True, conn=conn)
-        assert both["total_matching"] == 100  # 98 → 100 2026-10-28: two MED4-reached metabolites gained the go_transport tag from Ford 2021 strains ← 165 → 98 2026-10-24T17:33Z: MED4 transport arm now direct systems only
+        assert both["total_matching"] == 46  # 100 → 46 release-prep 2c.5: organism + evidence_sources now route-scoped (MED4's own GO route, not any-route reach × GO-tagged anywhere) ← 98 → 100 2026-10-28: two MED4-reached metabolites gained the go_transport tag from Ford 2021 strains ← 165 → 98 2026-10-24T17:33Z: MED4 transport arm now direct systems only
 
     def test_list_metabolites_rows_carry_go_organisms(self, conn):
         r = api.list_metabolites(
@@ -5771,7 +5771,7 @@ class TestGoTransportPassThroughs:
         assert row["go_transport_organism_count"] >= 1
 
     def test_kg_release_info_carries_excluded_targets(self, conn):
-        r = api.kg_release_info(conn)
+        r = api.kg_release_info(conn=conn)
         excluded = r["kg"]["go_transport_excluded_targets"]
         assert len(excluded) == 12  # 13 → 12 2026-10-26T04:21Z: Na+ now chebi:29101
         assert "kegg.compound:C00080" in excluded

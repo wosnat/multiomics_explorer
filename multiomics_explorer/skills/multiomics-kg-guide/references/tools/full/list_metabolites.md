@@ -23,9 +23,9 @@ docs://tools/list_metabolites; summary=True first.
 | elements | list[string] \| None | None | Element-presence filter (Hill-notation symbols, e.g. 'Fe', 'N'). AND of presence — ['N', 'P'] matches metabolites containing BOTH. A case-insensitive symbol ('n', 'fe') or a full element name ('Nitrogen') for one of the ~12 elements this KG's chemistry layer carries (C, H, N, O, P, S, Fe, Mg, Mn, Zn, Cu, Co, Mo, Ni, Se) is normalized silently; anything else is dropped from the filter and reported in `not_found.elements` with a warning. Use this rather than substring-matching on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Empty/null formula metabolites never match. |
 | min_mass | float \| None | None | Minimum monoisotopic mass (Da). Excludes metabolites with null `mass` (~22%). E.g. 60.0. |
 | max_mass | float \| None | None | Maximum monoisotopic mass (Da). E.g. 1000.0. |
-| organism_names | list[string] \| None | None | Restrict to metabolites reachable by these organisms (case-insensitive on `preferred_name`). UNION semantics — a metabolite reached by ANY listed organism qualifies. Matches `Organism_has_metabolite` (catalysis OR TCDB transport) or `go_transport_organism_names`. E.g. ['Prochlorococcus MED4']. `not_found.organism_names` lists any unknown names. |
+| organism_names | list[string] \| None | None | Metabolites reached by ANY of these organisms (case-insensitive `preferred_name`), by any route. With `evidence_sources`, a listed organism must reach it by one of those routes. E.g. ['Prochlorococcus MED4']. Unknown: `not_found.organism_names`. |
 | pathway_ids | list[string] \| None | None | Filter by KEGG pathway membership (`KeggTerm.id`). E.g. ['kegg.pathway:ko00910'] for nitrogen metabolism. Joined via `Metabolite_in_pathway`. `not_found.pathway_ids` lists unknown IDs. |
-| evidence_sources | list[string ('metabolism', 'transport', 'metabolomics', 'go_transport')] \| None | None | Filter by evidence path (ANY). Values: 'metabolism' (catalysis-reachable), 'transport' (TCDB substrate), 'metabolomics' (measured by a MetaboliteAssay), 'go_transport' (named by a GO transport term). Other values raise at the MCP boundary. |
+| evidence_sources | list[string ('metabolism', 'transport', 'metabolomics', 'go_transport')] \| None | None | Filter by evidence path (ANY): 'metabolism', 'transport' (TCDB substrate), 'metabolomics' (measured), 'go_transport'. Alone = metabolite-level ('transport' = some TCDB system lists it); with `organism_names` = that organism's route. |
 | structure_kind | list[string] \| None | None | Structure kind(s) (OR): 'defined' (one molecule), 'generic' (a compound class) or 'polymer'. E.g. ['defined'] drops generic substrates like 'amino acid'. Values: list_filter_values('structure_kind'). |
 | kegg_functional_categories | list[string] \| None | None | KEGG br08001 categories (OR). Hand-curated and partial: only ~10% of metabolites are listed, so a missing category means 'KEGG did not list it', not 'not in it' (fumarate is unclassified). Values: list_filter_values('kegg_functional_category'). |
 | kegg_brite_classes | list[string] \| None | None | Classes from 7 other KEGG compound BRITE trees, as 'Tree: Class' (OR), e.g. 'Lipids: Fatty acyls'. Curated and partial (~20% of metabolites): unlisted = 'KEGG did not list it', not 'not in it'. Values: list_filter_values('kegg_brite_class'). |
@@ -44,7 +44,7 @@ total_entries, total_matching, top_organisms, top_metabolite_pathways, by_eviden
 
 - **total_entries** (int): Total Metabolite nodes in KG (unfiltered).
 - **total_matching** (int): Metabolites matching filters.
-- **top_organisms** (list[MetTopOrganism]): Top 10 organisms by metabolite count (within matched set), sorted desc.
+- **top_organisms** (list[MetTopOrganism]): Top 10 organisms by metabolite count (within matched set), sorted desc. With evidence_sources, an organism counts only by those routes.
 - **top_metabolite_pathways** (list[MetTopPathway]): Top 10 pathways by metabolite count (within matched set), sorted desc. Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology`).
 - **by_evidence_source** (list[MetEvidenceSourceBreakdown]): Frequency of evidence_sources values across matched set. Bounded by the {metabolism, transport, metabolomics, go_transport} domain.
 - **xref_coverage** (MetXrefCoverage): Cross-ref ID coverage within matched set.
@@ -724,7 +724,15 @@ list_metabolites(kegg_brite_classes=["Lipids: Fatty acyls"], limit=3)
 list_metabolites(evidence_sources=["transport"], summary=True)
 ```
 
-### Example 10: Transport-only metabolite by ID — reading the two gene counts together
+### Example 10: One organism's transport reach — organism_names + evidence_sources scope each other
+
+```example-call
+list_metabolites(organism_names=["Prochlorococcus MED4"], evidence_sources=["transport"], elements=["N"], summary=True)
+```
+
+*With both filters set, a metabolite matches only when MED4 itself reaches it by a TCDB transport route, so the roster is far smaller than the `evidence_sources=['transport']` catalogue for N. `top_organisms` counts each organism by the listed routes only.*
+
+### Example 11: Transport-only metabolite by ID — reading the two gene counts together
 
 ```example-call
 list_metabolites(metabolite_ids=["chebi:17234"])
@@ -795,7 +803,7 @@ list_metabolites(metabolite_ids=["chebi:17234"])
 }
 ```
 
-### Example 11: Stereo relatives — generic Cysteine carries the transport, L-Cysteine the catalysis
+### Example 12: Stereo relatives — generic Cysteine carries the transport, L-Cysteine the catalysis
 
 ```example-call
 list_metabolites(metabolite_ids=["kegg.compound:C00736", "kegg.compound:C00097"])
@@ -966,7 +974,7 @@ list_metabolites(metabolite_ids=["kegg.compound:C00736", "kegg.compound:C00097"]
 }
 ```
 
-### Example 12: Measured metabolites — measurement coverage envelope
+### Example 13: Measured metabolites — measurement coverage envelope
 
 ```example-call
 list_metabolites(evidence_sources=["metabolomics"], summary=True)
@@ -978,11 +986,10 @@ list_metabolites(evidence_sources=["metabolomics"], summary=True)
   "total_matching": 135,
   "top_organisms": [
     {"organism_name": "Prochlorococcus MIT9313", "count": 134},
-    {"organism_name": "Prochlorococcus MIT9301", "count": 124},
-    {"organism_name": "Prochlorococcus MIT0801", "count": 124},
-    {"organism_name": "Pseudomonas putida KT2440", "count": 113},
-    {"organism_name": "Synechococcus MITS9220", "count": 110},
-    ...
+    {"organism_name": "Prochlorococcus MIT9301", "count": 96},
+    {"organism_name": "Prochlorococcus MIT0801", "count": 92},
+    {"organism_name": "Prochlorococcus MIT9312", "count": 70},
+    {"organism_name": "Prochlorococcus MIT9303", "count": 16}
   ],
   "top_metabolite_pathways": [
     {
@@ -1058,7 +1065,7 @@ list_metabolites(evidence_sources=["metabolomics"], summary=True)
 }
 ```
 
-### Example 13: Multi-step — find N-metabolites then drill into catalysts
+### Example 14: Multi-step — find N-metabolites then drill into catalysts
 
 ```
 Step 1: list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"], limit=10)
@@ -1068,7 +1075,7 @@ Step 2: genes_by_metabolite(metabolite_ids=[chosen_ids], organism="Prochlorococc
         → catalysing genes per metabolite
 ```
 
-### Example 14: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O when top_metabolites is dominated by them
+### Example 15: Currency-cofactor strip — exclude ATP/ADP/NADH/NADPH/H2O when top_metabolites is dominated by them
 
 ```example-call
 list_metabolites(
@@ -1085,93 +1092,86 @@ list_metabolites(
 
 ```
 
-### Example 15: GO transport route — metabolites a GO transport term names (evidence_sources=['go_transport'])
+### Example 16: GO transport route — metabolites a GO transport term names (evidence_sources=['go_transport'])
 
 ```example-call
 list_metabolites(evidence_sources=["go_transport"], organism_names=["Prochlorococcus MED4"], limit=5)
 ```
 
-*Rows carry `go_transport_organism_names` / `go_transport_organism_count` (organisms with a gene annotated to a GO term that names this metabolite, direct annotations only). The `organism_names` filter matches either the KEGG/TCDB/assay organism list or the GO list, so GO-only metabolites appear for the organism too; `organism_count` and the gene counts still ignore the GO route. A metabolite with no `go_transport_organism_names` may still have a GO edge reached only through ancestor terms: absent means no directly annotated gene path.*
+*Rows carry `go_transport_organism_names` / `go_transport_organism_count` (organisms with a gene annotated to a GO term that names this metabolite, direct annotations only). With `evidence_sources=['go_transport']` set, `organism_names` matches only organisms on the GO list (`go_transport_organism_names`), and `top_organisms` counts the GO route only; `organism_count` and the gene counts still ignore the GO route. A metabolite with no `go_transport_organism_names` may still have a GO edge reached only through ancestor terms: absent means no directly annotated gene path.*
 
 ```example-response
 {
   "total_entries": 3251,
-  "total_matching": 100,
+  "total_matching": 46,
   "top_organisms": [
-    {"organism_name": "Prochlorococcus MED4", "count": 100},
-    {"organism_name": "Synechococcus WH8102", "count": 100},
-    {"organism_name": "Pseudomonas putida KT2440", "count": 99},
-    {"organism_name": "Prochlorococcus SB", "count": 97},
-    {"organism_name": "Prochlorococcus NATL1A", "count": 97},
+    {"organism_name": "Prochlorococcus MED4", "count": 46},
+    {"organism_name": "Synechococcus WH8102", "count": 46},
+    {"organism_name": "Prochlorococcus SB", "count": 43},
+    {"organism_name": "Prochlorococcus MIT9301", "count": 42},
+    {"organism_name": "Prochlorococcus NATL1A", "count": 42},
     ...
   ],
   "top_metabolite_pathways": [
     {
-      "metabolite_pathway_id": "kegg.pathway:ko01100",
-      "metabolite_pathway_name": "Metabolic pathways",
-      "count": 61
-    },
-    {
       "metabolite_pathway_id": "kegg.pathway:ko02010",
       "metabolite_pathway_name": "ABC transporters",
-      "count": 42
+      "count": 15
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko01100",
+      "metabolite_pathway_name": "Metabolic pathways",
+      "count": 12
     },
     {
       "metabolite_pathway_id": "kegg.pathway:ko01110",
       "metabolite_pathway_name": "Biosynthesis of secondary metabolites",
-      "count": 38
+      "count": 7
+    },
+    {
+      "metabolite_pathway_id": "kegg.pathway:ko02020",
+      "metabolite_pathway_name": "Two-component system",
+      "count": 7
     },
     {
       "metabolite_pathway_id": "kegg.pathway:ko01120",
       "metabolite_pathway_name": "Microbial metabolism in diverse environments",
-      "count": 26
-    },
-    {
-      "metabolite_pathway_id": "kegg.pathway:ko01230",
-      "metabolite_pathway_name": "Biosynthesis of amino acids",
-      "count": 20
+      "count": 5
     },
     ...
   ],
   "by_evidence_source": [
-    {"evidence_source": "go_transport", "count": 100},
-    {"evidence_source": "transport", "count": 89},
-    {"evidence_source": "metabolism", "count": 72},
-    {"evidence_source": "metabolomics", "count": 34}
+    {"evidence_source": "go_transport", "count": 46},
+    {"evidence_source": "transport", "count": 38},
+    {"evidence_source": "metabolism", "count": 20},
+    {"evidence_source": "metabolomics", "count": 2}
   ],
-  "xref_coverage": {"with_chebi": 99, "with_hmdb": 69, "with_mnxm": 100},
-  "mass_stats": {"mass_min": 18.015, "mass_median": 116.072, "mass_max": 805.546},
+  "xref_coverage": {"with_chebi": 45, "with_hmdb": 19, "with_mnxm": 46},
+  "mass_stats": {"mass_min": 18.039, "mass_median": 95.978, "mass_max": 614.483},
   "by_measurement_coverage": {
-    "by_paper_count": [
-      {"paper_count": 0, "count": 66},
-      {"paper_count": 1, "count": 18},
-      {"paper_count": 2, "count": 14},
-      {"paper_count": 3, "count": 2}
-    ],
+    "by_paper_count": [{"paper_count": 0, "count": 44}, {"paper_count": 1, "count": 1}, {"paper_count": 2, "count": 1}],
     "by_compartment": [
-      {"compartment": "extracellular", "count": 26},
-      {"compartment": "vesicle", "count": 22},
-      {"compartment": "whole_cell", "count": 34}
+      {"compartment": "extracellular", "count": 2},
+      {"compartment": "vesicle", "count": 1},
+      {"compartment": "whole_cell", "count": 2}
     ]
   },
   "by_structure_kind": [
-    {"structure_kind": "defined", "count": 78},
-    {"structure_kind": "generic", "count": 21},
+    {"structure_kind": "defined", "count": 27},
+    {"structure_kind": "generic", "count": 18},
     {"structure_kind": "polymer", "count": 1}
   ],
   "by_kegg_functional_category": [
-    {"kegg_functional_category": "Peptides", "count": 22},
-    {"kegg_functional_category": "Nucleic acids", "count": 6},
-    {"kegg_functional_category": "Hormones and transmitters", "count": 4},
-    {"kegg_functional_category": "Organic acids", "count": 4},
-    {"kegg_functional_category": "Vitamins and cofactors", "count": 4},
-    ...
+    {"kegg_functional_category": "Vitamins and cofactors", "count": 2},
+    {"kegg_functional_category": "Carbohydrates", "count": 1},
+    {"kegg_functional_category": "Hormones and transmitters", "count": 1},
+    {"kegg_functional_category": "Peptides", "count": 1},
+    {"kegg_functional_category": "not classified", "count": 42}
   ],
   "by_kegg_brite_class": [
-    {"kegg_brite_class": "Lipids: Fatty acyls", "count": 5},
     {"kegg_brite_class": "Lipids: Polyketides", "count": 1},
     {"kegg_brite_class": "Pesticides: Pesticides", "count": 1},
-    {"kegg_brite_class": "not classified", "count": 93}
+    {"kegg_brite_class": "not classified", "count": 44}
   ],
   "score_max": null,
   "score_median": null,
@@ -1183,35 +1183,6 @@ list_metabolites(evidence_sources=["go_transport"], organism_names=["Prochloroco
   "warnings": [],
   "no_formula_excluded": null,
   "results": [
-    {
-      "metabolite_id": "kegg.compound:C00001",
-      "name": "H2O",
-      "formula": "H2O",
-      "elements": ["H", "O"],
-      "mass": 18.015,
-      "catalyst_gene_count": 25282,
-      "organism_count": 118,
-      "transporter_count": 3,
-      "transporter_gene_count": 22,
-      "evidence_sources": ["go_transport", "metabolism", "transport"],
-      "go_transport_organism_names": [
-        "Cyanobium NS01",
-        "Cyanobium PCC6307",
-        "Cyanobium PCC7001",
-        "Meiothermus ruber",
-        "Pseudomonas putida KT2440",
-        ...
-      ],
-      "go_transport_organism_count": 10,
-      "chebi_id": "15377",
-      "pathway_ids": ["kegg.pathway:ko00190", "kegg.pathway:ko00195", "kegg.pathway:ko00710", "kegg.pathway:ko01100"],
-      "pathway_count": 4,
-      "measured_assay_count": 0,
-      "measured_paper_count": 0,
-      "measured_organisms": [],
-      "measured_compartments": [],
-      "structure_kind": "defined"
-    },
     {
       "metabolite_id": "kegg.compound:C00009",
       "name": "Orthophosphate",
@@ -1284,6 +1255,64 @@ list_metabolites(evidence_sources=["go_transport"], organism_names=["Prochloroco
       "measured_compartments": [],
       "structure_kind": "defined"
     },
+    {
+      "metabolite_id": "kegg.compound:C00025",
+      "name": "L-Glutamate",
+      "formula": "C5H8NO4",
+      "elements": ["C", "H", "N", "O"],
+      "mass": 146.122,
+      "catalyst_gene_count": 4836,
+      "organism_count": 118,
+      "transporter_count": 1,
+      "transporter_gene_count": 2,
+      "evidence_sources": ["go_transport", "metabolism", "metabolomics", "transport"],
+      "go_transport_organism_names": [
+        "Cyanobium NS01",
+        "Cyanobium PCC6307",
+        "Cyanobium PCC7001",
+        "Prochlorococcus AS9601",
+        "Prochlorococcus EQPAC1",
+        ...
+      ],
+      "go_transport_organism_count": 73,
+      "chebi_id": "16015",
+      "pathway_ids": [
+        "kegg.pathway:ko00220",
+        "kegg.pathway:ko00250",
+        "kegg.pathway:ko00330",
+        "kegg.pathway:ko00332",
+        "kegg.pathway:ko00340",
+        ...
+      ],
+      "pathway_count": 31,
+      "measured_assay_count": 12,
+      "measured_paper_count": 2,
+      "measured_organisms": [
+        "Prochlorococcus MIT0801",
+        "Prochlorococcus MIT9301",
+        "Prochlorococcus MIT9312",
+        "Prochlorococcus MIT9313"
+      ],
+      "measured_compartments": ["extracellular", "vesicle", "whole_cell"],
+      "structure_kind": "defined",
+      "kegg_functional_categories": ["Hormones and transmitters", "Peptides"],
+      "stereo_relatives": [
+        {
+          "metabolite_id": "kegg.compound:C00217",
+          "name": "D-Glutamate",
+          "relation": "enantiomer",
+          "catalyst_gene_count": 260,
+          "transporter_gene_count": 2
+        },
+        {
+          "metabolite_id": "kegg.compound:C00302",
+          "name": "Glutamate",
+          "relation": "unspecified_form",
+          "catalyst_gene_count": 167,
+          "transporter_gene_count": 391
+        }
+      ]
+    },
     ...
   ]
 }
@@ -1310,6 +1339,24 @@ list_metabolites(evidence_sources=['go_transport'], organism_names=[...]) → ge
 - catalyst_gene_count counts the catalysis arm only (genes reaching the metabolite via Gene → Reaction → Metabolite). catalyst_gene_count = 0 does NOT mean metabolomics-only: transport-only metabolites (TCDB substrates with no local catalysis) also read 0. Discriminate via the paired counts: catalyst_gene_count = 0 with `transporter_gene_count > 0` is transport-only; both 0 with `evidence_sources == ['metabolomics']` is measurement-only (no gene path). `transporter_gene_count` counts distinct genes with a direct TCDB call (`tcdb_gate='direct'`) on a system curated with the metabolite, all organisms — it equals the distinct genes `genes_by_metabolite` returns in its default (direct) transport rows, unioned over organisms. `'transport'` in `evidence_sources` only means TCDB lists the metabolite as a substrate of a kept system; many such metabolites read `transporter_gene_count = 0`, so route on the count, not the tag.
 
 - A 0 `catalyst_gene_count` on a generic (stereo-unspecified) metabolite does not mean no enzyme acts on the compound. Stereo forms are separate nodes and no count combines across them: TCDB names substrates generically, so transport sits on 'Cysteine' (`kegg.compound:C00736`, 0 catalysts), while KEGG reactions use the specific form, so catalysis sits on 'L-Cysteine' (`kegg.compound:C00097`). Read the row's `stereo_relatives` (`relation` = `specific_form` / `unspecified_form` / `enantiomer`, each with its own `catalyst_gene_count` / `transporter_gene_count`), then use `genes_by_metabolite(..., include_stereo_forms=True)` for a per-organism transport ↔ catalysis join. A generic's `specific_form` relatives can include a D-form. Stereo links are incomplete (e.g. 'glucose' `chebi:17234` has none yet), so an absent `stereo_relatives` is not proof of no other form: `search_text` by name lists every form.
+
+```mistake
+list_metabolites(organism_names=['Prochlorococcus MED4'], evidence_sources=['transport'])  # read as 'transport catalogue, plus MED4 reaches it somehow'
+```
+
+```correction
+With both filters set, the organism must reach the metabolite by one of the
+listed routes: here, a MED4 gene with a direct TCDB call on a system that
+carries the compound. `metabolism` = a MED4 gene's KEGG reaction,
+`metabolomics` = a MED4 assay measured it, `go_transport` = MED4 is on the
+row's `go_transport_organism_names`. Either filter alone is unchanged:
+`organism_names` alone = reached by any route; `evidence_sources` alone = the
+catalogue sense (`transport` = some TCDB system lists the compound, whether or
+not any organism's gene reaches it). With `evidence_sources` set, envelope
+`top_organisms` counts each organism by the listed routes only. Per-row
+`organism_names` / `organism_count` stay any-route.
+
+```
 
 - organism_names with multiple values is UNION, not intersection. To find metabolites BOTH organisms reach, run two single-org calls and intersect by `metabolite_id` (per-row `organism_count` tells you how many organisms reach a metabolite, but not which — the envelope `top_organisms` rollup is the only per-organism breakdown).
 
@@ -1404,7 +1451,7 @@ passed. The xref filters (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_id
 
 - See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/concepts` for the chemistry layer overview.
 
-- `evidence_sources=['go_transport']` is a metabolite-level filter (a GO transport term names this compound), independent of the organism filter; the organism clause matches the union of `organism_names` and `go_transport_organism_names`. `catalyst_gene_count`, `transporter_gene_count` and `organism_count` stay KEGG / TCDB / assay only (no blending), so a GO-only metabolite reads zero on all three. Drill the GO route with `genes_by_metabolite`. See `docs://analysis/transport`.
+- `evidence_sources=['go_transport']` alone is a metabolite-level filter (a GO transport term names this compound). Combined with `organism_names`, the organism must be on the row's `go_transport_organism_names`; `organism_names` alone matches organisms on either the KEGG / TCDB / assay list or the GO list. `catalyst_gene_count`, `transporter_gene_count` and `organism_count` stay KEGG / TCDB / assay only (no blending), so a GO-only metabolite reads zero on all three. Drill the GO route with `genes_by_metabolite`. See `docs://analysis/transport`.
 
 ## Package import equivalent
 

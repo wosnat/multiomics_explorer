@@ -1706,7 +1706,7 @@ class TestKGReleaseInfoLive:
         """
         from multiomics_explorer import kg_release_info
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
 
         if report["verdict"] != "ok":
             pytest.fail(
@@ -1721,14 +1721,14 @@ class TestKGReleaseInfoLive:
         from importlib.metadata import version
         from multiomics_explorer import kg_release_info
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
         assert report["explorer_version"] == version("multiomics-explorer")
 
     def test_kg_identity_has_real_counts(self, conn):
         """The KG identity carries plausible counts (catches 'connected to empty DB')."""
         from multiomics_explorer import kg_release_info
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
         assert report["kg"]["gene_count"] > 0
         assert report["kg"]["experiment_count"] > 0
         assert report["kg"]["version"]  # any non-empty string
@@ -1745,7 +1745,7 @@ class TestKGReleaseInfoLive:
         """
         from multiomics_explorer import kg_release_info
 
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
         assert "deployment_role" in report["kg"]
         live = conn.execute_query(
             "MATCH (s:Schema_info) RETURN s.deployment_role AS role"
@@ -2062,6 +2062,6 @@ class TestGoTransportContract:
         assert "go_transport" in r["results"][0]["evidence_sources"]
 
     def test_kg_release_info_kg_block_has_excluded_targets(self, conn):
-        r = api.kg_release_info(conn)
+        r = api.kg_release_info(conn=conn)
         assert isinstance(r["kg"]["go_transport_excluded_targets"], list)
         assert isinstance(r["kg"]["tcdb_substrate_excluded_targets"], list)

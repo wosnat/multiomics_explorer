@@ -1755,13 +1755,15 @@ def build_gene_overview_summary(
         "         + coalesce(g.boolean_metric_count, 0)\n"
         "         + coalesce(g.categorical_metric_count, 0) > 0]) AS has_derived_metrics,\n"
         # has_chemistry: metabolism arm OR direct-gate transport arm (G1 —
-        # same predicate as the detail evidence_sources traversal).
+        # same predicate as the detail evidence_sources traversal). The
+        # transport arm counts metabolite AND chemical-role substrates
+        # (backlog 2c.19: role-only systems are transport chemistry too).
         "       size([g IN found WHERE EXISTS {\n"
         "         MATCH (g)-[:Gene_catalyzes_reaction]->(:Reaction)"
         "-[:Reaction_has_metabolite]->(:Metabolite)\n"
         "       } OR EXISTS {\n"
         "         MATCH (g)-[gt:Gene_has_tcdb_family]->(tf:TcdbFamily)"
-        "-[:Tcdb_family_transports_metabolite]->(:Metabolite)\n"
+        f"-[:{_TCDB_SUBSTRATE_RELS}]->(:Metabolite|ChemicalRole)\n"
         f"         WHERE {TCDB_DIRECT_GATE_PREDICATE}\n"
         # GO transport route (go-transport-surface §6.5).
         "       } OR EXISTS {\n"
@@ -1857,6 +1859,10 @@ def build_gene_overview(
     # path-existence-derived evidence_sources. The CASE/EXISTS form
     # avoids the false-positive 'metabolism' tag that a metabolite-level
     # rollup would produce on transport-only genes (e.g. cynD PMM0372).
+    # 'transport' = a direct-gate TCDB system with a metabolite OR
+    # chemical-role substrate (backlog 2c.19); 'metabolomics' stays
+    # metabolite-only (roles have no assays). transported_metabolite_count
+    # stays metabolites-only, so a gene can be 'transport' with count 0.
     chemistry_with = (
         "WITH g,\n"
         "  CASE WHEN EXISTS {\n"
@@ -1865,7 +1871,7 @@ def build_gene_overview(
         "  } THEN ['metabolism'] ELSE [] END +\n"
         "  CASE WHEN EXISTS {\n"
         "    MATCH (g)-[gt:Gene_has_tcdb_family]->(tf:TcdbFamily)"
-        "-[:Tcdb_family_transports_metabolite]->(:Metabolite)\n"
+        f"-[:{_TCDB_SUBSTRATE_RELS}]->(:Metabolite|ChemicalRole)\n"
         f"    WHERE {TCDB_DIRECT_GATE_PREDICATE}\n"
         "  } THEN ['transport'] ELSE [] END +\n"
         "  CASE WHEN EXISTS {\n"
@@ -2654,6 +2660,36 @@ def build_gene_overview_top_discussing_publications(
     return cypher, {"locus_tags": locus_tags}
 
 
+_LIST_METABOLITES_EDGE_ROUTE = {
+    "metabolism": "metabolism",
+    "transport": "transport",
+    "metabolomics": "measured",
+}
+"""Metabolite-level ``evidence_sources`` value -> ``Organism_has_metabolite``
+edge ``evidence_sources`` value (backlog 2c.5). ``go_transport`` has no
+edge route; it reads ``m.go_transport_organism_names`` instead."""
+
+
+def _list_metabolites_route_params(
+    evidence_sources: list[str],
+) -> dict:
+    """``edge_sources`` / ``want_go`` params for route-scoped organism logic.
+
+    ``edge_sources`` keeps request order (may be ``[]``, e.g. only
+    ``go_transport`` requested); ``want_go`` is True iff ``go_transport``
+    is listed.
+    """
+    edge_sources: list[str] = []
+    for s in evidence_sources:
+        mapped = _LIST_METABOLITES_EDGE_ROUTE.get(s)
+        if mapped is not None and mapped not in edge_sources:
+            edge_sources.append(mapped)
+    return {
+        "edge_sources": edge_sources,
+        "want_go": "go_transport" in evidence_sources,
+    }
+
+
 def _list_metabolites_where(
     *,
     search_text: str | None = None,
@@ -2729,7 +2765,24 @@ def _list_metabolites_where(
         conditions.append("m.mass <= $mass_max")
         params["mass_max"] = mass_max
 
-    if organism_names_lc:
+    if organism_names_lc and evidence_sources:
+        # Both filters: a listed organism must reach the metabolite by one
+        # of the listed routes (backlog 2c.5). Replaces the metabolite-level
+        # organism + evidence conditions, which combined independently
+        # ("organism reaches it somehow" AND "some organism reaches it by
+        # route X") and over-matched.
+        conditions.append(
+            "(EXISTS { MATCH (o:OrganismTaxon)-[r:Organism_has_metabolite]->(m)\n"
+            "          WHERE toLower(o.preferred_name) IN $organism_names_lc\n"
+            "            AND ANY(s IN coalesce(r.evidence_sources, [])"
+            " WHERE s IN $edge_sources) }\n"
+            "  OR ($want_go AND ANY(o IN coalesce(m.go_transport_organism_names, [])"
+            " WHERE toLower(o) IN $organism_names_lc)))"
+        )
+        params["organism_names_lc"] = organism_names_lc
+        params["evidence_sources"] = evidence_sources  # echoed; unused here
+        params.update(_list_metabolites_route_params(evidence_sources))
+    elif organism_names_lc:
         conditions.append(
             "ANY(o IN coalesce(m.organism_names, [])"
             " + coalesce(m.go_transport_organism_names, []) "
@@ -2743,7 +2796,9 @@ def _list_metabolites_where(
         )
         params["pathway_ids"] = pathway_ids
 
-    if evidence_sources:
+    if evidence_sources and not organism_names_lc:
+        # Alone: catalogue sense (metabolite-level; `transport` = some TCDB
+        # system lists it). With organism_names see the edge-scoped branch.
         conditions.append(
             "ANY(s IN $evidence_sources "
             "WHERE s IN coalesce(m.evidence_sources, []))"
@@ -3101,6 +3156,36 @@ def build_list_metabolites_summary(
         kegg_brite_classes=kegg_brite_classes,
     )
 
+    # top_organisms: with evidence_sources set, count an organism only by
+    # the listed routes (backlog 2c.5) — per-metabolite CALL collecting the
+    # names on matching Organism_has_metabolite edges, plus GO-route names
+    # when go_transport is listed. Without evidence_sources: any route.
+    if evidence_sources:
+        params.update(_list_metabolites_route_params(evidence_sources))
+        route_orgs_call = (
+            "CALL {\n"
+            "  WITH m\n"
+            "  OPTIONAL MATCH (o:OrganismTaxon)-[r:Organism_has_metabolite]->(m)\n"
+            "  WHERE ANY(s IN coalesce(r.evidence_sources, [])"
+            " WHERE s IN $edge_sources)\n"
+            "  RETURN collect(DISTINCT o.preferred_name) AS route_orgs\n"
+            "}\n"
+        )
+        orgs_expr = (
+            "route_orgs + CASE WHEN $want_go"
+            " THEN coalesce(m.go_transport_organism_names, []) ELSE [] END"
+        )
+    else:
+        route_orgs_call = ""
+        orgs_expr = (
+            "coalesce(m.organism_names, [])"
+            " + coalesce(m.go_transport_organism_names, [])"
+        )
+    all_orgs_line = (
+        "     apoc.coll.flatten(\n"
+        f"       collect(apoc.coll.toSet({orgs_expr}))) AS all_orgs,\n"
+    )
+
     top_organisms_block = (
         "CALL {\n"
         "  WITH all_orgs\n"
@@ -3134,12 +3219,11 @@ def build_list_metabolites_summary(
             "CALL db.index.fulltext.queryNodes('metaboliteFullText', $search)\n"
             "YIELD node AS m, score\n"
             f"{where_block}"
+            f"{route_orgs_call}"
             "WITH count(m) AS total_matching,\n"
             "     apoc.coll.flatten(\n"
             "       collect(coalesce(m.evidence_sources, []))) AS es,\n"
-            "     apoc.coll.flatten(\n"
-            "       collect(apoc.coll.toSet(coalesce(m.organism_names, [])"
-            " + coalesce(m.go_transport_organism_names, [])))) AS all_orgs,\n"
+            f"{all_orgs_line}"
             "     apoc.coll.flatten(\n"
             "       collect(coalesce(m.pathway_ids, []))) AS all_pwys,\n"
             "     count(m.chebi_id) AS with_chebi,\n"
@@ -3196,13 +3280,12 @@ def build_list_metabolites_summary(
             "WITH count(m) AS total_entries\n"
             "OPTIONAL MATCH (m:Metabolite)\n"
             f"{where_block}"
+            f"{route_orgs_call}"
             "WITH total_entries,\n"
             "     count(m) AS total_matching,\n"
             "     apoc.coll.flatten(\n"
             "       collect(coalesce(m.evidence_sources, []))) AS es,\n"
-            "     apoc.coll.flatten(\n"
-            "       collect(apoc.coll.toSet(coalesce(m.organism_names, [])"
-            " + coalesce(m.go_transport_organism_names, [])))) AS all_orgs,\n"
+            f"{all_orgs_line}"
             "     apoc.coll.flatten(\n"
             "       collect(coalesce(m.pathway_ids, []))) AS all_pwys,\n"
             "     count(m.chebi_id) AS with_chebi,\n"

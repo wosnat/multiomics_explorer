@@ -13348,7 +13348,9 @@ class TestBuildListMetabolitesNoFormulaCount:
             "m.mass <= $mass_max",
             "WHERE toLower(o) IN $organism_names_lc)",
             "ANY(p IN coalesce(m.pathway_ids, []) WHERE p IN $pathway_ids)",
-            "WHERE s IN coalesce(m.evidence_sources, []))",
+            # organism + evidence together → route-scoped on the organism
+            # edge (release-prep spec 4.1), not metabolite-level.
+            "WHERE s IN $edge_sources) }",
         ):
             assert frag in cypher, f"missing filter fragment: {frag}"
         assert params["metabolite_ids"] == ["kegg.compound:C00086"]
@@ -16203,3 +16205,248 @@ class TestChemistryMetaboliteStructureKind:
         assert re.search(
             r"metabolite_structure_kind\s*:\s*m\.structure_kind\b", cypher
         ), cypher
+
+
+
+# ===========================================================================
+# Release prep (RED) —
+# docs/tool-specs/release-prep-transport-reach-and-alpha6-cleanup.md
+#
+# 2c.5  list_metabolites: organism_names + evidence_sources together → an
+#       edge-scoped EXISTS over (o:OrganismTaxon)-[r:Organism_has_metabolite]->(m)
+#       on r.evidence_sources ∈ $edge_sources (metabolism→metabolism,
+#       transport→transport, metabolomics→measured), OR'd with
+#       m.go_transport_organism_names only when $want_go. Either filter alone
+#       is unchanged. top_organisms counts by matching-route edges when
+#       evidence_sources is set.
+# 2c.19 gene_overview: the TCDB transport EXISTS (evidence_sources detail +
+#       has_chemistry summary) traverses both TCDB substrate rels to
+#       (:Metabolite|ChemicalRole); the metabolomics EXISTS stays
+#       metabolite-only.
+# ===========================================================================
+
+from multiomics_explorer.kg import queries_lib as _qlrp
+
+_RP_MED4_LC = ["prochlorococcus med4"]
+_RP_TCDB_ROLE_RELS = (
+    "Tcdb_family_transports_metabolite|Tcdb_family_transports_chemical_role"
+)
+_RP_MET_OR_ROLE_RE = re.compile(r"\(\w*:Metabolite\|ChemicalRole\)")
+
+
+def _rp_where(**kw):
+    return _qlrp._list_metabolites_where(**kw)
+
+
+class TestListMetabolitesWhereRouteScopedOrganism:
+    """2c.5 — `_list_metabolites_where` with both organism + evidence."""
+
+    def test_both_filters_use_edge_scoped_exists(self):
+        where, params = _rp_where(
+            organism_names_lc=_RP_MED4_LC, evidence_sources=["transport"])
+        assert "Organism_has_metabolite" in where
+        assert re.search(
+            r"\(o:OrganismTaxon\)-\[r:Organism_has_metabolite\]->\(m\)", where
+        ), where
+        assert "r.evidence_sources" in where
+        assert "$edge_sources" in where
+        assert "$organism_names_lc" in where
+        assert params["organism_names_lc"] == _RP_MED4_LC
+
+    def test_both_filters_drop_metabolite_level_conditions(self):
+        """The old any-route organism condition (m.organism_names) and the
+        metabolite-level evidence condition (m.evidence_sources) must NOT
+        apply — combining them is the 2c.5 bug."""
+        where, _ = _rp_where(
+            organism_names_lc=_RP_MED4_LC, evidence_sources=["transport"])
+        assert "m.organism_names" not in where
+        assert "m.evidence_sources" not in where
+
+    def test_transport_maps_to_transport_edge_source(self):
+        _, params = _rp_where(
+            organism_names_lc=_RP_MED4_LC, evidence_sources=["transport"])
+        assert list(params["edge_sources"]) == ["transport"]
+        assert params["want_go"] is False
+
+    def test_route_map_metabolomics_is_measured(self):
+        _, params = _rp_where(
+            organism_names_lc=_RP_MED4_LC,
+            evidence_sources=["metabolism", "transport", "metabolomics"])
+        assert set(params["edge_sources"]) == {
+            "metabolism", "transport", "measured"}
+        assert "metabolomics" not in params["edge_sources"]
+        assert params["want_go"] is False
+
+    def test_go_transport_only_sets_want_go(self):
+        where, params = _rp_where(
+            organism_names_lc=_RP_MED4_LC, evidence_sources=["go_transport"])
+        assert params["want_go"] is True
+        assert list(params["edge_sources"]) == []
+        assert "$want_go" in where
+        assert "m.go_transport_organism_names" in where
+
+    def test_transport_plus_go_transport(self):
+        where, params = _rp_where(
+            organism_names_lc=_RP_MED4_LC,
+            evidence_sources=["transport", "go_transport"])
+        assert list(params["edge_sources"]) == ["transport"]
+        assert params["want_go"] is True
+        assert "Organism_has_metabolite" in where
+        assert "m.go_transport_organism_names" in where
+
+    def test_organism_only_unchanged(self):
+        where, params = _rp_where(organism_names_lc=_RP_MED4_LC)
+        assert "Organism_has_metabolite" not in where
+        assert "m.organism_names" in where
+        assert "m.go_transport_organism_names" in where
+        assert "edge_sources" not in params
+        assert "want_go" not in params
+
+    def test_evidence_only_unchanged(self):
+        where, params = _rp_where(evidence_sources=["transport"])
+        assert "Organism_has_metabolite" not in where
+        assert "m.evidence_sources" in where
+        assert params["evidence_sources"] == ["transport"]
+
+    def test_both_filters_compose_with_other_filters(self):
+        where, params = _rp_where(
+            organism_names_lc=_RP_MED4_LC, evidence_sources=["transport"],
+            elements=["N"])
+        assert "Organism_has_metabolite" in where
+        assert "$elements" in where
+        assert params["elements"] == ["N"]
+
+
+class TestBuildListMetabolitesRouteScopedOrganism:
+    """2c.5 — the three builders sharing `_list_metabolites_where`."""
+
+    @pytest.mark.parametrize("search_text", [None, "glucose"])
+    def test_detail_both_filters_edge_scoped(self, search_text):
+        cypher, params = _qlrp.build_list_metabolites(
+            search_text=search_text, organism_names_lc=_RP_MED4_LC,
+            evidence_sources=["transport"])
+        assert "Organism_has_metabolite" in cypher
+        assert "$edge_sources" in cypher
+        assert list(params["edge_sources"]) == ["transport"]
+        assert params["want_go"] is False
+
+    def test_detail_organism_only_has_no_edge_traversal(self):
+        cypher, params = _qlrp.build_list_metabolites(
+            organism_names_lc=_RP_MED4_LC)
+        assert "Organism_has_metabolite" not in cypher
+        assert "edge_sources" not in params
+
+    def test_no_formula_count_both_filters_edge_scoped(self):
+        cypher, params = _qlrp.build_list_metabolites_no_formula_count(
+            organism_names_lc=_RP_MED4_LC, evidence_sources=["transport"],
+            elements=["N"])
+        assert "Organism_has_metabolite" in cypher
+        assert list(params["edge_sources"]) == ["transport"]
+
+    def test_no_formula_count_organism_only_unchanged(self):
+        cypher, _ = _qlrp.build_list_metabolites_no_formula_count(
+            organism_names_lc=_RP_MED4_LC, elements=["N"])
+        assert "Organism_has_metabolite" not in cypher
+
+    @pytest.mark.parametrize("search_text", [None, "glucose"])
+    def test_summary_both_filters_edge_scoped(self, search_text):
+        cypher, params = _qlrp.build_list_metabolites_summary(
+            search_text=search_text, organism_names_lc=_RP_MED4_LC,
+            evidence_sources=["transport"])
+        assert "Organism_has_metabolite" in cypher
+        assert "r.evidence_sources" in cypher
+        assert list(params["edge_sources"]) == ["transport"]
+
+
+class TestBuildListMetabolitesSummaryRouteScopedTopOrganisms:
+    """2c.5 — top_organisms counts by the listed routes when
+    evidence_sources is set (with or without an organism filter)."""
+
+    @pytest.mark.parametrize("search_text", [None, "glucose"])
+    def test_evidence_sources_scopes_top_organisms(self, search_text):
+        cypher, params = _qlrp.build_list_metabolites_summary(
+            search_text=search_text, evidence_sources=["transport"])
+        assert "Organism_has_metabolite" in cypher
+        assert "r.evidence_sources" in cypher
+        assert list(params["edge_sources"]) == ["transport"]
+        assert params["want_go"] is False
+
+    def test_evidence_sources_alone_keeps_metabolite_level_filter(self):
+        """The WHERE (catalogue sense) is unchanged when no organism is
+        given: matching still reads m.evidence_sources."""
+        cypher, _ = _qlrp.build_list_metabolites_summary(
+            evidence_sources=["transport"])
+        assert "m.evidence_sources" in cypher
+
+    def test_go_transport_top_organisms_includes_go_names(self):
+        cypher, params = _qlrp.build_list_metabolites_summary(
+            evidence_sources=["go_transport"])
+        assert params["want_go"] is True
+        assert "m.go_transport_organism_names" in cypher
+
+    def test_metabolomics_maps_to_measured_in_summary(self):
+        _, params = _qlrp.build_list_metabolites_summary(
+            evidence_sources=["metabolomics"])
+        assert list(params["edge_sources"]) == ["measured"]
+
+    @pytest.mark.parametrize("search_text", [None, "glucose"])
+    def test_no_evidence_sources_top_organisms_unchanged(self, search_text):
+        cypher, params = _qlrp.build_list_metabolites_summary(
+            search_text=search_text, organism_names_lc=_RP_MED4_LC)
+        assert "Organism_has_metabolite" not in cypher
+        assert "r.evidence_sources" not in cypher
+        assert "edge_sources" not in params
+
+    def test_unfiltered_summary_unchanged(self):
+        cypher, params = _qlrp.build_list_metabolites_summary()
+        assert "Organism_has_metabolite" not in cypher
+        assert "edge_sources" not in params
+
+
+def _rp_transport_segment(cypher: str) -> str:
+    """The gene_overview detail CASE block that yields ['transport']."""
+    end = cypher.index("THEN ['transport']")
+    start = cypher.rindex("THEN ['metabolism']", 0, end)
+    return cypher[start:end]
+
+
+def _rp_metabolomics_segment(cypher: str) -> str:
+    end = cypher.index("THEN ['metabolomics']")
+    start = cypher.index("THEN ['transport']")
+    return cypher[start:end]
+
+
+def _rp_has_chemistry_tcdb_segment(cypher: str) -> str:
+    """The has_chemistry TCDB EXISTS text in the gene_overview summary."""
+    end = cypher.index("AS has_chemistry")
+    start = cypher.rindex("Gene_has_tcdb_family", 0, end)
+    seg_end = cypher.index("}", start)
+    return cypher[start:seg_end]
+
+
+class TestBuildGeneOverviewTcdbRoleSubstrates:
+    """2c.19 — role-only TCDB systems count as `transport` chemistry."""
+
+    def test_detail_transport_exists_traverses_role_rel(self):
+        cypher, _ = build_gene_overview(locus_tags=["SynWH7803_0604"])
+        seg = _rp_transport_segment(cypher)
+        assert _RP_TCDB_ROLE_RELS in seg, seg
+        assert _RP_MET_OR_ROLE_RE.search(seg), seg
+
+    def test_detail_transport_exists_still_direct_gate(self):
+        cypher, _ = build_gene_overview(locus_tags=["SynWH7803_0604"])
+        seg = _rp_transport_segment(cypher)
+        assert _qlrp.TCDB_DIRECT_GATE_PREDICATE in seg, seg
+
+    def test_detail_metabolomics_exists_stays_metabolite_only(self):
+        cypher, _ = build_gene_overview(locus_tags=["SynWH7803_0604"])
+        seg = _rp_metabolomics_segment(cypher)
+        assert "ChemicalRole" not in seg, seg
+        assert "Tcdb_family_transports_chemical_role" not in seg, seg
+        assert "measured_assay_count" in seg
+
+    def test_summary_has_chemistry_traverses_role_rel(self):
+        cypher, _ = build_gene_overview_summary(locus_tags=["SynWH7803_0604"])
+        seg = _rp_has_chemistry_tcdb_segment(cypher)
+        assert _RP_TCDB_ROLE_RELS in seg, seg
+        assert _RP_MET_OR_ROLE_RE.search(seg), seg

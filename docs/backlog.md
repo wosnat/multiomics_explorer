@@ -1,7 +1,7 @@
 # Explorer backlog
 
 Single list of open work for `multiomics_explorer`. One line per item: what, why, size, origin.
-Status was verified against `main` on 2026-08-29 (HEAD `f7b9a70`, live KG dev build 2026-08-29T06:22Z). When an item ships, delete it
+Status was verified against `main` on 2026-10-31 (live KG dev build 2026-10-31T14:01Z). When an item ships, delete it
 here and let the CHANGELOG carry the record — this file is only ever the *open* set.
 
 Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · **L** multi-day, full
@@ -20,7 +20,7 @@ Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · *
 |---|---|---|---|
 | 2.8 | `organism=` word-match backlog: genus node `Alteromonas` matches all strains; `AltDE` matches `AltDE1`. Resolver gates on `gene_count > 0` so treatment taxa are safe (KG B4 removes the last name collision). | M | slice-2 ledger |
 | 2.14 | Outfacing-identifier lint: cross-check backtick-quoted identifiers in tools.py Field/docstrings, inputs/tools/*.yaml, hand-authored references md, CLAUDE.md against live input-schema param names + response-model field names (final-review rec, llm-review 2b.5). | S | 2b.5 final review |
-| 2.15 | alpha.6 queue: remove api/_compat aliases; rename not_found.publication_doi buckets to publication_dois on the 3 metabolomics tools; consider compartment as list[str]; the `listify=True` shims are now redundant with `listify_bare_str` (3.18) and go with the aliases; align `kg_release_info(conn)` to the `conn: GraphConnection \| None = None` keyword-only contract (docs-review 2026-09-15 — python_api.md documents the exception meanwhile). | M | 2b.5 final review |
+| 2.15b | Compartment as `list[str]` on the 12 functions that take `compartment: str` — deferred, no request; can land non-breakingly later as `str \| list[str]`. | M | 2.15 (release-prep spec 2026-10-31) |
 | 2.16 | Docs-surface guards (2b.4 final review): brief-sections lint (every brief carries Example/Response sketch/mistakes/chaining-or-marker), lint_index_size, kg_claims used_in content check, TOC line-number pin test, params.py verbose text names /full. | S | 2b.4 final review |
 
 ## 2b. LLM-consumer review 2026-08-29 (six-reviewer pass; report artifact `Explorer MCP Through an LLM's Eyes`, raw reports in session scratchpad)
@@ -36,12 +36,10 @@ Explorer-side items only; KG asks from the same log are §4 D. Template / method
 | # | Item | Size | Notes |
 |---|---|---|---|
 | 2c.2 | Genome-coordinate listing: all genes of an organism with contig / start / end / strand, pageable, with `coordinate_source`. The analysis needed it and swept `gene_neighbors` (8 × window=250) + `gene_details` instead. The OOM half shipped 2026-10-13 (window ≤ 100, row budget). Could be a `gene_details` organism mode instead of a new tool. | M | |
-| 2c.5 | `list_metabolites` transport reach is flat (`top_organisms` 1,294–1,304 of 1,462 for every organism) because `m.organism_names` unions inherited superfamily (ABC) substrates. Most-specific-only reach does discriminate (639 MED4 … 1,201 Pseudomonas KT2440). Blocked on the KG precompute `Metabolite.transport_most_specific_organism_names`; then rebuild `top_organisms` / the organism filter for transport on it. Interim fallback: compute per call in Cypher. | M | KG ask (drafted 2026-10-13) |
 | 2c.9 | Genome context for transport substrates: "which of this transporter's substrates are plausible in this genome". Per transport row in `metabolites_by_gene` (and per-metabolite in `genes_by_metabolite`): `organism_catalyst_gene_count`, `organism_transporter_gene_count`, `measured_in_organism`, with the stereo hop folded into the counts ("0 direct, 41 via L-Cysteine"). Example: MED4 `dppA` (PepT 3.A.1.5) lists 29 substrates; MED4 has enzymes for 7. The explorer-side half of KG ask D3. | L | design needed |
 | 2c.11 | Doc weight from the stereo-hint examples: full tool pages grew (`genes_by_metabolite/full` ~9.7k → 14.5k tok, `list_metabolites/full` ~11.7k → 13.6k, `metabolites_by_gene/full` ~8.1k → 10.2k). Trim the new examples' `top_*` lists if the yaml format allows partial responses. Also the CLAUDE.md `list_metabolites` row lost "unlisted ≠ not in it" for KEGG classes (row at the 700-char limit). | S | stereo-hint code review |
 | 2c.12 | Next explorer release must carry the metabolite identity + stereo-form surface (CHANGELOG `[Unreleased]`); the KG release that ships the identity / ask-8 rebuilds sets `mcp_min_version` to that explorer version and stamps `breaking_changes`. | S | release coordination |
 | 2c.18 | Organism resolver: "Alteromonas mediterranea AltDE" is ambiguous with AltDE1 and the builders' word match leaks AltDE1 genes (pre-existing) | M | GO transport surface 2026-10-23 |
-| 2c.19 | `has_chemistry` / gene_overview `transport` tag ignore the 29 genes whose only chemistry is a deepest TCDB role edge; revisit in the TCDB redesign | S | GO transport surface 2026-10-23 |
 
 ## 3. Older backlog — verified 2026-08-28
 

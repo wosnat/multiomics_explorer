@@ -977,7 +977,7 @@ chaining:
   - "genes_by_function(search_text=..., organism=...) → metabolites_by_gene(locus_tags=function_hit_genes, organism=...) (Workflow C variant — function-search chemistry)"
   - "gene_overview(locus_tags=[...]) → per-row reaction_count/catalyzed_metabolite_count > 0 → metabolites_by_gene(locus_tags=chemistry_genes, organism=...)"
   - "gene_overview(locus_tags=[...]) → per-row transported_metabolite_count > 0 → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['transport']) — distinct Metabolite targets in the direct rows equal transported_metabolite_count"
-  - "gene_overview(locus_tags=[...]) → per-row tcdb_assignment_count > 0 but transported_metabolite_count = 0 → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['transport'], include_tcdb_family_substrates=True) for family-level substrate candidates"
+  - "gene_overview(locus_tags=[...]) → per-row tcdb_assignment_count > 0 but transported_metabolite_count = 0 and no 'transport' in evidence_sources (a 'transport' tag here = role-only direct system, returned by default) → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['transport'], include_tcdb_family_substrates=True) for family-level substrate candidates"
 
   # downstream from envelope — top_metabolites
   - "metabolites_by_gene → top_metabolites → list_metabolites(metabolite_ids=[top_metabolite_ids]) for richer per-metabolite cross-refs (mass, formula, full pathway names)"

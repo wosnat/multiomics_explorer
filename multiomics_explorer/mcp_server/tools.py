@@ -646,7 +646,7 @@ class MetKeggBriteClassBucket(BaseModel):
 class ListMetabolitesResponse(BaseModel):
     total_entries: int = Field(description="Total Metabolite nodes in KG (unfiltered).")
     total_matching: int = Field(description="Metabolites matching filters.")
-    top_organisms: list[MetTopOrganism] = Field(default_factory=list, description="Top 10 organisms by metabolite count (within matched set), sorted desc.")
+    top_organisms: list[MetTopOrganism] = Field(default_factory=list, description="Top 10 organisms by metabolite count (within matched set), sorted desc. With evidence_sources, an organism counts only by those routes.")
     top_metabolite_pathways: list[MetTopPathway] = Field(default_factory=list, description="Top 10 pathways by metabolite count (within matched set), sorted desc. Metabolite-pathway rollup (distinct from KO-pathway annotations on `genes_by_ontology`).")
     by_evidence_source: list[MetEvidenceSourceBreakdown] = Field(default_factory=list, description="Frequency of evidence_sources values across matched set. Bounded by the {metabolism, transport, metabolomics, go_transport} domain.")
     xref_coverage: MetXrefCoverage = Field(description="Cross-ref ID coverage within matched set.")
@@ -2525,7 +2525,7 @@ def register_tools(mcp: FastMCP):
         )
         transported_metabolite_count: int = Field(
             default=0,
-            description="Distinct metabolites this gene transports via its direct TCDB systems (tcdb_gate='direct'; precomputed Gene.transported_metabolite_count). Pairs with catalyzed_metabolite_count. When > 0, drill via metabolites_by_gene(locus_tags=[...]).",
+            description="Distinct metabolites (not chemical roles) this gene transports via its direct TCDB systems (tcdb_gate='direct'). Can be 0 on a gene tagged 'transport' by role substrates only. When > 0, drill via metabolites_by_gene.",
         )
         go_transport_metabolite_count: int = Field(
             default=0,
@@ -2533,7 +2533,7 @@ def register_tools(mcp: FastMCP):
         )
         evidence_sources: list[str] = Field(
             default_factory=list,
-            description="Path provenance — values from {'metabolism', 'transport', 'metabolomics', 'go_transport'}. When non-empty, drill into metabolites_by_gene(locus_tags=[...]). Per-source definitions: see docs://guide/concepts.",
+            description="Path provenance: 'metabolism', 'transport', 'metabolomics', 'go_transport'. 'transport' includes TCDB chemical-role substrates (e.g. 'drug'), so transported_metabolite_count may be 0. Drill via metabolites_by_gene.",
         )
         # Annotation-trust surface: protease / family-domain routing columns.
         merops_classes: list[str] = Field(
@@ -2630,7 +2630,7 @@ def register_tools(mcp: FastMCP):
         )
         has_chemistry: int = Field(
             default=0,
-            description="Count of requested locus_tags with non-empty evidence_sources (participate in at least one reaction-to-metabolite or transport path).",
+            description="Count of requested locus_tags with non-empty evidence_sources (a reaction, transport or measurement path; TCDB transport includes chemical-role substrates such as 'drug').",
         )
         has_discussed: int = Field(
             default=0,
@@ -8439,13 +8439,11 @@ def register_tools(mcp: FastMCP):
             description="Maximum monoisotopic mass (Da). E.g. 1000.0.",
         )] = None,
         organism_names: Annotated[list[str] | None, Field(
-            description="Restrict to metabolites reachable by these organisms "
-            "(case-insensitive on `preferred_name`). UNION semantics — a "
-            "metabolite reached by ANY listed organism qualifies. Matches "
-            "`Organism_has_metabolite` (catalysis OR TCDB transport) or "
-            "`go_transport_organism_names`. "
-            "E.g. ['Prochlorococcus MED4']. `not_found.organism_names` lists "
-            "any unknown names.",
+            description="Metabolites reached by ANY of these organisms "
+            "(case-insensitive `preferred_name`), by any route. With "
+            "`evidence_sources`, a listed organism must reach it by one of "
+            "those routes. E.g. ['Prochlorococcus MED4']. Unknown: "
+            "`not_found.organism_names`.",
         )] = None,
         pathway_ids: Annotated[list[str] | None, Field(
             description="Filter by KEGG pathway membership (`KeggTerm.id`). "
@@ -8455,11 +8453,11 @@ def register_tools(mcp: FastMCP):
         evidence_sources: Annotated[
             list[Literal["metabolism", "transport", "metabolomics", "go_transport"]] | None,
             Field(
-                description="Filter by evidence path (ANY). Values: "
-                "'metabolism' (catalysis-reachable), 'transport' (TCDB "
-                "substrate), 'metabolomics' (measured by a MetaboliteAssay), "
-                "'go_transport' (named by a GO transport term). Other values "
-                "raise at the MCP boundary.",
+                description="Filter by evidence path (ANY): 'metabolism', "
+                "'transport' (TCDB substrate), 'metabolomics' (measured), "
+                "'go_transport'. Alone = metabolite-level ('transport' = some "
+                "TCDB system lists it); with `organism_names` = that "
+                "organism's route.",
             ),
         ] = None,
         structure_kind: Annotated[list[str] | None, Field(
@@ -9120,7 +9118,7 @@ def register_tools(mcp: FastMCP):
         experiment_ids: list[str] = Field(
             default_factory=list,
             description="Input experiment_ids that yielded no matching assay")
-        publication_doi: list[str] = Field(
+        publication_dois: list[str] = Field(
             default_factory=list,
             description="Input publication DOIs that yielded no matching assay")
 
@@ -9285,9 +9283,7 @@ def register_tools(mcp: FastMCP):
         not_found: LmaNotFound = Field(
             default_factory=LmaNotFound,
             description="Per-batch-input unknown IDs (4 buckets: "
-            "assay_ids, metabolite_ids, experiment_ids, publication_doi — "
-            "bucket key is singular `publication_doi` regardless of the "
-            "`publication_dois` input filter name).")
+            "assay_ids, metabolite_ids, experiment_ids, publication_dois).")
         resolved_aliases: dict[str, list[str]] = Field(
             default_factory=dict,
             description="Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.")
@@ -9536,7 +9532,7 @@ def register_tools(mcp: FastMCP):
         experiment_ids: list[str] = Field(
             default_factory=list,
             description="Input experiment_ids absent from the KG.")
-        publication_doi: list[str] = Field(
+        publication_dois: list[str] = Field(
             default_factory=list,
             description="Input publication DOIs absent from the KG.")
 
@@ -9702,9 +9698,7 @@ def register_tools(mcp: FastMCP):
         not_found: MqaNotFound = Field(
             default_factory=MqaNotFound,
             description="Per-batch-input unknown IDs (4 buckets: "
-            "assay_ids, metabolite_ids, experiment_ids, publication_doi — "
-            "bucket key is singular `publication_doi` regardless of the "
-            "`publication_dois` input filter name).")
+            "assay_ids, metabolite_ids, experiment_ids, publication_dois).")
         returned: int = Field(description="Length of `results`.")
         truncated: bool = Field(
             description="True when total_matching > offset + returned.")
@@ -9935,7 +9929,7 @@ def register_tools(mcp: FastMCP):
         assay_ids: list[str] = Field(default_factory=list)
         metabolite_ids: list[str] = Field(default_factory=list)
         experiment_ids: list[str] = Field(default_factory=list)
-        publication_doi: list[str] = Field(default_factory=list)
+        publication_dois: list[str] = Field(default_factory=list)
 
     class MfaByStereoAssignment(BaseModel):
         stereo_assignment: str = Field(
@@ -10031,9 +10025,7 @@ def register_tools(mcp: FastMCP):
         not_found: MfaNotFound = Field(
             default_factory=MfaNotFound,
             description="Per-batch-input unknown IDs (4 buckets: "
-            "assay_ids, metabolite_ids, experiment_ids, publication_doi — "
-            "bucket key is singular `publication_doi` regardless of the "
-            "`publication_dois` input filter name). "
+            "assay_ids, metabolite_ids, experiment_ids, publication_dois). "
             "assay_ids is a real existence check — an assay_id that "
             "exists as the other value_kind is NOT here (see `warnings`).")
         returned: int = Field(description="Length of `results`.")

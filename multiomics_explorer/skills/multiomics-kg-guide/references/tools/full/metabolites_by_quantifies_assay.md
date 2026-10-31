@@ -58,7 +58,7 @@ total_matching, by_detection_status, by_stereo_assignment, by_metric_bucket, by_
 - **excluded_assays** (list[string]): `assay_ids` soft-excluded under rankable-gating (non-rankable assays dropped when a rankable filter is set).
 - **warnings** (list[string]): Human-readable rankable-gating diagnostics, metabolite-id notes (removed compound, chemical role), a count of dominant-form-assumed rows, and a sibling-tool notice when a requested assay_id exists as value_kind='boolean' (genuinely found, excluded from `not_found.assay_ids` — use `metabolites_by_flags_assay` instead).
 - **resolved_aliases** (object): Metabolite inputs resolved to a different canonical ID (bare, xref, secondary or retired ids), `{input: [canonical]}`, across `metabolite_ids` and `exclude_metabolite_ids`. Inputs already canonical are not listed.
-- **not_found** (MqaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_doi — bucket key is singular `publication_doi` regardless of the `publication_dois` input filter name).
+- **not_found** (MqaNotFound): Per-batch-input unknown IDs (4 buckets: assay_ids, metabolite_ids, experiment_ids, publication_dois).
 - **returned** (int): Length of `results`.
 - **truncated** (bool): True when total_matching > offset + returned.
 - **offset** (int): Pagination offset used.
@@ -226,7 +226,7 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:met
     "4 of 64 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on L-Alanine); filter s..."
   ],
   "resolved_aliases": {},
-  "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
+  "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_dois": []},
   "returned": 5,
   "truncated": true,
   "offset": 0
@@ -312,7 +312,7 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:1462-2920.15834:s7_
   "excluded_assays": [],
   "warnings": [],
   "resolved_aliases": {},
-  "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
+  "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_dois": []},
   "returned": 0,
   "truncated": true,
   "offset": 0
@@ -402,7 +402,7 @@ Expect not_found to be a flat list[str].
 
 ```correction
 Drill-downs use a structured NotFound (4 keys: assay_ids, metabolite_ids,
-experiment_ids, publication_doi) — multi-batch input → structured.
+experiment_ids, publication_dois) — multi-batch input → structured.
 Inspect each bucket separately to see which input was bad. Mirrors
 `MetNotFound` on `list_metabolites` and `GbmNotFound` on
 `genes_by_metabolite`.

@@ -9370,7 +9370,7 @@ class TestListMetaboliteAssaysWrapper:
         "returned": 0, "offset": 0, "truncated": True,
         "not_found": {
             "assay_ids": [], "metabolite_ids": [],
-            "experiment_ids": [], "publication_doi": [],
+            "experiment_ids": [], "publication_dois": [],
         },
         "results": [],
     }
@@ -9519,14 +9519,14 @@ class TestListMetaboliteAssaysWrapper:
     async def test_structured_not_found(self, tool_fns, mock_ctx):
         """not_found in response is the structured Pydantic model
         with all 4 batch-input buckets (assay_ids, metabolite_ids,
-        experiment_ids, publication_doi) — parent §11 Conv B / §13.6."""
+        experiment_ids, publication_dois) — parent §11 Conv B / §13.6."""
         api_return = {
             **self._SAMPLE_API_RETURN,
             "not_found": {
                 "assay_ids": ["nonexistent_assay_id"],
                 "metabolite_ids": ["kegg.compound:C99999"],
                 "experiment_ids": ["bogus_exp"],
-                "publication_doi": ["10.x/bogus"],
+                "publication_dois": ["10.x/bogus"],
             },
         }
         with patch(
@@ -9537,7 +9537,7 @@ class TestListMetaboliteAssaysWrapper:
         assert result.not_found.assay_ids == ["nonexistent_assay_id"]
         assert result.not_found.metabolite_ids == ["kegg.compound:C99999"]
         assert result.not_found.experiment_ids == ["bogus_exp"]
-        assert result.not_found.publication_doi == ["10.x/bogus"]
+        assert result.not_found.publication_dois == ["10.x/bogus"]
 
 
 # ---------------------------------------------------------------------------
@@ -9567,7 +9567,7 @@ class TestMetabolitesByQuantifiesAssayWrapper:
             "assay_ids": [],
             "metabolite_ids": [],
             "experiment_ids": [],
-            "publication_doi": [],
+            "publication_dois": [],
         },
         "returned": 0,
         "truncated": True,
@@ -9622,7 +9622,7 @@ class TestMetabolitesByFlagsAssayWrapper:
             "assay_ids": [],
             "metabolite_ids": [],
             "experiment_ids": [],
-            "publication_doi": [],
+            "publication_dois": [],
         },
         "returned": 0,
         "truncated": True,
@@ -14794,3 +14794,71 @@ class TestTcdbFamilyNameDescriptions:
         desc = GeneReactionMetaboliteTriplet.model_fields[
             "tcdb_family_name"].description or ""
         assert "nearest named ancestor" in desc
+
+
+
+# ===========================================================================
+# Release prep (RED) —
+# docs/tool-specs/release-prep-transport-reach-and-alpha6-cleanup.md §4.3.2
+# not_found.publication_doi -> publication_dois on LmaNotFound /
+# MqaNotFound / MfaNotFound (MCP-visible, Breaking).
+# ===========================================================================
+
+_RP_NF = {
+    "assay_ids": ["bogus_assay"],
+    "metabolite_ids": [],
+    "experiment_ids": [],
+    "publication_dois": ["10.x/bogus"],
+}
+
+
+class TestReleasePrepNotFoundPublicationDoisWrapper:
+
+    @staticmethod
+    def _assert_model(not_found):
+        fields = type(not_found).model_fields
+        assert "publication_dois" in fields
+        assert "publication_doi" not in fields
+        assert not_found.publication_dois == ["10.x/bogus"]
+        assert not_found.assay_ids == ["bogus_assay"]
+
+    @pytest.mark.asyncio
+    async def test_list_metabolite_assays(self, tool_fns, mock_ctx):
+        api_return = {
+            **TestListMetaboliteAssaysWrapper._SAMPLE_API_RETURN,
+            "not_found": dict(_RP_NF),
+        }
+        with patch(
+            "multiomics_explorer.api.functions.list_metabolite_assays",
+            return_value=api_return,
+        ):
+            result = await tool_fns["list_metabolite_assays"](mock_ctx)
+        self._assert_model(result.not_found)
+
+    @pytest.mark.asyncio
+    async def test_metabolites_by_quantifies_assay(self, tool_fns, mock_ctx):
+        api_return = {
+            **TestMetabolitesByQuantifiesAssayWrapper._SAMPLE_API_RETURN,
+            "not_found": dict(_RP_NF),
+        }
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_quantifies_assay",
+            return_value=api_return,
+        ):
+            result = await tool_fns["metabolites_by_quantifies_assay"](
+                mock_ctx, assay_ids=["bogus_assay"], summary=True)
+        self._assert_model(result.not_found)
+
+    @pytest.mark.asyncio
+    async def test_metabolites_by_flags_assay(self, tool_fns, mock_ctx):
+        api_return = {
+            **TestMetabolitesByFlagsAssayWrapper._SAMPLE_API_RETURN,
+            "not_found": dict(_RP_NF),
+        }
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_flags_assay",
+            return_value=api_return,
+        ):
+            result = await tool_fns["metabolites_by_flags_assay"](
+                mock_ctx, assay_ids=["bogus_assay"], summary=True)
+        self._assert_model(result.not_found)

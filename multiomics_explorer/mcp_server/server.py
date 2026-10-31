@@ -42,7 +42,7 @@ async def lifespan(server: FastMCP):
 
     # KG compatibility check — defensive: never block startup on this.
     try:
-        report = kg_release_info(conn)
+        report = kg_release_info(conn=conn)
     except Exception as e:
         logger.warning("KG compatibility check failed to evaluate: %s", e)
         report = {

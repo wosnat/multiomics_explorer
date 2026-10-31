@@ -96,8 +96,8 @@ Plus five orthogonal helpers:
 
 ### "Which metabolites can organism A make that organism B can take up?"
 This is **cross-feeding**: pair one organism's production with another's uptake capability.
-1. `list_metabolites(organism_names=["A"])` — per-row `catalyst_gene_count` (production) and `transporter_gene_count` (A's own uptake/export).
-2. `genes_by_metabolite(metabolite_ids=[...], organism="B")` — same IDs, filtered to B, for its transporter genes (`evidence_sources=['transport']`).
+1. `list_metabolites(organism_names=["A"], evidence_sources=["metabolism"])` — both filters = A's route (row gene counts: all organisms).
+2. Same: `["B"]` + `["transport"]`; intersect by `metabolite_id`, then `genes_by_metabolite(metabolite_ids=[...], organism="B", evidence_sources=['transport'])`.
 3. Compare the two gene sets per metabolite. Full tree + the undirected-reaction caveat: `docs://analysis/metabolites`.
 
 ### "Which genes belong to BRITE category / TCDB family / CAZy family / InterPro entry / MEROPS clan X?"

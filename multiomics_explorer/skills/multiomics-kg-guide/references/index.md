@@ -4,8 +4,8 @@
 
 - `docs://guide/concepts` — ~6431 tok — The knowledge graph integrates Prochlorococcus and Alteromonas multi-omics data: genomes, transcriptomes…
 - `docs://guide/conventions` — ~7042 tok — Patterns that hold across most or all 42 tools — things you'd otherwise re-learn tool by tool.
-- `docs://guide/python_api` — ~4178 tok — The `multiomics_explorer` package exposes the same 42 tools available via MCP, plus a handful of analysis…
-- `docs://guide/start_here` — ~4019 tok — This MCP server exposes 42 tools over a Prochlorococcus/Alteromonas multi-omics KG, in ten families below.
+- `docs://guide/python_api` — ~4172 tok — The `multiomics_explorer` package exposes the same 42 tools available via MCP, plus a handful of analysis…
+- `docs://guide/start_here` — ~4020 tok — This MCP server exposes 42 tools over a Prochlorococcus/Alteromonas multi-omics KG, in ten families below.
 
 ## Tools (brief)
 
@@ -38,7 +38,7 @@
 - `docs://tools/list_experiments` — ~1703 tok
 - `docs://tools/list_filter_values` — ~1582 tok
 - `docs://tools/list_metabolite_assays` — ~1315 tok
-- `docs://tools/list_metabolites` — ~1997 tok
+- `docs://tools/list_metabolites` — ~1970 tok
 - `docs://tools/list_organisms` — ~991 tok
 - `docs://tools/list_publications` — ~1249 tok
 - `docs://tools/metabolites_by_flags_assay` — ~1553 tok
@@ -68,7 +68,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/gene_homologs/full` — ~2045 tok
 - `docs://tools/gene_neighbors/full` — ~3449 tok
 - `docs://tools/gene_ontology_terms/full` — ~11489 tok
-- `docs://tools/gene_overview/full` — ~12430 tok
+- `docs://tools/gene_overview/full` — ~12682 tok
 - `docs://tools/gene_response_profile/full` — ~5472 tok
 - `docs://tools/genes_by_boolean_metric/full` — ~5980 tok
 - `docs://tools/genes_by_categorical_metric/full` — ~6068 tok
@@ -84,13 +84,13 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/list_derived_metrics/full` — ~3493 tok
 - `docs://tools/list_experiments/full` — ~10531 tok
 - `docs://tools/list_filter_values/full` — ~7260 tok
-- `docs://tools/list_metabolite_assays/full` — ~3970 tok
-- `docs://tools/list_metabolites/full` — ~16272 tok
+- `docs://tools/list_metabolite_assays/full` — ~3946 tok
+- `docs://tools/list_metabolites/full` — ~16814 tok
 - `docs://tools/list_organisms/full` — ~15010 tok
 - `docs://tools/list_publications/full` — ~8803 tok
-- `docs://tools/metabolites_by_flags_assay/full` — ~4799 tok
-- `docs://tools/metabolites_by_gene/full` — ~17422 tok
-- `docs://tools/metabolites_by_quantifies_assay/full` — ~6456 tok
+- `docs://tools/metabolites_by_flags_assay/full` — ~4775 tok
+- `docs://tools/metabolites_by_gene/full` — ~17450 tok
+- `docs://tools/metabolites_by_quantifies_assay/full` — ~6432 tok
 - `docs://tools/ontology_landscape/full` — ~10889 tok
 - `docs://tools/ontology_term_details/full` — ~9623 tok
 - `docs://tools/pathway_enrichment/full` — ~13390 tok
@@ -105,8 +105,8 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://analysis/derived_metrics` — ~2771 tok — The DerivedMetric (DM) node family: what DMs are, how to discover them, and how to drill into gene-level…
 - `docs://analysis/enrichment` — ~7337 tok — How to run over-representation analysis (ORA) with the `multiomics_explorer` package: the building blocks…
 - `docs://analysis/expression` — ~2361 tok — The differential-expression (DE) tool family and the two analysis utilities that reshape its output into…
-- `docs://analysis/metabolites` — ~14529 tok — LLM-facing decision-tree guide for metabolite questions.
-- `docs://analysis/transport` — ~3990 tok — What transports compound X in organism Y, or what does gene Z move? The KG answers from three routes.
+- `docs://analysis/metabolites` — ~14632 tok — LLM-facing decision-tree guide for metabolite questions.
+- `docs://analysis/transport` — ~4203 tok — What transports compound X in organism Y, or what does gene Z move? The KG answers from three routes.
 
 ## Ontologies
 

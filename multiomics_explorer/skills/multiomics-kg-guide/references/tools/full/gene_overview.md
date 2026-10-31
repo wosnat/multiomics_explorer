@@ -37,7 +37,7 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 - **has_orthologs** (int): Genes with ortholog group membership.
 - **has_clusters** (int): Genes with cluster membership.
 - **has_derived_metrics** (int): Count of requested locus_tags carrying any DM annotation.
-- **has_chemistry** (int): Count of requested locus_tags with non-empty evidence_sources (participate in at least one reaction-to-metabolite or transport path).
+- **has_chemistry** (int): Count of requested locus_tags with non-empty evidence_sources (a reaction, transport or measurement path; TCDB transport includes chemical-role substrates such as 'drug').
 - **has_discussed** (int): Count of requested locus_tags discussed in prose by at least one publication (discussed_in_publication_count > 0).
 - **top_discussing_publications** (list[OverviewDiscussingPublication]): Publications ranked by how many of the queried genes they discuss (batch set-coverage — recovers 'which one paper covers most of my gene set'). Feed a doi into discussed_by_publication for that paper's full discussed set.
 - **has_ncbifam** (int): Count of requested locus_tags with at least one NCBIfam family annotation (ncbifam_family_count > 0).
@@ -75,9 +75,9 @@ total_matching, by_organism, by_category, by_annotation_type, by_annotation_stat
 | reaction_count | int (optional) | Distinct reactions catalysed by this gene (precomputed Gene-side rollup). When > 0, drill via metabolites_by_gene(locus_tags=[locus_tag], organism=...). |
 | catalyzed_metabolite_count | int (optional) | Distinct metabolites reachable via catalysis only (Gene_catalyzes_reaction → Reaction_has_metabolite). Transport-only genes read 0 — check transported_metabolite_count / 'transport' in evidence_sources (e.g. cynD PMM0372: 0 here, 3 transported). |
 | tcdb_best_hit_identity | float \| None (optional) | Percent identity of the gene's rank-1 diamond best hit to TCDB, read live and NOT gated (reported even below the 40% gate). How close the nearest characterised system is; rank, don't filter. None = no best hit. |
-| transported_metabolite_count | int (optional) | Distinct metabolites this gene transports via its direct TCDB systems (tcdb_gate='direct'; precomputed Gene.transported_metabolite_count). Pairs with catalyzed_metabolite_count. When > 0, drill via metabolites_by_gene(locus_tags=[...]). |
+| transported_metabolite_count | int (optional) | Distinct metabolites (not chemical roles) this gene transports via its direct TCDB systems (tcdb_gate='direct'). Can be 0 on a gene tagged 'transport' by role substrates only. When > 0, drill via metabolites_by_gene. |
 | go_transport_metabolite_count | int (optional) | GO-route mirror of transported_metabolite_count: distinct metabolites (not roles) via the gene's direct GO terms; is_a-inherited not counted. A term-definition count, not a gene fact. Drill via metabolites_by_gene. |
-| evidence_sources | list[string] (optional) | Path provenance — values from {'metabolism', 'transport', 'metabolomics', 'go_transport'}. When non-empty, drill into metabolites_by_gene(locus_tags=[...]). Per-source definitions: see docs://guide/concepts. |
+| evidence_sources | list[string] (optional) | Path provenance: 'metabolism', 'transport', 'metabolomics', 'go_transport'. 'transport' includes TCDB chemical-role substrates (e.g. 'drug'), so transported_metabolite_count may be 0. Drill via metabolites_by_gene. |
 | merops_classes | list[string] (optional) | Distinct MEROPS call_class values across this gene's MEROPS calls (e.g. ['peptidase']). Empty when no MEROPS annotation. Drill via gene_ontology_terms(ontology='merops'). |
 | ncbifam_family_count | int (optional) | Distinct NCBIfam family annotations on this gene. When > 0, drill via gene_ontology_terms(ontology='ncbifam'). |
 | tcdb_assignment_count | int (optional) | Distinct gated TCDB targets (systems, subfamilies, families) minus any that is an ancestor of another (precomputed Gene.tcdb_assignment_count); equals the default TCDB leaf row count from gene_ontology_terms. 0 = no gated TCDB call. |
@@ -943,6 +943,14 @@ gene_overview(locus_tags=["PMM0372", "PMM0125", "PMM0673", "PMM0024"])
 
 *`tcdb_assignment_count` counts the gene's gated TCDB targets (`tcdb_gate` direct or annotated, minus any target that is an ancestor of another). cynD (PMM0372) has 2 sibling systems and reaches 3 metabolites directly; ecfA1 (PMM0125) has 7 eggNOG subfamily calls but no system, so `transported_metabolite_count=0`; phnD (PMM0673) has 1 subfamily call and also 0 direct reach (its substrates come from the family walk in `metabolites_by_gene`); thiL (PMM0024) has 0, because its only TCDB edge is a weak tier-3 DIAMOND hit. `tcdb_best_hit_identity` is the identity of the rank-1 DIAMOND best hit, reported even below the gate (ecfA1 33.5) and null when there is none (phnD, thiL): rank by it, never filter.*
 
+### Example 13: Role-only transporter — tagged 'transport' with transported_metabolite_count=0
+
+```example-call
+gene_overview(locus_tags=["SynWH7803_0604"])
+```
+
+*SynWH7803_0604, a small multidrug resistance (SMR) efflux protein, has a direct TCDB system curated only with the chemical role 'drug'. It reads `evidence_sources` with `transport` and counts toward `has_chemistry`, while `transported_metabolite_count=0` because roles are not metabolites. `metabolites_by_gene` returns the role row (`target_kind='chemical_role'`).*
+
 ## Chaining patterns
 
 ```
@@ -978,7 +986,9 @@ gene_overview → evidence_sources contains 'go_transport' → metabolites_by_ge
 
 - `catalyzed_metabolite_count` counts the catalysis arm only (distinct metabolites via Gene → Reaction → Metabolite). It is NOT a total chemistry reach: a transport-only gene reads 0 here while `transported_metabolite_count > 0` and 'transport' appears in `evidence_sources`. Use `evidence_sources` to see which arms exist before interpreting a 0.
 
-- TCDB routing rule: `transported_metabolite_count > 0` means the gene points directly (`tcdb_gate='direct'`) at a TC system that TCDB curates with substrates; drill with `metabolites_by_gene`. `tcdb_assignment_count > 0` with `transported_metabolite_count = 0` means TCDB placed the gene only at family or subfamily level (or at a system with no curated substrate): its substrate candidates come from `metabolites_by_gene(..., include_tcdb_family_substrates=True)`, a recall expansion. `tcdb_assignment_count = 0` with a TCDB edge means weak DIAMOND hits only; `gene_ontology_terms(..., include_weak_tcdb_hits=True)` shows them.
+- The `transport` tag in `evidence_sources` (and `has_chemistry`) includes direct TCDB systems curated only with chemical roles, such as efflux pumps whose substrate is the 'drug' role. `transported_metabolite_count` counts metabolites only, so a gene can read `transport` with `transported_metabolite_count = 0` and no family-level call: drill with `metabolites_by_gene`, whose rows for it carry `target_kind='chemical_role'`.
+
+- TCDB routing rule: `transported_metabolite_count > 0` means the gene points directly (`tcdb_gate='direct'`) at a TC system that TCDB curates with substrates; drill with `metabolites_by_gene`. `tcdb_assignment_count > 0` with `transported_metabolite_count = 0` and no `transport` tag means TCDB placed the gene only at family or subfamily level (or at a system with no curated substrate): its substrate candidates come from `metabolites_by_gene(..., include_tcdb_family_substrates=True)`, a recall expansion. `tcdb_assignment_count = 0` with a TCDB edge means weak DIAMOND hits only; `gene_ontology_terms(..., include_weak_tcdb_hits=True)` shows them.
 
 - `tcdb_assignment_count` is the KG's count of the gene's gated TCDB targets (`tcdb_gate` direct or annotated), minus any target that is an ancestor of another; most are systems or subfamilies, not families. It equals the TCDB row count of `gene_ontology_terms(ontology=['tcdb'])` in default leaf mode. `has_tcdb` counts genes with `tcdb_assignment_count > 0`.
 

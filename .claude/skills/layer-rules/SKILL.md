@@ -56,7 +56,9 @@ are plural (`locus_tags`, `publication_dois`); R4 a filter is named after the
 row field it filters (`metric_bucket`, `flag_value`). Shared params come from
 `mcp_server/params.py` — never re-describe `organism`, `limit`, `summary`,
 trust filters etc. inline. Python-API renames keep the old keyword one
-release via `api/_compat.deprecated_alias`; MCP schemas never carry aliases.
+release behind a `DeprecationWarning` shim, removed at the next breaking
+release (the alpha.5 shim module `api/_compat.py` was removed this way);
+MCP schemas never carry aliases.
 
 ## Layer 4: Skills (MCP resources)
 

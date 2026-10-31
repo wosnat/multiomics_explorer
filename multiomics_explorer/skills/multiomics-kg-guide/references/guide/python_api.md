@@ -263,9 +263,9 @@ rarely need it.
 
 Every API function accepts `conn: GraphConnection | None = None` as a
 **keyword-only** argument (`conn=conn`; passing it positionally raises
-`TypeError`). The one exception is `kg_release_info(conn)`, where `conn`
-is required and positional. When `conn=None` (the default), the function
-creates a fresh `GraphConnection` per call:
+`TypeError`), including `kg_release_info()` / `kg_release_info(conn=conn)`.
+When `conn=None` (the default), the function creates a fresh
+`GraphConnection` per call:
 
 ```python
 def _default_conn(conn: GraphConnection | None) -> GraphConnection:
