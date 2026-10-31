@@ -92,8 +92,8 @@ genes_by_function(search_text="photosystem")
     {"category": "Post-translational modification", "count": 352},
     ...
   ],
-  "score_max": 6.0226969718933105,
-  "score_median": 4.02415657043457,
+  "score_max": 6.025513648986816,
+  "score_median": 4.0308990478515625,
   "returned": 5,
   "offset": 0,
   "truncated": true,
@@ -106,7 +106,7 @@ genes_by_function(search_text="photosystem")
       "organism_name": "Synechococcus elongatus PCC 7942",
       "gene_category": "Unknown",
       "annotation_quality": 3,
-      "score": 6.0226969718933105
+      "score": 6.025513648986816
     },
     {
       "locus_tag": "M744_01545",
@@ -115,7 +115,7 @@ genes_by_function(search_text="photosystem")
       "organism_name": "Synechococcus elongatus UTEX 2973",
       "gene_category": "Unknown",
       "annotation_quality": 3,
-      "score": 6.0226969718933105
+      "score": 6.025513648986816
     },
     {
       "locus_tag": "SYNPCC7002_A0269",
@@ -124,7 +124,7 @@ genes_by_function(search_text="photosystem")
       "organism_name": "Synechococcus PCC 7002",
       "gene_category": "Unknown",
       "annotation_quality": 3,
-      "score": 6.0226969718933105
+      "score": 6.025513648986816
     },
     ...
   ]
@@ -164,8 +164,8 @@ genes_by_function(search_text="chaperone", summary=True)
     {"category": "Cell wall and membrane", "count": 91},
     ...
   ],
-  "score_max": 7.704065322875977,
-  "score_median": 4.191235542297363,
+  "score_max": 7.707810401916504,
+  "score_median": 4.2014923095703125,
   "returned": 0,
   "offset": 0,
   "truncated": true,

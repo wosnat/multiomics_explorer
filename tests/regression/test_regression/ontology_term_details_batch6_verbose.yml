@@ -307,6 +307,7 @@ results:
   properties:
     direct_gene_count: 1656
     direction: unknown
+    display_name: The ATP-binding Cassette (ABC) Superfamily
     gene_count: 9192
     id: tcdb:3.A.1
     level: 2

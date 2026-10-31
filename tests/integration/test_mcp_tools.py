@@ -3457,7 +3457,8 @@ class TestMetabolitesByFlagsAssayKG:
         # Only the dominant-form stereo warning (metabolite-identity-surface spec D).
         assert len(result["warnings"]) == 1
         # 21 → 23 2026-10-24T17:33Z: stereo_assignment now judged from the node's own ChEBI enantiomer links
-        assert result["warnings"][0].startswith("23 of 93 rows assume the dominant stereo form")
+        # 23 → 29 2026-10-31T12:27Z: KEGG-filed stereo rule + 6 msystems names
+        assert result["warnings"][0].startswith("29 of 93 rows assume the dominant stereo form")
 
     def test_msystems_top5_alphabetical_true(self, conn):
         """§7: top-5 detail rows are flag_value=true; expected names
@@ -4938,7 +4939,7 @@ class TestMetaboliteIdentitySurface:
             stereo_assignment=["dominant_form_assumed"], summary=True,
             conn=conn)
         assert {b["assay_id"]: b["count"] for b in out["by_assay"]} == {
-            a: 23 for a in _MIS_MSYSTEMS_FLAG_ASSAYS}  # 21 → 23 2026-10-24T17:33Z: stereo rule change
+            a: 29 for a in _MIS_MSYSTEMS_FLAG_ASSAYS}  # 21 → 23 2026-10-24T17:33Z: stereo rule change; 23 → 29 2026-10-31T12:27Z: KEGG-filed stereo rule + 6 msystems names
 
     def test_flags_by_stereo_assignment_sums_and_warns(self, conn):
         out = api.metabolites_by_flags_assay(
@@ -4947,7 +4948,7 @@ class TestMetaboliteIdentitySurface:
             == out["total_matching"]
         assert {b["stereo_assignment"]: b["count"]
                 for b in out["by_stereo_assignment"]} == {
-            "as_reported": 140, "dominant_form_assumed": 46}  # 2026-10-24T17:33Z: stereo rule change
+            "as_reported": 128, "dominant_form_assumed": 58}  # 2026-10-24T17:33Z: stereo rule change; 140/46 → 128/58 2026-10-31T12:27Z: KEGG-filed stereo rule + 6 msystems names
         assert any("dominant stereo form" in w for w in out["warnings"])
 
     def test_quantifies_by_stereo_assignment_sums(self, conn):

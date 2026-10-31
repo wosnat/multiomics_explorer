@@ -264,7 +264,7 @@ rows:
   n_replicates: 1
   name: 5^-Methylthioadenosine
   organism_name: Prochlorococcus MIT9301
-  stereo_assignment: as_reported
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -360,7 +360,7 @@ rows:
   n_replicates: 1
   name: N-Acetyl-L-glutamate
   organism_name: Prochlorococcus MIT9301
-  stereo_assignment: as_reported
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -396,7 +396,7 @@ rows:
   n_replicates: 1
   name: Pantothenate
   organism_name: Prochlorococcus MIT9301
-  stereo_assignment: as_reported
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -576,7 +576,7 @@ rows:
   n_replicates: 1
   name: Glutathione disulfide
   organism_name: Prochlorococcus MIT9301
-  stereo_assignment: as_reported
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -960,7 +960,7 @@ rows:
   n_replicates: 1
   name: N-Acetylmuramate
   organism_name: Prochlorococcus MIT9301
-  stereo_assignment: as_reported
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''
@@ -1092,7 +1092,7 @@ rows:
   n_replicates: 1
   name: (R)-2,3-Dihydroxypropane-1-sulfonate
   organism_name: Prochlorococcus MIT9301
-  stereo_assignment: as_reported
+  stereo_assignment: dominant_form_assumed
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
   condition_label: ''

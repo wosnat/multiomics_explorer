@@ -55,8 +55,8 @@ examples:
         "total_matching": 93,
         "by_value": [{"flag_value": false, "count": 58}, {"flag_value": true, "count": 35}],
         "by_stereo_assignment": [
-          {"stereo_assignment": "as_reported", "count": 70},
-          {"stereo_assignment": "dominant_form_assumed", "count": 23}
+          {"stereo_assignment": "as_reported", "count": 64},
+          {"stereo_assignment": "dominant_form_assumed", "count": 29}
         ],
         "by_assay": [
           {
@@ -74,7 +74,7 @@ examples:
         ],
         "excluded_assays": [],
         "warnings": [
-          "23 of 93 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on L-Alanine); filter ..."
+          "29 of 93 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on L-Alanine); filter ..."
         ],
         "resolved_aliases": {},
         "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_doi": []},
@@ -122,21 +122,21 @@ examples:
     response: |
       {
         "results": [],
-        "total_matching": 70,
-        "by_value": [{"flag_value": false, "count": 49}, {"flag_value": true, "count": 21}],
-        "by_stereo_assignment": [{"stereo_assignment": "as_reported", "count": 70}],
+        "total_matching": 64,
+        "by_value": [{"flag_value": false, "count": 46}, {"flag_value": true, "count": 18}],
+        "by_stereo_assignment": [{"stereo_assignment": "as_reported", "count": 64}],
         "by_assay": [
           {
             "assay_id": "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular",
-            "count": 70
+            "count": 64
           }
         ],
-        "by_compartment": [{"compartment": "whole_cell", "count": 70}],
-        "by_organism": [{"organism_name": "Prochlorococcus MIT9301", "count": 70}],
+        "by_compartment": [{"compartment": "whole_cell", "count": 64}],
+        "by_organism": [{"organism_name": "Prochlorococcus MIT9301", "count": 64}],
         "by_metric": [
           {
             "assay_id": "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular",
-            "count": 70
+            "count": 64
           }
         ],
         "excluded_assays": [],

@@ -8,8 +8,8 @@ rows:
   by_organism:
   - '{''count'': 93, ''item'': ''Prochlorococcus MIT9301''}'
   by_stereo_assignment:
-  - '{''count'': 23, ''item'': ''dominant_form_assumed''}'
-  - '{''count'': 70, ''item'': ''as_reported''}'
+  - '{''count'': 29, ''item'': ''dominant_form_assumed''}'
+  - '{''count'': 64, ''item'': ''as_reported''}'
   by_value:
   - '{''count'': 35, ''item'': True}'
   - '{''count'': 58, ''item'': False}'

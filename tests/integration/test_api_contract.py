@@ -1621,10 +1621,10 @@ class TestMetabolitesByFlagsAssayContract:
         # excluded_assays always [] on boolean arm (§5.3).
         assert validated.excluded_assays == []
         # warnings carries only the dominant-form stereo warning (metabolite-
-        # identity-surface spec D): 23 of the 93 msystems presence-flag rows
-        # (21 → 23 2026-10-24T17:33Z: stereo rule change).
+        # identity-surface spec D): 29 of the 93 msystems presence-flag rows
+        # (21 → 23 2026-10-24T17:33Z: stereo rule change; 23 → 29 2026-10-31T12:27Z: KEGG-filed stereo rule + 6 msystems names).
         assert len(validated.warnings) == 1
-        assert validated.warnings[0].startswith("23 of 93 rows assume the dominant stereo form")
+        assert validated.warnings[0].startswith("29 of 93 rows assume the dominant stereo form")
         # Detail rows surface flag_value as Python bool.
         for r in validated.results:
             assert isinstance(r.flag_value, bool)

@@ -35,6 +35,8 @@ rows:
   - '[pfam] FtsH_ext: FtsH Extracellular'
   - '[pfam] Peptidase_M41: Peptidase family M41'
   - '[protein_family] AAA ATPase family; Peptidase M41 family; AAA ATPase family'
+  - '[tcdb_best_hit] ATP-dependent zinc metaloprotease, FtsH of 644 aas and 2 TMSs.
+    [3.A.29.1.5]'
   - '[tigr_role] Cellular processes / Cell division'
   - '[tigr_role_inferred] Protein fate / Degradation of proteins, peptides, and glycopeptides'
   - '[uniprot] Acts as a processive, ATP-dependent zinc metallopeptidase for both

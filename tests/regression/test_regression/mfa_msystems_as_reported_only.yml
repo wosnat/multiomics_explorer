@@ -1,5 +1,5 @@
 case_id: mfa_msystems_as_reported_only
-row_count: 70
+row_count: 64
 rows:
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
   compartment: whole_cell
@@ -137,18 +137,6 @@ rows:
   compartment: whole_cell
   condition_label: ''
   flag_value: true
-  kegg_compound_id: C00170
-  metabolite_id: kegg.compound:C00170
-  metric_type: presence_flag_intracellular
-  n_positive: 1
-  n_replicates: 1
-  name: 5^-Methylthioadenosine
-  organism_name: Prochlorococcus MIT9301
-  stereo_assignment: as_reported
-- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
-  compartment: whole_cell
-  condition_label: ''
-  flag_value: true
   kegg_compound_id: C00233
   metabolite_id: kegg.compound:C00233
   metric_type: presence_flag_intracellular
@@ -197,36 +185,12 @@ rows:
   compartment: whole_cell
   condition_label: ''
   flag_value: true
-  kegg_compound_id: C00624
-  metabolite_id: kegg.compound:C00624
-  metric_type: presence_flag_intracellular
-  n_positive: 1
-  n_replicates: 1
-  name: N-Acetyl-L-glutamate
-  organism_name: Prochlorococcus MIT9301
-  stereo_assignment: as_reported
-- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
-  compartment: whole_cell
-  condition_label: ''
-  flag_value: true
   kegg_compound_id: C00719
   metabolite_id: kegg.compound:C00719
   metric_type: presence_flag_intracellular
   n_positive: 1
   n_replicates: 1
   name: Betaine
-  organism_name: Prochlorococcus MIT9301
-  stereo_assignment: as_reported
-- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
-  compartment: whole_cell
-  condition_label: ''
-  flag_value: true
-  kegg_compound_id: C00864
-  metabolite_id: kegg.compound:C00864
-  metric_type: presence_flag_intracellular
-  n_positive: 1
-  n_replicates: 1
-  name: Pantothenate
   organism_name: Prochlorococcus MIT9301
   stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
@@ -335,18 +299,6 @@ rows:
   n_positive: 0
   n_replicates: 1
   name: Fumarate
-  organism_name: Prochlorococcus MIT9301
-  stereo_assignment: as_reported
-- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
-  compartment: whole_cell
-  condition_label: ''
-  flag_value: false
-  kegg_compound_id: C00127
-  metabolite_id: kegg.compound:C00127
-  metric_type: presence_flag_intracellular
-  n_positive: 0
-  n_replicates: 1
-  name: Glutathione disulfide
   organism_name: Prochlorococcus MIT9301
   stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
@@ -677,18 +629,6 @@ rows:
   compartment: whole_cell
   condition_label: ''
   flag_value: false
-  kegg_compound_id: C02713
-  metabolite_id: kegg.compound:C02713
-  metric_type: presence_flag_intracellular
-  n_positive: 0
-  n_replicates: 1
-  name: N-Acetylmuramate
-  organism_name: Prochlorococcus MIT9301
-  stereo_assignment: as_reported
-- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
-  compartment: whole_cell
-  condition_label: ''
-  flag_value: false
   kegg_compound_id: C02823
   metabolite_id: kegg.compound:C02823
   metric_type: presence_flag_intracellular
@@ -803,18 +743,6 @@ rows:
   n_positive: 0
   n_replicates: 1
   name: Syringic acid
-  organism_name: Prochlorococcus MIT9301
-  stereo_assignment: as_reported
-- assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
-  compartment: whole_cell
-  condition_label: ''
-  flag_value: false
-  kegg_compound_id: C19675
-  metabolite_id: kegg.compound:C19675
-  metric_type: presence_flag_intracellular
-  n_positive: 0
-  n_replicates: 1
-  name: (R)-2,3-Dihydroxypropane-1-sulfonate
   organism_name: Prochlorococcus MIT9301
   stereo_assignment: as_reported
 - assay_id: metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular
