@@ -65,6 +65,10 @@ LINT_PATTERN = re.compile(
     # {'tcdb': ['sources','evidence','evidence_score','tier']}.
     r"|['\"]tcdb['\"]:\s*\[[^\]]*['\"]evidence_score['\"]"
     r"|(?i:\brank_prop\b[^\n]{0,60}\btcdb\b|\btcdb\b[^\n]{0,60}\brank_prop\b)"
+    # TCDB names are shown as display_name, which never falls back to the
+    # bare TCID. Source violation: the GbmTopTcdbFamily / MbgTopTcdbFamily
+    # tcdb_family_name descriptions ("falls back to the `tcdb_id` value").
+    r"|\bfalls? back to (?:the )?`?tcdb_id\b"
 )
 
 # Path-scoped stale-language patterns: keyed by file name, applied only to

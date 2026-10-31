@@ -1218,3 +1218,6 @@ mistakes:
     untouched. Set while `evidence_sources` excludes `go_transport`, they are
     ignored with a warning. Use `go_namespace=['molecular_function']` for "is this
     gene a transporter".
+  - >-
+    A row with `metabolite_structure_kind='generic'` names a compound class (e.g. fatty
+    acid, peptide), not one molecule — read it as "some member of this class".

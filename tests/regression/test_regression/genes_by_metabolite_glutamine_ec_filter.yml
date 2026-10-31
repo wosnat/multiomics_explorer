@@ -51,6 +51,7 @@ results:
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
   metabolite_name: L-Glutamine
+  metabolite_structure_kind: defined
   product: glutamine synthetase, type I
   reaction_id: kegg.reaction:R00253
   reaction_name: L-glutamate:ammonia ligase (ADP-forming); ATP + L-Glutamate + Ammonia

@@ -5794,3 +5794,55 @@ class TestGoTransportPassThroughs:
         assert rels["Molecular_function_transports_metabolite"][
             "description"].startswith("GO defines this molecular-function term")
         assert "Tcdb_family_transports_chemical_role" in rels
+
+
+@pytest.mark.kg
+class TestTcdbDisplayNameAndStructureKind:
+    """TCDB names shown as display_name; gene↔metabolite rows carry
+    metabolite_structure_kind (spec tcdb-display-name-and-structure-kind)."""
+
+    _MED4 = "Prochlorococcus MED4"
+
+    def test_gene_ontology_terms_unnamed_subfamily_reads_borrowed_name(self, conn):
+        out = api.gene_ontology_terms(
+            ["PMM0010"], organism=self._MED4, ontology="tcdb", conn=conn)
+        names = {r["term_id"]: r["term_name"] for r in out["results"]}
+        assert names["tcdb:3.A.5.7"] == (
+            "The General Secretory Pathway (Sec) Family — subfamily 3.A.5.7")
+        # No TCDB row shows a bare TCID as its name.
+        assert all(n != tid.removeprefix("tcdb:") for tid, n in names.items())
+
+    def test_genes_by_ontology_rows_use_display_name(self, conn):
+        out = api.genes_by_ontology(
+            ontology="tcdb", organism=self._MED4, term_ids=["tcdb:3.A.5.7"],
+            min_gene_set_size=1, conn=conn)
+        assert out["results"]
+        assert {r["term_name"] for r in out["results"]
+                if r["term_id"] == "tcdb:3.A.5.7"} == {
+            "The General Secretory Pathway (Sec) Family — subfamily 3.A.5.7"}
+
+    def test_ontology_term_details_children_use_display_name(self, conn):
+        out = api.ontology_term_details(["tcdb:3.A.5"], conn=conn)
+        row = out["results"][0]
+        assert row["name"] == "The General Secretory Pathway (Sec) Family"
+        assert row["children"]
+        assert all(not c["name"].startswith(c["id"].removeprefix("tcdb:"))
+                   for c in row["children"])
+
+    def test_non_tcdb_names_unchanged(self, conn):
+        out = api.ontology_term_details(["go:0006260"], conn=conn)
+        assert out["results"][0]["name"] == "DNA replication"
+
+    def test_genes_by_metabolite_rows_carry_structure_kind(self, conn):
+        # Peptide (C00012) is a TCDB class substrate; Urea (C00086) a molecule.
+        out = api.genes_by_metabolite(
+            ["kegg.compound:C00012", "kegg.compound:C00086"],
+            organism=self._MED4, conn=conn)
+        kinds = {r["metabolite_id"]: r.get("metabolite_structure_kind")
+                 for r in out["results"]}
+        assert kinds.get("kegg.compound:C00086") == "defined"
+        assert kinds.get("kegg.compound:C00012") == "generic"
+        assert all(r.get("metabolite_structure_kind") in
+                   {"defined", "generic", "polymer"}
+                   for r in out["results"]
+                   if r.get("target_kind") != "chemical_role")

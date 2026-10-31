@@ -522,3 +522,13 @@ def test_lint_catches_tcdb_rank_prop(lint_mod, tmp_path):
     clean = tmp_path / "c.md"
     clean.write_text("MEROPS ranks by `rank_prop` = confidence_score.\n")
     assert lint_mod.lint_about_content([clean]) == []
+
+
+def test_lint_catches_tcdb_id_name_fallback(lint_mod, tmp_path):
+    md = tmp_path / "t.md"
+    md.write_text(
+        "for tc_subfamily / tc_system it falls back to the `tcdb_id` value.\n"
+        "The display name is the nearest named ancestor's name.\n")
+    vs = lint_mod.lint_about_content([md])
+    assert len(vs) == 1
+    assert vs[0][1] == 1

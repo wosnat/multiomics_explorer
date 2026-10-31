@@ -85,6 +85,7 @@ results:
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
   metabolite_name: L-Glutamine
+  metabolite_structure_kind: defined
   product: carbamoyl-phosphate synthase, large subunit
   reaction_id: kegg.reaction:R00256
   reaction_name: L-glutamine amidohydrolase; L-Glutamine + H2O <=> L-Glutamate + Ammonia
@@ -116,6 +117,7 @@ results:
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
   metabolite_name: L-Glutamine
+  metabolite_structure_kind: defined
   product: glutamine synthetase, type I
   reaction_id: kegg.reaction:R00253
   reaction_name: L-glutamate:ammonia ligase (ADP-forming); ATP + L-Glutamate + Ammonia
@@ -162,6 +164,7 @@ results:
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
   metabolite_name: L-Glutamine
+  metabolite_structure_kind: defined
   product: carbamoyl-phosphate synthase small subunit
   reaction_id: kegg.reaction:R00256
   reaction_name: L-glutamine amidohydrolase; L-Glutamine + H2O <=> L-Glutamate + Ammonia
@@ -193,6 +196,7 @@ results:
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
   metabolite_name: L-Glutamine
+  metabolite_structure_kind: defined
   product: NAD+ synthase (glutamine-hydrolysing)
   reaction_id: kegg.reaction:R00257
   reaction_name: deamido-NAD+:L-glutamine amido-ligase (AMP-forming); ATP + Deamino-NAD+
@@ -225,6 +229,7 @@ results:
   metabolite_id: kegg.compound:C00064
   metabolite_mass: 146.146
   metabolite_name: L-Glutamine
+  metabolite_structure_kind: defined
   product: ferredoxin-dependent glutamate synthase
   reaction_id: kegg.reaction:R00021
   reaction_name: L-glutamate:ferredoxin oxidoreductase (transaminating); 2 L-Glutamate

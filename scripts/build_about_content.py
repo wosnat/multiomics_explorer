@@ -855,6 +855,7 @@ _NODE_PROP_NOTES = {
     "id": "term ID as used in `term_ids=[...]` (self-prefixed CURIE)",
     "preferred_id": "same value as `id`",
     "name": "term name (what `search_ontology` indexes)",
+    "display_name": "name shown on rows: `name`, or for an unnamed TCDB node '<nearest named ancestor> — subfamily / system <id>'; not indexed by search",
     "description": "longer free text (verbose on `search_ontology`; compact on `ontology_term_details`)",
     "level": "hierarchy depth, 0 = root / broadest",
     "level_kind": "what a level means in this ontology (e.g. `tc_family`, `pathway`) — read values via `list_filter_values`",

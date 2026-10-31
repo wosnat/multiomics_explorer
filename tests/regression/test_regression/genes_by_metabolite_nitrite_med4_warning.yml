@@ -52,6 +52,7 @@ results:
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005
   metabolite_name: Nitrite
+  metabolite_structure_kind: defined
   product: cyanate ABC transporter, substrate-binding protein
   reaction_id: null
   reaction_name: null
@@ -85,6 +86,7 @@ results:
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005
   metabolite_name: Nitrite
+  metabolite_structure_kind: defined
   product: cyanate ABC transporter, substrate-binding protein
   reaction_id: null
   reaction_name: null
@@ -117,6 +119,7 @@ results:
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005
   metabolite_name: Nitrite
+  metabolite_structure_kind: defined
   product: cyanate ABC transporter, permease protein
   reaction_id: null
   reaction_name: null
@@ -149,6 +152,7 @@ results:
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005
   metabolite_name: Nitrite
+  metabolite_structure_kind: defined
   product: cyanate ABC transporter, permease protein
   reaction_id: null
   reaction_name: null
@@ -180,6 +184,7 @@ results:
   metabolite_id: kegg.compound:C00088
   metabolite_mass: 46.005
   metabolite_name: Nitrite
+  metabolite_structure_kind: defined
   product: cyanate ABC transporter ATP-binding protein
   reaction_id: null
   reaction_name: null

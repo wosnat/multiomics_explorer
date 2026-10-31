@@ -61,6 +61,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: urease alpha subunit
   reaction_id: kegg.reaction:R00131
   reaction_name: urea amidohydrolase; Urea + H2O <=> CO2 + 2 Ammonia
@@ -92,6 +93,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: urease beta subunit
   reaction_id: kegg.reaction:R00131
   reaction_name: urea amidohydrolase; Urea + H2O <=> CO2 + 2 Ammonia
@@ -123,6 +125,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: urease gamma subunit
   reaction_id: kegg.reaction:R00131
   reaction_name: urea amidohydrolase; Urea + H2O <=> CO2 + 2 Ammonia
@@ -153,6 +156,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: ABC-type urea transporter, ATPase component UrtE
   reaction_id: null
   reaction_name: null
@@ -187,6 +191,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: agmatinase
   reaction_id: kegg.reaction:R01157
   reaction_name: agmatine amidinohydrolase; Agmatine + H2O <=> Putrescine + Urea

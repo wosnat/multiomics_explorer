@@ -112,6 +112,15 @@ pitfalls: |
     most nodes read `unknown`.
   - `tcdb_substrate_count` is TCDB's curated range for the node, not what
     any particular gene moves.
+  - Names shown on rows are display names. TCDB leaves many subfamilies and
+    some systems unnamed; those read "<nearest named ancestor> — subfamily
+    <id>" or "— system <id>", and do not inherit that ancestor's
+    `direction`. Search matches TCDB's own names only: a borrowed suffix
+    such as "— subfamily 3.A.1.118" is not searchable. Find the family by its
+    own name (quote multi-word phrases: `'"ABC Superfamily"'`) or by id with
+    `ontology_term_details(['tcdb:3.A.1'])`;
+    `genes_by_ontology(term_ids=['tcdb:3.A.1'])` expands down to its unnamed
+    subfamilies.
 
 typical_questions:
   - "Which ABC-transporter subfamilies does MED4 carry, and how is each call supported? — `genes_by_ontology(ontology='tcdb', organism='MED4', term_ids=['tcdb:3.A.1'], level=3, verbose=True)`"

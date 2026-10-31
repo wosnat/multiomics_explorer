@@ -100,6 +100,7 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 | `direct_gene_count` | int | genes attached to this exact node (not descendants); absent where it would be vacuous |
 | `direction` | string | `uptake` / `export` / `unknown`, conservative: set only by ABC uptake numbering (3.A.1.1-99 subfamilies and their systems) or a `tc_system`'s own name; family and subfamily names never set it — node-level, not a per-gene call |
 | `direction_basis` | string | sparse: which rule set `direction` (`abc_numbering`: uptake only / `tcdb_name`: systems only) |
+| `display_name` | string | name shown on rows: `name`, or for an unnamed TCDB node '<nearest named ancestor> — subfamily / system <id>'; not indexed by search |
 | `gene_count` | int | genes annotated to the term — subtree-inclusive on hierarchical labels, direct on flat ones |
 | `id` | string | term ID as used in `term_ids=[...]` (self-prefixed CURIE) |
 | `level` | int | hierarchy depth, 0 = root / broadest |
@@ -183,6 +184,15 @@ superfamily behave as catch-alls by size; enrich at `level=2` (family) or
   most nodes read `unknown`.
 - `tcdb_substrate_count` is TCDB's curated range for the node, not what
   any particular gene moves.
+- Names shown on rows are display names. TCDB leaves many subfamilies and
+  some systems unnamed; those read "<nearest named ancestor> — subfamily
+  <id>" or "— system <id>", and do not inherit that ancestor's
+  `direction`. Search matches TCDB's own names only: a borrowed suffix
+  such as "— subfamily 3.A.1.118" is not searchable. Find the family by its
+  own name (quote multi-word phrases: `'"ABC Superfamily"'`) or by id with
+  `ontology_term_details(['tcdb:3.A.1'])`;
+  `genes_by_ontology(term_ids=['tcdb:3.A.1'])` expands down to its unnamed
+  subfamilies.
 
 ## Typical questions
 

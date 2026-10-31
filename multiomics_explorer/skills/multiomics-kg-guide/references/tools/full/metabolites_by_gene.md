@@ -92,7 +92,7 @@ total_matching, returned, offset, truncated, warnings, stereo_relatives, resolve
 | ec_numbers | list[string] \| None (optional) | EC classification(s) for this reaction. Empty list on reactions without an EC annotation. None on transport rows. |
 | mass_balance | string ('balanced', 'unbalanced') \| None (optional) | Reaction mass-balance status. None on transport rows. |
 | tcdb_family_id | string \| None (optional) | Full prefixed TcdbFamily ID (e.g. 'tcdb:3.A.1.4.5'). Transport rows only. |
-| tcdb_family_name | string \| None (optional) | Name of `tcdb_family_id` (the system on direct rows, the attached family / subfamily on family rows), e.g. 'High affinity phosphate-specific transporter, PstABCS'. Transport rows only. |
+| tcdb_family_name | string \| None (optional) | TCDB name of `tcdb_family_id`; for a subfamily or system TCDB left unnamed, the nearest named ancestor's name plus '— subfamily <id>' / '— system <id>'. Transport rows only. |
 | go_term_id | string \| None (optional) | GO route rows only. The gene's own GO term (e.g. 'go:0015891'). A term definition, not a gene fact: the term names the target; the gene is annotated to the term. |
 | go_term_name | string \| None (optional) | Name of `go_term_id` (e.g. 'siderophore transport'). GO route rows only. |
 | go_namespace | string ('molecular_function', 'biological_process') \| None (optional) | GO route rows only. Namespace of the term. BP terms are broader than MF ones (a process, not a specific activity). |
@@ -107,6 +107,7 @@ total_matching, returned, offset, truncated, warnings, stereo_relatives, resolve
 | metabolite_formula | string \| None (optional) | Hill-notation formula; null on a minority of metabolites (transport-only ChEBI generics). |
 | metabolite_mass | float \| None (optional) | Monoisotopic mass (Da); null on a minority of metabolites. |
 | metabolite_chebi_id | string \| None (optional) | ChEBI numeric ID; populated on most metabolites. |
+| metabolite_structure_kind | string ('defined', 'generic', 'polymer') \| None (optional) | 'defined' (one molecule), 'generic' (a compound class, e.g. 'Peptide', 'Fatty acid') or 'polymer'. Null on chemical-role targets. |
 | via_stereo_form_of | string \| None (optional) | genes_by_metabolite with include_stereo_forms=True: the input id this row's metabolite is a stereo form of (e.g. 'kegg.compound:C00736'). Absent on rows for inputs. |
 | stereo_relative_ids | list[string] \| None (optional) | metabolites_by_gene: stereo forms of this row's metabolite with genes in this organism (e.g. ['kegg.compound:C00097']); counts in envelope stereo_relatives. Absent when none. |
 | go_chebi_ids | list[string] \| None (optional) | ChEBI ids carried by the GO term (e.g. ['CHEBI:26672']). Verbose, GO route rows only. |
@@ -1207,6 +1208,8 @@ passed. Exclude-wins-on-overlap is computed on the canonical IDs, so currency-co
 - A multi-source pair is corroborated, not proven. `by_evidence_source_combination`, `by_gene[].multi_source_metabolite_count` and `top_metabolites[].multi_source_gene_count` count the (gene, metabolite) pairs that two or more routes name, but the routes share homology (InterPro2GO and eggNOG vs the TCDB calls), so agreement raises confidence without being independent confirmation. A single-source pair is not wrong.
 
 - `go_namespace` and `go_evidence` narrow the GO arm only; KEGG and TCDB rows are untouched. Set while `evidence_sources` excludes `go_transport`, they are ignored with a warning. Use `go_namespace=['molecular_function']` for "is this gene a transporter".
+
+- A row with `metabolite_structure_kind='generic'` names a compound class (e.g. fatty acid, peptide), not one molecule — read it as "some member of this class".
 
 ## Package import equivalent
 

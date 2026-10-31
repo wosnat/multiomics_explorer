@@ -264,3 +264,9 @@ MED4 urtA (PMM0970): `[tcdb_best_hit] The high-affinity (<1 μM) urea porter [3.
 ## Explorer absorbed (2026-10-31)
 
 Build `2026-10-31T12:27:06.047Z` absorbed on explorer branch `absorb-rebuild-2026-10-31-1227` (E3 done): 17 goldens, 4 pins, 6 example responses; every diff traced to §1–§3, no shape change beyond `display_name` in verbose TCDB `properties`. The E1 / E2 / E4 explorer work is backlog 2c.20–2c.23.
+
+## Explorer correction to E2 (2026-10-31)
+
+After discussion, the explorer shows `display_name` in place of `name` on TCDB rows (`term_name`,
+`tcdb_family_name`, term-detail names) rather than adding a second name field. `name = tcdb_id`
+remains the KG's unnamed test. Nothing is needed KG-side.

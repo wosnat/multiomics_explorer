@@ -14650,3 +14650,147 @@ class TestTcdbCleanupReviewFixes:
             row = _row_model(tool_fns, tool_name)
             tdesc = row.model_fields["tier"].description or ""
             assert "identity band" in tdesc and "eggnog" in tdesc, tdesc
+
+
+# ===========================================================================
+# TCDB display names + metabolite structure_kind (RED) —
+# docs/tool-specs/tcdb-display-name-and-structure-kind.md (2c.20 / 2c.21)
+# ===========================================================================
+
+_DN_SUBFAMILY_NAME = (
+    "The ATP-binding Cassette (ABC) Superfamily — subfamily 3.A.1.118")
+
+
+def _dn_api_return(base):
+    """Sample api return with structure_kind on rows + a chemical-role row."""
+    metab, trans = (dict(r) for r in base["results"])
+    metab["metabolite_structure_kind"] = "defined"
+    trans["metabolite_structure_kind"] = "generic"
+    trans["tcdb_family_name"] = _DN_SUBFAMILY_NAME
+    role = {**trans, "locus_tag": "PMM0711",
+            "metabolite_id": "chebi.role:33281",
+            "metabolite_name": "antimicrobial agent",
+            "target_kind": "chemical_role",
+            "metabolite_structure_kind": None}
+    for k in ("metabolite_formula", "metabolite_mass", "metabolite_chebi_id"):
+        role.pop(k, None)
+    return {**base, "returned": 3, "results": [metab, trans, role]}
+
+
+class TestGeneReactionMetaboliteTripletStructureKind:
+    """D2 Pydantic: `metabolite_structure_kind` on the shared gbm/mbg row."""
+
+    def _model(self):
+        from multiomics_explorer.mcp_server.tools import (
+            GeneReactionMetaboliteTriplet,
+        )
+        return GeneReactionMetaboliteTriplet
+
+    def test_field_exists_default_none(self):
+        f = self._model().model_fields["metabolite_structure_kind"]
+        assert f.default is None
+
+    def test_field_follows_chebi_id(self):
+        names = list(self._model().model_fields)
+        assert names.index("metabolite_structure_kind") == (
+            names.index("metabolite_chebi_id") + 1)
+
+    @pytest.mark.parametrize("value", ["defined", "generic", "polymer", None])
+    def test_accepts_allowed_values_and_null(self, value):
+        row = {**_GBM_TRANS_ROW, "metabolite_structure_kind": value}
+        m = self._model()(**row)
+        assert m.metabolite_structure_kind == value
+
+    def test_rejects_unknown_value(self):
+        from pydantic import ValidationError
+        with pytest.raises(ValidationError):
+            self._model()(**{**_GBM_TRANS_ROW,
+                             "metabolite_structure_kind": "molecule"})
+
+    def test_description_explains_generic_and_role_null(self):
+        desc = self._model().model_fields[
+            "metabolite_structure_kind"].description or ""
+        for s in ("defined", "generic", "polymer", "chemical-role"):
+            assert s in desc, s
+
+    def test_serialized_when_set(self):
+        m = self._model()(**{**_GBM_TRANS_ROW,
+                             "metabolite_structure_kind": "generic"})
+        assert m.model_dump()["metabolite_structure_kind"] == "generic"
+
+
+class TestGenesByMetaboliteStructureKindWrapper:
+    """D2: the genes_by_metabolite wrapper surfaces the column on rows."""
+
+    @pytest.mark.asyncio
+    async def test_rows_carry_structure_kind(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=_dn_api_return(_GBM_SAMPLE_API_RETURN),
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx, metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+        by_lt = {r.locus_tag: r for r in result.results}
+        assert by_lt["PMM0944"].metabolite_structure_kind == "defined"
+        assert by_lt["PMM0974"].metabolite_structure_kind == "generic"
+        assert by_lt["PMM0711"].metabolite_structure_kind is None
+        dumped = by_lt["PMM0974"].model_dump()
+        assert dumped["metabolite_structure_kind"] == "generic"
+
+    @pytest.mark.asyncio
+    async def test_tcdb_family_display_name_surfaces(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_metabolite",
+            return_value=_dn_api_return(_GBM_SAMPLE_API_RETURN),
+        ):
+            result = await tool_fns["genes_by_metabolite"](
+                mock_ctx, metabolite_ids=["kegg.compound:C00086"],
+                organism="Prochlorococcus MED4",
+            )
+        trans = next(r for r in result.results if r.locus_tag == "PMM0974")
+        assert trans.tcdb_family_name == _DN_SUBFAMILY_NAME
+
+
+class TestMetabolitesByGeneStructureKindWrapper:
+    """D2: the metabolites_by_gene wrapper surfaces the column on rows."""
+
+    @pytest.mark.asyncio
+    async def test_rows_carry_structure_kind(self, tool_fns, mock_ctx):
+        api_ret = _dn_api_return(_MBG_SAMPLE_API_RETURN)
+        with patch(
+            "multiomics_explorer.api.functions.metabolites_by_gene",
+            return_value=api_ret,
+        ):
+            result = await tool_fns["metabolites_by_gene"](
+                mock_ctx,
+                locus_tags=[r["locus_tag"] for r in api_ret["results"]],
+                organism="Prochlorococcus MED4",
+            )
+        kinds = {r.locus_tag: r.metabolite_structure_kind
+                 for r in result.results}
+        assert sorted(k for k in kinds.values() if k) == ["defined", "generic"]
+        assert kinds["PMM0711"] is None
+
+
+class TestTcdbFamilyNameDescriptions:
+    """D3: TCDB name descriptions describe the display name, not a tcdb_id
+    fallback."""
+
+    @pytest.mark.parametrize("model_name", ["GbmTopTcdbFamily", "MbgTopTcdbFamily"])
+    def test_top_tcdb_family_name_description(self, model_name):
+        import multiomics_explorer.mcp_server.tools as t
+        desc = getattr(t, model_name).model_fields[
+            "tcdb_family_name"].description or ""
+        assert "falls back to the `tcdb_id`" not in desc
+        assert "nearest named ancestor" in desc
+        assert "subfamily" in desc and "system" in desc
+
+    def test_row_tcdb_family_name_description(self):
+        from multiomics_explorer.mcp_server.tools import (
+            GeneReactionMetaboliteTriplet,
+        )
+        desc = GeneReactionMetaboliteTriplet.model_fields[
+            "tcdb_family_name"].description or ""
+        assert "nearest named ancestor" in desc

@@ -185,6 +185,9 @@ ONTOLOGY_CONFIG = {
         "gene_rel": "Gene_has_tcdb_family",
         "hierarchy_rels": ["Tcdb_family_is_a_tcdb_family"],
         "fulltext_index": "tcdbFamilyFullText",
+        # Name shown for a term: unnamed subfamilies / systems carry
+        # "<named ancestor> — subfamily <id>" here (see _term_name_cypher).
+        "display_name_prop": "display_name",
         # KG 3a: one edge per (gene, node, tcdb_call); no evidence_score.
         "trust": {"sources": "sources", "evidence": "evidence", "tier": "tier"},
         # Representative edge of a (gene, node) pair (G2): ordered
@@ -408,6 +411,20 @@ def _ontology_cfg(ontology: str) -> dict:
             f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
         )
     return ONTOLOGY_CONFIG[ontology]
+
+
+def _term_name_cypher(cfg: dict, var: str = "t") -> str:
+    """Cypher for a term's display name.
+
+    `coalesce(<var>.<display_name_prop>, <var>.name)` when the ontology
+    declares a `display_name_prop` (TCDB), else plain `<var>.name`.
+    `build_ontology_term_details` is the one exception: its batch mixes
+    ontologies in a single query, so it writes the coalesce directly.
+    """
+    prop = cfg.get("display_name_prop")
+    if prop:
+        return f"coalesce({var}.{prop}, {var}.name)"
+    return f"{var}.name"
 
 
 def ontology_trust_axes(ontology: str) -> list[str]:
@@ -1418,7 +1435,7 @@ def _tcdb_transport_return(
         "       null AS ec_numbers,\n"
         "       null AS mass_balance,\n"
         "       tf.id AS tcdb_family_id,\n"
-        "       tf.name AS tcdb_family_name,\n"
+        "       coalesce(tf.display_name, tf.name) AS tcdb_family_name,\n"
         "       tf.id AS attached_tcdb_id,\n"
         "       tf.direction AS tcdb_direction,\n"
         "       rep.identity AS tcdb_identity,\n"
@@ -1429,6 +1446,7 @@ def _tcdb_transport_return(
         "       m.formula AS metabolite_formula,\n"
         "       m.mass AS metabolite_mass,\n"
         "       m.chebi_id AS metabolite_chebi_id,\n"
+        "       m.structure_kind AS metabolite_structure_kind,\n"
         f"{_GO_NULL_COLUMNS},\n"
         "       CASE WHEN m:ChemicalRole THEN 'chemical_role'"
         " ELSE 'metabolite' END AS target_kind"
@@ -1671,6 +1689,7 @@ def _go_transport_detail_return(verbose: bool) -> str:
         "       m.formula AS metabolite_formula,\n"
         "       m.mass AS metabolite_mass,\n"
         "       m.chebi_id AS metabolite_chebi_id,\n"
+        "       m.structure_kind AS metabolite_structure_kind,\n"
         "       go.id AS go_term_id,\n"
         "       go.name AS go_term_name,\n"
         "       CASE WHEN type(t) STARTS WITH 'Molecular_function'"
@@ -4277,6 +4296,7 @@ def build_search_ontology(
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
     facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
     cfg = ONTOLOGY_CONFIG[ontology]
+    term_name = _term_name_cypher(cfg)
     index_name = cfg["fulltext_index"]
     parent_index = cfg.get("parent_fulltext_index")
     browse = _is_browse(search_text)
@@ -4365,7 +4385,7 @@ def build_search_ontology(
             + where_clause
             + org_block
             + skip_clause + limit_clause + "\n"
-            "RETURN t.id AS id, t.name AS name, null AS score,\n"
+            f"RETURN t.id AS id, {term_name} AS name, null AS score,\n"
             "       t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
             "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
             + term_cols_flat
@@ -4396,7 +4416,7 @@ def build_search_ontology(
             "  YIELD node AS t, score\n"
             + where_clause
             + org_inner
-            + "  RETURN t.id AS id, t.name AS name, score,\n"
+            + f"  RETURN t.id AS id, {term_name} AS name, score,\n"
             "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
             "         coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
             + term_cols + inner_discusses + "\n"
@@ -4405,7 +4425,7 @@ def build_search_ontology(
             "  YIELD node AS t, score\n"
             + where_clause
             + org_inner
-            + "  RETURN t.id AS id, t.name AS name, score,\n"
+            + f"  RETURN t.id AS id, {term_name} AS name, score,\n"
             "         t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
             "         coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
             + term_cols + inner_discusses + "\n"
@@ -4420,7 +4440,7 @@ def build_search_ontology(
             "YIELD node AS t, score\n"
             + where_clause
             + org_flat
-            + "RETURN t.id AS id, t.name AS name, score,\n"
+            + f"RETURN t.id AS id, {term_name} AS name, score,\n"
             "       t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
             "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
             + term_cols_flat
@@ -4765,7 +4785,8 @@ def build_genes_by_ontology_detail(
     return_block = (
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.gene_category AS gene_category,\n"
-        "       t.id AS term_id, t.name AS term_name, t.level AS level,\n"
+        f"       t.id AS term_id, {_term_name_cypher(ONTOLOGY_CONFIG[ontology])} AS term_name,"
+        " t.level AS level,\n"
         "       t.tree AS tree, t.tree_code AS tree_code,\n"
         "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
         f"{verbose_cols}{edge_prop_cols}\n"
@@ -4991,22 +5012,24 @@ def build_ontology_term_details(
         "UNWIND $term_ids AS tid\n"
         f"OPTIONAL MATCH (t {{id: tid}}) WHERE {label_guard}\n"
         "WITH tid, t\n"
+        # Mixed-ontology batch, so no per-ontology `_term_name_cypher`: the
+        # coalesce falls back to `name` on every label without display_name.
         f"OPTIONAL MATCH (t)-[:{hier_union}]->(p)\n"
         "WITH tid, t, p ORDER BY p.id\n"
         "WITH tid, t,\n"
         "     [x IN collect(DISTINCT CASE WHEN p IS NULL THEN null\n"
-        "         ELSE {id: p.id, name: p.name, level: p.level} END)\n"
+        "         ELSE {id: p.id, name: coalesce(p.display_name, p.name), level: p.level} END)\n"
         "      WHERE x IS NOT NULL] AS parents\n"
         f"OPTIONAL MATCH (t)<-[:{hier_union}]-(c)\n"
         "WITH tid, t, parents, c ORDER BY c.id\n"
         "WITH tid, t, parents, count(DISTINCT c) AS children_total,\n"
         "     [x IN collect(DISTINCT CASE WHEN c IS NULL THEN null\n"
-        "         ELSE {id: c.id, name: c.name, level: c.level} END)\n"
+        "         ELSE {id: c.id, name: coalesce(c.display_name, c.name), level: c.level} END)\n"
         "      WHERE x IS NOT NULL][0..50] AS children\n"
         + bridge_block
         + gene_block
         + "RETURN tid AS term_id, t IS NULL AS not_found, labels(t) AS labels,\n"
-        "       t.name AS name, t.description AS description,\n"
+        "       coalesce(t.display_name, t.name) AS name, t.description AS description,\n"
         "       t.level AS level, t.level_kind AS level_kind,\n"
         "       CASE WHEN t IS NULL THEN null\n"
         "            ELSE coalesce(t.is_uninformative, '') <> 'true' END AS is_informative,\n"
@@ -5243,7 +5266,8 @@ def build_genes_by_ontology_per_term(
         "UNWIND term_genes AS g\n"
         "WITH t, collect({lt: g.locus_tag, "
         "cat: coalesce(g.gene_category, 'Unknown')}) AS gene_rows\n"
-        "RETURN t.id AS term_id, t.name AS term_name, t.level AS level,\n"
+        f"RETURN t.id AS term_id, {_term_name_cypher(ONTOLOGY_CONFIG[ontology])} AS term_name,"
+        " t.level AS level,\n"
         "       t.tree AS tree, t.tree_code AS tree_code,\n"
         "       t.level_is_best_effort IS NOT NULL AS best_effort,\n"
         "       size(gene_rows) AS n_genes,\n"
@@ -5449,6 +5473,7 @@ def build_gene_ontology_terms_summary(
         min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
     )
     cfg = ONTOLOGY_CONFIG[ontology]
+    term_name = _term_name_cypher(cfg)
     gene_rel = cfg["gene_rel"]
     label = cfg["label"]
 
@@ -5522,13 +5547,13 @@ def build_gene_ontology_terms_summary(
             f"{walk}"
             f"{facet_filter}"
             f"{informative_filter}"
-            "WITH g.locus_tag AS lt, collect(DISTINCT {id: t.id, name: t.name, level: t.level, tree: t.tree, tree_code: t.tree_code}) AS terms\n"
+            f"WITH g.locus_tag AS lt, collect(DISTINCT {{id: t.id, name: {term_name}, level: t.level, tree: t.tree, tree_code: t.tree_code}}) AS terms\n"
             "WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes\n"
             "WITH genes,\n"
             "     apoc.coll.flatten([g IN genes | g.terms]) AS all_terms,\n"
             "     [g IN genes | {locus_tag: g.lt, term_count: g.cnt}] AS gene_term_counts\n"
             "UNWIND all_terms AS t\n"
-            "WITH genes, gene_term_counts, t.id AS tid, t.name AS tname, t.level AS tlevel, t.tree AS ttree, t.tree_code AS ttree_code, count(*) AS cnt\n"
+            f"WITH genes, gene_term_counts, t.id AS tid, {term_name} AS tname, t.level AS tlevel, t.tree AS ttree, t.tree_code AS ttree_code, count(*) AS cnt\n"
             "WITH genes, gene_term_counts,\n"
             "     collect({term_id: tid, term_name: tname, level: tlevel, tree: ttree, tree_code: ttree_code, count: cnt}) AS by_term\n"
             "RETURN size(genes) AS gene_count,\n"
@@ -5580,13 +5605,13 @@ def build_gene_ontology_terms_summary(
             f"{level_filter}"
             f"{facet_filter}"
             f"{informative_filter}"
-            f"WITH g.locus_tag AS lt, collect({leaf_distinct}{{id: t.id, name: t.name, level: t.level, tree: t.tree, tree_code: t.tree_code}}) AS terms\n"
+            f"WITH g.locus_tag AS lt, collect({leaf_distinct}{{id: t.id, name: {term_name}, level: t.level, tree: t.tree, tree_code: t.tree_code}}) AS terms\n"
             "WITH collect({lt: lt, cnt: size(terms), terms: terms}) AS genes\n"
             "WITH genes,\n"
             "     apoc.coll.flatten([g IN genes | g.terms]) AS all_terms,\n"
             "     [g IN genes | {locus_tag: g.lt, term_count: g.cnt}] AS gene_term_counts\n"
             "UNWIND all_terms AS t\n"
-            "WITH genes, gene_term_counts, t.id AS tid, t.name AS tname, t.level AS tlevel, t.tree AS ttree, t.tree_code AS ttree_code, count(*) AS cnt\n"
+            f"WITH genes, gene_term_counts, t.id AS tid, {term_name} AS tname, t.level AS tlevel, t.tree AS ttree, t.tree_code AS ttree_code, count(*) AS cnt\n"
             "WITH genes, gene_term_counts,\n"
             "     collect({term_id: tid, term_name: tname, level: tlevel, tree: ttree, tree_code: ttree_code, count: cnt}) AS by_term\n"
             "RETURN size(genes) AS gene_count,\n"
@@ -5658,6 +5683,7 @@ def build_gene_ontology_terms(
         min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
     )
     cfg = ONTOLOGY_CONFIG[ontology]
+    term_name = _term_name_cypher(cfg)
     gene_rel = cfg["gene_rel"]
     label = cfg["label"]
 
@@ -5772,7 +5798,7 @@ def build_gene_ontology_terms(
             f"{informative_filter}"
             f"{rebind}"
             f"{row_head}"
-            f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
+            f"       {term_name} AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
             f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}{edge_prop_cols}\n"
             f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
         )
@@ -5824,7 +5850,7 @@ def build_gene_ontology_terms(
             f"{informative_filter}"
             f"{leaf_collapse}"
             "RETURN g.locus_tag AS locus_tag, t.id AS term_id,\n"
-            f"       t.name AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
+            f"       {term_name} AS term_name, t.level AS level, t.tree AS tree, t.tree_code AS tree_code,\n"
             f"       coalesce(t.is_uninformative, '') <> 'true' AS is_informative{verbose_cols}{edge_prop_cols}\n"
             f"ORDER BY g.locus_tag, t.id{skip_clause}{limit_clause}"
         )
@@ -8356,7 +8382,7 @@ def build_ontology_landscape(
     )
     verbose_agg = (
         ",\n"
-        "     collect({term_id:t.id, name:t.name, "
+        f"     collect({{term_id:t.id, name:{_term_name_cypher(ONTOLOGY_CONFIG[ontology])}, "
         "n_genes:n_g_per_term})[0..3] AS example_terms"
         if verbose else ""
     )
@@ -9961,7 +9987,8 @@ def build_genes_by_metabolite_metabolism(
     tcdb_substrate_system_count (all null), reaction_id,
     reaction_name, ec_numbers, mass_balance, tcdb_family_id (null),
     tcdb_family_name (null), metabolite_id, metabolite_name,
-    metabolite_formula, metabolite_mass, metabolite_chebi_id.
+    metabolite_formula, metabolite_mass, metabolite_chebi_id,
+    metabolite_structure_kind.
 
     Verbose adds: gene_category, metabolite_inchikey, metabolite_smiles,
     metabolite_mnxm_id, metabolite_hmdb_id, reaction_mnxr_id,
@@ -10023,6 +10050,7 @@ def build_genes_by_metabolite_metabolism(
         "       m.formula AS metabolite_formula,\n"
         "       m.mass AS metabolite_mass,\n"
         "       m.chebi_id AS metabolite_chebi_id,\n"
+        "       m.structure_kind AS metabolite_structure_kind,\n"
         f"{_GO_NULL_COLUMNS},\n"
         "       'metabolite' AS target_kind"
         f"{verbose_cols}\n"
@@ -10058,7 +10086,7 @@ def build_genes_by_metabolite_transport(
     (representative edge `identity`; null on eggNOG), tcdb_calls (lineage
     call kinds, precedence order), tcdb_substrate_system_count (null),
     metabolite_id, metabolite_name, metabolite_formula, metabolite_mass,
-    metabolite_chebi_id, the GO null columns, target_kind.
+    metabolite_chebi_id, metabolite_structure_kind, the GO null columns, target_kind.
 
     Sort: metabolite_id, tcdb_identity DESC (nulls last), tcdb_family_id,
     locus_tag.
@@ -10499,12 +10527,13 @@ def build_genes_by_metabolite_summary(
         "       reaction_name: r.name,\n"
         "       reaction_ec_numbers: coalesce(r.ec_numbers, []),\n"
         "       tcdb_family_id: tf.id,\n"
-        "       tcdb_family_name: tf.name,\n"
+        "       tcdb_family_name: coalesce(tf.display_name, tf.name),\n"
         "       tcdb_family_level_kind: tf.level_kind,\n"
         "       tcdb_family_direction: tf.direction,\n"
         "       metabolite_id: m.id,\n"
         "       metabolite_name: m.name,\n"
         "       metabolite_formula: m.formula,\n"
+        "       metabolite_structure_kind: m.structure_kind,\n"
         "       es: es,\n"
         "       tcdb_route: troute,\n"
         "       go_term_depth: gdepth,\n"
@@ -10817,7 +10846,7 @@ def build_metabolites_by_gene_metabolism(
     the TCDB transport columns (all null), reaction_id, reaction_name,
     ec_numbers, mass_balance, tcdb_family_id (null), tcdb_family_name
     (null), metabolite_id, metabolite_name, metabolite_formula,
-    metabolite_mass, metabolite_chebi_id.
+    metabolite_mass, metabolite_chebi_id, metabolite_structure_kind.
 
     Verbose adds: gene_category, metabolite_inchikey, metabolite_smiles,
     metabolite_mnxm_id, metabolite_hmdb_id, reaction_mnxr_id,
@@ -10889,6 +10918,7 @@ def build_metabolites_by_gene_metabolism(
         "       m.formula AS metabolite_formula,\n"
         "       m.mass AS metabolite_mass,\n"
         "       m.chebi_id AS metabolite_chebi_id,\n"
+        "       m.structure_kind AS metabolite_structure_kind,\n"
         f"{_GO_NULL_COLUMNS},\n"
         "       'metabolite' AS target_kind"
         f"{verbose_cols}\n"
@@ -11351,12 +11381,13 @@ def build_metabolites_by_gene_summary(
         "       reaction_name: r.name,\n"
         "       reaction_ec_numbers: coalesce(r.ec_numbers, []),\n"
         "       tcdb_family_id: tf.id,\n"
-        "       tcdb_family_name: tf.name,\n"
+        "       tcdb_family_name: coalesce(tf.display_name, tf.name),\n"
         "       tcdb_family_level_kind: tf.level_kind,\n"
         "       tcdb_family_direction: tf.direction,\n"
         "       metabolite_id: m.id,\n"
         "       metabolite_name: m.name,\n"
         "       metabolite_formula: m.formula,\n"
+        "       metabolite_structure_kind: m.structure_kind,\n"
         "       metabolite_elements: coalesce(m.elements, []),\n"
         "       metabolite_pathway_ids: coalesce(m.pathway_ids, []),\n"
         "       es: es,\n"

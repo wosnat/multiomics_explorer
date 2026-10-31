@@ -7953,7 +7953,7 @@ class TestBuildGenesByMetaboliteTransport:
             "g.product AS product",
             "'transport' AS evidence_source",
             "tf.id AS tcdb_family_id",
-            "tf.name AS tcdb_family_name",
+            "coalesce(tf.display_name, tf.name) AS tcdb_family_name",
             "null AS reaction_id",
             "null AS reaction_name",
             "null AS ec_numbers",
@@ -8387,7 +8387,7 @@ class TestBuildMetabolitesByGeneTransport:
             "g.product AS product",
             "'transport' AS evidence_source",
             "tf.id AS tcdb_family_id",
-            "tf.name AS tcdb_family_name",
+            "coalesce(tf.display_name, tf.name) AS tcdb_family_name",
             "null AS reaction_id",
             "null AS reaction_name",
             "null AS ec_numbers",
@@ -15849,3 +15849,357 @@ class TestTcdbCleanupGeneOverview:
         cypher, _ = build_gene_overview_summary(locus_tags=_TC_LOCI)
         m = re.search(r"tcdb_assignment_count[^\n]*AS has_tcdb", cypher)
         assert m, "has_tcdb must read Gene.tcdb_assignment_count > 0"
+
+
+# ===========================================================================
+# TCDB display names + metabolite structure_kind (RED) —
+# docs/tool-specs/tcdb-display-name-and-structure-kind.md (backlog 2c.20/2c.21)
+#
+# D1: every ontology-builder site that projects a term name goes through
+# `_term_name_cypher(cfg, var)` → `coalesce(<var>.display_name, <var>.name)`
+# for TCDB (the only ontology declaring `display_name_prop`), plain
+# `<var>.name` elsewhere. Output column names are unchanged.
+# D1 chemistry: `coalesce(tf.display_name, tf.name)` for tcdb_family_name.
+# D2: gbm / mbg row builders project `m.structure_kind` as
+# `metabolite_structure_kind` next to `metabolite_formula`.
+# ===========================================================================
+
+import multiomics_explorer.kg.queries_lib as _qldn
+
+
+def _dn_coalesce_re(var: str) -> str:
+    """Regex for `coalesce(<var>.display_name, <var>.name)`, whitespace-tolerant."""
+    return (
+        rf"coalesce\(\s*{var}\.display_name\s*,\s*{var}\.name\s*\)"
+    )
+
+
+def _dn_as(cypher: str, var: str, alias: str) -> bool:
+    """`coalesce(<var>.display_name, <var>.name) AS <alias>`."""
+    return re.search(_dn_coalesce_re(var) + rf"\s+AS\s+{alias}\b", cypher) is not None
+
+
+def _dn_map(cypher: str, var: str, key: str) -> bool:
+    """Map projection `<key>: coalesce(<var>.display_name, <var>.name)`."""
+    return re.search(rf"\b{key}\s*:\s*" + _dn_coalesce_re(var), cypher) is not None
+
+
+_DN_TCDB_TERM = "tcdb:3.A.1"
+_DN_ORG = "Prochlorococcus MED4"
+
+
+class TestTermNameCypherHelper:
+    """D1: config key + `_term_name_cypher` helper."""
+
+    def test_tcdb_declares_display_name_prop(self):
+        assert _qldn.ONTOLOGY_CONFIG["tcdb"]["display_name_prop"] == "display_name"
+
+    def test_only_tcdb_declares_display_name_prop(self):
+        declaring = sorted(
+            k for k, cfg in _qldn.ONTOLOGY_CONFIG.items()
+            if cfg.get("display_name_prop")
+        )
+        assert declaring == ["tcdb"]
+
+    def test_helper_tcdb_default_var(self):
+        assert _qldn._term_name_cypher(_qldn.ONTOLOGY_CONFIG["tcdb"]) == (
+            "coalesce(t.display_name, t.name)"
+        )
+
+    @pytest.mark.parametrize("var", ["t", "p", "c"])
+    def test_helper_tcdb_custom_var(self, var):
+        assert _qldn._term_name_cypher(_qldn.ONTOLOGY_CONFIG["tcdb"], var) == (
+            f"coalesce({var}.display_name, {var}.name)"
+        )
+
+    @pytest.mark.parametrize("ontology", ["go_bp", "pfam", "kegg", "cazy"])
+    def test_helper_non_tcdb_plain_name(self, ontology):
+        cfg = _qldn.ONTOLOGY_CONFIG[ontology]
+        assert _qldn._term_name_cypher(cfg) == "t.name"
+        assert _qldn._term_name_cypher(cfg, "p") == "p.name"
+
+
+class TestSearchOntologyTcdbDisplayName:
+    """D1: search_ontology (browse + search) name column."""
+
+    def test_tcdb_search_projects_display_name_as_name(self):
+        cypher, _ = build_search_ontology(ontology="tcdb", search_text="ABC")
+        assert _dn_as(cypher, "t", "name"), cypher
+        assert "t.name AS name" not in cypher
+
+    def test_tcdb_browse_projects_display_name_as_name(self):
+        cypher, _ = build_search_ontology(ontology="tcdb", search_text=None)
+        assert _dn_as(cypher, "t", "name"), cypher
+        assert "t.name AS name" not in cypher
+
+    def test_tcdb_browse_with_organism_projects_display_name(self):
+        cypher, _ = build_search_ontology(
+            ontology="tcdb", search_text=None, organism=_DN_ORG)
+        assert _dn_as(cypher, "t", "name"), cypher
+
+    @pytest.mark.parametrize("ontology", ["go_bp", "pfam"])
+    @pytest.mark.parametrize("search_text", [None, "transport"])
+    def test_non_tcdb_has_no_display_name(self, ontology, search_text):
+        cypher, _ = build_search_ontology(
+            ontology=ontology, search_text=search_text)
+        assert "display_name" not in cypher
+        assert "t.name AS name" in cypher
+
+
+class TestGenesByOntologyDetailTcdbDisplayName:
+    """D1: genes_by_ontology detail term_name."""
+
+    def test_tcdb_term_name_is_display_name(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology="tcdb", organism=_DN_ORG, term_ids=[_DN_TCDB_TERM],
+            level=None, min_gene_set_size=5, max_gene_set_size=500,
+        )
+        assert _dn_as(cypher, "t", "term_name"), cypher
+        assert "t.name AS term_name" not in cypher
+
+    @pytest.mark.parametrize("ontology,term", [
+        ("go_bp", "go:0006260"), ("pfam", "pfam:PF00005"),
+    ])
+    def test_non_tcdb_has_no_display_name(self, ontology, term):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_detail,
+        )
+        cypher, _ = build_genes_by_ontology_detail(
+            ontology=ontology, organism=_DN_ORG, term_ids=[term],
+            level=None, min_gene_set_size=5, max_gene_set_size=500,
+        )
+        assert "display_name" not in cypher
+        assert "t.name AS term_name" in cypher
+
+
+class TestGenesByOntologyPerTermTcdbDisplayName:
+    """D1: genes_by_ontology per-term envelope (and enrichment TERM2GENE)."""
+
+    def test_tcdb_term_name_is_display_name(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, _ = build_genes_by_ontology_per_term(
+            ontology="tcdb", organism=_DN_ORG, level=1, term_ids=None,
+            min_gene_set_size=5, max_gene_set_size=500,
+        )
+        assert _dn_as(cypher, "t", "term_name"), cypher
+        assert "t.name AS term_name" not in cypher
+
+    @pytest.mark.parametrize("ontology", ["go_bp", "pfam"])
+    def test_non_tcdb_has_no_display_name(self, ontology):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_ontology_per_term,
+        )
+        cypher, _ = build_genes_by_ontology_per_term(
+            ontology=ontology, organism=_DN_ORG,
+            level=1 if ontology == "go_bp" else None,
+            term_ids=None if ontology == "go_bp" else ["pfam:PF00005"],
+            min_gene_set_size=5, max_gene_set_size=500,
+        )
+        assert "display_name" not in cypher
+        assert "t.name AS term_name" in cypher
+
+
+class TestOntologyTermDetailsTcdbDisplayName:
+    """D1: ontology_term_details name, parents[].name, children[].name."""
+
+    def _cypher(self, **kw):
+        kw.setdefault("term_ids", [_DN_TCDB_TERM, "go:0006979"])
+        cypher, _ = _qldn.build_ontology_term_details(**kw)
+        return cypher
+
+    def test_name_column_uses_display_name(self):
+        cypher = self._cypher()
+        assert re.search(_dn_coalesce_re("t"), cypher), cypher
+        assert re.search(r"\bAS name\b", cypher)
+        assert "t.name AS name" not in cypher
+
+    def test_parents_name_uses_display_name(self):
+        cypher = self._cypher()
+        assert re.search(_dn_coalesce_re("p"), cypher), cypher
+        assert not re.search(r"\bname\s*:\s*p\.name\b", cypher)
+
+    def test_children_name_uses_display_name(self):
+        cypher = self._cypher()
+        assert re.search(_dn_coalesce_re("c"), cypher), cypher
+        assert not re.search(r"\bname\s*:\s*c\.name\b", cypher)
+
+    def test_verbose_properties_keep_raw_props(self):
+        cypher = self._cypher(verbose=True)
+        assert "t{.*} AS properties" in cypher
+        assert re.search(_dn_coalesce_re("t"), cypher)
+
+
+class TestGeneOntologyTermsTcdbDisplayName:
+    """D1: gene_ontology_terms leaf + rollup term_name."""
+
+    @pytest.mark.parametrize("mode,level", [("leaf", None), ("rollup", 1)])
+    def test_tcdb_term_name_is_display_name(self, mode, level):
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0010"], ontology="tcdb", organism_name=_DN_ORG,
+            mode=mode, level=level,
+        )
+        assert _dn_as(cypher, "t", "term_name"), cypher
+        assert "t.name AS term_name" not in cypher
+
+    @pytest.mark.parametrize("ontology,mode", [
+        ("go_bp", "leaf"), ("go_bp", "rollup"), ("pfam", "leaf"),
+    ])
+    def test_non_tcdb_has_no_display_name(self, ontology, mode):
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["PMM0010"], ontology=ontology, organism_name=_DN_ORG,
+            mode=mode, level=1 if mode == "rollup" else None,
+        )
+        assert "display_name" not in cypher
+        assert "t.name AS term_name" in cypher
+
+
+class TestGeneOntologyTermsSummaryTcdbDisplayName:
+    """D1: gene_ontology_terms summary `by_term` name (leaf + rollup)."""
+
+    @pytest.mark.parametrize("mode,level", [("leaf", None), ("rollup", 1)])
+    def test_tcdb_by_term_name_is_display_name(self, mode, level):
+        cypher, _ = build_gene_ontology_terms_summary(
+            locus_tags=["PMM0010"], ontology="tcdb", organism_name=_DN_ORG,
+            mode=mode, level=level,
+        )
+        assert _dn_map(cypher, "t", "name"), cypher
+        assert _dn_as(cypher, "t", "tname"), cypher
+        assert not re.search(r"\bname\s*:\s*t\.name\b", cypher)
+        assert "t.name AS tname" not in cypher
+
+    @pytest.mark.parametrize("ontology", ["go_bp", "pfam"])
+    def test_non_tcdb_has_no_display_name(self, ontology):
+        cypher, _ = build_gene_ontology_terms_summary(
+            locus_tags=["PMM0010"], ontology=ontology, organism_name=_DN_ORG,
+        )
+        assert "display_name" not in cypher
+        assert "t.name AS tname" in cypher
+
+
+class TestOntologyLandscapeTcdbDisplayName:
+    """D1: ontology_landscape verbose example-term names."""
+
+    def test_tcdb_example_terms_use_display_name(self):
+        cypher, _ = build_ontology_landscape(
+            ontology="tcdb", organism_name=_DN_ORG, verbose=True)
+        assert "example_terms" in cypher
+        assert _dn_map(cypher, "t", "name"), cypher
+        assert not re.search(r"\bname\s*:\s*t\.name\b", cypher)
+
+    @pytest.mark.parametrize("ontology", ["go_bp", "pfam"])
+    def test_non_tcdb_has_no_display_name(self, ontology):
+        cypher, _ = build_ontology_landscape(
+            ontology=ontology, organism_name=_DN_ORG, verbose=True)
+        assert "display_name" not in cypher
+        assert re.search(r"\bname\s*:\s*t\.name\b", cypher)
+
+
+# --- chemistry: tcdb_family_name (D1) + metabolite_structure_kind (D2) ------
+
+_DN_METS = ["kegg.compound:C00086"]
+_DN_LOCI = ["PMM0974"]
+
+_DN_GBM_ROW_BUILDERS = [
+    "build_genes_by_metabolite_metabolism",
+    "build_genes_by_metabolite_transport",
+    "build_genes_by_metabolite_tcdb_family",
+    "build_genes_by_metabolite_go_transport",
+]
+_DN_MBG_ROW_BUILDERS = [
+    "build_metabolites_by_gene_metabolism",
+    "build_metabolites_by_gene_transport",
+    "build_metabolites_by_gene_tcdb_family",
+    "build_metabolites_by_gene_go_transport",
+]
+_DN_TCDB_ROW_BUILDERS = [
+    "build_genes_by_metabolite_transport",
+    "build_genes_by_metabolite_tcdb_family",
+    "build_metabolites_by_gene_transport",
+    "build_metabolites_by_gene_tcdb_family",
+]
+_DN_ALL_ARMS = ("metabolism", "transport", "go_transport")
+
+
+def _dn_chem(name: str, **kw):
+    fn = getattr(_qldn, name)
+    if "genes_by_metabolite" in name:
+        kw.setdefault("metabolite_ids", list(_DN_METS))
+    else:
+        kw.setdefault("locus_tags", list(_DN_LOCI))
+    kw.setdefault("organism", _DN_ORG)
+    cypher, _ = fn(**kw)
+    return cypher
+
+
+def _dn_summary(name: str):
+    return _dn_chem(
+        name, arms=_DN_ALL_ARMS, include_tcdb_family_substrates=True)
+
+
+class TestChemistryTcdbFamilyDisplayName:
+    """D1 chemistry: tcdb_family_name reads display_name."""
+
+    @pytest.mark.parametrize("name", _DN_TCDB_ROW_BUILDERS)
+    @pytest.mark.parametrize("verbose", [False, True])
+    def test_row_builder_tcdb_family_name(self, name, verbose):
+        cypher = _dn_chem(name, verbose=verbose)
+        assert _dn_as(cypher, "tf", "tcdb_family_name"), cypher
+        assert "tf.name AS tcdb_family_name" not in cypher
+
+    @pytest.mark.parametrize("name", [
+        "build_genes_by_metabolite_summary",
+        "build_metabolites_by_gene_summary",
+    ])
+    def test_summary_row_map_tcdb_family_name(self, name):
+        cypher = _dn_summary(name)
+        assert _dn_map(cypher, "tf", "tcdb_family_name"), cypher
+        assert not re.search(r"tcdb_family_name\s*:\s*tf\.name\b", cypher)
+
+    @pytest.mark.parametrize(
+        "name", _DN_GBM_ROW_BUILDERS + _DN_MBG_ROW_BUILDERS + [
+            "build_genes_by_metabolite_summary",
+            "build_metabolites_by_gene_summary",
+        ])
+    def test_no_bare_tf_name_as_tcdb_family_name(self, name):
+        if name.endswith("_summary"):
+            cypher = _dn_summary(name)
+        else:
+            cypher = _dn_chem(name)
+        assert "tf.name AS tcdb_family_name" not in cypher
+        assert not re.search(r"tcdb_family_name\s*:\s*tf\.name\b", cypher)
+
+
+class TestChemistryMetaboliteStructureKind:
+    """D2: metabolite_structure_kind on every gbm / mbg row builder."""
+
+    @pytest.mark.parametrize("name", _DN_GBM_ROW_BUILDERS + _DN_MBG_ROW_BUILDERS)
+    @pytest.mark.parametrize("verbose", [False, True])
+    def test_row_builder_projects_structure_kind(self, name, verbose):
+        cypher = _dn_chem(name, verbose=verbose)
+        assert "metabolite_formula" in cypher
+        assert re.search(
+            r"m\.structure_kind\s+AS\s+metabolite_structure_kind\b", cypher
+        ), cypher
+
+    @pytest.mark.parametrize("name", _DN_GBM_ROW_BUILDERS + _DN_MBG_ROW_BUILDERS)
+    def test_structure_kind_follows_chebi_id(self, name):
+        cypher = _dn_chem(name)
+        chebi = cypher.index("AS metabolite_chebi_id")
+        sk = cypher.index("AS metabolite_structure_kind")
+        assert sk > chebi
+
+    @pytest.mark.parametrize("name", [
+        "build_genes_by_metabolite_summary",
+        "build_metabolites_by_gene_summary",
+    ])
+    def test_summary_row_map_projects_structure_kind(self, name):
+        cypher = _dn_summary(name)
+        assert "metabolite_formula: m.formula" in cypher
+        assert re.search(
+            r"metabolite_structure_kind\s*:\s*m\.structure_kind\b", cypher
+        ), cypher

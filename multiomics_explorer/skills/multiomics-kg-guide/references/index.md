@@ -72,9 +72,9 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/gene_response_profile/full` — ~5472 tok
 - `docs://tools/genes_by_boolean_metric/full` — ~5980 tok
 - `docs://tools/genes_by_categorical_metric/full` — ~6068 tok
-- `docs://tools/genes_by_function/full` — ~2702 tok
+- `docs://tools/genes_by_function/full` — ~2829 tok
 - `docs://tools/genes_by_homolog_group/full` — ~2447 tok
-- `docs://tools/genes_by_metabolite/full` — ~23484 tok
+- `docs://tools/genes_by_metabolite/full` — ~23580 tok
 - `docs://tools/genes_by_numeric_metric/full` — ~6747 tok
 - `docs://tools/genes_by_ontology/full` — ~16404 tok
 - `docs://tools/genes_in_cluster/full` — ~1960 tok
@@ -89,7 +89,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/list_organisms/full` — ~15010 tok
 - `docs://tools/list_publications/full` — ~8803 tok
 - `docs://tools/metabolites_by_flags_assay/full` — ~4799 tok
-- `docs://tools/metabolites_by_gene/full` — ~17327 tok
+- `docs://tools/metabolites_by_gene/full` — ~17422 tok
 - `docs://tools/metabolites_by_quantifies_assay/full` — ~6456 tok
 - `docs://tools/ontology_landscape/full` — ~10889 tok
 - `docs://tools/ontology_term_details/full` — ~9623 tok
@@ -106,7 +106,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://analysis/enrichment` — ~7337 tok — How to run over-representation analysis (ORA) with the `multiomics_explorer` package: the building blocks…
 - `docs://analysis/expression` — ~2361 tok — The differential-expression (DE) tool family and the two analysis utilities that reshape its output into…
 - `docs://analysis/metabolites` — ~14529 tok — LLM-facing decision-tree guide for metabolite questions.
-- `docs://analysis/transport` — ~3905 tok — What transports compound X in organism Y, or what does gene Z move? The KG answers from three routes.
+- `docs://analysis/transport` — ~3990 tok — What transports compound X in organism Y, or what does gene Z move? The KG answers from three routes.
 
 ## Ontologies
 
@@ -126,7 +126,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://ontologies/pfam` — ~1983 tok
 - `docs://ontologies/signal_peptide_type` — ~1488 tok
 - `docs://ontologies/subcellular_localization` — ~1510 tok
-- `docs://ontologies/tcdb` — ~3530 tok
+- `docs://ontologies/tcdb` — ~3714 tok
 - `docs://ontologies/tigr_role` — ~2602 tok
 
 ## Examples

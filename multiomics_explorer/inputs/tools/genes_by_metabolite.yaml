@@ -1937,3 +1937,6 @@ mistakes:
     `evidence_sources` excludes `go_transport`, they are ignored with a warning.
     The inherited-row dedup ignores them, so a filtered result is always a subset of
     the unfiltered one.
+  - >-
+    A row with `metabolite_structure_kind='generic'` names a compound class (e.g. fatty
+    acid, peptide), not one molecule — read it as "some member of this class".

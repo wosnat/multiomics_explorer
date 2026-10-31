@@ -23846,3 +23846,135 @@ class TestListFilterValuesTcdbCleanup:
         values = {r["value"] for r in out["results"]}
         assert "evidence_score" not in values
         assert {"sources", "evidence", "tier"} <= values
+
+
+# ===========================================================================
+# TCDB display names + metabolite structure_kind (RED) —
+# docs/tool-specs/tcdb-display-name-and-structure-kind.md (2c.20 / 2c.21)
+#
+# D2: gbm / mbg detail rows carry `metabolite_structure_kind` (from
+# `m.structure_kind`): 'defined' / 'generic' / 'polymer', null on
+# chemical-role targets. The api passes the column through on every arm.
+# D1: the builders already return TCDB display names under the unchanged
+# `tcdb_family_name` key — the api passes the string through untouched.
+# ===========================================================================
+
+_DN_SUBFAMILY_NAME = (
+    "The ATP-binding Cassette (ABC) Superfamily — subfamily 3.A.1.118")
+
+
+def _dn_rows():
+    """One row per arm, each with a structure_kind; plus a role row (null)."""
+    metab = {**_tcdb_metab_row("PMM0001"),
+             "metabolite_structure_kind": "defined"}
+    direct = {**_tcdb_row("PMM0710", identity=61.0,
+                          family_id="tcdb:3.A.1.118"),
+              "tcdb_family_name": _DN_SUBFAMILY_NAME,
+              "metabolite_structure_kind": "generic"}
+    walk = {**_tcdb_family_row("PMM0673", identity=55.0),
+            "metabolite_structure_kind": "polymer"}
+    role = {**_tcdb_row("PMM0711", identity=50.0,
+                        metabolite_id="chebi.role:33281"),
+            "metabolite_name": "antimicrobial agent",
+            "metabolite_formula": None, "metabolite_mass": None,
+            "metabolite_chebi_id": None,
+            "target_kind": "chemical_role",
+            "metabolite_structure_kind": None}
+    return metab, direct, walk, role
+
+
+def _dn_by_lt(out):
+    return {r["locus_tag"]: r for r in out["results"]}
+
+
+class TestGenesByMetaboliteStructureKind:
+    """api.genes_by_metabolite passes metabolite_structure_kind through."""
+
+    _METS = [_PHOSPHATE]
+
+    def _run(self, monkeypatch, **kw):
+        metab, direct, walk, role = _dn_rows()
+        rec: dict = {}
+        _install_tcdb_builders(monkeypatch, rec, "gbm")
+        conn = _TcdbConn(
+            hint=_tcdb_hint(),
+            arm_rows={
+                "metabolism": [metab],
+                "transport": [direct, role],
+                "tcdb_family": [walk],
+                "go_transport": [],
+            },
+            summary=_tcdb_summary(direct=2, family=1, metab=1),
+        )
+        return api.genes_by_metabolite(
+            self._METS, _TCDB_MED4, conn=conn,
+            include_tcdb_family_substrates=True, **kw)
+
+    def test_structure_kind_passes_through_every_arm(self, monkeypatch):
+        rows = _dn_by_lt(self._run(monkeypatch))
+        assert rows["PMM0001"]["metabolite_structure_kind"] == "defined"
+        assert rows["PMM0710"]["metabolite_structure_kind"] == "generic"
+        assert rows["PMM0673"]["metabolite_structure_kind"] == "polymer"
+
+    def test_structure_kind_null_on_chemical_role_row(self, monkeypatch):
+        rows = _dn_by_lt(self._run(monkeypatch))
+        assert rows["PMM0711"]["target_kind"] == "chemical_role"
+        assert rows["PMM0711"].get("metabolite_structure_kind") is None
+
+    def test_structure_kind_passes_through_verbose(self, monkeypatch):
+        rows = _dn_by_lt(self._run(monkeypatch, verbose=True))
+        assert rows["PMM0710"]["metabolite_structure_kind"] == "generic"
+
+    def test_tcdb_family_display_name_passes_through(self, monkeypatch):
+        rows = _dn_by_lt(self._run(monkeypatch))
+        assert rows["PMM0710"]["tcdb_family_name"] == _DN_SUBFAMILY_NAME
+
+
+class TestMetabolitesByGeneStructureKind:
+    """api.metabolites_by_gene passes metabolite_structure_kind through."""
+
+    _LOCI = ["PMM0001", "PMM0710", "PMM0673", "PMM0711"]
+
+    def _by_gene(self):
+        return [{
+            "locus_tag": lt, "gene_name": None, "product": "p", "rows": 1,
+            "metabolite_count": 1, "reaction_count": 0,
+            "transporter_count": 1, "metabolism_rows": 0,
+            "tcdb_direct_rows": 1, "tcdb_family_rows": 0,
+            "tcdb_assignment_count": 1, "go_transport_rows": 0,
+            "multi_source_metabolite_count": 0,
+        } for lt in self._LOCI]
+
+    def _run(self, monkeypatch, **kw):
+        metab, direct, walk, role = _dn_rows()
+        rec: dict = {}
+        _install_tcdb_builders(monkeypatch, rec, "mbg")
+        conn = _TcdbConn(
+            hint=_tcdb_hint(no_direct=[]),
+            arm_rows={
+                "metabolism": [metab],
+                "transport": [direct, role],
+                "tcdb_family": [walk],
+                "go_transport": [],
+            },
+            summary=_tcdb_summary(direct=2, family=1, metab=1,
+                                  by_gene=self._by_gene()),
+        )
+        return api.metabolites_by_gene(
+            self._LOCI, _TCDB_MED4, conn=conn,
+            include_tcdb_family_substrates=True, **kw)
+
+    def test_structure_kind_passes_through_every_arm(self, monkeypatch):
+        rows = _dn_by_lt(self._run(monkeypatch))
+        assert rows["PMM0001"]["metabolite_structure_kind"] == "defined"
+        assert rows["PMM0710"]["metabolite_structure_kind"] == "generic"
+        assert rows["PMM0673"]["metabolite_structure_kind"] == "polymer"
+
+    def test_structure_kind_null_on_chemical_role_row(self, monkeypatch):
+        rows = _dn_by_lt(self._run(monkeypatch))
+        assert rows["PMM0711"]["target_kind"] == "chemical_role"
+        assert rows["PMM0711"].get("metabolite_structure_kind") is None
+
+    def test_tcdb_family_display_name_passes_through(self, monkeypatch):
+        rows = _dn_by_lt(self._run(monkeypatch))
+        assert rows["PMM0710"]["tcdb_family_name"] == _DN_SUBFAMILY_NAME

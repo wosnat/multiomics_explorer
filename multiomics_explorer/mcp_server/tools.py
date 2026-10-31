@@ -773,10 +773,9 @@ class GeneReactionMetaboliteTriplet(SparseRow):
         "Transport rows only.")
     tcdb_family_name: str | None = Field(
         default=None,
-        description="Name of `tcdb_family_id` (the system on direct rows, "
-        "the attached family / subfamily on family rows), e.g. 'High "
-        "affinity phosphate-specific transporter, PstABCS'. Transport rows "
-        "only.")
+        description="TCDB name of `tcdb_family_id`; for a subfamily or "
+        "system TCDB left unnamed, the nearest named ancestor's name plus "
+        "'— subfamily <id>' / '— system <id>'. Transport rows only.")
 
     # GO-transport-arm fields (None on metabolism / transport rows)
     go_term_id: str | None = Field(
@@ -833,6 +832,11 @@ class GeneReactionMetaboliteTriplet(SparseRow):
     metabolite_chebi_id: str | None = Field(
         default=None,
         description="ChEBI numeric ID; populated on most metabolites.")
+    metabolite_structure_kind: Literal["defined", "generic", "polymer"] | None = Field(
+        default=None,
+        description="'defined' (one molecule), 'generic' (a compound class, "
+        "e.g. 'Peptide', 'Fatty acid') or 'polymer'. Null on chemical-role "
+        "targets.")
     via_stereo_form_of: str | None = Field(
         default=None,
         description="genes_by_metabolite with include_stereo_forms=True: "
@@ -1017,10 +1021,9 @@ class GbmTopTcdbFamily(BaseModel):
     tcdb_family_id: str = Field(
         description="Full prefixed TcdbFamily ID (e.g. 'tcdb:3.A.1.4.5').")
     tcdb_family_name: str = Field(
-        description="Display name. For tc_family-level entries this is "
-        "human-readable (e.g. 'The ATP-binding Cassette (ABC) Superfamily'); "
-        "for tc_subfamily / tc_system levels it falls back to the "
-        "`tcdb_id` value.")
+        description="TCDB name; for a subfamily or system TCDB left unnamed, "
+        "the nearest named ancestor's name plus '— subfamily <id>' / "
+        "'— system <id>'.")
     level_kind: str = Field(
         description="One of tc_family / tc_subfamily / tc_system (ontology "
         "convention): tc_system on direct rows, tc_family / tc_subfamily "
@@ -1488,10 +1491,9 @@ class MbgTopTcdbFamily(BaseModel):
     tcdb_family_id: str = Field(
         description="Full prefixed TcdbFamily ID (e.g. 'tcdb:3.A.1.4.5').")
     tcdb_family_name: str = Field(
-        description="Display name. For tc_family-level entries this is "
-        "human-readable (e.g. 'The ATP-binding Cassette (ABC) Superfamily'); "
-        "for tc_subfamily / tc_system it falls back to the `tcdb_id` "
-        "value.")
+        description="TCDB name; for a subfamily or system TCDB left unnamed, "
+        "the nearest named ancestor's name plus '— subfamily <id>' / "
+        "'— system <id>'.")
     level_kind: str = Field(
         description="One of tc_family / tc_subfamily / tc_system (ontology "
         "convention): tc_system on direct rows, tc_family / tc_subfamily "

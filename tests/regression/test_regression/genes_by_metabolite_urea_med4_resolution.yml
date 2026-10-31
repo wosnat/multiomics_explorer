@@ -52,6 +52,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: ABC-type urea transporter, substrate binding component
   reaction_id: null
   reaction_name: null
@@ -85,6 +86,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: ABC-type urea transporter, substrate binding component
   reaction_id: null
   reaction_name: null
@@ -117,6 +119,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: ABC-type urea transporter, permease component
   reaction_id: null
   reaction_name: null
@@ -149,6 +152,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: ABC-type urea transporter, permease component
   reaction_id: null
   reaction_name: null
@@ -180,6 +184,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: ABC-type urea transporter, membrane component
   reaction_id: null
   reaction_name: null
@@ -212,6 +217,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: ABC-type urea transporter, membrane component
   reaction_id: null
   reaction_name: null
@@ -243,6 +249,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: ABC-type urea transporter, ATP-binding component UrtD
   reaction_id: null
   reaction_name: null
@@ -275,6 +282,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: ABC-type urea transporter, ATP-binding component UrtD
   reaction_id: null
   reaction_name: null
@@ -306,6 +314,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: ABC-type urea transporter, ATPase component UrtE
   reaction_id: null
   reaction_name: null
@@ -338,6 +347,7 @@ results:
   metabolite_id: kegg.compound:C00086
   metabolite_mass: 60.056
   metabolite_name: Urea
+  metabolite_structure_kind: defined
   product: ABC-type urea transporter, ATPase component UrtE
   reaction_id: null
   reaction_name: null

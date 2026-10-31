@@ -796,6 +796,7 @@ schema:
         direct_gene_count: int
         direction: string
         direction_basis: string
+        display_name: string
         gene_count: int
         id: string
         level: int
