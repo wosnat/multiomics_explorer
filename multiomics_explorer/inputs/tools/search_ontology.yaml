@@ -38,8 +38,8 @@ examples:
             "score": 2.654890298843384,
             "level": 6,
             "is_informative": true,
-            "gene_count": 3197,
-            "organism_count": 117
+            "gene_count": 3243,
+            "organism_count": 118
           },
           {
             "id": "go:0006270",
@@ -48,8 +48,8 @@ examples:
             "score": 2.3511452674865723,
             "level": 6,
             "is_informative": true,
-            "gene_count": 271,
-            "organism_count": 117
+            "gene_count": 277,
+            "organism_count": 118
           },
           {
             "id": "go:0006274",
@@ -58,8 +58,8 @@ examples:
             "score": 2.3511452674865723,
             "level": 6,
             "is_informative": true,
-            "gene_count": 7,
-            "organism_count": 6
+            "gene_count": 9,
+            "organism_count": 7
           },
           ...
         ]
@@ -100,8 +100,8 @@ examples:
             "score": null,
             "level": 1,
             "is_informative": true,
-            "gene_count": 852,
-            "organism_count": 117
+            "gene_count": 868,
+            "organism_count": 118
           },
           {
             "id": "merops.family:C26",
@@ -110,8 +110,8 @@ examples:
             "score": null,
             "level": 1,
             "is_informative": true,
-            "gene_count": 704,
-            "organism_count": 117
+            "gene_count": 710,
+            "organism_count": 118
           },
           {
             "id": "merops.family:S09",
@@ -120,8 +120,8 @@ examples:
             "score": null,
             "level": 1,
             "is_informative": true,
-            "gene_count": 497,
-            "organism_count": 117
+            "gene_count": 515,
+            "organism_count": 118
           },
           ...
         ]
@@ -163,8 +163,8 @@ examples:
             "score": null,
             "level": 2,
             "is_informative": true,
-            "gene_count": 9107,
-            "organism_count": 117,
+            "gene_count": 9192,
+            "organism_count": 118,
             "organism_gene_count": 52
           },
           {
@@ -174,8 +174,8 @@ examples:
             "score": null,
             "level": 2,
             "is_informative": true,
-            "gene_count": 1949,
-            "organism_count": 117,
+            "gene_count": 1950,
+            "organism_count": 118,
             "organism_gene_count": 17
           },
           {
@@ -238,8 +238,8 @@ examples:
             "score": null,
             "level": 0,
             "is_informative": false,
-            "gene_count": 162041,
-            "organism_count": 117
+            "gene_count": 164384,
+            "organism_count": 118
           },
           {
             "id": "go:0009987",
@@ -248,8 +248,8 @@ examples:
             "score": null,
             "level": 1,
             "is_informative": true,
-            "gene_count": 148760,
-            "organism_count": 117
+            "gene_count": 150852,
+            "organism_count": 118
           },
           {
             "id": "go:0008152",
@@ -258,8 +258,8 @@ examples:
             "score": null,
             "level": 2,
             "is_informative": true,
-            "gene_count": 123459,
-            "organism_count": 117
+            "gene_count": 124957,
+            "organism_count": 118
           }
         ]
       }
@@ -308,8 +308,8 @@ examples:
             "score": null,
             "level": 0,
             "is_informative": true,
-            "gene_count": 1219,
-            "organism_count": 117
+            "gene_count": 1232,
+            "organism_count": 118
           },
           {
             "id": "ncbifam:TIGR02937",
@@ -318,8 +318,8 @@ examples:
             "score": null,
             "level": 0,
             "is_informative": true,
-            "gene_count": 975,
-            "organism_count": 117
+            "gene_count": 991,
+            "organism_count": 118
           },
           {
             "id": "ncbifam:TIGR03798",
@@ -378,8 +378,8 @@ examples:
             "score": 1.5253678560256958,
             "level": 3,
             "is_informative": true,
-            "gene_count": 23853,
-            "organism_count": 117
+            "gene_count": 24309,
+            "organism_count": 118
           },
           {
             "id": "go:0015990",
@@ -388,8 +388,8 @@ examples:
             "score": 1.356764793395996,
             "level": 7,
             "is_informative": true,
-            "gene_count": 239,
-            "organism_count": 116
+            "gene_count": 245,
+            "organism_count": 117
           },
           {
             "id": "go:0006821",
@@ -398,8 +398,8 @@ examples:
             "score": 1.3283048868179321,
             "level": 5,
             "is_informative": true,
-            "gene_count": 209,
-            "organism_count": 117
+            "gene_count": 210,
+            "organism_count": 118
           },
           ...
         ]
@@ -410,8 +410,8 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 58176,
-        "total_matching": 207,
+        "total_entries": 58185,
+        "total_matching": 208,
         "score_max": 11.335722923278809,
         "score_median": 3.41845965385437,
         "returned": 19,
@@ -473,8 +473,8 @@ examples:
             "score": 3.5730364322662354,
             "level": 4,
             "is_informative": true,
-            "gene_count": 366,
-            "organism_count": 101
+            "gene_count": 369,
+            "organism_count": 102
           },
           {
             "id": "go:1902025",
@@ -483,8 +483,8 @@ examples:
             "score": 3.5730364322662354,
             "level": 5,
             "is_informative": true,
-            "gene_count": 125,
-            "organism_count": 71
+            "gene_count": 126,
+            "organism_count": 72
           },
           {
             "id": "go:0008940",
@@ -552,8 +552,8 @@ examples:
             "is_informative": true,
             "tree": "transporters",
             "tree_code": "ko02000",
-            "gene_count": 270,
-            "organism_count": 53
+            "gene_count": 288,
+            "organism_count": 54
           }
         ]
       }
@@ -695,19 +695,19 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 13343,
-        "total_matching": 50,
-        "score_max": 9.802618980407715,
-        "score_median": 1.5768532752990723,
+        "total_entries": 13352,
+        "total_matching": 51,
+        "score_max": 9.792551040649414,
+        "score_median": 1.570216178894043,
         "returned": 5,
         "offset": 0,
         "truncated": true,
         "by_ontology": [
           {
             "ontology": "interpro",
-            "total_entries": 13343,
-            "total_matching": 50,
-            "score_max": 9.802618980407715,
+            "total_entries": 13352,
+            "total_matching": 51,
+            "score_max": 9.792551040649414,
             "returned": 5,
             "truncated": true
           }
@@ -722,34 +722,34 @@ examples:
             "id": "interpro:IPR027417",
             "name": "P-loop containing nucleoside triphosphate hydrolase",
             "ontology_type": "interpro",
-            "score": 9.802618980407715,
+            "score": 9.792551040649414,
             "level": 0,
             "is_informative": true,
             "interpro_type": "HOMOLOGOUS_SUPERFAMILY",
-            "gene_count": 17886,
-            "organism_count": 117
+            "gene_count": 18080,
+            "organism_count": 118
           },
           {
             "id": "interpro:IPR008250",
             "name": "P-type ATPase, A domain superfamily",
             "ontology_type": "interpro",
-            "score": 5.829111576080322,
+            "score": 5.81855583190918,
             "level": 0,
             "is_informative": true,
             "interpro_type": "HOMOLOGOUS_SUPERFAMILY",
-            "gene_count": 229,
-            "organism_count": 114
+            "gene_count": 232,
+            "organism_count": 115
           },
           {
             "id": "interpro:IPR023534",
             "name": "Rof/RNase P-like",
             "ontology_type": "interpro",
-            "score": 4.443747520446777,
+            "score": 4.435574054718018,
             "level": 0,
             "is_informative": true,
             "interpro_type": "HOMOLOGOUS_SUPERFAMILY",
-            "gene_count": 7,
-            "organism_count": 7
+            "gene_count": 8,
+            "organism_count": 8
           },
           ...
         ]
@@ -794,8 +794,8 @@ examples:
             "score": null,
             "level": 0,
             "is_informative": true,
-            "gene_count": 1219,
-            "organism_count": 117,
+            "gene_count": 1232,
+            "organism_count": 118,
             "description": "Proteins with a small GTP-binding domain recognized by this model include Ras, RhoA, Rab11, translation elongation fa...",
             "level_kind": null,
             "family_type": "domain",
@@ -808,8 +808,8 @@ examples:
             "score": null,
             "level": 0,
             "is_informative": true,
-            "gene_count": 975,
-            "organism_count": 117,
+            "gene_count": 991,
+            "organism_count": 118,
             "description": "This model encompasses all varieties of the sigma-70 type sigma factors including the ECF subfamily. A number of sigm...",
             "level_kind": null,
             "family_type": "superfamily",
@@ -868,8 +868,8 @@ examples:
             "score": 1.653455376625061,
             "level": 1,
             "is_informative": true,
-            "gene_count": 232,
-            "organism_count": 117
+            "gene_count": 233,
+            "organism_count": 118
           },
           {
             "id": "merops.family:S16",
@@ -878,8 +878,8 @@ examples:
             "score": 1.653455376625061,
             "level": 1,
             "is_informative": true,
-            "gene_count": 160,
-            "organism_count": 117
+            "gene_count": 163,
+            "organism_count": 118
           },
           {
             "id": "merops.family:S49",
@@ -888,8 +888,8 @@ examples:
             "score": 1.653455376625061,
             "level": 1,
             "is_informative": true,
-            "gene_count": 221,
-            "organism_count": 117
+            "gene_count": 223,
+            "organism_count": 118
           },
           ...
         ]
@@ -930,8 +930,8 @@ examples:
             "score": 0.5361359119415283,
             "level": 0,
             "is_informative": true,
-            "gene_count": 3221,
-            "organism_count": 117
+            "gene_count": 3355,
+            "organism_count": 118
           }
         ]
       }
@@ -973,8 +973,8 @@ examples:
             "level": 1,
             "is_informative": true,
             "discussed_by_n_publications": 0,
-            "gene_count": 7439,
-            "organism_count": 117
+            "gene_count": 7525,
+            "organism_count": 118
           },
           {
             "id": "kegg.subcategory:09141",
@@ -984,8 +984,8 @@ examples:
             "level": 1,
             "is_informative": true,
             "discussed_by_n_publications": 0,
-            "gene_count": 785,
-            "organism_count": 117
+            "gene_count": 802,
+            "organism_count": 118
           },
           {
             "id": "kegg.orthology:K03322",
@@ -1037,9 +1037,9 @@ examples:
             "score": 4.152606964111328,
             "level": 2,
             "is_informative": true,
-            "discussed_by_n_publications": 24,
-            "gene_count": 1847,
-            "organism_count": 117
+            "discussed_by_n_publications": 27,
+            "gene_count": 1868,
+            "organism_count": 118
           }
         ]
       }

@@ -2,7 +2,7 @@
 # Live ControlledVocabulary values for the properties the docs quote.
 # tests/unit/test_docs_lint.py reads this offline; the -m kg test in
 # tests/integration/test_docs_kg_claims.py asserts it matches the live KG.
-kg_built_at: '2026-10-28T18:39:47.059Z'
+kg_built_at: '2026-10-31T08:59:10.026Z'
 vocabularies:
   background_factors:
     ClusteringAnalysis:
@@ -366,10 +366,12 @@ vocabularies:
       - compartment
       - darkness
       - diel
+      - essentiality
       - genomic_analysis
       - growth_phase
       - iron
       - light
+      - mutant
       - nitrogen
       - oxygen
       - phosphorus
@@ -388,10 +390,12 @@ vocabularies:
       - compartment
       - darkness
       - diel
+      - essentiality
       - genomic_analysis
       - growth_phase
       - iron
       - light
+      - mutant
       - nitrogen
       - oxygen
       - phosphorus
@@ -410,10 +414,12 @@ vocabularies:
       - compartment
       - darkness
       - diel
+      - essentiality
       - genomic_analysis
       - growth_phase
       - iron
       - light
+      - mutant
       - nitrogen
       - oxygen
       - phosphorus
@@ -432,10 +438,12 @@ vocabularies:
       - compartment
       - darkness
       - diel
+      - essentiality
       - genomic_analysis
       - growth_phase
       - iron
       - light
+      - mutant
       - nitrogen
       - oxygen
       - phosphorus

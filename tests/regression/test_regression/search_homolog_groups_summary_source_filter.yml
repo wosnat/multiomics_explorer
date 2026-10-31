@@ -6,7 +6,7 @@ rows:
   by_source:
   - '{''count'': 487, ''item'': ''cyanorak''}'
   score_max: 3.8851
-  score_median: 1.0955
+  score_median: 1.0954
   top_cog_categories:
   - '{''id'': ''cog.category:C'', ''count'': 197, ''name'': ''Energy production and
     conversion''}'

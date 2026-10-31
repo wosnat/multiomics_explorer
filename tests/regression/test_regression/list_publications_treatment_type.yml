@@ -1,5 +1,5 @@
 case_id: list_publications_treatment_type
-row_count: 11
+row_count: 14
 rows:
 - authors:
   - Daniel Sher
@@ -157,6 +157,43 @@ rows:
   - coculture
   year: 2022
 - authors:
+  - Arthur S. Edison
+  - Brittany Widner
+  - Elizabeth B. Kujawinski
+  - Frank Xavier Ferrer-González
+  - John Glushka
+  - Mary Ann Moran
+  - Nicole R. Holderman
+  background_factors:
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  discussed_gene_count: 3
+  discussed_pathway_count: 0
+  doi: 10.1038/s41396-020-00811-y
+  experiment_count: 1
+  growth_phases:
+  - exponential
+  journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Ruegeria pomeroyi DSS-3
+  - Thalassiosira pseudonana
+  study_type: Transcriptomics|Metabolomics
+  title: Resource partitioning of phytoplankton metabolites that support bacterial
+    heterotrophy
+  treatment_types:
+  - coculture
+  year: 2020
+- authors:
   - Amandeep Kaur
   - Elizabeth M. Wellington
   - Joseph A. Christie-Oleza
@@ -299,6 +336,98 @@ rows:
   treatment_types:
   - coculture
   year: 2016
+- authors:
+  - Benjamin A. S. Van Mooy
+  - Bryndan P. Durham
+  - Christa B. Smith
+  - E. Virginia Armbrust
+  - Elizabeth B. Kujawinski
+  - Haiwei Luo
+  - Mary Ann Moran
+  - Sara J. Bender
+  - Shady A. Amin
+  - Shalabh Sharma
+  - Shawn R. Campagna
+  - Stephen P. Dearth
+  background_factors:
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  discussed_gene_count: 6
+  discussed_pathway_count: 2
+  doi: 10.1073/pnas.1413137112
+  experiment_count: 1
+  growth_phases:
+  - unknown
+  journal: PNAS
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Ruegeria pomeroyi DSS-3
+  - Thalassiosira pseudonana
+  study_type: Transcriptomics (RNA-Seq)
+  title: Cryptic carbon and sulfur cycling between surface ocean plankton
+  treatment_types:
+  - coculture
+  year: 2015
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - exoproteome
+  derived_metric_count: 16
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  discussed_gene_count: 44
+  discussed_pathway_count: 4
+  doi: 10.1111/1462-2920.12822
+  experiment_count: 12
+  growth_phases:
+  - darkness
+  - exponential
+  - infected
+  - other:early_incubation
+  journal: Environmental Microbiology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - EXOPROTEOMICS
+  organisms:
+  - Phage
+  - Ruegeria pomeroyi DSS-3
+  - Synechococcus CC9311
+  - Synechococcus RS9916
+  - Synechococcus RS9917
+  - Synechococcus WH5701
+  - Synechococcus WH7803
+  - Synechococcus WH7805
+  - Synechococcus WH8102
+  - Synechococcus sp. BL107
+  study_type: Proteomics
+  title: Functional distinctness in the exoproteomes of marine Synechococcus
+  treatment_types:
+  - coculture
+  - compartment
+  - darkness
+  - growth_phase
+  - viral
+  year: 2015
 - authors:
   - David J. Scanlan
   - Jean Armengaud

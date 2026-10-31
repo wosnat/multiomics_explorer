@@ -1,5 +1,5 @@
 case_id: list_experiments_all
-row_count: 303
+row_count: 338
 rows:
 - authors:
   - Guadalupe Gómez-Baena
@@ -1099,6 +1099,341 @@ rows:
   treatment_type:
   - carbon
 - authors:
+  - Alexandra H. Campbell
+  - Beatriz Noriega-Ortega
+  - Dominik Lücking
+  - Ezequiel M. Marzinelli
+  - Galaxy Qiu
+  - Hanna Koch
+  - Heike M. Freese
+  - Jörg Overmann
+  - Martine Berger
+  - Matthias Wietz
+  - Meinhard Simon
+  - Nora Germscheid
+  - Peter D. Steinberg
+  - Thorsten Dittmar
+  background_factors: []
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: null
+  derived_metric_count: 1
+  derived_metric_value_kinds:
+  - boolean
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1038/s41598-020-57526-5_unique_genes_831
+  experiment_name: Alteromonas 83-1 strain-unique genes among 12 A. macleodii genomes
+    (Koch 2020)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: BIOINFORMATIC
+  organism_name: Alteromonas macleodii 83-1
+  publication_doi: 10.1038/s41598-020-57526-5
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: null
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - genomic_analysis
+- authors:
+  - Alexandra Dürwald
+  - Beatriz Noriega-Ortega
+  - Dörte Becher
+  - Hanna Koch
+  - Heike M. Freese
+  - Jan-Hendrik Hehemann
+  - Matthias Wietz
+  - Meinhard Simon
+  - Silvia Vidal-Melgosa
+  - Thomas Schweder
+  - Thorsten Dittmar
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: baseline
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Two sampling times of the same cultures: phase M2 at 21 h (alginate
+    and pectin use, no net growth) against phase M1 at 13 h (exponential growth on
+    laminarin) as reference.'
+  distinct_gene_count: 4018
+  experiment_id: 10.1038/s41396-018-0252-4_mix_alginate_pectin_phase_vs_laminarin_phase_831_rnaseq
+  experiment_name: Alteromonas 83-1 alginate/pectin phase (M2, 21 h) vs laminarin
+    phase (M1, 13 h) on a polysaccharide mix (RNASEQ)
+  gene_count: 4018
+  growth_phases:
+  - other:no_net_growth
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii 83-1
+  publication_doi: 10.1038/s41396-018-0252-4
+  significant_down_count: 246
+  significant_up_count: 280
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_growth_phases:
+  - other:no_net_growth
+  time_point_hours:
+  - '21.0'
+  time_point_labels:
+  - 21h (M2)
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '246'
+  time_point_significant_up:
+  - '280'
+  time_point_totals:
+  - '4018'
+  treatment_type:
+  - carbon
+  - growth_phase
+- authors:
+  - Alexandra Dürwald
+  - Beatriz Noriega-Ortega
+  - Dörte Becher
+  - Hanna Koch
+  - Heike M. Freese
+  - Jan-Hendrik Hehemann
+  - Matthias Wietz
+  - Meinhard Simon
+  - Silvia Vidal-Melgosa
+  - Thomas Schweder
+  - Thorsten Dittmar
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: null
+  distinct_gene_count: 4018
+  experiment_id: 10.1038/s41396-018-0252-4_polysaccharide_mix_vs_glucose_phase1_831_rnaseq
+  experiment_name: Alteromonas 83-1 on a polysaccharide mix vs glucose at 13 h (M1
+    vs G1) (RNASEQ)
+  gene_count: 4018
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii 83-1
+  publication_doi: 10.1038/s41396-018-0252-4
+  significant_down_count: 49
+  significant_up_count: 49
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '13.0'
+  time_point_labels:
+  - 13h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '49'
+  time_point_significant_up:
+  - '49'
+  time_point_totals:
+  - '4018'
+  treatment_type:
+  - carbon
+- authors:
+  - Alexandra Dürwald
+  - Beatriz Noriega-Ortega
+  - Dörte Becher
+  - Hanna Koch
+  - Heike M. Freese
+  - Jan-Hendrik Hehemann
+  - Matthias Wietz
+  - Meinhard Simon
+  - Silvia Vidal-Melgosa
+  - Thomas Schweder
+  - Thorsten Dittmar
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Same sampling time (21 h) in both arms, but different physiological
+    states: no net growth on alginate and pectin vs stationary phase on glucose.'
+  distinct_gene_count: 4018
+  experiment_id: 10.1038/s41396-018-0252-4_polysaccharide_mix_vs_glucose_phase2_831_rnaseq
+  experiment_name: Alteromonas 83-1 on a polysaccharide mix vs glucose at 21 h (M2
+    vs G2) (RNASEQ)
+  gene_count: 4018
+  growth_phases:
+  - other:no_net_growth
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii 83-1
+  publication_doi: 10.1038/s41396-018-0252-4
+  significant_down_count: 580
+  significant_up_count: 279
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_growth_phases:
+  - other:no_net_growth
+  time_point_hours:
+  - '21.0'
+  time_point_labels:
+  - 21h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '580'
+  time_point_significant_up:
+  - '279'
+  time_point_totals:
+  - '4018'
+  treatment_type:
+  - carbon
+- authors:
+  - Alexandra Dürwald
+  - Beatriz Noriega-Ortega
+  - Dörte Becher
+  - Hanna Koch
+  - Heike M. Freese
+  - Jan-Hendrik Hehemann
+  - Matthias Wietz
+  - Meinhard Simon
+  - Silvia Vidal-Melgosa
+  - Thomas Schweder
+  - Thorsten Dittmar
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: baseline
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Two sampling times of the same glucose cultures: stationary phase
+    at 21 h against exponential phase at 13 h as reference.'
+  distinct_gene_count: 4018
+  experiment_id: 10.1038/s41396-018-0252-4_glucose_stationary_vs_exponential_831_rnaseq
+  experiment_name: Alteromonas 83-1 on glucose, stationary (G2, 21 h) vs exponential
+    (G1, 13 h) (RNASEQ)
+  gene_count: 4018
+  growth_phases:
+  - stationary
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii 83-1
+  publication_doi: 10.1038/s41396-018-0252-4
+  significant_down_count: 542
+  significant_up_count: 785
+  table_scope: all_detected_genes
+  table_scope_detail: ''
+  time_point_count: 1
+  time_point_growth_phases:
+  - stationary
+  time_point_hours:
+  - '21.0'
+  time_point_labels:
+  - 21h (G2)
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '542'
+  time_point_significant_up:
+  - '785'
+  time_point_totals:
+  - '4018'
+  treatment_type:
+  - growth_phase
+- authors:
+  - Alexandra Dürwald
+  - Beatriz Noriega-Ortega
+  - Dörte Becher
+  - Hanna Koch
+  - Heike M. Freese
+  - Jan-Hendrik Hehemann
+  - Matthias Wietz
+  - Meinhard Simon
+  - Silvia Vidal-Melgosa
+  - Thomas Schweder
+  - Thorsten Dittmar
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: null
+  derived_metric_count: 4
+  derived_metric_value_kinds:
+  - numeric
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1038/s41396-018-0252-4_proteome_nsaf_831_proteomics
+  experiment_name: Alteromonas 83-1 whole-cell proteome on glucose and on a polysaccharide
+    mix at 13 h and 21 h (%NSAF)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas macleodii 83-1
+  publication_doi: 10.1038/s41396-018-0252-4
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: null
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - carbon
+- authors:
   - Cécile Carpaneto Bastos
   - Daniel Sher
   - Eduard Fadeev
@@ -1146,6 +1481,58 @@ rows:
   treatment_type:
   - compartment
 - authors:
+  - Alexandra H. Campbell
+  - Beatriz Noriega-Ortega
+  - Dominik Lücking
+  - Ezequiel M. Marzinelli
+  - Galaxy Qiu
+  - Hanna Koch
+  - Heike M. Freese
+  - Jörg Overmann
+  - Martine Berger
+  - Matthias Wietz
+  - Meinhard Simon
+  - Nora Germscheid
+  - Peter D. Steinberg
+  - Thorsten Dittmar
+  background_factors: []
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: null
+  derived_metric_count: 1
+  derived_metric_value_kinds:
+  - boolean
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1038/s41598-020-57526-5_unique_genes_ad45
+  experiment_name: Alteromonas AD45 strain-unique genes among 12 A. macleodii genomes
+    (Koch 2020)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: BIOINFORMATIC
+  organism_name: Alteromonas macleodii AD45
+  publication_doi: 10.1038/s41598-020-57526-5
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: null
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - genomic_analysis
+- authors:
   - Cécile Carpaneto Bastos
   - Daniel Sher
   - Eduard Fadeev
@@ -1192,6 +1579,209 @@ rows:
   time_point_totals: []
   treatment_type:
   - compartment
+- authors:
+  - Christopher L. Dupont
+  - Josh L. Espinoza
+  - Katherine A. Barbeau
+  - Lauren E. Manck
+  background_factors: []
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: null
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1128/mSystems.00070-20_tbdt_survey_atcc27126
+  experiment_name: Alteromonas ATCC27126 TonB-dependent transporter inventory and
+    substrate prediction (Manck 2020)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: BIOINFORMATIC
+  organism_name: Alteromonas macleodii ATCC27126
+  publication_doi: 10.1128/mSystems.00070-20
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: null
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - genomic_analysis
+- authors:
+  - Christopher L. Dupont
+  - Josh L. Espinoza
+  - Katherine A. Barbeau
+  - Lauren E. Manck
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: Both arms were inoculated from the same carbon-limited preculture
+    and harvested together when the carbon-replete cultures reached mid-exponential
+    phase.
+  distinct_gene_count: 958
+  experiment_id: 10.1128/mSystems.00070-20_carbon_limitation_atcc27126_rnaseq
+  experiment_name: Alteromonas ATCC27126 carbon limitation vs carbon replete RNA-seq
+    (Manck 2020)
+  gene_count: 958
+  growth_phases:
+  - nutrient_limited
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii ATCC27126
+  publication_doi: 10.1128/mSystems.00070-20
+  significant_down_count: 448
+  significant_up_count: 510
+  table_scope: significant_only
+  table_scope_detail: Data Set S1 lists only differentially expressed ORFs (,log2FC,
+    >= 1, FDR < 0.05)
+  time_point_count: 1
+  time_point_growth_phases:
+  - nutrient_limited
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - mid-exponential (replete)
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '448'
+  time_point_significant_up:
+  - '510'
+  time_point_totals:
+  - '958'
+  treatment_type:
+  - carbon
+- authors:
+  - Christopher L. Dupont
+  - Josh L. Espinoza
+  - Katherine A. Barbeau
+  - Lauren E. Manck
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: Both arms were inoculated from the same iron-preconditioned culture
+    and harvested together after 6.5 h, when the iron-replete cultures reached mid-exponential
+    phase (OD600 0.68).
+  distinct_gene_count: 742
+  experiment_id: 10.1128/mSystems.00070-20_iron_limitation_atcc27126_rnaseq
+  experiment_name: Alteromonas ATCC27126 iron limitation vs iron replete RNA-seq (Manck
+    2020)
+  gene_count: 742
+  growth_phases:
+  - nutrient_limited
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Alteromonas macleodii ATCC27126
+  publication_doi: 10.1128/mSystems.00070-20
+  significant_down_count: 323
+  significant_up_count: 419
+  table_scope: significant_only
+  table_scope_detail: Data Set S1 lists only differentially expressed ORFs (,log2FC,
+    >= 1, FDR < 0.05)
+  time_point_count: 1
+  time_point_growth_phases:
+  - nutrient_limited
+  time_point_hours:
+  - '6.5'
+  time_point_labels:
+  - 6.5h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '323'
+  time_point_significant_up:
+  - '419'
+  time_point_totals:
+  - '742'
+  treatment_type:
+  - iron
+- authors:
+  - Alexandra H. Campbell
+  - Beatriz Noriega-Ortega
+  - Dominik Lücking
+  - Ezequiel M. Marzinelli
+  - Galaxy Qiu
+  - Hanna Koch
+  - Heike M. Freese
+  - Jörg Overmann
+  - Martine Berger
+  - Matthias Wietz
+  - Meinhard Simon
+  - Nora Germscheid
+  - Peter D. Steinberg
+  - Thorsten Dittmar
+  background_factors: []
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: null
+  derived_metric_count: 1
+  derived_metric_value_kinds:
+  - boolean
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1038/s41598-020-57526-5_unique_genes_atcc27126
+  experiment_name: Alteromonas ATCC27126 strain-unique genes among 12 A. macleodii
+    genomes (Koch 2020)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: BIOINFORMATIC
+  organism_name: Alteromonas macleodii ATCC27126
+  publication_doi: 10.1038/s41598-020-57526-5
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: null
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - genomic_analysis
 - authors:
   - Cécile Carpaneto Bastos
   - Daniel Sher
@@ -2622,6 +3212,58 @@ rows:
   time_point_totals: []
   treatment_type:
   - compartment
+- authors:
+  - Alexandra H. Campbell
+  - Beatriz Noriega-Ortega
+  - Dominik Lücking
+  - Ezequiel M. Marzinelli
+  - Galaxy Qiu
+  - Hanna Koch
+  - Heike M. Freese
+  - Jörg Overmann
+  - Martine Berger
+  - Matthias Wietz
+  - Meinhard Simon
+  - Nora Germscheid
+  - Peter D. Steinberg
+  - Thorsten Dittmar
+  background_factors: []
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: null
+  derived_metric_count: 1
+  derived_metric_value_kinds:
+  - boolean
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1038/s41598-020-57526-5_unique_genes_mit1002
+  experiment_name: Alteromonas MIT1002 strain-unique genes among 12 A. macleodii genomes
+    (Koch 2020)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: BIOINFORMATIC
+  organism_name: Alteromonas macleodii MIT1002
+  publication_doi: 10.1038/s41598-020-57526-5
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: null
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - genomic_analysis
 - authors:
   - Allison Coe
   - Sallie W. Chisholm
@@ -12000,6 +12642,291 @@ rows:
   treatment_type:
   - coculture
 - authors:
+  - Adam W. E. Stewart
+  - David Schleheck
+  - Hamza Tahir
+  - Helen Barber
+  - Mihwa Lee
+  - Nichollas E. Scott
+  - Sabrina Borusak
+  - Spencer J. Williams
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state: every culture was harvested at mid-log phase
+    on its own substrate, so the glucose control and the treatment were sampled at
+    the same growth stage, not the same clock time. Perseus Difference was glucose
+    minus substrate and is negated in the builder.'
+  distinct_gene_count: 1836
+  experiment_id: 10.1039/d6sc02372j_l_cysteine_vs_glucose_dss3_proteomics
+  experiment_name: R. pomeroyi DSS-3 proteome on L-cysteine vs glucose (LFQ proteomics)
+  gene_count: 1836
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: PROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1039/d6sc02372j
+  significant_down_count: 61
+  significant_up_count: 57
+  table_scope: all_detected_genes
+  table_scope_detail: All 1,837 R. pomeroyi protein groups quantified (Perseus Imputed
+    sheet); missing LFQ values imputed (width 0.3, downshift 2.0 SD)
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - mid-log
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '61'
+  time_point_significant_up:
+  - '57'
+  time_point_totals:
+  - '1836'
+  treatment_type:
+  - carbon
+- authors:
+  - Adam W. E. Stewart
+  - David Schleheck
+  - Hamza Tahir
+  - Helen Barber
+  - Mihwa Lee
+  - Nichollas E. Scott
+  - Sabrina Borusak
+  - Spencer J. Williams
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state: both enantiomer cultures harvested at mid-log
+    phase. Perseus Difference R-DHPS_S_DHPS is R minus S and is used unchanged (Fig.
+    S2).'
+  distinct_gene_count: 1836
+  experiment_id: 10.1039/d6sc02372j_r_dhps_vs_s_dhps_dss3_proteomics
+  experiment_name: R. pomeroyi DSS-3 proteome on R-DHPS vs S-DHPS (LFQ proteomics)
+  gene_count: 1836
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: PROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1039/d6sc02372j
+  significant_down_count: 23
+  significant_up_count: 44
+  table_scope: all_detected_genes
+  table_scope_detail: All 1,837 R. pomeroyi protein groups quantified (Perseus Imputed
+    sheet); missing LFQ values imputed (width 0.3, downshift 2.0 SD)
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - mid-log
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '23'
+  time_point_significant_up:
+  - '44'
+  time_point_totals:
+  - '1836'
+  treatment_type:
+  - carbon
+- authors:
+  - Adam W. E. Stewart
+  - David Schleheck
+  - Hamza Tahir
+  - Helen Barber
+  - Mihwa Lee
+  - Nichollas E. Scott
+  - Sabrina Borusak
+  - Spencer J. Williams
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state: every culture was harvested at mid-log phase
+    on its own substrate, so the glucose control and the treatment were sampled at
+    the same growth stage, not the same clock time. Perseus Difference was glucose
+    minus substrate and is negated in the builder.'
+  distinct_gene_count: 1836
+  experiment_id: 10.1039/d6sc02372j_r_dhps_vs_glucose_dss3_proteomics
+  experiment_name: R. pomeroyi DSS-3 proteome on R-DHPS vs glucose (LFQ proteomics)
+  gene_count: 1836
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: PROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1039/d6sc02372j
+  significant_down_count: 77
+  significant_up_count: 55
+  table_scope: all_detected_genes
+  table_scope_detail: All 1,837 R. pomeroyi protein groups quantified (Perseus Imputed
+    sheet); missing LFQ values imputed (width 0.3, downshift 2.0 SD)
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - mid-log
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '77'
+  time_point_significant_up:
+  - '55'
+  time_point_totals:
+  - '1836'
+  treatment_type:
+  - carbon
+- authors:
+  - Adam W. E. Stewart
+  - David Schleheck
+  - Hamza Tahir
+  - Helen Barber
+  - Mihwa Lee
+  - Nichollas E. Scott
+  - Sabrina Borusak
+  - Spencer J. Williams
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state: every culture was harvested at mid-log phase
+    on its own substrate, so the glucose control and the treatment were sampled at
+    the same growth stage, not the same clock time. Perseus Difference was glucose
+    minus substrate and is negated in the builder.'
+  distinct_gene_count: 1836
+  experiment_id: 10.1039/d6sc02372j_s_dhps_vs_glucose_dss3_proteomics
+  experiment_name: R. pomeroyi DSS-3 proteome on S-DHPS vs glucose (LFQ proteomics)
+  gene_count: 1836
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: PROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1039/d6sc02372j
+  significant_down_count: 131
+  significant_up_count: 81
+  table_scope: all_detected_genes
+  table_scope_detail: All 1,837 R. pomeroyi protein groups quantified (Perseus Imputed
+    sheet); missing LFQ values imputed (width 0.3, downshift 2.0 SD)
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - mid-log
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '131'
+  time_point_significant_up:
+  - '81'
+  time_point_totals:
+  - '1836'
+  treatment_type:
+  - carbon
+- authors:
+  - Arthur S. Edison
+  - Brittany Widner
+  - Elizabeth B. Kujawinski
+  - Frank Xavier Ferrer-González
+  - John Glushka
+  - Mary Ann Moran
+  - Nicole R. Holderman
+  background_factors:
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner:
+  - Thalassiosira pseudonana
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: Both arms sampled 8 h after bacterial inoculation, during the light
+    period. The control is axenic DSS-3 on glucose rather than DSS-3 alone without
+    carbon, so the contrast also includes the carbon-source difference (diatom exometabolites
+    vs glucose); the authors chose it to give a baseline of actively growing cells.
+    Table sign was control minus co-culture and is negated in the builder.
+  distinct_gene_count: 4224
+  experiment_id: 10.1038/s41396-020-00811-y_coculture_tpseudonana_dss3_rnaseq
+  experiment_name: R. pomeroyi DSS-3 transcriptome in co-culture with Thalassiosira
+    pseudonana vs glucose control (8 h)
+  gene_count: 4224
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1038/s41396-020-00811-y
+  significant_down_count: 343
+  significant_up_count: 392
+  table_scope: all_detected_genes
+  table_scope_detail: All 4,277 DSS-3 genes in Table S5 (DESeq2 output)
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '8.0'
+  time_point_labels:
+  - 8h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '343'
+  time_point_significant_up:
+  - '392'
+  time_point_totals:
+  - '4224'
+  treatment_type:
+  - coculture
+- authors:
   - Amandeep Kaur
   - Elizabeth M. Wellington
   - Joseph A. Christie-Oleza
@@ -12251,6 +13178,69 @@ rows:
   - '79'
   time_point_totals:
   - '1724'
+  treatment_type:
+  - coculture
+- authors:
+  - Benjamin A. S. Van Mooy
+  - Bryndan P. Durham
+  - Christa B. Smith
+  - E. Virginia Armbrust
+  - Elizabeth B. Kujawinski
+  - Haiwei Luo
+  - Mary Ann Moran
+  - Sara J. Bender
+  - Shady A. Amin
+  - Shalabh Sharma
+  - Shawn R. Campagna
+  - Stephen P. Dearth
+  background_factors:
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner:
+  - Thalassiosira pseudonana
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: Both arms sampled 8 h after bacterial inoculation at the midpoint
+    of the light cycle. The control is DSS-3 alone in the same carbon-free f/2 medium,
+    so the only carbon source in the co-culture is diatom-derived. Fold changes in
+    ST01 are linear and are converted to log2 in the builder.
+  distinct_gene_count: 101
+  experiment_id: 10.1073/pnas.1413137112_coculture_tpseudonana_dss3_rnaseq
+  experiment_name: R. pomeroyi DSS-3 transcriptome in co-culture with B12-limited
+    Thalassiosira pseudonana vs DSS-3 alone (8 h)
+  gene_count: 101
+  growth_phases:
+  - unknown
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1073/pnas.1413137112
+  significant_down_count: 34
+  significant_up_count: 67
+  table_scope: significant_only
+  table_scope_detail: 101 DSS-3 genes with baySeq FDR < 0.05 in at least two of three
+    independent subsampled analyses
+  time_point_count: 1
+  time_point_growth_phases:
+  - unknown
+  time_point_hours:
+  - '8.0'
+  time_point_labels:
+  - 8h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '34'
+  time_point_significant_up:
+  - '67'
+  time_point_totals:
+  - '101'
   treatment_type:
   - coculture
 - authors:
@@ -13343,6 +14333,52 @@ rows:
   time_point_totals: []
   treatment_type:
   - genomic_analysis
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: exoproteome
+  control_timing: null
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_cc9311
+  experiment_name: Synechococcus CC9311 exoproteome composition under standard growth
+    (Christie-Oleza 2015b)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus CC9311
+  publication_doi: 10.1111/1462-2920.12822
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: filtered_subset
+  table_scope_detail: Exoproteins detected with >=2 unique peptides in this strain,
+    plus BLASTp homologues (E < 1e-20) of exoproteins detected in the other strains
+    (listed as not detected)
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
 - authors:
   - Benjamin A. Ford
   - Bhumika S. Shah
@@ -14572,6 +15608,52 @@ rows:
   treatment_type:
   - genomic_analysis
 - authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: exoproteome
+  control_timing: null
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_rs9916
+  experiment_name: Synechococcus RS9916 exoproteome composition under standard growth
+    (Christie-Oleza 2015b)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus RS9916
+  publication_doi: 10.1111/1462-2920.12822
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: filtered_subset
+  table_scope_detail: Exoproteins detected with >=2 unique peptides in this strain,
+    plus BLASTp homologues (E < 1e-20) of exoproteins detected in the other strains
+    (listed as not detected)
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
   - Benjamin A. Ford
   - Bhumika S. Shah
   - Bridget C. Mabbutt
@@ -14618,6 +15700,52 @@ rows:
   time_point_totals: []
   treatment_type:
   - genomic_analysis
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: exoproteome
+  control_timing: null
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_rs9917
+  experiment_name: Synechococcus RS9917 exoproteome composition under standard growth
+    (Christie-Oleza 2015b)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus RS9917
+  publication_doi: 10.1111/1462-2920.12822
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: filtered_subset
+  table_scope_detail: Exoproteins detected with >=2 unique peptides in this strain,
+    plus BLASTp homologues (E < 1e-20) of exoproteins detected in the other strains
+    (listed as not detected)
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
 - authors:
   - Benjamin A. Ford
   - Bhumika S. Shah
@@ -14759,6 +15887,53 @@ rows:
   time_point_totals: []
   treatment_type:
   - genomic_analysis
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: exoproteome
+  control_timing: null
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_wh5701
+  experiment_name: Synechococcus WH5701 exoproteome composition under standard growth
+    (Christie-Oleza 2015b)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH5701
+  publication_doi: 10.1111/1462-2920.12822
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: filtered_subset
+  table_scope_detail: Exoproteins detected with >=2 unique peptides in this strain,
+    plus BLASTp homologues (E < 1e-20) of exoproteins detected in the other strains
+    (listed as not detected)
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
 - authors:
   - Guadalupe Gómez-Baena
   - Jesús Díez
@@ -15528,6 +16703,53 @@ rows:
   treatment_type:
   - viral
 - authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: exoproteome
+  control_timing: null
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_wh7803
+  experiment_name: Synechococcus WH7803 exoproteome composition under standard growth
+    (Christie-Oleza 2015b)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH7803
+  publication_doi: 10.1111/1462-2920.12822
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: filtered_subset
+  table_scope_detail: Exoproteins detected with >=2 unique peptides in this strain,
+    plus BLASTp homologues (E < 1e-20) of exoproteins detected in the other strains
+    (listed as not detected)
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
   - Benjamin A. Ford
   - Bhumika S. Shah
   - Bridget C. Mabbutt
@@ -15574,6 +16796,53 @@ rows:
   time_point_totals: []
   treatment_type:
   - genomic_analysis
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: exoproteome
+  control_timing: null
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_wh7805
+  experiment_name: Synechococcus WH7805 exoproteome composition under standard growth
+    (Christie-Oleza 2015b)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH7805
+  publication_doi: 10.1111/1462-2920.12822
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: filtered_subset
+  table_scope_detail: Exoproteins detected with >=2 unique peptides in this strain,
+    plus BLASTp homologues (E < 1e-20) of exoproteins detected in the other strains
+    (listed as not detected)
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
 - authors:
   - Benjamin A. Ford
   - Bhumika S. Shah
@@ -16094,6 +17363,322 @@ rows:
   treatment_type:
   - viral
 - authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner:
+  - Phage
+  compartment: exoproteome
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: null
+  distinct_gene_count: 130
+  experiment_id: 10.1111/1462-2920.12822_wh8102_exoproteome_phage_srsm4_10h
+  experiment_name: Synechococcus WH8102 exoproteome 10 h after cyanophage S-RSM4 infection
+    vs uninfected
+  gene_count: 130
+  growth_phases:
+  - infected
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH8102
+  publication_doi: 10.1111/1462-2920.12822
+  significant_down_count: 7
+  significant_up_count: 4
+  table_scope: all_detected_genes
+  table_scope_detail: Every protein validated (>=2 unique peptides) in either arm,
+    including p > 0.05
+  time_point_count: 1
+  time_point_growth_phases:
+  - infected
+  time_point_hours:
+  - '10.0'
+  time_point_labels:
+  - 10 h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '7'
+  time_point_significant_up:
+  - '4'
+  time_point_totals:
+  - '130'
+  treatment_type:
+  - viral
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: exoproteome
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: null
+  distinct_gene_count: 191
+  experiment_id: 10.1111/1462-2920.12822_wh8102_exoproteome_dark_10h
+  experiment_name: Synechococcus WH8102 exoproteome after 10 h in the dark vs 10 h
+    in the light
+  gene_count: 191
+  growth_phases:
+  - darkness
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH8102
+  publication_doi: 10.1111/1462-2920.12822
+  significant_down_count: 12
+  significant_up_count: 46
+  table_scope: all_detected_genes
+  table_scope_detail: Every protein validated (>=2 unique peptides) in either arm,
+    including p > 0.05
+  time_point_count: 1
+  time_point_growth_phases:
+  - darkness
+  time_point_hours:
+  - '10.0'
+  time_point_labels:
+  - 10 h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '12'
+  time_point_significant_up:
+  - '46'
+  time_point_totals:
+  - '191'
+  treatment_type:
+  - darkness
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: exoproteome
+  control_timing: baseline
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Incubation time is the variable: the 10 h arm is compared with the
+    standard 4-day cultures (the same samples as exoproteome_wh8102 in Table S4),
+    sampled about 3.5 days later at ~1e8 cells/ml, still growing (exponential).'
+  distinct_gene_count: 157
+  experiment_id: 10.1111/1462-2920.12822_wh8102_exoproteome_10h_vs_4d
+  experiment_name: Synechococcus WH8102 exoproteome after 10 h vs 4 days of incubation
+  gene_count: 157
+  growth_phases:
+  - other:early_incubation
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH8102
+  publication_doi: 10.1111/1462-2920.12822
+  significant_down_count: 28
+  significant_up_count: 12
+  table_scope: all_detected_genes
+  table_scope_detail: Every protein validated (>=2 unique peptides) in either arm,
+    including p > 0.05
+  time_point_count: 1
+  time_point_growth_phases:
+  - other:early_incubation
+  time_point_hours:
+  - '10.0'
+  time_point_labels:
+  - 10 h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '28'
+  time_point_significant_up:
+  - '12'
+  time_point_totals:
+  - '157'
+  treatment_type:
+  - growth_phase
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: exoproteome
+  control_timing: null
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_wh8102
+  experiment_name: Synechococcus WH8102 exoproteome composition under standard growth
+    (Christie-Oleza 2015b)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH8102
+  publication_doi: 10.1111/1462-2920.12822
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: filtered_subset
+  table_scope_detail: Exoproteins detected with >=2 unique peptides in this strain,
+    plus BLASTp homologues (E < 1e-20) of exoproteins detected in the other strains
+    (listed as not detected)
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner:
+  - Ruegeria pomeroyi DSS-3
+  compartment: exoproteome
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: null
+  distinct_gene_count: 151
+  experiment_id: 10.1111/1462-2920.12822_wh8102_exoproteome_coculture_dss3
+  experiment_name: Synechococcus WH8102 exoproteome in coculture with Ruegeria pomeroyi
+    DSS-3 vs axenic (4 days)
+  gene_count: 151
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH8102
+  publication_doi: 10.1111/1462-2920.12822
+  significant_down_count: 56
+  significant_up_count: 15
+  table_scope: all_detected_genes
+  table_scope_detail: Every WH8102 protein validated (>=2 unique peptides) in either
+    arm, including p > 0.05
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '96.0'
+  time_point_labels:
+  - 4 days
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '56'
+  time_point_significant_up:
+  - '15'
+  time_point_totals:
+  - '151'
+  treatment_type:
+  - coculture
+- authors:
+  - Aaron Johnson
+  - Brian Palenik
+  - Dave J Scanlan
+  - Ian T Paulsen
+  - Katherine Phillippy
+  - Martin Ostrowski
+  - Sasha G Tetu
+  - Sophie Mazard
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Matched: ptrA mutant and wild-type cultures were grown in parallel
+    under the same low-P regime and both harvested ~125-150 h after inoculation, at
+    early P stress (nutrient_limited) as defined by phosphatase induction in the wild
+    type.'
+  distinct_gene_count: 160
+  experiment_id: 10.1038/ismej.2010.24_ptra_synw1019_knockout_p_stress_wh8102_microarray
+  experiment_name: WH8102 ptrA (SYNW1019) knockout vs wild type under P stress (microarray)
+  gene_count: 160
+  growth_phases:
+  - nutrient_limited
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: MICROARRAY
+  organism_name: Synechococcus WH8102
+  publication_doi: 10.1038/ismej.2010.24
+  significant_down_count: 96
+  significant_up_count: 64
+  table_scope: filtered_subset
+  table_scope_detail: 'Only genes significant by SAM (FDR < 1 percent) AND changed
+    more than 2-fold: main-text Table 1 (68 down), Table 2 (64 up) and Supplementary
+    Table 3 (29 further down, unknown function). The paper reports 516 down and 645
+    up significant genes in total; the rest are only in GEO GSE18511. The wild-type
+    early-P-stress column of these tables is Tetu 2009 data and is not included.'
+  time_point_count: 1
+  time_point_growth_phases:
+  - nutrient_limited
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - early P stress (~125-150h)
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '96'
+  time_point_significant_up:
+  - '64'
+  time_point_totals:
+  - '160'
+  treatment_type:
+  - mutant
+- authors:
   - Brian Palenik
   - D. Aaron Johnson
   - Ian T. Paulsen
@@ -16151,6 +17736,182 @@ rows:
   - '294'
   treatment_type:
   - coculture
+- authors:
+  - Bianca Brahamsha
+  - Brian Palenik
+  - Daniel A Johnson
+  - Ian T Paulsen
+  - Katherine Phillippy
+  - Sasha G Tetu
+  - Vera Tai
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: baseline
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: Both P-stress timepoints are compared with one P-replete wild-type
+    reference harvested in mid-log phase (exponential), not with a culture sampled
+    alongside the stressed one. early P stress is the point where alkaline phosphatase
+    activity is first detected and late P stress is when growth has largely ceased
+    (late log), several days later.
+  distinct_gene_count: 1541
+  experiment_id: 10.1038/ismej.2009.31_p_stress_wh8102_microarray
+  experiment_name: WH8102 early and late phosphate stress vs P-replete (microarray)
+  gene_count: 1966
+  growth_phases:
+  - nutrient_limited
+  is_time_course: time_course
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: MICROARRAY
+  organism_name: Synechococcus WH8102
+  publication_doi: 10.1038/ismej.2009.31
+  significant_down_count: 967
+  significant_up_count: 999
+  table_scope: significant_only
+  table_scope_detail: Supplementary Table 1A/1B list only the genes SAM called significant
+    at FDR < 5 percent (positive and negative blocks); 2-4 unnamed PSEUDOGENE probe
+    rows per sheet dropped (no gene id).
+  time_point_count: 2
+  time_point_growth_phases:
+  - nutrient_limited
+  - nutrient_limited
+  time_point_hours:
+  - '-1.0'
+  - '-1.0'
+  time_point_labels:
+  - early P stress
+  - late P stress
+  time_point_orders:
+  - '1'
+  - '2'
+  time_point_significant_down:
+  - '324'
+  - '643'
+  time_point_significant_up:
+  - '389'
+  - '610'
+  time_point_totals:
+  - '1253'
+  - '713'
+  treatment_type:
+  - phosphorus
+- authors:
+  - Bianca Brahamsha
+  - Brian Palenik
+  - Daniel A Johnson
+  - Ian T Paulsen
+  - Katherine Phillippy
+  - Sasha G Tetu
+  - Vera Tai
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state: knockout and wild type were grown in parallel
+    in the same P-replete medium and harvested at mid-log phase (exponential).'
+  distinct_gene_count: 1778
+  experiment_id: 10.1038/ismej.2009.31_phob_synw0947_knockout_wh8102_microarray
+  experiment_name: WH8102 phoB (SYNW0947) knockout vs wild type, P-replete (microarray)
+  gene_count: 1778
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: MICROARRAY
+  organism_name: Synechococcus WH8102
+  publication_doi: 10.1038/ismej.2009.31
+  significant_down_count: 959
+  significant_up_count: 819
+  table_scope: significant_only
+  table_scope_detail: Supplementary Table 1C lists only the genes SAM called significant
+    at FDR < 5 percent; unnamed PSEUDOGENE probe rows dropped.
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - mid-log
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '959'
+  time_point_significant_up:
+  - '819'
+  time_point_totals:
+  - '1778'
+  treatment_type:
+  - mutant
+- authors:
+  - Bianca Brahamsha
+  - Brian Palenik
+  - Daniel A Johnson
+  - Ian T Paulsen
+  - Katherine Phillippy
+  - Sasha G Tetu
+  - Vera Tai
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state: knockout and wild type were grown in parallel
+    in the same P-replete medium and harvested at mid-log phase (exponential).'
+  distinct_gene_count: 1038
+  experiment_id: 10.1038/ismej.2009.31_phor_synw0948_knockout_wh8102_microarray
+  experiment_name: WH8102 phoR (SYNW0948) knockout vs wild type, P-replete (microarray)
+  gene_count: 1038
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: MICROARRAY
+  organism_name: Synechococcus WH8102
+  publication_doi: 10.1038/ismej.2009.31
+  significant_down_count: 551
+  significant_up_count: 487
+  table_scope: significant_only
+  table_scope_detail: Supplementary Table 1D lists only the genes SAM called significant
+    at FDR < 5 percent; unnamed PSEUDOGENE probe rows dropped.
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - mid-log
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '551'
+  time_point_significant_up:
+  - '487'
+  time_point_totals:
+  - '1038'
+  treatment_type:
+  - mutant
 - authors:
   - Benjamin A. Ford
   - Bhumika S. Shah
@@ -16463,6 +18224,57 @@ rows:
   - '522'
   treatment_type:
   - coculture
+- authors:
+  - Adam Deutschbauer
+  - Adam P. Arkin
+  - Benjamin E. Rubin
+  - Genevieve Curtin
+  - Kelly M. Wetmore
+  - Laura C. Lowe
+  - Morgan N. Price
+  - Ryan K. Shultzaberger
+  - Spencer Diamond
+  - Susan S. Golden
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: null
+  derived_metric_count: 1
+  derived_metric_value_kinds:
+  - categorical
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1073/pnas.1519220112_rbtnseq_essentiality_pcc7942
+  experiment_name: S. elongatus PCC 7942 genome-wide gene essentiality by RB-TnSeq
+    (Rubin 2015)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: DNASEQ
+  organism_name: Synechococcus elongatus PCC 7942
+  publication_doi: 10.1073/pnas.1519220112
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: all_detected_genes
+  table_scope_detail: All 2,723 annotated protein-coding genes (chromosome + pANS
+    + pANL); 25 paralogs not_analyzed.
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - essentiality
 - authors:
   - Jiajia Ma
   - Lei Chen
@@ -16844,6 +18656,52 @@ rows:
   time_point_totals: []
   treatment_type:
   - genomic_analysis
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: exoproteome
+  control_timing: null
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_bl107
+  experiment_name: Synechococcus sp. BL107 exoproteome composition under standard
+    growth (Christie-Oleza 2015b)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus sp. BL107
+  publication_doi: 10.1111/1462-2920.12822
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: filtered_subset
+  table_scope_detail: Exoproteins detected with >=2 unique peptides in this strain,
+    plus BLASTp homologues (E < 1e-20) of exoproteins detected in the other strains
+    (listed as not detected)
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
+  treatment_type:
+  - compartment
 - authors:
   - Alexander S. Beliaev
   - Donald A. Bryant

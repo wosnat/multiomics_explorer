@@ -2,62 +2,62 @@ case_id: search_ontology_kegg
 row_count: 68
 rows:
 - discussed_by_n_publications: 0
-  gene_count: 73485
+  gene_count: 74281
   id: kegg.category:09100
   is_informative: true
   level: 0
   name: Metabolism
-  organism_count: 117
+  organism_count: 118
   score: 3.0116
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 12
+  gene_count: 13
   id: kegg.orthology:K03402
   is_informative: true
   level: 3
   name: argR, ahrC; transcriptional regulator of arginine metabolism
-  organism_count: 12
+  organism_count: 13
   score: 1.9405
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 1406
+  gene_count: 1425
   id: kegg.pathway:ko00051
   is_informative: true
   level: 2
   name: Fructose and mannose metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.3602
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 1082
+  gene_count: 1098
   id: kegg.pathway:ko00052
   is_informative: true
   level: 2
   name: Galactose metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 2
-  gene_count: 437
+  gene_count: 442
   id: kegg.pathway:ko00053
   is_informative: true
   level: 2
   name: Ascorbate and aldarate metabolism
-  organism_count: 116
+  organism_count: 117
   score: 2.3602
   tree: null
   tree_code: null
 - discussed_by_n_publications: 4
-  gene_count: 4835
+  gene_count: 4896
   id: kegg.pathway:ko00230
   is_informative: true
   level: 2
   name: Purine metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
@@ -72,112 +72,112 @@ rows:
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
-  gene_count: 3045
+  gene_count: 3083
   id: kegg.pathway:ko00240
   is_informative: true
   level: 2
   name: Pyrimidine metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
-  gene_count: 2407
+  gene_count: 2443
   id: kegg.pathway:ko00250
   is_informative: true
   level: 2
   name: Alanine, aspartate and glutamate metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.2015
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
-  gene_count: 3167
+  gene_count: 3202
   id: kegg.pathway:ko00260
   is_informative: true
   level: 2
   name: Glycine, serine and threonine metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.2015
   tree: null
   tree_code: null
 - discussed_by_n_publications: 3
-  gene_count: 3388
+  gene_count: 3427
   id: kegg.pathway:ko00270
   is_informative: true
   level: 2
   name: Cysteine and methionine metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.3602
   tree: null
   tree_code: null
 - discussed_by_n_publications: 3
-  gene_count: 1897
+  gene_count: 1926
   id: kegg.pathway:ko00330
   is_informative: true
   level: 2
   name: Arginine and proline metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.3602
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
-  gene_count: 1523
+  gene_count: 1540
   id: kegg.pathway:ko00340
   is_informative: true
   level: 2
   name: Histidine metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 726
+  gene_count: 740
   id: kegg.pathway:ko00350
   is_informative: true
   level: 2
   name: Tyrosine metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 696
+  gene_count: 710
   id: kegg.pathway:ko00360
   is_informative: true
   level: 2
   name: Phenylalanine metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 686
+  gene_count: 706
   id: kegg.pathway:ko00380
   is_informative: true
   level: 2
   name: Tryptophan metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
-- discussed_by_n_publications: 0
-  gene_count: 515
+- discussed_by_n_publications: 1
+  gene_count: 527
   id: kegg.pathway:ko00410
   is_informative: true
   level: 2
   name: beta-Alanine metabolism
-  organism_count: 116
+  organism_count: 117
   score: 2.5436
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 310
+  gene_count: 319
   id: kegg.pathway:ko00430
   is_informative: true
   level: 2
   name: Taurine and hypotaurine metabolism
-  organism_count: 87
+  organism_count: 88
   score: 2.3602
   tree: null
   tree_code: null
@@ -192,492 +192,492 @@ rows:
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 1133
+  gene_count: 1144
   id: kegg.pathway:ko00450
   is_informative: true
   level: 2
   name: Selenocompound metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 616
+  gene_count: 629
   id: kegg.pathway:ko00460
   is_informative: true
   level: 2
   name: Cyanoamino acid metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.5436
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 878
+  gene_count: 887
   id: kegg.pathway:ko00470
   is_informative: true
   level: 2
   name: D-Amino acid metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.3602
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
-  gene_count: 1801
+  gene_count: 1825
   id: kegg.pathway:ko00480
   is_informative: true
   level: 2
   name: Glutathione metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 4
-  gene_count: 2392
+  gene_count: 2421
   id: kegg.pathway:ko00500
   is_informative: true
   level: 2
   name: Starch and sucrose metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.3602
   tree: null
   tree_code: null
-- discussed_by_n_publications: 0
-  gene_count: 3359
+- discussed_by_n_publications: 1
+  gene_count: 3393
   id: kegg.pathway:ko00520
   is_informative: true
   level: 2
   name: Amino sugar and nucleotide sugar metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.0628
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 1516
+  gene_count: 1531
   id: kegg.pathway:ko00561
   is_informative: true
   level: 2
   name: Glycerolipid metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 413
+  gene_count: 419
   id: kegg.pathway:ko00562
   is_informative: true
   level: 2
   name: Inositol phosphate metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.5436
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 951
+  gene_count: 970
   id: kegg.pathway:ko00564
   is_informative: true
   level: 2
   name: Glycerophospholipid metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 20
+  gene_count: 21
   id: kegg.pathway:ko00565
   is_informative: true
   level: 2
   name: Ether lipid metabolism
-  organism_count: 18
+  organism_count: 19
   score: 2.5436
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 138
+  gene_count: 139
   id: kegg.pathway:ko00566
   is_informative: true
   level: 2
   name: Sulfoquinovose metabolism
-  organism_count: 116
+  organism_count: 117
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 25
+  gene_count: 27
   id: kegg.pathway:ko00590
   is_informative: true
   level: 2
   name: Arachidonic acid metabolism
-  organism_count: 14
+  organism_count: 15
   score: 2.5436
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 22
+  gene_count: 24
   id: kegg.pathway:ko00591
   is_informative: true
   level: 2
   name: Linoleic acid metabolism
-  organism_count: 12
+  organism_count: 13
   score: 2.5436
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 45
+  gene_count: 48
   id: kegg.pathway:ko00592
   is_informative: true
   level: 2
   name: alpha-Linolenic acid metabolism
-  organism_count: 15
+  organism_count: 16
   score: 2.3602
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 151
+  gene_count: 154
   id: kegg.pathway:ko00600
   is_informative: true
   level: 2
   name: Sphingolipid metabolism
-  organism_count: 77
+  organism_count: 78
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 5
-  gene_count: 2827
+  gene_count: 2877
   id: kegg.pathway:ko00620
   is_informative: true
   level: 2
   name: Pyruvate metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
-- discussed_by_n_publications: 5
-  gene_count: 2880
+- discussed_by_n_publications: 7
+  gene_count: 2924
   id: kegg.pathway:ko00630
   is_informative: true
   level: 2
   name: Glyoxylate and dicarboxylate metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.3602
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
-  gene_count: 1444
+  gene_count: 1477
   id: kegg.pathway:ko00640
   is_informative: true
   level: 2
   name: Propanoate metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 905
+  gene_count: 930
   id: kegg.pathway:ko00650
   is_informative: true
   level: 2
   name: Butanoate metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 696
+  gene_count: 705
   id: kegg.pathway:ko00660
   is_informative: true
   level: 2
   name: C5-Branched dibasic acid metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.2015
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 1838
+  gene_count: 1862
   id: kegg.pathway:ko00680
   is_informative: true
   level: 2
   name: Methane metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
-- discussed_by_n_publications: 1
-  gene_count: 1385
+- discussed_by_n_publications: 3
+  gene_count: 1396
   id: kegg.pathway:ko00730
   is_informative: true
   level: 2
   name: Thiamine metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
-  gene_count: 1000
+  gene_count: 1010
   id: kegg.pathway:ko00740
   is_informative: true
   level: 2
   name: Riboflavin metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
-- discussed_by_n_publications: 0
-  gene_count: 636
+- discussed_by_n_publications: 1
+  gene_count: 645
   id: kegg.pathway:ko00750
   is_informative: true
   level: 2
   name: Vitamin B6 metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.5436
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 1552
+  gene_count: 1569
   id: kegg.pathway:ko00760
   is_informative: true
   level: 2
   name: Nicotinate and nicotinamide metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.3602
   tree: null
   tree_code: null
-- discussed_by_n_publications: 0
-  gene_count: 1382
+- discussed_by_n_publications: 1
+  gene_count: 1395
   id: kegg.pathway:ko00780
   is_informative: true
   level: 2
   name: Biotin metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
-  gene_count: 1421
+  gene_count: 1434
   id: kegg.pathway:ko00785
   is_informative: true
   level: 2
   name: Lipoic acid metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.5436
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 163
+  gene_count: 165
   id: kegg.pathway:ko00830
   is_informative: true
   level: 2
   name: Retinol metabolism
-  organism_count: 114
-  score: 2.7579
-  tree: null
-  tree_code: null
-- discussed_by_n_publications: 8
-  gene_count: 5416
-  id: kegg.pathway:ko00860
-  is_informative: true
-  level: 2
-  name: Porphyrin metabolism
-  organism_count: 117
+  organism_count: 115
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 10
-  gene_count: 945
+  gene_count: 5437
+  id: kegg.pathway:ko00860
+  is_informative: true
+  level: 2
+  name: Porphyrin metabolism
+  organism_count: 118
+  score: 2.7579
+  tree: null
+  tree_code: null
+- discussed_by_n_publications: 12
+  gene_count: 962
   id: kegg.pathway:ko00910
   is_informative: true
   level: 2
   name: Nitrogen metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
-- discussed_by_n_publications: 0
-  gene_count: 1629
+- discussed_by_n_publications: 1
+  gene_count: 1649
   id: kegg.pathway:ko00920
   is_informative: true
   level: 2
   name: Sulfur metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 718
+  gene_count: 725
   id: kegg.pathway:ko00980
   is_informative: true
   level: 2
   name: Metabolism of xenobiotics by cytochrome P450
-  organism_count: 116
+  organism_count: 117
   score: 2.0628
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 768
+  gene_count: 775
   id: kegg.pathway:ko00982
   is_informative: true
   level: 2
   name: Drug metabolism - cytochrome P450
-  organism_count: 117
+  organism_count: 118
   score: 2.3602
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 1129
+  gene_count: 1142
   id: kegg.pathway:ko00983
   is_informative: true
   level: 2
   name: Drug metabolism - other enzymes
-  organism_count: 117
+  organism_count: 118
   score: 2.3602
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 14454
+  gene_count: 14682
   id: kegg.pathway:ko01120
   is_informative: false
   level: 2
   name: Microbial metabolism in diverse environments
-  organism_count: 117
+  organism_count: 118
   score: 2.2015
   tree: null
   tree_code: null
-- discussed_by_n_publications: 4
-  gene_count: 7795
+- discussed_by_n_publications: 5
+  gene_count: 7908
   id: kegg.pathway:ko01200
   is_informative: false
   level: 2
   name: Carbon metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 3225
+  gene_count: 3264
   id: kegg.pathway:ko01210
   is_informative: false
   level: 2
   name: 2-Oxocarboxylic acid metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.3602
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 1877
+  gene_count: 1910
   id: kegg.pathway:ko01212
   is_informative: false
   level: 2
   name: Fatty acid metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.5436
   tree: null
   tree_code: null
 - discussed_by_n_publications: 1
-  gene_count: 3178
+  gene_count: 3222
   id: kegg.pathway:ko01232
   is_informative: false
   level: 2
   name: Nucleotide metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 13825
+  gene_count: 14042
   id: kegg.subcategory:09101
   is_informative: true
   level: 1
   name: Carbohydrate metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 18364
+  gene_count: 18499
   id: kegg.subcategory:09102
   is_informative: true
   level: 1
   name: Energy metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 4329
+  gene_count: 4404
   id: kegg.subcategory:09103
   is_informative: true
   level: 1
   name: Lipid metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 7295
+  gene_count: 7384
   id: kegg.subcategory:09104
   is_informative: true
   level: 1
   name: Nucleotide metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.7579
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 16359
+  gene_count: 16585
   id: kegg.subcategory:09105
   is_informative: true
   level: 1
   name: Amino acid metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.5436
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 5022
+  gene_count: 5091
   id: kegg.subcategory:09106
   is_informative: true
   level: 1
   name: Metabolism of other amino acids
-  organism_count: 117
+  organism_count: 118
   score: 2.2015
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 8102
+  gene_count: 8195
   id: kegg.subcategory:09107
   is_informative: true
   level: 1
   name: Glycan biosynthesis and metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.3602
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 20090
+  gene_count: 20268
   id: kegg.subcategory:09108
   is_informative: true
   level: 1
   name: Metabolism of cofactors and vitamins
-  organism_count: 117
+  organism_count: 118
   score: 2.2015
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 3680
+  gene_count: 3717
   id: kegg.subcategory:09109
   is_informative: true
   level: 1
   name: Metabolism of terpenoids and polyketides
-  organism_count: 117
+  organism_count: 118
   score: 2.2015
   tree: null
   tree_code: null
 - discussed_by_n_publications: 0
-  gene_count: 2959
+  gene_count: 3012
   id: kegg.subcategory:09111
   is_informative: true
   level: 1
   name: Xenobiotics biodegradation and metabolism
-  organism_count: 117
+  organism_count: 118
   score: 2.3602
   tree: null
   tree_code: null

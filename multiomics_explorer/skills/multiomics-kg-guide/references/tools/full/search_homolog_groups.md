@@ -91,8 +91,8 @@ search_homolog_groups(search_text="photosynthesis")
     {"taxonomic_level": "Prochloraceae", "count": 402},
     ...
   ],
-  "score_max": 6.71530294418335,
-  "score_median": 1.0955063104629517,
+  "score_max": 6.71514892578125,
+  "score_median": 1.0953537225723267,
   "top_cyanorak_roles": [
     {"id": "cyanorak.role:G.2", "name": "Energy metabolism > Electron transport", "count": 276},
     {
@@ -129,7 +129,7 @@ search_homolog_groups(search_text="photosynthesis")
       "specificity_rank": 3,
       "member_count": 47,
       "organism_count": 47,
-      "score": 6.71530294418335
+      "score": 6.71514892578125
     },
     {
       "group_id": "eggnog:31GDS@2",
@@ -141,7 +141,7 @@ search_homolog_groups(search_text="photosynthesis")
       "specificity_rank": 3,
       "member_count": 95,
       "organism_count": 95,
-      "score": 6.71530294418335
+      "score": 6.71514892578125
     },
     {
       "group_id": "eggnog:32YIH@2",
@@ -153,7 +153,7 @@ search_homolog_groups(search_text="photosynthesis")
       "specificity_rank": 3,
       "member_count": 107,
       "organism_count": 101,
-      "score": 6.71530294418335
+      "score": 6.71514892578125
     },
     ...
   ]

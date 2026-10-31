@@ -1,5 +1,5 @@
 case_id: list_organisms
-row_count: 121
+row_count: 123
 rows:
 - background_factors: []
   catalyzed_metabolite_count: 0
@@ -70,6 +70,49 @@ rows:
   - carbon
 - background_factors:
   - axenic
+  catalyzed_metabolite_count: 1339
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 5
+  derived_metric_value_kinds:
+  - boolean
+  - numeric
+  experiment_count: 6
+  gene_count: 4060
+  genus: Alteromonas
+  go_transport_metabolite_count: 96
+  growth_phases:
+  - exponential
+  - other:no_net_growth
+  - stationary
+  interpro_gene_count: 3605
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 28108
+  ncbifam_gene_count: 1656
+  nonpeptidase_homolog_gene_count: 33
+  omics_types:
+  - BIOINFORMATIC
+  - PROTEOMICS
+  - RNASEQ
+  organism_name: Alteromonas macleodii 83-1
+  organism_type: genome_strain
+  peptidase_gene_count: 127
+  publication_count: 2
+  reaction_count: 1275
+  reference_database: null
+  reference_proteome: null
+  species: Alteromonas macleodii
+  strain: 83-1
+  transported_metabolite_count: 151
+  treatment_types:
+  - carbon
+  - genomic_analysis
+  - growth_phase
+- background_factors:
+  - axenic
   - darkness
   catalyzed_metabolite_count: 1326
   clade: null
@@ -77,10 +120,12 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - vesicle
-  derived_metric_count: 3
+  - whole_cell
+  derived_metric_count: 4
   derived_metric_value_kinds:
+  - boolean
   - numeric
-  experiment_count: 1
+  experiment_count: 2
   gene_count: 3929
   genus: Alteromonas
   go_transport_metabolite_count: 85
@@ -91,11 +136,12 @@ rows:
   ncbifam_gene_count: 1611
   nonpeptidase_homolog_gene_count: 32
   omics_types:
+  - BIOINFORMATIC
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii AD45
   organism_type: genome_strain
   peptidase_gene_count: 129
-  publication_count: 1
+  publication_count: 2
   reaction_count: 1259
   reference_database: null
   reference_proteome: null
@@ -104,6 +150,7 @@ rows:
   transported_metabolite_count: 144
   treatment_types:
   - compartment
+  - genomic_analysis
 - background_factors:
   - axenic
   - darkness
@@ -113,25 +160,31 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - vesicle
-  derived_metric_count: 3
+  - whole_cell
+  derived_metric_count: 6
   derived_metric_value_kinds:
+  - boolean
+  - categorical
   - numeric
-  experiment_count: 1
+  experiment_count: 5
   gene_count: 3834
   genus: Alteromonas
   go_transport_metabolite_count: 89
-  growth_phases: []
+  growth_phases:
+  - nutrient_limited
   interpro_gene_count: 3456
   measured_metabolite_count: 0
   ncbi_taxon_id: 529120
   ncbifam_gene_count: 1598
   nonpeptidase_homolog_gene_count: 37
   omics_types:
+  - BIOINFORMATIC
+  - RNASEQ
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii ATCC27126
   organism_type: genome_strain
   peptidase_gene_count: 125
-  publication_count: 1
+  publication_count: 3
   reaction_count: 1251
   reference_database: null
   reference_proteome: null
@@ -139,7 +192,10 @@ rows:
   strain: ATCC27126
   transported_metabolite_count: 153
   treatment_types:
+  - carbon
   - compartment
+  - genomic_analysis
+  - iron
 - background_factors:
   - axenic
   - darkness
@@ -313,11 +369,11 @@ rows:
   compartments:
   - vesicle
   - whole_cell
-  derived_metric_count: 5
+  derived_metric_count: 6
   derived_metric_value_kinds:
   - boolean
   - numeric
-  experiment_count: 5
+  experiment_count: 6
   gene_count: 4028
   genus: Alteromonas
   go_transport_metabolite_count: 91
@@ -331,12 +387,13 @@ rows:
   ncbifam_gene_count: 1699
   nonpeptidase_homolog_gene_count: 32
   omics_types:
+  - BIOINFORMATIC
   - RNASEQ
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii MIT1002
   organism_type: genome_strain
   peptidase_gene_count: 120
-  publication_count: 4
+  publication_count: 5
   reaction_count: 1288
   reference_database: null
   reference_proteome: null
@@ -346,6 +403,7 @@ rows:
   treatment_types:
   - compartment
   - darkness
+  - genomic_analysis
   - growth_phase
 - background_factors: []
   catalyzed_metabolite_count: 1304
@@ -629,7 +687,7 @@ rows:
   organism_name: Phage
   organism_type: treatment
   peptidase_gene_count: 0
-  publication_count: 4
+  publication_count: 5
   reaction_count: 0
   reference_database: null
   reference_proteome: null
@@ -2351,6 +2409,8 @@ rows:
   treatment_types:
   - coculture
 - background_factors:
+  - axenic
+  - diel
   - light
   catalyzed_metabolite_count: 1466
   clade: null
@@ -2362,13 +2422,14 @@ rows:
   derived_metric_value_kinds:
   - categorical
   - numeric
-  experiment_count: 5
+  experiment_count: 11
   gene_count: 4368
   genus: Ruegeria
   go_transport_metabolite_count: 83
   growth_phases:
   - acclimated_steady_state
   - exponential
+  - unknown
   interpro_gene_count: 3953
   measured_metabolite_count: 0
   ncbi_taxon_id: 89184
@@ -2377,10 +2438,11 @@ rows:
   omics_types:
   - EXOPROTEOMICS
   - PROTEOMICS
+  - RNASEQ
   organism_name: Ruegeria pomeroyi DSS-3
   organism_type: genome_strain
   peptidase_gene_count: 111
-  publication_count: 3
+  publication_count: 7
   reaction_count: 1377
   reference_database: null
   reference_proteome: null
@@ -2388,6 +2450,7 @@ rows:
   strain: DSS-3
   transported_metabolite_count: 154
   treatment_types:
+  - carbon
   - coculture
 - background_factors:
   - light
@@ -2937,16 +3000,19 @@ rows:
 - background_factors:
   - coculture
   - diel
+  - light
   catalyzed_metabolite_count: 1128
   clade: I
   cluster_types: []
   clustering_analysis_count: 0
   compartments:
+  - exoproteome
   - whole_cell
-  derived_metric_count: 2
+  derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
-  experiment_count: 2
+  - numeric
+  experiment_count: 3
   gene_count: 3038
   genus: Synechococcus
   go_transport_metabolite_count: 39
@@ -2959,11 +3025,12 @@ rows:
   nonpeptidase_homolog_gene_count: 17
   omics_types:
   - BIOINFORMATIC
+  - EXOPROTEOMICS
   - RNASEQ
   organism_name: Synechococcus CC9311
   organism_type: genome_strain
   peptidase_gene_count: 70
-  publication_count: 2
+  publication_count: 3
   reaction_count: 1039
   reference_database: null
   reference_proteome: null
@@ -2972,6 +3039,7 @@ rows:
   transported_metabolite_count: 83
   treatment_types:
   - carbon
+  - compartment
   - genomic_analysis
 - background_factors: []
   catalyzed_metabolite_count: 1160
@@ -3722,17 +3790,20 @@ rows:
   transported_metabolite_count: 75
   treatment_types:
   - genomic_analysis
-- background_factors: []
+- background_factors:
+  - light
   catalyzed_metabolite_count: 1175
   clade: IX
   cluster_types: []
   clustering_analysis_count: 0
   compartments:
+  - exoproteome
   - whole_cell
-  derived_metric_count: 2
+  derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
-  experiment_count: 1
+  - numeric
+  experiment_count: 2
   gene_count: 2926
   genus: Synechococcus
   go_transport_metabolite_count: 41
@@ -3744,10 +3815,11 @@ rows:
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
+  - EXOPROTEOMICS
   organism_name: Synechococcus RS9916
   organism_type: genome_strain
   peptidase_gene_count: 70
-  publication_count: 1
+  publication_count: 2
   reaction_count: 1039
   reference_database: null
   reference_proteome: null
@@ -3755,18 +3827,22 @@ rows:
   strain: RS9916
   transported_metabolite_count: 72
   treatment_types:
+  - compartment
   - genomic_analysis
-- background_factors: []
+- background_factors:
+  - light
   catalyzed_metabolite_count: 1120
   clade: VIII
   cluster_types: []
   clustering_analysis_count: 0
   compartments:
+  - exoproteome
   - whole_cell
-  derived_metric_count: 2
+  derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
-  experiment_count: 1
+  - numeric
+  experiment_count: 2
   gene_count: 2799
   genus: Synechococcus
   go_transport_metabolite_count: 42
@@ -3778,10 +3854,11 @@ rows:
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
+  - EXOPROTEOMICS
   organism_name: Synechococcus RS9917
   organism_type: genome_strain
   peptidase_gene_count: 61
-  publication_count: 1
+  publication_count: 2
   reaction_count: 1012
   reference_database: null
   reference_proteome: null
@@ -3789,6 +3866,7 @@ rows:
   strain: RS9917
   transported_metabolite_count: 72
   treatment_types:
+  - compartment
   - genomic_analysis
 - background_factors: []
   catalyzed_metabolite_count: 1127
@@ -3858,17 +3936,21 @@ rows:
   transported_metabolite_count: 72
   treatment_types:
   - genomic_analysis
-- background_factors: []
+- background_factors:
+  - axenic
+  - light
   catalyzed_metabolite_count: 1156
   clade: '5.2'
   cluster_types: []
   clustering_analysis_count: 0
   compartments:
+  - exoproteome
   - whole_cell
-  derived_metric_count: 2
+  derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
-  experiment_count: 1
+  - numeric
+  experiment_count: 2
   gene_count: 3353
   genus: Synechococcus
   go_transport_metabolite_count: 49
@@ -3880,10 +3962,11 @@ rows:
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
+  - EXOPROTEOMICS
   organism_name: Synechococcus WH5701
   organism_type: genome_strain
   peptidase_gene_count: 74
-  publication_count: 1
+  publication_count: 2
   reaction_count: 1046
   reference_database: null
   reference_proteome: null
@@ -3891,8 +3974,10 @@ rows:
   strain: WH5701
   transported_metabolite_count: 73
   treatment_types:
+  - compartment
   - genomic_analysis
 - background_factors:
+  - axenic
   - coculture
   - darkness
   - diel
@@ -3903,11 +3988,13 @@ rows:
   - time_course
   clustering_analysis_count: 1
   compartments:
+  - exoproteome
   - whole_cell
-  derived_metric_count: 2
+  derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
-  experiment_count: 11
+  - numeric
+  experiment_count: 12
   gene_count: 2590
   genus: Synechococcus
   go_transport_metabolite_count: 30
@@ -3932,7 +4019,7 @@ rows:
   organism_name: Synechococcus WH7803
   organism_type: genome_strain
   peptidase_gene_count: 68
-  publication_count: 7
+  publication_count: 8
   reaction_count: 1045
   reference_database: null
   reference_proteome: null
@@ -3942,19 +4029,24 @@ rows:
   treatment_types:
   - carbon
   - coculture
+  - compartment
   - genomic_analysis
   - viral
-- background_factors: []
+- background_factors:
+  - axenic
+  - light
   catalyzed_metabolite_count: 1161
   clade: VI
   cluster_types: []
   clustering_analysis_count: 0
   compartments:
+  - exoproteome
   - whole_cell
-  derived_metric_count: 2
+  derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
-  experiment_count: 1
+  - numeric
+  experiment_count: 2
   gene_count: 2909
   genus: Synechococcus
   go_transport_metabolite_count: 47
@@ -3966,10 +4058,11 @@ rows:
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
+  - EXOPROTEOMICS
   organism_name: Synechococcus WH7805
   organism_type: genome_strain
   peptidase_gene_count: 61
-  publication_count: 1
+  publication_count: 2
   reaction_count: 1058
   reference_database: null
   reference_proteome: null
@@ -3977,6 +4070,7 @@ rows:
   strain: WH7805
   transported_metabolite_count: 85
   treatment_types:
+  - compartment
   - genomic_analysis
 - background_factors: []
   catalyzed_metabolite_count: 1157
@@ -4047,6 +4141,7 @@ rows:
   treatment_types:
   - genomic_analysis
 - background_factors:
+  - axenic
   - coculture
   - darkness
   - diel
@@ -4056,11 +4151,13 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments:
+  - exoproteome
   - whole_cell
-  derived_metric_count: 2
+  derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
-  experiment_count: 8
+  - numeric
+  experiment_count: 17
   gene_count: 2830
   genus: Parasynechococcus
   go_transport_metabolite_count: 62
@@ -4068,6 +4165,8 @@ rows:
   - darkness
   - exponential
   - infected
+  - nutrient_limited
+  - other:early_incubation
   interpro_gene_count: 2105
   measured_metabolite_count: 0
   ncbi_taxon_id: 84588
@@ -4075,13 +4174,14 @@ rows:
   nonpeptidase_homolog_gene_count: 13
   omics_types:
   - BIOINFORMATIC
+  - EXOPROTEOMICS
   - MICROARRAY
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus WH8102
   organism_type: genome_strain
   peptidase_gene_count: 61
-  publication_count: 6
+  publication_count: 9
   reaction_count: 1027
   reference_database: null
   reference_proteome: null
@@ -4091,7 +4191,12 @@ rows:
   treatment_types:
   - carbon
   - coculture
+  - compartment
+  - darkness
   - genomic_analysis
+  - growth_phase
+  - mutant
+  - phosphorus
   - viral
 - background_factors: []
   catalyzed_metabolite_count: 1101
@@ -4166,15 +4271,18 @@ rows:
   - genomic_analysis
   - viral
 - background_factors:
+  - axenic
   - light
   catalyzed_metabolite_count: 1169
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
-  compartments: []
-  derived_metric_count: 0
-  derived_metric_value_kinds: []
-  experiment_count: 2
+  compartments:
+  - whole_cell
+  derived_metric_count: 1
+  derived_metric_value_kinds:
+  - categorical
+  experiment_count: 3
   gene_count: 2717
   genus: Synechococcus
   go_transport_metabolite_count: 58
@@ -4186,12 +4294,13 @@ rows:
   ncbifam_gene_count: 1081
   nonpeptidase_homolog_gene_count: 14
   omics_types:
+  - DNASEQ
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus elongatus PCC 7942
   organism_type: genome_strain
   peptidase_gene_count: 81
-  publication_count: 1
+  publication_count: 2
   reaction_count: 1033
   reference_database: null
   reference_proteome: null
@@ -4200,6 +4309,7 @@ rows:
   transported_metabolite_count: 82
   treatment_types:
   - coculture
+  - essentiality
 - background_factors:
   - light
   catalyzed_metabolite_count: 1174
@@ -4244,11 +4354,13 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments:
+  - exoproteome
   - whole_cell
-  derived_metric_count: 2
+  derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
-  experiment_count: 5
+  - numeric
+  experiment_count: 6
   gene_count: 2567
   genus: Synechococcus
   go_transport_metabolite_count: 38
@@ -4262,11 +4374,12 @@ rows:
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
+  - EXOPROTEOMICS
   - PROTEOMICS
   organism_name: Synechococcus sp. BL107
   organism_type: genome_strain
   peptidase_gene_count: 61
-  publication_count: 2
+  publication_count: 3
   reaction_count: 989
   reference_database: null
   reference_proteome: null
@@ -4275,7 +4388,38 @@ rows:
   transported_metabolite_count: 62
   treatment_types:
   - carbon
+  - compartment
   - genomic_analysis
+- background_factors: []
+  catalyzed_metabolite_count: 0
+  clade: null
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments: []
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  experiment_count: 0
+  gene_count: 0
+  genus: Thalassiosira
+  go_transport_metabolite_count: 0
+  growth_phases: []
+  interpro_gene_count: 0
+  measured_metabolite_count: 0
+  ncbi_taxon_id: 35128
+  ncbifam_gene_count: 0
+  nonpeptidase_homolog_gene_count: 0
+  omics_types: []
+  organism_name: Thalassiosira pseudonana
+  organism_type: treatment
+  peptidase_gene_count: 0
+  publication_count: 2
+  reaction_count: 0
+  reference_database: null
+  reference_proteome: null
+  species: null
+  strain: null
+  transported_metabolite_count: 0
+  treatment_types: []
 - background_factors:
   - coculture
   catalyzed_metabolite_count: 1003

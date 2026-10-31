@@ -11,25 +11,31 @@ by_cluster_type:
   count: 1
 by_compartment:
 - compartment: whole_cell
-  count: 97
+  count: 101
+- compartment: exoproteome
+  count: 10
 - compartment: vesicle
   count: 9
-- compartment: exoproteome
-  count: 2
 by_measurement_capability:
   has_metabolomics: 5
-  no_metabolomics: 116
+  no_metabolomics: 118
 by_metric_type:
 - count: 95
   metric_type: sbp_nutrient_class
 - count: 95
   metric_type: sbp_predicted_substrate
+- count: 9
+  metric_type: exoproteome_avg_pct_nsaf
+- count: 9
+  metric_type: exoproteome_detection_status
 - count: 6
   metric_type: log2_mv_cell_enrichment
 - count: 6
   metric_type: prop_abund_cells_percent
 - count: 6
   metric_type: prop_abund_mvs_percent
+- count: 4
+  metric_type: strain_unique_gene_koch2020
 - count: 2
   metric_type: antisense_tss_count
 - count: 2
@@ -127,22 +133,32 @@ by_metric_type:
 - count: 1
   metric_type: whole_cell_detected_evolved_800ppm
 - count: 1
-  metric_type: exoproteome_avg_pct_nsaf
+  metric_type: gene_essentiality
 - count: 1
-  metric_type: exoproteome_detection_status
+  metric_type: tbdt_manck2020
+- count: 1
+  metric_type: tbdt_predicted_substrate_manck2020
+- count: 1
+  metric_type: nsaf_glucose_13h
+- count: 1
+  metric_type: nsaf_glucose_21h
+- count: 1
+  metric_type: nsaf_polysaccharide_mix_13h
+- count: 1
+  metric_type: nsaf_polysaccharide_mix_21h
 by_organism_type:
-- count: 115
+- count: 116
   organism_type: genome_strain
-- count: 4
+- count: 5
   organism_type: treatment
 - count: 2
   organism_type: reference_proteome_match
 by_value_kind:
-- count: 96
+- count: 98
   value_kind: categorical
-- count: 10
+- count: 19
   value_kind: numeric
-- count: 5
+- count: 8
   value_kind: boolean
 case_id: list_organisms_summary_capability
 not_found: []
@@ -169,6 +185,12 @@ top_annotation_capability:
   organism_name: Shewanella sp. W3-18-1
   peptidase_gene_count: 128
   preferred_name: Shewanella sp. W3-18-1
+- interpro_gene_count: 3605
+  ncbifam_gene_count: 1656
+  nonpeptidase_homolog_gene_count: 33
+  organism_name: Alteromonas macleodii 83-1
+  peptidase_gene_count: 127
+  preferred_name: Alteromonas macleodii 83-1
 - interpro_gene_count: 3608
   ncbifam_gene_count: 1656
   nonpeptidase_homolog_gene_count: 33
@@ -886,6 +908,11 @@ top_metabolic_capability:
   transported_metabolite_count: 161
 - catalyzed_metabolite_count: 1339
   go_transport_metabolite_count: 96
+  organism_name: Alteromonas macleodii 83-1
+  reaction_count: 1275
+  transported_metabolite_count: 151
+- catalyzed_metabolite_count: 1339
+  go_transport_metabolite_count: 96
   organism_name: Alteromonas macleodii BGP6
   reaction_count: 1275
   transported_metabolite_count: 151
@@ -1439,7 +1466,7 @@ top_metabolic_capability:
   organism_name: Prochlorococcus HNLC1
   reaction_count: 733
   transported_metabolite_count: 39
-total_entries: 121
-total_matching: 121
+total_entries: 123
+total_matching: 123
 truncated: true
 warnings: []

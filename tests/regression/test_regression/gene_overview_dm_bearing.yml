@@ -15,7 +15,7 @@ rows:
   cazy_family_count: 0
   closest_ortholog_genera:
   - Alteromonas
-  closest_ortholog_group_size: 9
+  closest_ortholog_group_size: 10
   cluster_membership_count: 0
   cluster_types: []
   discussed_in_publication_count: 0

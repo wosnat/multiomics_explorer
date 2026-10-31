@@ -144,12 +144,12 @@ genes_by_homolog_group(group_ids=["cyanorak:CK_00000570", "eggnog:COG0592@2"], s
 
 ```example-response
 {
-  "total_matching": 213,
-  "total_genes": 213,
+  "total_matching": 214,
+  "total_genes": 214,
   "total_categories": 2,
   "offset": 0,
-  "genes_per_group_max": 117,
-  "genes_per_group_median": 106.5,
+  "genes_per_group_max": 118,
+  "genes_per_group_median": 107.0,
   "by_organism": [
     {"organism_name": "Cyanobium NS01", "count": 2},
     {"organism_name": "Cyanobium PCC6307", "count": 2},
@@ -158,8 +158,8 @@ genes_by_homolog_group(group_ids=["cyanorak:CK_00000570", "eggnog:COG0592@2"], s
     {"organism_name": "Prochlorococcus EQPAC1", "count": 2},
     ...
   ],
-  "top_categories": [{"category": "Replication and repair", "count": 117}, {"category": "Photosynthesis", "count": 96}],
-  "top_groups": [{"group_id": "eggnog:COG0592@2", "count": 117}, {"group_id": "cyanorak:CK_00000570", "count": 96}],
+  "top_categories": [{"category": "Replication and repair", "count": 118}, {"category": "Photosynthesis", "count": 96}],
+  "top_groups": [{"group_id": "eggnog:COG0592@2", "count": 118}, {"group_id": "cyanorak:CK_00000570", "count": 96}],
   "not_found_groups": [],
   "not_matched_groups": [],
   "not_found_organisms": [],

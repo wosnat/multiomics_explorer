@@ -7,7 +7,7 @@ to drill into gene-level annotations across the three value kinds (numeric,
 boolean, categorical). Every Python block below runs as written against the
 live KG.
 
-> Counts here are a live snapshot (273 DMs: 46 numeric, 27 boolean, 200
+> Counts here are a live snapshot (300 DMs: 58 numeric, 32 boolean, 210
 > categorical — 190 of the categorical are Ford 2021's per-genome SBP
 > annotation calls on `BIOINFORMATIC` experiments) and drift with each KG rebuild. `list_derived_metrics` and
 > `list_filter_values` are the current source.
@@ -27,11 +27,11 @@ Key properties on a `DerivedMetric` node:
 - `metric_type` — free-text tag, e.g. `damping_ratio`,
   `diel_amplitude_transcript_log2`, `vesicle_proteome_member`,
   `darkness_survival_class`. Enumerate with
-  `list_filter_values(filter_type="metric_type")` (55 values live) — the tag is
+  `list_filter_values(filter_type="metric_type")` (63 values live) — the tag is
   the paper's column name, so guess nothing.
 - `value_kind` — `numeric`, `boolean`, `categorical`.
-- `compartment` — wet-lab fraction. DMs use `whole_cell` (235), `vesicle` (31)
-  and `exoproteome` (7). The vocabulary
+- `compartment` — wet-lab fraction. DMs use `whole_cell` (246), `vesicle` (31)
+  and `exoproteome` (23). The vocabulary
   (`list_filter_values(filter_type="compartment")`) also carries
   `extracellular`, which only metabolite assays use.
 - `rankable` — whether edge-level `rank` / `bucket` / `percentile` are
@@ -220,7 +220,7 @@ vesicle = genes_by_numeric_metric(
 ## KG constraints
 
 - **Boolean tested-absent storage is per DM.** `genes_by_boolean_metric(flag_value=False)`
-  returns rows only on the 11 of 27 boolean DMs that store `not_flagged`
+  returns rows only on the 11 of 32 boolean DMs that store `not_flagged`
   edges — Steglich 2010 `expressed_above_background` (1), Voigt 2014
   `has_primary_tss` (MED4 + MIT9313, 2), Hennon 2015 `rapid_recovery_*` (2),
   and the Alteromonas EZ55 `whole_cell_detected_*` / `exoproteome_detected_*`

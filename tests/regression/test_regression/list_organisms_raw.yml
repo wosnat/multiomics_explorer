@@ -1,5 +1,5 @@
 case_id: list_organisms_raw
-row_count: 121
+row_count: 123
 rows:
 - clade: null
   experiment_count: 0
@@ -26,31 +26,55 @@ rows:
   treatment_types:
   - carbon
 - clade: null
-  experiment_count: 1
+  experiment_count: 6
+  gene_count: 4060
+  genus: Alteromonas
+  ncbi_taxon_id: 28108
+  omics_types:
+  - BIOINFORMATIC
+  - PROTEOMICS
+  - RNASEQ
+  organism_name: Alteromonas macleodii 83-1
+  publication_count: 2
+  species: Alteromonas macleodii
+  strain: 83-1
+  treatment_types:
+  - carbon
+  - genomic_analysis
+  - growth_phase
+- clade: null
+  experiment_count: 2
   gene_count: 3929
   genus: Alteromonas
   ncbi_taxon_id: 1004787
   omics_types:
+  - BIOINFORMATIC
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii AD45
-  publication_count: 1
+  publication_count: 2
   species: Alteromonas macleodii
   strain: AD45
   treatment_types:
   - compartment
+  - genomic_analysis
 - clade: null
-  experiment_count: 1
+  experiment_count: 5
   gene_count: 3834
   genus: Alteromonas
   ncbi_taxon_id: 529120
   omics_types:
+  - BIOINFORMATIC
+  - RNASEQ
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii ATCC27126
-  publication_count: 1
+  publication_count: 3
   species: Alteromonas macleodii
   strain: ATCC27126
   treatment_types:
+  - carbon
   - compartment
+  - genomic_analysis
+  - iron
 - clade: null
   experiment_count: 1
   gene_count: 4063
@@ -112,20 +136,22 @@ rows:
   - compartment
   - nitrogen
 - clade: null
-  experiment_count: 5
+  experiment_count: 6
   gene_count: 4028
   genus: Alteromonas
   ncbi_taxon_id: 28108
   omics_types:
+  - BIOINFORMATIC
   - RNASEQ
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii MIT1002
-  publication_count: 4
+  publication_count: 5
   species: Alteromonas macleodii
   strain: MIT1002
   treatment_types:
   - compartment
   - darkness
+  - genomic_analysis
   - growth_phase
 - clade: null
   experiment_count: 0
@@ -230,7 +256,7 @@ rows:
   ncbi_taxon_id: 10239
   omics_types: []
   organism_name: Phage
-  publication_count: 4
+  publication_count: 5
   species: null
   strain: null
   treatment_types: []
@@ -895,18 +921,20 @@ rows:
   treatment_types:
   - coculture
 - clade: null
-  experiment_count: 5
+  experiment_count: 11
   gene_count: 4368
   genus: Ruegeria
   ncbi_taxon_id: 89184
   omics_types:
   - EXOPROTEOMICS
   - PROTEOMICS
+  - RNASEQ
   organism_name: Ruegeria pomeroyi DSS-3
-  publication_count: 3
+  publication_count: 7
   species: Ruegeria pomeroyi
   strain: DSS-3
   treatment_types:
+  - carbon
   - coculture
 - clade: null
   experiment_count: 3
@@ -1118,19 +1146,21 @@ rows:
   treatment_types:
   - genomic_analysis
 - clade: I
-  experiment_count: 2
+  experiment_count: 3
   gene_count: 3038
   genus: Synechococcus
   ncbi_taxon_id: 64471
   omics_types:
   - BIOINFORMATIC
+  - EXOPROTEOMICS
   - RNASEQ
   organism_name: Synechococcus CC9311
-  publication_count: 2
+  publication_count: 3
   species: null
   strain: CC9311
   treatment_types:
   - carbon
+  - compartment
   - genomic_analysis
 - clade: II
   experiment_count: 1
@@ -1420,30 +1450,34 @@ rows:
   treatment_types:
   - genomic_analysis
 - clade: IX
-  experiment_count: 1
+  experiment_count: 2
   gene_count: 2926
   genus: Synechococcus
   ncbi_taxon_id: 221359
   omics_types:
   - BIOINFORMATIC
+  - EXOPROTEOMICS
   organism_name: Synechococcus RS9916
-  publication_count: 1
+  publication_count: 2
   species: null
   strain: RS9916
   treatment_types:
+  - compartment
   - genomic_analysis
 - clade: VIII
-  experiment_count: 1
+  experiment_count: 2
   gene_count: 2799
   genus: Synechococcus
   ncbi_taxon_id: 221360
   omics_types:
   - BIOINFORMATIC
+  - EXOPROTEOMICS
   organism_name: Synechococcus RS9917
-  publication_count: 1
+  publication_count: 2
   species: null
   strain: RS9917
   treatment_types:
+  - compartment
   - genomic_analysis
 - clade: I
   experiment_count: 1
@@ -1472,20 +1506,22 @@ rows:
   treatment_types:
   - genomic_analysis
 - clade: '5.2'
-  experiment_count: 1
+  experiment_count: 2
   gene_count: 3353
   genus: Synechococcus
   ncbi_taxon_id: 69042
   omics_types:
   - BIOINFORMATIC
+  - EXOPROTEOMICS
   organism_name: Synechococcus WH5701
-  publication_count: 1
+  publication_count: 2
   species: null
   strain: WH5701
   treatment_types:
+  - compartment
   - genomic_analysis
 - clade: V
-  experiment_count: 11
+  experiment_count: 12
   gene_count: 2590
   genus: Synechococcus
   ncbi_taxon_id: 32051
@@ -1496,26 +1532,29 @@ rows:
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus WH7803
-  publication_count: 7
+  publication_count: 8
   species: null
   strain: WH7803
   treatment_types:
   - carbon
   - coculture
+  - compartment
   - genomic_analysis
   - viral
 - clade: VI
-  experiment_count: 1
+  experiment_count: 2
   gene_count: 2909
   genus: Synechococcus
   ncbi_taxon_id: 59931
   omics_types:
   - BIOINFORMATIC
+  - EXOPROTEOMICS
   organism_name: Synechococcus WH7805
-  publication_count: 1
+  publication_count: 2
   species: null
   strain: WH7805
   treatment_types:
+  - compartment
   - genomic_analysis
 - clade: I
   experiment_count: 1
@@ -1544,23 +1583,29 @@ rows:
   treatment_types:
   - genomic_analysis
 - clade: III
-  experiment_count: 8
+  experiment_count: 17
   gene_count: 2830
   genus: Parasynechococcus
   ncbi_taxon_id: 84588
   omics_types:
   - BIOINFORMATIC
+  - EXOPROTEOMICS
   - MICROARRAY
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus WH8102
-  publication_count: 6
+  publication_count: 9
   species: Parasynechococcus marenigrum
   strain: WH8102
   treatment_types:
   - carbon
   - coculture
+  - compartment
+  - darkness
   - genomic_analysis
+  - growth_phase
+  - mutant
+  - phosphorus
   - viral
 - clade: III
   experiment_count: 1
@@ -1591,19 +1636,21 @@ rows:
   - genomic_analysis
   - viral
 - clade: null
-  experiment_count: 2
+  experiment_count: 3
   gene_count: 2717
   genus: Synechococcus
   ncbi_taxon_id: 1140
   omics_types:
+  - DNASEQ
   - PROTEOMICS
   - RNASEQ
   organism_name: Synechococcus elongatus PCC 7942
-  publication_count: 1
+  publication_count: 2
   species: Synechococcus elongatus
   strain: PCC7942
   treatment_types:
   - coculture
+  - essentiality
 - clade: null
   experiment_count: 2
   gene_count: 2714
@@ -1619,20 +1666,33 @@ rows:
   treatment_types:
   - coculture
 - clade: IV
-  experiment_count: 5
+  experiment_count: 6
   gene_count: 2567
   genus: Synechococcus
   ncbi_taxon_id: 313625
   omics_types:
   - BIOINFORMATIC
+  - EXOPROTEOMICS
   - PROTEOMICS
   organism_name: Synechococcus sp. BL107
-  publication_count: 2
+  publication_count: 3
   species: Synechococcus sp.
   strain: BL107
   treatment_types:
   - carbon
+  - compartment
   - genomic_analysis
+- clade: null
+  experiment_count: 0
+  gene_count: 0
+  genus: Thalassiosira
+  ncbi_taxon_id: 35128
+  omics_types: []
+  organism_name: Thalassiosira pseudonana
+  publication_count: 2
+  species: null
+  strain: null
+  treatment_types: []
 - clade: null
   experiment_count: 1
   gene_count: 2449

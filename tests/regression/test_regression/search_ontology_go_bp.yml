@@ -10,84 +10,84 @@ rows:
   score: 2.1098
   tree: null
   tree_code: null
-- gene_count: 3197
+- gene_count: 3243
   id: go:0006260
   is_informative: true
   level: 6
   name: DNA replication
-  organism_count: 117
+  organism_count: 118
   score: 2.6549
   tree: null
   tree_code: null
-- gene_count: 1581
+- gene_count: 1608
   id: go:0006261
   is_informative: true
   level: 7
   name: DNA-templated DNA replication
-  organism_count: 117
+  organism_count: 118
   score: 2.1098
   tree: null
   tree_code: null
-- gene_count: 164
+- gene_count: 166
   id: go:0006269
   is_informative: true
   level: 7
   name: DNA replication, synthesis of primer
-  organism_count: 116
+  organism_count: 117
   score: 1.9133
   tree: null
   tree_code: null
-- gene_count: 271
+- gene_count: 277
   id: go:0006270
   is_informative: true
   level: 6
   name: DNA replication initiation
-  organism_count: 117
+  organism_count: 118
   score: 2.3511
   tree: null
   tree_code: null
-- gene_count: 220
+- gene_count: 225
   id: go:0006271
   is_informative: true
   level: 7
   name: DNA strand elongation involved in DNA replication
-  organism_count: 114
+  organism_count: 115
   score: 1.613
   tree: null
   tree_code: null
-- gene_count: 7
+- gene_count: 9
   id: go:0006274
   is_informative: true
   level: 6
   name: DNA replication termination
-  organism_count: 6
+  organism_count: 7
   score: 2.3511
   tree: null
   tree_code: null
-- gene_count: 271
+- gene_count: 277
   id: go:0006275
   is_informative: true
   level: 7
   name: regulation of DNA replication
-  organism_count: 117
+  organism_count: 118
   score: 2.1098
   tree: null
   tree_code: null
-- gene_count: 141
+- gene_count: 145
   id: go:0008156
   is_informative: true
   level: 8
   name: negative regulation of DNA replication
-  organism_count: 104
+  organism_count: 105
   score: 1.9133
   tree: null
   tree_code: null
-- gene_count: 14
+- gene_count: 15
   id: go:0019045
   is_informative: true
   level: 2
   name: latent virus replication
-  organism_count: 13
+  organism_count: 14
   score: 2.3511
   tree: null
   tree_code: null
@@ -100,48 +100,48 @@ rows:
   score: 2.3511
   tree: null
   tree_code: null
-- gene_count: 138
+- gene_count: 142
   id: go:0030174
   is_informative: true
   level: 9
   name: regulation of DNA-templated DNA replication initiation
-  organism_count: 104
+  organism_count: 105
   score: 1.613
   tree: null
   tree_code: null
-- gene_count: 314
+- gene_count: 316
   id: go:0031297
   is_informative: true
   level: 7
   name: replication fork processing
-  organism_count: 117
+  organism_count: 118
   score: 2.3511
   tree: null
   tree_code: null
-- gene_count: 35
+- gene_count: 38
   id: go:0032297
   is_informative: true
   level: 10
   name: negative regulation of DNA-templated DNA replication initiation
-  organism_count: 13
+  organism_count: 14
   score: 1.4956
   tree: null
   tree_code: null
-- gene_count: 13
+- gene_count: 14
   id: go:0032298
   is_informative: true
   level: 10
   name: positive regulation of DNA-templated DNA replication initiation
-  organism_count: 13
+  organism_count: 14
   score: 1.4956
   tree: null
   tree_code: null
-- gene_count: 178
+- gene_count: 181
   id: go:0033567
   is_informative: true
   level: 6
   name: DNA replication, Okazaki fragment processing
-  organism_count: 113
+  organism_count: 114
   score: 1.9133
   tree: null
   tree_code: null
@@ -154,66 +154,66 @@ rows:
   score: 2.3511
   tree: null
   tree_code: null
-- gene_count: 119
+- gene_count: 122
   id: go:0043137
   is_informative: true
   level: 7
   name: DNA replication, removal of RNA primer
-  organism_count: 96
+  organism_count: 97
   score: 1.7504
   tree: null
   tree_code: null
-- gene_count: 25
+- gene_count: 27
   id: go:0044786
   is_informative: true
   level: 3
   name: cell cycle DNA replication
-  organism_count: 13
+  organism_count: 14
   score: 2.1098
   tree: null
   tree_code: null
-- gene_count: 25
+- gene_count: 27
   id: go:0044787
   is_informative: true
   level: 4
   name: bacterial-type DNA replication
-  organism_count: 13
+  organism_count: 14
   score: 2.1098
   tree: null
   tree_code: null
-- gene_count: 39
+- gene_count: 41
   id: go:0045004
   is_informative: true
   level: 6
   name: DNA replication proofreading
-  organism_count: 21
+  organism_count: 22
   score: 2.3511
   tree: null
   tree_code: null
-- gene_count: 355
+- gene_count: 359
   id: go:0045005
   is_informative: true
   level: 6
   name: DNA-templated DNA replication maintenance of fidelity
-  organism_count: 117
+  organism_count: 118
   score: 1.613
   tree: null
   tree_code: null
-- gene_count: 13
+- gene_count: 14
   id: go:0045740
   is_informative: true
   level: 8
   name: positive regulation of DNA replication
-  organism_count: 13
+  organism_count: 14
   score: 1.9133
   tree: null
   tree_code: null
-- gene_count: 13
+- gene_count: 14
   id: go:0070581
   is_informative: true
   level: 8
   name: rolling circle DNA replication
-  organism_count: 13
+  organism_count: 14
   score: 2.1098
   tree: null
   tree_code: null
@@ -226,66 +226,66 @@ rows:
   score: 2.2637
   tree: null
   tree_code: null
-- gene_count: 297
+- gene_count: 298
   id: go:0071932
   is_informative: true
   level: 8
   name: replication fork reversal
-  organism_count: 117
+  organism_count: 118
   score: 2.3511
   tree: null
   tree_code: null
-- gene_count: 140
+- gene_count: 144
   id: go:0090329
   is_informative: true
   level: 8
   name: regulation of DNA-templated DNA replication
-  organism_count: 104
+  organism_count: 105
   score: 1.7504
   tree: null
   tree_code: null
-- gene_count: 35
+- gene_count: 36
   id: go:0090592
   is_informative: true
   level: 7
   name: DNA synthesis involved in DNA replication
-  organism_count: 30
+  organism_count: 31
   score: 1.7504
   tree: null
   tree_code: null
-- gene_count: 11
+- gene_count: 12
   id: go:1902292
   is_informative: true
   level: 3
   name: cell cycle DNA replication initiation
-  organism_count: 11
+  organism_count: 12
   score: 1.9133
   tree: null
   tree_code: null
-- gene_count: 11
+- gene_count: 12
   id: go:1902328
   is_informative: true
   level: 4
   name: bacterial-type DNA replication initiation
-  organism_count: 11
+  organism_count: 12
   score: 1.9133
   tree: null
   tree_code: null
-- gene_count: 37
+- gene_count: 40
   id: go:2000104
   is_informative: true
   level: 9
   name: negative regulation of DNA-templated DNA replication
-  organism_count: 13
+  organism_count: 14
   score: 1.613
   tree: null
   tree_code: null
-- gene_count: 13
+- gene_count: 14
   id: go:2000105
   is_informative: true
   level: 9
   name: positive regulation of DNA-templated DNA replication
-  organism_count: 13
+  organism_count: 14
   score: 1.613
   tree: null
   tree_code: null

@@ -114,7 +114,7 @@ results:
   organism_name: Phage
   organism_type: treatment
   peptidase_gene_count: 0
-  publication_count: 4
+  publication_count: 5
   reaction_count: 0
   species: null
   strain: null
@@ -221,7 +221,7 @@ top_metabolic_capability:
   organism_name: Prochlorococcus MED4
   reaction_count: 943
   transported_metabolite_count: 39
-total_entries: 121
+total_entries: 123
 total_matching: 3
 truncated: false
 warnings: []

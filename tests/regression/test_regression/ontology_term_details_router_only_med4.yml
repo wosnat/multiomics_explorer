@@ -116,10 +116,10 @@ results:
   children_total: 97
   children_truncated: true
   description: null
-  direct_gene_count: 1640
+  direct_gene_count: 1656
   direction: unknown
   direction_basis: null
-  gene_count: 9107
+  gene_count: 9192
   is_informative: true
   label: TcdbFamily
   level: 2
@@ -128,7 +128,7 @@ results:
   member_count: 97
   name: The ATP-binding Cassette (ABC) Superfamily
   ontology: tcdb
-  organism_count: 117
+  organism_count: 118
   organism_gene_count: 52
   parents:
   - '{''id'': ''tcdb:3.A'', ''level'': 1, ''name'': ''P-P-bond-hydrolysis-driven transporters''}'
@@ -152,8 +152,8 @@ results:
     is a substrate, have been shown to share a short conserved sequence around a methionine
     which is probably involved in the catalytic activity of this type of enzymes.
     The following are examples of members of this family:'
-  direct_gene_count: 357
-  gene_count: 357
+  direct_gene_count: 360
+  gene_count: 360
   interpro_id: IPR000362
   interpro_type: FAMILY
   is_informative: true
@@ -179,7 +179,7 @@ results:
   member_count: 4
   name: Fumarate lyase family
   ontology: interpro
-  organism_count: 117
+  organism_count: 118
   organism_gene_count: 3
   parents: []
   term_id: interpro:IPR000362

@@ -957,7 +957,7 @@ class TestSearchOntologyBrowseCorrectnessKG:
         rows = conn.execute_query(cypher, **params)
         assert [r["id"] for r in rows] == [
             "merops.family:S33", "merops.family:C26", "merops.family:S09",
-            "merops.family:C44", "merops.family:S14",
+            "merops.family:C44", "merops.family:M41",  # ties S14 at 426 (2026-10-31); id breaks it
         ]
         live = {x["id"]: x["gc"] for x in run_query(
             "MATCH (t:MeropsFamily) WHERE t.id IN $ids RETURN t.id AS id, t.gene_count AS gc",

@@ -35,7 +35,7 @@ not_found:
 offset: 0
 resolved_aliases: {}
 results:
-- catalyst_gene_count: 733
+- catalyst_gene_count: 745
   chebi_id: '4167'
   elements:
   - C
@@ -46,9 +46,10 @@ results:
   - metabolism
   - transport
   formula: C6H12O6
-  go_transport_organism_count: 101
+  go_transport_organism_count: 102
   go_transport_organism_names:
   - Alteromonas (MarRef v6)
+  - Alteromonas macleodii 83-1
   - Alteromonas macleodii AD45
   - Alteromonas macleodii ATCC27126
   - Alteromonas macleodii BGP6
@@ -158,7 +159,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00031
   name: D-Glucose
-  organism_count: 117
+  organism_count: 118
   pathway_count: 21
   pathway_ids:
   - kegg.pathway:ko00010
@@ -185,15 +186,15 @@ results:
   stereo_relatives:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00221'',
     ''name'': ''beta-D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
-    492}'
+    500}'
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00267'',
     ''name'': ''alpha-D-Glucose'', ''relation'': ''specific_form'', ''catalyst_gene_count'':
-    508}'
-  - '{''transporter_gene_count'': 133, ''metabolite_id'': ''chebi:17234'', ''name'':
+    515}'
+  - '{''transporter_gene_count'': 136, ''metabolite_id'': ''chebi:17234'', ''name'':
     ''glucose'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'': 0}'
   structure_kind: defined
   transporter_count: 2
-  transporter_gene_count: 16
+  transporter_gene_count: 18
 returned: 1
 row_count: 1
 score_max: null
@@ -231,6 +232,8 @@ top_metabolite_pathways:
   metabolite_pathway_name: Glycolysis / Gluconeogenesis
 top_organisms:
 - count: 1
+  organism_name: Alteromonas macleodii 83-1
+- count: 1
   organism_name: Alteromonas macleodii AD45
 - count: 1
   organism_name: Alteromonas macleodii ATCC27126
@@ -246,8 +249,6 @@ top_organisms:
   organism_name: Alteromonas macleodii MIT1002
 - count: 1
   organism_name: Alteromonas mediterranea AltDE
-- count: 1
-  organism_name: Alteromonas mediterranea AltDE1
 - count: 1
   organism_name: Alteromonas (MarRef v6)
 total_entries: 3251

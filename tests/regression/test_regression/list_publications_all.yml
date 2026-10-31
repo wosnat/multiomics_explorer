@@ -1,5 +1,5 @@
 case_id: list_publications_all
-row_count: 50
+row_count: 60
 rows:
 - authors:
   - James I. Mullet
@@ -36,6 +36,43 @@ rows:
   title: Biofilm formation and dynamics in the marine cyanobacterium Prochlorococcus
   treatment_types:
   - growth_phase
+  year: 2026
+- authors:
+  - Adam W. E. Stewart
+  - David Schleheck
+  - Hamza Tahir
+  - Helen Barber
+  - Mihwa Lee
+  - Nichollas E. Scott
+  - Sabrina Borusak
+  - Spencer J. Williams
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  discussed_gene_count: 13
+  discussed_pathway_count: 2
+  doi: 10.1039/d6sc02372j
+  experiment_count: 4
+  growth_phases:
+  - exponential
+  journal: Chemical Science
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - PROTEOMICS
+  organisms:
+  - Ruegeria pomeroyi DSS-3
+  study_type: Proteomics; Biophysical analysis; X-ray crystallography; Bioinformatics
+  title: Chiral recognition of 2,3-dihydroxypropanesulfonate by bacterial transport
+    proteins adapted to distinct ecological niches
+  treatment_types:
+  - carbon
   year: 2026
 - authors:
   - Jordan Rozum
@@ -827,6 +864,172 @@ rows:
   - viral
   year: 2021
 - authors:
+  - Alexandra H. Campbell
+  - Beatriz Noriega-Ortega
+  - Dominik Lücking
+  - Ezequiel M. Marzinelli
+  - Galaxy Qiu
+  - Hanna Koch
+  - Heike M. Freese
+  - Jörg Overmann
+  - Martine Berger
+  - Matthias Wietz
+  - Meinhard Simon
+  - Nora Germscheid
+  - Peter D. Steinberg
+  - Thorsten Dittmar
+  background_factors: []
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 4
+  derived_metric_value_kinds:
+  - boolean
+  discussed_gene_count: 1
+  discussed_pathway_count: 5
+  doi: 10.1038/s41598-020-57526-5
+  experiment_count: 4
+  growth_phases: []
+  journal: Scientific Reports
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - BIOINFORMATIC
+  organisms:
+  - Alteromonas macleodii 83-1
+  - Alteromonas macleodii AD45
+  - Alteromonas macleodii ATCC27126
+  - Alteromonas macleodii MIT1002
+  study_type: Genomics|Metabolomics|Phenotypic assays|Exometabolomics|Co-culture experiments
+  title: Genomic, metabolic and phenotypic variability shapes ecological differentiation
+    and intraspecies interactions of Alteromonas macleodii
+  treatment_types:
+  - genomic_analysis
+  year: 2020
+- authors:
+  - Arthur S. Edison
+  - Brittany Widner
+  - Elizabeth B. Kujawinski
+  - Frank Xavier Ferrer-González
+  - John Glushka
+  - Mary Ann Moran
+  - Nicole R. Holderman
+  background_factors:
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  discussed_gene_count: 3
+  discussed_pathway_count: 0
+  doi: 10.1038/s41396-020-00811-y
+  experiment_count: 1
+  growth_phases:
+  - exponential
+  journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Ruegeria pomeroyi DSS-3
+  - Thalassiosira pseudonana
+  study_type: Transcriptomics|Metabolomics
+  title: Resource partitioning of phytoplankton metabolites that support bacterial
+    heterotrophy
+  treatment_types:
+  - coculture
+  year: 2020
+- authors:
+  - Christopher L. Dupont
+  - Josh L. Espinoza
+  - Katherine A. Barbeau
+  - Lauren E. Manck
+  background_factors:
+  - axenic
+  - darkness
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 2
+  derived_metric_value_kinds:
+  - boolean
+  - categorical
+  discussed_gene_count: 55
+  discussed_pathway_count: 14
+  doi: 10.1128/mSystems.00070-20
+  experiment_count: 3
+  growth_phases:
+  - nutrient_limited
+  journal: mSystems
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - BIOINFORMATIC
+  - RNASEQ
+  organisms:
+  - Alteromonas macleodii ATCC27126
+  study_type: Transcriptomics
+  title: Transcriptomic Study of Substrate-Specific Transport Mechanisms for Iron
+    and Carbon in the Marine Copiotroph Alteromonas macleodii
+  treatment_types:
+  - carbon
+  - genomic_analysis
+  - iron
+  year: 2020
+- authors:
+  - Alexandra Dürwald
+  - Beatriz Noriega-Ortega
+  - Dörte Becher
+  - Hanna Koch
+  - Heike M. Freese
+  - Jan-Hendrik Hehemann
+  - Matthias Wietz
+  - Meinhard Simon
+  - Silvia Vidal-Melgosa
+  - Thomas Schweder
+  - Thorsten Dittmar
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 4
+  derived_metric_value_kinds:
+  - numeric
+  discussed_gene_count: 33
+  discussed_pathway_count: 5
+  doi: 10.1038/s41396-018-0252-4
+  experiment_count: 5
+  growth_phases:
+  - exponential
+  - other:no_net_growth
+  - stationary
+  journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - PROTEOMICS
+  - RNASEQ
+  organisms:
+  - Alteromonas macleodii 83-1
+  study_type: Transcriptomics, Proteomics, Exometabolomics
+  title: Biphasic cellular adaptations and ecological implications of Alteromonas
+    macleodii degrading a mixture of algal polysaccharides
+  treatment_types:
+  - carbon
+  - growth_phase
+  year: 2019
+- authors:
   - Ian T. Paulsen
   - Indrani Sarker
   - Liam D.H. Elbourne
@@ -1325,6 +1528,98 @@ rows:
   - viral
   year: 2016
 - authors:
+  - Benjamin A. S. Van Mooy
+  - Bryndan P. Durham
+  - Christa B. Smith
+  - E. Virginia Armbrust
+  - Elizabeth B. Kujawinski
+  - Haiwei Luo
+  - Mary Ann Moran
+  - Sara J. Bender
+  - Shady A. Amin
+  - Shalabh Sharma
+  - Shawn R. Campagna
+  - Stephen P. Dearth
+  background_factors:
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  discussed_gene_count: 6
+  discussed_pathway_count: 2
+  doi: 10.1073/pnas.1413137112
+  experiment_count: 1
+  growth_phases:
+  - unknown
+  journal: PNAS
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - RNASEQ
+  organisms:
+  - Ruegeria pomeroyi DSS-3
+  - Thalassiosira pseudonana
+  study_type: Transcriptomics (RNA-Seq)
+  title: Cryptic carbon and sulfur cycling between surface ocean plankton
+  treatment_types:
+  - coculture
+  year: 2015
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - exoproteome
+  derived_metric_count: 16
+  derived_metric_value_kinds:
+  - categorical
+  - numeric
+  discussed_gene_count: 44
+  discussed_pathway_count: 4
+  doi: 10.1111/1462-2920.12822
+  experiment_count: 12
+  growth_phases:
+  - darkness
+  - exponential
+  - infected
+  - other:early_incubation
+  journal: Environmental Microbiology
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - EXOPROTEOMICS
+  organisms:
+  - Phage
+  - Ruegeria pomeroyi DSS-3
+  - Synechococcus CC9311
+  - Synechococcus RS9916
+  - Synechococcus RS9917
+  - Synechococcus WH5701
+  - Synechococcus WH7803
+  - Synechococcus WH7805
+  - Synechococcus WH8102
+  - Synechococcus sp. BL107
+  study_type: Proteomics
+  title: Functional distinctness in the exoproteomes of marine Synechococcus
+  treatment_types:
+  - coculture
+  - compartment
+  - darkness
+  - growth_phase
+  - viral
+  year: 2015
+- authors:
   - Andreas Henschel
   - Lina F. Yousef
   - Mai M. Oudah
@@ -1389,6 +1684,45 @@ rows:
   title: Response of Prochlorococcus to varying CO2:O2 ratios
   treatment_types:
   - carbon
+  year: 2015
+- authors:
+  - Adam Deutschbauer
+  - Adam P. Arkin
+  - Benjamin E. Rubin
+  - Genevieve Curtin
+  - Kelly M. Wetmore
+  - Laura C. Lowe
+  - Morgan N. Price
+  - Ryan K. Shultzaberger
+  - Spencer Diamond
+  - Susan S. Golden
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 1
+  derived_metric_value_kinds:
+  - categorical
+  discussed_gene_count: 34
+  discussed_pathway_count: 8
+  doi: 10.1073/pnas.1519220112
+  experiment_count: 1
+  growth_phases: []
+  journal: PNAS
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - DNASEQ
+  organisms:
+  - Synechococcus elongatus PCC 7942
+  study_type: RB-TnSeq / Transposon sequencing
+  title: The essential gene set of a photosynthetic organism
+  treatment_types:
+  - essentiality
   year: 2015
 - authors:
   - Huiming Ding
@@ -1729,6 +2063,44 @@ rows:
   - iron
   year: 2011
 - authors:
+  - Aaron Johnson
+  - Brian Palenik
+  - Dave J Scanlan
+  - Ian T Paulsen
+  - Katherine Phillippy
+  - Martin Ostrowski
+  - Sasha G Tetu
+  - Sophie Mazard
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  discussed_gene_count: 40
+  discussed_pathway_count: 5
+  doi: 10.1038/ismej.2010.24
+  experiment_count: 1
+  growth_phases:
+  - nutrient_limited
+  journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Synechococcus WH8102
+  study_type: Microarray, RT-qPCR, EMSA
+  title: PtrA is required for coordinate regulation of gene expression during phosphate
+    stress in a marine Synechococcus
+  treatment_types:
+  - mutant
+  year: 2010
+- authors:
   - Claudia Steglich
   - Debbie Lindell
   - Matthias Futschik
@@ -1807,6 +2179,45 @@ rows:
     Photoautotroph, Prochlorococcus
   treatment_types:
   - diel
+  year: 2009
+- authors:
+  - Bianca Brahamsha
+  - Brian Palenik
+  - Daniel A Johnson
+  - Ian T Paulsen
+  - Katherine Phillippy
+  - Sasha G Tetu
+  - Vera Tai
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  compartments:
+  - whole_cell
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  discussed_gene_count: 53
+  discussed_pathway_count: 7
+  doi: 10.1038/ismej.2009.31
+  experiment_count: 3
+  growth_phases:
+  - exponential
+  - nutrient_limited
+  journal: The ISME Journal
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_types:
+  - MICROARRAY
+  organisms:
+  - Synechococcus WH8102
+  study_type: Microarray
+  title: Microarray analysis of phosphate regulation in the marine cyanobacterium
+    Synechococcus sp. WH8102
+  treatment_types:
+  - mutant
+  - phosphorus
   year: 2009
 - authors:
   - Brian Palenik

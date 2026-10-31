@@ -1,48 +1,48 @@
 case_id: search_ontology_pfam
 row_count: 62
 rows:
-- gene_count: 86
+- gene_count: 89
   id: pfam:PF00078
   is_informative: true
   level: 1
   name: Reverse transcriptase (RNA-dependent DNA polymerase)
-  organism_count: 22
+  organism_count: 23
   score: 1.8737
   tree: null
   tree_code: null
-- gene_count: 13
+- gene_count: 14
   id: pfam:PF00136
   is_informative: true
   level: 1
   name: DNA polymerase family B
-  organism_count: 12
+  organism_count: 13
   score: 2.2321
   tree: null
   tree_code: null
-- gene_count: 137
+- gene_count: 138
   id: pfam:PF00476
   is_informative: true
   level: 1
   name: DNA polymerase family A
-  organism_count: 116
+  organism_count: 117
   score: 2.2321
   tree: null
   tree_code: null
-- gene_count: 117
+- gene_count: 118
   id: pfam:PF00562
   is_informative: true
   level: 1
   name: RNA polymerase Rpb2, domain 6
-  organism_count: 116
+  organism_count: 117
   score: 2.0373
   tree: null
   tree_code: null
-- gene_count: 115
+- gene_count: 116
   id: pfam:PF00623
   is_informative: true
   level: 1
   name: RNA polymerase Rpb1, domain 2
-  organism_count: 114
+  organism_count: 115
   score: 2.0373
   tree: null
   tree_code: null
@@ -55,12 +55,12 @@ rows:
   score: 1.8737
   tree: null
   tree_code: null
-- gene_count: 118
+- gene_count: 119
   id: pfam:PF00712
   is_informative: true
   level: 1
   name: DNA polymerase III beta subunit, N-terminal domain
-  organism_count: 117
+  organism_count: 118
   score: 1.6144
   tree: null
   tree_code: null
@@ -73,75 +73,75 @@ rows:
   score: 2.2321
   tree: null
   tree_code: null
-- gene_count: 117
+- gene_count: 118
   id: pfam:PF01000
   is_informative: true
   level: 1
   name: RNA polymerase Rpb3/RpoA insert domain
-  organism_count: 116
+  organism_count: 117
   score: 1.8737
   tree: null
   tree_code: null
-- gene_count: 117
+- gene_count: 118
   id: pfam:PF01192
   is_informative: true
   level: 1
   name: RNA polymerase Rpb6
-  organism_count: 117
+  organism_count: 118
   score: 2.4683
   tree: null
   tree_code: null
-- gene_count: 117
+- gene_count: 118
   id: pfam:PF01193
   is_informative: true
   level: 1
   name: RNA polymerase Rpb3/Rpb11 dimerisation domain
-  organism_count: 116
+  organism_count: 117
   score: 1.8737
   tree: null
   tree_code: null
-- gene_count: 234
+- gene_count: 236
   id: pfam:PF01743
   is_informative: true
   level: 1
   name: Poly A polymerase head domain
-  organism_count: 117
+  organism_count: 118
   score: 2.0373
   tree: null
   tree_code: null
-- gene_count: 118
+- gene_count: 119
   id: pfam:PF02767
   is_informative: true
   level: 1
   name: DNA polymerase III beta subunit, central domain
-  organism_count: 117
+  organism_count: 118
   score: 1.7344
   tree: null
   tree_code: null
-- gene_count: 118
+- gene_count: 119
   id: pfam:PF02768
   is_informative: true
   level: 1
   name: DNA polymerase III beta subunit, C-terminal domain
-  organism_count: 117
+  organism_count: 118
   score: 1.6144
   tree: null
   tree_code: null
-- gene_count: 13
+- gene_count: 14
   id: pfam:PF03104
   is_informative: true
   level: 1
   name: DNA polymerase family B, exonuclease domain
-  organism_count: 12
+  organism_count: 13
   score: 1.8737
   tree: null
   tree_code: null
-- gene_count: 117
+- gene_count: 118
   id: pfam:PF03118
   is_informative: true
   level: 1
   name: Bacterial RNA polymerase, alpha chain C terminal domain
-  organism_count: 116
+  organism_count: 117
   score: 1.6144
   tree: null
   tree_code: null
@@ -154,102 +154,102 @@ rows:
   score: 2.0373
   tree: null
   tree_code: null
-- gene_count: 13
+- gene_count: 14
   id: pfam:PF04353
   is_informative: true
   level: 1
   name: Regulator of RNA polymerase sigma(70) subunit, Rsd/AlgQ
-  organism_count: 13
+  organism_count: 14
   score: 1.5099
   tree: null
   tree_code: null
-- gene_count: 13
+- gene_count: 14
   id: pfam:PF04364
   is_informative: true
   level: 1
   name: DNA polymerase III chi subunit, HolC
-  organism_count: 13
+  organism_count: 14
   score: 1.8737
   tree: null
   tree_code: null
-- gene_count: 117
+- gene_count: 118
   id: pfam:PF04560
   is_informative: true
   level: 1
   name: RNA polymerase Rpb2, domain 7
-  organism_count: 116
+  organism_count: 117
   score: 2.0373
   tree: null
   tree_code: null
-- gene_count: 117
+- gene_count: 118
   id: pfam:PF04561
   is_informative: true
   level: 1
   name: RNA polymerase Rpb2, domain 2
-  organism_count: 116
+  organism_count: 117
   score: 2.0373
   tree: null
   tree_code: null
-- gene_count: 117
+- gene_count: 118
   id: pfam:PF04563
   is_informative: true
   level: 1
   name: RNA polymerase beta subunit
-  organism_count: 116
+  organism_count: 117
   score: 2.2321
   tree: null
   tree_code: null
-- gene_count: 117
+- gene_count: 118
   id: pfam:PF04565
   is_informative: true
   level: 1
   name: RNA polymerase Rpb2, domain 3
-  organism_count: 116
+  organism_count: 117
   score: 2.0373
   tree: null
   tree_code: null
-- gene_count: 214
+- gene_count: 215
   id: pfam:PF04983
   is_informative: true
   level: 1
   name: RNA polymerase Rpb1, domain 3
-  organism_count: 114
-  score: 2.0373
-  tree: null
-  tree_code: null
-- gene_count: 115
-  id: pfam:PF04997
-  is_informative: true
-  level: 1
-  name: RNA polymerase Rpb1, domain 1
-  organism_count: 114
-  score: 2.0373
-  tree: null
-  tree_code: null
-- gene_count: 115
-  id: pfam:PF04998
-  is_informative: true
-  level: 1
-  name: RNA polymerase Rpb1, domain 5
-  organism_count: 114
-  score: 2.0373
-  tree: null
-  tree_code: null
-- gene_count: 115
-  id: pfam:PF05000
-  is_informative: true
-  level: 1
-  name: RNA polymerase Rpb1, domain 4
-  organism_count: 114
+  organism_count: 115
   score: 2.0373
   tree: null
   tree_code: null
 - gene_count: 116
+  id: pfam:PF04997
+  is_informative: true
+  level: 1
+  name: RNA polymerase Rpb1, domain 1
+  organism_count: 115
+  score: 2.0373
+  tree: null
+  tree_code: null
+- gene_count: 116
+  id: pfam:PF04998
+  is_informative: true
+  level: 1
+  name: RNA polymerase Rpb1, domain 5
+  organism_count: 115
+  score: 2.0373
+  tree: null
+  tree_code: null
+- gene_count: 116
+  id: pfam:PF05000
+  is_informative: true
+  level: 1
+  name: RNA polymerase Rpb1, domain 4
+  organism_count: 115
+  score: 2.0373
+  tree: null
+  tree_code: null
+- gene_count: 117
   id: pfam:PF06144
   is_informative: true
   level: 1
   name: DNA polymerase III, delta subunit
-  organism_count: 116
+  organism_count: 117
   score: 2.0373
   tree: null
   tree_code: null
@@ -271,21 +271,21 @@ rows:
   score: 1.7344
   tree: null
   tree_code: null
-- gene_count: 130
+- gene_count: 132
   id: pfam:PF07733
   is_informative: true
   level: 1
   name: Bacterial DNA polymerase III alpha NTPase domain
-  organism_count: 117
+  organism_count: 118
   score: 1.7344
   tree: null
   tree_code: null
-- gene_count: 13
+- gene_count: 14
   id: pfam:PF09115
   is_informative: true
   level: 1
   name: DNA polymerase III, delta subunit, C terminal
-  organism_count: 13
+  organism_count: 14
   score: 1.7344
   tree: null
   tree_code: null
@@ -316,12 +316,12 @@ rows:
   score: 1.7344
   tree: null
   tree_code: null
-- gene_count: 117
+- gene_count: 118
   id: pfam:PF10385
   is_informative: true
   level: 1
   name: RNA polymerase beta subunit external 1 domain
-  organism_count: 116
+  organism_count: 117
   score: 1.7344
   tree: null
   tree_code: null
@@ -343,39 +343,39 @@ rows:
   score: 1.5099
   tree: null
   tree_code: null
-- gene_count: 13
+- gene_count: 14
   id: pfam:PF12137
   is_informative: true
   level: 1
   name: RNA polymerase recycling family C-terminal
-  organism_count: 13
+  organism_count: 14
   score: 1.8737
   tree: null
   tree_code: null
-- gene_count: 12
+- gene_count: 13
   id: pfam:PF12168
   is_informative: true
   level: 1
   name: DNA polymerase III subunits tau domain IV DnaB-binding
-  organism_count: 12
+  organism_count: 13
   score: 1.5099
   tree: null
   tree_code: null
-- gene_count: 121
+- gene_count: 122
   id: pfam:PF12169
   is_informative: true
   level: 1
   name: DNA polymerase III subunits gamma and tau domain III
-  organism_count: 116
+  organism_count: 117
   score: 1.5099
   tree: null
   tree_code: null
-- gene_count: 15
+- gene_count: 16
   id: pfam:PF12170
   is_informative: true
   level: 1
   name: DNA polymerase III tau subunit V interacting with alpha
-  organism_count: 15
+  organism_count: 16
   score: 1.5099
   tree: null
   tree_code: null
@@ -397,30 +397,30 @@ rows:
   score: 1.8737
   tree: null
   tree_code: null
-- gene_count: 14
+- gene_count: 15
   id: pfam:PF12626
   is_informative: true
   level: 1
   name: Polymerase A arginine-rich C-terminus
-  organism_count: 13
+  organism_count: 14
   score: 1.8737
   tree: null
   tree_code: null
-- gene_count: 234
+- gene_count: 236
   id: pfam:PF12627
   is_informative: true
   level: 1
   name: Probable RNA and SrmB- binding site of polymerase A
-  organism_count: 117
+  organism_count: 118
   score: 1.5099
   tree: null
   tree_code: null
-- gene_count: 237
+- gene_count: 239
   id: pfam:PF13177
   is_informative: true
   level: 1
   name: DNA polymerase III, delta subunit
-  organism_count: 117
+  organism_count: 118
   score: 2.0373
   tree: null
   tree_code: null
@@ -451,12 +451,12 @@ rows:
   score: 2.2321
   tree: null
   tree_code: null
-- gene_count: 129
+- gene_count: 131
   id: pfam:PF17657
   is_informative: true
   level: 1
   name: Bacterial DNA polymerase III alpha subunit finger domain
-  organism_count: 117
+  organism_count: 118
   score: 1.6144
   tree: null
   tree_code: null
@@ -469,12 +469,12 @@ rows:
   score: 2.4683
   tree: null
   tree_code: null
-- gene_count: 12
+- gene_count: 13
   id: pfam:PF20914
   is_informative: true
   level: 1
   name: DNA polymerase III subunit alpha, C-terminal domain
-  organism_count: 12
+  organism_count: 13
   score: 1.6144
   tree: null
   tree_code: null
@@ -523,12 +523,12 @@ rows:
   score: 1.6144
   tree: null
   tree_code: null
-- gene_count: 13
+- gene_count: 14
   id: pfam:PF21999
   is_informative: true
   level: 1
   name: DNA polymerase-iota, thumb domain
-  organism_count: 13
+  organism_count: 14
   score: 2.0373
   tree: null
   tree_code: null
@@ -541,12 +541,12 @@ rows:
   score: 2.0373
   tree: null
   tree_code: null
-- gene_count: 115
+- gene_count: 116
   id: pfam:PF22608
   is_informative: true
   level: 1
   name: DNA polymerase III clamp loader subunit, ATPase lid domain
-  organism_count: 115
+  organism_count: 116
   score: 1.5099
   tree: null
   tree_code: null

@@ -94,9 +94,9 @@ list_filter_values(filter_type="gene_category")
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "Unknown", "count": 113921},
+    {"value": "Unknown", "count": 115163},
     {"value": "Stress response and adaptation", "count": 23297},
-    {"value": "Coenzyme metabolism", "count": 21174},
+    {"value": "Coenzyme metabolism", "count": 21311},
     ...
   ]
 }
@@ -158,14 +158,14 @@ list_filter_values(filter_type="metric_type")
 {
   "filter_type": "metric_type",
   "description": null,
-  "total_entries": 55,
-  "returned": 55,
+  "total_entries": 63,
+  "returned": 63,
   "truncated": false,
   "warnings": [],
   "results": [
     {"value": "sbp_nutrient_class", "count": 95},
     {"value": "sbp_predicted_substrate", "count": 95},
-    {"value": "log2_mv_cell_enrichment", "count": 6},
+    {"value": "exoproteome_avg_pct_nsaf", "count": 10},
     ...
   ]
 }
@@ -186,9 +186,9 @@ list_filter_values(filter_type="value_kind")
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "categorical", "count": 200},
-    {"value": "numeric", "count": 46},
-    {"value": "boolean", "count": 27}
+    {"value": "categorical", "count": 210},
+    {"value": "numeric", "count": 58},
+    {"value": "boolean", "count": 32}
   ]
 }
 ```
@@ -208,9 +208,9 @@ list_filter_values(filter_type="compartment")
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "whole_cell", "count": 280},
+    {"value": "whole_cell", "count": 303},
+    {"value": "exoproteome", "count": 19},
     {"value": "vesicle", "count": 13},
-    {"value": "exoproteome", "count": 7},
     ...
   ]
 }
@@ -226,14 +226,14 @@ list_filter_values(filter_type="omics_type")
 {
   "filter_type": "omics_type",
   "description": null,
-  "total_entries": 9,
-  "returned": 9,
+  "total_entries": 10,
+  "returned": 10,
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "BIOINFORMATIC", "count": 95},
-    {"value": "EXOPROTEOMICS", "count": 7},
-    {"value": "METABOLOMICS", "count": 12},
+    {"value": "BIOINFORMATIC", "count": 100},
+    {"value": "DNASEQ", "count": 1},
+    {"value": "EXOPROTEOMICS", "count": 19},
     ...
   ]
 }
@@ -249,13 +249,13 @@ list_filter_values(filter_type="growth_phase")
 {
   "filter_type": "growth_phase",
   "description": null,
-  "total_entries": 11,
-  "returned": 11,
+  "total_entries": 13,
+  "returned": 13,
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "exponential", "count": 70},
-    {"value": "darkness", "count": 33},
+    {"value": "exponential", "count": 79},
+    {"value": "darkness", "count": 34},
     {"value": "acute_stress", "count": 26},
     ...
   ]
@@ -619,8 +619,8 @@ list_filter_values(filter_type="treatment_type")
 {
   "filter_type": "treatment_type",
   "description": "The manipulated variable(s) of the experiment — nitrogen, phosphorus, iron, carbon, salt, light, temperature, plastic...",
-  "total_entries": 19,
-  "returned": 19,
+  "total_entries": 21,
+  "returned": 21,
   "truncated": false,
   "warnings": [],
   "results": [

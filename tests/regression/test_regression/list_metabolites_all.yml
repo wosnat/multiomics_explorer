@@ -123,7 +123,7 @@ not_found:
 offset: 0
 resolved_aliases: {}
 results:
-- catalyst_gene_count: 24955
+- catalyst_gene_count: 25282
   chebi_id: '15377'
   elements:
   - H
@@ -152,7 +152,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00001
   name: H2O
-  organism_count: 117
+  organism_count: 118
   pathway_count: 4
   pathway_ids:
   - kegg.pathway:ko00190
@@ -162,7 +162,7 @@ results:
   structure_kind: defined
   transporter_count: 3
   transporter_gene_count: 22
-- catalyst_gene_count: 15995
+- catalyst_gene_count: 16145
   chebi_id: '15422'
   elements:
   - C
@@ -188,7 +188,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00002
   name: ATP
-  organism_count: 117
+  organism_count: 118
   pathway_count: 18
   pathway_ids:
   - kegg.pathway:ko00190
@@ -212,7 +212,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 14214
+- catalyst_gene_count: 14388
   chebi_id: '15378'
   elements:
   - H
@@ -228,7 +228,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00080
   name: H+
-  organism_count: 117
+  organism_count: 118
   pathway_count: 6
   pathway_ids:
   - kegg.pathway:ko00190
@@ -240,7 +240,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 11502
+- catalyst_gene_count: 11610
   chebi_id: '29888'
   elements:
   - H
@@ -259,14 +259,14 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00013
   name: Diphosphate
-  organism_count: 117
+  organism_count: 118
   pathway_count: 1
   pathway_ids:
   - kegg.pathway:ko00190
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 10602
+- catalyst_gene_count: 10708
   chebi_id: '26078'
   elements:
   - H
@@ -277,9 +277,10 @@ results:
   - metabolism
   - transport
   formula: HO4P
-  go_transport_organism_count: 117
+  go_transport_organism_count: 118
   go_transport_organism_names:
   - Alteromonas (MarRef v6)
+  - Alteromonas macleodii 83-1
   - Alteromonas macleodii AD45
   - Alteromonas macleodii ATCC27126
   - Alteromonas macleodii BGP6
@@ -403,7 +404,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00009
   name: Orthophosphate
-  organism_count: 117
+  organism_count: 118
   pathway_count: 6
   pathway_ids:
   - kegg.pathway:ko00190
@@ -414,7 +415,7 @@ results:
   - kegg.pathway:ko04111
   structure_kind: defined
   transporter_count: 14
-  transporter_gene_count: 52
+  transporter_gene_count: 56
 returned: 5
 row_count: 5
 score_max: null
@@ -467,10 +468,10 @@ top_organisms:
   organism_name: Alteromonas (MarRef v6)
 - count: 1473
   organism_name: Alteromonas macleodii BGP6
+- count: 1473
+  organism_name: Alteromonas macleodii 83-1
 - count: 1462
   organism_name: Alteromonas macleodii HOT1A3
-- count: 1461
-  organism_name: Alteromonas mediterranea AltDE1
 total_entries: 3251
 total_matching: 3251
 truncated: true

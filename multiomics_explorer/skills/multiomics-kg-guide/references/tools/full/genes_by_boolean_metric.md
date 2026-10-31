@@ -23,7 +23,7 @@ docs://tools/genes_by_boolean_metric; summary=True first.
 | treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
 | background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
-| flag_value | bool \| None | None | Filter on `r.value`: True keeps `'flagged'` edges, False keeps `'not_flagged'` edges (tested-absent — real biology, stored on 11 of 27 boolean DMs; the rest are positive-only and return 0 rows for False). Check `by_metric[*].false_count` before reading an absent gene as 'not flagged' vs 'not assessed'. |
+| flag_value | bool \| None | None | Filter on `r.value`: True keeps `'flagged'` edges, False keeps `'not_flagged'` edges (tested-absent — real biology, stored on 11 of 32 boolean DMs; the rest are positive-only and return 0 rows for False). Check `by_metric[*].false_count` before reading an absent gene as 'not flagged' vs 'not assessed'. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | limit | int | 25 | Max rows returned (paging). |
@@ -46,7 +46,7 @@ total_matching, total_derived_metrics, total_genes, by_organism, by_compartment,
 - **by_compartment** (list[GenesByNumericMetricCompartmentBreakdown]): Rows per compartment.
 - **by_publication** (list[GenesByNumericMetricPublicationBreakdown]): Rows per publication.
 - **by_experiment** (list[GenesByNumericMetricExperimentBreakdown]): Rows per experiment.
-- **by_value** (list[GenesByBooleanMetricValueBreakdown]): Frequency rollup of `r.value` across surviving rows. Values are 'flagged' / 'not_flagged'; not_flagged rows exist on 11 of 27 boolean DMs.
+- **by_value** (list[GenesByBooleanMetricValueBreakdown]): Frequency rollup of `r.value` across surviving rows. Values are 'flagged' / 'not_flagged'; not_flagged rows exist on 11 of 32 boolean DMs.
 - **top_categories** (list[GenesByNumericMetricCategoryBreakdown]): Top 5 gene categories by count.
 - **by_metric** (list[GenesByBooleanMetricBreakdown]): Per-DM rollup: filtered-slice true/false counts + full-DM precomputed tallies. Sorted by count desc.
 - **genes_per_metric_max** (int): Largest per-DM gene count.
@@ -459,7 +459,7 @@ genes_by_boolean_metric (no organism filter) → split via envelope by_organism 
 
 ## Common mistakes
 
-- Two storage conventions coexist. 11 of 27 boolean DMs (Biller 2022, Voigt 2014, Hennon 2015, Steglich 2010) store `r.value="not_flagged"` edges, so `flag_value=False` returns tested-absent rows there; the rest (Biller 2014 / 2018, Coe 2016) are positive-only and return 0 rows for `flag_value=False`. Read `by_metric[*].false_count` before reading an absent gene as "not flagged" rather than "not assessed"; `dm_false_count` is the full-DM precomputed twin (0 on positive-only DMs). Contrast `metabolites_by_flags_assay`, whose edges always store both states.
+- Two storage conventions coexist. 11 of 32 boolean DMs (Biller 2022, Voigt 2014, Hennon 2015, Steglich 2010) store `r.value="not_flagged"` edges, so `flag_value=False` returns tested-absent rows there; the rest (Biller 2014 / 2018, Coe 2016) are positive-only and return 0 rows for `flag_value=False`. Read `by_metric[*].false_count` before reading an absent gene as "not flagged" rather than "not assessed"; `dm_false_count` is the full-DM precomputed twin (0 on positive-only DMs). Contrast `metabolites_by_flags_assay`, whose edges always store both states.
 
 - Sparse `rankable` / `has_p_value` echoes. Both are always `False` on every row from boolean DMs in the current KG — kept for cross-tool row-shape consistency with `genes_by_numeric_metric`, not because this tool reads them as a meaningful signal. Don't gate downstream logic on them.
 
@@ -471,7 +471,7 @@ genes_by_boolean_metric(derived_metric_ids=['derived_metric:...:damping_ratio'])
 genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
 ```
 
-- See `docs://analysis/derived_metrics` for the DM family overview. Note: `flag_value=False` returns rows only on DMs that store `not_flagged` edges (11 of 27); metabolomics `metabolites_by_flags_assay` always stores both states.
+- See `docs://analysis/derived_metrics` for the DM family overview. Note: `flag_value=False` returns rows only on DMs that store `not_flagged` edges (11 of 32); metabolomics `metabolites_by_flags_assay` always stores both states.
 
 - `excluded_derived_metrics` is always `[]` here — no rankable / has_p_value gate applies to boolean DMs; it is kept for envelope-shape parity with `genes_by_numeric_metric`. `warnings` carries the closed-vocabulary, organism-existence, positive-only-flag and kind-mismatch notices instead.
 

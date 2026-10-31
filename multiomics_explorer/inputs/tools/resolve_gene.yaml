@@ -27,13 +27,13 @@ examples:
     call: resolve_gene(identifier="dnaN")
     response: |
       {
-        "total_matching": 118,
+        "total_matching": 119,
         "by_organism": [
           {"organism_name": "Synechococcus KORDI-100", "count": 2},
           {"organism_name": "Alteromonas (MarRef v6)", "count": 1},
+          {"organism_name": "Alteromonas macleodii 83-1", "count": 1},
           {"organism_name": "Alteromonas macleodii AD45", "count": 1},
           {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
-          {"organism_name": "Alteromonas macleodii BGP6", "count": 1},
           ...
         ],
         "by_organism_truncated": true,
@@ -48,16 +48,16 @@ examples:
             "organism_name": "Alteromonas (MarRef v6)"
           },
           {
+            "locus_tag": "ALT831_00002",
+            "gene_name": "dnaN",
+            "product": "DNA polymerase III subunit beta",
+            "organism_name": "Alteromonas macleodii 83-1"
+          },
+          {
             "locus_tag": "AMBAS45_00010",
             "gene_name": "dnaN",
             "product": "DNA polymerase III subunit beta",
             "organism_name": "Alteromonas macleodii AD45"
-          },
-          {
-            "locus_tag": "MASE_00010",
-            "gene_name": "dnaN",
-            "product": "DNA polymerase III subunit beta",
-            "organism_name": "Alteromonas macleodii ATCC27126"
           },
           ...
         ]

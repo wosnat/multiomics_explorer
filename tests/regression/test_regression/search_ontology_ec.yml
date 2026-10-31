@@ -19,21 +19,21 @@ rows:
   score: 2.722
   tree: null
   tree_code: null
-- gene_count: 12
+- gene_count: 13
   id: ec:1.1.99.28
   is_informative: true
   level: 3
   name: glucose-fructose oxidoreductase
-  organism_count: 12
+  organism_count: 13
   score: 2.722
   tree: null
   tree_code: null
-- gene_count: 9
+- gene_count: 10
   id: ec:1.12.5.1
   is_informative: true
   level: 3
   name: hydrogen:quinone oxidoreductase
-  organism_count: 7
+  organism_count: 8
   score: 3.0869
   tree: null
   tree_code: null
@@ -109,12 +109,12 @@ rows:
   score: 3.0869
   tree: null
   tree_code: null
-- gene_count: 53
+- gene_count: 57
   id: ec:1.3.99.16
   is_informative: true
   level: 3
   name: isoquinoline 1-oxidoreductase
-  organism_count: 15
+  organism_count: 16
   score: 2.722
   tree: null
   tree_code: null
@@ -226,12 +226,12 @@ rows:
   score: 2.722
   tree: null
   tree_code: null
-- gene_count: 3497
+- gene_count: 3517
   id: ec:7.1.1.-
   is_informative: true
   level: 2
   name: Hydron translocation or charge separation linked to oxidoreductase reactions
-  organism_count: 117
+  organism_count: 118
   score: 1.5925
   tree: null
   tree_code: null
@@ -253,12 +253,12 @@ rows:
   score: 2.2016
   tree: null
   tree_code: null
-- gene_count: 84
+- gene_count: 90
   id: ec:7.2.1.-
   is_informative: true
   level: 2
   name: Linked to oxidoreductase reactions
-  organism_count: 13
+  organism_count: 14
   score: 2.4343
   tree: null
   tree_code: null

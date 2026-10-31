@@ -277,7 +277,7 @@ Boolean-like properties are stored as **two-state strings** in the KG
 `Assay_flags_metabolite.flag_value`: `detected` / `not_detected`). Tool
 parameters and most output columns stay `bool`; a couple of rollups
 surface the KG literal instead. Tested-absent (`not_flagged`) edges exist
-on only 11 of 27 boolean DMs — the rest are positive-only, so
+on only 11 of 32 boolean DMs — the rest are positive-only, so
 `genes_by_boolean_metric(flag_value=False)` is DM-dependent (read
 `by_metric[*].false_count`). `Assay_flags_metabolite` always stores both
 states.
@@ -520,8 +520,8 @@ additionally accepts an exact `preferred_name` for gene-less taxa;
 `list_metabolites(organism_names=[...])` is exact, case-insensitive on
 `preferred_name` only.
 
-Enumerate with `list_organisms()` (121 `OrganismTaxon` nodes, 121 distinct
-names, 117 with genes). In `run_cypher`, join genes to organisms via
+Enumerate with `list_organisms()` (123 `OrganismTaxon` nodes, 123 distinct
+names, 118 with genes). In `run_cypher`, join genes to organisms via
 `Gene_belongs_to_organism`.
 
 `organism=` filters the **profiled organism only** (`list_experiments`,

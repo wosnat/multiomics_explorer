@@ -1,6 +1,92 @@
 case_id: list_derived_metrics_rankable_true
-row_count: 42
+row_count: 54
 rows:
+- allowed_categories: null
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  derived_metric_id: derived_metric:s41396-018-0252-4:proteome_nsaf:nsaf_glucose_13h
+  experiment_id: 10.1038/s41396-018-0252-4_proteome_nsaf_831_proteomics
+  field_description: Whole-cell protein abundance as %NSAF (mean of three replicates),
+    glucose phase G1 (13 h, exponential); proteins not detected carry no edge.
+  growth_phases: []
+  has_p_value: false
+  metric_type: nsaf_glucose_13h
+  name: Protein abundance on glucose, 13 h (G1, %NSAF)
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas macleodii 83-1
+  publication_doi: 10.1038/s41396-018-0252-4
+  rankable: true
+  total_gene_count: 1049
+  treatment_type:
+  - carbon
+  unit: '%NSAF'
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  derived_metric_id: derived_metric:s41396-018-0252-4:proteome_nsaf:nsaf_glucose_21h
+  experiment_id: 10.1038/s41396-018-0252-4_proteome_nsaf_831_proteomics
+  field_description: Whole-cell protein abundance as %NSAF (mean of three replicates),
+    glucose phase G2 (21 h, stationary); proteins not detected carry no edge.
+  growth_phases: []
+  has_p_value: false
+  metric_type: nsaf_glucose_21h
+  name: Protein abundance on glucose, 21 h (G2, %NSAF)
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas macleodii 83-1
+  publication_doi: 10.1038/s41396-018-0252-4
+  rankable: true
+  total_gene_count: 1095
+  treatment_type:
+  - carbon
+  unit: '%NSAF'
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  derived_metric_id: derived_metric:s41396-018-0252-4:proteome_nsaf:nsaf_polysaccharide_mix_13h
+  experiment_id: 10.1038/s41396-018-0252-4_proteome_nsaf_831_proteomics
+  field_description: Whole-cell protein abundance as %NSAF (mean of three replicates),
+    polysaccharide mix phase M1 (13 h, growth on laminarin); proteins not detected
+    carry no edge.
+  growth_phases: []
+  has_p_value: false
+  metric_type: nsaf_polysaccharide_mix_13h
+  name: Protein abundance on the polysaccharide mix, 13 h (M1, %NSAF)
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas macleodii 83-1
+  publication_doi: 10.1038/s41396-018-0252-4
+  rankable: true
+  total_gene_count: 975
+  treatment_type:
+  - carbon
+  unit: '%NSAF'
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  derived_metric_id: derived_metric:s41396-018-0252-4:proteome_nsaf:nsaf_polysaccharide_mix_21h
+  experiment_id: 10.1038/s41396-018-0252-4_proteome_nsaf_831_proteomics
+  field_description: Whole-cell protein abundance as %NSAF (mean of three replicates),
+    polysaccharide mix phase M2 (21 h, alginate and pectin use without net growth);
+    proteins not detected carry no edge.
+  growth_phases: []
+  has_p_value: false
+  metric_type: nsaf_polysaccharide_mix_21h
+  name: Protein abundance on the polysaccharide mix, 21 h (M2, %NSAF)
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas macleodii 83-1
+  publication_doi: 10.1038/s41396-018-0252-4
+  rankable: true
+  total_gene_count: 1034
+  treatment_type:
+  - carbon
+  unit: '%NSAF'
+  value_kind: numeric
 - allowed_categories: null
   background_factors:
   - axenic
@@ -967,5 +1053,209 @@ rows:
   total_gene_count: 39
   treatment_type:
   - coculture
+  unit: '% NSAF'
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_cc9311_exoproteome:exoproteome_avg_pct_nsaf
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_cc9311
+  field_description: 'Average % NSAF (normalized spectral abundance factor: spectral
+    counts / molecular weight, normalised to the sum over all proteins validated with
+    >=2 unique peptides) of this protein in the cell-free culture supernatant of Synechococcus
+    CC9311 under standard growth, averaged over the replicates (Christie-Oleza 2015b
+    Table S4). Blank (no edge) when the protein was not detected. Higher = more abundant
+    in the exoproteome.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_avg_pct_nsaf
+  name: Avg % NSAF in Synechococcus CC9311 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus CC9311
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: true
+  total_gene_count: 59
+  treatment_type:
+  - compartment
+  unit: '% NSAF'
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_rs9916_exoproteome:exoproteome_avg_pct_nsaf
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_rs9916
+  field_description: 'Average % NSAF (normalized spectral abundance factor: spectral
+    counts / molecular weight, normalised to the sum over all proteins validated with
+    >=2 unique peptides) of this protein in the cell-free culture supernatant of Synechococcus
+    RS9916 under standard growth, averaged over the replicates (Christie-Oleza 2015b
+    Table S4). Blank (no edge) when the protein was not detected. Higher = more abundant
+    in the exoproteome.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_avg_pct_nsaf
+  name: Avg % NSAF in Synechococcus RS9916 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus RS9916
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: true
+  total_gene_count: 41
+  treatment_type:
+  - compartment
+  unit: '% NSAF'
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_rs9917_exoproteome:exoproteome_avg_pct_nsaf
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_rs9917
+  field_description: 'Average % NSAF (normalized spectral abundance factor: spectral
+    counts / molecular weight, normalised to the sum over all proteins validated with
+    >=2 unique peptides) of this protein in the cell-free culture supernatant of Synechococcus
+    RS9917 under standard growth, averaged over the replicates (Christie-Oleza 2015b
+    Table S4). Blank (no edge) when the protein was not detected. Higher = more abundant
+    in the exoproteome.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_avg_pct_nsaf
+  name: Avg % NSAF in Synechococcus RS9917 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus RS9917
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: true
+  total_gene_count: 67
+  treatment_type:
+  - compartment
+  unit: '% NSAF'
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_wh5701_exoproteome:exoproteome_avg_pct_nsaf
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_wh5701
+  field_description: 'Average % NSAF (normalized spectral abundance factor: spectral
+    counts / molecular weight, normalised to the sum over all proteins validated with
+    >=2 unique peptides) of this protein in the cell-free culture supernatant of Synechococcus
+    WH5701 under standard growth, averaged over the replicates (Christie-Oleza 2015b
+    Table S4). Blank (no edge) when the protein was not detected. Higher = more abundant
+    in the exoproteome.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_avg_pct_nsaf
+  name: Avg % NSAF in Synechococcus WH5701 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH5701
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: true
+  total_gene_count: 247
+  treatment_type:
+  - compartment
+  unit: '% NSAF'
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_wh7803_exoproteome:exoproteome_avg_pct_nsaf
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_wh7803
+  field_description: 'Average % NSAF (normalized spectral abundance factor: spectral
+    counts / molecular weight, normalised to the sum over all proteins validated with
+    >=2 unique peptides) of this protein in the cell-free culture supernatant of Synechococcus
+    WH7803 under standard growth, averaged over the replicates (Christie-Oleza 2015b
+    Table S4). Blank (no edge) when the protein was not detected. Higher = more abundant
+    in the exoproteome.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_avg_pct_nsaf
+  name: Avg % NSAF in Synechococcus WH7803 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH7803
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: true
+  total_gene_count: 202
+  treatment_type:
+  - compartment
+  unit: '% NSAF'
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_wh7805_exoproteome:exoproteome_avg_pct_nsaf
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_wh7805
+  field_description: 'Average % NSAF (normalized spectral abundance factor: spectral
+    counts / molecular weight, normalised to the sum over all proteins validated with
+    >=2 unique peptides) of this protein in the cell-free culture supernatant of Synechococcus
+    WH7805 under standard growth, averaged over the replicates (Christie-Oleza 2015b
+    Table S4). Blank (no edge) when the protein was not detected. Higher = more abundant
+    in the exoproteome.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_avg_pct_nsaf
+  name: Avg % NSAF in Synechococcus WH7805 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH7805
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: true
+  total_gene_count: 84
+  treatment_type:
+  - compartment
+  unit: '% NSAF'
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_wh8102_exoproteome:exoproteome_avg_pct_nsaf
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_wh8102
+  field_description: 'Average % NSAF (normalized spectral abundance factor: spectral
+    counts / molecular weight, normalised to the sum over all proteins validated with
+    >=2 unique peptides) of this protein in the cell-free culture supernatant of Synechococcus
+    WH8102 under standard growth, averaged over the replicates (Christie-Oleza 2015b
+    Table S4). Blank (no edge) when the protein was not detected. Higher = more abundant
+    in the exoproteome.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_avg_pct_nsaf
+  name: Avg % NSAF in Synechococcus WH8102 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH8102
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: true
+  total_gene_count: 146
+  treatment_type:
+  - compartment
+  unit: '% NSAF'
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_bl107_exoproteome:exoproteome_avg_pct_nsaf
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_bl107
+  field_description: 'Average % NSAF (normalized spectral abundance factor: spectral
+    counts / molecular weight, normalised to the sum over all proteins validated with
+    >=2 unique peptides) of this protein in the cell-free culture supernatant of Synechococcus
+    sp. BL107 under standard growth, averaged over the replicates (Christie-Oleza
+    2015b Table S4). Blank (no edge) when the protein was not detected. Higher = more
+    abundant in the exoproteome.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_avg_pct_nsaf
+  name: Avg % NSAF in Synechococcus sp. BL107 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus sp. BL107
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: true
+  total_gene_count: 11
+  treatment_type:
+  - compartment
   unit: '% NSAF'
   value_kind: numeric

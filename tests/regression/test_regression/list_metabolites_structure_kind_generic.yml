@@ -90,18 +90,18 @@ top_organisms:
   organism_name: Alteromonas macleodii MIT1002
 - count: 311
   organism_name: Alteromonas macleodii BGP6
-- count: 309
-  organism_name: Alteromonas macleodii HOT1A3
+- count: 311
+  organism_name: Alteromonas macleodii 83-1
 - count: 309
   organism_name: Alteromonas mediterranea AltDE1
+- count: 309
+  organism_name: Alteromonas macleodii HOT1A3
 - count: 308
   organism_name: Alteromonas macleodii ATCC27126
 - count: 303
   organism_name: Alteromonas macleodii AD45
 - count: 303
   organism_name: Alteromonas mediterranea AltDE
-- count: 301
-  organism_name: Alteromonas macleodii BS11
 total_entries: 3251
 total_matching: 641
 truncated: true

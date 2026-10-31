@@ -37,7 +37,7 @@ resolved_aliases:
   chebi:14654:
   - kegg.compound:C00244
 results:
-- catalyst_gene_count: 77
+- catalyst_gene_count: 78
   chebi_id: '48107'
   elements:
   - H
@@ -48,9 +48,10 @@ results:
   - metabolism
   - transport
   formula: HNO3
-  go_transport_organism_count: 72
+  go_transport_organism_count: 73
   go_transport_organism_names:
   - Alteromonas (MarRef v6)
+  - Alteromonas macleodii 83-1
   - Alteromonas macleodii AD45
   - Alteromonas macleodii ATCC27126
   - Alteromonas macleodii BGP6
@@ -129,7 +130,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00244
   name: Nitrate
-  organism_count: 73
+  organism_count: 74
   pathway_count: 6
   pathway_ids:
   - kegg.pathway:ko00910
@@ -140,7 +141,7 @@ results:
   - kegg.pathway:ko02020
   structure_kind: defined
   transporter_count: 5
-  transporter_gene_count: 165
+  transporter_gene_count: 168
 returned: 1
 row_count: 1
 score_max: null
@@ -166,6 +167,8 @@ top_metabolite_pathways:
   metabolite_pathway_name: Two-component system
 top_organisms:
 - count: 1
+  organism_name: Alteromonas macleodii 83-1
+- count: 1
   organism_name: Alteromonas macleodii AD45
 - count: 1
   organism_name: Alteromonas macleodii ATCC27126
@@ -181,8 +184,6 @@ top_organisms:
   organism_name: Alteromonas macleodii MIT1002
 - count: 1
   organism_name: Alteromonas mediterranea AltDE
-- count: 1
-  organism_name: Alteromonas mediterranea AltDE1
 - count: 1
   organism_name: Alteromonas (MarRef v6)
 total_entries: 3251

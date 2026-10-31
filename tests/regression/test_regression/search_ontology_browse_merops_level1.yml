@@ -14,85 +14,85 @@ case_id: search_ontology_browse_merops_level1
 mode: browse
 offset: 0
 results:
-- gene_count: 704
+- gene_count: 710
   id: merops.family:C26
   is_informative: true
   level: 1
   name: gamma-glutamyl hydrolase
   ontology_type: merops
-  organism_count: 117
+  organism_count: 118
   score: null
-- gene_count: 459
+- gene_count: 464
   id: merops.family:C44
   is_informative: true
   level: 1
   name: amidophosphoribosyltransferase precursor
   ontology_type: merops
-  organism_count: 117
+  organism_count: 118
   score: null
-- gene_count: 280
+- gene_count: 285
   id: merops.family:M24
   is_informative: true
   level: 1
   name: methionyl aminopeptidase 1 ({Escherichia}-type)
   ontology_type: merops
-  organism_count: 117
+  organism_count: 118
   score: null
-- gene_count: 374
+- gene_count: 382
   id: merops.family:M38
   is_informative: true
   level: 1
   name: beta-aspartyl dipeptidase
   ontology_type: merops
-  organism_count: 117
+  organism_count: 118
   score: null
-- gene_count: 424
+- gene_count: 426
   id: merops.family:M41
   is_informative: true
   level: 1
   name: FtsH endopeptidase
   ontology_type: merops
-  organism_count: 117
+  organism_count: 118
   score: null
-- gene_count: 371
+- gene_count: 375
   id: merops.family:S01
   is_informative: true
   level: 1
   name: chymotrypsin
   ontology_type: merops
-  organism_count: 117
+  organism_count: 118
   score: null
-- gene_count: 497
+- gene_count: 515
   id: merops.family:S09
   is_informative: true
   level: 1
   name: prolyl oligopeptidase
   ontology_type: merops
-  organism_count: 117
+  organism_count: 118
   score: null
-- gene_count: 425
+- gene_count: 426
   id: merops.family:S14
   is_informative: true
   level: 1
   name: ClpP endopeptidase
   ontology_type: merops
-  organism_count: 116
+  organism_count: 117
   score: null
-- gene_count: 275
+- gene_count: 277
   id: merops.family:S26
   is_informative: true
   level: 1
   name: signal peptidase I
   ontology_type: merops
-  organism_count: 117
+  organism_count: 118
   score: null
-- gene_count: 852
+- gene_count: 868
   id: merops.family:S33
   is_informative: true
   level: 1
   name: prolyl aminopeptidase
   ontology_type: merops
-  organism_count: 117
+  organism_count: 118
   score: null
 returned: 10
 row_count: 10

@@ -1,5 +1,5 @@
 case_id: list_experiments_proteomics
-row_count: 77
+row_count: 82
 rows:
 - authors:
   - Guadalupe Gómez-Baena
@@ -1096,6 +1096,56 @@ rows:
   - '27'
   time_point_totals:
   - '78'
+  treatment_type:
+  - carbon
+- authors:
+  - Alexandra Dürwald
+  - Beatriz Noriega-Ortega
+  - Dörte Becher
+  - Hanna Koch
+  - Heike M. Freese
+  - Jan-Hendrik Hehemann
+  - Matthias Wietz
+  - Meinhard Simon
+  - Silvia Vidal-Melgosa
+  - Thomas Schweder
+  - Thorsten Dittmar
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: null
+  derived_metric_count: 4
+  derived_metric_value_kinds:
+  - numeric
+  design_notes: null
+  distinct_gene_count: 0
+  experiment_id: 10.1038/s41396-018-0252-4_proteome_nsaf_831_proteomics
+  experiment_name: Alteromonas 83-1 whole-cell proteome on glucose and on a polysaccharide
+    mix at 13 h and 21 h (%NSAF)
+  gene_count: 0
+  growth_phases: []
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: PROTEOMICS
+  organism_name: Alteromonas macleodii 83-1
+  publication_doi: 10.1038/s41396-018-0252-4
+  significant_down_count: 0
+  significant_up_count: 0
+  table_scope: null
+  table_scope_detail: ''
+  time_point_count: 0
+  time_point_growth_phases: []
+  time_point_hours: []
+  time_point_labels: []
+  time_point_orders: []
+  time_point_significant_down: []
+  time_point_significant_up: []
+  time_point_totals: []
   treatment_type:
   - carbon
 - authors:
@@ -3329,6 +3379,233 @@ rows:
   - '228'
   treatment_type:
   - coculture
+- authors:
+  - Adam W. E. Stewart
+  - David Schleheck
+  - Hamza Tahir
+  - Helen Barber
+  - Mihwa Lee
+  - Nichollas E. Scott
+  - Sabrina Borusak
+  - Spencer J. Williams
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state: every culture was harvested at mid-log phase
+    on its own substrate, so the glucose control and the treatment were sampled at
+    the same growth stage, not the same clock time. Perseus Difference was glucose
+    minus substrate and is negated in the builder.'
+  distinct_gene_count: 1836
+  experiment_id: 10.1039/d6sc02372j_l_cysteine_vs_glucose_dss3_proteomics
+  experiment_name: R. pomeroyi DSS-3 proteome on L-cysteine vs glucose (LFQ proteomics)
+  gene_count: 1836
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: PROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1039/d6sc02372j
+  significant_down_count: 61
+  significant_up_count: 57
+  table_scope: all_detected_genes
+  table_scope_detail: All 1,837 R. pomeroyi protein groups quantified (Perseus Imputed
+    sheet); missing LFQ values imputed (width 0.3, downshift 2.0 SD)
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - mid-log
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '61'
+  time_point_significant_up:
+  - '57'
+  time_point_totals:
+  - '1836'
+  treatment_type:
+  - carbon
+- authors:
+  - Adam W. E. Stewart
+  - David Schleheck
+  - Hamza Tahir
+  - Helen Barber
+  - Mihwa Lee
+  - Nichollas E. Scott
+  - Sabrina Borusak
+  - Spencer J. Williams
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state: both enantiomer cultures harvested at mid-log
+    phase. Perseus Difference R-DHPS_S_DHPS is R minus S and is used unchanged (Fig.
+    S2).'
+  distinct_gene_count: 1836
+  experiment_id: 10.1039/d6sc02372j_r_dhps_vs_s_dhps_dss3_proteomics
+  experiment_name: R. pomeroyi DSS-3 proteome on R-DHPS vs S-DHPS (LFQ proteomics)
+  gene_count: 1836
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: PROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1039/d6sc02372j
+  significant_down_count: 23
+  significant_up_count: 44
+  table_scope: all_detected_genes
+  table_scope_detail: All 1,837 R. pomeroyi protein groups quantified (Perseus Imputed
+    sheet); missing LFQ values imputed (width 0.3, downshift 2.0 SD)
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - mid-log
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '23'
+  time_point_significant_up:
+  - '44'
+  time_point_totals:
+  - '1836'
+  treatment_type:
+  - carbon
+- authors:
+  - Adam W. E. Stewart
+  - David Schleheck
+  - Hamza Tahir
+  - Helen Barber
+  - Mihwa Lee
+  - Nichollas E. Scott
+  - Sabrina Borusak
+  - Spencer J. Williams
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state: every culture was harvested at mid-log phase
+    on its own substrate, so the glucose control and the treatment were sampled at
+    the same growth stage, not the same clock time. Perseus Difference was glucose
+    minus substrate and is negated in the builder.'
+  distinct_gene_count: 1836
+  experiment_id: 10.1039/d6sc02372j_r_dhps_vs_glucose_dss3_proteomics
+  experiment_name: R. pomeroyi DSS-3 proteome on R-DHPS vs glucose (LFQ proteomics)
+  gene_count: 1836
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: PROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1039/d6sc02372j
+  significant_down_count: 77
+  significant_up_count: 55
+  table_scope: all_detected_genes
+  table_scope_detail: All 1,837 R. pomeroyi protein groups quantified (Perseus Imputed
+    sheet); missing LFQ values imputed (width 0.3, downshift 2.0 SD)
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - mid-log
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '77'
+  time_point_significant_up:
+  - '55'
+  time_point_totals:
+  - '1836'
+  treatment_type:
+  - carbon
+- authors:
+  - Adam W. E. Stewart
+  - David Schleheck
+  - Hamza Tahir
+  - Helen Barber
+  - Mihwa Lee
+  - Nichollas E. Scott
+  - Sabrina Borusak
+  - Spencer J. Williams
+  background_factors:
+  - axenic
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: 'Matched by growth state: every culture was harvested at mid-log phase
+    on its own substrate, so the glucose control and the treatment were sampled at
+    the same growth stage, not the same clock time. Perseus Difference was glucose
+    minus substrate and is negated in the builder.'
+  distinct_gene_count: 1836
+  experiment_id: 10.1039/d6sc02372j_s_dhps_vs_glucose_dss3_proteomics
+  experiment_name: R. pomeroyi DSS-3 proteome on S-DHPS vs glucose (LFQ proteomics)
+  gene_count: 1836
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: PROTEOMICS
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1039/d6sc02372j
+  significant_down_count: 131
+  significant_up_count: 81
+  table_scope: all_detected_genes
+  table_scope_detail: All 1,837 R. pomeroyi protein groups quantified (Perseus Imputed
+    sheet); missing LFQ values imputed (width 0.3, downshift 2.0 SD)
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '-1.0'
+  time_point_labels:
+  - mid-log
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '131'
+  time_point_significant_up:
+  - '81'
+  time_point_totals:
+  - '1836'
+  treatment_type:
+  - carbon
 - authors:
   - David J. Scanlan
   - Despoina Sousoni

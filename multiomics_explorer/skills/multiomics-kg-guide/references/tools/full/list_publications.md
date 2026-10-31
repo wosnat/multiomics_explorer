@@ -48,7 +48,7 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 - **by_metric_type** (list[PubMetricTypeBreakdown]): DerivedMetric type frequency rollup across matched publications.
 - **by_metric_type_truncated** (bool | None): True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown.
 - **by_compartment** (list[PubCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched publications.
-- **by_discusses_coverage** (PubDiscussesCoverageBreakdown): Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (46 vs 4 in the current KG).
+- **by_discusses_coverage** (PubDiscussesCoverageBreakdown): Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (56 vs 4 in the current KG).
 - **returned** (int): Publications in this response (0 when summary=True).
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.
@@ -103,39 +103,39 @@ list_publications()
 
 ```example-response
 {
-  "total_entries": 50,
-  "total_matching": 50,
+  "total_entries": 60,
+  "total_matching": 60,
   "by_organism": [
     {"organism_name": "Prochlorococcus MED4", "count": 21},
     {"organism_name": "Prochlorococcus MIT9313", "count": 11},
+    {"organism_name": "Synechococcus WH8102", "count": 9},
+    {"organism_name": "Synechococcus WH7803", "count": 8},
     {"organism_name": "Prochlorococcus NATL2A", "count": 7},
-    {"organism_name": "Synechococcus WH7803", "count": 7},
-    {"organism_name": "Prochlorococcus MIT9312", "count": 6},
     ...
   ],
   "by_organism_truncated": true,
   "by_treatment_type": [
-    {"treatment_type": "coculture", "count": 11},
-    {"treatment_type": "carbon", "count": 7},
+    {"treatment_type": "coculture", "count": 14},
+    {"treatment_type": "carbon", "count": 10},
+    {"treatment_type": "growth_phase", "count": 6},
     {"treatment_type": "light", "count": 6},
-    {"treatment_type": "growth_phase", "count": 4},
-    {"treatment_type": "compartment", "count": 4},
+    {"treatment_type": "compartment", "count": 5},
     ...
   ],
   "by_background_factors": [
-    {"background_factor": "axenic", "count": 33},
-    {"background_factor": "light", "count": 32},
-    {"background_factor": "diel", "count": 10},
+    {"background_factor": "axenic", "count": 40},
+    {"background_factor": "light", "count": 36},
+    {"background_factor": "diel", "count": 12},
     {"background_factor": "coculture", "count": 8},
-    {"background_factor": "darkness", "count": 3},
+    {"background_factor": "darkness", "count": 4},
     ...
   ],
   "by_omics_type": [
-    {"omics_type": "RNASEQ", "count": 26},
-    {"omics_type": "MICROARRAY", "count": 10},
-    {"omics_type": "PROTEOMICS", "count": 9},
+    {"omics_type": "RNASEQ", "count": 30},
+    {"omics_type": "MICROARRAY", "count": 12},
+    {"omics_type": "PROTEOMICS", "count": 11},
+    {"omics_type": "EXOPROTEOMICS", "count": 4},
     {"omics_type": "VESICLE_PROTEOMICS", "count": 3},
-    {"omics_type": "METABOLOMICS", "count": 3},
     ...
   ],
   "by_cluster_type": [
@@ -146,26 +146,26 @@ list_publications()
     {"cluster_type": "genomic_island", "count": 1}
   ],
   "by_value_kind": [
-    {"value_kind": "boolean", "count": 7},
-    {"value_kind": "numeric", "count": 7},
-    {"value_kind": "categorical", "count": 6}
+    {"value_kind": "boolean", "count": 9},
+    {"value_kind": "categorical", "count": 9},
+    {"value_kind": "numeric", "count": 9}
   ],
   "by_metric_type": [
+    {"metric_type": "exoproteome_avg_pct_nsaf", "count": 2},
+    {"metric_type": "exoproteome_detection_status", "count": 2},
     {"metric_type": "expression_change_high_light_shock", "count": 1},
     {"metric_type": "expression_change_low_co2_no_o2_shock", "count": 1},
     {"metric_type": "expression_change_low_co2_shock", "count": 1},
-    {"metric_type": "rapid_recovery_low_co2_no_o2_shock", "count": 1},
-    {"metric_type": "rapid_recovery_low_co2_shock", "count": 1},
     ...
   ],
   "by_metric_type_truncated": true,
   "by_compartment": [
-    {"compartment": "whole_cell", "count": 46},
+    {"compartment": "whole_cell", "count": 55},
+    {"compartment": "exoproteome", "count": 4},
     {"compartment": "vesicle", "count": 3},
-    {"compartment": "exoproteome", "count": 3},
     {"compartment": "extracellular", "count": 1}
   ],
-  "by_discusses_coverage": {"has_discusses": 46, "no_discusses": 4},
+  "by_discusses_coverage": {"has_discusses": 56, "no_discusses": 4},
   "returned": 5,
   "offset": 0,
   "truncated": true,
@@ -197,6 +197,30 @@ list_publications()
       "discussed_pathway_count": 3
     },
     {
+      "doi": "10.1039/d6sc02372j",
+      "title": "Chiral recognition of 2,3-dihydroxypropanesulfonate by bacterial transport proteins adapted to distinct ecological ni...",
+      "authors": ["Helen Barber", "Sabrina Borusak", "Adam W. E. Stewart", "Hamza Tahir", "Nichollas E. Scott", ...],
+      "year": 2026,
+      "journal": "Chemical Science",
+      "study_type": "Proteomics; Biophysical analysis; X-ray crystallography; Bioinformatics",
+      "organisms": ["Ruegeria pomeroyi DSS-3"],
+      "experiment_count": 4,
+      "treatment_types": ["carbon"],
+      "background_factors": ["axenic"],
+      "omics_types": ["PROTEOMICS"],
+      "clustering_analysis_count": 0,
+      "cluster_types": [],
+      "growth_phases": ["exponential"],
+      "derived_metric_count": 0,
+      "derived_metric_value_kinds": [],
+      "compartments": ["whole_cell"],
+      "metabolite_count": 0,
+      "metabolite_assay_count": 0,
+      "metabolite_compartments": [],
+      "discussed_gene_count": 13,
+      "discussed_pathway_count": 2
+    },
+    {
       "doi": "10.64898/2026.04.15.718746",
       "title": "Extreme genome reduction selectively retains modular regulatory architecture in Prochlorococcus MED4: conserved trans...",
       "authors": ["Zachary Johnson", "Natalie C. Sadler", "Marci R. Garcia", "Xiaolu Li", "Jordan Rozum", ...],
@@ -219,30 +243,6 @@ list_publications()
       "metabolite_compartments": [],
       "discussed_gene_count": 75,
       "discussed_pathway_count": 11
-    },
-    {
-      "doi": "10.1128/aem.00798-26",
-      "title": "Vesicle-associated exudates from Alteromonas enhance growth and survival of Prochlorococcus in batch culture",
-      "authors": ["Zhiying Lu", "Sydney Plummer", "James Kizziah", "Steven J. Biller", "J. Jeffrey Morris"],
-      "year": 2026,
-      "journal": "Applied and Environmental Microbiology",
-      "study_type": "co-culture experiments with experimental evolution",
-      "organisms": ["Alteromonas macleodii EZ55"],
-      "experiment_count": 2,
-      "treatment_types": ["compartment"],
-      "background_factors": ["axenic"],
-      "omics_types": ["EXOPROTEOMICS", "PROTEOMICS"],
-      "clustering_analysis_count": 0,
-      "cluster_types": [],
-      "growth_phases": [],
-      "derived_metric_count": 6,
-      "derived_metric_value_kinds": ["boolean"],
-      "compartments": ["exoproteome", "whole_cell"],
-      "metabolite_count": 0,
-      "metabolite_assay_count": 0,
-      "metabolite_compartments": [],
-      "discussed_gene_count": 2,
-      "discussed_pathway_count": 2
     },
     ...
   ]
@@ -282,7 +282,7 @@ list_publications(compartment="vesicle")
 
 ```example-response
 {
-  "total_entries": 50,
+  "total_entries": 60,
   "total_matching": 3,
   "by_organism": [
     {"organism_name": "Prochlorococcus MIT9313", "count": 2},
@@ -432,7 +432,7 @@ list_publications(publication_dois=["10.1128/msystems.01261-22", "10.1073/pnas.2
 
 ```example-response
 {
-  "total_entries": 50,
+  "total_entries": 60,
   "total_matching": 3,
   "by_organism": [
     {"organism_name": "Prochlorococcus MIT9313", "count": 3},
@@ -572,39 +572,39 @@ list_publications()
 
 ```example-response
 {
-  "total_entries": 50,
-  "total_matching": 50,
+  "total_entries": 60,
+  "total_matching": 60,
   "by_organism": [
     {"organism_name": "Prochlorococcus MED4", "count": 21},
     {"organism_name": "Prochlorococcus MIT9313", "count": 11},
+    {"organism_name": "Synechococcus WH8102", "count": 9},
+    {"organism_name": "Synechococcus WH7803", "count": 8},
     {"organism_name": "Prochlorococcus NATL2A", "count": 7},
-    {"organism_name": "Synechococcus WH7803", "count": 7},
-    {"organism_name": "Prochlorococcus MIT9312", "count": 6},
     ...
   ],
   "by_organism_truncated": true,
   "by_treatment_type": [
-    {"treatment_type": "coculture", "count": 11},
-    {"treatment_type": "carbon", "count": 7},
+    {"treatment_type": "coculture", "count": 14},
+    {"treatment_type": "carbon", "count": 10},
+    {"treatment_type": "growth_phase", "count": 6},
     {"treatment_type": "light", "count": 6},
-    {"treatment_type": "growth_phase", "count": 4},
-    {"treatment_type": "compartment", "count": 4},
+    {"treatment_type": "compartment", "count": 5},
     ...
   ],
   "by_background_factors": [
-    {"background_factor": "axenic", "count": 33},
-    {"background_factor": "light", "count": 32},
-    {"background_factor": "diel", "count": 10},
+    {"background_factor": "axenic", "count": 40},
+    {"background_factor": "light", "count": 36},
+    {"background_factor": "diel", "count": 12},
     {"background_factor": "coculture", "count": 8},
-    {"background_factor": "darkness", "count": 3},
+    {"background_factor": "darkness", "count": 4},
     ...
   ],
   "by_omics_type": [
-    {"omics_type": "RNASEQ", "count": 26},
-    {"omics_type": "MICROARRAY", "count": 10},
-    {"omics_type": "PROTEOMICS", "count": 9},
+    {"omics_type": "RNASEQ", "count": 30},
+    {"omics_type": "MICROARRAY", "count": 12},
+    {"omics_type": "PROTEOMICS", "count": 11},
+    {"omics_type": "EXOPROTEOMICS", "count": 4},
     {"omics_type": "VESICLE_PROTEOMICS", "count": 3},
-    {"omics_type": "METABOLOMICS", "count": 3},
     ...
   ],
   "by_cluster_type": [
@@ -615,26 +615,26 @@ list_publications()
     {"cluster_type": "genomic_island", "count": 1}
   ],
   "by_value_kind": [
-    {"value_kind": "boolean", "count": 7},
-    {"value_kind": "numeric", "count": 7},
-    {"value_kind": "categorical", "count": 6}
+    {"value_kind": "boolean", "count": 9},
+    {"value_kind": "categorical", "count": 9},
+    {"value_kind": "numeric", "count": 9}
   ],
   "by_metric_type": [
+    {"metric_type": "exoproteome_avg_pct_nsaf", "count": 2},
+    {"metric_type": "exoproteome_detection_status", "count": 2},
     {"metric_type": "expression_change_high_light_shock", "count": 1},
     {"metric_type": "expression_change_low_co2_no_o2_shock", "count": 1},
     {"metric_type": "expression_change_low_co2_shock", "count": 1},
-    {"metric_type": "rapid_recovery_low_co2_no_o2_shock", "count": 1},
-    {"metric_type": "rapid_recovery_low_co2_shock", "count": 1},
     ...
   ],
   "by_metric_type_truncated": true,
   "by_compartment": [
-    {"compartment": "whole_cell", "count": 46},
+    {"compartment": "whole_cell", "count": 55},
+    {"compartment": "exoproteome", "count": 4},
     {"compartment": "vesicle", "count": 3},
-    {"compartment": "exoproteome", "count": 3},
     {"compartment": "extracellular", "count": 1}
   ],
-  "by_discusses_coverage": {"has_discusses": 46, "no_discusses": 4},
+  "by_discusses_coverage": {"has_discusses": 56, "no_discusses": 4},
   "returned": 5,
   "offset": 0,
   "truncated": true,
@@ -666,6 +666,30 @@ list_publications()
       "discussed_pathway_count": 3
     },
     {
+      "doi": "10.1039/d6sc02372j",
+      "title": "Chiral recognition of 2,3-dihydroxypropanesulfonate by bacterial transport proteins adapted to distinct ecological ni...",
+      "authors": ["Helen Barber", "Sabrina Borusak", "Adam W. E. Stewart", "Hamza Tahir", "Nichollas E. Scott", ...],
+      "year": 2026,
+      "journal": "Chemical Science",
+      "study_type": "Proteomics; Biophysical analysis; X-ray crystallography; Bioinformatics",
+      "organisms": ["Ruegeria pomeroyi DSS-3"],
+      "experiment_count": 4,
+      "treatment_types": ["carbon"],
+      "background_factors": ["axenic"],
+      "omics_types": ["PROTEOMICS"],
+      "clustering_analysis_count": 0,
+      "cluster_types": [],
+      "growth_phases": ["exponential"],
+      "derived_metric_count": 0,
+      "derived_metric_value_kinds": [],
+      "compartments": ["whole_cell"],
+      "metabolite_count": 0,
+      "metabolite_assay_count": 0,
+      "metabolite_compartments": [],
+      "discussed_gene_count": 13,
+      "discussed_pathway_count": 2
+    },
+    {
       "doi": "10.64898/2026.04.15.718746",
       "title": "Extreme genome reduction selectively retains modular regulatory architecture in Prochlorococcus MED4: conserved trans...",
       "authors": ["Zachary Johnson", "Natalie C. Sadler", "Marci R. Garcia", "Xiaolu Li", "Jordan Rozum", ...],
@@ -688,30 +712,6 @@ list_publications()
       "metabolite_compartments": [],
       "discussed_gene_count": 75,
       "discussed_pathway_count": 11
-    },
-    {
-      "doi": "10.1128/aem.00798-26",
-      "title": "Vesicle-associated exudates from Alteromonas enhance growth and survival of Prochlorococcus in batch culture",
-      "authors": ["Zhiying Lu", "Sydney Plummer", "James Kizziah", "Steven J. Biller", "J. Jeffrey Morris"],
-      "year": 2026,
-      "journal": "Applied and Environmental Microbiology",
-      "study_type": "co-culture experiments with experimental evolution",
-      "organisms": ["Alteromonas macleodii EZ55"],
-      "experiment_count": 2,
-      "treatment_types": ["compartment"],
-      "background_factors": ["axenic"],
-      "omics_types": ["EXOPROTEOMICS", "PROTEOMICS"],
-      "clustering_analysis_count": 0,
-      "cluster_types": [],
-      "growth_phases": [],
-      "derived_metric_count": 6,
-      "derived_metric_value_kinds": ["boolean"],
-      "compartments": ["exoproteome", "whole_cell"],
-      "metabolite_count": 0,
-      "metabolite_assay_count": 0,
-      "metabolite_compartments": [],
-      "discussed_gene_count": 2,
-      "discussed_pathway_count": 2
     },
     ...
   ]

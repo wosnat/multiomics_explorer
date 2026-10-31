@@ -64,21 +64,21 @@ rows:
   score: 0.9228
   tree: null
   tree_code: null
-- gene_count: 19390
+- gene_count: 19817
   id: go:0005886
   is_informative: true
   level: 3
   name: plasma membrane
-  organism_count: 117
+  organism_count: 118
   score: 1.0584
   tree: null
   tree_code: null
-- gene_count: 1535
+- gene_count: 1620
   id: go:0009279
   is_informative: true
   level: 3
   name: cell outer membrane
-  organism_count: 109
+  organism_count: 110
   score: 0.9228
   tree: null
   tree_code: null
@@ -109,30 +109,30 @@ rows:
   score: 0.9228
   tree: null
   tree_code: null
-- gene_count: 177
+- gene_count: 189
   id: go:0009897
   is_informative: true
   level: 3
   name: external side of plasma membrane
-  organism_count: 23
+  organism_count: 24
   score: 0.7345
   tree: null
   tree_code: null
-- gene_count: 733
+- gene_count: 750
   id: go:0009898
   is_informative: true
   level: 4
   name: cytoplasmic side of plasma membrane
-  organism_count: 111
+  organism_count: 112
   score: 0.7345
   tree: null
   tree_code: null
-- gene_count: 54239
+- gene_count: 55055
   id: go:0016020
   is_informative: true
   level: 2
   name: membrane
-  organism_count: 117
+  organism_count: 118
   score: 1.2409
   tree: null
   tree_code: null
@@ -145,30 +145,30 @@ rows:
   score: 0.9228
   tree: null
   tree_code: null
-- gene_count: 2340
+- gene_count: 2448
   id: go:0019867
   is_informative: true
   level: 3
   name: outer membrane
-  organism_count: 117
+  organism_count: 118
   score: 1.0584
   tree: null
   tree_code: null
-- gene_count: 166
+- gene_count: 179
   id: go:0019897
   is_informative: true
   level: 3
   name: extrinsic component of plasma membrane
-  organism_count: 16
+  organism_count: 17
   score: 0.7345
   tree: null
   tree_code: null
-- gene_count: 493
+- gene_count: 507
   id: go:0019898
   is_informative: true
   level: 2
   name: extrinsic component of membrane
-  organism_count: 116
+  organism_count: 117
   score: 0.8179
   tree: null
   tree_code: null
@@ -199,12 +199,12 @@ rows:
   score: 0.6665
   tree: null
   tree_code: null
-- gene_count: 1700
+- gene_count: 1744
   id: go:0030288
   is_informative: true
   level: 3
   name: outer membrane-bounded periplasmic space
-  organism_count: 113
+  organism_count: 114
   score: 0.7345
   tree: null
   tree_code: null
@@ -226,12 +226,12 @@ rows:
   score: 0.5623
   tree: null
   tree_code: null
-- gene_count: 99
+- gene_count: 107
   id: go:0031234
   is_informative: true
   level: 4
   name: extrinsic component of cytoplasmic side of plasma membrane
-  organism_count: 15
+  organism_count: 16
   score: 0.5623
   tree: null
   tree_code: null
@@ -244,21 +244,21 @@ rows:
   score: 0.5623
   tree: null
   tree_code: null
-- gene_count: 15
+- gene_count: 18
   id: go:0031240
   is_informative: true
   level: 3
   name: external side of cell outer membrane
-  organism_count: 9
+  organism_count: 10
   score: 0.6665
   tree: null
   tree_code: null
-- gene_count: 112
+- gene_count: 121
   id: go:0031241
   is_informative: true
   level: 3
   name: periplasmic side of cell outer membrane
-  organism_count: 13
+  organism_count: 14
   score: 0.6665
   tree: null
   tree_code: null
@@ -316,12 +316,12 @@ rows:
   score: 1.0584
   tree: null
   tree_code: null
-- gene_count: 165
+- gene_count: 167
   id: go:0031974
   is_informative: true
   level: 2
   name: membrane-enclosed lumen
-  organism_count: 109
+  organism_count: 110
   score: 0.9228
   tree: null
   tree_code: null
@@ -415,21 +415,21 @@ rows:
   score: 0.7345
   tree: null
   tree_code: null
-- gene_count: 1874
+- gene_count: 1881
   id: go:0043227
   is_informative: true
   level: 3
   name: membrane-bounded organelle
-  organism_count: 117
+  organism_count: 118
   score: 0.9228
   tree: null
   tree_code: null
-- gene_count: 1873
+- gene_count: 1880
   id: go:0043231
   is_informative: true
   level: 4
   name: intracellular membrane-bounded organelle
-  organism_count: 117
+  organism_count: 118
   score: 0.8179
   tree: null
   tree_code: null
@@ -442,30 +442,30 @@ rows:
   score: 0.9228
   tree: null
   tree_code: null
-- gene_count: 18
+- gene_count: 19
   id: go:0044853
   is_informative: true
   level: 4
   name: plasma membrane raft
-  organism_count: 13
+  organism_count: 14
   score: 0.9228
   tree: null
   tree_code: null
-- gene_count: 23
+- gene_count: 24
   id: go:0045121
   is_informative: true
   level: 4
   name: membrane raft
-  organism_count: 15
+  organism_count: 16
   score: 1.0584
   tree: null
   tree_code: null
-- gene_count: 110
+- gene_count: 111
   id: go:0048501
   is_informative: true
   level: 4
   name: signal recognition particle, plasma membrane targeting
-  organism_count: 110
+  organism_count: 111
   score: 0.6665
   tree: null
   tree_code: null
@@ -478,30 +478,30 @@ rows:
   score: 0.9228
   tree: null
   tree_code: null
-- gene_count: 1046
+- gene_count: 1087
   id: go:0098552
   is_informative: true
   level: 2
   name: side of membrane
-  organism_count: 111
+  organism_count: 112
   score: 0.9228
   tree: null
   tree_code: null
-- gene_count: 733
+- gene_count: 750
   id: go:0098562
   is_informative: true
   level: 3
   name: cytoplasmic side of membrane
-  organism_count: 111
+  organism_count: 112
   score: 0.8179
   tree: null
   tree_code: null
-- gene_count: 66
+- gene_count: 71
   id: go:0098567
   is_informative: true
   level: 4
   name: periplasmic side of plasma membrane
-  organism_count: 14
+  organism_count: 15
   score: 0.7345
   tree: null
   tree_code: null
@@ -514,30 +514,30 @@ rows:
   score: 0.8179
   tree: null
   tree_code: null
-- gene_count: 424
+- gene_count: 425
   id: go:0098590
   is_informative: true
   level: 3
   name: plasma membrane region
-  organism_count: 30
+  organism_count: 31
   score: 0.9228
   tree: null
   tree_code: null
-- gene_count: 14572
+- gene_count: 14654
   id: go:0098796
   is_informative: true
   level: 2
   name: membrane protein complex
-  organism_count: 117
+  organism_count: 118
   score: 0.9228
   tree: null
   tree_code: null
-- gene_count: 8090
+- gene_count: 8139
   id: go:0098797
   is_informative: true
   level: 3
   name: plasma membrane protein complex
-  organism_count: 117
+  organism_count: 118
   score: 0.8179
   tree: null
   tree_code: null
@@ -577,12 +577,12 @@ rows:
   score: 0.9228
   tree: null
   tree_code: null
-- gene_count: 23
+- gene_count: 24
   id: go:0098857
   is_informative: true
   level: 3
   name: membrane microdomain
-  organism_count: 15
+  organism_count: 16
   score: 1.0584
   tree: null
   tree_code: null

@@ -12,8 +12,8 @@ rows:
   by_source:
   - '{''count'': 1939, ''item'': ''eggnog''}'
   - '{''count'': 487, ''item'': ''cyanorak''}'
-  score_max: 6.7153
-  score_median: 1.0955
+  score_max: 6.7151
+  score_median: 1.0954
   top_cog_categories:
   - '{''id'': ''cog.category:C'', ''count'': 830, ''name'': ''Energy production and
     conversion''}'

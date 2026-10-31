@@ -18,21 +18,21 @@ case_id: search_ontology_multi_go_bp_tcdb_transport
 mode: search
 offset: 0
 results:
-- gene_count: 23853
+- gene_count: 24309
   id: go:0006810
   is_informative: true
   level: 3
   name: transport
   ontology_type: go_bp
-  organism_count: 117
+  organism_count: 118
   score: 1.5254
-- gene_count: 209
+- gene_count: 210
   id: go:0006821
   is_informative: true
   level: 5
   name: chloride transport
   ontology_type: go_bp
-  organism_count: 117
+  organism_count: 118
   score: 1.3283
 - gene_count: 9
   id: go:0006833
@@ -50,13 +50,13 @@ results:
   ontology_type: go_bp
   organism_count: 3
   score: 1.3283
-- gene_count: 239
+- gene_count: 245
   id: go:0015990
   is_informative: true
   level: 7
   name: electron transport coupled proton transport
   ontology_type: go_bp
-  organism_count: 116
+  organism_count: 117
   score: 1.3568
 - gene_count: 0
   id: tcdb:1.A.1.29.5

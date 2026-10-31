@@ -139,11 +139,11 @@ list_metabolites(metabolite_ids=["chebi:14654"])
   "total_entries": 3251,
   "total_matching": 1,
   "top_organisms": [
+    {"organism_name": "Alteromonas macleodii 83-1", "count": 1},
     {"organism_name": "Alteromonas macleodii AD45", "count": 1},
     {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
     {"organism_name": "Alteromonas macleodii BGP6", "count": 1},
     {"organism_name": "Alteromonas macleodii BS11", "count": 1},
-    {"organism_name": "Alteromonas macleodii EZ55", "count": 1},
     ...
   ],
   "top_metabolite_pathways": [
@@ -197,20 +197,20 @@ list_metabolites(metabolite_ids=["chebi:14654"])
       "formula": "HNO3",
       "elements": ["H", "N", "O"],
       "mass": 63.012,
-      "catalyst_gene_count": 77,
-      "organism_count": 73,
+      "catalyst_gene_count": 78,
+      "organism_count": 74,
       "transporter_count": 5,
-      "transporter_gene_count": 165,
+      "transporter_gene_count": 168,
       "evidence_sources": ["go_transport", "metabolism", "transport"],
       "go_transport_organism_names": [
         "Alteromonas (MarRef v6)",
+        "Alteromonas macleodii 83-1",
         "Alteromonas macleodii AD45",
         "Alteromonas macleodii ATCC27126",
         "Alteromonas macleodii BGP6",
-        "Alteromonas macleodii BS11",
         ...
       ],
-      "go_transport_organism_count": 72,
+      "go_transport_organism_count": 73,
       "chebi_id": "48107",
       "pathway_ids": [
         "kegg.pathway:ko00910",
@@ -246,7 +246,7 @@ list_metabolites(structure_kind=["generic"], summary=True)
     {"organism_name": "Alteromonas macleodii EZ55", "count": 315},
     {"organism_name": "Alteromonas macleodii MIT1002", "count": 312},
     {"organism_name": "Alteromonas macleodii BGP6", "count": 311},
-    {"organism_name": "Alteromonas macleodii HOT1A3", "count": 309},
+    {"organism_name": "Alteromonas macleodii 83-1", "count": 311},
     ...
   ],
   "top_metabolite_pathways": [
@@ -324,9 +324,9 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
   "total_matching": 59,
   "top_organisms": [
     {"organism_name": "Ruegeria pomeroyi DSS-3", "count": 48},
-    {"organism_name": "Meiothermus ruber", "count": 47},
-    {"organism_name": "Pseudomonas putida KT2440", "count": 47},
     {"organism_name": "Alteromonas mediterranea AltDE", "count": 47},
+    {"organism_name": "Pseudomonas putida KT2440", "count": 47},
+    {"organism_name": "Meiothermus ruber", "count": 47},
     {"organism_name": "Alteromonas (MarRef v6)", "count": 46},
     ...
   ],
@@ -401,8 +401,8 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
       "formula": "C5H8NO4",
       "elements": ["C", "H", "N", "O"],
       "mass": 146.122,
-      "catalyst_gene_count": 4781,
-      "organism_count": 117,
+      "catalyst_gene_count": 4836,
+      "organism_count": 118,
       "transporter_count": 1,
       "transporter_gene_count": 2,
       "evidence_sources": ["go_transport", "metabolism", "metabolomics", "transport"],
@@ -441,15 +441,15 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
           "metabolite_id": "kegg.compound:C00217",
           "name": "D-Glutamate",
           "relation": "enantiomer",
-          "catalyst_gene_count": 257,
+          "catalyst_gene_count": 260,
           "transporter_gene_count": 2
         },
         {
           "metabolite_id": "kegg.compound:C00302",
           "name": "Glutamate",
           "relation": "unspecified_form",
-          "catalyst_gene_count": 165,
-          "transporter_gene_count": 390
+          "catalyst_gene_count": 167,
+          "transporter_gene_count": 391
         }
       ]
     },
@@ -459,8 +459,8 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
       "formula": "C5H10N2O3",
       "elements": ["C", "H", "N", "O"],
       "mass": 146.146,
-      "catalyst_gene_count": 2912,
-      "organism_count": 117,
+      "catalyst_gene_count": 2938,
+      "organism_count": 118,
       "transporter_count": 0,
       "transporter_gene_count": 0,
       "evidence_sources": ["metabolism", "metabolomics", "transport"],
@@ -492,7 +492,7 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
           "metabolite_id": "kegg.compound:C00819",
           "name": "D-Glutamine",
           "relation": "enantiomer",
-          "catalyst_gene_count": 22,
+          "catalyst_gene_count": 23,
           "transporter_gene_count": 0
         },
         {
@@ -510,10 +510,10 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
       "formula": "C2H5NO2",
       "elements": ["C", "H", "N", "O"],
       "mass": 75.067,
-      "catalyst_gene_count": 2128,
-      "organism_count": 117,
+      "catalyst_gene_count": 2148,
+      "organism_count": 118,
       "transporter_count": 8,
-      "transporter_gene_count": 118,
+      "transporter_gene_count": 120,
       "evidence_sources": ["go_transport", "metabolism", "transport"],
       "go_transport_organism_names": ["Pseudomonas putida KT2440"],
       "go_transport_organism_count": 1,
@@ -628,8 +628,8 @@ list_metabolites(kegg_brite_classes=["Lipids: Fatty acyls"], limit=3)
       "formula": "C3H3O3",
       "elements": ["C", "H", "O"],
       "mass": 87.054,
-      "catalyst_gene_count": 2920,
-      "organism_count": 117,
+      "catalyst_gene_count": 2967,
+      "organism_count": 118,
       "transporter_count": 5,
       "transporter_gene_count": 96,
       "evidence_sources": ["metabolism", "transport"],
@@ -659,8 +659,8 @@ list_metabolites(kegg_brite_classes=["Lipids: Fatty acyls"], limit=3)
       "formula": "C23H34N7O17P3S",
       "elements": ["C", "H", "N", "O", "P", ...],
       "mass": 805.546,
-      "catalyst_gene_count": 2622,
-      "organism_count": 117,
+      "catalyst_gene_count": 2657,
+      "organism_count": 118,
       "transporter_count": 0,
       "transporter_gene_count": 0,
       "evidence_sources": ["go_transport", "metabolism", "metabolomics", "transport"],
@@ -689,10 +689,10 @@ list_metabolites(kegg_brite_classes=["Lipids: Fatty acyls"], limit=3)
       "formula": "C2H3O2",
       "elements": ["C", "H", "O"],
       "mass": 59.044,
-      "catalyst_gene_count": 1298,
-      "organism_count": 117,
+      "catalyst_gene_count": 1313,
+      "organism_count": 118,
       "transporter_count": 8,
-      "transporter_gene_count": 23,
+      "transporter_gene_count": 24,
       "evidence_sources": ["go_transport", "metabolism", "transport"],
       "go_transport_organism_names": ["Pseudomonas putida KT2440", "Shewanella sp. W3-18-1"],
       "go_transport_organism_count": 2,
@@ -735,11 +735,11 @@ list_metabolites(metabolite_ids=["chebi:17234"])
   "total_entries": 3251,
   "total_matching": 1,
   "top_organisms": [
+    {"organism_name": "Alteromonas macleodii 83-1", "count": 1},
     {"organism_name": "Alteromonas macleodii AD45", "count": 1},
     {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
     {"organism_name": "Alteromonas macleodii BGP6", "count": 1},
     {"organism_name": "Alteromonas macleodii BS11", "count": 1},
-    {"organism_name": "Alteromonas macleodii EZ55", "count": 1},
     ...
   ],
   "top_metabolite_pathways": [],
@@ -767,9 +767,9 @@ list_metabolites(metabolite_ids=["chebi:17234"])
       "elements": ["C", "H", "O"],
       "mass": 180.156,
       "catalyst_gene_count": 0,
-      "organism_count": 77,
+      "organism_count": 78,
       "transporter_count": 12,
-      "transporter_gene_count": 133,
+      "transporter_gene_count": 136,
       "evidence_sources": ["transport"],
       "go_transport_organism_names": null,
       "go_transport_organism_count": null,
@@ -786,8 +786,8 @@ list_metabolites(metabolite_ids=["chebi:17234"])
           "metabolite_id": "kegg.compound:C00031",
           "name": "D-Glucose",
           "relation": "specific_form",
-          "catalyst_gene_count": 733,
-          "transporter_gene_count": 16
+          "catalyst_gene_count": 745,
+          "transporter_gene_count": 18
         }
       ]
     }
@@ -877,20 +877,20 @@ list_metabolites(metabolite_ids=["kegg.compound:C00736", "kegg.compound:C00097"]
       "formula": "C3H7NO2S",
       "elements": ["C", "H", "N", "O", "S"],
       "mass": 121.161,
-      "catalyst_gene_count": 1678,
-      "organism_count": 117,
+      "catalyst_gene_count": 1694,
+      "organism_count": 118,
       "transporter_count": 1,
-      "transporter_gene_count": 13,
+      "transporter_gene_count": 14,
       "evidence_sources": ["go_transport", "metabolism", "metabolomics", "transport"],
       "go_transport_organism_names": [
+        "Alteromonas macleodii 83-1",
         "Alteromonas macleodii AD45",
         "Alteromonas macleodii ATCC27126",
         "Alteromonas macleodii BGP6",
         "Alteromonas macleodii BS11",
-        "Alteromonas macleodii EZ55",
         ...
       ],
-      "go_transport_organism_count": 13,
+      "go_transport_organism_count": 14,
       "chebi_id": "17561",
       "pathway_ids": [
         "kegg.pathway:ko00260",
@@ -912,7 +912,7 @@ list_metabolites(metabolite_ids=["kegg.compound:C00736", "kegg.compound:C00097"]
           "metabolite_id": "kegg.compound:C00793",
           "name": "D-Cysteine",
           "relation": "enantiomer",
-          "catalyst_gene_count": 12,
+          "catalyst_gene_count": 13,
           "transporter_gene_count": 0
         },
         {
@@ -950,14 +950,14 @@ list_metabolites(metabolite_ids=["kegg.compound:C00736", "kegg.compound:C00097"]
           "metabolite_id": "kegg.compound:C00097",
           "name": "L-Cysteine",
           "relation": "specific_form",
-          "catalyst_gene_count": 1678,
-          "transporter_gene_count": 13
+          "catalyst_gene_count": 1694,
+          "transporter_gene_count": 14
         },
         {
           "metabolite_id": "kegg.compound:C00793",
           "name": "D-Cysteine",
           "relation": "specific_form",
-          "catalyst_gene_count": 12,
+          "catalyst_gene_count": 13,
           "transporter_gene_count": 0
         }
       ]
@@ -978,8 +978,8 @@ list_metabolites(evidence_sources=["metabolomics"], summary=True)
   "total_matching": 135,
   "top_organisms": [
     {"organism_name": "Prochlorococcus MIT9313", "count": 134},
-    {"organism_name": "Prochlorococcus MIT0801", "count": 124},
     {"organism_name": "Prochlorococcus MIT9301", "count": 124},
+    {"organism_name": "Prochlorococcus MIT0801", "count": 124},
     {"organism_name": "Pseudomonas putida KT2440", "count": 113},
     {"organism_name": "Synechococcus MITS9220", "count": 110},
     ...
@@ -1189,8 +1189,8 @@ list_metabolites(evidence_sources=["go_transport"], organism_names=["Prochloroco
       "formula": "H2O",
       "elements": ["H", "O"],
       "mass": 18.015,
-      "catalyst_gene_count": 24955,
-      "organism_count": 117,
+      "catalyst_gene_count": 25282,
+      "organism_count": 118,
       "transporter_count": 3,
       "transporter_gene_count": 22,
       "evidence_sources": ["go_transport", "metabolism", "transport"],
@@ -1218,20 +1218,20 @@ list_metabolites(evidence_sources=["go_transport"], organism_names=["Prochloroco
       "formula": "HO4P",
       "elements": ["H", "O", "P"],
       "mass": 95.978,
-      "catalyst_gene_count": 10602,
-      "organism_count": 117,
+      "catalyst_gene_count": 10708,
+      "organism_count": 118,
       "transporter_count": 14,
-      "transporter_gene_count": 52,
+      "transporter_gene_count": 56,
       "evidence_sources": ["go_transport", "metabolism", "transport"],
       "go_transport_organism_names": [
         "Alteromonas (MarRef v6)",
+        "Alteromonas macleodii 83-1",
         "Alteromonas macleodii AD45",
         "Alteromonas macleodii ATCC27126",
         "Alteromonas macleodii BGP6",
-        "Alteromonas macleodii BS11",
         ...
       ],
-      "go_transport_organism_count": 117,
+      "go_transport_organism_count": 118,
       "chebi_id": "26078",
       "pathway_ids": [
         "kegg.pathway:ko00190",
@@ -1254,20 +1254,20 @@ list_metabolites(evidence_sources=["go_transport"], organism_names=["Prochloroco
       "formula": "H4N",
       "elements": ["H", "N"],
       "mass": 18.039,
-      "catalyst_gene_count": 5082,
-      "organism_count": 117,
+      "catalyst_gene_count": 5149,
+      "organism_count": 118,
       "transporter_count": 7,
-      "transporter_gene_count": 135,
+      "transporter_gene_count": 137,
       "evidence_sources": ["go_transport", "metabolism", "transport"],
       "go_transport_organism_names": [
         "Alteromonas (MarRef v6)",
+        "Alteromonas macleodii 83-1",
         "Alteromonas macleodii AD45",
         "Alteromonas macleodii ATCC27126",
         "Alteromonas macleodii BGP6",
-        "Alteromonas macleodii BS11",
         ...
       ],
-      "go_transport_organism_count": 117,
+      "go_transport_organism_count": 118,
       "chebi_id": "16134",
       "pathway_ids": [
         "kegg.pathway:ko00220",

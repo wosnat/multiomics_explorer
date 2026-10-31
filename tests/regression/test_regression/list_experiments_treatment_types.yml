@@ -1,5 +1,5 @@
 case_id: list_experiments_treatment_types
-row_count: 36
+row_count: 39
 rows:
 - authors:
   - J. Jeffrey Morris
@@ -941,6 +941,64 @@ rows:
   treatment_type:
   - coculture
 - authors:
+  - Arthur S. Edison
+  - Brittany Widner
+  - Elizabeth B. Kujawinski
+  - Frank Xavier Ferrer-González
+  - John Glushka
+  - Mary Ann Moran
+  - Nicole R. Holderman
+  background_factors:
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner:
+  - Thalassiosira pseudonana
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: Both arms sampled 8 h after bacterial inoculation, during the light
+    period. The control is axenic DSS-3 on glucose rather than DSS-3 alone without
+    carbon, so the contrast also includes the carbon-source difference (diatom exometabolites
+    vs glucose); the authors chose it to give a baseline of actively growing cells.
+    Table sign was control minus co-culture and is negated in the builder.
+  distinct_gene_count: 4224
+  experiment_id: 10.1038/s41396-020-00811-y_coculture_tpseudonana_dss3_rnaseq
+  experiment_name: R. pomeroyi DSS-3 transcriptome in co-culture with Thalassiosira
+    pseudonana vs glucose control (8 h)
+  gene_count: 4224
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1038/s41396-020-00811-y
+  significant_down_count: 343
+  significant_up_count: 392
+  table_scope: all_detected_genes
+  table_scope_detail: All 4,277 DSS-3 genes in Table S5 (DESeq2 output)
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '8.0'
+  time_point_labels:
+  - 8h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '343'
+  time_point_significant_up:
+  - '392'
+  time_point_totals:
+  - '4224'
+  treatment_type:
+  - coculture
+- authors:
   - Amandeep Kaur
   - Elizabeth M. Wellington
   - Joseph A. Christie-Oleza
@@ -1192,6 +1250,69 @@ rows:
   - '79'
   time_point_totals:
   - '1724'
+  treatment_type:
+  - coculture
+- authors:
+  - Benjamin A. S. Van Mooy
+  - Bryndan P. Durham
+  - Christa B. Smith
+  - E. Virginia Armbrust
+  - Elizabeth B. Kujawinski
+  - Haiwei Luo
+  - Mary Ann Moran
+  - Sara J. Bender
+  - Shady A. Amin
+  - Shalabh Sharma
+  - Shawn R. Campagna
+  - Stephen P. Dearth
+  background_factors:
+  - diel
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner:
+  - Thalassiosira pseudonana
+  compartment: whole_cell
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: Both arms sampled 8 h after bacterial inoculation at the midpoint
+    of the light cycle. The control is DSS-3 alone in the same carbon-free f/2 medium,
+    so the only carbon source in the co-culture is diatom-derived. Fold changes in
+    ST01 are linear and are converted to log2 in the builder.
+  distinct_gene_count: 101
+  experiment_id: 10.1073/pnas.1413137112_coculture_tpseudonana_dss3_rnaseq
+  experiment_name: R. pomeroyi DSS-3 transcriptome in co-culture with B12-limited
+    Thalassiosira pseudonana vs DSS-3 alone (8 h)
+  gene_count: 101
+  growth_phases:
+  - unknown
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: RNASEQ
+  organism_name: Ruegeria pomeroyi DSS-3
+  publication_doi: 10.1073/pnas.1413137112
+  significant_down_count: 34
+  significant_up_count: 67
+  table_scope: significant_only
+  table_scope_detail: 101 DSS-3 genes with baySeq FDR < 0.05 in at least two of three
+    independent subsampled analyses
+  time_point_count: 1
+  time_point_growth_phases:
+  - unknown
+  time_point_hours:
+  - '8.0'
+  time_point_labels:
+  - 8h
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '34'
+  time_point_significant_up:
+  - '67'
+  time_point_totals:
+  - '101'
   treatment_type:
   - coculture
 - authors:
@@ -1982,6 +2103,58 @@ rows:
   - '20'
   time_point_totals:
   - '1050'
+  treatment_type:
+  - coculture
+- authors:
+  - David J. Scanlan
+  - Jean Armengaud
+  - Joseph A. Christie-Oleza
+  - Philippe Guerin
+  background_factors:
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner:
+  - Ruegeria pomeroyi DSS-3
+  compartment: exoproteome
+  control_timing: matched
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: null
+  distinct_gene_count: 151
+  experiment_id: 10.1111/1462-2920.12822_wh8102_exoproteome_coculture_dss3
+  experiment_name: Synechococcus WH8102 exoproteome in coculture with Ruegeria pomeroyi
+    DSS-3 vs axenic (4 days)
+  gene_count: 151
+  growth_phases:
+  - exponential
+  is_time_course: single_time_point
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH8102
+  publication_doi: 10.1111/1462-2920.12822
+  significant_down_count: 56
+  significant_up_count: 15
+  table_scope: all_detected_genes
+  table_scope_detail: Every WH8102 protein validated (>=2 unique peptides) in either
+    arm, including p > 0.05
+  time_point_count: 1
+  time_point_growth_phases:
+  - exponential
+  time_point_hours:
+  - '96.0'
+  time_point_labels:
+  - 4 days
+  time_point_orders:
+  - '1'
+  time_point_significant_down:
+  - '56'
+  time_point_significant_up:
+  - '15'
+  time_point_totals:
+  - '151'
   treatment_type:
   - coculture
 - authors:

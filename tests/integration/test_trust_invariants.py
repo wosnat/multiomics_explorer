@@ -394,7 +394,7 @@ class TestOrganismAnnotationRollups:
             "       sum(o.peptidase_gene_count) AS pep_sum,\n"
             "       max(o.peptidase_gene_count) AS pep_max")[0]
         assert row["pep"] == row["nonpep"] == row["ipr"] == row["ncbi"] == row["n"]
-        assert row["pep_sum"] == 7926  # 3439 over the 47 pre-Ford organisms
+        assert row["pep_sum"] == 8053  # 7926 before 83-1 (+127); 3439 over the 47 pre-Ford organisms
         assert row["pep_max"] == 148
 
     def test_organism_preferred_names_are_unique(self, conn):

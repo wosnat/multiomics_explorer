@@ -1,5 +1,5 @@
 case_id: list_experiments_time_course
-row_count: 40
+row_count: 41
 rows:
 - authors:
   - Daniel Sher
@@ -3234,6 +3234,72 @@ rows:
   - '2509'
   treatment_type:
   - viral
+- authors:
+  - Bianca Brahamsha
+  - Brian Palenik
+  - Daniel A Johnson
+  - Ian T Paulsen
+  - Katherine Phillippy
+  - Sasha G Tetu
+  - Vera Tai
+  background_factors:
+  - axenic
+  - light
+  cluster_types: []
+  clustering_analysis_count: 0
+  coculture_partner: []
+  compartment: whole_cell
+  control_timing: baseline
+  derived_metric_count: 0
+  derived_metric_value_kinds: []
+  design_notes: Both P-stress timepoints are compared with one P-replete wild-type
+    reference harvested in mid-log phase (exponential), not with a culture sampled
+    alongside the stressed one. early P stress is the point where alkaline phosphatase
+    activity is first detected and late P stress is when growth has largely ceased
+    (late log), several days later.
+  distinct_gene_count: 1541
+  experiment_id: 10.1038/ismej.2009.31_p_stress_wh8102_microarray
+  experiment_name: WH8102 early and late phosphate stress vs P-replete (microarray)
+  gene_count: 1966
+  growth_phases:
+  - nutrient_limited
+  is_time_course: time_course
+  metabolite_assay_count: 0
+  metabolite_compartments: []
+  metabolite_count: 0
+  omics_type: MICROARRAY
+  organism_name: Synechococcus WH8102
+  publication_doi: 10.1038/ismej.2009.31
+  significant_down_count: 967
+  significant_up_count: 999
+  table_scope: significant_only
+  table_scope_detail: Supplementary Table 1A/1B list only the genes SAM called significant
+    at FDR < 5 percent (positive and negative blocks); 2-4 unnamed PSEUDOGENE probe
+    rows per sheet dropped (no gene id).
+  time_point_count: 2
+  time_point_growth_phases:
+  - nutrient_limited
+  - nutrient_limited
+  time_point_hours:
+  - '-1.0'
+  - '-1.0'
+  time_point_labels:
+  - early P stress
+  - late P stress
+  time_point_orders:
+  - '1'
+  - '2'
+  time_point_significant_down:
+  - '324'
+  - '643'
+  time_point_significant_up:
+  - '389'
+  - '610'
+  time_point_totals:
+  - '1253'
+  - '713'
+  treatment_type:
+  - phosphorus
 - authors:
   - Ayalla Fedida
   - Claudia Steglich

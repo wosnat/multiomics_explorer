@@ -52,7 +52,7 @@ not_found:
 offset: 0
 resolved_aliases: {}
 results:
-- catalyst_gene_count: 5988
+- catalyst_gene_count: 6053
   chebi_id: '16526'
   elements:
   - C
@@ -70,7 +70,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00011
   name: CO2
-  organism_count: 117
+  organism_count: 118
   pathway_count: 17
   pathway_ids:
   - kegg.pathway:ko00220
@@ -93,7 +93,7 @@ results:
   structure_kind: defined
   transporter_count: 5
   transporter_gene_count: 110
-- catalyst_gene_count: 5082
+- catalyst_gene_count: 5149
   chebi_id: '16134'
   elements:
   - H
@@ -103,9 +103,10 @@ results:
   - metabolism
   - transport
   formula: H4N
-  go_transport_organism_count: 117
+  go_transport_organism_count: 118
   go_transport_organism_names:
   - Alteromonas (MarRef v6)
+  - Alteromonas macleodii 83-1
   - Alteromonas macleodii AD45
   - Alteromonas macleodii ATCC27126
   - Alteromonas macleodii BGP6
@@ -229,7 +230,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00014
   name: Ammonia
-  organism_count: 117
+  organism_count: 118
   pathway_count: 14
   pathway_ids:
   - kegg.pathway:ko00220
@@ -248,8 +249,8 @@ results:
   - kegg.pathway:ko01310
   structure_kind: defined
   transporter_count: 7
-  transporter_gene_count: 135
-- catalyst_gene_count: 4781
+  transporter_gene_count: 137
+- catalyst_gene_count: 4836
   chebi_id: '16015'
   elements:
   - C
@@ -354,7 +355,7 @@ results:
   measured_paper_count: 2
   metabolite_id: kegg.compound:C00025
   name: L-Glutamate
-  organism_count: 117
+  organism_count: 118
   pathway_count: 31
   pathway_ids:
   - kegg.pathway:ko00220
@@ -391,14 +392,14 @@ results:
   stereo_relatives:
   - '{''transporter_gene_count'': 2, ''metabolite_id'': ''kegg.compound:C00217'',
     ''name'': ''D-Glutamate'', ''relation'': ''enantiomer'', ''catalyst_gene_count'':
-    257}'
-  - '{''transporter_gene_count'': 390, ''metabolite_id'': ''kegg.compound:C00302'',
+    260}'
+  - '{''transporter_gene_count'': 391, ''metabolite_id'': ''kegg.compound:C00302'',
     ''name'': ''Glutamate'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
-    165}'
+    167}'
   structure_kind: defined
   transporter_count: 1
   transporter_gene_count: 2
-- catalyst_gene_count: 3271
+- catalyst_gene_count: 3315
   chebi_id: '15379'
   elements:
   - O
@@ -407,9 +408,10 @@ results:
   - metabolism
   - transport
   formula: O2
-  go_transport_organism_count: 13
+  go_transport_organism_count: 14
   go_transport_organism_names:
   - Alteromonas (MarRef v6)
+  - Alteromonas macleodii 83-1
   - Alteromonas macleodii AD45
   - Alteromonas macleodii ATCC27126
   - Alteromonas macleodii BGP6
@@ -429,7 +431,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00007
   name: Oxygen
-  organism_count: 117
+  organism_count: 118
   pathway_count: 9
   pathway_ids:
   - kegg.pathway:ko00190
@@ -444,7 +446,7 @@ results:
   structure_kind: defined
   transporter_count: 2
   transporter_gene_count: 285
-- catalyst_gene_count: 2912
+- catalyst_gene_count: 2938
   chebi_id: '18050'
   elements:
   - C
@@ -474,7 +476,7 @@ results:
   measured_paper_count: 2
   metabolite_id: kegg.compound:C00064
   name: L-Glutamine
-  organism_count: 117
+  organism_count: 118
   pathway_count: 17
   pathway_ids:
   - kegg.pathway:ko00220
@@ -497,14 +499,14 @@ results:
   stereo_relatives:
   - '{''transporter_gene_count'': 0, ''metabolite_id'': ''kegg.compound:C00819'',
     ''name'': ''D-Glutamine'', ''relation'': ''enantiomer'', ''catalyst_gene_count'':
-    22}'
+    23}'
   - '{''transporter_gene_count'': 422, ''metabolite_id'': ''kegg.compound:C00303'',
     ''name'': ''Glutamine'', ''relation'': ''unspecified_form'', ''catalyst_gene_count'':
     0}'
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 1153
+- catalyst_gene_count: 1167
   chebi_id: '17544'
   elements:
   - C
@@ -587,7 +589,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00288
   name: HCO3-
-  organism_count: 117
+  organism_count: 118
   pathway_count: 10
   pathway_ids:
   - kegg.pathway:ko00220
@@ -602,8 +604,8 @@ results:
   - kegg.pathway:ko04113
   structure_kind: defined
   transporter_count: 9
-  transporter_gene_count: 155
-- catalyst_gene_count: 898
+  transporter_gene_count: 156
+- catalyst_gene_count: 908
   chebi_id: '30751'
   elements:
   - C
@@ -614,8 +616,9 @@ results:
   - metabolism
   - transport
   formula: CHO2
-  go_transport_organism_count: 52
+  go_transport_organism_count: 53
   go_transport_organism_names:
+  - Alteromonas macleodii 83-1
   - Alteromonas macleodii AD45
   - Alteromonas macleodii ATCC27126
   - Alteromonas macleodii BGP6
@@ -679,7 +682,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00058
   name: Formate
-  organism_count: 117
+  organism_count: 118
   pathway_count: 11
   pathway_ids:
   - kegg.pathway:ko00440
@@ -695,8 +698,8 @@ results:
   - kegg.pathway:ko01220
   structure_kind: defined
   transporter_count: 1
-  transporter_gene_count: 12
-- catalyst_gene_count: 515
+  transporter_gene_count: 13
+- catalyst_gene_count: 520
   chebi_id: '17672'
   elements:
   - C
@@ -716,7 +719,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00169
   name: Carbamoyl phosphate
-  organism_count: 117
+  organism_count: 118
   pathway_count: 11
   pathway_ids:
   - kegg.pathway:ko00220
@@ -733,7 +736,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 323
+- catalyst_gene_count: 328
   chebi_id: '28616'
   elements:
   - C
@@ -752,7 +755,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C01563
   name: Carbamate
-  organism_count: 117
+  organism_count: 118
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00240
@@ -761,7 +764,7 @@ results:
   structure_kind: defined
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 193
+- catalyst_gene_count: 196
   chebi_id: '25567'
   elements:
   - N
@@ -846,7 +849,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00088
   name: Nitrite
-  organism_count: 88
+  organism_count: 89
   pathway_count: 8
   pathway_ids:
   - kegg.pathway:ko00910
@@ -859,8 +862,8 @@ results:
   - kegg.pathway:ko02020
   structure_kind: defined
   transporter_count: 6
-  transporter_gene_count: 168
-- catalyst_gene_count: 72
+  transporter_gene_count: 171
+- catalyst_gene_count: 73
   chebi_id: '28024'
   elements:
   - C
@@ -891,7 +894,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C01417
   name: Cyanate
-  organism_count: 78
+  organism_count: 79
   pathway_count: 3
   pathway_ids:
   - kegg.pathway:ko00910
@@ -899,8 +902,8 @@ results:
   - kegg.pathway:ko02010
   structure_kind: defined
   transporter_count: 2
-  transporter_gene_count: 99
-- catalyst_gene_count: 77
+  transporter_gene_count: 101
+- catalyst_gene_count: 78
   chebi_id: '48107'
   elements:
   - H
@@ -911,9 +914,10 @@ results:
   - metabolism
   - transport
   formula: HNO3
-  go_transport_organism_count: 72
+  go_transport_organism_count: 73
   go_transport_organism_names:
   - Alteromonas (MarRef v6)
+  - Alteromonas macleodii 83-1
   - Alteromonas macleodii AD45
   - Alteromonas macleodii ATCC27126
   - Alteromonas macleodii BGP6
@@ -992,7 +996,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00244
   name: Nitrate
-  organism_count: 73
+  organism_count: 74
   pathway_count: 6
   pathway_ids:
   - kegg.pathway:ko00910
@@ -1003,8 +1007,8 @@ results:
   - kegg.pathway:ko02020
   structure_kind: defined
   transporter_count: 5
-  transporter_gene_count: 165
-- catalyst_gene_count: 40
+  transporter_gene_count: 168
+- catalyst_gene_count: 41
   chebi_id: '18379'
   elements:
   - C
@@ -1021,7 +1025,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00726
   name: Nitrile
-  organism_count: 39
+  organism_count: 40
   pathway_count: 2
   pathway_ids:
   - kegg.pathway:ko00910
@@ -1029,7 +1033,7 @@ results:
   structure_kind: generic
   transporter_count: 0
   transporter_gene_count: 0
-- catalyst_gene_count: 38
+- catalyst_gene_count: 39
   chebi_id: '16397'
   elements:
   - C
@@ -1049,7 +1053,7 @@ results:
   measured_paper_count: 0
   metabolite_id: kegg.compound:C00488
   name: Formamide
-  organism_count: 26
+  organism_count: 27
   pathway_count: 4
   pathway_ids:
   - kegg.pathway:ko00460
@@ -1220,21 +1224,21 @@ top_organisms:
 - count: 16
   organism_name: Shewanella sp. W3-18-1
 - count: 14
-  organism_name: Alteromonas macleodii ATCC27126
+  organism_name: Alteromonas macleodii AD45
+- count: 14
+  organism_name: Alteromonas macleodii BGP6
 - count: 14
   organism_name: Alteromonas macleodii BS11
 - count: 14
   organism_name: Alteromonas macleodii EZ55
 - count: 14
+  organism_name: Alteromonas macleodii MIT1002
+- count: 14
   organism_name: Alteromonas macleodii HOT1A3
 - count: 14
   organism_name: Alteromonas mediterranea AltDE
 - count: 14
-  organism_name: Alteromonas macleodii MIT1002
-- count: 14
-  organism_name: Alteromonas mediterranea AltDE1
-- count: 14
-  organism_name: Alteromonas macleodii BGP6
+  organism_name: Alteromonas macleodii ATCC27126
 total_entries: 3251
 total_matching: 18
 truncated: false

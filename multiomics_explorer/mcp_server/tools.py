@@ -4027,7 +4027,7 @@ def register_tools(mcp: FastMCP):
         by_metric_type: list[PubMetricTypeBreakdown] = Field(default_factory=list, description="DerivedMetric type frequency rollup across matched publications.")
         by_metric_type_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown.")
         by_compartment: list[PubCompartmentBreakdown] = Field(default_factory=list, description="Wet-lab compartment frequency rollup across matched publications.")
-        by_discusses_coverage: PubDiscussesCoverageBreakdown = Field(default_factory=PubDiscussesCoverageBreakdown, description="Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (46 vs 4 in the current KG).")
+        by_discusses_coverage: PubDiscussesCoverageBreakdown = Field(default_factory=PubDiscussesCoverageBreakdown, description="Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (56 vs 4 in the current KG).")
         returned: int = Field(description="Publications in this response (0 when summary=True).")
         offset: int = Field(default=0, description="Offset into full result set.")
         truncated: bool = Field(description="True if total_matching > returned.")
@@ -7716,7 +7716,7 @@ def register_tools(mcp: FastMCP):
             description="Rows in filtered slice with r.value='flagged'.")
         false_count: int = Field(
             description="Rows in filtered slice with r.value='not_flagged' "
-                        "(tested-absent; populated on 11 of 27 boolean "
+                        "(tested-absent; populated on 11 of 32 boolean "
                         "DMs, 0 on positive-only DMs).")
         # Full DM (precomputed)
         dm_total_gene_count: int = Field(
@@ -7827,7 +7827,7 @@ def register_tools(mcp: FastMCP):
             default_factory=list,
             description="Frequency rollup of `r.value` across surviving rows. "
                         "Values are 'flagged' / 'not_flagged'; not_flagged "
-                        "rows exist on 11 of 27 boolean DMs.")
+                        "rows exist on 11 of 32 boolean DMs.")
         top_categories: list[GenesByNumericMetricCategoryBreakdown] = Field(
             default_factory=list, description="Top 5 gene categories by count.")
         by_metric: list[GenesByBooleanMetricBreakdown] = Field(
@@ -7931,7 +7931,7 @@ def register_tools(mcp: FastMCP):
         flag_value: Annotated[bool | None, Field(
             description="Filter on `r.value`: True keeps `'flagged'` edges, "
                         "False keeps `'not_flagged'` edges (tested-absent — "
-                        "real biology, stored on 11 of 27 boolean DMs; the "
+                        "real biology, stored on 11 of 32 boolean DMs; the "
                         "rest are positive-only and return 0 rows for False). "
                         "Check `by_metric[*].false_count` before reading an "
                         "absent gene as 'not flagged' vs 'not assessed'.",
@@ -10067,7 +10067,7 @@ def register_tools(mcp: FastMCP):
             description="Filter by flag presence — `True` (presence flagged), "
                         "`False` (absence flagged — *tested-absent*, real biology), "
                         "`None` (both). `Assay_flags_metabolite` always stores "
-                        "both states (unlike the DM layer, where only 11 of 27 "
+                        "both states (unlike the DM layer, where only 11 of 32 "
                         "boolean DMs store `not_flagged`), so `flag_value=False` "
                         "returns real rows (about 69% of boolean rows).",
         )] = None,

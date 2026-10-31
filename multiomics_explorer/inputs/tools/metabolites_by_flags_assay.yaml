@@ -209,7 +209,7 @@ mistakes:
       `Assay_flags_metabolite` ALWAYS stores both states (KG literals
       'detected' / 'not_detected', bool on the surface) — about 69% of
       boolean rows are `flag_value=false`, and flag_value=False returns real
-      rows. On the DM side only 11 of 27 boolean DMs store `not_flagged`
+      rows. On the DM side only 11 of 32 boolean DMs store `not_flagged`
       edges (the rest are positive-only), so `genes_by_boolean_metric(flag_value=False)`
       is DM-dependent — read its `by_metric[*].dm_false_count` first.
 
@@ -245,5 +245,5 @@ mistakes:
       stay verbatim in `not_found` with a `warnings` entry naming the replacement or
       the role. Other unresolved inputs stay verbatim in `not_found` in the form you
       passed.
-  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (about 69% of boolean rows are flag_value=False, kept by default; on the DM side only 11 of 27 boolean DMs store `not_flagged` edges)."
+  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (about 69% of boolean rows are flag_value=False, kept by default; on the DM side only 11 of 32 boolean DMs store `not_flagged` edges)."
   - "`organism` here matches by case-insensitive CONTAINS, not the word-based match the gene tools use; cross-organism is the default."

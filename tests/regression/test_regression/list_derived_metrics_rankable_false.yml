@@ -1,6 +1,132 @@
 case_id: list_derived_metrics_rankable_false
-row_count: 231
+row_count: 246
 rows:
+- allowed_categories: null
+  background_factors: []
+  compartment: whole_cell
+  derived_metric_id: derived_metric:s41598-020-57526-5:unique_genes_831_table:strain_unique_gene_koch2020
+  experiment_id: 10.1038/s41598-020-57526-5_unique_genes_831
+  field_description: Flagged when Koch 2020 Table S7 lists the gene as present in
+    this strain and absent from the other 11 Alteromonas macleodii genomes of its
+    pangenome (anvio). Genes not in the list carry no edge. Uniqueness is relative
+    to those 12 genomes only.
+  growth_phases: []
+  has_p_value: false
+  metric_type: strain_unique_gene_koch2020
+  name: Strain-unique gene among 12 A. macleodii genomes (Koch 2020)
+  omics_type: BIOINFORMATIC
+  organism_name: Alteromonas macleodii 83-1
+  publication_doi: 10.1038/s41598-020-57526-5
+  rankable: false
+  total_gene_count: 117
+  treatment_type:
+  - genomic_analysis
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors: []
+  compartment: whole_cell
+  derived_metric_id: derived_metric:s41598-020-57526-5:unique_genes_ad45_table:strain_unique_gene_koch2020
+  experiment_id: 10.1038/s41598-020-57526-5_unique_genes_ad45
+  field_description: Flagged when Koch 2020 Table S7 lists the gene as present in
+    this strain and absent from the other 11 Alteromonas macleodii genomes of its
+    pangenome (anvio). Genes not in the list carry no edge. Uniqueness is relative
+    to those 12 genomes only.
+  growth_phases: []
+  has_p_value: false
+  metric_type: strain_unique_gene_koch2020
+  name: Strain-unique gene among 12 A. macleodii genomes (Koch 2020)
+  omics_type: BIOINFORMATIC
+  organism_name: Alteromonas macleodii AD45
+  publication_doi: 10.1038/s41598-020-57526-5
+  rankable: false
+  total_gene_count: 213
+  treatment_type:
+  - genomic_analysis
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors: []
+  compartment: whole_cell
+  derived_metric_id: derived_metric:mSystems.00070-20:tbdt_inventory:tbdt_manck2020
+  experiment_id: 10.1128/mSystems.00070-20_tbdt_survey_atcc27126
+  field_description: Flagged when the gene is one of the 66 putative TonB-dependent
+    transporters (TBDTs, outer-membrane transporters for siderophores, carbohydrates,
+    peptides and other large substrates) that Manck 2020 Data Set S2 lists for A.
+    macleodii ATCC 27126. Genes not in the set carry no edge. Their iron- and carbon-limitation
+    fold changes are the Manck 2020 expression edges.
+  growth_phases: []
+  has_p_value: false
+  metric_type: tbdt_manck2020
+  name: TonB-dependent transporter (Manck 2020 curated set)
+  omics_type: BIOINFORMATIC
+  organism_name: Alteromonas macleodii ATCC27126
+  publication_doi: 10.1128/mSystems.00070-20
+  rankable: false
+  total_gene_count: 63
+  treatment_type:
+  - genomic_analysis
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors: []
+  compartment: whole_cell
+  derived_metric_id: derived_metric:s41598-020-57526-5:unique_genes_atcc27126_table:strain_unique_gene_koch2020
+  experiment_id: 10.1038/s41598-020-57526-5_unique_genes_atcc27126
+  field_description: Flagged when Koch 2020 Table S7 lists the gene as present in
+    this strain and absent from the other 11 Alteromonas macleodii genomes of its
+    pangenome (anvio). Genes not in the list carry no edge. Uniqueness is relative
+    to those 12 genomes only.
+  growth_phases: []
+  has_p_value: false
+  metric_type: strain_unique_gene_koch2020
+  name: Strain-unique gene among 12 A. macleodii genomes (Koch 2020)
+  omics_type: BIOINFORMATIC
+  organism_name: Alteromonas macleodii ATCC27126
+  publication_doi: 10.1038/s41598-020-57526-5
+  rankable: false
+  total_gene_count: 105
+  treatment_type:
+  - genomic_analysis
+  unit: ''
+  value_kind: boolean
+- allowed_categories:
+  - alpha_arabinosides
+  - alpha_glucans
+  - beta_glucans
+  - endogenous_siderophore
+  - exogenous_siderophore
+  - ferric_citrate
+  - galactolipids
+  - n_acetyl_beta_d_glucosaminides
+  - not_assessed
+  - not_predicted
+  - peptide
+  - polyhydroxybutyrate
+  - xyloglucans
+  background_factors: []
+  compartment: whole_cell
+  derived_metric_id: derived_metric:mSystems.00070-20:tbdt_inventory:tbdt_predicted_substrate_manck2020
+  experiment_id: 10.1128/mSystems.00070-20_tbdt_survey_atcc27126
+  field_description: Substrate Manck 2020 predicts from gene-neighborhood analysis
+    (Table 1) for the 26 TBDTs responsive to iron limitation (11) or carbon limitation
+    (15). not_predicted = in Table 1 but no substrate could be inferred; not_assessed
+    = one of the other 40 TBDTs, not analysed. MASE_17485 and MASE_17500 share one
+    PepSY permease, so which of the two is the siderophore transporter is ambiguous.
+    Prediction, not experimentally validated.
+  growth_phases: []
+  has_p_value: false
+  metric_type: tbdt_predicted_substrate_manck2020
+  name: Predicted TBDT substrate (Manck 2020 Table 1)
+  omics_type: BIOINFORMATIC
+  organism_name: Alteromonas macleodii ATCC27126
+  publication_doi: 10.1128/mSystems.00070-20
+  rankable: false
+  total_gene_count: 63
+  treatment_type:
+  - genomic_analysis
+  unit: ''
+  value_kind: categorical
 - allowed_categories: null
   background_factors:
   - axenic
@@ -355,6 +481,28 @@ rows:
   total_gene_count: 2
   treatment_type:
   - darkness
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors: []
+  compartment: whole_cell
+  derived_metric_id: derived_metric:s41598-020-57526-5:unique_genes_mit1002_table:strain_unique_gene_koch2020
+  experiment_id: 10.1038/s41598-020-57526-5_unique_genes_mit1002
+  field_description: Flagged when Koch 2020 Table S7 lists the gene as present in
+    this strain and absent from the other 11 Alteromonas macleodii genomes of its
+    pangenome (anvio). Genes not in the list carry no edge. Uniqueness is relative
+    to those 12 genomes only.
+  growth_phases: []
+  has_p_value: false
+  metric_type: strain_unique_gene_koch2020
+  name: Strain-unique gene among 12 A. macleodii genomes (Koch 2020)
+  omics_type: BIOINFORMATIC
+  organism_name: Alteromonas macleodii MIT1002
+  publication_doi: 10.1038/s41598-020-57526-5
+  rankable: false
+  total_gene_count: 197
+  treatment_type:
+  - genomic_analysis
   unit: ''
   value_kind: boolean
 - allowed_categories:
@@ -5300,6 +5448,33 @@ rows:
   unit: ''
   value_kind: categorical
 - allowed_categories:
+  - detected
+  - not_detected
+  - sporadic
+  background_factors:
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_cc9311_exoproteome:exoproteome_detection_status
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_cc9311
+  field_description: 'Detection in the Synechococcus CC9311 exoproteome from the per-replicate
+    % NSAF values of Table S4: detected = non-zero in every biological replicate,
+    sporadic = non-zero in some, not_detected = zero in all. not_detected is only
+    assigned to the proteins Table S4 lists, i.e. BLASTp homologues (E < 1e-20) of
+    exoproteins detected in another of the 8 strains; other genes carry no edge.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_detection_status
+  name: Detection status in Synechococcus CC9311 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus CC9311
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: false
+  total_gene_count: 338
+  treatment_type:
+  - compartment
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
   - carbon
   - nitrogen
   - phosphorus
@@ -6884,6 +7059,33 @@ rows:
   unit: ''
   value_kind: categorical
 - allowed_categories:
+  - detected
+  - not_detected
+  - sporadic
+  background_factors:
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_rs9916_exoproteome:exoproteome_detection_status
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_rs9916
+  field_description: 'Detection in the Synechococcus RS9916 exoproteome from the per-replicate
+    % NSAF values of Table S4: detected = non-zero in every biological replicate,
+    sporadic = non-zero in some, not_detected = zero in all. not_detected is only
+    assigned to the proteins Table S4 lists, i.e. BLASTp homologues (E < 1e-20) of
+    exoproteins detected in another of the 8 strains; other genes carry no edge.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_detection_status
+  name: Detection status in Synechococcus RS9916 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus RS9916
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: false
+  total_gene_count: 337
+  treatment_type:
+  - compartment
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
   - carbon
   - nitrogen
   - phosphorus
@@ -6953,6 +7155,33 @@ rows:
   total_gene_count: 16
   treatment_type:
   - genomic_analysis
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
+  - detected
+  - not_detected
+  - sporadic
+  background_factors:
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_rs9917_exoproteome:exoproteome_detection_status
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_rs9917
+  field_description: 'Detection in the Synechococcus RS9917 exoproteome from the per-replicate
+    % NSAF values of Table S4: detected = non-zero in every biological replicate,
+    sporadic = non-zero in some, not_detected = zero in all. not_detected is only
+    assigned to the proteins Table S4 lists, i.e. BLASTp homologues (E < 1e-20) of
+    exoproteins detected in another of the 8 strains; other genes carry no edge.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_detection_status
+  name: Detection status in Synechococcus RS9917 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus RS9917
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: false
+  total_gene_count: 334
+  treatment_type:
+  - compartment
   unit: ''
   value_kind: categorical
 - allowed_categories:
@@ -7172,6 +7401,34 @@ rows:
   unit: ''
   value_kind: categorical
 - allowed_categories:
+  - detected
+  - not_detected
+  - sporadic
+  background_factors:
+  - axenic
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_wh5701_exoproteome:exoproteome_detection_status
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_wh5701
+  field_description: 'Detection in the Synechococcus WH5701 exoproteome from the per-replicate
+    % NSAF values of Table S4: detected = non-zero in every biological replicate,
+    sporadic = non-zero in some, not_detected = zero in all. not_detected is only
+    assigned to the proteins Table S4 lists, i.e. BLASTp homologues (E < 1e-20) of
+    exoproteins detected in another of the 8 strains; other genes carry no edge.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_detection_status
+  name: Detection status in Synechococcus WH5701 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH5701
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: false
+  total_gene_count: 341
+  treatment_type:
+  - compartment
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
   - carbon
   - nitrogen
   - phosphorus
@@ -7244,6 +7501,34 @@ rows:
   unit: ''
   value_kind: categorical
 - allowed_categories:
+  - detected
+  - not_detected
+  - sporadic
+  background_factors:
+  - axenic
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_wh7803_exoproteome:exoproteome_detection_status
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_wh7803
+  field_description: 'Detection in the Synechococcus WH7803 exoproteome from the per-replicate
+    % NSAF values of Table S4: detected = non-zero in every biological replicate,
+    sporadic = non-zero in some, not_detected = zero in all. not_detected is only
+    assigned to the proteins Table S4 lists, i.e. BLASTp homologues (E < 1e-20) of
+    exoproteins detected in another of the 8 strains; other genes carry no edge.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_detection_status
+  name: Detection status in Synechococcus WH7803 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH7803
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: false
+  total_gene_count: 329
+  treatment_type:
+  - compartment
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
   - carbon
   - nitrogen
   - phosphorus
@@ -7313,6 +7598,34 @@ rows:
   total_gene_count: 16
   treatment_type:
   - genomic_analysis
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
+  - detected
+  - not_detected
+  - sporadic
+  background_factors:
+  - axenic
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_wh7805_exoproteome:exoproteome_detection_status
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_wh7805
+  field_description: 'Detection in the Synechococcus WH7805 exoproteome from the per-replicate
+    % NSAF values of Table S4: detected = non-zero in every biological replicate,
+    sporadic = non-zero in some, not_detected = zero in all. not_detected is only
+    assigned to the proteins Table S4 lists, i.e. BLASTp homologues (E < 1e-20) of
+    exoproteins detected in another of the 8 strains; other genes carry no edge.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_detection_status
+  name: Detection status in Synechococcus WH7805 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH7805
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: false
+  total_gene_count: 343
+  treatment_type:
+  - compartment
   unit: ''
   value_kind: categorical
 - allowed_categories:
@@ -7532,6 +7845,34 @@ rows:
   unit: ''
   value_kind: categorical
 - allowed_categories:
+  - detected
+  - not_detected
+  - sporadic
+  background_factors:
+  - axenic
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_wh8102_exoproteome:exoproteome_detection_status
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_wh8102
+  field_description: 'Detection in the Synechococcus WH8102 exoproteome from the per-replicate
+    % NSAF values of Table S4: detected = non-zero in every biological replicate,
+    sporadic = non-zero in some, not_detected = zero in all. not_detected is only
+    assigned to the proteins Table S4 lists, i.e. BLASTp homologues (E < 1e-20) of
+    exoproteins detected in another of the 8 strains; other genes carry no edge.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_detection_status
+  name: Detection status in Synechococcus WH8102 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus WH8102
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: false
+  total_gene_count: 319
+  treatment_type:
+  - compartment
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
   - carbon
   - nitrogen
   - phosphorus
@@ -7745,6 +8086,67 @@ rows:
   total_gene_count: 12
   treatment_type:
   - genomic_analysis
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
+  - ambiguous
+  - beneficial
+  - essential
+  - non_essential
+  - not_analyzed
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:pnas.1519220112:sd03_gene_essentiality:gene_essentiality
+  experiment_id: 10.1073/pnas.1519220112_rbtnseq_essentiality_pcc7942
+  field_description: Per-gene essentiality from a barcoded Tn5 library under standard
+    lab conditions (continuous light, BG-11, 30C). essential = lethal when mutated
+    (insertion-index log2 likelihood ratio < -2); beneficial = viable mutants with
+    a growth defect (mean outgrowth fitness <= -1.32, P < 0.01, FDR < 0.1); non_essential
+    = no defect detected; ambiguous = between likelihood cut-offs or essential call
+    unsupported by outgrowth fitness; not_analyzed = reads not uniquely mappable (psbA,
+    psbD, cpc paralogs). Calls apply to standard laboratory growth only.
+  growth_phases: []
+  has_p_value: false
+  metric_type: gene_essentiality
+  name: Gene essentiality class, RB-TnSeq (Rubin 2015 Dataset S3)
+  omics_type: DNASEQ
+  organism_name: Synechococcus elongatus PCC 7942
+  publication_doi: 10.1073/pnas.1519220112
+  rankable: false
+  total_gene_count: 2601
+  treatment_type:
+  - essentiality
+  unit: ''
+  value_kind: categorical
+- allowed_categories:
+  - detected
+  - not_detected
+  - sporadic
+  background_factors:
+  - light
+  compartment: exoproteome
+  derived_metric_id: derived_metric:1462-2920.12822:table_s4_bl107_exoproteome:exoproteome_detection_status
+  experiment_id: 10.1111/1462-2920.12822_exoproteome_bl107
+  field_description: 'Detection in the Synechococcus sp. BL107 exoproteome from the
+    per-replicate % NSAF values of Table S4: detected = non-zero in every biological
+    replicate, sporadic = non-zero in some, not_detected = zero in all. not_detected
+    is only assigned to the proteins Table S4 lists, i.e. BLASTp homologues (E < 1e-20)
+    of exoproteins detected in another of the 8 strains; other genes carry no edge.
+    Technical re-runs of one biological replicate (BL107 A1/A2, B1/B2) count as one
+    replicate, detected if either run is.'
+  growth_phases: []
+  has_p_value: false
+  metric_type: exoproteome_detection_status
+  name: Detection status in Synechococcus sp. BL107 exoproteome (Table S4)
+  omics_type: EXOPROTEOMICS
+  organism_name: Synechococcus sp. BL107
+  publication_doi: 10.1111/1462-2920.12822
+  rankable: false
+  total_gene_count: 304
+  treatment_type:
+  - compartment
   unit: ''
   value_kind: categorical
 - allowed_categories:

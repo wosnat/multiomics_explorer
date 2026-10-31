@@ -133,8 +133,8 @@ list_experiments(summary=True)
 
 ```example-response
 {
-  "total_entries": 303,
-  "total_matching": 303,
+  "total_entries": 338,
+  "total_matching": 338,
   "returned": 0,
   "offset": 0,
   "truncated": true,
@@ -143,55 +143,55 @@ list_experiments(summary=True)
     {"organism_name": "Alteromonas (MarRef v6)", "count": 20},
     {"organism_name": "Marinobacter (MarRef v6)", "count": 20},
     {"organism_name": "Prochlorococcus MIT9313", "count": 19},
-    {"organism_name": "Alteromonas macleodii EZ55", "count": 12},
+    {"organism_name": "Synechococcus WH8102", "count": 17},
     ...
   ],
   "by_organism_truncated": null,
   "by_treatment_type": [
-    {"treatment_type": "genomic_analysis", "count": 95},
-    {"treatment_type": "carbon", "count": 79},
-    {"treatment_type": "coculture", "count": 36},
-    {"treatment_type": "compartment", "count": 17},
+    {"treatment_type": "genomic_analysis", "count": 100},
+    {"treatment_type": "carbon", "count": 88},
+    {"treatment_type": "coculture", "count": 39},
+    {"treatment_type": "compartment", "count": 25},
     {"treatment_type": "nitrogen", "count": 16},
     ...
   ],
   "by_treatment_type_truncated": null,
   "by_background_factors": [
-    {"background_factor": "light", "count": 119},
-    {"background_factor": "axenic", "count": 85},
+    {"background_factor": "light", "count": 135},
+    {"background_factor": "axenic", "count": 107},
     {"background_factor": "coculture", "count": 77},
-    {"background_factor": "darkness", "count": 37},
-    {"background_factor": "diel", "count": 31},
+    {"background_factor": "darkness", "count": 39},
+    {"background_factor": "diel", "count": 33},
     ...
   ],
   "by_background_factors_truncated": null,
   "by_omics_type": [
-    {"omics_type": "BIOINFORMATIC", "count": 95},
-    {"omics_type": "PROTEOMICS", "count": 77},
-    {"omics_type": "RNASEQ", "count": 71},
-    {"omics_type": "MICROARRAY", "count": 29},
-    {"omics_type": "METABOLOMICS", "count": 12},
+    {"omics_type": "BIOINFORMATIC", "count": 100},
+    {"omics_type": "PROTEOMICS", "count": 82},
+    {"omics_type": "RNASEQ", "count": 79},
+    {"omics_type": "MICROARRAY", "count": 33},
+    {"omics_type": "EXOPROTEOMICS", "count": 19},
     ...
   ],
   "by_publication": [
     {"publication_doi": "10.1042/BST20200244", "count": 95},
     {"publication_doi": "10.1128/spectrum.03275-22", "count": 60},
+    {"publication_doi": "10.1111/1462-2920.12822", "count": 12},
     {"publication_doi": "10.1038/s43705-022-00197-2", "count": 11},
     {"publication_doi": "10.1101/2025.11.24.690089", "count": 10},
-    {"publication_doi": "10.1111/1462-2920.15834", "count": 6},
     ...
   ],
   "by_publication_truncated": null,
   "by_table_scope": [
-    {"table_scope": "all_detected_genes", "count": 111},
-    {"table_scope": "significant_only", "count": 40},
-    {"table_scope": "filtered_subset", "count": 21},
+    {"table_scope": "all_detected_genes", "count": 125},
+    {"table_scope": "significant_only", "count": 46},
+    {"table_scope": "filtered_subset", "count": 30},
     {"table_scope": "significant_any_timepoint", "count": 12},
     {"table_scope": "top_n", "count": 7}
   ],
   "by_control_timing": [
-    {"control_timing": "matched", "count": 151},
-    {"control_timing": "baseline", "count": 18},
+    {"control_timing": "matched", "count": 167},
+    {"control_timing": "baseline", "count": 22},
     {"control_timing": "mixed", "count": 4}
   ],
   "by_cluster_type": [
@@ -201,35 +201,35 @@ list_experiments(summary=True)
     {"cluster_type": "decay_pattern", "count": 1}
   ],
   "by_growth_phase": [
-    {"growth_phase": "exponential", "count": 70},
-    {"growth_phase": "darkness", "count": 33},
+    {"growth_phase": "exponential", "count": 79},
+    {"growth_phase": "darkness", "count": 34},
     {"growth_phase": "acute_stress", "count": 26},
+    {"growth_phase": "nutrient_limited", "count": 21},
     {"growth_phase": "acclimated_steady_state", "count": 20},
-    {"growth_phase": "nutrient_limited", "count": 17},
     ...
   ],
   "by_value_kind": [
-    {"value_kind": "categorical", "count": 103},
-    {"value_kind": "numeric", "count": 17},
-    {"value_kind": "boolean", "count": 13}
+    {"value_kind": "categorical", "count": 113},
+    {"value_kind": "numeric", "count": 26},
+    {"value_kind": "boolean", "count": 18}
   ],
   "by_metric_type": [
     {"metric_type": "sbp_nutrient_class", "count": 95},
     {"metric_type": "sbp_predicted_substrate", "count": 95},
+    {"metric_type": "exoproteome_avg_pct_nsaf", "count": 10},
+    {"metric_type": "exoproteome_detection_status", "count": 10},
     {"metric_type": "log2_mv_cell_enrichment", "count": 6},
-    {"metric_type": "prop_abund_cells_percent", "count": 6},
-    {"metric_type": "prop_abund_mvs_percent", "count": 6},
     ...
   ],
   "by_metric_type_truncated": null,
   "by_compartment": [
-    {"compartment": "whole_cell", "count": 280},
+    {"compartment": "whole_cell", "count": 303},
+    {"compartment": "exoproteome", "count": 19},
     {"compartment": "vesicle", "count": 13},
-    {"compartment": "exoproteome", "count": 7},
     {"compartment": "extracellular", "count": 3}
   ],
-  "by_coculture_role": [{"coculture_role": "background", "count": 77}, {"coculture_role": "treatment", "count": 43}],
-  "time_course_count": 40,
+  "by_coculture_role": [{"coculture_role": "background", "count": 77}, {"coculture_role": "treatment", "count": 47}],
+  "time_course_count": 41,
   "score_max": null,
   "score_median": null,
   "not_found": [],
@@ -278,8 +278,8 @@ list_experiments(control_timing=["baseline", "mixed"], summary=True)
 
 ```example-response
 {
-  "total_entries": 303,
-  "total_matching": 22,
+  "total_entries": 338,
+  "total_matching": 26,
   "returned": 0,
   "offset": 0,
   "truncated": true,
@@ -294,44 +294,44 @@ list_experiments(control_timing=["baseline", "mixed"], summary=True)
   "by_organism_truncated": null,
   "by_treatment_type": [
     {"treatment_type": "nitrogen", "count": 9},
+    {"treatment_type": "growth_phase", "count": 5},
     {"treatment_type": "coculture", "count": 4},
     {"treatment_type": "iron", "count": 3},
-    {"treatment_type": "growth_phase", "count": 2},
-    {"treatment_type": "viral", "count": 2},
+    {"treatment_type": "carbon", "count": 2},
     ...
   ],
   "by_treatment_type_truncated": null,
   "by_background_factors": [
-    {"background_factor": "light", "count": 22},
-    {"background_factor": "axenic", "count": 10},
+    {"background_factor": "light", "count": 24},
+    {"background_factor": "axenic", "count": 14},
     {"background_factor": "coculture", "count": 6}
   ],
   "by_background_factors_truncated": null,
   "by_omics_type": [
-    {"omics_type": "RNASEQ", "count": 8},
-    {"omics_type": "MICROARRAY", "count": 6},
-    {"omics_type": "PROTEOMICS", "count": 4},
-    {"omics_type": "EXOPROTEOMICS", "count": 4}
+    {"omics_type": "RNASEQ", "count": 10},
+    {"omics_type": "MICROARRAY", "count": 7},
+    {"omics_type": "EXOPROTEOMICS", "count": 5},
+    {"omics_type": "PROTEOMICS", "count": 4}
   ],
   "by_publication": [
     {"publication_doi": "10.1101/2025.11.24.690089", "count": 8},
     {"publication_doi": "10.1111/1462-2920.14012", "count": 4},
     {"publication_doi": "10.1038/ismej.2011.49", "count": 3},
     {"publication_doi": "10.1038/ismej.2016.82", "count": 2},
-    {"publication_doi": "10.1038/ismej.2015.36", "count": 1},
+    {"publication_doi": "10.1038/s41396-018-0252-4", "count": 2},
     ...
   ],
   "by_publication_truncated": null,
   "by_table_scope": [
-    {"table_scope": "all_detected_genes", "count": 14},
+    {"table_scope": "all_detected_genes", "count": 17},
     {"table_scope": "significant_any_timepoint", "count": 5},
-    {"table_scope": "significant_only", "count": 2},
+    {"table_scope": "significant_only", "count": 3},
     {"table_scope": "filtered_subset", "count": 1}
   ],
-  "by_control_timing": [{"control_timing": "baseline", "count": 18}, {"control_timing": "mixed", "count": 4}],
+  "by_control_timing": [{"control_timing": "baseline", "count": 22}, {"control_timing": "mixed", "count": 4}],
   "by_cluster_type": [{"cluster_type": "time_course", "count": 6}],
   "by_growth_phase": [
-    {"growth_phase": "nutrient_limited", "count": 11},
+    {"growth_phase": "nutrient_limited", "count": 12},
     {"growth_phase": "acclimated_steady_state", "count": 4},
     {"growth_phase": "exponential", "count": 4},
     {"growth_phase": "acute_stress", "count": 3},
@@ -341,9 +341,9 @@ list_experiments(control_timing=["baseline", "mixed"], summary=True)
   "by_value_kind": [],
   "by_metric_type": [],
   "by_metric_type_truncated": null,
-  "by_compartment": [{"compartment": "whole_cell", "count": 18}, {"compartment": "exoproteome", "count": 4}],
+  "by_compartment": [{"compartment": "whole_cell", "count": 21}, {"compartment": "exoproteome", "count": 5}],
   "by_coculture_role": [{"coculture_role": "background", "count": 6}, {"coculture_role": "treatment", "count": 6}],
-  "time_course_count": 16,
+  "time_course_count": 17,
   "score_max": null,
   "score_median": null,
   "not_found": [],
@@ -396,7 +396,7 @@ list_experiments(compartment="vesicle", limit=2)
 
 ```example-response
 {
-  "total_entries": 303,
+  "total_entries": 338,
   "total_matching": 13,
   "returned": 2,
   "offset": 0,
@@ -541,7 +541,7 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
 
 ```example-response
 {
-  "total_entries": 303,
+  "total_entries": 338,
   "total_matching": 2,
   "returned": 2,
   "offset": 0,

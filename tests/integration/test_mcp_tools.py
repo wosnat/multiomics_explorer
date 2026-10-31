@@ -647,7 +647,8 @@ class TestListExperiments:
         """compartment='exoproteome' filter returns experiments (pinned baseline)."""
         result = api.list_experiments(compartment="exoproteome", summary=True, conn=conn)
         # 10 -> 7 at the 2026-10-18 rebuild: Oleza 2017 re-curated as whole_cell proteomics.
-        assert result["total_matching"] == 7
+        # 7 -> 19 at the 2026-10-31 rebuild: Oleza 2015b adds 12 exoproteome experiments.
+        assert result["total_matching"] == 19
 
     def test_per_row_compartment_field(self, conn):
         """Each result row has 'compartment' field in {whole_cell, vesicle, exoproteome}."""
@@ -1556,7 +1557,7 @@ class TestListDerivedMetrics:
     def test_organism_alteromonas(self, conn):
         from multiomics_explorer.api import list_derived_metrics
         out = list_derived_metrics(organism="MIT1002", conn=conn, limit=None)
-        assert out["total_matching"] == 5
+        assert out["total_matching"] == 6  # +1 Koch 2020 strain-unique DM 2026-10-31
 
     def test_search_text_diel_amplitude(self, conn):
         from multiomics_explorer.api import list_derived_metrics
@@ -1590,7 +1591,7 @@ class TestListDerivedMetrics:
         assert out["results"] == []
         assert out["returned"] == 0
         assert len(out["by_value_kind"]) == 3  # numeric, boolean, categorical
-        assert len(out["by_organism"]) == 103  # 12 → 103 2026-10-28: Ford 2021 DMs on 95 genomes
+        assert len(out["by_organism"]) == 105  # 12 → 103 2026-10-28: Ford 2021 DMs on 95 genomes; +83-1, PCC 7942 2026-10-31
 
     def test_verbose_adds_fields(self, conn):
         from multiomics_explorer.api import list_derived_metrics
@@ -3929,10 +3930,10 @@ class TestSearchOntologyBrowseLive:
         ids = [r["id"] for r in result["results"]]
         assert ids == [
             "merops.family:S33", "merops.family:C26", "merops.family:S09",
-            "merops.family:C44", "merops.family:S14",
-        ]  # reordered 2026-10-28: Ford 2021 strains (121 organisms)
+            "merops.family:C44", "merops.family:M41",
+        ]  # 2026-10-31: M41 +1 (83-1) ties S14 at 426; id breaks the tie
         assert [r["gene_count"] for r in result["results"]] == [
-            852, 704, 497, 459, 425]
+            868, 710, 515, 464, 426]
 
     def test_browse_sorts_gene_count_desc(self, conn):
         result = api.search_ontology(ontology="tcdb", limit=20, conn=conn)
@@ -4406,9 +4407,9 @@ class TestListOrganismsAnnotationCapabilityLive:
         assert zero["top_annotation_capability"] == []
 
     def test_sum_of_peptidase_counts(self, conn):
-        """Spec §7.1: Σ peptidase 7,926 over the 121 organisms (3,439 over the old 47)."""
+        """Spec §7.1: Σ peptidase 8,053 over the 123 organisms (7,926 before 83-1; 3,439 over the old 47)."""
         res = api.list_organisms(limit=500, conn=conn)
-        assert sum(r["peptidase_gene_count"] for r in res["results"]) == 7926
+        assert sum(r["peptidase_gene_count"] for r in res["results"]) == 8053
 
     @pytest.mark.asyncio
     async def test_wrapper_round_trip(self, tool_fns, conn):
@@ -5150,16 +5151,16 @@ class TestControlTimingSurface:
     def test_list_experiments_baseline_mixed_count(self, conn):
         out = api.list_experiments(
             control_timing=["baseline", "mixed"], summary=True, conn=conn)
-        assert out["total_matching"] == 22
+        assert out["total_matching"] == 26  # +4 baseline 2026-10-31: Tetu 2009, Koch 2019 x2, Oleza 2015b
         counts = {b["control_timing"]: b["count"]
                   for b in out["by_control_timing"]}
-        assert counts == {"baseline": 18, "mixed": 4}
+        assert counts == {"baseline": 22, "mixed": 4}
         assert out["warnings"] == []
 
     def test_list_experiments_rows_match_filter(self, conn):
         out = api.list_experiments(
             control_timing=["baseline", "mixed"], limit=50, conn=conn)
-        assert out["returned"] == 22
+        assert out["returned"] == 26
         for r in out["results"]:
             assert r["control_timing"] in ("baseline", "mixed")
             # every non-matched experiment carries design_notes (18 + 4)
