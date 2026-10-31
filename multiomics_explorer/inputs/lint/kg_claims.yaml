@@ -54,7 +54,6 @@
   used_in:
     - CLAUDE.md
     - multiomics_explorer/inputs/tools/genes_by_boolean_metric.yaml
-    - multiomics_explorer/inputs/tools/metabolites_by_flags_assay.yaml
     - multiomics_explorer/mcp_server/tools.py
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/derived_metrics.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
