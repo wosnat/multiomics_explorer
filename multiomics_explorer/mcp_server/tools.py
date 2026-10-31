@@ -6901,8 +6901,8 @@ def register_tools(mcp: FastMCP):
         organism_gene_count: int
         n_ontologies: int
         by_ontology: dict[str, OntologySummary] = Field(default_factory=dict)
-        not_found: list[str] = Field(default_factory=list)
-        not_matched: list[str] = Field(default_factory=list)
+        not_found: list[str] = Field(default_factory=list, description="experiment_ids absent from the KG")
+        not_matched: list[str] = Field(default_factory=list, description="experiment_ids present but not in this organism")
         total_matching: int
         returned: int
         truncated: bool

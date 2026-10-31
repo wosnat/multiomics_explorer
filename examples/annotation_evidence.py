@@ -71,6 +71,7 @@ def scenario_merops_call_class() -> None:
         organism="MIT1002",
         level=0,
         call_class=["peptidase"],
+        min_gene_set_size=1, max_gene_set_size=None,  # census, not enrichment
     )
     print("call_class=['peptidase']:")
     print(f"  total_terms={peptidase_only.get('total_terms')}  "
@@ -84,6 +85,7 @@ def scenario_merops_call_class() -> None:
         ontology="merops",
         organism="MIT1002",
         level=0,
+        min_gene_set_size=1, max_gene_set_size=None,
     )
     print("no call_class filter (folds in nonpeptidase_homolog rows):")
     print(f"  total_terms={unfiltered.get('total_terms')}  "
@@ -255,9 +257,9 @@ def scenario_organism_rollups() -> None:
     Surface: list_organisms rows carry four zero-filled distinct-gene counts
     (peptidase_gene_count, nonpeptidase_homolog_gene_count,
     interpro_gene_count, ncbifam_gene_count); the envelope's
-    top_annotation_capability ranks the top 10 of the matched set by
-    peptidase_gene_count. There is no filter on these counts by design —
-    48 organisms is small enough to read, so read the ranking.
+    top_annotation_capability ranks the matched set by peptidase_gene_count
+    (top 10 on detail calls; summary=True returns the full ranked list).
+    There is no filter on these counts by design — read the ranking.
     """
     print("=== Scenario: organism_rollups ===")
     print("Question class: 'which organisms are protease-rich / best covered by domain annotation?'")
@@ -266,11 +268,11 @@ def scenario_organism_rollups() -> None:
     survey = list_organisms(summary=True)
     ranking = survey.get("top_annotation_capability") or []
     print(f"organisms matched: {survey.get('total_matching')}; "
-          f"ranked (all-zero rows excluded, top 10): {len(ranking)}")
+          f"ranked (all-zero rows excluded): {len(ranking)}")
     print(f"  {'organism':<34} {'peptidase_gene_count':>20} "
           f"{'nonpeptidase_homolog_gene_count':>31} {'interpro_gene_count':>19} "
           f"{'ncbifam_gene_count':>18}")
-    for row in ranking:
+    for row in ranking[:10]:
         print(f"  {row.get('preferred_name', '')[:34]:<34} "
               f"{row.get('peptidase_gene_count'):>20} "
               f"{row.get('nonpeptidase_homolog_gene_count'):>31} "

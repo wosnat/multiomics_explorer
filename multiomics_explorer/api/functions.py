@@ -4126,7 +4126,8 @@ def genes_by_ontology(
             f"min_gene_set_size={min_gene_set_size} / "
             f"max_gene_set_size={max_gene_set_size} and were dropped. "
             "The defaults suit enrichment; to enumerate every gene pass "
-            "min_gene_set_size=1, max_gene_set_size=None."
+            "min_gene_set_size=1 and a large max_gene_set_size "
+            "(e.g. 100000 via MCP; None from Python)."
         )
 
     # --- Compose envelope ---
