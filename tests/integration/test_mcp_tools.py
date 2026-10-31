@@ -436,14 +436,14 @@ class TestListOrganisms:
             assert row["catalyzed_metabolite_count"] > 0
 
     def test_top_metabolic_capability_top_organisms(self, conn):
-        """top_metabolic_capability (summary=True) is the FULL ranking
-        (llm-review 2b.2: summary keeps the full list), sorted desc by
-        catalyzed_metabolite_count, excluding zero-chemistry organisms
-        (catalysis-arm rename, KG-SYNC-001)."""
+        """top_metabolic_capability (summary=True) is capped at 10 like the
+        detail call (backlog 2d.2), sorted desc by catalyzed_metabolite_count,
+        excluding zero-chemistry organisms (catalysis-arm rename,
+        KG-SYNC-001)."""
         result = api.list_organisms(summary=True, conn=conn)
         cap = result["top_metabolic_capability"]
-        assert len(cap) > 0
-        assert "top_metabolic_capability_truncated" not in result
+        assert len(cap) == 10
+        assert result["top_metabolic_capability_truncated"] is True
         # Sorted descending by catalyzed_metabolite_count
         catalyzed_counts = [r["catalyzed_metabolite_count"] for r in cap]
         assert catalyzed_counts == sorted(catalyzed_counts, reverse=True)
@@ -486,10 +486,20 @@ class TestListExperiments:
         assert result["total_matching"] >= 20
 
     def test_summary_breakdown_counts_sum(self, conn):
-        """by_organism experiment_counts sum to total_matching."""
+        """by_organism experiment_counts sum to total_matching when the
+        rollup is not capped (backlog 2d.2 caps it at 10 in summary too)."""
         result = api.list_experiments(summary=True, conn=conn)
         org_total = sum(b["count"] for b in result["by_organism"])
-        assert org_total == result["total_matching"]
+        if result.get("by_organism_truncated"):
+            assert len(result["by_organism"]) == 10
+            assert org_total < result["total_matching"]
+        else:
+            assert org_total == result["total_matching"]
+        narrowed = api.list_experiments(
+            organism="MED4", summary=True, conn=conn)
+        assert "by_organism_truncated" not in narrowed
+        assert (sum(b["count"] for b in narrowed["by_organism"])
+                == narrowed["total_matching"])
 
     def test_summary_treatment_type_counts_sum(self, conn):
         """by_treatment_type counts >= total_matching (experiments can have multiple treatment_types)."""
@@ -4374,20 +4384,17 @@ class TestListOrganismsAnnotationCapabilityLive:
         peps = [c["peptidase_gene_count"] for c in cap]
         assert peps == sorted(peps, reverse=True)
 
-    def test_summary_mode_is_the_full_ranking_detail_mode_is_capped(self, conn):
-        """llm-review 2b.2 `_cap_breakdowns`: detail calls (summary=False)
-        cap the ranking to the first 10 with `_truncated=True`; summary=True
-        carries the full ranking. Detail's capped list is exactly the
-        summary ranking's first 10 entries."""
+    def test_summary_and_detail_modes_are_both_capped(self, conn):
+        """backlog 2d.2: detail and summary calls both cap the ranking to
+        the first 10 with `_truncated=True`, and the two lists agree."""
         detail_result = api.list_organisms(limit=500, conn=conn)
         detail = detail_result["top_annotation_capability"]
         summary_result = api.list_organisms(summary=True, conn=conn)
         summary = summary_result["top_annotation_capability"]
         assert len(detail) == 10
         assert detail_result["top_annotation_capability_truncated"] is True
-        assert len(summary) > 10
-        assert "top_annotation_capability_truncated" not in summary_result
-        assert summary[:10] == detail
+        assert summary_result["top_annotation_capability_truncated"] is True
+        assert summary == detail
 
     def test_med4_subset_ranks_exactly_med4(self, conn):
         res = api.list_organisms(organism_names=[_SLICE4_MED4], conn=conn)

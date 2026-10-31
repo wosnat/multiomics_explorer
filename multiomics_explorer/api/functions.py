@@ -301,8 +301,10 @@ _TRUST_AXIS_DESCRIPTIONS: dict[str, str] = {
     "evidence_score": "Composite trust score in 0..1 — the only numeric "
                       "cutoff (min_evidence_score) and the within-ontology "
                       "sort key.",
-    "tier": "Diamond-truncation depth 1..3; null means the edge was never "
-            "truncated (for TCDB, an eggNOG call).",
+    "tier": "Confidence band 1..3. TCDB: consensus tier on diamond_tier "
+            "edges, identity band on diamond_best_hit edges (never compare "
+            "across call kinds), null on eggNOG calls. MEROPS: diamond "
+            "truncation depth.",
 }
 
 # Cached ControlledVocabulary reads, keyed by (applies_to, property). The
@@ -1530,9 +1532,9 @@ def resolve_gene(
     truncated, results.
     Per result: locus_tag, gene_name, product, organism_name.
 
-    by_organism is capped to 10 entries on detail calls
-    (`by_organism_truncated: True` when trimmed); summary=True returns it
-    uncapped with results=[], returned=0, truncated = total_matching > 0.
+    by_organism is capped to 10 entries on every call, summary=True included
+    (`by_organism_truncated: True` when trimmed); summary=True returns
+    results=[], returned=0, truncated = total_matching > 0.
     """
     if not identifier or not identifier.strip():
         logger.debug("resolve_gene: empty identifier")
@@ -1565,7 +1567,9 @@ def resolve_gene(
         "truncated": (total > 0) if summary else (total > offset + len(results)),
         "results": results,
     }
-    return _cap_breakdowns(envelope, ("by_organism",), summary=summary)
+    # backlog 2d.2: capped on summary calls too, so summary=True stays smaller
+    # than a default page.
+    return _cap_breakdowns(envelope, ("by_organism",), summary=False)
 
 
 @listify_bare_str
@@ -2465,9 +2469,8 @@ def list_organisms(
     organism for MEROPS / InterPro / NCBIfam questions — there is no filter
     on these counts.
     top_metabolic_capability / top_annotation_capability / by_metric_type
-    are capped to the first 10 entries on detail calls (summary=False, the
-    default), with a sparse `<key>_truncated=True` flag when capped;
-    summary=True returns each list in full.
+    are capped to the first 10 entries on every call (summary=True
+    included), with a sparse `<key>_truncated=True` flag when capped.
     """
     conn = _default_conn(conn)
     if summary:
@@ -2560,7 +2563,7 @@ def list_organisms(
     # in the matched set; excludes zero-chemistry rows. transported_metabolite_count
     # and go_transport_metabolite_count ride along as columns (ranking
     # unchanged — catalysis arm). Capped to
-    # top 10 on detail calls by _cap_breakdowns below.
+    # top 10 on every call by _cap_breakdowns below.
     chemistry_capable = [
         {
             "organism_name": r["organism_name"],
@@ -2578,15 +2581,15 @@ def list_organisms(
     chemistry_capable.sort(
         key=lambda r: r["catalyzed_metabolite_count"], reverse=True,
     )
-    # Full sorted list; _cap_breakdowns below caps to top 10 on detail calls
+    # Full sorted list; _cap_breakdowns below caps to top 10 on every call
     # and keeps the full list when summary=True.
     top_metabolic_capability = chemistry_capable
 
     # top_annotation_capability (slice 4 §3.3): organisms ranked by
     # peptidase_gene_count desc then preferred_name; all-four-zero rows
     # excluded. Ranked api-side from the full matched capability rows (same
-    # set in both detail and summary mode) so summary=True can carry the
-    # full ranking; _cap_breakdowns caps to top 10 on detail calls.
+    # set in both detail and summary mode); the ranking is identical
+    # in both modes; _cap_breakdowns caps to top 10 on every call.
     top_annotation_capability = _rank_annotation_capability(capability_rows)
 
     # not_found: input names that didn't match any OrganismTaxon
@@ -2633,10 +2636,12 @@ def list_organisms(
         "warnings": warnings,
         "results": results,
     }
+    # backlog 2d.2: capped on summary calls too (uncapped they were ~5x a
+    # default page); the per-organism counts are on the rows themselves.
     return _cap_breakdowns(
         envelope,
         ("by_metric_type", "top_annotation_capability", "top_metabolic_capability"),
-        summary=summary,
+        summary=False,
     )
 
 
@@ -2651,8 +2656,7 @@ def _rank_annotation_capability(rows: list[dict]) -> list[dict]:
 
     Sort key: peptidase_gene_count desc, then preferred_name (== organism_name
     on the row projection). Rows with all four counts at 0 are dropped.
-    Callers cap to the top 10 (see `_cap_breakdowns`); summary callers keep
-    the full ranking.
+    The caller caps to the top 10 (see `_cap_breakdowns`) on every call.
     """
     entries = []
     for r in rows:
@@ -2693,9 +2697,9 @@ def list_publications(
     by_omics_type, by_cluster_type, by_value_kind, by_metric_type,
     by_compartment, by_discusses_coverage, not_found, warnings, results.
 
-    summary=True: results=[], returned=0, truncated = total_matching > 0,
-    and every by_* rollup is returned uncapped (detail calls cap
-    by_organism / by_metric_type to 10 with a `<key>_truncated` flag).
+    summary=True: results=[], returned=0, truncated = total_matching > 0.
+    by_organism / by_metric_type are capped to 10 with a `<key>_truncated`
+    flag on every call, summary=True included.
     The detail Cypher is skipped entirely.
 
     warnings: a closed-vocabulary filter value (treatment_type /
@@ -2832,8 +2836,24 @@ def list_publications(
         "warnings": warnings,
         "results": results,
     }
+    # backlog 2d.2: capped on summary calls too, so summary=True stays smaller
+    # than a default page.
     return _cap_breakdowns(
-        envelope, ("by_metric_type", "by_organism"), summary=summary_flag,
+        envelope, ("by_metric_type", "by_organism"), summary=False,
+    )
+
+
+def _cap_list_experiments_breakdowns(envelope: dict, *, summary: bool) -> dict:
+    """by_publication / by_metric_type / by_organism are capped on every call
+    (backlog 2d.2 — uncapped they made summary=True larger than a default
+    page); the short vocabulary rollups stay uncapped on summary calls."""
+    _cap_breakdowns(
+        envelope, ("by_publication", "by_metric_type", "by_organism"),
+        summary=False,
+    )
+    return _cap_breakdowns(
+        envelope, ("by_treatment_type", "by_background_factors"),
+        summary=summary,
     )
 
 
@@ -2886,6 +2906,9 @@ def list_experiments(
 
     summary=True is sugar for limit=0: results is empty list,
     returned=0, truncated=True.
+    by_organism / by_publication / by_metric_type are capped to 10 with a
+    `<key>_truncated` flag on every call; by_treatment_type /
+    by_background_factors are capped on detail calls only.
     When summary=False (default): results populated with experiments.
     Per result (compact): experiment_id, experiment_name, publication_doi,
     authors, organism_name, treatment_type, background_factors, coculture_partner,
@@ -3085,12 +3108,7 @@ def list_experiments(
         envelope["offset"] = offset
         envelope["truncated"] = envelope["total_matching"] > 0
         envelope["results"] = []
-        return _cap_breakdowns(
-            envelope,
-            ("by_publication", "by_metric_type", "by_organism",
-             "by_treatment_type", "by_background_factors"),
-            summary=summary,
-        )
+        return _cap_list_experiments_breakdowns(envelope, summary=summary)
 
     # Detail: run detail query
     try:
@@ -3176,12 +3194,7 @@ def list_experiments(
     envelope["offset"] = offset
     envelope["truncated"] = envelope["total_matching"] > offset + len(processed)
     envelope["results"] = processed
-    return _cap_breakdowns(
-        envelope,
-        ("by_publication", "by_metric_type", "by_organism",
-         "by_treatment_type", "by_background_factors"),
-        summary=summary,
-    )
+    return _cap_list_experiments_breakdowns(envelope, summary=summary)
 
 
 _SEARCH_ONTOLOGY_NARROWING = ("level", "tree", "interpro_type", "min_gene_count", "organism")
@@ -3916,14 +3929,43 @@ def ontology_term_details(
     }
 
 
+class _DefaultGeneSetSize(int):
+    """An int that remembers it is a default (backlog 2d.8).
+
+    genes_by_ontology warns about size-dropped terms only when the caller
+    left both size bounds at their defaults: an explicit window (even one
+    equal to the defaults) is a deliberate choice, not a silent drop. The
+    value behaves as a plain int everywhere else (repr, arithmetic, JSON).
+    """
+
+    __slots__ = ()
+
+    @classmethod
+    def __get_pydantic_core_schema__(cls, source, handler):
+        # Lets the MCP wrapper use these markers as parameter defaults: the
+        # JSON schema then shows a plain integer default (5 / 500).
+        from pydantic_core import core_schema
+        return core_schema.int_schema(
+            serialization=core_schema.plain_serializer_function_ser_schema(int),
+        )
+
+
+GENE_SET_SIZE_MIN_DEFAULT = _DefaultGeneSetSize(5)
+GENE_SET_SIZE_MAX_DEFAULT = _DefaultGeneSetSize(500)
+
+
+def _is_default_size(value) -> bool:
+    return isinstance(value, _DefaultGeneSetSize)
+
+
 @listify_bare_str
 def genes_by_ontology(
     ontology: str,
     organism: str,
     level: int | None = None,
     term_ids: list[str] | None = None,
-    min_gene_set_size: int = 5,
-    max_gene_set_size: int | None = 500,
+    min_gene_set_size: int = GENE_SET_SIZE_MIN_DEFAULT,
+    max_gene_set_size: int | None = GENE_SET_SIZE_MAX_DEFAULT,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -3954,7 +3996,8 @@ def genes_by_ontology(
     - ``sources``: keep edges asserted by any of the named pipelines.
     - ``evidence``: keep edges on the named rungs of the strength ladder
       (curated > signature > homology > family_inferred > domain_inferred).
-    - ``max_tier``: keep edges at or above this truncation depth. Edges with
+    - ``max_tier``: keep edges at or above this confidence band (tier 1..3;
+      see the ``tier`` trust axis for its per-ontology meaning). Edges with
       no tier are kept and counted in the ``by_tier`` null bucket.
     - ``min_evidence_score``: the one numeric cutoff. Sets
       ``evidence_score_signals`` in the envelope.
@@ -3990,8 +4033,10 @@ def genes_by_ontology(
     window, and distinct genes lost from ``total_genes`` because they sit
     only in those terms. Both are 0 when nothing is dropped or when the size
     filters are no-ops (``min_gene_set_size <= 1`` and
-    ``max_gene_set_size=None``). A warning fires when terms were dropped;
-    pass ``min_gene_set_size=1, max_gene_set_size=None`` to enumerate every
+    ``max_gene_set_size=None``). A warning fires when terms were dropped
+    and both bounds were left at their defaults (an explicitly passed
+    window, even 5 / 500, is a deliberate choice and gets no warning); pass
+    ``min_gene_set_size=1, max_gene_set_size=None`` to enumerate every
     gene.
 
     Raises ValueError when the ontology does not carry a filter you set.
@@ -4119,7 +4164,8 @@ def genes_by_ontology(
                 len(unfiltered_per_gene) - len(per_gene), 0)
 
     size_warnings: list[str] = []
-    if size_filtered_terms > 0:
+    if (size_filtered_terms > 0 and _is_default_size(min_gene_set_size)
+            and _is_default_size(max_gene_set_size)):
         size_warnings.append(
             f"{size_filtered_terms} terms ({size_filtered_genes} genes not "
             f"otherwise covered) fell outside "
@@ -7552,6 +7598,22 @@ def _check_enrichment_level(ontology: str, level: int | None, conn: "GraphConnec
         )
 
 
+def _annotated_background(term2gene, gbo_kwargs: dict) -> list[str]:
+    """`background='annotated'` universe (backlog 3.12): genes that reach at
+    least one term of the ontology under the run's own TERM2GENE rules —
+    same trust filters, tree, interpro_type and informative_only, before the
+    gene-set size filter. With `level` + `term_ids` the universe is every
+    term at that level (one extra genes_by_ontology call), not only the
+    requested terms; with `term_ids` alone it is their union."""
+    if gbo_kwargs.get("term_ids") and gbo_kwargs.get("level") is not None:
+        from multiomics_explorer.analysis.frames import to_dataframe
+        term2gene = to_dataframe(
+            genes_by_ontology(**{**gbo_kwargs, "term_ids": None}))
+    if term2gene.empty or "locus_tag" not in term2gene.columns:
+        return []
+    return sorted(set(term2gene["locus_tag"].dropna()))
+
+
 # ---------------------------------------------------------------------------
 # pathway_enrichment public function
 # ---------------------------------------------------------------------------
@@ -7599,6 +7661,14 @@ def pathway_enrichment(
     types are separate strata, not levels of one hierarchy, and pooling
     them mixes families with domains and superfamilies.
 
+    ``background``: ``'table_scope'`` (default, the genes each experiment
+    quantified), ``'organism'`` (every gene), ``'annotated'`` (genes with at
+    least one edge in the chosen ontology under the same trust filters /
+    tree / interpro_type / informative_only as TERM2GENE — counters
+    annotation-coverage bias such as TIGR roles covering only part of the
+    genome; with ``level`` + ``term_ids`` it spans every term at that level,
+    with ``term_ids`` alone their union), or an explicit locus-tag list.
+
     ``include_nonsignificant`` (default True — the package returns the
     full ranked list) is stored on ``result.params`` and consumed by
     ``result.to_envelope(...)``: when False, rows with ``p_adjust >=
@@ -7632,17 +7702,18 @@ def pathway_enrichment(
     if direction not in {"up", "down", "both"}:
         raise ValueError(f"direction must be 'up'|'down'|'both'; got {direction!r}")
     if isinstance(background, str):
-        if background not in {"table_scope", "organism"}:
+        if background not in {"table_scope", "organism", "annotated"}:
             raise ValueError(
-                f"background must be 'table_scope', 'organism', or a list; got {background!r}"
+                "background must be 'table_scope', 'organism', 'annotated', "
+                f"or a list; got {background!r}"
             )
     elif isinstance(background, list):
         if not background:
             raise ValueError("background list must be non-empty")
     else:
         raise ValueError(
-            f"background must be 'table_scope', 'organism', or a list; "
-            f"got {type(background).__name__}"
+            "background must be 'table_scope', 'organism', 'annotated', or a "
+            f"list; got {type(background).__name__}"
         )
     if min_gene_set_size < 0:
         raise ValueError("min_gene_set_size must be >= 0.")
@@ -7691,6 +7762,10 @@ def pathway_enrichment(
         org_locus_tags = org_rows[0]["locus_tags"] if org_rows else []
         resolved_bg = {c: list(org_locus_tags) for c in inputs.gene_sets}
         background_mode = "organism"
+    elif background == "annotated":
+        # Filled in once TERM2GENE is built (_annotated_background).
+        resolved_bg = {c: [] for c in inputs.gene_sets}
+        background_mode = "annotated"
     else:
         resolved_bg = {c: list(background) for c in inputs.gene_sets}
         background_mode = {
@@ -7701,7 +7776,7 @@ def pathway_enrichment(
 
     inputs.background = resolved_bg
 
-    gbo_result = genes_by_ontology(
+    gbo_kwargs = dict(
         ontology=ontology, organism=inputs.organism_name,
         level=level, term_ids=term_ids,
         min_gene_set_size=0, max_gene_set_size=None,
@@ -7711,8 +7786,12 @@ def pathway_enrichment(
         conn=conn,
         **trust_filters,
     )
+    gbo_result = genes_by_ontology(**gbo_kwargs)
     from multiomics_explorer.analysis.frames import to_dataframe
     term2gene = to_dataframe(gbo_result)
+    if background == "annotated":
+        annotated = _annotated_background(term2gene, gbo_kwargs)
+        inputs.background = {c: list(annotated) for c in inputs.gene_sets}
 
     if term2gene.empty or not inputs.gene_sets:
         result = EnrichmentResult(
@@ -7835,6 +7914,10 @@ def cluster_enrichment(
     pathway_enrichment.
     ``interpro_type`` is required when ``ontology='interpro'``.
 
+    ``background``: ``'cluster_union'`` (default), ``'organism'``,
+    ``'annotated'`` (genes with at least one edge in the chosen ontology,
+    built exactly as in pathway_enrichment), or an explicit locus-tag list.
+
     ``include_nonsignificant`` (default True) behaves exactly as in
     ``pathway_enrichment``: stored on ``result.params``, consumed by
     ``result.to_envelope(...)`` to drop non-significant rows before
@@ -7862,17 +7945,18 @@ def cluster_enrichment(
     if level is None and not term_ids:
         raise ValueError("At least one of `level` or `term_ids` must be provided.")
     if isinstance(background, str):
-        if background not in {"cluster_union", "organism"}:
+        if background not in {"cluster_union", "organism", "annotated"}:
             raise ValueError(
-                f"background must be 'cluster_union', 'organism', or a list; got {background!r}"
+                "background must be 'cluster_union', 'organism', 'annotated', "
+                f"or a list; got {background!r}"
             )
     elif isinstance(background, list):
         if not background:
             raise ValueError("background list must be non-empty")
     else:
         raise ValueError(
-            f"background must be 'cluster_union', 'organism', or a list; "
-            f"got {type(background).__name__}"
+            "background must be 'cluster_union', 'organism', 'annotated', or "
+            f"a list; got {type(background).__name__}"
         )
     if min_gene_set_size < 0:
         raise ValueError("min_gene_set_size must be >= 0.")
@@ -7920,6 +8004,10 @@ def cluster_enrichment(
         org_locus_tags = org_rows[0]["locus_tags"] if org_rows else []
         resolved_bg = {c: list(org_locus_tags) for c in inputs.gene_sets}
         background_mode = "organism"
+    elif background == "annotated":
+        # Filled in once TERM2GENE is built (_annotated_background).
+        resolved_bg = {c: [] for c in inputs.gene_sets}
+        background_mode = "annotated"
     else:
         resolved_bg = {c: list(background) for c in inputs.gene_sets}
         background_mode = {
@@ -7956,7 +8044,7 @@ def cluster_enrichment(
         )
         return result
 
-    gbo_result = genes_by_ontology(
+    gbo_kwargs = dict(
         ontology=ontology, organism=inputs.organism_name,
         level=level, term_ids=term_ids,
         min_gene_set_size=0, max_gene_set_size=None,
@@ -7966,8 +8054,12 @@ def cluster_enrichment(
         conn=conn,
         **trust_filters,
     )
+    gbo_result = genes_by_ontology(**gbo_kwargs)
     from multiomics_explorer.analysis.frames import to_dataframe
     term2gene = to_dataframe(gbo_result)
+    if background == "annotated":
+        annotated = _annotated_background(term2gene, gbo_kwargs)
+        inputs.background = {c: list(annotated) for c in inputs.gene_sets}
 
     if term2gene.empty:
         result = EnrichmentResult(
@@ -9446,7 +9538,8 @@ def genes_by_metabolite(
       - `tcdb_family_substrates_skipped` (list of `{locus_tag, tcdb_id,
         tcdb_substrate_count}`): genes whose walk start was removed by the
         200-substrate cap — a superfamily-level call, substrate unknown.
-        Always computed.
+        Always computed; scoped to superfamilies whose systems carry a
+        queried metabolite.
       - `by_metabolite[]` entries carry `tcdb_direct_rows` /
         `tcdb_family_rows`; `top_genes[]` entries carry `tcdb_direct_rows`,
         `tcdb_family_rows` and `tcdb_assignment_count` (KG precompute,
@@ -10274,7 +10367,8 @@ def metabolites_by_gene(
       - `tcdb_family_substrates_skipped` (list of `{locus_tag, tcdb_id,
         tcdb_substrate_count}`): genes whose walk start was removed by the
         200-substrate cap — a superfamily-level call, substrate unknown.
-        Always computed.
+        Always computed; with a metabolite filter, scoped to superfamilies
+        whose systems carry a matching metabolite.
       - `by_gene[]` entries carry `tcdb_direct_rows`, `tcdb_family_rows`
         and `tcdb_assignment_count` (KG precompute, distinct gated TCDB
         targets of the gene); `top_tcdb_families[]` entries carry
@@ -10824,8 +10918,14 @@ def metabolites_by_gene(
     walkable = [g_["locus_tag"] for g_ in no_direct if g_.get("walkable")]
     skipped_tags = {s.get("locus_tag") for s in hint["skipped"]}
     not_walkable = [g_["locus_tag"] for g_ in no_direct if not g_.get("walkable")]
-    capped = [lt for lt in not_walkable if lt in skipped_tags]
-    no_range = [lt for lt in not_walkable if lt not in skipped_tags]
+    # `capped` is the per-gene flag (unscoped by metabolite filters, backlog
+    # 2d.6); fall back to the skipped list for hint rows without it.
+    capped_tags = {
+        g_["locus_tag"] for g_ in no_direct
+        if g_.get("capped", g_["locus_tag"] in skipped_tags)
+    }
+    capped = [lt for lt in not_walkable if lt in capped_tags]
+    no_range = [lt for lt in not_walkable if lt not in capped_tags]
     if walkable and not walk_on:
         warnings.append(
             f"No direct TCDB system call for {_name_list(walkable)}: their "
@@ -10836,8 +10936,9 @@ def metabolites_by_gene(
     if capped:
         warnings.append(
             f"No direct TCDB system call for {_name_list(capped)}: the TCDB "
-            "call is superfamily-level, so the substrate is unknown "
-            "(see tcdb_family_substrates_skipped)."
+            "call is superfamily-level, so the substrate is unknown"
+            + (" (see tcdb_family_substrates_skipped)."
+               if any(lt in skipped_tags for lt in capped) else ".")
         )
     if no_range:
         warnings.append(

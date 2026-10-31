@@ -370,7 +370,9 @@ mistakes:
     PMM0673 → 5 metabolites via tcdb:3.A.1.9). (2) Its only usable call is on a
     superfamily curated with over 200 substrates (ABC tcdb:3.A.1, MFS
     tcdb:2.A.1): it is listed in `tcdb_family_substrates_skipped` and its
-    substrate is unknown. Genes with only weak DIAMOND hits (`below_gate`)
+    substrate is unknown. With a metabolite filter (`metabolite_ids`,
+    `metabolite_elements`, ...) the list keeps only superfamilies that carry
+    a matching metabolite. Genes with only weak DIAMOND hits (`below_gate`)
     reach no substrate here; `gene_ontology_terms(...,
     include_weak_tcdb_hits=True)` shows them. See `docs://analysis/transport`.
   - >-

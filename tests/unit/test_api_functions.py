@@ -18146,12 +18146,13 @@ class TestResolveGeneBreakdownCap:
         assert len(result["by_organism"]) == 5
         assert "by_organism_truncated" not in result
 
-    def test_summary_true_returns_full_by_organism_and_no_rows(self, mock_conn):
-        """backlog 2b.7: summary=True uncaps by_organism; results empty."""
+    def test_summary_true_caps_by_organism_and_no_rows(self, mock_conn):
+        """backlog 2d.2: summary=True caps by_organism too (summary must stay
+        smaller than a default page); results empty."""
         mock_conn.execute_query.return_value = self._genes(12)
         result = api.resolve_gene("PMM", summary=True, conn=mock_conn)
-        assert len(result["by_organism"]) == 12
-        assert "by_organism_truncated" not in result
+        assert len(result["by_organism"]) == 10
+        assert result["by_organism_truncated"] is True
         assert result["results"] == []
         assert result["returned"] == 0
         assert result["total_matching"] == 12
@@ -18218,13 +18219,13 @@ class TestListPublicationsBreakdownCap:
         assert result["by_organism_truncated"] is True
         assert result["by_organism"][0]["organism_name"] == "Organism 00"
 
-    def test_summary_true_skips_detail_query_and_uncaps(self, mock_conn):
-        """backlog 2b.7: summary=True runs only the summary Cypher, returns
-        by_organism uncapped and no rows."""
+    def test_summary_true_skips_detail_query_and_caps(self, mock_conn):
+        """backlog 2b.7 + 2d.2: summary=True runs only the summary Cypher,
+        returns by_organism capped at 10 and no rows."""
         mock_conn.execute_query.side_effect = [[self._summary_row(12)]]
         result = api.list_publications(summary=True, conn=mock_conn)
-        assert len(result["by_organism"]) == 12
-        assert "by_organism_truncated" not in result
+        assert len(result["by_organism"]) == 10
+        assert result["by_organism_truncated"] is True
         assert result["results"] == [] and result["returned"] == 0
         assert result["truncated"] is True
         assert mock_conn.execute_query.call_count == 1
@@ -18257,15 +18258,16 @@ class TestListExperimentsBreakdownCap:
         assert result["by_publication_truncated"] is True
         assert result["by_publication"][0]["publication_doi"] == "10.1234/p00"
 
-    def test_by_publication_full_list_on_summary_true(self, mock_conn):
+    def test_by_publication_capped_on_summary_true(self, mock_conn):
+        """backlog 2d.2: summary=True caps too."""
         pub_freq = [{"item": f"10.1234/p{i:02d}", "count": 12 - i} for i in range(12)]
         mock_conn.execute_query.side_effect = [
             self._summary_result(pub_freq),
             self._summary_result(pub_freq),
         ]
         result = api.list_experiments(summary=True, conn=mock_conn)
-        assert len(result["by_publication"]) == 12
-        assert "by_publication_truncated" not in result
+        assert len(result["by_publication"]) == 10
+        assert result["by_publication_truncated"] is True
 
 
 class TestListOrganismsBreakdownCap:
@@ -18296,12 +18298,13 @@ class TestListOrganismsBreakdownCap:
         assert result["by_metric_type_truncated"] is True
         assert result["by_metric_type"][0]["metric_type"] == "metric_00"
 
-    def test_by_metric_type_full_list_on_summary_true(self, mock_conn):
+    def test_by_metric_type_capped_on_summary_true(self, mock_conn):
+        """backlog 2d.2: summary=True caps too."""
         freq = [{"item": f"metric_{i:02d}", "count": 12 - i} for i in range(12)]
         self._wire(mock_conn, freq)
         result = api.list_organisms(summary=True, conn=mock_conn)
-        assert len(result["by_metric_type"]) == 12
-        assert "by_metric_type_truncated" not in result
+        assert len(result["by_metric_type"]) == 10
+        assert result["by_metric_type_truncated"] is True
 
     def test_top_annotation_capability_capped_and_ranked(self, mock_conn):
         """top_annotation_capability is ranked api-side over the matched
@@ -18341,8 +18344,9 @@ class TestListOrganismsBreakdownCap:
 
         mock_conn.execute_query.side_effect = _exec
         summary_result = api.list_organisms(summary=True, conn=mock_conn)
-        assert len(summary_result["top_annotation_capability"]) == 12
-        assert "top_annotation_capability_truncated" not in summary_result
+        # backlog 2d.2: summary=True caps too.
+        assert len(summary_result["top_annotation_capability"]) == 10
+        assert summary_result["top_annotation_capability_truncated"] is True
 
 
 class TestDifferentialExpressionByGeneBreakdownCap:
@@ -19191,16 +19195,30 @@ class TestGenesByOntologySizeFiltered:
         assert "were dropped" in w
         assert "The defaults suit enrichment" in w
 
-    def test_warning_reports_max_none(self):
+    @pytest.mark.parametrize("bounds", [
+        {"min_gene_set_size": 5, "max_gene_set_size": None},
+        {"min_gene_set_size": 5, "max_gene_set_size": 500},
+        {"min_gene_set_size": 2},
+        {"max_gene_set_size": 100},
+    ])
+    def test_explicit_bounds_suppress_warning_keep_counts(self, bounds):
+        """backlog 2d.8: the caller chose the window, so the drop is not
+        silent — counts stay, the warning does not fire."""
         out, _ = self._run(
-            level=2, summary=True, min_gene_set_size=5,
-            max_gene_set_size=None,
+            level=2, summary=True, **bounds,
             pt_sized=self._pt("t1"), pg_sized=self._pg("g1"),
             pt_all=self._pt("t1", "t2"), pg_all=self._pg("g1", "g2"),
         )
-        ws = self._size_warnings(out)
-        assert len(ws) == 1, out["warnings"]
-        assert "min_gene_set_size=5 / max_gene_set_size=None" in ws[0]
+        assert out["size_filtered_terms"] == 1
+        assert out["size_filtered_genes"] == 1
+        assert self._size_warnings(out) == [], out["warnings"]
+
+    def test_default_bounds_are_plain_int_values(self):
+        import inspect
+        sig = inspect.signature(api.genes_by_ontology)
+        assert sig.parameters["min_gene_set_size"].default == 5
+        assert sig.parameters["max_gene_set_size"].default == 500
+        assert repr(sig.parameters["min_gene_set_size"].default) == "5"
 
     def test_warning_fires_in_detail_mode_too(self):
         """Non-summary path rewrites `warnings` after the detail query —
@@ -23287,6 +23305,20 @@ class TestMetabolitesByGeneTcdbCleanup:
         assert "curates no substrates" in ws[0]
         assert "superfamily" not in ws[0].lower()
 
+    def test_capped_flag_wins_over_scoped_skipped_list(self, monkeypatch):
+        """backlog 2d.6: with a metabolite filter the skipped list is scoped,
+        so a capped gene may be absent from it — the per-gene `capped` flag
+        still routes it to the superfamily warning, not 'curates no
+        substrates'."""
+        out, _ = self._run(monkeypatch, hint=_tcdb_hint(
+            skipped=[],
+            no_direct=[{"locus_tag": "PMM0234", "walkable": False,
+                        "capped": True}]))
+        ws = [w for w in out["warnings"] if "PMM0234" in w]
+        assert len(ws) == 1, out["warnings"]
+        assert "superfamily" in ws[0].lower()
+        assert "curates no substrates" not in ws[0]
+
     def test_one_breadth_cap_warning(self, monkeypatch):
         out, _ = self._run(monkeypatch, hint=_tcdb_hint(
             skipped=[_ABC_SKIP, _MFS_SKIP], no_direct=[]))
@@ -24104,3 +24136,127 @@ class TestReleasePrepListMetabolitesRouteScopedApi:
         assert list(kw["edge_sources"]) == ["transport"]
         assert kw["want_go"] is False
         assert "Organism_has_metabolite" in summary_calls[0].args[0]
+
+
+class TestTrustAxisTierDescription:
+    """backlog E6: the `tier` trust-axis description must not call a null
+    TCDB tier 'never truncated' — on TCDB tier is a consensus tier
+    (diamond_tier) or identity band (diamond_best_hit), null on eggNOG."""
+
+    def test_tier_description_names_tcdb_call_kinds(self):
+        desc = api._TRUST_AXIS_DESCRIPTIONS["tier"]
+        assert "never truncated" not in desc
+        for s in ("diamond_tier", "diamond_best_hit", "identity band",
+                  "eggNOG", "MEROPS"):
+            assert s in desc, s
+
+
+# ---------------------------------------------------------------------------
+# backlog 3.12 — background='annotated' on pathway_enrichment / cluster_enrichment
+# ---------------------------------------------------------------------------
+class TestEnrichmentAnnotatedBackground:
+    """`background='annotated'`: the universe is the genes that reach at
+    least one term of the run's TERM2GENE scope (same trust filters / tree /
+    interpro_type / informative_only); with `level` + `term_ids` it widens
+    to every term at that level."""
+
+    @pytest.fixture(autouse=True)
+    def _enrichment_preflight(self, monkeypatch):
+        _patch_enrichment_preflight(monkeypatch)
+
+    _T2G = [
+        {"term_id": "T1", "term_name": "Term1", "locus_tag": "PMM0001", "level": 1},
+        {"term_id": "T1", "term_name": "Term1", "locus_tag": "PMM0002", "level": 1},
+        {"term_id": "T2", "term_name": "Term2", "locus_tag": "PMM0002", "level": 1},
+        {"term_id": "T2", "term_name": "Term2", "locus_tag": "PMM0005", "level": 1},
+    ]
+    _WIDE = _T2G + [
+        {"term_id": "T9", "term_name": "Term9", "locus_tag": "PMM0009", "level": 1},
+    ]
+
+    @staticmethod
+    def _de_inputs():
+        from multiomics_explorer.analysis.enrichment import EnrichmentInputs
+        return EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"exp1|T0|up": ["PMM0001", "PMM0007"]},
+            background={"exp1|T0|up": ["PMM0001", "PMM0007", "PMM0008"]},
+            cluster_metadata={"exp1|T0|up": {
+                "experiment_id": "exp1", "timepoint": "T0", "direction": "up"}},
+            not_found=[], not_matched=[], no_expression=[],
+            not_found_experiments=[],
+        )
+
+    def _wire(self, monkeypatch, *, kind):
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+        gbo_calls, seen = [], {}
+
+        def _gbo(**kw):
+            gbo_calls.append(kw)
+            rows = self._WIDE if kw.get("term_ids") is None else self._T2G
+            return TestPathwayEnrichment._stub_gbo_result(rows=rows)
+
+        def _fisher(inputs, term2gene, **kw):
+            seen["background"] = {k: sorted(v) for k, v in inputs.background.items()}
+            return _fake_fisher_ora_three_rows(next(iter(inputs.gene_sets)))(
+                inputs, term2gene, **kw)
+
+        monkeypatch.setattr(f, "genes_by_ontology", _gbo)
+        monkeypatch.setattr(enr, "fisher_ora", _fisher)
+        if kind == "pathway":
+            monkeypatch.setattr(enr, "de_enrichment_inputs",
+                                lambda **_: self._de_inputs())
+        else:
+            monkeypatch.setattr(enr, "cluster_enrichment_inputs",
+                                lambda **_: TestClusterEnrichment._stub_inputs())
+        return gbo_calls, seen
+
+    def _call(self, kind, **kw):
+        from multiomics_explorer.api import cluster_enrichment, pathway_enrichment
+        if kind == "pathway":
+            return pathway_enrichment(
+                organism="MED4", experiment_ids=["exp1"],
+                ontology="cyanorak_role", min_gene_set_size=0, **kw)
+        return cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", min_gene_set_size=0, **kw)
+
+    @pytest.mark.parametrize("kind", ["pathway", "cluster"])
+    def test_background_is_annotated_genes_of_term2gene(self, monkeypatch, kind):
+        gbo_calls, seen = self._wire(monkeypatch, kind=kind)
+        result = self._call(kind, level=1, background="annotated")
+        assert len(gbo_calls) == 1
+        (bg,) = seen["background"].values()
+        assert bg == ["PMM0001", "PMM0002", "PMM0005", "PMM0009"]
+        assert result.params["background_mode"] == "annotated"
+
+    @pytest.mark.parametrize("kind", ["pathway", "cluster"])
+    def test_level_plus_term_ids_widens_to_the_whole_level(
+            self, monkeypatch, kind):
+        gbo_calls, seen = self._wire(monkeypatch, kind=kind)
+        self._call(kind, level=1, term_ids=["T1", "T2"],
+                   background="annotated", sources=["eggnog"])
+        assert len(gbo_calls) == 2
+        tested, universe = gbo_calls
+        assert tested["term_ids"] == ["T1", "T2"]
+        assert universe["term_ids"] is None
+        strip = lambda d: {k: v for k, v in d.items() if k != "term_ids"}  # noqa: E731
+        assert strip(tested) == strip(universe)
+        assert universe["sources"] == ["eggnog"]
+        (bg,) = seen["background"].values()
+        assert "PMM0009" in bg
+
+    @pytest.mark.parametrize("kind", ["pathway", "cluster"])
+    def test_term_ids_only_uses_union_of_requested_terms(
+            self, monkeypatch, kind):
+        gbo_calls, seen = self._wire(monkeypatch, kind=kind)
+        self._call(kind, term_ids=["T1", "T2"], background="annotated")
+        assert len(gbo_calls) == 1
+        (bg,) = seen["background"].values()
+        assert bg == ["PMM0001", "PMM0002", "PMM0005"]
+
+    @pytest.mark.parametrize("kind", ["pathway", "cluster"])
+    def test_validation_message_names_annotated(self, kind):
+        with pytest.raises(ValueError, match="'annotated'"):
+            self._call(kind, level=1, background="genome")

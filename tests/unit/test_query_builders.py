@@ -15766,6 +15766,42 @@ class TestTcdbFamilyWalkHintBuilders:
         assert "$locus_tags" in cypher
         assert params["metabolite_elements"] == ["P"]
 
+    @staticmethod
+    def _mbg_skipped_block(cypher):
+        return cypher.split("AS skipped")[0].rsplit("CALL {", 1)[1]
+
+    @pytest.mark.parametrize("mfilter", [
+        {"metabolite_ids": ["kegg.compound:C00009"]},
+        {"metabolite_elements": ["P"]},
+        {"metabolite_pathway_ids": ["kegg.pathway:map00190"]},
+    ])
+    def test_mbg_skipped_scoped_to_metabolite_filters(self, mfilter):
+        """backlog 2d.6: with a metabolite filter, a capped start is listed
+        only when its descendant systems carry a matching metabolite the gene
+        has no direct row for (same rule as the gbm hint)."""
+        cypher, _ = _qltc.build_metabolites_by_gene_tcdb_family_hint(
+            **_mbg_kw(**mfilter))
+        block = self._mbg_skipped_block(cypher)
+        assert "level_kind: 'tc_system'" in block
+        assert re.search(r"\bm\.", block), block
+        assert "gx.tcdb_gate = 'direct'" in block
+
+    def test_mbg_no_direct_genes_carry_capped_flag(self):
+        """backlog 2d.6: `capped` per no-direct gene (unscoped by metabolite
+        filters) so the api warning does not depend on the scoped list."""
+        cypher, _ = _qltc.build_metabolites_by_gene_tcdb_family_hint(
+            **_mbg_kw(metabolite_ids=["kegg.compound:C00009"]))
+        assert "capped: capped}" in cypher
+        assert "AS capped" in cypher
+
+    def test_mbg_skipped_unscoped_without_metabolite_filters(self):
+        """No metabolite filter: every capped start of the input genes is
+        listed (no substrate walk)."""
+        cypher, _ = _qltc.build_metabolites_by_gene_tcdb_family_hint(
+            **_mbg_kw())
+        block = self._mbg_skipped_block(cypher)
+        assert "tc_system" not in block
+
 
 class TestTcdbCleanupReviewFixes:
     """Stage-3 code-review regressions (tcdb-cleanup-surface)."""

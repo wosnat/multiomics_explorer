@@ -12550,6 +12550,44 @@ class TestGenesByOntologySizeFilteredWrapper:
         assert result.size_filtered_terms == 0
         assert result.size_filtered_genes == 0
 
+    @pytest.mark.asyncio
+    async def test_omitted_bounds_reach_api_as_defaults(self, tool_fns, mock_ctx):
+        """backlog 2d.8: omitted size bounds reach the api as its default
+        markers (so it can warn); explicit ones as plain ints."""
+        from multiomics_explorer.api.functions import _is_default_size
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            return_value=dict(self._BASE),
+        ) as m:
+            await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="go_bp",
+                organism="Prochlorococcus MED4", level=1,
+            )
+            kw = m.call_args.kwargs
+            assert kw["min_gene_set_size"] == 5
+            assert kw["max_gene_set_size"] == 500
+            assert _is_default_size(kw["min_gene_set_size"])
+            assert _is_default_size(kw["max_gene_set_size"])
+            await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="go_bp",
+                organism="Prochlorococcus MED4", level=1,
+                min_gene_set_size=5, max_gene_set_size=500,
+            )
+            kw = m.call_args.kwargs
+            assert not _is_default_size(kw["min_gene_set_size"])
+            assert not _is_default_size(kw["max_gene_set_size"])
+
+    @pytest.mark.asyncio
+    async def test_no_ctx_warning_without_api_size_warning(
+            self, tool_fns, mock_ctx):
+        """Explicit bounds: size_filtered_terms > 0 but the api emitted no
+        size warning, so the wrapper logs none either."""
+        api_return = {**self._BASE, "size_filtered_terms": 3,
+                      "size_filtered_genes": 1, "warnings": []}
+        await self._call(tool_fns, mock_ctx, api_return)
+        msgs = [c.args[0] for c in mock_ctx.warning.call_args_list]
+        assert not any("gene_set_size" in m for m in msgs), msgs
+
     def test_model_declares_int_fields(self, tool_fns):
         import typing
         fn = tool_fns["genes_by_ontology"]
@@ -14886,3 +14924,10 @@ class TestReleasePrepNotFoundPublicationDoisWrapper:
             result = await tool_fns["metabolites_by_flags_assay"](
                 mock_ctx, assay_ids=["bogus_assay"], summary=True)
         self._assert_model(result.not_found)
+
+
+@pytest.mark.parametrize("tool_name", ["pathway_enrichment", "cluster_enrichment"])
+def test_enrichment_background_describes_annotated_mode(tool_fns, tool_name):
+    """backlog 3.12: the background param names the annotated mode."""
+    desc = _param_description(tool_fns, tool_name, "background")
+    assert "'annotated'" in desc, desc

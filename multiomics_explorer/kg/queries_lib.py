@@ -11135,10 +11135,14 @@ def build_metabolites_by_gene_tcdb_family_hint(
     (shared metabolite filters, start rules 1-4, dedupe vs direct).
     `tcdb_family_substrates_skipped` [{locus_tag, tcdb_id,
     tcdb_substrate_count}]: input genes' walk starts (rules 1-3) over the
-    breadth cap. `tcdb_no_direct_genes` [{locus_tag, walkable}] (input
+    breadth cap; with a metabolite filter (metabolite_ids /
+    metabolite_elements / metabolite_pathway_ids / exclude_metabolite_ids)
+    only starts whose descendant systems carry a matching metabolite the
+    gene has no direct row for. `tcdb_no_direct_genes` [{locus_tag, walkable, capped}] (input
     order): input genes with gate-passing TCDB edges but no direct edge;
-    `walkable` is false when no start survives the cap (a superfamily-level
-    call, substrate unknown).
+    `walkable` is false when no start survives the cap; `capped` is true
+    when a start is over the cap (a superfamily-level call, substrate
+    unknown) -- independent of the metabolite filters.
     """
     conditions, params = _metabolites_by_gene_shared_where(
         locus_tags=locus_tags, organism=organism,
@@ -11148,15 +11152,26 @@ def build_metabolites_by_gene_tcdb_family_hint(
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
     )
-    gene_conditions, _ = _split_gene_metabolite_conditions(conditions)
+    gene_conditions, metabolite_conditions = _split_gene_metabolite_conditions(
+        conditions)
     gene_where = " AND ".join(gene_conditions)
     capped = _tcdb_walk_start_where(cap_op=">").replace("\n", "\n  ")
-    skipped_block = (
-        "  MATCH (g:Gene)-[gt:Gene_has_tcdb_family]->(a:TcdbFamily)\n"
-        f"  WHERE {gene_where}\n"
-        f"    AND {capped}\n"
-    )
+    if metabolite_conditions:
+        # backlog 2d.6: a metabolite filter scopes the skipped list like the
+        # gbm hint — a capped start counts only when its descendant systems
+        # carry a matching metabolite the gene has no direct row for.
+        skipped_block = _tcdb_walk_match(
+            conditions, anchor="gene", indent="  ", cap_op=">",
+        )
+    else:
+        skipped_block = (
+            "  MATCH (g:Gene)-[gt:Gene_has_tcdb_family]->(a:TcdbFamily)\n"
+            f"  WHERE {gene_where}\n"
+            f"    AND {capped}\n"
+        )
     walkable = _tcdb_walk_start_where().replace("\n", "\n    ")
+    # unscoped by metabolite filters: the api's superfamily warning needs it
+    capped_inner = _tcdb_walk_start_where(cap_op=">").replace("\n", "\n    ")
     gate_pass = _gate_pass_predicate(ONTOLOGY_CONFIG["tcdb"]["gate"], "gp")
     extra_calls = (
         "CALL {\n"
@@ -11169,10 +11184,13 @@ def build_metabolites_by_gene_tcdb_family_hint(
         "  WITH g, EXISTS {\n"
         "    MATCH (g)-[gt:Gene_has_tcdb_family]->(a:TcdbFamily)\n"
         f"    WHERE {walkable}\n"
-        "  } AS walkable\n"
+        "  } AS walkable, EXISTS {\n"
+        "    MATCH (g)-[gt:Gene_has_tcdb_family]->(a:TcdbFamily)\n"
+        f"    WHERE {capped_inner}\n"
+        "  } AS capped\n"
         "  ORDER BY apoc.coll.indexOf($locus_tags, g.locus_tag)\n"
-        "  RETURN collect({locus_tag: g.locus_tag, walkable: walkable})"
-        " AS no_direct\n"
+        "  RETURN collect({locus_tag: g.locus_tag, walkable: walkable,"
+        " capped: capped}) AS no_direct\n"
         "}\n"
     )
     cypher = _tcdb_family_hint_cypher(

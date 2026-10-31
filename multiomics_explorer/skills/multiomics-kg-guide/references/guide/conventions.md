@@ -64,8 +64,8 @@ only the envelope (`results=[]`, `returned=0`; `truncated` is `true`
 whenever rows were withheld and `false` when nothing matched). Use it as the **first call** for any
 question that doesn't already specify exact IDs. Pattern: `summary=True`
 → narrow filters → drop `summary=True` for detail. The envelope is
-usually smaller than a 5-row page, but larger on `list_organisms`,
-`list_publications`, `list_experiments` and `resolve_gene`. On
+smaller than a 5-row page (rollups stay capped at 10), except an
+organism-wide `differential_expression_by_gene` call. On
 `metabolites_by_gene` the envelope is computed over the whole locus-tag
 batch, so `summary=True` on 50+ genes costs as much as a detail call.
 

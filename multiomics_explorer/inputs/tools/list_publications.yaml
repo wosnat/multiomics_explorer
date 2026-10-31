@@ -556,6 +556,6 @@ mistakes:
   - wrong: "list_experiments(publication='Biller 2018')"
     right: "list_publications(author='Biller') then list_experiments(publication_dois=['10.1038/...'])"
   - "`publication_dois` combines with the other filters via AND, and `not_found` lists any provided DOI that did not match — the same shape as `experiment_ids` on the sibling `list_*` tools."
-  - "`compartment` keeps publications with at least one experiment in that compartment — it is not a per-publication property. `summary=True` returns every `by_*` rollup uncapped (by_organism alone lists every organism with a paper), so it is larger than the default call; use it when you need the full breakdowns."
+  - "`compartment` keeps publications with at least one experiment in that compartment — it is not a per-publication property. `by_organism` and `by_metric_type` are capped at 10 entries on every call, `summary=True` included (`<key>_truncated: true` when trimmed). For a per-organism publication count across every organism, use list_organisms (`publication_count`)."
   - "Unknown treatment_type / background_factors / growth_phases values return 0 rows with a warning listing the valid values; check list_filter_values first."
   - "`organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works."
