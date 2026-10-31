@@ -239,7 +239,7 @@ top_annotation_capability:
   organism_name: Alteromonas mediterranea AltDE1
   peptidase_gene_count: 116
   preferred_name: Alteromonas mediterranea AltDE1
-- interpro_gene_count: 3953
+- interpro_gene_count: 3952
   ncbifam_gene_count: 1453
   nonpeptidase_homolog_gene_count: 33
   organism_name: Ruegeria pomeroyi DSS-3
@@ -389,7 +389,7 @@ top_annotation_capability:
   organism_name: Synechococcus CB0205
   peptidase_gene_count: 71
   preferred_name: Synechococcus CB0205
-- interpro_gene_count: 1923
+- interpro_gene_count: 1922
   ncbifam_gene_count: 883
   nonpeptidase_homolog_gene_count: 10
   organism_name: Prochlorococcus MIT1327
@@ -659,7 +659,7 @@ top_annotation_capability:
   organism_name: Prochlorococcus MIT0602
   peptidase_gene_count: 51
   preferred_name: Prochlorococcus MIT0602
-- interpro_gene_count: 1525
+- interpro_gene_count: 1524
   ncbifam_gene_count: 760
   nonpeptidase_homolog_gene_count: 8
   organism_name: Prochlorococcus SB
@@ -677,7 +677,7 @@ top_annotation_capability:
   organism_name: Prochlorococcus MED4
   peptidase_gene_count: 50
   preferred_name: Prochlorococcus MED4
-- interpro_gene_count: 1600
+- interpro_gene_count: 1599
   ncbifam_gene_count: 770
   nonpeptidase_homolog_gene_count: 8
   organism_name: Prochlorococcus MIT0604
@@ -707,7 +707,7 @@ top_annotation_capability:
   organism_name: Prochlorococcus MIT9515
   peptidase_gene_count: 50
   preferred_name: Prochlorococcus MIT9515
-- interpro_gene_count: 1567
+- interpro_gene_count: 1566
   ncbifam_gene_count: 775
   nonpeptidase_homolog_gene_count: 10
   organism_name: Prochlorococcus NATL2A
@@ -731,7 +731,7 @@ top_annotation_capability:
   organism_name: Prochlorococcus LG
   peptidase_gene_count: 49
   preferred_name: Prochlorococcus LG
-- interpro_gene_count: 1535
+- interpro_gene_count: 1534
   ncbifam_gene_count: 746
   nonpeptidase_homolog_gene_count: 8
   organism_name: Prochlorococcus MIT9116
@@ -743,7 +743,7 @@ top_annotation_capability:
   organism_name: Prochlorococcus MIT9301
   peptidase_gene_count: 49
   preferred_name: Prochlorococcus MIT9301
-- interpro_gene_count: 1579
+- interpro_gene_count: 1578
   ncbifam_gene_count: 767
   nonpeptidase_homolog_gene_count: 8
   organism_name: Prochlorococcus MIT9302
@@ -797,13 +797,13 @@ top_annotation_capability:
   organism_name: Prochlorococcus GP2
   peptidase_gene_count: 48
   preferred_name: Prochlorococcus GP2
-- interpro_gene_count: 1537
+- interpro_gene_count: 1536
   ncbifam_gene_count: 749
   nonpeptidase_homolog_gene_count: 8
   organism_name: Prochlorococcus MIT9107
   peptidase_gene_count: 48
   preferred_name: Prochlorococcus MIT9107
-- interpro_gene_count: 1547
+- interpro_gene_count: 1546
   ncbifam_gene_count: 749
   nonpeptidase_homolog_gene_count: 8
   organism_name: Prochlorococcus MIT9123

@@ -533,7 +533,7 @@ search_ontology(search_text="nitrate", limit=2)
 ```example-response
 {
   "mode": "search",
-  "total_entries": 58185,
+  "total_entries": 58147,
   "total_matching": 208,
   "score_max": 11.335722923278809,
   "score_median": 3.41845965385437,
@@ -846,7 +846,7 @@ search_ontology(search_text="P-loop", ontology=["interpro"], interpro_type="HOMO
 ```example-response
 {
   "mode": "search",
-  "total_entries": 13352,
+  "total_entries": 13314,
   "total_matching": 51,
   "score_max": 9.792551040649414,
   "score_median": 1.570216178894043,
@@ -856,7 +856,7 @@ search_ontology(search_text="P-loop", ontology=["interpro"], interpro_type="HOMO
   "by_ontology": [
     {
       "ontology": "interpro",
-      "total_entries": 13352,
+      "total_entries": 13314,
       "total_matching": 51,
       "score_max": 9.792551040649414,
       "returned": 5,

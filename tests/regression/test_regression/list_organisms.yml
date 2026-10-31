@@ -1130,7 +1130,7 @@ rows:
   go_transport_metabolite_count: 35
   growth_phases:
   - acute_stress
-  interpro_gene_count: 1600
+  interpro_gene_count: 1599
   measured_metabolite_count: 0
   ncbi_taxon_id: 1501268
   ncbifam_gene_count: 770
@@ -1341,7 +1341,7 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 44
   growth_phases: []
-  interpro_gene_count: 1923
+  interpro_gene_count: 1922
   measured_metabolite_count: 0
   ncbi_taxon_id: 1801626
   ncbifam_gene_count: 883
@@ -1374,7 +1374,7 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 33
   growth_phases: []
-  interpro_gene_count: 1537
+  interpro_gene_count: 1536
   measured_metabolite_count: 0
   ncbi_taxon_id: 59921
   ncbifam_gene_count: 749
@@ -1409,7 +1409,7 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 33
   growth_phases: []
-  interpro_gene_count: 1535
+  interpro_gene_count: 1534
   measured_metabolite_count: 0
   ncbi_taxon_id: 167544
   ncbifam_gene_count: 746
@@ -1444,7 +1444,7 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 33
   growth_phases: []
-  interpro_gene_count: 1547
+  interpro_gene_count: 1546
   measured_metabolite_count: 0
   ncbi_taxon_id: 167545
   ncbifam_gene_count: 749
@@ -1665,7 +1665,7 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 36
   growth_phases: []
-  interpro_gene_count: 1579
+  interpro_gene_count: 1578
   measured_metabolite_count: 0
   ncbi_taxon_id: 74545
   ncbifam_gene_count: 767
@@ -2120,7 +2120,7 @@ rows:
   - infected
   - nutrient_limited
   - recovery
-  interpro_gene_count: 1567
+  interpro_gene_count: 1566
   measured_metabolite_count: 0
   ncbi_taxon_id: 59920
   ncbifam_gene_count: 775
@@ -2228,7 +2228,7 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 44
   growth_phases: []
-  interpro_gene_count: 1525
+  interpro_gene_count: 1524
   measured_metabolite_count: 0
   ncbi_taxon_id: 59926
   ncbifam_gene_count: 760
@@ -2495,7 +2495,7 @@ rows:
   - acclimated_steady_state
   - exponential
   - unknown
-  interpro_gene_count: 3953
+  interpro_gene_count: 3952
   measured_metabolite_count: 0
   ncbi_taxon_id: 89184
   ncbifam_gene_count: 1453

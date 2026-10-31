@@ -384,20 +384,6 @@ rows:
   q1_genes_per_term: 1.0
   q3_genes_per_term: 1.0
   relevance_rank: 29
-- best_effort_share: null
-  genome_coverage: 0.5915
-  interpro_type: FAMILY
-  level: 0
-  max_genes_per_term: 9
-  median_genes_per_term: 1.0
-  min_genes_per_term: 1
-  n_genes_at_level: 1167
-  n_levels_in_ontology: 3
-  n_terms_with_genes: 1158
-  ontology_type: interpro
-  q1_genes_per_term: 1.0
-  q3_genes_per_term: 1.0
-  relevance_rank: 30
 - best_effort_share: 0.7778
   genome_coverage: 0.1972
   level: 3
@@ -410,6 +396,20 @@ rows:
   ontology_type: go_cc
   q1_genes_per_term: 1.0
   q3_genes_per_term: 9.0
+  relevance_rank: 30
+- best_effort_share: null
+  genome_coverage: 0.5884
+  interpro_type: FAMILY
+  level: 0
+  max_genes_per_term: 9
+  median_genes_per_term: 1.0
+  min_genes_per_term: 1
+  n_genes_at_level: 1161
+  n_levels_in_ontology: 3
+  n_terms_with_genes: 1148
+  ontology_type: interpro
+  q1_genes_per_term: 1.0
+  q3_genes_per_term: 1.0
   relevance_rank: 31
 - best_effort_share: null
   genome_coverage: 0.556
@@ -473,7 +473,7 @@ rows:
   min_genes_per_term: 1
   n_genes_at_level: 898
   n_levels_in_ontology: 3
-  n_terms_with_genes: 979
+  n_terms_with_genes: 980
   ontology_type: interpro
   q1_genes_per_term: 1.0
   q3_genes_per_term: 2.0
@@ -671,15 +671,15 @@ rows:
   tree: trna_biogenesis
   tree_code: ko03016
 - best_effort_share: null
-  genome_coverage: 0.1399
+  genome_coverage: 0.1419
   interpro_type: FAMILY
   level: 1
   max_genes_per_term: 4
   median_genes_per_term: 1.0
   min_genes_per_term: 1
-  n_genes_at_level: 276
+  n_genes_at_level: 280
   n_levels_in_ontology: 3
-  n_terms_with_genes: 270
+  n_terms_with_genes: 274
   ontology_type: interpro
   q1_genes_per_term: 1.0
   q3_genes_per_term: 1.0
@@ -730,15 +730,15 @@ rows:
   tree: ribosome
   tree_code: ko03011
 - best_effort_share: null
-  genome_coverage: 0.1257
+  genome_coverage: 0.1262
   interpro_type: CONSERVED_SITE
   level: 0
   max_genes_per_term: 20
   median_genes_per_term: 1.0
   min_genes_per_term: 1
-  n_genes_at_level: 248
+  n_genes_at_level: 249
   n_levels_in_ontology: 3
-  n_terms_with_genes: 185
+  n_terms_with_genes: 186
   ontology_type: interpro
   q1_genes_per_term: 1.0
   q3_genes_per_term: 1.0

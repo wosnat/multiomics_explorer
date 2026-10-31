@@ -9,7 +9,7 @@ by_ontology:
 - ontology: interpro
   returned: 5
   score_max: null
-  total_entries: 13352
+  total_entries: 13314
   total_matching: 74
   truncated: true
 case_id: search_ontology_browse_interpro_med4_scoped
@@ -71,7 +71,7 @@ row_count: 5
 score_max: null
 score_median: null
 skipped_ontologies: []
-total_entries: 13352
+total_entries: 13314
 total_matching: 74
 truncated: true
 warnings: []
