@@ -4189,6 +4189,32 @@ class TestDETreatmentBackgroundApi:
             "treatment_type value 'dielx' matched nothing"
         )
 
+    def test_de_by_gene_case_variant_treatment_type_no_warning(self, mock_conn):
+        """The DE filter matches case-insensitively, so 'Diel' must not warn."""
+        mock_conn.execute_query.side_effect = self._by_gene_side_effect()
+        with patch(
+            "multiomics_explorer.api.functions._read_vocab_values",
+            return_value=self._VOCAB,
+        ):
+            result = api.differential_expression_by_gene(
+                organism="MED4", treatment_type=["Diel"],
+                background_factors=["AXENIC"], conn=mock_conn,
+            )
+        assert result["warnings"] == []
+
+    def test_closed_vocab_case_insensitive_params(self, mock_conn):
+        """Case-insensitive filters compare lower-cased; exact filters stay exact."""
+        with patch(
+            "multiomics_explorer.api.functions._read_vocab_values",
+            return_value={**self._VOCAB, "values": ["diel", "vesicle"]},
+        ):
+            assert api._closed_vocab_warnings(
+                mock_conn, treatment_type=["DIEL"], growth_phases=["Diel"],
+                omics_type="diel", background_factors=["Diel"],
+            ) == []
+            out = api._closed_vocab_warnings(mock_conn, compartment="Vesicle")
+        assert len(out) == 1 and "'Vesicle'" in out[0]
+
     def test_de_by_ortholog_filters_reach_builders(self, mock_conn):
         mock_conn.execute_query.side_effect = self._by_ortholog_side_effect()
         with patch(
@@ -17658,7 +17684,8 @@ class TestCanonicalizeMetaboliteIds:
         assert "chebi.role:33229" in w
         assert "vitamin (role)" in w
         assert "not a metabolite" in w
-        assert "run_cypher" in w
+        assert "run_cypher" not in w
+        assert "genes_by_metabolite" in w and "metabolites_by_gene" in w
 
     def test_role_id_itself_kept_verbatim_with_warning(self):
         conn = _AliasConn(roles={"chebi.role:33229": [

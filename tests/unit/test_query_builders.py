@@ -4007,6 +4007,18 @@ class TestBuildSearchHomologGroupsSummary:
         assert "by_level" in cypher
         assert "total_entries" in cypher
 
+    def test_facets_count_each_group_once(self):
+        """Role / COG joins are aggregated per group before the envelope
+        facets, so by_source / by_level / scores see one entry per group
+        (no role x COG cross product)."""
+        cypher, _ = build_search_homolog_groups_summary(search_text="test")
+        cr_at = cypher.index("Og_has_cyanorak_role")
+        cc_at = cypher.index("Og_in_cog_category")
+        between = cypher[cr_at:cc_at]
+        assert "collect(DISTINCT" in between, "roles must collapse per group first"
+        assert "collect(og.source)" in cypher
+        assert "collect(og.taxonomic_level)" in cypher
+
     def test_with_source_filter(self):
         cypher, params = build_search_homolog_groups_summary(
             search_text="test", source="cyanorak")
@@ -4682,6 +4694,15 @@ class TestClusteringAnalysisWhere:
         assert "background_factors" in conditions[0]
         assert params["background_factors"] == ["axenic"]
 
+    def test_treatment_and_background_case_insensitive(self):
+        from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
+        conditions, params = _clustering_analysis_where(
+            treatment_type=["Nitrogen"], background_factors=["Axenic"])
+        assert "toLower(tt) IN $treatment_type" in conditions[0]
+        assert "toLower(bf) IN $background_factors" in conditions[1]
+        assert params["treatment_type"] == ["nitrogen"]
+        assert params["background_factors"] == ["axenic"]
+
     def test_combined_filters(self):
         from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
         conditions, params = _clustering_analysis_where(
@@ -4873,6 +4894,19 @@ class TestBuildGeneClustersByGeneSummary:
         assert "$background_factors" in cypher
         assert "ca.background_factors" in cypher
         assert params["background_factors"] == ["axenic"]
+
+    def test_treatment_and_background_case_insensitive(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_gene_clusters_by_gene, build_gene_clusters_by_gene_summary)
+        for builder in (build_gene_clusters_by_gene_summary,
+                        build_gene_clusters_by_gene):
+            cypher, params = builder(
+                locus_tags=["PMM0370"], treatment_type=["Nitrogen"],
+                background_factors=["Axenic"])
+            assert "toLower(tt) IN $treatment_type" in cypher
+            assert "toLower(bf) IN $background_factors" in cypher
+            assert params["treatment_type"] == ["nitrogen"]
+            assert params["background_factors"] == ["axenic"]
 
     def test_with_analysis_ids_filter(self):
         from multiomics_explorer.kg.queries_lib import build_gene_clusters_by_gene_summary
@@ -9407,6 +9441,16 @@ class TestBuildListMetabolitesPhase1Plumbing:
         assert "measured_paper_count" in cypher
         assert "measured_organisms" in cypher
         assert "measured_compartments" in cypher
+
+    def test_summary_paper_counts_skip_optional_null_row(self):
+        """An empty filter leaves one null `m` from OPTIONAL MATCH; it must
+        not land in by_paper_count as a phantom paper_count=0 metabolite."""
+        for kw in ({}, {"search_text": "glucose"}):
+            cypher, _ = self._build_summary(**kw)
+            assert ("collect(CASE WHEN m IS NOT NULL THEN "
+                    "coalesce(m.measured_paper_count, 0) END) AS paper_counts"
+                    ) in cypher
+            assert "collect(coalesce(m.measured_paper_count, 0))" not in cypher
 
     def test_summary_returns_by_measurement_coverage(self):
         cypher, _ = self._build_summary()

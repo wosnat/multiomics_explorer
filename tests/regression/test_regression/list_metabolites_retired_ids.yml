@@ -193,8 +193,8 @@ warnings:
 - '''kegg.compound:C00525'' was removed; its paper measurements now live on kegg.compound:C00078
   (L-Tryptophan) — pass that id to see them.'
 - '''chebi:10004'' is the chemical role ''vitamin (role)'' (chebi.role:33229), not
-  a metabolite — TCDB families that transport it are reachable through run_cypher
-  (see docs://analysis/metabolites).'
+  a metabolite — pass it to genes_by_metabolite / metabolites_by_gene for the genes
+  that transport it (see docs://analysis/metabolites).'
 xref_coverage:
   with_chebi: 1
   with_hmdb: 0

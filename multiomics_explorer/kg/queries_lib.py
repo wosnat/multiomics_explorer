@@ -3231,7 +3231,8 @@ def build_list_metabolites_summary(
             "     count(m.mnxm_id) AS with_mnxm,\n"
             "     collect(m.mass) AS masses,\n"
             "     collect(score) AS scores,\n"
-            "     collect(coalesce(m.measured_paper_count, 0)) AS paper_counts,\n"
+            "     collect(CASE WHEN m IS NOT NULL THEN "
+            "coalesce(m.measured_paper_count, 0) END) AS paper_counts,\n"
             "     apoc.coll.flatten(\n"
             "       collect(coalesce(m.measured_compartments, []))) AS m_comps,\n"
             "     collect(m.structure_kind) AS sks,\n"
@@ -3292,7 +3293,8 @@ def build_list_metabolites_summary(
             "     count(m.hmdb_id) AS with_hmdb,\n"
             "     count(m.mnxm_id) AS with_mnxm,\n"
             "     collect(m.mass) AS masses,\n"
-            "     collect(coalesce(m.measured_paper_count, 0)) AS paper_counts,\n"
+            "     collect(CASE WHEN m IS NOT NULL THEN "
+            "coalesce(m.measured_paper_count, 0) END) AS paper_counts,\n"
             "     apoc.coll.flatten(\n"
             "       collect(coalesce(m.measured_compartments, []))) AS m_comps,\n"
             "     collect(m.structure_kind) AS sks,\n"
@@ -6697,19 +6699,22 @@ def build_search_homolog_groups_summary(
         "CALL db.index.fulltext.queryNodes('orthologGroupFullText', $search_text)\n"
         "YIELD node AS og, score\n"
         f"{where_block}"
+        # Collapse the role and COG joins per group before aggregating, so
+        # every facet (by_source / by_level / score stats / top_* counts)
+        # sees each matching group exactly once — no role x COG product.
         "OPTIONAL MATCH (og)-[:Og_has_cyanorak_role]->(cr:CyanorakRole)\n"
+        "WITH og, score, collect(DISTINCT cr.id + ' | ' + cr.name) AS og_cr\n"
         "OPTIONAL MATCH (og)-[:Og_in_cog_category]->(cc:CogFunctionalCategory)\n"
-        "WITH collect({src: og.source, lvl: og.taxonomic_level,\n"
-        "              cr_id: cr.id, cr_name: cr.name,\n"
-        "              cc_id: cc.id, cc_name: cc.name}) AS rows,\n"
+        "WITH og, score, og_cr,\n"
+        "     collect(DISTINCT cc.id + ' | ' + cc.name) AS og_cc\n"
+        "WITH collect(og.source) AS sources,\n"
+        "     collect(og.taxonomic_level) AS levels,\n"
+        "     apoc.coll.flatten(collect(og_cr)) AS cr_items,\n"
+        "     apoc.coll.flatten(collect(og_cc)) AS cc_items,\n"
         "     count(DISTINCT og) AS total_matching,\n"
         "     max(score) AS score_max,\n"
         "     percentileDisc(score, 0.5) AS score_median\n"
         "CALL { MATCH (all_og:OrthologGroup) RETURN count(all_og) AS total_entries }\n"
-        "WITH *, [r IN rows | r.src] AS sources,\n"
-        "        [r IN rows | r.lvl] AS levels,\n"
-        "        [r IN rows WHERE r.cr_id IS NOT NULL | r.cr_id + ' | ' + r.cr_name] AS cr_items,\n"
-        "        [r IN rows WHERE r.cc_id IS NOT NULL | r.cc_id + ' | ' + r.cc_name] AS cc_items\n"
         "WITH total_entries, total_matching, score_max, score_median,\n"
         "     apoc.coll.frequencies(sources) AS by_source,\n"
         "     apoc.coll.frequencies(levels) AS by_level,\n"
@@ -7758,18 +7763,18 @@ def _clustering_analysis_where(
         params["cluster_type"] = cluster_type
     if treatment_type is not None:
         conditions.append(
-            "ANY(tt IN ca.treatment_type WHERE tt IN $treatment_type)"
+            "ANY(tt IN ca.treatment_type WHERE toLower(tt) IN $treatment_type)"
         )
-        params["treatment_type"] = treatment_type
+        params["treatment_type"] = [t.lower() for t in treatment_type]
     if omics_type:
         conditions.append("toUpper(ca.omics_type) IN $omics_types")
         params["omics_types"] = [t.upper() for t in omics_type]
     if background_factors is not None:
         conditions.append(
             "ANY(bf IN coalesce(ca.background_factors, [])"
-            " WHERE bf IN $background_factors)"
+            " WHERE toLower(bf) IN $background_factors)"
         )
-        params["background_factors"] = background_factors
+        params["background_factors"] = [bf.lower() for bf in background_factors]
     if growth_phases is not None:
         conditions.append(
             "ANY(gp IN coalesce(ca.growth_phases, [])"
@@ -8011,13 +8016,13 @@ def build_gene_clusters_by_gene_summary(
         params["cluster_type"] = cluster_type
     if treatment_type is not None:
         ca_conditions.append(
-            "ANY(tt IN ca.treatment_type WHERE tt IN $treatment_type)")
-        params["treatment_type"] = treatment_type
+            "ANY(tt IN ca.treatment_type WHERE toLower(tt) IN $treatment_type)")
+        params["treatment_type"] = [t.lower() for t in treatment_type]
     if background_factors is not None:
         ca_conditions.append(
             "ANY(bf IN coalesce(ca.background_factors, [])"
-            " WHERE bf IN $background_factors)")
-        params["background_factors"] = background_factors
+            " WHERE toLower(bf) IN $background_factors)")
+        params["background_factors"] = [bf.lower() for bf in background_factors]
     if analysis_ids is not None:
         ca_conditions.append("ca.id IN $analysis_ids")
         params["analysis_ids"] = analysis_ids
@@ -8101,13 +8106,13 @@ def build_gene_clusters_by_gene(
         params["cluster_type"] = cluster_type
     if treatment_type is not None:
         ca_conditions.append(
-            "ANY(tt IN ca.treatment_type WHERE tt IN $treatment_type)")
-        params["treatment_type"] = treatment_type
+            "ANY(tt IN ca.treatment_type WHERE toLower(tt) IN $treatment_type)")
+        params["treatment_type"] = [t.lower() for t in treatment_type]
     if background_factors is not None:
         ca_conditions.append(
             "ANY(bf IN coalesce(ca.background_factors, [])"
-            " WHERE bf IN $background_factors)")
-        params["background_factors"] = background_factors
+            " WHERE toLower(bf) IN $background_factors)")
+        params["background_factors"] = [bf.lower() for bf in background_factors]
     if analysis_ids is not None:
         ca_conditions.append("ca.id IN $analysis_ids")
         params["analysis_ids"] = analysis_ids

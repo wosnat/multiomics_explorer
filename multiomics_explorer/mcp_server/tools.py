@@ -6888,6 +6888,15 @@ def register_tools(mcp: FastMCP):
         returned: int
         truncated: bool
         offset: int = 0
+        filters_applied: dict = Field(default_factory=dict,
+            description="Echo of the trust filters that were actually set on this call.")
+        trust_axes: dict[str, list[str]] = Field(default_factory=dict,
+            description="Trust axes each surveyed ontology carries, keyed by ontology.")
+        skipped_ontologies: list[dict] = Field(default_factory=list,
+            description="Multi-ontology: [{ontology, reason}] for ontologies dropped "
+                        "because a filter/facet only some of the queried ontologies own.")
+        warnings: list[str] = Field(default_factory=list,
+            description="Auto-warnings, incl. skipped-ontology and trust-filter notices.")
         results: list[OntologyLandscapeRow] = Field(default_factory=list)
 
     @mcp.tool(
@@ -6957,7 +6966,13 @@ def register_tools(mcp: FastMCP):
                 call_class=call_class, tcdb_call=tcdb_call, interpro_type=interpro_type,
                 conn=conn,
             )
-            return OntologyLandscapeResponse(**data)
+            response = OntologyLandscapeResponse(**data)
+            for w in response.warnings:
+                await ctx.warning(w)
+            if response.skipped_ontologies:
+                await ctx.warning(
+                    f"skipped_ontologies: {response.skipped_ontologies}")
+            return response
         except ValueError as e:
             await ctx.warning(f"ontology_landscape error: {e}")
             raise ToolError(str(e))

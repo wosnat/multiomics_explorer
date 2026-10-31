@@ -695,6 +695,15 @@ class TestSearchHomologGroupsContract:
         assert set(result.keys()) == expected_keys
         assert result["total_matching"] >= 5
 
+    def test_facets_count_distinct_groups(self, conn):
+        result = api.search_homolog_groups("nitrogen", summary=True, conn=conn)
+        n = result["total_matching"]
+        assert n > 0
+        assert sum(r["count"] for r in result["by_source"]) == n
+        assert sum(r["count"] for r in result["by_level"]) == n
+        assert all(r["count"] <= n for r in result["top_cyanorak_roles"])
+        assert all(r["count"] <= n for r in result["top_cog_categories"])
+
     def test_result_keys_compact(self, conn):
         result = api.search_homolog_groups("photosynthesis", conn=conn)
         expected_keys = {
@@ -1242,6 +1251,12 @@ class TestGenesByNumericMetricContract:
 @pytest.mark.kg
 class TestListMetabolitesContract:
     """Pin the envelope + per-row schema for list_metabolites."""
+
+    def test_empty_match_has_empty_paper_count_facet(self, conn):
+        r = api.list_metabolites(
+            metabolite_ids=["chebi.role:33229"], summary=True, conn=conn)
+        assert r["total_matching"] == 0
+        assert r["by_measurement_coverage"]["by_paper_count"] == []
 
     EXPECTED_ENVELOPE_KEYS = {
         "total_entries", "total_matching",

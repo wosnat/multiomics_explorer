@@ -2,30 +2,30 @@ case_id: search_homolog_groups_summary_source_filter
 row_count: 1
 rows:
 - by_level:
-  - '{''count'': 487, ''item'': ''curated''}'
+  - '{''count'': 274, ''item'': ''curated''}'
   by_source:
-  - '{''count'': 487, ''item'': ''cyanorak''}'
+  - '{''count'': 274, ''item'': ''cyanorak''}'
   score_max: 3.8851
-  score_median: 1.0954
+  score_median: 1.1421
   top_cog_categories:
-  - '{''id'': ''cog.category:C'', ''count'': 197, ''name'': ''Energy production and
+  - '{''id'': ''cog.category:C'', ''count'': 112, ''name'': ''Energy production and
     conversion''}'
-  - '{''id'': ''cog.category:G'', ''count'': 18, ''name'': ''Carbohydrate transport
+  - '{''id'': ''cog.category:G'', ''count'': 11, ''name'': ''Carbohydrate transport
     and metabolism''}'
-  - '{''id'': ''cog.category:H'', ''count'': 28, ''name'': ''Coenzyme transport and
+  - '{''id'': ''cog.category:H'', ''count'': 23, ''name'': ''Coenzyme transport and
     metabolism''}'
-  - '{''id'': ''cog.category:P'', ''count'': 16, ''name'': ''Inorganic ion transport
+  - '{''id'': ''cog.category:P'', ''count'': 8, ''name'': ''Inorganic ion transport
     and metabolism''}'
-  - '{''id'': ''cog.category:S'', ''count'': 151, ''name'': ''Function unknown''}'
+  - '{''id'': ''cog.category:S'', ''count'': 86, ''name'': ''Function unknown''}'
   top_cyanorak_roles:
-  - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 46, ''name'': ''Cellular processes
+  - '{''id'': ''cyanorak.role:D.1.2'', ''count'': 45, ''name'': ''Cellular processes
     > Adaptation/acclimation to atypical conditions and detoxification > Light''}'
-  - '{''id'': ''cyanorak.role:G.2'', ''count'': 62, ''name'': ''Energy metabolism
+  - '{''id'': ''cyanorak.role:G.2'', ''count'': 59, ''name'': ''Energy metabolism
     > Electron transport''}'
-  - '{''id'': ''cyanorak.role:J'', ''count'': 40, ''name'': ''Photosynthesis and respiration''}'
-  - '{''id'': ''cyanorak.role:J.2'', ''count'': 43, ''name'': ''Photosynthesis and
+  - '{''id'': ''cyanorak.role:J'', ''count'': 39, ''name'': ''Photosynthesis and respiration''}'
+  - '{''id'': ''cyanorak.role:J.2'', ''count'': 37, ''name'': ''Photosynthesis and
     respiration > CO2 fixation''}'
-  - '{''id'': ''cyanorak.role:J.8'', ''count'': 43, ''name'': ''Photosynthesis and
+  - '{''id'': ''cyanorak.role:J.8'', ''count'': 42, ''name'': ''Photosynthesis and
     respiration > Photosystem II''}'
   total_entries: 70426
   total_matching: 274
