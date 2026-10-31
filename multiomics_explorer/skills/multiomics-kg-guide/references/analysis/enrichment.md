@@ -320,8 +320,8 @@ comparable between runs with the same setting; raw `pvalue` is unaffected.
 
 **What the flag actually covers (live KG).** GO roots (`go:0008150`,
 `go:0003674`, `go:0005575`) and other root / catch-all terms are flagged. KEGG
-is flagged at two levels: KO catch-alls (`K…; uncharacterized protein`, 212 of
-4,644 KOs) and the global / overview pathway maps — `kegg.pathway:ko01100`
+is flagged at two levels: KO catch-alls (`K…; uncharacterized protein`, 216 of
+4,808 KOs) and the global / overview pathway maps — `kegg.pathway:ko01100`
 "Metabolic pathways" (519 of 1,973 MED4 genes, 26%), `ko01110`, `ko01120` and
 the `ko012xx` block, 11 of the 13 parentless pathway nodes — so a `level=2`
 KEGG run under `informative_only=True` has those rows removed. `ko01310`

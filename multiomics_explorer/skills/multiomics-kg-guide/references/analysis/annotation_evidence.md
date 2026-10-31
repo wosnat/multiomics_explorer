@@ -111,8 +111,8 @@ across ontologies compare only with the live caveat below in mind.
 **Live state (current build).** The rung is derived from `sources` at KG
 build time, uniformly across every edge type: any curated source (`cyanorak`,
 `uniprot`, `ncbi`) ⇒ `curated`; an `eggnog` source with no curated source ⇒
-`family_inferred` (an orthology transfer — GO-BP ~434k edges, GO-MF ~180k,
-GO-CC ~100k, EC 11.7k, Pfam 24.7k, CAZy 744 are eggNOG-only); InterProScan-only
+`family_inferred` (an orthology transfer — GO-BP ~776k edges, GO-MF ~311k,
+GO-CC ~209k, EC ~23k, Pfam ~52k, CAZy ~2k are eggNOG-only); InterProScan-only
 ⇒ the recorded signature strength (`signature` on Pfam, `family_inferred` /
 `domain_inferred` elsewhere). The one asymmetry is deliberate: an
 `['eggnog','interproscan']` pair reads `signature` on Pfam (the HMM hit is the
@@ -378,7 +378,7 @@ families (a **router** — InterPro's function-inference relation is
 recall-biased and should never be read as "this gene has this EC/CAZy
 function," only "this InterPro entry family clusters with this
 EC/CAZy family"), NCBIfam families to TIGR roles
-(`Ncbifam_family_has_tigr_role`, 1,847 edges, all from `TIGR*`-prefixed
+(`Ncbifam_family_has_tigr_role`, 1,865 edges, all from `TIGR*`-prefixed
 families — also a router: only the `equivalog` subset licenses a gene-level
 `Gene_has_tigr_role` edge (`evidence='family_inferred'`); the other family
 types reach a role through the bridge only), and KEGG terms to BRITE

@@ -1,0 +1,78 @@
+# Backtick-quoted snake_case identifiers that hand-authored docs may quote even
+# though no tool param, response field, package name, schema_baseline label /
+# property or vocab-snapshot value carries them. Read by
+# scripts/build_about_content.py `lint_outfacing_identifiers` (backlog 2.14;
+# wired into `--lint`, gated by tests/unit/test_docs_surface_guards.py).
+#
+# Add a token only when it is intentional — a live KG data value outside the
+# vocab snapshot, a placeholder, a "there is no `foo_bar`" statement. A token
+# flagged because a param / field was renamed is a doc bug: fix the doc (and
+# add the old name to stale_identifiers.yaml).
+#
+# Entry fields:
+#   tokens   list of identifiers
+#   reason   why they are legitimate
+
+- tokens: [multiomics_explorer, multiomics_biocypher_kg]
+  reason: package / repository names.
+
+- tokens: [no_evidence, catch_all_only, informative_single, informative_multi]
+  reason: Gene.annotation_state values (the [AQ] ladder); not in the vocab snapshot.
+
+- tokens:
+    - tigr_mainrole
+    - tigr_subrole
+    - brite_class
+    - brite_subclass
+    - brite_family
+    - brite_subfamily
+    - cazy_class
+    - cazy_family
+    - cazy_subfamily
+    - merops_clan
+    - merops_family
+    - merops_subfamily
+  reason: ontology-term level_kind values (level_kind is skipped by the vocab snapshot; cazy_subfamily is a listed but unpopulated vocabulary value).
+
+- tokens: [transcription_factors, two_component, translation_factors, trna_biogenesis, dna_replication]
+  reason: BriteCategory.tree values (the `tree=` param of the BRITE tools).
+
+- tokens: [hypoth_equivalog, equivalog_domain, hypoth_equivalog_domain]
+  reason: NcbifamFamily.family_type values.
+
+- tokens: [abc_numbering, tcdb_name]
+  reason: TcdbFamily.direction_basis values.
+
+- tokens: [energy_metabolism]
+  reason: TigrRole.code slug of a mainrole (worked example on the tigr_role page).
+
+- tokens: [part_of, cellular_component]
+  reason: GO relation name and GO-CC root term name.
+
+- tokens: [multi_source, high_trust_assertion, not_domain_inferred]
+  reason: evidence_score_signals values (composite score inputs from ControlledVocabulary), quoted as a live example.
+
+- tokens: [tcdb_best_hit, tcdb_substrates]
+  reason: bracketed line labels inside Gene.alternate_functional_descriptions text.
+
+- tokens:
+    - damping_ratio
+    - diel_amplitude_transcript_log2
+    - vesicle_proteome_member
+    - darkness_survival_class
+    - expressed_above_background
+    - has_primary_tss
+    - peak_time_protein_h
+    - peak_time_transcript_h
+    - cell_abundance_biovolume_normalized
+    - predicted_subcellular_localization
+  reason: DerivedMetric.metric_type values quoted as worked examples.
+
+- tokens: [coordinate_source, sequence_source]
+  reason: Gene properties newer than config/schema_baseline.yaml (gene_details returns every Gene property).
+
+- tokens: [list_reactions, reaction_details, links_in, tcdb_class_ids, by_timepoint, is_reversible, ko_terms, kegg_ids]
+  reason: named only to say they do not exist (no such tool / param / breakdown / property, or always null).
+
+- tokens: [that_id, cluster_membership_exp1]
+  reason: placeholders in prose examples.

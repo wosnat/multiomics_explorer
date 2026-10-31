@@ -1508,6 +1508,37 @@ def build_ontologies(*, live_vocab: bool = False) -> int:
 # one) — rows are never dropped.
 INDEX_MAX_CHARS = 7500
 
+# Hand-written read-when notes for `docs://index` rows whose page opens with a
+# poor routing hint (a self-description such as "This MCP server exposes 42
+# tools ..." or "Example: working with metabolites"). Keyed by URI; every
+# other read-when row keeps the page's first sentence. One sentence each,
+# ≤ 110 chars, ending in "." (tests/unit/test_docs_surface_guards.py). The
+# index-size binary search still shortens these if the page runs over cap.
+READ_WHEN_OVERRIDES: dict[str, str] = {
+    "docs://guide/start_here":
+        "Read first: the tool families, a question-shape decision tree, and when to call summary=True.",
+    "docs://guide/conventions":
+        "Read when a cross-tool behaviour surprises you: envelopes, filters, not_found vs not_matched, paging.",
+    "docs://guide/python_api":
+        "Read before scripting: Python vs MCP, imports, the three return shapes, DataFrame conversion.",
+    "docs://analysis/annotation_evidence":
+        "Read before trusting, filtering or ranking gene→term annotations: evidence ladder, tiers, gates.",
+    "docs://analysis/enrichment":
+        "Read before pathway_enrichment / cluster_enrichment: building blocks, backgrounds, levels, pitfalls.",
+    "docs://analysis/derived_metrics":
+        "Read for non-DE gene evidence (rhythmicity, amplitudes, classes): discover DMs, then drill down.",
+    "docs://analysis/expression":
+        "Read for DE questions: the DE tool family, plus response_matrix / gene_set_compare summaries.",
+    "docs://examples/annotation_evidence.py":
+        "Runnable: MEROPS call_class, the TCDB gate, InterPro enrichment, trust-filtered TCDB, rollups.",
+    "docs://examples/metabolites.py":
+        "Runnable: metabolite discovery, compound↔gene, cross-feeding, N-source DE, TCDB, metabolomics.",
+    "docs://examples/ontology_terms.py":
+        "Runnable: browse terms, one search across ontologies, a term-details batch, a bridge walk.",
+    "docs://examples/pathway_enrichment.py":
+        "Runnable: enrichment from a landscape scout, DE, clusters, ortholog groups and custom gene lists.",
+}
+
 _READ_WHEN_HEADING_PREFIXES = ("#",)
 _READ_WHEN_SKIP_PREFIXES = ("|", "-", "`", "<", "(", "*", "import ", "from ", "#!")
 
@@ -1543,6 +1574,14 @@ def _read_when(path: Path, max_len: int = 110) -> str:
     return _summary_sentence(" ".join(paragraph), max_len=max_len)
 
 
+def _read_when_for(uri: str, path: Path, max_len: int = 110) -> str:
+    """`READ_WHEN_OVERRIDES[uri]` (cut to `max_len`) or the page's first sentence."""
+    note = READ_WHEN_OVERRIDES.get(uri)
+    if note:
+        return _summary_sentence(note, max_len=max_len)
+    return _read_when(path, max_len)
+
+
 def _index_tok(path: Path) -> int:
     return len(path.read_bytes()) // 4
 
@@ -1557,7 +1596,7 @@ def _render_docs_index_at(read_when_max_len: int) -> str:
     L += ["## Guides", ""]
     for f in sorted((refs / "guide").glob("*.md")):
         uri = f"docs://guide/{f.stem}"
-        L.append(f"- `{uri}` — ~{_index_tok(f)} tok — {_read_when(f, read_when_max_len)}")
+        L.append(f"- `{uri}` — ~{_index_tok(f)} tok — {_read_when_for(uri, f, read_when_max_len)}")
     L.append("")
 
     L += ["## Tools (brief)", ""]
@@ -1581,7 +1620,7 @@ def _render_docs_index_at(read_when_max_len: int) -> str:
     L += ["## Analysis", ""]
     for f in sorted((refs / "analysis").glob("*.md")):
         uri = f"docs://analysis/{f.stem}"
-        L.append(f"- `{uri}` — ~{_index_tok(f)} tok — {_read_when(f, read_when_max_len)}")
+        L.append(f"- `{uri}` — ~{_index_tok(f)} tok — {_read_when_for(uri, f, read_when_max_len)}")
     L.append("")
 
     # Ontology pages are compact like tool pages (docs://ontologies/index
@@ -1591,7 +1630,7 @@ def _render_docs_index_at(read_when_max_len: int) -> str:
     for f in sorted((refs / "ontologies").glob("*.md")):
         uri = f"docs://ontologies/{f.stem}"
         if f.stem == "index":
-            L.append(f"- `{uri}` — ~{_index_tok(f)} tok — {_read_when(f, read_when_max_len)}")
+            L.append(f"- `{uri}` — ~{_index_tok(f)} tok — {_read_when_for(uri, f, read_when_max_len)}")
         else:
             L.append(f"- `{uri}` — ~{_index_tok(f)} tok")
     L.append("")
@@ -1599,7 +1638,7 @@ def _render_docs_index_at(read_when_max_len: int) -> str:
     L += ["## Examples", ""]
     for f in sorted(examples_dir.glob("*.py")):
         uri = f"docs://examples/{f.name}"
-        L.append(f"- `{uri}` — ~{_index_tok(f)} tok — {_read_when(f, read_when_max_len)}")
+        L.append(f"- `{uri}` — ~{_index_tok(f)} tok — {_read_when_for(uri, f, read_when_max_len)}")
     L.append("")
 
     return "\n".join(L) + "\n"
@@ -1630,6 +1669,468 @@ def lint_index_fresh() -> list[str]:
     return []
 
 
+# ---------------------------------------------------------------------------
+# Docs-surface guards (backlog 2.14 / 2.16 / 3.13). Each returns a list of
+# violation strings; `main --lint` prints them and exits 1 on any.
+# ---------------------------------------------------------------------------
+
+REPO_ROOT = Path(__file__).resolve().parent.parent
+_PKG_DIR = REPO_ROOT / "multiomics_explorer"
+_REFS_DIR = OUTPUT_DIR.parent
+_LINT_DATA_DIR = _PKG_DIR / "inputs" / "lint"
+KG_CLAIMS_PATH = _LINT_DATA_DIR / "kg_claims.yaml"
+IDENTIFIER_ALLOWLIST_PATH = _LINT_DATA_DIR / "identifier_allowlist.yaml"
+EXAMPLES_DIR = REPO_ROOT / "examples"
+
+
+def _shown(path: Path) -> str:
+    try:
+        return str(path.relative_to(REPO_ROOT))
+    except ValueError:
+        return str(path)
+
+
+def hand_authored_doc_paths() -> list[Path]:
+    """Hand-authored agent-facing text: guide + analysis md, tool and ontology
+    YAML inputs, the MCP tool / shared-param modules, CLAUDE.md. Generated
+    pages are covered through their sources."""
+    paths = (
+        sorted((_REFS_DIR / "guide").glob("*.md"))
+        + sorted((_REFS_DIR / "analysis").glob("*.md"))
+        + sorted(INPUTS_DIR.glob("*.yaml"))
+        + sorted(ONTOLOGY_INPUTS_DIR.glob("*.yaml"))
+        + [
+            _PKG_DIR / "mcp_server" / "tools.py",
+            _PKG_DIR / "mcp_server" / "params.py",
+            REPO_ROOT / "CLAUDE.md",
+        ]
+    )
+    return [p for p in paths if p.exists()]
+
+
+# --- 2.16: brief-page sections ---------------------------------------------
+
+BRIEF_REQUIRED_SECTIONS = (
+    "## What it does",
+    "## Parameters",
+    "## Example",
+    "## Response sketch",
+    "## Common mistakes",
+)
+
+
+def lint_brief_sections(paths: list[Path]) -> list[str]:
+    """Every brief page carries the five fixed sections, chaining patterns
+    (or the "Chaining patterns: see ..." overflow marker `render_brief`
+    leaves when it trims them) and the `docs://tools/{name}/full` pointer.
+
+    A missing section means the tool's YAML lacks examples / mistakes /
+    chaining, or `render_brief` trimmed past its floor.
+    """
+    out: list[str] = []
+    for p in paths:
+        text = p.read_text(encoding="utf-8")
+        headings = {line.strip() for line in text.splitlines() if line.startswith("## ")}
+        missing = [s for s in BRIEF_REQUIRED_SECTIONS if s not in headings]
+        if "## Chaining patterns" not in headings and "Chaining patterns: see `docs://tools/" not in text:
+            missing.append("## Chaining patterns (or overflow marker)")
+        if f"docs://tools/{p.stem}/full" not in text:
+            missing.append(f"`docs://tools/{p.stem}/full` pointer")
+        if missing:
+            out.append(f"{p.stem}: brief page missing {', '.join(missing)}")
+    return out
+
+
+# --- 2.16: index size --------------------------------------------------------
+
+def lint_index_size(index_path: Path | None = None) -> list[str]:
+    """`references/index.md` stays within `INDEX_MAX_CHARS`.
+
+    `render_docs_index` shortens read-when text to fit, but the tool rows
+    carry none — enough new pages overflow the cap even at zero read-when.
+    """
+    path = index_path or (_REFS_DIR / "index.md")
+    if not path.exists():
+        return [f"{_shown(path)} missing — rerun build"]
+    n = len(path.read_text(encoding="utf-8"))
+    if n > INDEX_MAX_CHARS:
+        return [f"{_shown(path)}: {n} chars > INDEX_MAX_CHARS {INDEX_MAX_CHARS}"]
+    return []
+
+
+# --- 2.16: kg_claims `quoted` text appears in every used_in file --------------
+
+def _squash(text: str) -> str:
+    return re.sub(r"\s+", " ", text)
+
+
+def lint_kg_claims_quoted(claims: list[dict] | None = None, repo: Path | None = None) -> list[str]:
+    """Each `kg_claims.yaml` entry lists `quoted` — the literal phrasings of
+    its number in prose — and every `used_in` file contains at least one of
+    them (whitespace-insensitive, so wrapped lines still match).
+
+    Catches the two silent failure modes of the register: a `used_in` file
+    that no longer quotes the number (stale pointer), and prose whose number
+    was edited without the register (or vice versa). The live value itself is
+    checked by tests/integration/test_docs_kg_claims.py (-m kg).
+    """
+    repo = repo or REPO_ROOT
+    if claims is None:
+        claims = yaml.safe_load(KG_CLAIMS_PATH.read_text(encoding="utf-8")) or []
+    out: list[str] = []
+    cache: dict[str, str] = {}
+    for c in claims:
+        quoted = c.get("quoted")
+        if not quoted or not isinstance(quoted, list) or not all(isinstance(q, str) and q for q in quoted):
+            out.append(f"kg_claims {c.get('id')}: needs `quoted` (non-empty list of strings)")
+            continue
+        needles = [_squash(q) for q in quoted]
+        for rel in c.get("used_in") or []:
+            if rel not in cache:
+                p = repo / rel
+                cache[rel] = _squash(p.read_text(encoding="utf-8")) if p.exists() else ""
+            if not any(n in cache[rel] for n in needles):
+                out.append(f"kg_claims {c['id']}: none of {quoted} appears in {rel}")
+    return out
+
+
+# --- 2.16: example-script CONTENTS line pins -----------------------------------
+
+_TOC_LINE_RE = re.compile(r"^#\s+\d+\.\s+(\w+)\s.*\(line ~(\d+)\)")
+TOC_LINE_TOLERANCE = 5
+
+
+def lint_example_tocs(paths: list[Path] | None = None, tolerance: int = TOC_LINE_TOLERANCE) -> list[str]:
+    """`(line ~N)` pointers in an example script's `# CONTENTS` block land
+    within `tolerance` lines of the named scenario's `def`."""
+    if paths is None:
+        paths = sorted(EXAMPLES_DIR.glob("*.py"))
+    out: list[str] = []
+    for p in paths:
+        lines = p.read_text(encoding="utf-8").splitlines()
+        defs = {}
+        for i, line in enumerate(lines, 1):
+            m = re.match(r"(?:async\s+)?def (\w+)\(", line)
+            if m:
+                defs.setdefault(m.group(1), i)
+        for line in lines:
+            m = _TOC_LINE_RE.match(line)
+            if not m:
+                continue
+            name, pinned = m.group(1), int(m.group(2))
+            actual = defs.get(name)
+            if actual is None:
+                out.append(f"{_shown(p)}: CONTENTS names {name} but the script defines no {name}()")
+            elif abs(actual - pinned) > tolerance:
+                out.append(f"{_shown(p)}: CONTENTS pins {name} at line ~{pinned}, def is at line {actual}")
+    return out
+
+
+# --- 2.14: outfacing identifiers -------------------------------------------------
+
+_IDENT_FULL_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+_IDENT_ANY_RE = re.compile(r"[A-Za-z_][A-Za-z0-9_]*")
+_CYPHER_HINT_RE = re.compile(r"\b(?:MATCH|RETURN|WITH|UNWIND)\b")
+
+
+def load_identifier_allowlist(raw: bool = False):
+    """`inputs/lint/identifier_allowlist.yaml`: `[{tokens: [...], reason}]`.
+    Returns the token set (or the raw entries with `raw=True`)."""
+    entries = yaml.safe_load(IDENTIFIER_ALLOWLIST_PATH.read_text(encoding="utf-8")) or []
+    if raw:
+        return entries
+    return {tok for e in entries for tok in e.get("tokens") or []}
+
+
+def _schema_property_names(node, acc: set[str]) -> None:
+    if isinstance(node, dict):
+        props = node.get("properties")
+        if isinstance(props, dict):
+            acc.update(props)
+        for v in node.values():
+            _schema_property_names(v, acc)
+    elif isinstance(node, list):
+        for v in node:
+            _schema_property_names(v, acc)
+
+
+def _yaml_identifiers(node, acc: set[str]) -> None:
+    if isinstance(node, dict):
+        for k, v in node.items():
+            if isinstance(k, str):
+                acc.add(k)
+            _yaml_identifiers(v, acc)
+    elif isinstance(node, list):
+        for v in node:
+            _yaml_identifiers(v, acc)
+    elif isinstance(node, str) and _IDENT_FULL_RE.match(node):
+        acc.add(node)
+
+
+def _python_identifiers(path: Path, acc: set[str]) -> None:
+    """Every name the code itself uses: defs, args, attributes, keywords,
+    identifier-shaped string constants, and the identifiers inside Cypher
+    strings (KG properties the baseline may not list yet)."""
+    import ast
+
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            acc.add(node.name)
+        elif isinstance(node, ast.arg):
+            acc.add(node.arg)
+        elif isinstance(node, ast.Attribute):
+            acc.add(node.attr)
+        elif isinstance(node, ast.Name):
+            acc.add(node.id)
+        elif isinstance(node, ast.keyword) and node.arg:
+            acc.add(node.arg)
+        elif isinstance(node, ast.Constant) and isinstance(node.value, str):
+            if _IDENT_FULL_RE.match(node.value):
+                acc.add(node.value)
+            elif _CYPHER_HINT_RE.search(node.value):
+                acc.update(_IDENT_ANY_RE.findall(node.value))
+
+
+def known_identifiers(schemas: dict) -> set[str]:
+    """Every identifier a doc may legitimately quote: tool names, MCP input
+    params, response-model fields (all nesting levels), names used by the
+    package / build script / example scripts, KG labels + properties
+    (`config/schema_baseline.yaml`), controlled-vocabulary values
+    (`inputs/lint/vocab_snapshot.yaml`), and the hand-kept allowlist."""
+    known: set[str] = set(schemas)
+    for s in schemas.values():
+        known.update((s.get("parameters") or {}).get("properties") or {})
+        _schema_property_names(s.get("output_schema") or {}, known)
+    py_files = (
+        sorted(_PKG_DIR.rglob("*.py"))
+        + [Path(__file__).resolve()]
+        + sorted(EXAMPLES_DIR.glob("*.py"))
+    )
+    for p in py_files:
+        _python_identifiers(p, known)
+    for data in (SCHEMA_BASELINE_PATH, _LINT_DATA_DIR / "vocab_snapshot.yaml"):
+        if data.exists():
+            _yaml_identifiers(yaml.safe_load(data.read_text(encoding="utf-8")), known)
+    known |= load_identifier_allowlist()
+    return known
+
+
+def tool_call_params(schemas: dict) -> dict[str, set[str]]:
+    """`{tool: params}` — MCP input-schema params ∪ the same-named Python API
+    function's signature (docs show both call styles)."""
+    import inspect
+
+    import multiomics_explorer as pkg
+
+    out: dict[str, set[str]] = {}
+    for name, s in schemas.items():
+        params = set((s.get("parameters") or {}).get("properties") or {})
+        fn = getattr(pkg, name, None)
+        if callable(fn):
+            params |= set(inspect.signature(fn).parameters)
+        out[name] = params
+    return out
+
+
+def lint_outfacing_identifiers(schemas: dict, paths: list[Path] | None = None) -> list[str]:
+    """Two checks over hand-authored docs (`hand_authored_doc_paths`):
+
+    1. `tool(param=...)` — every top-level keyword of a call to a registered
+       tool is a param of that tool (MCP schema or Python API signature).
+       `def tool(` definitions are skipped.
+    2. backtick-quoted snake_case identifiers (`` `foo_bar` ``) are known
+       (`known_identifiers`). Only tokens with an underscore are checked;
+       URIs, dotted / prefixed IDs and plain words are not.
+
+    YAML `examples:` sections and the `wrong:` side of mistakes are skipped
+    (`prose_lines`). Intentional unknowns — KG data values, placeholders,
+    "there is no `foo_bar` param" statements — go in
+    `inputs/lint/identifier_allowlist.yaml` with a reason.
+    """
+    from multiomics_explorer._outfacing_lint import (
+        backtick_identifiers,
+        call_kwargs,
+        prose_lines,
+    )
+
+    if paths is None:
+        paths = hand_authored_doc_paths()
+    known = known_identifiers(schemas)
+    call_params = tool_call_params(schemas)
+    call_re = re.compile(
+        r"(?<![\w.])(?<!def )("
+        + "|".join(sorted(map(re.escape, schemas), key=len, reverse=True))
+        + r")\("
+    )
+    out: list[str] = []
+    for p in paths:
+        lines = prose_lines(p)
+        text = "\n".join(lines)
+        for m in call_re.finditer(text):
+            if re.search(r"def\s+$", text[max(0, m.start() - 10):m.start()]):
+                continue
+            tool = m.group(1)
+            for kw, pos in call_kwargs(text, m.end()):
+                if kw not in call_params[tool]:
+                    line_no = text.count("\n", 0, pos) + 1
+                    out.append(f"{_shown(p)}:{line_no}: {tool}({kw}=) — {tool} has no parameter {kw!r}")
+        for i, line in enumerate(lines, 1):
+            for tok in backtick_identifiers(line):
+                if tok not in known:
+                    out.append(
+                        f"{_shown(p)}:{i}: `{tok}` is not a tool param, response field, "
+                        "KG name or vocab value (fix it, or allowlist it in "
+                        "inputs/lint/identifier_allowlist.yaml)"
+                    )
+    return out
+
+
+# --- 3.13: hierarchical ontologies are never "flat" ---------------------------
+
+# Prose names per ontology key beyond the key itself and its node label.
+_ONTOLOGY_PROSE_ALIASES = {
+    "go_bp": ("GO", "GO-BP", "GO BP"),
+    "go_mf": ("GO", "GO-MF", "GO MF"),
+    "go_cc": ("GO", "GO-CC", "GO CC"),
+    "ec": ("EC",),
+    "kegg": ("KEGG",),
+    "cog_category": ("COG",),
+    "cyanorak_role": ("Cyanorak",),
+    "tigr_role": ("TIGR",),
+    "pfam": ("Pfam",),
+    "brite": ("BRITE",),
+    "tcdb": ("TCDB",),
+    "cazy": ("CAZy",),
+    "subcellular_localization": ("PSORTb",),
+    "signal_peptide_type": ("SignalP",),
+    "interpro": ("InterPro",),
+    "ncbifam": ("NCBIfam",),
+    "merops": ("MEROPS",),
+}
+
+_FLAT_TRIGGER_RE = re.compile(
+    r"(?<!not )(?<!n't )(?<!non-)\bflat\b(?![- ](?:list|lists|long|envelope|one-row|scalar|dict|propert|`list|g\{|keys?\b|fields?\b|rows?\b|labels?\b|ones\b|not_found|bucket))"
+    r"|`level ?(?:=|>=) ?1`[^.;]{0,40}?\b(?:returns? (?:nothing|no rows|empty)|empty results?)"
+    r"|`level=0`\**\s+only\b|\bonly (?:accept )?`level=0`",
+    re.IGNORECASE,
+)
+
+
+def _split_segments(text: str) -> list[str]:
+    """Cut at sentence ends / `;` / spaced em dashes outside parentheses."""
+    segs: list[str] = []
+    depth = 0
+    start = 0
+    i = 0
+    while i < len(text):
+        c = text[i]
+        if c in "([":
+            depth += 1
+        elif c in ")]":
+            depth = max(0, depth - 1)
+        elif depth == 0 and c in ".;!?" and (i + 1 == len(text) or text[i + 1] == " "):
+            segs.append(text[start:i + 1])
+            start = i + 1
+        elif depth == 0 and text.startswith(" — ", i):
+            segs.append(text[start:i])
+            start = i + 3
+            i += 3
+            continue
+        i += 1
+    segs.append(text[start:])
+    return [seg.strip() for seg in segs if seg.strip()]
+
+
+def _ontology_alias_patterns() -> tuple[dict[str, re.Pattern], set[str]]:
+    from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+
+    pats: dict[str, re.Pattern] = {}
+    hierarchical: set[str] = set()
+    for key, cfg in ONTOLOGY_CONFIG.items():
+        names = {key, cfg.get("label") or key, *_ONTOLOGY_PROSE_ALIASES.get(key, ())}
+        alt = "|".join(sorted(map(re.escape, names), key=len, reverse=True))
+        pats[key] = re.compile(rf"(?<![\w.:/-])(?:{alt})(?![\w:/])")
+        if cfg.get("hierarchy_rels"):
+            hierarchical.add(key)
+    return pats, hierarchical
+
+
+def _prose_segments(lines: list[str]):
+    """Yield (line_no, segment) — paragraphs re-joined across wrapped lines,
+    table rows kept apart, then cut at sentence ends / `;` / spaced em dashes."""
+    para: list[tuple[int, str]] = []
+
+    def flush():
+        if not para:
+            return
+        start = para[0][0]
+        joined = " ".join(s.strip() for _, s in para)
+        for seg in _split_segments(joined):
+            yield start, seg
+        para.clear()
+
+    for i, line in enumerate(lines, 1):
+        stripped = line.strip()
+        if not stripped:
+            yield from flush()
+        elif stripped.startswith("|") or stripped.startswith("- ") or stripped.startswith("#"):
+            yield from flush()
+            for seg in _split_segments(stripped):
+                yield i, seg
+        else:
+            para.append((i, line))
+    yield from flush()
+
+
+def _python_string_segments(path: Path):
+    """Yield (line_no, segment) for each string literal (docstrings, Field
+    descriptions; implicit concatenation arrives as one literal)."""
+    import ast
+
+    for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+        if isinstance(node, ast.Constant) and isinstance(node.value, str):
+            joined = " ".join(node.value.split())
+            for seg in _split_segments(joined):
+                yield node.lineno, seg
+
+
+def lint_hierarchy_flat_claims(paths: list[Path] | None = None) -> list[str]:
+    """Registry-driven: for every `ONTOLOGY_CONFIG` key with non-empty
+    `hierarchy_rels`, no prose sentence calls that ontology flat or says
+    `level=1` returns nothing for it.
+
+    A sentence is flagged when it carries a flat trigger ("flat", "`level=1`
+    returns nothing", "`level=0` only") and names a hierarchical ontology
+    (key, node label or prose alias). In `inputs/ontologies/{key}.yaml` the
+    file's own key counts as named unless the sentence names a flat ontology.
+    "flat list" / "not flat" and similar are not triggers.
+    """
+    from multiomics_explorer._outfacing_lint import prose_lines
+
+    if paths is None:
+        paths = hand_authored_doc_paths()
+    pats, hierarchical = _ontology_alias_patterns()
+    flat_keys = set(pats) - hierarchical
+    out: list[str] = []
+    for p in paths:
+        own = p.stem if (p.suffix == ".yaml" and p.stem in pats) else None
+        segments = _python_string_segments(p) if p.suffix == ".py" else _prose_segments(prose_lines(p))
+        for line_no, seg in segments:
+            if not _FLAT_TRIGGER_RE.search(seg):
+                continue
+            named = {k for k, pat in pats.items() if pat.search(seg)}
+            hier_named = named & hierarchical
+            if not hier_named and own in hierarchical and not (named & flat_keys):
+                hier_named = {own}
+            if hier_named:
+                out.append(
+                    f"{_shown(p)}:{line_no}: calls hierarchical ontology "
+                    f"{sorted(hier_named)} flat / level-0-only: {seg.strip()[:160]}"
+                )
+    return out
+
+
 def main():
     parser = argparse.ArgumentParser(description="Build about-content for MCP tools")
     parser.add_argument("tools", nargs="*", help="Tool names to build (default: all with input files)")
@@ -1652,7 +2153,10 @@ def main():
         help=(
             "Scan rendered md for outfacing-doc style-rule violations, plus "
             "the inputs/tools/*.yaml example-entry checks (unknown keys, "
-            "response block naming no envelope key). "
+            "response block naming no envelope key), and the docs-surface "
+            "guards (brief sections, index size/freshness, kg_claims quoted "
+            "text, example TOC pins, outfacing identifiers, hierarchical "
+            "ontologies called flat). "
             "With positional tool names, scopes to those tools' md. "
             "Exit 1 if any violation, 0 if clean."
         ),
@@ -1729,6 +2233,21 @@ def main():
             for v in index_violations:
                 print(v, file=sys.stderr)
             if index_violations:
+                rc = rc or 1
+            # Docs-surface guards: brief sections, index size, kg_claims
+            # quoted text, example TOC pins, outfacing identifiers,
+            # hierarchical ontologies never called flat.
+            guard_violations = (
+                lint_brief_sections(sorted(OUTPUT_DIR.glob("*.md")))
+                + lint_index_size()
+                + lint_kg_claims_quoted()
+                + lint_example_tocs()
+                + lint_outfacing_identifiers(schemas)
+                + lint_hierarchy_flat_claims()
+            )
+            for v in guard_violations:
+                print(v, file=sys.stderr)
+            if guard_violations:
                 rc = rc or 1
         sys.exit(rc)
 

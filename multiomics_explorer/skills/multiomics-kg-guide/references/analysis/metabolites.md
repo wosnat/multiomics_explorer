@@ -590,7 +590,7 @@ On the numeric arm (`metabolites_by_quantifies_assay` and the quantifies rows of
 
 - **Numeric arm (12 assays):** 70.7% of `Assay_quantifies` edges are `not_detected` (1046 of 1480 rows). Tested-absent is the majority signal, not an exception.
 - **Boolean arm (2 assays, 186 rows total):** 68.8% have `flag_value = false` (128 of 186 rows).
-- **PEP (`kegg.compound:C00074`):** 14 of 20 measurements (70%) are tested-absent across the 14 assays (12 `not_detected` quantifies-edges + 2 `flag_value=false` boolean-edges).
+- **PEP (`kegg.compound:C00074`):** 14 of 20 measurements (70%) are tested-absent across the 10 assays that measure it (12 `not_detected` quantifies-edges + 2 `flag_value=false` boolean-edges).
 
 Default-filtering tested-absent rows would discard the majority of measured biology under this KG state.
 

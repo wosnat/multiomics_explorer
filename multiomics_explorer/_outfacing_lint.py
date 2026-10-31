@@ -271,3 +271,105 @@ def run_lint(paths: list[Path], stream: TextIO | None = None) -> int:
         return 1
     print("Lint clean.", file=stream)
     return 0
+
+
+# ---------------------------------------------------------------------------
+# Hand-authored doc text, ready for identifier-level lints
+# ---------------------------------------------------------------------------
+#
+# The identifier lints (scripts/build_about_content.py
+# `lint_outfacing_identifiers`, `lint_hierarchy_flat_claims`) read prose, not
+# payloads. Two kinds of line are blanked (kept as "" so line numbers stay
+# true):
+#
+# - a YAML ``examples:`` section — call / response blocks are live KG data
+#   checked by their own gates (tests/unit/test_about_content.py kwargs check,
+#   scripts/refresh_examples.py);
+# - the ``wrong:`` side of a mistakes entry (and its continuation lines) —
+#   wrong on purpose.
+
+_YAML_TOP_KEY_RE = re.compile(r"^([A-Za-z_][\w-]*):")
+_WRONG_KEY_RE = re.compile(r"^(\s*)(?:-\s+)?wrong:")
+
+
+def prose_lines(path: Path, text: str | None = None) -> list[str]:
+    """Lines of `path` with YAML ``examples:`` sections and ``wrong:`` entries
+    blanked. Non-YAML files only lose ``wrong:`` lines (none in practice)."""
+    if text is None:
+        text = path.read_text(encoding="utf-8")
+    is_yaml = path.suffix in (".yaml", ".yml")
+    out: list[str] = []
+    in_examples = False
+    wrong_indent: int | None = None
+    for line in text.splitlines():
+        if is_yaml:
+            top = _YAML_TOP_KEY_RE.match(line)
+            if top:
+                in_examples = top.group(1) == "examples"
+            if in_examples:
+                out.append("")
+                continue
+        indent = len(line) - len(line.lstrip())
+        if wrong_indent is not None:
+            if line.strip() and indent <= wrong_indent:
+                wrong_indent = None
+            else:
+                out.append("")
+                continue
+        m = _WRONG_KEY_RE.match(line)
+        if m:
+            # Continuation lines of a block scalar are indented past the key.
+            wrong_indent = len(m.group(1)) + (2 if line.lstrip().startswith("-") else 0)
+            out.append("")
+            continue
+        out.append(line)
+    return out
+
+
+BACKTICK_SPAN_RE = re.compile(r"`([^`\n]+)`")
+# snake_case with at least one underscore; not part of a dotted / prefixed /
+# URI token (`kegg.pathway:ko01100`, `docs://...`, `go:0006810`).
+SNAKE_IDENT_RE = re.compile(r"(?<![\w.:/-])([a-z][a-z0-9]*(?:_[a-z0-9]+)+)(?![\w:/-])")
+
+
+def backtick_identifiers(line: str) -> list[str]:
+    """snake_case identifiers inside backtick spans of `line` (URIs skipped)."""
+    out: list[str] = []
+    for span in BACKTICK_SPAN_RE.findall(line):
+        if "://" in span:
+            continue
+        out.extend(SNAKE_IDENT_RE.findall(span))
+    return out
+
+
+_KWARG_RE = re.compile(r"([A-Za-z_][A-Za-z0-9_]*)\s*=(?!=)")
+
+
+def call_kwargs(text: str, open_paren: int, max_chars: int = 800) -> list[tuple[str, int]]:
+    """Top-level ``name=`` keywords of the call whose ``(`` sits just before
+    `open_paren`. Returns ``(name, offset)`` pairs. Quoted strings and nested
+    brackets are skipped; gives up after `max_chars` or an unbalanced quote.
+    """
+    depth = 1
+    i = open_paren
+    seg: list[str] = []
+    while i < len(text) and depth > 0 and i - open_paren < max_chars:
+        c = text[i]
+        if c in "([{":
+            depth += 1
+            seg.append(" ")
+        elif c in ")]}":
+            depth -= 1
+            seg.append(" ")
+        elif c in "'\"":
+            j = text.find(c, i + 1)
+            if j == -1 or "\n\n" in text[i:j]:
+                break
+            seg.append(" " * (j - i + 1))
+            i = j + 1
+            continue
+        else:
+            seg.append(c if depth == 1 else " ")
+        i += 1
+    joined = "".join(seg)
+    return [(m.group(1), open_paren + m.start(1)) for m in _KWARG_RE.finditer(joined)]

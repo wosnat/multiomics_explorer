@@ -12333,7 +12333,7 @@ class TestGeneOverviewMeropsNcbifamColumns:
 class TestGeneOverviewFamilyCountColumns:
     """Backlog 3.4 — gene_overview surfaces tcdb_family_count and
     cazy_family_count (both KG precomputes: tcdb = attachment_depth=
-    'most_specific' edges only since the 2026-08-29 rebuild; cazy is flat),
+    'most_specific' edges only since the 2026-08-29 rebuild),
     plus the has_tcdb / has_cazy envelope counts."""
 
     def test_detail_projects_tcdb_assignment_count_from_the_precompute(self):

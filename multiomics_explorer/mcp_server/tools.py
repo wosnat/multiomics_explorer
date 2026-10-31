@@ -1543,7 +1543,7 @@ class MbgTopPathway(BaseModel):
     pathway_reaction_count ASC` (more genes hitting + more focused
     pathway).
 
-    Drill-down: pass any `pathway_id` to
+    Drill-down: pass any `metabolite_pathway_id` to
     `list_metabolites(pathway_ids=[...])` for the full metabolite roster
     of the pathway (not just gene-set hits), or
     `genes_by_ontology(ontology="kegg", term_ids=[id], organism=...)`
@@ -2558,7 +2558,7 @@ def register_tools(mcp: FastMCP):
         cazy_family_count: int = Field(
             0,
             description="Distinct CAZy families on this gene (precomputed "
-                        "Gene.cazy_family_count; flat ontology). When > 0, drill via "
+                        "Gene.cazy_family_count). When > 0, drill via "
                         "gene_ontology_terms(ontology=['cazy']) or find peers with "
                         "genes_by_ontology(ontology='cazy').",
         )
