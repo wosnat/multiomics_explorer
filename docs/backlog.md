@@ -1,111 +1,76 @@
 # Explorer backlog
 
 Single list of open work for `multiomics_explorer`. One line per item: what, why, size, origin.
-Status was verified against `main` on 2026-10-31 (live KG dev build 2026-10-31T14:01Z). When an item ships, delete it
+Status was verified against `main` on 2026-10-31 (live KG dev build 2026-10-31T19:34Z; `main` = `origin/main`). When an item ships, delete it
 here and let the CHANGELOG carry the record — this file is only ever the *open* set.
 
 Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · **L** multi-day, full
 `/add-or-update-tool` cycle · **KG** needs a KG-side change first.
 
-## 1. Now — release cut (explorer 0.1.0-alpha.5 ↔ KG 0.1.0-alpha.7)
+## 1. Now — next release (explorer 0.1.0-alpha.6, breaking)
+
+`[Unreleased]` already carries breaking changes (alpha.5 alias removal, TCDB cleanup, `coculture_partner` list, `not_found.publication_dois`, `kg_release_info` kw-only) plus the metabolite identity / stereo surface, GO transport arm and `control_timing`.
 
 | # | Item | Size | Notes |
 |---|---|---|---|
-| 1.2 | KG alpha.7 cut landed 2026-09-15 (version + `mcp_min_version 0.1.0a5` stamped, hash unchanged, absorbed same day) — residual: `release_highlights` / `breaking_changes` were NOT stamped (both null) and `deployment_role` reads `staging`; ask KG side to stamp the §4 A1 draft on the next re-cut or confirm intentional. | KG | Highlights + breaking list drafted in §4 A1 below. |
-| 1.3 | Eval pass on the annotation-trust surface in `multiomics_research` (protease vs dead-homolog, urea transporter ranking, InterPro superfamily ORA on a dark-survival cluster). | M | The contract gates are green; only agent-driven runs show whether routing / warnings / `docs://` pages lead to the right tool. Roadmap "stress test" step. |
+| 1.1 | Cut alpha.6 with `/release-explorer` (CHANGELOG `[Unreleased]` → dated section; polish the Breaking list). | S | was 2c.12 |
+| 1.2 | KG-side coordination for that cut: next official KG release sets `mcp_min_version` to the alpha.6 version and stamps `release_highlights` / `breaking_changes` (alpha.7 shipped with both null; live dev build still null). Draft both from the CHANGELOG once 1.1 is polished. | KG | §5 A1 |
+| 1.3 | Decide whether 2b.6 consolidation rides this breaking release or becomes a separate alpha.7 (it was deferred from alpha.5 to avoid two breaking releases in a row — alpha.6 is already breaking). | — | decision |
 
-## 2. Follow-ups from the sync-release program (slices 3–4 + polish), post-cut
-
-| # | Item | Size | Origin |
-|---|---|---|---|
-| 2.8 | `organism=` word-match backlog: genus node `Alteromonas` matches all strains; `AltDE` matches `AltDE1`. Resolver gates on `gene_count > 0` so treatment taxa are safe (KG B4 removes the last name collision). | M | slice-2 ledger |
-| 2.14 | Outfacing-identifier lint: cross-check backtick-quoted identifiers in tools.py Field/docstrings, inputs/tools/*.yaml, hand-authored references md, CLAUDE.md against live input-schema param names + response-model field names (final-review rec, llm-review 2b.5). | S | 2b.5 final review |
-| 2.15b | Compartment as `list[str]` on the 12 functions that take `compartment: str` — deferred, no request; can land non-breakingly later as `str \| list[str]`. | M | 2.15 (release-prep spec 2026-10-31) |
-| 2.16 | Docs-surface guards (2b.4 final review): brief-sections lint (every brief carries Example/Response sketch/mistakes/chaining-or-marker), lint_index_size, kg_claims used_in content check, TOC line-number pin test, params.py verbose text names /full. | S | 2b.4 final review |
-
-## 2b. LLM-consumer review 2026-08-29 (six-reviewer pass; report artifact `Explorer MCP Through an LLM's Eyes`, raw reports in session scratchpad)
-
-| # | Item | Size | Status |
-|---|---|---|---|
-| 2b.6 | **Consolidation** (release boundary + KG `mcp_min_version`). Kept post-cut 2026-08-30 — tool merges too risky before alpha.5; means alpha.6 is a second breaking release. Merge `metabolites_by_quantifies_assay` + `metabolites_by_flags_assay` → `metabolites_by_assay`; merge or front the three `genes_by_*_metric`; `SKILL.md` for the skill tree and collapse CLAUDE.md's tool table; delete the research repo's duplicate python guide + fix its dangling `docs://analysis/to_dataframe` link. | L | queued |
-
-## 2c. Pro N-import coculture analysis 2026-10-06 (`multiomics_analysis/analyses/2026-10-06-pro_n_import_coculture/gaps_and_friction.md`)
-
-Explorer-side items only; KG asks from the same log are §4 D. Template / methodology entries in that log stay in the analysis repo.
-
-| # | Item | Size | Notes |
-|---|---|---|---|
-| 2c.2 | Genome-coordinate listing: all genes of an organism with contig / start / end / strand, pageable, with `coordinate_source`. The analysis needed it and swept `gene_neighbors` (8 × window=250) + `gene_details` instead. The OOM half shipped 2026-10-13 (window ≤ 100, row budget). Could be a `gene_details` organism mode instead of a new tool. | M | |
-| 2c.9 | Genome context for transport substrates: "which of this transporter's substrates are plausible in this genome". Per transport row in `metabolites_by_gene` (and per-metabolite in `genes_by_metabolite`): `organism_catalyst_gene_count`, `organism_transporter_gene_count`, `measured_in_organism`, with the stereo hop folded into the counts ("0 direct, 41 via L-Cysteine"). Example: MED4 `dppA` (PepT 3.A.1.5) lists 29 substrates; MED4 has enzymes for 7. The explorer-side half of KG ask D3. | L | design needed |
-| 2c.11 | Doc weight from the stereo-hint examples: full tool pages grew (`genes_by_metabolite/full` ~9.7k → 14.5k tok, `list_metabolites/full` ~11.7k → 13.6k, `metabolites_by_gene/full` ~8.1k → 10.2k). Trim the new examples' `top_*` lists if the yaml format allows partial responses. Also the CLAUDE.md `list_metabolites` row lost "unlisted ≠ not in it" for KEGG classes (row at the 700-char limit). | S | stereo-hint code review |
-| 2c.12 | Next explorer release must carry the metabolite identity + stereo-form surface (CHANGELOG `[Unreleased]`); the KG release that ships the identity / ask-8 rebuilds sets `mcp_min_version` to that explorer version and stamps `breaking_changes`. | S | release coordination |
-| 2c.18 | Organism resolver: "Alteromonas mediterranea AltDE" is ambiguous with AltDE1 and the builders' word match leaks AltDE1 genes (pre-existing) | M | GO transport surface 2026-10-23 |
-
-## 2d. Docs review 2026-10-31 (Phase 1b, pre-release; findings in session scratchpad `docs_review_2026-10-31.md`)
+## 2. Next — small, concrete (no design needed)
 
 | # | Item | Size | Origin |
 |---|---|---|---|
-| 2d.1 | Cap pasted example responses in `refresh_examples.py` (≤ N rows, truncate nested dicts/lists) and refresh: ~5k YAML lines of untrimmed responses; `tools/full/genes_by_metabolite.md` ~23.6k tok, mostly responses. Then drop responses whose point the note already carries. | M | docs-review 2026-10-31 |
+| 2d.1 | Cap pasted example responses in `refresh_examples.py` (≤ N rows, truncate nested dicts/lists) and refresh: ~5k YAML lines of untrimmed responses; `tools/full/genes_by_metabolite.md` ~23.6k tok, mostly responses. Then drop responses whose point the note already carries. Absorbs old 2c.11 (stereo-hint examples bloated three full pages; CLAUDE.md `list_metabolites` row lost "unlisted ≠ not in it" for KEGG classes at the 700-char limit). | M | docs-review 2026-10-31 |
 | 2d.2 | Cap `summary=True` envelopes on `list_organisms` / `list_publications` / `resolve_gene` / `list_experiments` (larger than the default 5-row page today; docs now say so). Restores the "summary first" habit. | S | docs-review 2026-10-31 |
-| 2d.3 | Fold `analysis/metabolites.md` §g into `analysis/transport.md` (phnD / Pst examples, breadth cap, scale repeat). | S | docs-review 2026-10-31 |
-| 2d.4 | Split `analysis/metabolites.md` (~770 lines, release-by-release accretion): ID forms / stereo / structure_kind / KEGG categories → own page; reorder tested-absent section; drop hard-coded counts. Glutamine reading path ~24k → ~12k tok. | M | docs-review 2026-10-31 |
+| 2d.3 | Restructure `analysis/metabolites.md` (~770 lines): fold §g into `analysis/transport.md` (phnD / Pst examples, breadth cap, scale repeat); split ID forms / stereo / structure_kind / KEGG categories to their own page; reorder tested-absent section; drop hard-coded counts. Glutamine reading path ~24k → ~12k tok. | M | docs-review 2026-10-31 (was 2d.3 + 2d.4) |
 | 2d.5 | `docs://index` read-when overrides in the generator (rows are each page's first sentence). | S | docs-review 2026-10-31 |
 | 2d.6 | `tcdb_family_substrates_skipped` lists the same breadth-capped genes (MED4 ABC `tcdb:3.A.1`: PMM0449/0450/0913/0977) for every compound — scope to genes whose family carries the queried metabolite, or say "skipped regardless of metabolite". | S | docs-review 2026-10-31 |
 | 2d.7 | `examples/metabolites.py --scenario n_source_de`: top hits are TCDB drug / macromolecule substrates, not N sources — restrict to a curated N-source set. | S | docs-review 2026-10-31 |
 | 2d.8 | `ontology_landscape` / `genes_by_ontology` size-filter warning fires on census-style calls; consider no warning when the caller passed explicit size bounds. Brief "Result row" field order (verbose-heavy models). | S | docs-review 2026-10-31 |
+| 2.14 | Outfacing-identifier lint: cross-check backtick-quoted identifiers in tools.py Field/docstrings, inputs/tools/*.yaml, hand-authored references md, CLAUDE.md against live input-schema param names + response-model field names. | S | llm-review 2b.5 |
+| 2.16 | Docs-surface guards: brief-sections lint (every brief carries Example/Response sketch/mistakes/chaining-or-marker), lint_index_size, kg_claims used_in content check, TOC line-number pin test, params.py verbose text names /full. | S | llm-review 2b.4 |
+| 3.13 | Registry-driven lint: for every `ONTOLOGY_CONFIG` key with non-empty `hierarchy_rels`, flag md/yaml prose calling it "flat" or saying `level=1` returns nothing (the fixed regex missed 3 yamls + 2 test comments in the TIGR absorb). | S | tigr-role-bridge 2026-08-29 |
+| 3.17 | Concepts-page node counts: generate at build time (or keep them out — current policy) and add a `kg_claims.yaml` entry per number the guides still quote (organism counts, ~127k genes, ~70% tested-absent, boolean-DM counts). | S | docs review 2026-08-29 |
+| 3.12 | Annotated-genes ORA background mode for `pathway_enrichment` / `cluster_enrichment` (genes with ≥1 edge in the chosen ontology; TIGR coverage bias — workaround is an explicit `background=` list). | S | tigr-role-bridge 2026-08-29 |
+| 3.20 | `kg_schema` property sampling misses sparse properties (`rank_up` on 9% of `Changes_expression_of` dropped out after the 2026-10-13 rebuild). Union keys over the whole type (`db.schema.relTypeProperties`) or flag sparse ones. | S | rebuild absorb 2026-10-13 |
+| E6 | KG ask (P3): TCDB `tier` wording in the `trust_axes` vocab ("Diamond-truncation depth") should match the `Gene_has_tcdb_family.tier` edge description. | KG | `docs/kg-specs/2026-10-31-docs-review-kg-asks.md` |
 
-## 3. Older backlog — verified 2026-08-28
+## 3. Larger — needs a spec / design
 
-Shipped since the last refresh (removed from the open set): 3.9 metabolomics-DM slice (KG owner decided 2026-08-29: not planned, no driver dataset — reopenable); 3.10 KG-MET-002 (comment landed in rebuild #3); 3.6 static resources (verified 2026-08-29: every `docs://` URI is a static `FunctionResource`, no templates); `_freq_rollup` helper extraction;
-`search_text` kwarg unification (only `run_cypher.query` differs, by design); `tcdb_level_kind` filter
-type; KEGG pathway `reaction_count` / `metabolite_count` on term rows and `list_metabolites`
-pathway rollups; `mcp_min_version` mismatch (live reads `0.1.0a1`, verdict `ok`); KG-MET asks
-001/006/013/016.
+| # | Item | Size | Origin |
+|---|---|---|---|
+| 2b.6 | **Consolidation** (breaking; see 1.3). Merge `metabolites_by_quantifies_assay` + `metabolites_by_flags_assay` → `metabolites_by_assay`; merge or front the three `genes_by_*_metric`; `SKILL.md` for the skill tree and collapse CLAUDE.md's tool table; delete the research repo's duplicate python guide + fix its dangling `docs://analysis/to_dataframe` link. | L | llm-review 2026-08-29 |
+| 2.8 | Organism resolver word-match leaks: "Alteromonas mediterranea AltDE" / `AltDE` matches `AltDE1` and the builders leak AltDE1 genes; genus node `Alteromonas` matches all strains. Resolver gates on `gene_count > 0`, so treatment taxa are safe. | M | slice-2 ledger + GO transport 2026-10-23 (was 2.8 + 2c.18) |
+| 3.21 | Eval pass on the annotation-trust surface in `multiomics_research` (protease vs dead-homolog, urea transporter ranking, InterPro superfamily ORA on a dark-survival cluster) — only agent-driven runs show whether routing / warnings / `docs://` pages lead to the right tool. Roadmap "stress test" step. | M | was 1.3 |
+| 2c.2 | Genome-coordinate listing: all genes of an organism with contig / start / end / strand / `coordinate_source`, pageable (the N-import analysis swept `gene_neighbors` + `gene_details` instead). Possibly a `gene_details` organism mode. | M | N-import analysis 2026-10-06 |
+| 2c.9 | Genome context for transport substrates: per transport row `organism_catalyst_gene_count`, `organism_transporter_gene_count`, `measured_in_organism`, stereo hop folded in ("0 direct, 41 via L-Cysteine"). E.g. MED4 `dppA` lists 29 substrates; MED4 has enzymes for 7. Explorer half of KG ask D3. | L | N-import analysis 2026-10-06 |
+| 3.19 | GSEA (signed-`log2fc` ranking, fgsea-style) alongside Fisher ORA in `pathway_enrichment`; needs `all_detected_genes` experiments (table_scope gate), same trust filters / TERM2GENE as ORA, a GSEA section in `docs://analysis/enrichment`. | M | upstream ticket 2026-08 #2 |
+| 3.5 | `kg_schema` property-description enrichment + analysis-doc `field_description` callout. | M | metabolites roadmap Track B |
+
+## 4. Parked — until a request or workflow drives it
 
 | # | Item | Size | Notes |
 |---|---|---|---|
-| 3.5 | `kg_schema` property-description enrichment + analysis-doc `field_description` callout. | M | metabolites roadmap Track B |
-| 3.7 | MCP usability audit passes B/C/D + KG-1..KG-7. Pass A shipped 2026-04-30. Re-scope against the current surface before starting — much of it landed via the readability passes and the trust surface. | L | audit |
-| 3.8 | Chemistry slice 2+: `metabolites_by_pathway`, `list_reactions` / `genes_by_reaction`, `organism_metabolite_overlap`, Tier-3 `pathway_chemistry`. Defer until a workflow needs them. | L | chemistry design |
-| 3.11 | PyPI publication (out of scope for `/release-explorer` v1; install path is the git tag). | M | release |
-| 3.12 | Annotated-genes ORA background mode for `pathway_enrichment` / `cluster_enrichment` (per-organism genes with ≥1 edge in the chosen ontology; TIGR coverage bias — workaround is an explicit `background=` list from `genes_by_ontology(ontology='tigr_role', level=0)`). | S | tigr-role-bridge 2026-08-29 |
-| 3.13 | Registry-driven outfacing lint: for every `ONTOLOGY_CONFIG` key with non-empty `hierarchy_rels`, flag md/yaml prose calling it "flat" or saying `level=1` returns nothing for it (the fixed `LINT_PATTERN` regex missed `search_ontology.yaml`, `genes_by_ontology.yaml`, `ontology_landscape.yaml` and two test comments during the TIGR absorb). | S | tigr-role-bridge code review 2026-08-29 |
-| 3.17 | Generate the concepts-page node counts at build time (or keep them out — current policy) and add a `kg_claims.yaml` entry per number the guides still quote (47/47/43 organisms, ~127k genes, ~70% / ~69% tested-absent, 11 of 27 boolean DMs). | S | docs review 2026-08-29 |
-| 3.19 | GSEA (rank-based, e.g. fgsea-style permutation on a signed `log2fc` ranking) alongside the Fisher ORA in `pathway_enrichment` — the coculture analysis (`multiomics_analysis/docs/upstream-tickets-2026-08.md` #2) tried to build it on `rank_up` / `rank_down`, which are significant-only. Needs an `all_detected_genes` experiment (table_scope gate), a ranking choice (signed `log2fc` vs signed `rank`), and TERM2GENE from `genes_by_ontology` — same trust filters and background rules as ORA; `docs://analysis/enrichment` gets a GSEA section. Docs for the rank fields shipped 2026-08-30. | M | upstream ticket 2026-08 |
-| 3.20 | `kg_schema` property sampling misses sparse properties. After the 2026-10-13 rebuild the sampled `Changes_expression_of` property list lost `rank_up` (live on 28,931 of 327k edges, significant-up only) because the deterministic sample no longer hit one. Union property keys over the whole type (`db.schema.relTypeProperties` / `apoc.meta`) or flag sparse properties, so the schema doesn't flip with edge order. | S | rebuild absorb 2026-10-13 |
+| 2.15b | `compartment` as `str \| list[str]` on the 12 functions taking `compartment: str` (non-breaking later). | M | no request |
+| 3.7 | MCP usability audit passes B/C/D + KG-1..KG-7. Likely mostly superseded by the readability passes, trust surface and the two docs reviews — re-scope or drop before starting. | L | audit 2026-04 |
+| 3.8 | Chemistry slice 2+: `metabolites_by_pathway`, `list_reactions` / `genes_by_reaction`, `organism_metabolite_overlap`, `pathway_chemistry`. | L | chemistry design |
+| 3.11 | PyPI publication (install path is the git tag today). | M | release |
 
-## 4. KG asks pending (explorer → KG)
+## 5. KG asks pending (explorer → KG)
 
-Filed in chat 2026-08-28; the non-release set (B1–B3, new B5 rebuild-#3 ping, KG-MET-002, MET-DM spec question) is written up in
-`multiomics_biocypher_kg/docs/kg-changes/2026-08-28-explorer-handoff.md` §"Explorer open asks (2026-08-29)". KG answered 2026-08-29 (same doc, §"KG answers to the consolidated explorer asks"): B2 + B3 + KG-MET-002 ship in rebuild #3 (hash-neutral); B1 filed KG-side as a trust-vocab slice after #3; MET-DM not planned.
+**A — release coordination**
+- A1. On the next official KG cut: `mcp_min_version` = explorer alpha.6, and stamp `release_highlights` / `breaking_changes` (null on alpha.7). Drafts come from the alpha.6 CHANGELOG (item 1.2).
 
-**A — for the alpha.7 cut (P1)**
-- A1. Stamp `Schema_info` at the cut: `version 0.1.0-alpha.7`, `mcp_min_version 0.1.0a5`, `git_sha_short`, `release_highlights` (KG-SYNC-005 trust surface; KG-SYNC-006 paper batch 49 pubs / 209 experiments / 48 organisms incl. WH8109; ORG-001 organism rollups; `controlled_vocabularies_hash` recipe; dense non-empty `treatment_type` / `background_factors` with `rna_decay` / `tss_mapping` / `genomic_analysis` / `oxygen`; Bernstein 2017 relabel; sparse `table_scope`), `breaking_changes` (InterPro `gene_count` direct → subtree; ncbifam `score` → `bit_score`; MeropsFamily `family_type` → `family_class`; `treatment_type: []` no longer occurs; `table_scope ""` → absent).
-- A2. Hash freeze until the cut (extended ~1 week for 2b.5 + 2b.4, 2026-08-30): no `ControlledVocabulary` value / `min_size` / `signals` edits without telling the explorer (description-only edits are hash-neutral).
+**D — from the Pro N-import coculture analysis 2026-10-06 (not filed KG-side)**
+- D3. Genome-context counts for transport substrates (KG half of 2c.9).
+- D7. Culture-level measurement node type (cell counts, medium NH₄⁺/NO₃⁻, N biomass, DON): organism, condition, bottle id, time, growth phase, value, unit, measured/derived, extraction method. Medium nutrients can already go in as `spent_medium` metabolite assays. Not urgent.
 
-**B — small, whenever (P3)**
-- ~~B1~~ landed in the 2026-08-29 08:53Z rebuild (`value_descriptions` on 39 of 122 `ControlledVocabulary` nodes, hash-neutral). 2.3 is unblocked.
-- ~~B2~~ done in rebuild #3 (42 vocab descriptions rewritten researcher-facing; provenance → yaml comments; hash-neutral).
-- ~~B3~~ done in rebuild #3 (`min_size: int` sparse on the vocab node — was dropped by BioCypher for lack of a schema slot; hash-neutral, no re-pin).
-- ~~B5~~ rebuild #3 verified 2026-08-29 (07:22Z): `kg_release_info` ok, hash unchanged, 17/17 asserts; `min_size = 1` on the 7 promised vocab nodes; 4 goldens moved (3 Biller 2022 DM + `cluster_type` text), 2,904 `-m kg` passed after 4 stale pin fixes.
-- ~~B4~~ closed 2026-08-28 (HO-002: synonyms + `taxonomy_note`, name kept). Was: two `OrganismTaxon` nodes share `preferred_name = 'Meiothermus ruber'` (genome strain + 0-gene treatment taxon) — disambiguate the treatment taxon's name or add a uniqueness validity test.
+**E — docs review 2026-10-31** — E6 (listed in §2).
 
-**D — from the Pro N-import coculture analysis 2026-10-06 (not yet filed KG-side)**
-- ~~D1~~ landed in the 2026-10-15T16:26Z rebuild (metabolite identity: one node per metabolite via MNX / ChEBI↔KEGG xref / conjugate / tautomer merges; stereo forms linked by `Metabolite_is_stereo_form_of` / `Metabolite_is_enantiomer_of`, not merged; `all_identifiers` CURIE list). Absorbed 2026-10-15. Explorer surfacing (CURIE resolver, stereo hint, `stereo_assignment`, `structure_kind`) shipped 2026-10-16. Merge-quality follow-up: `docs/kg-specs/2026-10-15-metabolite-stereo-merge-asks.md`.
-- ~~D2~~ landed in the same rebuild (`MetaboliteClass` from KEGG compound BRITE + `Metabolite.kegg_compound_categories`; ChEBI roles as `ChemicalRole`). Absorbed 2026-10-15; explorer surfacing shipped 2026-10-16.
-- ~~D4~~ landed in the 2026-10-13T06:28Z rebuild (Cyanorak coordinate + sequence fallback: 3,837 genes placed; every Gene now has coordinates + sequence; `coordinate_source` / `sequence_source` vocabs). Absorbed 2026-10-13.
-- ~~D5~~ landed in the 2026-10-13T13:51Z rebuild (`coculture_partner` → dense list incl. background partners, `partner_role` edge property; dialog in `docs/kg-specs/2026-10-13-coculture-partner-list-explorer-asks.md`). Absorbed 2026-10-13; explorer role surface shipped 2026-10-14.
-- ~~D6~~ landed in the 2026-10-18T07:51Z rebuild as curated `Experiment.control_timing` (`matched` / `baseline` / `mixed`) + `design_notes` (per-arm sampling as text; the shared-model id was dropped KG-side). Surfaced on `list_experiments` / both DE tools / `list_filter_values` (spec `docs/tool-specs/control-timing-surface.md`); dialog `docs/kg-specs/2026-10-13-per-arm-sampling-shared-model-explorer-asks.md`.
-- D7. Culture-level measurement node type (cell counts, medium NH₄⁺/NO₃⁻, N biomass, DON): organism, condition, bottle id, time, growth phase, value, unit, measured/derived, extraction method. Medium nutrients can already go in as `spent_medium` metabolite assays. Researcher wants cell counts; it's not urgent.
-- D8 (note): no KEGG reactions on di-/tripeptides; KO coverage gaps on transporters (`amt1`, `focA`). These are annotation limits, no ask yet.
-- ~~D9~~ landed in the 2026-10-31T11:20:55Z rebuild (KG `d3020457`: the 38 retired InterPro accessions are dropped — `InterproEntry` 13,352 → 13,314, `Gene_has_interpro_entry` −1,665; B2 CHANGELOG notes added). The 2 held goldens regenerated in that absorb.
+**C — notes, no action**: `expression_bin` declared but unused (drift test checks in-use ⊆ declared); `direct_gene_count` absent on PfamClan / BriteCategory (documented); 4 publications without `discusses` edges (extraction gaps); no KEGG reactions on di-/tripeptides and KO gaps on transporters (`amt1`, `focA`) — annotation limits.
 
-**E — docs review 2026-10-31** (`docs/kg-specs/2026-10-31-docs-review-kg-asks.md`; K1–K5 closed by the 19:34Z rebuild)
-- E6. TCDB `tier` wording in the `trust_axes` vocab ("Diamond-truncation depth") should match the `Gene_has_tcdb_family.tier` edge description. P3.
-
-**C — notes, no action**: `expression_bin` declared but unused (drift test checks in-use ⊆ declared); `direct_gene_count` absent on PfamClan / BriteCategory (documented); 4 publications without `discusses` edges (pre-existing extraction gaps).
-
-## 5. Conventions this file relies on
+## 6. Conventions this file relies on
 
 - Absent = not applicable, null = applicable-but-empty (`docs://guide/conventions`); row-level models are `SparseRow`, union-shape rows (`GeneReactionMetaboliteTriplet`, `AssaysByMetaboliteResult`, `DiscussedByPublicationResult`) stay `BaseModel`.
 - Every `(edge_or_label, prop)` the explorer filters or rolls up on has a `ControlledVocabulary` node (`-m kg` coverage test); runtime falls back to a pivot query + warning, never a hard-coded list.
