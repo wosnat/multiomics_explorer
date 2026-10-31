@@ -123,7 +123,6 @@ chaining:
   - "gene_details → gene_homologs(locus_tags=[...]) for ortholog group memberships, and list_organisms for the organism's taxonomy and capability rollups"
 
 mistakes:
-  - "annotation_quality / min_quality semantics shifted in 2026-05 KG release. Existing notebooks using min_quality may select a different gene set than before. See docs://guide/conventions."
   - "This returns ALL Gene node properties via g{.*} — for the common case, use gene_overview which returns curated fields with routing signals."
   - "What this adds over gene_overview: the amino-acid `sequence`, genome coordinates (`contig`, `start`, `end`, `strand`, `protein_id`) with their provenance `coordinate_source` / `sequence_source` (`ncbi` / `cyanorak`; `protein_id` is null on genes only Cyanorak called), the free-text `gene_summary` / `function_description` / `alternate_functional_descriptions`, sparse `catalytic_activities` (present on a minority of genes), `contributing_sources`, `seed_ortholog` + `seed_ortholog_evalue`, `all_identifiers`, `subcellular_localization`, and the full set of precomputed per-kind DM counts."
   - "The Gene node carries NO `ec_numbers`, `ko_terms`, `kegg_ids` or `cog_categories` properties — those are null on every gene. Ontology memberships (GO, KEGG KO / pathway, EC, COG, TCDB, CAZy, Pfam, ...) are graph edges: use gene_ontology_terms(locus_tags=[...], ontology=['ec', 'kegg']) (or any ontology list) to read them, gene_overview's `annotation_types` to see which exist."
@@ -132,12 +131,13 @@ mistakes:
     `gene_ontology_terms(ontology=['ec', 'kegg'])` plus the sparse `catalytic_activities`
     text returned here; (2) `gene_overview` per-row `reaction_count` /
     `catalyzed_metabolite_count` / `tcdb_assignment_count` / `transported_metabolite_count`
-    + `evidence_sources` rollup (routing surface — when non-zero, drill; the same counts
+    / `go_transport_metabolite_count` + `evidence_sources` rollup (routing surface — when non-zero, drill; the same counts
     are on the raw node here); (3) `metabolites_by_gene` for the actual metabolite list
     (per-arm: reaction-anchored via Gene → Reaction → Metabolite, transport-anchored via
-    the TC systems the gene points at directly). For 'what compounds does this gene's chemistry
+    the TC systems the gene points at directly, GO-term-anchored via `go_transport` — term
+    definitions, see docs://analysis/transport). For 'what compounds does this gene's chemistry
     touch?', chain `gene_details → metabolites_by_gene` (or pre-filter with
     `gene_overview` first to skip genes with no chemistry).
   - wrong: "gene_details(locus_tags='PMM0001')"
-    right: "gene_details(locus_tags=['PMM0001']) — always a list"
+    right: "gene_details(locus_tags=['PMM0001']) — lists everywhere (MCP rejects a bare string; the Python API wraps it)"
   - "`limit` defaults to every input gene (min 25) rather than a small page — pass an explicit number to page."

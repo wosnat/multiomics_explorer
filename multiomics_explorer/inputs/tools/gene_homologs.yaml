@@ -97,5 +97,5 @@ mistakes:
   - "not_found means the gene doesn't exist in the KG; no_groups means the gene exists but has no ortholog group membership. `no_groups` is this tool's name for the not_matched bucket — see docs://guide/conventions for the shared not_found / not_matched semantics."
   - "For member genes within a group, use genes_by_homolog_group (not this tool)"
   - wrong: "gene_homologs(locus_tags='PMM0001')"
-    right: "gene_homologs(locus_tags=['PMM0001']) — always a list"
+    right: "gene_homologs(locus_tags=['PMM0001']) — lists everywhere (MCP rejects a bare string; the Python API wraps it)"
   - "`limit` defaults to every input gene × 5 groups (min 25) rather than a small page — pass an explicit number to page."

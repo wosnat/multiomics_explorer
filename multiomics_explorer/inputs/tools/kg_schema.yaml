@@ -128,7 +128,7 @@ chaining:
   - "kg_schema(relationship_types=['Biological_process_transports_metabolite', ...]) → run_cypher over Gene → GO term → Metabolite (examples: docs://analysis/transport)"
 
 mistakes:
-  - "Calling kg_schema() with no arguments dumps every node label and relationship type in the KG (100+ KB) — pass labels / relationship_types / section to scope the call to what you actually need before validating a run_cypher query."
+  - "Calling kg_schema() with no arguments dumps every node label and relationship type in the KG (~45 KB, ~11k tokens) — pass labels / relationship_types / section to scope the call to what you actually need before validating a run_cypher query."
   - "Schema does not include node counts — use run_cypher for counts (or kg_release_info for the headline gene / organism / experiment / paper counts)"
   - "This is the one tool whose result is not a list envelope: no total_matching / results, just {nodes, relationships} keyed by label / relationship type. Ontology memberships are relationships (Gene_has_tcdb_family, Gene_involved_in_biological_process, ...), never Gene properties."
   - "Property types are Neo4j storage types (string / int / float / list / bool) — the meaning of each property lives on the tool pages (docs://tools/{tool}) and ontology pages (docs://ontologies/{key}), and vocabularies in list_filter_values."

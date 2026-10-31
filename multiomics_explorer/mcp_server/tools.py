@@ -1979,7 +1979,7 @@ def register_tools(mcp: FastMCP):
 
         Use as the first call of a session; for the graph shape use `kg_schema`, for live vocabulary values `list_filter_values`.
         Filters: none.
-        Returns: verdict, explorer_version, kg, asserts, summary; no row list. `warn` means quoted value lists may be stale, never that calls fail.
+        Returns: verdict, explorer_version, kg (incl. go_transport_excluded_targets / tcdb_substrate_excluded_targets — they explain an empty transport answer), asserts, summary; no row list. `warn` means quoted value lists may be stale, never that calls fail.
         docs://tools/kg_release_info.
         """
         await ctx.info("kg_release_info")
@@ -2241,7 +2241,7 @@ def register_tools(mcp: FastMCP):
         Use to pick an organism or check what data it carries before scoping another tool; for gene lookup use `resolve_gene`.
         Filters: organism_names, compartment.
         Returns: by_organism_type, top_metabolic_capability, top_annotation_capability, by_measurement_capability, not_found; one row = one OrganismTaxon.
-        docs://tools/list_organisms; summary=True first.
+        docs://tools/list_organisms; summary=True is uncapped (larger than the default call).
         """
         await ctx.info(
             f"list_organisms organism_names={organism_names} compartment={compartment} "
@@ -2341,10 +2341,10 @@ def register_tools(mcp: FastMCP):
     ) -> ResolveGeneResponse:
         """Resolve a gene identifier (locus tag, gene name, old locus tag, RefSeq protein ID; case-insensitive) to matching Gene nodes.
 
-        Use when the input is a name or partial label; for what a gene does use `gene_overview`, for free-text search `genes_by_function`.
+        Use when the input is an exact name, locus tag or alias (no partial matching); for partial / free-text use `genes_by_function`, for what a gene does `gene_overview`.
         Filters: identifier, organism.
         Returns: total_matching, by_organism; one row = one Gene match (locus_tag, gene_name, product, organism_name).
-        docs://tools/resolve_gene; summary=True first when a name may hit many strains.
+        docs://tools/resolve_gene; summary=True returns by_organism uncapped (larger than the default call).
         """
         await ctx.info(f"resolve_gene identifier={identifier} organism={organism} offset={offset} summary={summary}")
         try:
@@ -2387,7 +2387,7 @@ def register_tools(mcp: FastMCP):
         product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta').")
         organism_name: str = Field(description="Organism name (e.g. 'Prochlorococcus MED4').")
         gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Photosynthesis').")
-        annotation_quality: int = Field(description="Annotation quality, 0..3 numeric encoding of `Gene.annotation_state` (informative-evidence count). 3=informative_multi, 2=informative_single, 1=catch_all_only, 0=no_evidence. [AQ] Definition shifted in 2026-05 KG release; see docs://guide/conventions.")
+        annotation_quality: int = Field(description="Annotation quality, 0..3 numeric encoding of `Gene.annotation_state` (informative-evidence count). 3=informative_multi, 2=informative_single, 1=catch_all_only, 0=no_evidence. [AQ] see docs://guide/conventions.")
         score: float = Field(description="Lucene relevance score.")
         # verbose only
         function_description: str | None = Field(default=None, description="Functional description text (verbose-only).")
@@ -2429,9 +2429,10 @@ def register_tools(mcp: FastMCP):
         min_quality: Annotated[int, Field(
             description="Minimum annotation_quality (0..3 numeric encoding "
             "of `Gene.annotation_state`): 0=no_evidence, 1=catch_all_only, "
-            "2=informative_single, 3=informative_multi. Use 2 to skip "
-            "hypothetical proteins; 3 for high-confidence. [AQ] Definition "
-            "shifted in 2026-05 KG release; see docs://guide/conventions.",
+            "2=informative_single, 3=informative_multi. Use 2 to require at "
+            "least one informative annotation source (a hypothetical protein "
+            "with a Pfam / KO call still passes); 3 for multi-source support. "
+            "[AQ] see docs://guide/conventions.",
             ge=0, le=3,
         )] = 0,
         summary: SummaryParam = False,
@@ -2489,11 +2490,11 @@ def register_tools(mcp: FastMCP):
         gene_name: str | None = Field(default=None, description="Gene name (e.g. 'dnaN').")
         product: str | None = Field(default=None, description="Gene product (e.g. 'DNA polymerase III subunit beta').")
         gene_category: str | None = Field(default=None, description="Functional category (e.g. 'Replication and repair').")
-        annotation_quality: int | None = Field(default=None, description="0..3 numeric encoding of `Gene.annotation_state` (informative-evidence count). 3=informative_multi, 2=informative_single, 1=catch_all_only, 0=no_evidence. [AQ] Definition shifted in 2026-05 KG release; see docs://guide/conventions.")
+        annotation_quality: int | None = Field(default=None, description="0..3 numeric encoding of `Gene.annotation_state` (informative-evidence count). 3=informative_multi, 2=informative_single, 1=catch_all_only, 0=no_evidence. [AQ] see docs://guide/conventions.")
         organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4').")
         annotation_types: list[str] = Field(default_factory=list, description="Ontology source types where this gene has at least one annotation (e.g. ['go_bp', 'ec', 'kegg']). Presence-only — does NOT indicate content informativeness; a 'cog_category' entry may be 'Function unknown'. For term content, call gene_ontology_terms.")
         annotation_state: str = Field(description="Informativeness state: informative_multi | informative_single | catch_all_only | no_evidence.")
-        informative_annotation_types: list[str] = Field(default_factory=list, description="Subset of annotation_types backed by informative (non-catch-all) terms.")
+        informative_annotation_types: list[str] = Field(default_factory=list, description="Evidence kinds that make this gene informative (mostly annotation_types keys, plus 'reaction' / 'transporter' for KEGG-reaction / TCDB evidence); not a strict subset of annotation_types.")
         expression_edge_count: int = Field(default=0, description="Number of expression data points. When > 0, drill via differential_expression_by_gene(locus_tags=[...]) or gene_response_profile.")
         significant_up_count: int = Field(default=0, description="Significant up-regulated DE observations. When > 0, drill via differential_expression_by_gene(direction='up').")
         significant_down_count: int = Field(default=0, description="Significant down-regulated DE observations. When > 0, drill via differential_expression_by_gene(direction='down').")
@@ -2575,7 +2576,7 @@ def register_tools(mcp: FastMCP):
         # verbose-only
         discussed_in_publications: list[DiscussedPublicationRef] | None = Field(
             default=None,
-            description="Per-paper {doi, prominence, evidence} for papers discussing this gene (verbose-only; avg ~1, max 6 per gene). The evidence quote explains the mention inline. Call discussed_by_publication for a paper's full discussed set.",
+            description="Per-paper {doi, prominence, evidence} for papers discussing this gene (verbose-only; avg ~1, max ~8 per gene). The evidence quote explains the mention inline. Call discussed_by_publication for a paper's full discussed set.",
         )
         gene_summary: str | None = Field(default=None, description="Concatenated summary text (verbose-only, e.g. 'prmA :: ribosomal protein L11 methyltransferase :: Methylates ribosomal protein L11').")
         function_description: str | None = Field(default=None, description="Curated functional description (verbose-only). May be null when no curated text exists.")
@@ -2683,7 +2684,7 @@ def register_tools(mcp: FastMCP):
         Use to decide which drill-down has evidence for a gene batch; for the raw node dump use `gene_details`.
         Filters: locus_tags.
         Returns: by_organism, by_category, by_annotation_type, has_* batch counts, top_discussing_publications, not_found; one row = one gene's routing counts.
-        docs://tools/gene_overview; summary=True first.
+        docs://tools/gene_overview; summary=True for batches over a few hundred genes.
         """
         await ctx.info(f"gene_overview locus_tags={locus_tags} summary={summary}")
         try:
@@ -2748,7 +2749,7 @@ def register_tools(mcp: FastMCP):
         truncated: bool = Field(description="True if total_matching > returned.")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG.")
         warnings: list[str] = Field(default_factory=list, description="Advisory diagnostics — e.g. a not_found locus_tag differs only by case from a real one (locus_tags are never case-normalised).")
-        results: list[dict] = Field(default_factory=list, description="One row per gene — all Gene node properties via g{.*} (~30 fields incl. locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, function_description, catalytic_activities, ec_numbers). Sparse fields only present when populated. annotation_quality is 0..3 (see docs://guide/conventions for the [AQ] redefinition). TCDB and CAZy memberships are graph edges (Gene_has_tcdb_family / Gene_has_cazy_family), not properties.")
+        results: list[dict] = Field(default_factory=list, description="One row per gene — all Gene node properties via g{.*} (~50 fields incl. locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, sequence, coordinates, function_description, catalytic_activities, precomputed *_count rollups). Sparse fields only present when populated. annotation_quality is 0..3 ([AQ] see docs://guide/conventions). TCDB and CAZy memberships are graph edges (Gene_has_tcdb_family / Gene_has_cazy_family), not properties.")
 
     @mcp.tool(
         tags={"genes"},
@@ -4068,7 +4069,7 @@ def register_tools(mcp: FastMCP):
         Use as the study-level discovery entry point; for per-experiment detail use `list_experiments(publication_dois=[...])`, for the entities a paper names `discussed_by_publication`.
         Filters: organism, search_text, author, publication_dois, compartment, plus the condition filters.
         Returns: by_organism, by_treatment_type, by_omics_type, by_compartment, by_discusses_coverage, not_found; one row = one publication.
-        docs://tools/list_publications; summary=True first.
+        docs://tools/list_publications; summary=True is uncapped (larger than the default call).
         """
         await ctx.info(f"list_publications organism={organism} treatment_type={treatment_type} "
                        f"growth_phases={growth_phases} search_text={search_text} author={author} "
