@@ -6,8 +6,8 @@ Rank (ontology × level) strata by enrichment suitability — term sizes, genome
 
 Use as the pre-flight that picks (ontology, level) for `pathway_enrichment` / `cluster_enrichment`; the terms are `search_ontology`, gene sets `genes_by_ontology`.
 Filters: organism, ontology, tree, experiment_ids, min/max_gene_set_size, informative_only, call_class, tcdb_call, interpro_type.
-Returns: organism_gene_count, n_ontologies, by_ontology, not_found, not_matched; one row = one stratum (BRITE per tree, InterPro per type).
-docs://tools/ontology_landscape; summary=True first.
+Returns: organism_gene_count, n_ontologies, by_ontology, not_found, not_matched, skipped_ontologies; one row = one stratum (BRITE per tree, InterPro per type).
+docs://tools/ontology_landscape.
 
 ## Parameters
 
