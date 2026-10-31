@@ -109,6 +109,116 @@ def _infer_type(value: Any) -> str:
     return "string"
 
 
+# Per-process caches keyed by KG endpoint (restart the server after a KG
+# rebuild, as for the other per-process caches); fakes / custom conns are
+# never cached. `_PROPERTIES_CACHE` holds one property map per
+# (endpoint, kind, type name); `_NODE_CATALOG_CACHE` the whole-graph
+# `db.schema.nodeTypeProperties()` read (~5 s).
+_PROPERTIES_CACHE: dict[tuple, dict[str, str]] = {}
+_NODE_CATALOG_CACHE: dict[tuple, dict[str, dict[str, str]]] = {}
+
+_PROCEDURE_TYPES = {
+    "String": "string", "Long": "int", "Double": "float", "Boolean": "boolean",
+}
+
+
+def _endpoint(conn: GraphConnection) -> tuple | None:
+    settings = getattr(conn, "_settings", None)
+    if isinstance(conn, GraphConnection) and settings is not None:
+        return (settings.neo4j_uri, settings.neo4j_database)
+    return None
+
+
+def _procedure_type(types: list[str] | None) -> str:
+    """Map `db.schema.*TypeProperties` type names to `_infer_type` names."""
+    for t in sorted(types or []):
+        if t.endswith("Array"):
+            return "list"
+        if t in _PROCEDURE_TYPES:
+            return _PROCEDURE_TYPES[t]
+    return "any"
+
+
+def _node_catalog(conn: GraphConnection) -> dict[str, dict[str, str]]:
+    """label -> {property: type} over every node in the graph, from
+    `db.schema.nodeTypeProperties()` (a full scan, not a sample)."""
+    endpoint = _endpoint(conn)
+    if endpoint is not None and endpoint in _NODE_CATALOG_CACHE:
+        return _NODE_CATALOG_CACHE[endpoint]
+    catalog: dict[str, dict[str, str]] = {}
+    rows = conn.execute_query(
+        "CALL db.schema.nodeTypeProperties() "
+        "YIELD nodeLabels, propertyName, propertyTypes "
+        "RETURN nodeLabels, propertyName, propertyTypes"
+    )
+    for row in rows:
+        name = row.get("propertyName")
+        if not name:
+            continue
+        for label in row.get("nodeLabels") or []:
+            props = catalog.setdefault(label, {})
+            if props.get(name, "any") == "any":
+                props[name] = _procedure_type(row.get("propertyTypes"))
+    if endpoint is not None:
+        _NODE_CATALOG_CACHE[endpoint] = catalog
+    return catalog
+
+
+def _type_properties(conn: GraphConnection, kind: str, name: str) -> dict[str, str]:
+    """Property name -> type for one node label (``kind='node'``) or
+    relationship type (``kind='rel'``).
+
+    Types come from a deterministically ordered 10-row sample; the key set is
+    the union over *every* node / edge of the type, so a sparse property
+    (e.g. ``rank_up``, set only on significant-up expression edges) is listed
+    regardless of whether the sample hits it. Keys the sample missed take
+    their type from `db.schema.nodeTypeProperties()` (nodes) or from the
+    first carrier found (relationships; one batched query per type).
+    """
+    endpoint = _endpoint(conn)
+    cache_key = (*endpoint, kind, name) if endpoint is not None else None
+    if cache_key is not None and cache_key in _PROPERTIES_CACHE:
+        return dict(_PROPERTIES_CACHE[cache_key])
+
+    if kind == "node":
+        match, var, order = f"MATCH (n:`{name}`)", "n", "coalesce(n.id, elementId(n))"
+    else:
+        match, var, order = f"MATCH ()-[r:`{name}`]->()", "r", "elementId(r)"
+
+    props: dict[str, str] = {}
+    sample = conn.execute_query(
+        f"{match} RETURN properties({var}) AS props ORDER BY {order} LIMIT 10"
+    )
+    for row in sample:
+        if row.get("props"):
+            for k, v in row["props"].items():
+                if k not in props or props[k] == "any":
+                    props[k] = _infer_type(v)
+
+    if kind == "node":
+        for k, t in sorted(_node_catalog(conn).get(name, {}).items()):
+            if props.get(k, "any") == "any":
+                props[k] = t
+    else:
+        all_keys = conn.execute_query(
+            f"{match} UNWIND keys({var}) AS k RETURN DISTINCT k"
+        )
+        missing = sorted({row.get("k") for row in all_keys} - set(props) - {None})
+        if missing:
+            fill = conn.execute_query(
+                f"UNWIND $keys AS k CALL {{ WITH k {match} WHERE {var}[k] IS NOT NULL "
+                f"RETURN {var}[k] AS v LIMIT 1 }} RETURN k, v",
+                keys=missing,
+            )
+            found = {row.get("k"): row.get("v") for row in fill}
+            for k in missing:
+                props[k] = _infer_type(found.get(k))
+
+    if cache_key is not None:
+        _PROPERTIES_CACHE[cache_key] = dict(props)
+    return props
+
+
 def load_schema_from_neo4j(
     conn: GraphConnection,
     *,
@@ -128,10 +238,11 @@ def load_schema_from_neo4j(
     ``api.functions.kg_schema``). ``section`` skips introspecting the other
     half entirely (no catalog call for it).
 
-    Property sampling is ordered deterministically (``coalesce(n.id,
-    elementId(n))`` for nodes, ``elementId(r)`` for relationships) so the
-    captured type of a polymorphic property is stable across builds, even
-    for abstract labels that lack an ``id`` property.
+    Property keys are the union over every node / edge of the type
+    (``_type_properties``), so sparse properties are always listed; types come from a deterministically
+    ordered sample (``coalesce(n.id, elementId(n))`` for nodes,
+    ``elementId(r)`` for relationships), stable across builds even for
+    abstract labels that lack an ``id`` property. See ``_type_properties``.
     """
     schema = GraphSchema()
 
@@ -141,17 +252,7 @@ def load_schema_from_neo4j(
             count = conn.get_node_count(label)
             node_schema = NodeSchema(label=label, count=count)
 
-            # Sample multiple nodes, deterministically ordered, to capture
-            # optional properties.
-            sample = conn.execute_query(
-                f"MATCH (n:`{label}`) RETURN properties(n) AS props "
-                "ORDER BY coalesce(n.id, elementId(n)) LIMIT 10"
-            )
-            for row in sample:
-                if row["props"]:
-                    for k, v in row["props"].items():
-                        if k not in node_schema.properties or node_schema.properties[k] == "any":
-                            node_schema.properties[k] = _infer_type(v)
+            node_schema.properties = _type_properties(conn, "node", label)
 
             schema.nodes[label] = node_schema
 
@@ -173,17 +274,7 @@ def load_schema_from_neo4j(
             rel_schema.source_labels = sorted(src_labels)
             rel_schema.target_labels = sorted(tgt_labels)
 
-            # Sample multiple relationships, deterministically ordered, to
-            # capture optional properties.
-            sample = conn.execute_query(
-                f"MATCH ()-[r:`{rel_type}`]->() RETURN properties(r) AS props "
-                "ORDER BY elementId(r) LIMIT 10"
-            )
-            for row in sample:
-                if row["props"]:
-                    for k, v in row["props"].items():
-                        if k not in rel_schema.properties or rel_schema.properties[k] == "any":
-                            rel_schema.properties[k] = _infer_type(v)
+            rel_schema.properties = _type_properties(conn, "rel", rel_type)
 
             schema.relationships[rel_type] = rel_schema
 

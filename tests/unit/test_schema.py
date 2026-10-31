@@ -283,7 +283,10 @@ class TestLoadSchemaFromNeo4jScoping:
 
         load_schema_from_neo4j(conn, labels=["Gene"], section="nodes")
 
-        cypher = conn.execute_query.call_args[0][0]
+        cypher = next(
+            c.args[0] for c in conn.execute_query.call_args_list
+            if "properties(n)" in c.args[0]
+        )
         assert "ORDER BY coalesce(n.id, elementId(n))" in cypher
         assert "LIMIT 10" in cypher
 
@@ -302,3 +305,72 @@ class TestLoadSchemaFromNeo4jScoping:
         assert len(prop_calls) == 1
         assert "ORDER BY elementId(r)" in prop_calls[0]
         assert "LIMIT 10" in prop_calls[0]
+
+
+def _routing_conn(sample_props, all_keys, fill_values):
+    """Fake conn answering the three property queries by shape: the
+    10-row sample, the full-type key union, and the per-key fill."""
+    conn = MagicMock()
+    conn.get_node_count.return_value = 1
+
+    def execute(cypher, **params):
+        if "nodeTypeProperties" in cypher:
+            names = {int: "Long", float: "Double", str: "String"}
+            return [
+                {"nodeLabels": ["Gene"], "propertyName": k,
+                 "propertyTypes": [names[type(fill_values[k])]]}
+                for k in all_keys if k in fill_values
+            ]
+        if "properties(" in cypher:
+            return [{"props": p} for p in sample_props]
+        if "DISTINCT k" in cypher:
+            return [{"k": k} for k in all_keys]
+        if "AS v" in cypher:
+            return [{"k": k, "v": fill_values[k]} for k in params["keys"]]
+        return []
+
+    conn.execute_query.side_effect = execute
+    return conn
+
+
+class TestSparseProperties:
+    """Properties set on only a few nodes/edges must not depend on whether
+    the 10-row sample happens to hit one (backlog 3.20: `rank_up` on
+    `Changes_expression_of` dropped out after a rebuild)."""
+
+    def test_sparse_relationship_property_is_listed_with_its_type(self):
+        conn = _routing_conn(
+            sample_props=[{"log2_fold_change": 1.5}],
+            all_keys=["log2_fold_change", "rank_up"],
+            fill_values={"rank_up": 3},
+        )
+        schema = load_schema_from_neo4j(
+            conn, relationship_types=["Changes_expression_of"],
+            section="relationships",
+        )
+        props = schema.relationships["Changes_expression_of"].properties
+        assert props == {"log2_fold_change": "float", "rank_up": "int"}
+
+    def test_sparse_node_property_is_listed_with_its_type(self):
+        conn = _routing_conn(
+            sample_props=[{"locus_tag": "PMM0001"}],
+            all_keys=["locus_tag", "gene_name"],
+            fill_values={"gene_name": "dnaN"},
+        )
+        schema = load_schema_from_neo4j(conn, labels=["Gene"], section="nodes")
+        assert schema.nodes["Gene"].properties == {
+            "locus_tag": "string", "gene_name": "string",
+        }
+
+    def test_sampled_keys_are_not_refetched(self):
+        conn = _routing_conn(
+            sample_props=[{"log2_fold_change": 1.5}],
+            all_keys=["log2_fold_change"],
+            fill_values={},
+        )
+        load_schema_from_neo4j(
+            conn, relationship_types=["Changes_expression_of"],
+            section="relationships",
+        )
+        fills = [c for c in conn.execute_query.call_args_list if "AS v" in c.args[0]]
+        assert fills == []
