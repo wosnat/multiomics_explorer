@@ -303,7 +303,6 @@
   used_in:
     - multiomics_explorer/inputs/ontologies/kegg.yaml
     - multiomics_explorer/inputs/ontologies/brite.yaml
-    - multiomics_explorer/inputs/tools/genes_by_ontology.yaml
   note: "all KO ids use the kegg.orthology: prefix; kegg:K… is retired (prefixed == ko_terms is asserted separately)"
 
 - id: kegg_uninformative_by_level_kind
