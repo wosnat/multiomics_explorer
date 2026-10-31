@@ -50,11 +50,11 @@ on most tools) and `offset`.
 `by_*` / `top_*` envelope lists longer than a handful of entries are
 capped to the **first 10** (desc by ranking count) on a detail call
 (`summary=False`, default). A capped list gets a sparse sibling key
-`<key>_truncated: true`; otherwise absent in Python / `null` over MCP. `summary=True` always returns the **full, uncapped** list — read it
-first for a whole ranking (on `resolve_gene` the `by_organism` counts
-then sum exactly to `total_matching`; on `list_publications` a
-multi-organism paper counts once per organism). Each tool's docs name
-its capped keys. Exception: `pathway_enrichment.top_pathways_by_padj` is a
+`<key>_truncated: true`; otherwise absent in Python / `null` over MCP.
+`summary=True` returns the **full** list, except on `resolve_gene`,
+`list_organisms`, `list_publications` and `list_experiments`, which cap in
+summary too — a `_truncated` list there is a top 10; page the rows for the
+rest. Each tool's docs name its capped keys. Exception: `pathway_enrichment.top_pathways_by_padj` is a
 genuine top-10 in both modes, no `_truncated` companion key.
 
 ### `summary=True` mode

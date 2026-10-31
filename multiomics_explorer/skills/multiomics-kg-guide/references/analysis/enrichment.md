@@ -317,11 +317,13 @@ the genes with at least one edge in the chosen ontology, built by the same
 rules as TERM2GENE: the same trust filters, `tree`, `interpro_type` and
 `informative_only`, before the gene-set size filter. With `level` it spans
 every term at that level, even when `term_ids` narrows the tested terms; with
-`term_ids` alone it is the union of their genes. Gene-set genes outside the
-universe drop out of `n`. It is organism-wide (not intersected with the
-experiment's quantified genes) and shared by every gene set; for "annotated
-and quantified", pass that list explicitly. Before this mode existed the
-workaround was exactly that: an explicit `background=` list.
+`term_ids` alone it is the union of their genes — every tested term then
+covers most of the universe, so the run warns; pass `level`. The annotated
+set is intersected with each gene set's default universe (`table_scope` on
+`pathway_enrichment`, `cluster_union` on `cluster_enrichment`), so it means
+"annotated and quantified" / "annotated and clustered". Gene-set genes
+outside the universe drop out of `n`. Before this mode existed the workaround
+was an explicit `background=` list.
 
 ---
 

@@ -19198,11 +19198,10 @@ class TestGenesByOntologySizeFiltered:
     @pytest.mark.parametrize("bounds", [
         {"min_gene_set_size": 5, "max_gene_set_size": None},
         {"min_gene_set_size": 5, "max_gene_set_size": 500},
-        {"min_gene_set_size": 2},
-        {"max_gene_set_size": 100},
+        {"min_gene_set_size": 1, "max_gene_set_size": 100000},
     ])
     def test_explicit_bounds_suppress_warning_keep_counts(self, bounds):
-        """backlog 2d.8: the caller chose the window, so the drop is not
+        """backlog 2d.8: the caller chose both bounds, so the drop is not
         silent — counts stay, the warning does not fire."""
         out, _ = self._run(
             level=2, summary=True, **bounds,
@@ -19212,6 +19211,21 @@ class TestGenesByOntologySizeFiltered:
         assert out["size_filtered_terms"] == 1
         assert out["size_filtered_genes"] == 1
         assert self._size_warnings(out) == [], out["warnings"]
+
+    @pytest.mark.parametrize("bounds", [
+        {"min_gene_set_size": 2},
+        {"max_gene_set_size": None},
+        {"max_gene_set_size": 100000},
+    ])
+    def test_one_default_bound_still_warns(self, bounds):
+        """A bound left at its default can still drop terms the caller never
+        asked to drop (max=None alone keeps min=5)."""
+        out, _ = self._run(
+            level=2, summary=True, **bounds,
+            pt_sized=self._pt("t1"), pg_sized=self._pg("g1"),
+            pt_all=self._pt("t1", "t2"), pg_all=self._pg("g1", "g2"),
+        )
+        assert len(self._size_warnings(out)) == 1, out["warnings"]
 
     def test_default_bounds_are_plain_int_values(self):
         import inspect
@@ -24157,8 +24171,12 @@ class TestTrustAxisTierDescription:
 class TestEnrichmentAnnotatedBackground:
     """`background='annotated'`: the universe is the genes that reach at
     least one term of the run's TERM2GENE scope (same trust filters / tree /
-    interpro_type / informative_only); with `level` + `term_ids` it widens
-    to every term at that level."""
+    interpro_type / informative_only), intersected with each gene set's
+    default universe (table_scope / cluster_union); with `level` + `term_ids`
+    it widens to every term at that level."""
+
+    # Default universe: PMM0005 is annotated but not quantified / clustered.
+    _DEFAULT_BG = ["PMM0001", "PMM0002", "PMM0007", "PMM0008", "PMM0009"]
 
     @pytest.fixture(autouse=True)
     def _enrichment_preflight(self, monkeypatch):
@@ -24180,7 +24198,7 @@ class TestEnrichmentAnnotatedBackground:
         return EnrichmentInputs(
             organism_name="MED4",
             gene_sets={"exp1|T0|up": ["PMM0001", "PMM0007"]},
-            background={"exp1|T0|up": ["PMM0001", "PMM0007", "PMM0008"]},
+            background={"exp1|T0|up": list(TestEnrichmentAnnotatedBackground._DEFAULT_BG)},
             cluster_metadata={"exp1|T0|up": {
                 "experiment_id": "exp1", "timepoint": "T0", "direction": "up"}},
             not_found=[], not_matched=[], no_expression=[],
@@ -24208,8 +24226,11 @@ class TestEnrichmentAnnotatedBackground:
             monkeypatch.setattr(enr, "de_enrichment_inputs",
                                 lambda **_: self._de_inputs())
         else:
-            monkeypatch.setattr(enr, "cluster_enrichment_inputs",
-                                lambda **_: TestClusterEnrichment._stub_inputs())
+            def _cluster_inputs(**_):
+                inputs = TestClusterEnrichment._stub_inputs()
+                inputs.background = {"Cluster A": list(self._DEFAULT_BG)}
+                return inputs
+            monkeypatch.setattr(enr, "cluster_enrichment_inputs", _cluster_inputs)
         return gbo_calls, seen
 
     def _call(self, kind, **kw):
@@ -24228,7 +24249,8 @@ class TestEnrichmentAnnotatedBackground:
         result = self._call(kind, level=1, background="annotated")
         assert len(gbo_calls) == 1
         (bg,) = seen["background"].values()
-        assert bg == ["PMM0001", "PMM0002", "PMM0005", "PMM0009"]
+        # annotated {1, 2, 5, 9} ∩ default universe (no PMM0005, no 7 / 8)
+        assert bg == ["PMM0001", "PMM0002", "PMM0009"]
         assert result.params["background_mode"] == "annotated"
 
     @pytest.mark.parametrize("kind", ["pathway", "cluster"])
@@ -24251,10 +24273,19 @@ class TestEnrichmentAnnotatedBackground:
     def test_term_ids_only_uses_union_of_requested_terms(
             self, monkeypatch, kind):
         gbo_calls, seen = self._wire(monkeypatch, kind=kind)
-        self._call(kind, term_ids=["T1", "T2"], background="annotated")
+        result = self._call(kind, term_ids=["T1", "T2"], background="annotated")
         assert len(gbo_calls) == 1
         (bg,) = seen["background"].values()
-        assert bg == ["PMM0001", "PMM0002", "PMM0005"]
+        assert bg == ["PMM0001", "PMM0002"]
+        assert any("term_ids and no level" in w
+                   for w in result.inputs.warnings)
+
+    @pytest.mark.parametrize("kind", ["pathway", "cluster"])
+    def test_level_set_does_not_warn(self, monkeypatch, kind):
+        self._wire(monkeypatch, kind=kind)
+        result = self._call(kind, level=1, background="annotated")
+        assert not any("term_ids and no level" in w
+                       for w in result.inputs.warnings)
 
     @pytest.mark.parametrize("kind", ["pathway", "cluster"])
     def test_validation_message_names_annotated(self, kind):

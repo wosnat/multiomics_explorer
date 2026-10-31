@@ -12518,14 +12518,14 @@ class TestGenesByOntologySizeFilteredWrapper:
 
     _BASE = TestGenesByOntologyWrapper._SAMPLE_API_RETURN
 
-    async def _call(self, tool_fns, mock_ctx, api_return):
+    async def _call(self, tool_fns, mock_ctx, api_return, **kw):
         with patch(
             "multiomics_explorer.api.functions.genes_by_ontology",
             return_value=api_return,
         ):
             return await tool_fns["genes_by_ontology"](
                 mock_ctx, ontology="go_bp",
-                organism="Prochlorococcus MED4", level=1,
+                organism="Prochlorococcus MED4", level=1, **kw,
             )
 
     @pytest.mark.asyncio
@@ -12580,11 +12580,12 @@ class TestGenesByOntologySizeFilteredWrapper:
     @pytest.mark.asyncio
     async def test_no_ctx_warning_without_api_size_warning(
             self, tool_fns, mock_ctx):
-        """Explicit bounds: size_filtered_terms > 0 but the api emitted no
-        size warning, so the wrapper logs none either."""
+        """Both bounds explicit: size_filtered_terms > 0 but no warning is
+        due (api._size_warning_due), so the wrapper logs none."""
         api_return = {**self._BASE, "size_filtered_terms": 3,
                       "size_filtered_genes": 1, "warnings": []}
-        await self._call(tool_fns, mock_ctx, api_return)
+        await self._call(tool_fns, mock_ctx, api_return,
+                         min_gene_set_size=5, max_gene_set_size=500)
         msgs = [c.args[0] for c in mock_ctx.warning.call_args_list]
         assert not any("gene_set_size" in m for m in msgs), msgs
 

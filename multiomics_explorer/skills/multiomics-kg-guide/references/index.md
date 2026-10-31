@@ -3,14 +3,14 @@
 ## Guides
 
 - `docs://guide/concepts` — ~6596 tok — Read when an entity in a tool output is unfamiliar: what each node and edge means…
-- `docs://guide/conventions` — ~7036 tok — Read when a cross-tool behaviour surprises you: envelopes, filters, not_found vs not_matched, paging.
+- `docs://guide/conventions` — ~7088 tok — Read when a cross-tool behaviour surprises you: envelopes, filters, not_found vs not_matched, paging.
 - `docs://guide/python_api` — ~4167 tok — Read before scripting: Python vs MCP, imports, the three return shapes, DataFrame conversion.
 - `docs://guide/start_here` — ~4019 tok — Read first: the tool families, a question-shape decision tree, and when to call summary=True.
 
 ## Tools (brief)
 
 - `docs://tools/assays_by_metabolite` — ~1365 tok
-- `docs://tools/cluster_enrichment` — ~1858 tok
+- `docs://tools/cluster_enrichment` — ~1864 tok
 - `docs://tools/differential_expression_by_gene` — ~1179 tok
 - `docs://tools/differential_expression_by_ortholog` — ~1190 tok
 - `docs://tools/discussed_by_publication` — ~787 tok
@@ -46,7 +46,7 @@
 - `docs://tools/metabolites_by_quantifies_assay` — ~1892 tok
 - `docs://tools/ontology_landscape` — ~1346 tok
 - `docs://tools/ontology_term_details` — ~1116 tok
-- `docs://tools/pathway_enrichment` — ~1728 tok
+- `docs://tools/pathway_enrichment` — ~1734 tok
 - `docs://tools/resolve_gene` — ~604 tok
 - `docs://tools/run_cypher` — ~389 tok
 - `docs://tools/search_homolog_groups` — ~745 tok
@@ -57,7 +57,7 @@
 Append /full for the complete page — all worked examples + full response format.
 
 - `docs://tools/assays_by_metabolite/full` — ~5371 tok
-- `docs://tools/cluster_enrichment/full` — ~4440 tok
+- `docs://tools/cluster_enrichment/full` — ~4457 tok
 - `docs://tools/differential_expression_by_gene/full` — ~6425 tok
 - `docs://tools/differential_expression_by_ortholog/full` — ~3041 tok
 - `docs://tools/discussed_by_publication/full` — ~3344 tok
@@ -76,7 +76,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/genes_by_homolog_group/full` — ~2338 tok
 - `docs://tools/genes_by_metabolite/full` — ~11093 tok
 - `docs://tools/genes_by_numeric_metric/full` — ~6342 tok
-- `docs://tools/genes_by_ontology/full` — ~12067 tok
+- `docs://tools/genes_by_ontology/full` — ~12064 tok
 - `docs://tools/genes_in_cluster/full` — ~1979 tok
 - `docs://tools/kg_release_info/full` — ~2354 tok
 - `docs://tools/kg_schema/full` — ~2243 tok
@@ -93,7 +93,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/metabolites_by_quantifies_assay/full` — ~6093 tok
 - `docs://tools/ontology_landscape/full` — ~7407 tok
 - `docs://tools/ontology_term_details/full` — ~7526 tok
-- `docs://tools/pathway_enrichment/full` — ~9359 tok
+- `docs://tools/pathway_enrichment/full` — ~9374 tok
 - `docs://tools/resolve_gene/full` — ~1543 tok
 - `docs://tools/run_cypher/full` — ~945 tok
 - `docs://tools/search_homolog_groups/full` — ~2154 tok
@@ -103,7 +103,7 @@ Append /full for the complete page — all worked examples + full response forma
 
 - `docs://analysis/annotation_evidence` — ~7612 tok — Read before trusting, filtering or ranking gene→term annotations: evidence ladder, tiers, gates.
 - `docs://analysis/derived_metrics` — ~2771 tok — Read for non-DE gene evidence (rhythmicity, amplitudes, classes): discover DMs, then drill down.
-- `docs://analysis/enrichment` — ~7700 tok — Read before pathway_enrichment / cluster_enrichment: building blocks, backgrounds, levels, pitfalls.
+- `docs://analysis/enrichment` — ~7732 tok — Read before pathway_enrichment / cluster_enrichment: building blocks, backgrounds, levels, pitfalls.
 - `docs://analysis/expression` — ~2504 tok — Read for DE questions: the DE tool family, plus response_matrix / gene_set_compare summaries.
 - `docs://analysis/metabolites` — ~14644 tok — Read before any metabolite question: which pipeline answers it, then the drill.
 - `docs://analysis/transport` — ~4326 tok — What transports compound X in organism Y, or what does gene Z move? The KG answers from three routes.

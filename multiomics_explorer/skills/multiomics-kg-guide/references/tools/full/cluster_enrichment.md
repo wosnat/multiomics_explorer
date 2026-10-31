@@ -19,7 +19,7 @@ docs://tools/cluster_enrichment; summary=True first.
 | tree | string \| None | None | BRITE tree name filter. REQUIRED when ontology='brite' (12 trees; see list_filter_values(filter_type='brite_tree')) — a tree-less BRITE run raises, since it would mix taxonomy and function terms. Invalid for any other ontology. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level (0 = root). At least one of `level` or `term_ids` required. See docs://guide/conventions. |
 | term_ids | list[string] \| None | None | Specific term IDs to test. Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced to canonical (see `term_validation.resolved_aliases`). |
-| background | string \| list[string] | cluster_union | 'cluster_union' (default — union of all clustered genes; differs from `pathway_enrichment`'s 'table_scope' default), 'organism', 'annotated' (genes with >=1 edge in this ontology under the same filters), or explicit locus_tag list. See docs://analysis/enrichment. |
+| background | string \| list[string] | cluster_union | 'cluster_union' (default — union of all clustered genes; differs from `pathway_enrichment`'s 'table_scope' default), 'organism', 'annotated' (clustered genes with >=1 edge in this ontology under the same filters; pass level=), or explicit locus_tag list. See docs://analysis/enrichment. |
 | min_gene_set_size | int | 5 | Per-cluster M filter: drop pathways with fewer members. |
 | max_gene_set_size | int \| None | 500 | Per-cluster M filter upper bound. None disables. |
 | min_cluster_size | int | 3 | Skip clusters with fewer members than this. |
@@ -201,7 +201,7 @@ See `docs://analysis/annotation_evidence` for the trust-axis registry and rank-v
 
 - `informative_only=True` (default) changes the tested term set, and with it the BH-adjusted p-values. For results comparable to a run that kept every term, pass `informative_only=False` and post-filter on `is_informative`. See docs://guide/conventions.
 
-- Default background is `cluster_union` (union of all clustered genes, including size-filtered). Use `'organism'` only when clustering covers the full genome. `'annotated'` keeps only genes with at least one edge in the chosen ontology (same filters as the gene sets) — for partial-coverage ontologies such as `tigr_role`.
+- Default background is `cluster_union` (union of all clustered genes, including size-filtered). Use `'organism'` only when clustering covers the full genome. `'annotated'` keeps only clustered genes with at least one edge in the chosen ontology (same filters as the gene sets; intersected with `cluster_union`) — for partial-coverage ontologies such as `tigr_role`.
 
 - BH correction is per-cluster, NOT across clusters.
 

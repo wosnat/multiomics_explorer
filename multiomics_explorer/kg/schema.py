@@ -141,7 +141,8 @@ def _procedure_type(types: list[str] | None) -> str:
 
 def _node_catalog(conn: GraphConnection) -> dict[str, dict[str, str]]:
     """label -> {property: type} over every node in the graph, from
-    `db.schema.nodeTypeProperties()` (a full scan, not a sample)."""
+    `db.schema.nodeTypeProperties()` (a full scan, not a sample); abstract
+    parent labels are left out (see below)."""
     endpoint = _endpoint(conn)
     if endpoint is not None and endpoint in _NODE_CATALOG_CACHE:
         return _NODE_CATALOG_CACHE[endpoint]
@@ -151,11 +152,25 @@ def _node_catalog(conn: GraphConnection) -> dict[str, dict[str, str]]:
         "YIELD nodeLabels, propertyName, propertyTypes "
         "RETURN nodeLabels, propertyName, propertyTypes"
     )
+    # BioCypher stamps every ancestor label on a node (Gene also carries
+    # BiologicalEntity, NamedThing, Entity, ...). A label takes a row's
+    # properties only when it is the most specific label of that row's
+    # combination (fewest distinct combinations containing it), so abstract
+    # parents keep their sampled properties instead of every child's.
+    combos = {tuple(sorted(r.get("nodeLabels") or [])) for r in rows}
+    spread: dict[str, int] = {}
+    for combo in combos:
+        for label in combo:
+            spread[label] = spread.get(label, 0) + 1
     for row in rows:
         name = row.get("propertyName")
-        if not name:
+        labels = row.get("nodeLabels") or []
+        if not name or not labels:
             continue
-        for label in row.get("nodeLabels") or []:
+        narrowest = min(spread[label] for label in labels)
+        for label in labels:
+            if spread[label] != narrowest:
+                continue
             props = catalog.setdefault(label, {})
             if props.get(name, "any") == "any":
                 props[name] = _procedure_type(row.get("propertyTypes"))

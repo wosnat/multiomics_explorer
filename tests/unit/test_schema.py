@@ -374,3 +374,38 @@ class TestSparseProperties:
         )
         fills = [c for c in conn.execute_query.call_args_list if "AS v" in c.args[0]]
         assert fills == []
+
+
+class TestAbstractLabels:
+    """BioCypher parent labels (NamedThing, Entity, ...) sit on every node;
+    they must not collect every child label's properties from the catalog."""
+
+    def _conn(self):
+        conn = MagicMock()
+        conn.get_node_count.return_value = 1
+
+        def execute(cypher, **params):
+            if "nodeTypeProperties" in cypher:
+                return [
+                    {"nodeLabels": ["Gene", "NamedThing"],
+                     "propertyName": "locus_tag", "propertyTypes": ["String"]},
+                    {"nodeLabels": ["Gene", "NamedThing"],
+                     "propertyName": "rank_hint", "propertyTypes": ["Long"]},
+                    {"nodeLabels": ["Protein", "NamedThing"],
+                     "propertyName": "sequence_length", "propertyTypes": ["Long"]},
+                ]
+            return []
+
+        conn.execute_query.side_effect = execute
+        return conn
+
+    def test_concrete_label_gets_catalog_properties(self):
+        schema = load_schema_from_neo4j(self._conn(), labels=["Gene"], section="nodes")
+        assert schema.nodes["Gene"].properties == {
+            "locus_tag": "string", "rank_hint": "int",
+        }
+
+    def test_abstract_label_does_not_collect_child_properties(self):
+        schema = load_schema_from_neo4j(
+            self._conn(), labels=["NamedThing"], section="nodes")
+        assert schema.nodes["NamedThing"].properties == {}

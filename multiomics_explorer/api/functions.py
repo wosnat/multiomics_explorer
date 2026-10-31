@@ -2581,8 +2581,8 @@ def list_organisms(
     chemistry_capable.sort(
         key=lambda r: r["catalyzed_metabolite_count"], reverse=True,
     )
-    # Full sorted list; _cap_breakdowns below caps to top 10 on every call
-    # and keeps the full list when summary=True.
+    # Full sorted list; _cap_breakdowns below caps to top 10 on every call,
+    # summary included.
     top_metabolic_capability = chemistry_capable
 
     # top_annotation_capability (slice 4 §3.3): organisms ranked by
@@ -3958,6 +3958,15 @@ def _is_default_size(value) -> bool:
     return isinstance(value, _DefaultGeneSetSize)
 
 
+def _size_warning_due(min_gene_set_size, max_gene_set_size) -> bool:
+    """The genes_by_ontology size-filter warning fires while either bound is
+    still the default: a bound the caller never chose can drop terms
+    silently. Both bounds explicit (even 5 / 500) = the caller chose the
+    window; counts stay in the envelope, the warning does not fire."""
+    return (_is_default_size(min_gene_set_size)
+            or _is_default_size(max_gene_set_size))
+
+
 @listify_bare_str
 def genes_by_ontology(
     ontology: str,
@@ -4034,8 +4043,8 @@ def genes_by_ontology(
     only in those terms. Both are 0 when nothing is dropped or when the size
     filters are no-ops (``min_gene_set_size <= 1`` and
     ``max_gene_set_size=None``). A warning fires when terms were dropped
-    and both bounds were left at their defaults (an explicitly passed
-    window, even 5 / 500, is a deliberate choice and gets no warning); pass
+    and either bound was left at its default (passing both bounds, even
+    5 / 500, is a deliberate window and gets no warning); pass
     ``min_gene_set_size=1, max_gene_set_size=None`` to enumerate every
     gene.
 
@@ -4164,8 +4173,8 @@ def genes_by_ontology(
                 len(unfiltered_per_gene) - len(per_gene), 0)
 
     size_warnings: list[str] = []
-    if (size_filtered_terms > 0 and _is_default_size(min_gene_set_size)
-            and _is_default_size(max_gene_set_size)):
+    if size_filtered_terms > 0 and _size_warning_due(
+            min_gene_set_size, max_gene_set_size):
         size_warnings.append(
             f"{size_filtered_terms} terms ({size_filtered_genes} genes not "
             f"otherwise covered) fell outside "
@@ -7614,6 +7623,29 @@ def _annotated_background(term2gene, gbo_kwargs: dict) -> list[str]:
     return sorted(set(term2gene["locus_tag"].dropna()))
 
 
+def _apply_annotated_background(
+    inputs, term2gene, gbo_kwargs: dict, default_bg: dict,
+) -> None:
+    """Set ``inputs.background`` for ``background='annotated'``: per gene set,
+    the annotated genes (``_annotated_background``) intersected with that
+    gene set's default universe (table_scope / cluster_union), so genes that could never be in a gene set (unquantified,
+    unclustered) stay out. Warns when ``term_ids`` without ``level`` makes the
+    universe just the requested terms' genes (each term then covers most of
+    it and the test has no power)."""
+    annotated = set(_annotated_background(term2gene, gbo_kwargs))
+    inputs.background = {
+        c: sorted(annotated & set(default_bg.get(c) or []))
+        for c in inputs.gene_sets
+    }
+    if gbo_kwargs.get("term_ids") and gbo_kwargs.get("level") is None:
+        inputs.warnings.append(
+            "background='annotated' with term_ids and no level is the union "
+            "of the requested terms' genes, so every tested term covers most "
+            "of the universe and the test has little power; pass level= to "
+            "use every term at that level as the annotated universe."
+        )
+
+
 # ---------------------------------------------------------------------------
 # pathway_enrichment public function
 # ---------------------------------------------------------------------------
@@ -7666,8 +7698,9 @@ def pathway_enrichment(
     least one edge in the chosen ontology under the same trust filters /
     tree / interpro_type / informative_only as TERM2GENE — counters
     annotation-coverage bias such as TIGR roles covering only part of the
-    genome; with ``level`` + ``term_ids`` it spans every term at that level,
-    with ``term_ids`` alone their union), or an explicit locus-tag list.
+    genome; intersected with each gene set's table_scope; with ``level`` +
+    ``term_ids`` it spans every term at that level, with ``term_ids`` alone
+    their union, which warns), or an explicit locus-tag list.
 
     ``include_nonsignificant`` (default True — the package returns the
     full ranked list) is stored on ``result.params`` and consumed by
@@ -7750,6 +7783,7 @@ def pathway_enrichment(
             f"Get ids from list_experiments(organism='{organism_name}')."
         )
 
+    default_bg = inputs.background
     if background == "table_scope":
         resolved_bg = inputs.background
         background_mode = "table_scope"
@@ -7790,8 +7824,8 @@ def pathway_enrichment(
     from multiomics_explorer.analysis.frames import to_dataframe
     term2gene = to_dataframe(gbo_result)
     if background == "annotated":
-        annotated = _annotated_background(term2gene, gbo_kwargs)
-        inputs.background = {c: list(annotated) for c in inputs.gene_sets}
+        _apply_annotated_background(
+            inputs, term2gene, gbo_kwargs, default_bg)
 
     if term2gene.empty or not inputs.gene_sets:
         result = EnrichmentResult(
@@ -7916,7 +7950,8 @@ def cluster_enrichment(
 
     ``background``: ``'cluster_union'`` (default), ``'organism'``,
     ``'annotated'`` (genes with at least one edge in the chosen ontology,
-    built exactly as in pathway_enrichment), or an explicit locus-tag list.
+    built as in pathway_enrichment and intersected with the cluster union),
+    or an explicit locus-tag list.
 
     ``include_nonsignificant`` (default True) behaves exactly as in
     ``pathway_enrichment``: stored on ``result.params``, consumed by
@@ -7992,6 +8027,7 @@ def cluster_enrichment(
             f"Get ids from list_clustering_analyses(organism='{organism_name}')."
         )
 
+    default_bg = inputs.background
     if background == "cluster_union":
         resolved_bg = inputs.background
         background_mode = "cluster_union"
@@ -8058,8 +8094,8 @@ def cluster_enrichment(
     from multiomics_explorer.analysis.frames import to_dataframe
     term2gene = to_dataframe(gbo_result)
     if background == "annotated":
-        annotated = _annotated_background(term2gene, gbo_kwargs)
-        inputs.background = {c: list(annotated) for c in inputs.gene_sets}
+        _apply_annotated_background(
+            inputs, term2gene, gbo_kwargs, default_bg)
 
     if term2gene.empty:
         result = EnrichmentResult(

@@ -3537,7 +3537,7 @@ def register_tools(mcp: FastMCP):
         filtered_out: list[str] = Field(default_factory=list,
             description="Input term_ids valid but outside [min, max]_gene_set_size")
         size_filtered_terms: int = Field(default=0,
-            description="Terms passing every other filter but outside min/max_gene_set_size, dropped. >0 adds a warning when both bounds were left at their defaults; to enumerate all pass min_gene_set_size=1 and a large max_gene_set_size (e.g. 100000; Python also accepts None).")
+            description="Terms passing every other filter but outside min/max_gene_set_size, dropped. >0 adds a warning while either bound is still the default; to enumerate all pass min_gene_set_size=1 and a large max_gene_set_size (e.g. 100000; Python also accepts None).")
         size_filtered_genes: int = Field(default=0,
             description="Genes found only in size-dropped terms (missing from total_genes).")
         resolved_aliases: dict[str, list[str]] = Field(default_factory=dict,
@@ -3682,8 +3682,8 @@ def register_tools(mcp: FastMCP):
                     f"genes_by_ontology: {len(data['wrong_level'])} "
                     f"term_ids at wrong level (see response.wrong_level)"
                 )
-            if data.get("size_filtered_terms") and any(
-                    "fell outside" in w for w in data.get("warnings") or []):
+            if data.get("size_filtered_terms") and api._size_warning_due(
+                    min_gene_set_size, max_gene_set_size):
                 await ctx.warning(
                     f"genes_by_ontology: {data['size_filtered_terms']} "
                     f"terms outside min/max_gene_set_size were dropped "
@@ -7040,8 +7040,8 @@ def register_tools(mcp: FastMCP):
         )] = True,
         background: Annotated[str | list[str], Field(
             description="'table_scope' (default, per-cluster quantified set), 'organism' "
-                        "(full genome — inflates denominator), 'annotated' (genes with "
-                        ">=1 edge in this ontology under the same filters), or explicit "
+                        "(full genome — inflates denominator), 'annotated' (table_scope genes "
+                        "with >=1 edge in this ontology under the same filters; pass level=), or explicit "
                         "locus_tag list. See docs://analysis/enrichment.",
         )] = "table_scope",
         min_gene_set_size: Annotated[int, Field(
@@ -7179,8 +7179,8 @@ def register_tools(mcp: FastMCP):
         background: Annotated[str | list[str], Field(
             description="'cluster_union' (default — union of all clustered genes; differs "
                         "from `pathway_enrichment`'s 'table_scope' default), 'organism', "
-                        "'annotated' (genes with >=1 edge in this ontology under the same "
-                        "filters), or explicit locus_tag list. See docs://analysis/enrichment.")] = "cluster_union",
+                        "'annotated' (clustered genes with >=1 edge in this ontology under the same "
+                        "filters; pass level=), or explicit locus_tag list. See docs://analysis/enrichment.")] = "cluster_union",
         min_gene_set_size: Annotated[int, Field(description="Per-cluster M filter: drop pathways with fewer members.", ge=0)] = 5,
         max_gene_set_size: Annotated[int | None, Field(description="Per-cluster M filter upper bound. None disables.", ge=1)] = 500,
         min_cluster_size: Annotated[int, Field(description="Skip clusters with fewer members than this.", ge=0)] = 3,

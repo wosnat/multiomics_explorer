@@ -78,8 +78,9 @@ class EnrichmentInputs(BaseModel):
         default_factory=list,
         description=(
             "Diagnostic strings, threaded into the envelope by "
-            "generate_summary(). Always [] from de_enrichment_inputs "
-            "(pathway_enrichment). cluster_enrichment_inputs populates it "
+            "generate_summary(). de_enrichment_inputs leaves it []; "
+            "both enrichment wrappers append the background='annotated' "
+            "term_ids-without-level note. cluster_enrichment_inputs populates it "
             "with, e.g., an analysis that exists but yields zero "
             "cluster->gene rows for the requested organism — a normal "
             "empty result, not the `not_found` raise (llm-review 2b.3 "

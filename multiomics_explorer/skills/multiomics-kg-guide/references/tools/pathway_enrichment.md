@@ -21,7 +21,7 @@ docs://tools/pathway_enrichment; summary=True first.
 | term_ids | list[string] \| None | None | Specific term IDs to test. Combines with level to scope rollup. Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced to canonical (see `term_validation.resolved_aliases`). |
 | direction | string ('up', 'down', 'both') | both | DE direction(s) to include in gene_sets. |
 | significant_only | bool | True | If true, only significant DE rows count as foreground. |
-| background | string \| list[string] | table_scope | 'table_scope' (default, per-cluster quantified set), 'organism' (full genome — inflates denominator), 'annotated' (genes with >=1 edge in this ontology under the same filters), or explicit locus_tag list. See docs://analysis/enrichment. |
+| background | string \| list[string] | table_scope | 'table_scope' (default, per-cluster quantified set), 'organism' (full genome — inflates denominator), 'annotated' (table_scope genes with >=1 edge in this ontology under the same filters; pass level=), or explicit locus_tag list. See docs://analysis/enrichment. |
 | min_gene_set_size | int | 5 | Per-cluster M filter: drop pathways with fewer members in the background. |
 | max_gene_set_size | int \| None | 500 | Per-cluster M filter upper bound. None disables. |
 | pvalue_cutoff | float | 0.05 | Significance threshold for `p_adjust`. |

@@ -64,7 +64,7 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 - **wrong_ontology** (list[string]): Input term_ids present but in a different ontology label
 - **wrong_level** (list[string]): Input term_ids in the ontology but at wrong level (only when level + term_ids both set)
 - **filtered_out** (list[string]): Input term_ids valid but outside [min, max]_gene_set_size
-- **size_filtered_terms** (int): Terms passing every other filter but outside min/max_gene_set_size, dropped. >0 adds a warning when both bounds were left at their defaults; to enumerate all pass min_gene_set_size=1 and a large max_gene_set_size (e.g. 100000; Python also accepts None).
+- **size_filtered_terms** (int): Terms passing every other filter but outside min/max_gene_set_size, dropped. >0 adds a warning while either bound is still the default; to enumerate all pass min_gene_set_size=1 and a large max_gene_set_size (e.g. 100000; Python also accepts None).
 - **size_filtered_genes** (int): Genes found only in size-dropped terms (missing from total_genes).
 - **resolved_aliases** (object): Bare term_ids (e.g. 'ko00910', 'GO:0006979') coerced to canonical CURIEs, {input: [canonical]}. Empty when none were coerced.
 - **returned** (int): Rows in this response
@@ -842,7 +842,7 @@ genes_by_ontology(ontology='merops', call_class=['peptidase']) → pathway_enric
 
 - Term-anchored (term → genes). For 'which terms does this gene carry?' use `gene_ontology_terms(locus_tags=[...])` — same ontology surface, opposite anchor.
 
-- Default `min_gene_set_size=5` / `max_gene_set_size=500` suit enrichment and drop small and huge terms, which can hide most of a gene set (e.g. BRITE `tree='transporters'`, `level=2` in MED4). To enumerate every gene pass `min_gene_set_size=1` and a large `max_gene_set_size` (e.g. 100000 over MCP; `None` from Python). The envelope reports what was dropped: `size_filtered_terms` (terms outside the size bounds), `size_filtered_genes` (genes found only in those terms), and a `warnings` entry when both bounds were left at their defaults (passing either bound explicitly keeps the counts but drops the warning). `filtered_out` lists only input `term_ids`, so in `level` mode these fields are the only signal.
+- Default `min_gene_set_size=5` / `max_gene_set_size=500` suit enrichment and drop small and huge terms, which can hide most of a gene set (e.g. BRITE `tree='transporters'`, `level=2` in MED4). To enumerate every gene pass `min_gene_set_size=1` and a large `max_gene_set_size` (e.g. 100000 over MCP; `None` from Python). The envelope reports what was dropped: `size_filtered_terms` (terms outside the size bounds), `size_filtered_genes` (genes found only in those terms), and a `warnings` entry while either bound is still the default (passing both bounds explicitly keeps the counts but drops the warning). `filtered_out` lists only input `term_ids`, so in `level` mode these fields are the only signal.
 
 - Substrate-anchored TCDB questions ('which genes transport sucrose?') chain via `genes_by_metabolite`, NOT `genes_by_ontology`. Use `genes_by_ontology(ontology='tcdb', term_ids=[...])` for *family*-level questions ('which genes are in voltage-gated ion channels?'). The metabolite-anchored route includes every TC system curated with the substrate (plus the opt-in family walk); the family-anchored route here is anchored on one TC id and misses cross-family substrate hits.
 

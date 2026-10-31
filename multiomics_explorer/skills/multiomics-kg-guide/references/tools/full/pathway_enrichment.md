@@ -21,7 +21,7 @@ docs://tools/pathway_enrichment; summary=True first.
 | term_ids | list[string] \| None | None | Specific term IDs to test. Combines with level to scope rollup. Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced to canonical (see `term_validation.resolved_aliases`). |
 | direction | string ('up', 'down', 'both') | both | DE direction(s) to include in gene_sets. |
 | significant_only | bool | True | If true, only significant DE rows count as foreground. |
-| background | string \| list[string] | table_scope | 'table_scope' (default, per-cluster quantified set), 'organism' (full genome — inflates denominator), 'annotated' (genes with >=1 edge in this ontology under the same filters), or explicit locus_tag list. See docs://analysis/enrichment. |
+| background | string \| list[string] | table_scope | 'table_scope' (default, per-cluster quantified set), 'organism' (full genome — inflates denominator), 'annotated' (table_scope genes with >=1 edge in this ontology under the same filters; pass level=), or explicit locus_tag list. See docs://analysis/enrichment. |
 | min_gene_set_size | int | 5 | Per-cluster M filter: drop pathways with fewer members in the background. |
 | max_gene_set_size | int \| None | 500 | Per-cluster M filter upper bound. None disables. |
 | pvalue_cutoff | float | 0.05 | Significance threshold for `p_adjust`. |
@@ -550,7 +550,7 @@ See `docs://analysis/annotation_evidence` for the trust-axis registry (which fil
 
 - `informative_only=True` shrinks the TERM2GENE mapping, and `enrichment_params.term2gene_row_count` shows by how much — MED4 KEGG at `level=3`: 1124 rows with `informative_only=False`, 1094 with the default. Compare `enrichment_params` across runs before comparing p-values. For KEGG the flag also covers the global / overview maps (`kegg.pathway:ko01100` and kin), so a `level=2` run drops those rows too.
 
-- Default background is `table_scope` (per-experiment quantified set). `'organism'` inflates the denominator and underestimates enrichment. `'annotated'` keeps only genes with at least one edge in the chosen ontology (same trust filters / `tree` / `interpro_type` / `informative_only` as the gene sets) — use it when coverage is partial, e.g. `tigr_role`. It is organism-wide, not intersected with the quantified set. See `docs://analysis/enrichment` for the full methodology note.
+- Default background is `table_scope` (per-experiment quantified set). `'organism'` inflates the denominator and underestimates enrichment. `'annotated'` keeps only genes with at least one edge in the chosen ontology (same trust filters / `tree` / `interpro_type` / `informative_only` as the gene sets) — use it when coverage is partial, e.g. `tigr_role`. It is intersected with the `table_scope` set (annotated and quantified); pass `level=` with it. See `docs://analysis/enrichment` for the full methodology note.
 
 - BH correction is per-cluster (experiment × timepoint × direction), NOT across clusters. Cross-experiment FDR is biological replication, not statistical.
 
