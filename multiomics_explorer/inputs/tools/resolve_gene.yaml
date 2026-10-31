@@ -32,8 +32,6 @@ examples:
           {"organism_name": "Synechococcus KORDI-100", "count": 2},
           {"organism_name": "Alteromonas (MarRef v6)", "count": 1},
           {"organism_name": "Alteromonas macleodii 83-1", "count": 1},
-          {"organism_name": "Alteromonas macleodii AD45", "count": 1},
-          {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
           ...
         ],
         "by_organism_truncated": true,

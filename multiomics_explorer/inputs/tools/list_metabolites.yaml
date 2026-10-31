@@ -25,8 +25,6 @@ examples:
           {"organism_name": "Alteromonas macleodii 83-1", "count": 1},
           {"organism_name": "Alteromonas macleodii AD45", "count": 1},
           {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
-          {"organism_name": "Alteromonas macleodii BGP6", "count": 1},
-          {"organism_name": "Alteromonas macleodii BS11", "count": 1},
           ...
         ],
         "top_metabolite_pathways": [
@@ -45,12 +43,6 @@ examples:
             "metabolite_pathway_name": "Microbial metabolism in diverse environments",
             "count": 1
           },
-          {"metabolite_pathway_id": "kegg.pathway:ko01310", "metabolite_pathway_name": "Nitrogen cycle", "count": 1},
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko02010",
-            "metabolite_pathway_name": "ABC transporters",
-            "count": 1
-          },
           ...
         ],
         "by_evidence_source": [
@@ -64,15 +56,12 @@ examples:
         "by_structure_kind": [{"structure_kind": "defined", "count": 1}],
         "by_kegg_functional_category": [{"kegg_functional_category": "not classified", "count": 1}],
         "by_kegg_brite_class": [{"kegg_brite_class": "not classified", "count": 1}],
-        "score_max": null,
-        "score_median": null,
+        "...": "4 empty fields omitted (score_max, score_median, warnings, no_formula_excluded)",
         "returned": 1,
         "offset": 0,
         "truncated": false,
         "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": [], "elements": []},
         "resolved_aliases": {"chebi:14654": ["kegg.compound:C00244"]},
-        "warnings": [],
-        "no_formula_excluded": null,
         "results": [
           {
             "metabolite_id": "kegg.compound:C00244",
@@ -85,24 +74,10 @@ examples:
             "transporter_count": 5,
             "transporter_gene_count": 168,
             "evidence_sources": ["go_transport", "metabolism", "transport"],
-            "go_transport_organism_names": [
-              "Alteromonas (MarRef v6)",
-              "Alteromonas macleodii 83-1",
-              "Alteromonas macleodii AD45",
-              "Alteromonas macleodii ATCC27126",
-              "Alteromonas macleodii BGP6",
-              ...
-            ],
+            "go_transport_organism_names": ["Alteromonas (MarRef v6)", "Alteromonas macleodii 83-1", "Alteromonas macleodii AD45", ...],
             "go_transport_organism_count": 73,
             "chebi_id": "48107",
-            "pathway_ids": [
-              "kegg.pathway:ko00910",
-              "kegg.pathway:ko01100",
-              "kegg.pathway:ko01120",
-              "kegg.pathway:ko01310",
-              "kegg.pathway:ko02010",
-              ...
-            ],
+            "pathway_ids": ["kegg.pathway:ko00910", "kegg.pathway:ko01100", "kegg.pathway:ko01120", ...],
             "pathway_count": 6,
             "measured_assay_count": 0,
             "measured_paper_count": 0,
@@ -123,8 +98,6 @@ examples:
           {"organism_name": "Pseudomonas putida KT2440", "count": 322},
           {"organism_name": "Alteromonas macleodii EZ55", "count": 315},
           {"organism_name": "Alteromonas macleodii MIT1002", "count": 312},
-          {"organism_name": "Alteromonas macleodii BGP6", "count": 311},
-          {"organism_name": "Alteromonas macleodii 83-1", "count": 311},
           ...
         ],
         "top_metabolite_pathways": [
@@ -142,16 +115,6 @@ examples:
             "metabolite_pathway_id": "kegg.pathway:ko00061",
             "metabolite_pathway_name": "Fatty acid biosynthesis",
             "count": 42
-          },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko01212",
-            "metabolite_pathway_name": "Fatty acid metabolism",
-            "count": 35
-          },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko00970",
-            "metabolite_pathway_name": "Aminoacyl-tRNA biosynthesis",
-            "count": 25
           },
           ...
         ],
@@ -173,19 +136,14 @@ examples:
           {"kegg_brite_class": "Lipids: Fatty acyls", "count": 39},
           {"kegg_brite_class": "Lipids: Glycerophospholipids", "count": 24},
           {"kegg_brite_class": "Lipids: Glycerolipids", "count": 9},
-          {"kegg_brite_class": "Lipids: Sphingolipids", "count": 3},
-          {"kegg_brite_class": "Lipids: Sterol lipids", "count": 1},
-          ...
+          ...,
+          {"kegg_brite_class": "not classified", "count": 565}
         ],
-        "score_max": null,
-        "score_median": null,
+        "...": "5 empty fields omitted",
         "returned": 0,
         "offset": 0,
         "truncated": true,
         "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": [], "elements": []},
-        "resolved_aliases": {},
-        "warnings": [],
-        "no_formula_excluded": null,
         "results": []
       }
 
@@ -199,8 +157,6 @@ examples:
           {"organism_name": "Ruegeria pomeroyi DSS-3", "count": 48},
           {"organism_name": "Alteromonas mediterranea AltDE", "count": 47},
           {"organism_name": "Pseudomonas putida KT2440", "count": 47},
-          {"organism_name": "Meiothermus ruber", "count": 47},
-          {"organism_name": "Alteromonas (MarRef v6)", "count": 46},
           ...
         ],
         "top_metabolite_pathways": [
@@ -219,23 +175,13 @@ examples:
             "metabolite_pathway_name": "D-Amino acid metabolism",
             "count": 29
           },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko01230",
-            "metabolite_pathway_name": "Biosynthesis of amino acids",
-            "count": 25
-          },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko00970",
-            "metabolite_pathway_name": "Aminoacyl-tRNA biosynthesis",
-            "count": 20
-          },
           ...
         ],
         "by_evidence_source": [
           {"evidence_source": "metabolism", "count": 52},
           {"evidence_source": "transport", "count": 43},
           {"evidence_source": "metabolomics", "count": 26},
-          {"evidence_source": "go_transport", "count": 24}
+          ...
         ],
         "xref_coverage": {"with_chebi": 59, "with_hmdb": 54, "with_mnxm": 58},
         "mass_stats": {"mass_min": 62.092, "mass_median": 135.188, "mass_max": 650.976},
@@ -258,54 +204,31 @@ examples:
           {"kegg_brite_class": "Lipids: Fatty acyls", "count": 1},
           {"kegg_brite_class": "not classified", "count": 55}
         ],
-        "score_max": null,
-        "score_median": null,
+        "...": "5 empty fields omitted",
         "returned": 3,
         "offset": 0,
         "truncated": true,
         "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": [], "elements": []},
-        "resolved_aliases": {},
-        "warnings": [],
-        "no_formula_excluded": null,
         "results": [
           {
             "metabolite_id": "kegg.compound:C00025",
             "name": "L-Glutamate",
             "formula": "C5H8NO4",
-            "elements": ["C", "H", "N", "O"],
+            "elements": ["C", "H", "N", ...],
             "mass": 146.122,
             "catalyst_gene_count": 4836,
             "organism_count": 118,
             "transporter_count": 1,
             "transporter_gene_count": 2,
-            "evidence_sources": ["go_transport", "metabolism", "metabolomics", "transport"],
-            "go_transport_organism_names": [
-              "Cyanobium NS01",
-              "Cyanobium PCC6307",
-              "Cyanobium PCC7001",
-              "Prochlorococcus AS9601",
-              "Prochlorococcus EQPAC1",
-              ...
-            ],
+            "evidence_sources": ["go_transport", "metabolism", "metabolomics", ...],
+            "go_transport_organism_names": ["Cyanobium NS01", "Cyanobium PCC6307", "Cyanobium PCC7001", ...],
             "go_transport_organism_count": 73,
             "chebi_id": "16015",
-            "pathway_ids": [
-              "kegg.pathway:ko00220",
-              "kegg.pathway:ko00250",
-              "kegg.pathway:ko00330",
-              "kegg.pathway:ko00332",
-              "kegg.pathway:ko00340",
-              ...
-            ],
+            "pathway_ids": ["kegg.pathway:ko00220", "kegg.pathway:ko00250", "kegg.pathway:ko00330", ...],
             "pathway_count": 31,
             "measured_assay_count": 12,
             "measured_paper_count": 2,
-            "measured_organisms": [
-              "Prochlorococcus MIT0801",
-              "Prochlorococcus MIT9301",
-              "Prochlorococcus MIT9312",
-              "Prochlorococcus MIT9313"
-            ],
+            "measured_organisms": ["Prochlorococcus MIT0801", "Prochlorococcus MIT9301", "Prochlorococcus MIT9312", ...],
             "measured_compartments": ["extracellular", "vesicle", "whole_cell"],
             "structure_kind": "defined",
             "kegg_functional_categories": ["Hormones and transmitters", "Peptides"],
@@ -330,7 +253,7 @@ examples:
             "metabolite_id": "kegg.compound:C00064",
             "name": "L-Glutamine",
             "formula": "C5H10N2O3",
-            "elements": ["C", "H", "N", "O"],
+            "elements": ["C", "H", "N", ...],
             "mass": 146.146,
             "catalyst_gene_count": 2938,
             "organism_count": 118,
@@ -340,23 +263,11 @@ examples:
             "go_transport_organism_names": null,
             "go_transport_organism_count": null,
             "chebi_id": "18050",
-            "pathway_ids": [
-              "kegg.pathway:ko00220",
-              "kegg.pathway:ko00230",
-              "kegg.pathway:ko00240",
-              "kegg.pathway:ko00250",
-              "kegg.pathway:ko00470",
-              ...
-            ],
+            "pathway_ids": ["kegg.pathway:ko00220", "kegg.pathway:ko00230", "kegg.pathway:ko00240", ...],
             "pathway_count": 17,
             "measured_assay_count": 12,
             "measured_paper_count": 2,
-            "measured_organisms": [
-              "Prochlorococcus MIT0801",
-              "Prochlorococcus MIT9301",
-              "Prochlorococcus MIT9312",
-              "Prochlorococcus MIT9313"
-            ],
+            "measured_organisms": ["Prochlorococcus MIT0801", "Prochlorococcus MIT9301", "Prochlorococcus MIT9312", ...],
             "measured_compartments": ["extracellular", "vesicle", "whole_cell"],
             "structure_kind": "defined",
             "kegg_functional_categories": ["Peptides"],
@@ -381,7 +292,7 @@ examples:
             "metabolite_id": "kegg.compound:C00037",
             "name": "Glycine",
             "formula": "C2H5NO2",
-            "elements": ["C", "H", "N", "O"],
+            "elements": ["C", "H", "N", ...],
             "mass": 75.067,
             "catalyst_gene_count": 2148,
             "organism_count": 118,
@@ -391,14 +302,7 @@ examples:
             "go_transport_organism_names": ["Pseudomonas putida KT2440"],
             "go_transport_organism_count": 1,
             "chebi_id": "15428",
-            "pathway_ids": [
-              "kegg.pathway:ko00120",
-              "kegg.pathway:ko00230",
-              "kegg.pathway:ko00260",
-              "kegg.pathway:ko00310",
-              "kegg.pathway:ko00440",
-              ...
-            ],
+            "pathway_ids": ["kegg.pathway:ko00120", "kegg.pathway:ko00230", "kegg.pathway:ko00260", ...],
             "pathway_count": 26,
             "measured_assay_count": 0,
             "measured_paper_count": 0,
@@ -420,8 +324,6 @@ examples:
           {"organism_name": "Ruegeria pomeroyi DSS-3", "count": 193},
           {"organism_name": "Pseudomonas putida KT2440", "count": 187},
           {"organism_name": "Alteromonas macleodii EZ55", "count": 181},
-          {"organism_name": "Alteromonas macleodii AD45", "count": 178},
-          {"organism_name": "Alteromonas macleodii MIT1002", "count": 178},
           ...
         ],
         "top_metabolite_pathways": [
@@ -440,23 +342,13 @@ examples:
             "metabolite_pathway_name": "Fatty acid metabolism",
             "count": 72
           },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko01110",
-            "metabolite_pathway_name": "Biosynthesis of secondary metabolites",
-            "count": 55
-          },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko00061",
-            "metabolite_pathway_name": "Fatty acid biosynthesis",
-            "count": 41
-          },
           ...
         ],
         "by_evidence_source": [
           {"evidence_source": "metabolism", "count": 231},
           {"evidence_source": "transport", "count": 55},
           {"evidence_source": "go_transport", "count": 6},
-          {"evidence_source": "metabolomics", "count": 6}
+          ...
         ],
         "xref_coverage": {"with_chebi": 250, "with_hmdb": 154, "with_mnxm": 256},
         "mass_stats": {"mass_min": 45.017, "mass_median": 279.89, "mass_max": 1120.059},
@@ -469,26 +361,21 @@ examples:
           {"kegg_functional_category": "Organic acids", "count": 22},
           {"kegg_functional_category": "Lipids", "count": 18},
           {"kegg_functional_category": "Hormones and transmitters", "count": 1},
-          {"kegg_functional_category": "Peptides", "count": 1},
+          ...,
           {"kegg_functional_category": "not classified", "count": 219}
         ],
         "by_kegg_brite_class": [
           {"kegg_brite_class": "Lipids: Fatty acyls", "count": 257},
           {"kegg_brite_class": "Phytochemical compounds: Fatty acids related compounds", "count": 9},
           {"kegg_brite_class": "Phytochemical compounds: Phenylpropanoids", "count": 6},
-          {"kegg_brite_class": "Pesticides: Pesticides", "count": 1},
-          {"kegg_brite_class": "Phytochemical compounds: Terpenoids", "count": 1},
-          ...
+          ...,
+          {"kegg_brite_class": "not classified", "count": 0}
         ],
-        "score_max": null,
-        "score_median": null,
+        "...": "5 empty fields omitted",
         "returned": 3,
         "offset": 0,
         "truncated": true,
         "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": [], "elements": []},
-        "resolved_aliases": {},
-        "warnings": [],
-        "no_formula_excluded": null,
         "results": [
           {
             "metabolite_id": "kegg.compound:C00022",
@@ -504,14 +391,7 @@ examples:
             "go_transport_organism_names": null,
             "go_transport_organism_count": null,
             "chebi_id": "32816",
-            "pathway_ids": [
-              "kegg.pathway:ko00010",
-              "kegg.pathway:ko00020",
-              "kegg.pathway:ko00030",
-              "kegg.pathway:ko00040",
-              "kegg.pathway:ko00053",
-              ...
-            ],
+            "pathway_ids": ["kegg.pathway:ko00010", "kegg.pathway:ko00020", "kegg.pathway:ko00030", ...],
             "pathway_count": 48,
             "measured_assay_count": 0,
             "measured_paper_count": 0,
@@ -525,24 +405,17 @@ examples:
             "metabolite_id": "kegg.compound:C00024",
             "name": "Acetyl-CoA",
             "formula": "C23H34N7O17P3S",
-            "elements": ["C", "H", "N", "O", "P", ...],
+            "elements": ["C", "H", "N", ...],
             "mass": 805.546,
             "catalyst_gene_count": 2657,
             "organism_count": 118,
             "transporter_count": 0,
             "transporter_gene_count": 0,
-            "evidence_sources": ["go_transport", "metabolism", "metabolomics", "transport"],
+            "evidence_sources": ["go_transport", "metabolism", "metabolomics", ...],
             "go_transport_organism_names": ["Synechococcus ROS8604"],
             "go_transport_organism_count": 1,
             "chebi_id": "15351",
-            "pathway_ids": [
-              "kegg.pathway:ko00010",
-              "kegg.pathway:ko00020",
-              "kegg.pathway:ko00061",
-              "kegg.pathway:ko00062",
-              "kegg.pathway:ko00071",
-              ...
-            ],
+            "pathway_ids": ["kegg.pathway:ko00010", "kegg.pathway:ko00020", "kegg.pathway:ko00061", ...],
             "pathway_count": 49,
             "measured_assay_count": 2,
             "measured_paper_count": 1,
@@ -565,14 +438,7 @@ examples:
             "go_transport_organism_names": ["Pseudomonas putida KT2440", "Shewanella sp. W3-18-1"],
             "go_transport_organism_count": 2,
             "chebi_id": "15366",
-            "pathway_ids": [
-              "kegg.pathway:ko00010",
-              "kegg.pathway:ko00430",
-              "kegg.pathway:ko00440",
-              "kegg.pathway:ko00534",
-              "kegg.pathway:ko00620",
-              ...
-            ],
+            "pathway_ids": ["kegg.pathway:ko00010", "kegg.pathway:ko00430", "kegg.pathway:ko00440", ...],
             "pathway_count": 16,
             "measured_assay_count": 0,
             "measured_paper_count": 0,
@@ -603,11 +469,9 @@ examples:
           {"organism_name": "Alteromonas macleodii 83-1", "count": 1},
           {"organism_name": "Alteromonas macleodii AD45", "count": 1},
           {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
-          {"organism_name": "Alteromonas macleodii BGP6", "count": 1},
-          {"organism_name": "Alteromonas macleodii BS11", "count": 1},
           ...
         ],
-        "top_metabolite_pathways": [],
+        "...": "6 empty fields omitted",
         "by_evidence_source": [{"evidence_source": "transport", "count": 1}],
         "xref_coverage": {"with_chebi": 1, "with_hmdb": 0, "with_mnxm": 1},
         "mass_stats": {"mass_min": 180.156, "mass_median": 180.156, "mass_max": 180.156},
@@ -615,15 +479,10 @@ examples:
         "by_structure_kind": [{"structure_kind": "defined", "count": 1}],
         "by_kegg_functional_category": [{"kegg_functional_category": "not classified", "count": 1}],
         "by_kegg_brite_class": [{"kegg_brite_class": "not classified", "count": 1}],
-        "score_max": null,
-        "score_median": null,
         "returned": 1,
         "offset": 0,
         "truncated": false,
         "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": [], "elements": []},
-        "resolved_aliases": {},
-        "warnings": [],
-        "no_formula_excluded": null,
         "results": [
           {
             "metabolite_id": "chebi:17234",
@@ -662,167 +521,6 @@ examples:
   - title: Stereo relatives — generic Cysteine carries the transport, L-Cysteine the catalysis
     call: list_metabolites(metabolite_ids=["kegg.compound:C00736", "kegg.compound:C00097"])
     note: "Each row's `stereo_relatives` names the other stereo forms with their own KG-wide gene counts: Cysteine's `specific_form` relatives are L- and D-Cysteine, L-Cysteine's are its `enantiomer` D-Cysteine and its `unspecified_form` Cysteine. No count combines across forms. Rows with no relative have no `stereo_relatives` key."
-    response: |
-      {
-        "total_entries": 3251,
-        "total_matching": 2,
-        "top_organisms": [
-          {"organism_name": "Synechococcus SYN20", "count": 2},
-          {"organism_name": "Pseudomonas putida KT2440", "count": 2},
-          {"organism_name": "Meiothermus ruber", "count": 2},
-          {"organism_name": "Cyanobium PCC6307", "count": 2},
-          {"organism_name": "Synechococcus WH8016", "count": 2},
-          ...
-        ],
-        "top_metabolite_pathways": [
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko00270",
-            "metabolite_pathway_name": "Cysteine and methionine metabolism",
-            "count": 1
-          },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko00311",
-            "metabolite_pathway_name": "Penicillin and cephalosporin biosynthesis",
-            "count": 1
-          },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko00430",
-            "metabolite_pathway_name": "Taurine and hypotaurine metabolism",
-            "count": 1
-          },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko00460",
-            "metabolite_pathway_name": "Cyanoamino acid metabolism",
-            "count": 1
-          },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko00470",
-            "metabolite_pathway_name": "D-Amino acid metabolism",
-            "count": 1
-          },
-          ...
-        ],
-        "by_evidence_source": [
-          {"evidence_source": "transport", "count": 2},
-          {"evidence_source": "go_transport", "count": 1},
-          {"evidence_source": "metabolism", "count": 1},
-          {"evidence_source": "metabolomics", "count": 1}
-        ],
-        "xref_coverage": {"with_chebi": 2, "with_hmdb": 2, "with_mnxm": 2},
-        "mass_stats": {"mass_min": 121.161, "mass_median": 121.161, "mass_max": 121.161},
-        "by_measurement_coverage": {
-          "by_paper_count": [{"paper_count": 0, "count": 1}, {"paper_count": 1, "count": 1}],
-          "by_compartment": [{"compartment": "extracellular", "count": 1}, {"compartment": "whole_cell", "count": 1}]
-        },
-        "by_structure_kind": [{"structure_kind": "defined", "count": 2}],
-        "by_kegg_functional_category": [
-          {"kegg_functional_category": "Peptides", "count": 1},
-          {"kegg_functional_category": "not classified", "count": 1}
-        ],
-        "by_kegg_brite_class": [{"kegg_brite_class": "not classified", "count": 2}],
-        "score_max": null,
-        "score_median": null,
-        "returned": 2,
-        "offset": 0,
-        "truncated": false,
-        "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": [], "elements": []},
-        "resolved_aliases": {},
-        "warnings": [],
-        "no_formula_excluded": null,
-        "results": [
-          {
-            "metabolite_id": "kegg.compound:C00097",
-            "name": "L-Cysteine",
-            "formula": "C3H7NO2S",
-            "elements": ["C", "H", "N", "O", "S"],
-            "mass": 121.161,
-            "catalyst_gene_count": 1694,
-            "organism_count": 118,
-            "transporter_count": 1,
-            "transporter_gene_count": 14,
-            "evidence_sources": ["go_transport", "metabolism", "metabolomics", "transport"],
-            "go_transport_organism_names": [
-              "Alteromonas macleodii 83-1",
-              "Alteromonas macleodii AD45",
-              "Alteromonas macleodii ATCC27126",
-              "Alteromonas macleodii BGP6",
-              "Alteromonas macleodii BS11",
-              ...
-            ],
-            "go_transport_organism_count": 14,
-            "chebi_id": "17561",
-            "pathway_ids": [
-              "kegg.pathway:ko00260",
-              "kegg.pathway:ko00270",
-              "kegg.pathway:ko00311",
-              "kegg.pathway:ko00430",
-              "kegg.pathway:ko00460",
-              ...
-            ],
-            "pathway_count": 21,
-            "measured_assay_count": 8,
-            "measured_paper_count": 1,
-            "measured_organisms": ["Prochlorococcus MIT0801", "Prochlorococcus MIT9301", "Prochlorococcus MIT9313"],
-            "measured_compartments": ["extracellular", "whole_cell"],
-            "structure_kind": "defined",
-            "kegg_functional_categories": ["Peptides"],
-            "stereo_relatives": [
-              {
-                "metabolite_id": "kegg.compound:C00793",
-                "name": "D-Cysteine",
-                "relation": "enantiomer",
-                "catalyst_gene_count": 13,
-                "transporter_gene_count": 0
-              },
-              {
-                "metabolite_id": "kegg.compound:C00736",
-                "name": "Cysteine",
-                "relation": "unspecified_form",
-                "catalyst_gene_count": 0,
-                "transporter_gene_count": 10
-              }
-            ]
-          },
-          {
-            "metabolite_id": "kegg.compound:C00736",
-            "name": "Cysteine",
-            "formula": "C3H7NO2S",
-            "elements": ["C", "H", "N", "O", "S"],
-            "mass": 121.161,
-            "catalyst_gene_count": 0,
-            "organism_count": 8,
-            "transporter_count": 4,
-            "transporter_gene_count": 10,
-            "evidence_sources": ["transport"],
-            "go_transport_organism_names": null,
-            "go_transport_organism_count": null,
-            "chebi_id": "15356",
-            "pathway_ids": [],
-            "pathway_count": 0,
-            "measured_assay_count": 0,
-            "measured_paper_count": 0,
-            "measured_organisms": [],
-            "measured_compartments": [],
-            "structure_kind": "defined",
-            "stereo_relatives": [
-              {
-                "metabolite_id": "kegg.compound:C00097",
-                "name": "L-Cysteine",
-                "relation": "specific_form",
-                "catalyst_gene_count": 1694,
-                "transporter_gene_count": 14
-              },
-              {
-                "metabolite_id": "kegg.compound:C00793",
-                "name": "D-Cysteine",
-                "relation": "specific_form",
-                "catalyst_gene_count": 13,
-                "transporter_gene_count": 0
-              }
-            ]
-          }
-        ]
-      }
 
   - title: Measured metabolites — measurement coverage envelope
     call: list_metabolites(evidence_sources=["metabolomics"], summary=True)
@@ -834,8 +532,7 @@ examples:
           {"organism_name": "Prochlorococcus MIT9313", "count": 134},
           {"organism_name": "Prochlorococcus MIT9301", "count": 96},
           {"organism_name": "Prochlorococcus MIT0801", "count": 92},
-          {"organism_name": "Prochlorococcus MIT9312", "count": 70},
-          {"organism_name": "Prochlorococcus MIT9303", "count": 16}
+          ...
         ],
         "top_metabolite_pathways": [
           {
@@ -853,23 +550,13 @@ examples:
             "metabolite_pathway_name": "Biosynthesis of cofactors",
             "count": 49
           },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko01120",
-            "metabolite_pathway_name": "Microbial metabolism in diverse environments",
-            "count": 39
-          },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko02010",
-            "metabolite_pathway_name": "ABC transporters",
-            "count": 39
-          },
           ...
         ],
         "by_evidence_source": [
           {"evidence_source": "metabolomics", "count": 135},
           {"evidence_source": "metabolism", "count": 119},
           {"evidence_source": "transport", "count": 102},
-          {"evidence_source": "go_transport", "count": 41}
+          ...
         ],
         "xref_coverage": {"with_chebi": 135, "with_hmdb": 126, "with_mnxm": 133},
         "mass_stats": {"mass_min": 89.094, "mass_median": 179.172, "mass_max": 1353.372},
@@ -886,27 +573,21 @@ examples:
           {"kegg_functional_category": "Peptides", "count": 26},
           {"kegg_functional_category": "Vitamins and cofactors", "count": 16},
           {"kegg_functional_category": "Nucleic acids", "count": 13},
-          {"kegg_functional_category": "Organic acids", "count": 8},
-          {"kegg_functional_category": "Carbohydrates", "count": 5},
-          ...
+          ...,
+          {"kegg_functional_category": "not classified", "count": 65}
         ],
         "by_kegg_brite_class": [
           {"kegg_brite_class": "Lipids: Fatty acyls", "count": 6},
           {"kegg_brite_class": "Phytochemical compounds: Alkaloids", "count": 6},
           {"kegg_brite_class": "Glycosides: N-glycosides", "count": 5},
-          {"kegg_brite_class": "Lipids: Prenol lipids", "count": 3},
-          {"kegg_brite_class": "Pesticides: Pesticides", "count": 3},
-          ...
+          ...,
+          {"kegg_brite_class": "not classified", "count": 111}
         ],
-        "score_max": null,
-        "score_median": null,
+        "...": "5 empty fields omitted",
         "returned": 0,
         "offset": 0,
         "truncated": true,
         "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": [], "elements": []},
-        "resolved_aliases": {},
-        "warnings": [],
-        "no_formula_excluded": null,
         "results": []
       }
 
@@ -938,222 +619,6 @@ examples:
   - title: GO transport route — metabolites a GO transport term names (evidence_sources=['go_transport'])
     call: list_metabolites(evidence_sources=["go_transport"], organism_names=["Prochlorococcus MED4"], limit=5)
     note: "Rows carry `go_transport_organism_names` / `go_transport_organism_count` (organisms with a gene annotated to a GO term that names this metabolite, direct annotations only). With `evidence_sources=['go_transport']` set, `organism_names` matches only organisms on the GO list (`go_transport_organism_names`), and `top_organisms` counts the GO route only; `organism_count` and the gene counts still ignore the GO route. A metabolite with no `go_transport_organism_names` may still have a GO edge reached only through ancestor terms: absent means no directly annotated gene path."
-    response: |
-      {
-        "total_entries": 3251,
-        "total_matching": 46,
-        "top_organisms": [
-          {"organism_name": "Prochlorococcus MED4", "count": 46},
-          {"organism_name": "Synechococcus WH8102", "count": 46},
-          {"organism_name": "Prochlorococcus SB", "count": 43},
-          {"organism_name": "Prochlorococcus MIT9301", "count": 42},
-          {"organism_name": "Prochlorococcus NATL1A", "count": 42},
-          ...
-        ],
-        "top_metabolite_pathways": [
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko02010",
-            "metabolite_pathway_name": "ABC transporters",
-            "count": 15
-          },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko01100",
-            "metabolite_pathway_name": "Metabolic pathways",
-            "count": 12
-          },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko01110",
-            "metabolite_pathway_name": "Biosynthesis of secondary metabolites",
-            "count": 7
-          },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko02020",
-            "metabolite_pathway_name": "Two-component system",
-            "count": 7
-          },
-          {
-            "metabolite_pathway_id": "kegg.pathway:ko01120",
-            "metabolite_pathway_name": "Microbial metabolism in diverse environments",
-            "count": 5
-          },
-          ...
-        ],
-        "by_evidence_source": [
-          {"evidence_source": "go_transport", "count": 46},
-          {"evidence_source": "transport", "count": 38},
-          {"evidence_source": "metabolism", "count": 20},
-          {"evidence_source": "metabolomics", "count": 2}
-        ],
-        "xref_coverage": {"with_chebi": 45, "with_hmdb": 19, "with_mnxm": 46},
-        "mass_stats": {"mass_min": 18.039, "mass_median": 95.978, "mass_max": 614.483},
-        "by_measurement_coverage": {
-          "by_paper_count": [{"paper_count": 0, "count": 44}, {"paper_count": 1, "count": 1}, {"paper_count": 2, "count": 1}],
-          "by_compartment": [
-            {"compartment": "extracellular", "count": 2},
-            {"compartment": "vesicle", "count": 1},
-            {"compartment": "whole_cell", "count": 2}
-          ]
-        },
-        "by_structure_kind": [
-          {"structure_kind": "defined", "count": 27},
-          {"structure_kind": "generic", "count": 18},
-          {"structure_kind": "polymer", "count": 1}
-        ],
-        "by_kegg_functional_category": [
-          {"kegg_functional_category": "Vitamins and cofactors", "count": 2},
-          {"kegg_functional_category": "Carbohydrates", "count": 1},
-          {"kegg_functional_category": "Hormones and transmitters", "count": 1},
-          {"kegg_functional_category": "Peptides", "count": 1},
-          {"kegg_functional_category": "not classified", "count": 42}
-        ],
-        "by_kegg_brite_class": [
-          {"kegg_brite_class": "Lipids: Polyketides", "count": 1},
-          {"kegg_brite_class": "Pesticides: Pesticides", "count": 1},
-          {"kegg_brite_class": "not classified", "count": 44}
-        ],
-        "score_max": null,
-        "score_median": null,
-        "returned": 5,
-        "offset": 0,
-        "truncated": true,
-        "not_found": {"metabolite_ids": [], "organism_names": [], "pathway_ids": [], "elements": []},
-        "resolved_aliases": {},
-        "warnings": [],
-        "no_formula_excluded": null,
-        "results": [
-          {
-            "metabolite_id": "kegg.compound:C00009",
-            "name": "Orthophosphate",
-            "formula": "HO4P",
-            "elements": ["H", "O", "P"],
-            "mass": 95.978,
-            "catalyst_gene_count": 10708,
-            "organism_count": 118,
-            "transporter_count": 14,
-            "transporter_gene_count": 56,
-            "evidence_sources": ["go_transport", "metabolism", "transport"],
-            "go_transport_organism_names": [
-              "Alteromonas (MarRef v6)",
-              "Alteromonas macleodii 83-1",
-              "Alteromonas macleodii AD45",
-              "Alteromonas macleodii ATCC27126",
-              "Alteromonas macleodii BGP6",
-              ...
-            ],
-            "go_transport_organism_count": 118,
-            "chebi_id": "26078",
-            "pathway_ids": [
-              "kegg.pathway:ko00190",
-              "kegg.pathway:ko00195",
-              "kegg.pathway:ko02010",
-              "kegg.pathway:ko02020",
-              "kegg.pathway:ko02024",
-              ...
-            ],
-            "pathway_count": 6,
-            "measured_assay_count": 0,
-            "measured_paper_count": 0,
-            "measured_organisms": [],
-            "measured_compartments": [],
-            "structure_kind": "defined"
-          },
-          {
-            "metabolite_id": "kegg.compound:C00014",
-            "name": "Ammonia",
-            "formula": "H4N",
-            "elements": ["H", "N"],
-            "mass": 18.039,
-            "catalyst_gene_count": 5149,
-            "organism_count": 118,
-            "transporter_count": 7,
-            "transporter_gene_count": 137,
-            "evidence_sources": ["go_transport", "metabolism", "transport"],
-            "go_transport_organism_names": [
-              "Alteromonas (MarRef v6)",
-              "Alteromonas macleodii 83-1",
-              "Alteromonas macleodii AD45",
-              "Alteromonas macleodii ATCC27126",
-              "Alteromonas macleodii BGP6",
-              ...
-            ],
-            "go_transport_organism_count": 118,
-            "chebi_id": "16134",
-            "pathway_ids": [
-              "kegg.pathway:ko00220",
-              "kegg.pathway:ko00230",
-              "kegg.pathway:ko00250",
-              "kegg.pathway:ko00260",
-              "kegg.pathway:ko00460",
-              ...
-            ],
-            "pathway_count": 14,
-            "measured_assay_count": 0,
-            "measured_paper_count": 0,
-            "measured_organisms": [],
-            "measured_compartments": [],
-            "structure_kind": "defined"
-          },
-          {
-            "metabolite_id": "kegg.compound:C00025",
-            "name": "L-Glutamate",
-            "formula": "C5H8NO4",
-            "elements": ["C", "H", "N", "O"],
-            "mass": 146.122,
-            "catalyst_gene_count": 4836,
-            "organism_count": 118,
-            "transporter_count": 1,
-            "transporter_gene_count": 2,
-            "evidence_sources": ["go_transport", "metabolism", "metabolomics", "transport"],
-            "go_transport_organism_names": [
-              "Cyanobium NS01",
-              "Cyanobium PCC6307",
-              "Cyanobium PCC7001",
-              "Prochlorococcus AS9601",
-              "Prochlorococcus EQPAC1",
-              ...
-            ],
-            "go_transport_organism_count": 73,
-            "chebi_id": "16015",
-            "pathway_ids": [
-              "kegg.pathway:ko00220",
-              "kegg.pathway:ko00250",
-              "kegg.pathway:ko00330",
-              "kegg.pathway:ko00332",
-              "kegg.pathway:ko00340",
-              ...
-            ],
-            "pathway_count": 31,
-            "measured_assay_count": 12,
-            "measured_paper_count": 2,
-            "measured_organisms": [
-              "Prochlorococcus MIT0801",
-              "Prochlorococcus MIT9301",
-              "Prochlorococcus MIT9312",
-              "Prochlorococcus MIT9313"
-            ],
-            "measured_compartments": ["extracellular", "vesicle", "whole_cell"],
-            "structure_kind": "defined",
-            "kegg_functional_categories": ["Hormones and transmitters", "Peptides"],
-            "stereo_relatives": [
-              {
-                "metabolite_id": "kegg.compound:C00217",
-                "name": "D-Glutamate",
-                "relation": "enantiomer",
-                "catalyst_gene_count": 260,
-                "transporter_gene_count": 2
-              },
-              {
-                "metabolite_id": "kegg.compound:C00302",
-                "name": "Glutamate",
-                "relation": "unspecified_form",
-                "catalyst_gene_count": 167,
-                "transporter_gene_count": 391
-              }
-            ]
-          },
-          ...
-        ]
-      }
 
 verbose_fields:
   - inchikey

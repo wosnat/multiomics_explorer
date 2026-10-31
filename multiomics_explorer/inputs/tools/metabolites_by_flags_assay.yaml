@@ -73,9 +73,7 @@ examples:
           }
         ],
         "excluded_assays": [],
-        "warnings": [
-          "29 of 93 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on L-Alanine); filter ..."
-        ],
+        "warnings": ["29 of 93 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on..."],
         "resolved_aliases": {},
         "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_dois": []},
         "returned": 5,
@@ -137,9 +135,7 @@ examples:
             "count": 64
           }
         ],
-        "excluded_assays": [],
-        "warnings": [],
-        "resolved_aliases": {},
+        "...": "3 empty fields omitted (excluded_assays, warnings, resolved_aliases)",
         "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_dois": []},
         "returned": 0,
         "truncated": true,

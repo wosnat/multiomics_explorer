@@ -185,12 +185,101 @@ def test_trim_response_rules():
     t = rx.trim_response(live)
     assert t["total_matching"] == 100
     assert len(t["long"]) == rx.MAX_STRING_LEN and t["long"].endswith("...")
-    assert t["by_organism"] == [{"n": i} for i in range(5)] + ["..."]
-    assert t["top_terms"][0]["genes"] == [0, 1, 2, 3, 4, "..."]
-    assert t["results"][:3] == [{"r": i, "s": "y" * 117 + "..."} for i in range(3)]
+    assert t["by_organism"] == [{"n": i} for i in range(3)] + ["..."]
+    assert t["top_terms"][0]["genes"] == [0, 1, 2, "..."]
+    cut = "y" * (rx.MAX_STRING_LEN - 3) + "..."
+    assert t["results"][:3] == [{"r": i, "s": cut} for i in range(3)]
     assert t["results"][3] == "..." and len(t["results"]) == 4
     # small results list is untouched
     assert rx.trim_response({"results": [{"a": 1}]})["results"] == [{"a": 1}]
+
+
+def test_trim_response_elides_nulls_in_rows_only_above_threshold():
+    row = {"locus_tag": "PMM1", "a": None, "b": None, "c": None, "n": 0}
+    t = rx.trim_response({"results": [row], "top_genes": [row], "scalar_null": None})
+    expected = {"locus_tag": "PMM1", "n": 0, "...": "3 null fields omitted (a, b, c)"}
+    assert t["results"] == [expected]
+    assert t["top_genes"] == [expected]
+    assert t["scalar_null"] is None  # envelope-level nulls are kept
+    # below the threshold nulls stay visible
+    few = {"locus_tag": "PMM1", "gene_name": None, "x": None}
+    assert rx.trim_response({"results": [few]})["results"] == [few]
+    # a non-list dict (envelope mapping) keeps its nulls
+    assert rx.trim_response({"nf": {"a": None, "b": None, "c": None}})["nf"] == {"a": None, "b": None, "c": None}
+
+
+def test_trim_response_caps_mapping_valued_envelope_fields():
+    live = {"by_x": {f"k{i}": i for i in range(10)}, "small": {"a": 1}}
+    t = rx.trim_response(live)
+    assert list(t["by_x"])[: rx.MAX_DICT_KEYS] == [f"k{i}" for i in range(rx.MAX_DICT_KEYS)]
+    assert t["by_x"]["..."] == f"+{10 - rx.MAX_DICT_KEYS} more"
+    assert t["small"] == {"a": 1}
+
+
+def test_trim_response_wide_rollup_entries_keep_one_exemplar():
+    wide = {f"f{j}": j for j in range(rx.WIDE_ENTRY_KEYS + 1)}
+    narrow = {"category": "x", "gene_count": 1}
+    t = rx.trim_response({"top_genes": [wide] * 4, "top_cats": [narrow] * 4, "results": [wide] * 4})
+    assert t["top_genes"] == [wide, "..."]
+    assert t["top_cats"] == [narrow] * 3 + ["..."]
+    assert t["results"] == [wide] * 3 + ["..."]  # results rows follow max_rows only
+
+
+def test_trim_response_elides_empty_envelope_fields():
+    live = {
+        "total_matching": 0, "a": [], "b": None, "results": [],
+        "c": {}, "not_found": [], "d": 1,
+    }
+    t = rx.trim_response(live)
+    assert list(t) == ["total_matching", "...", "results", "not_found", "d"]
+    assert t["..."] == "3 empty fields omitted (a, b, c)"
+    # fewer than the threshold: shown as-is
+    assert rx.trim_response({"a": [], "b": None, "d": 1}) == {"a": [], "b": None, "d": 1}
+
+
+def test_trim_response_keeps_not_classified_tail_bucket():
+    rows = [{"kegg_functional_category": f"c{i}", "count": 9 - i} for i in range(6)]
+    rows.append({"kegg_functional_category": "not classified", "count": 42})
+    live = {"by_kegg_functional_category": rows}
+    t = rx.trim_response(live)
+    assert t["by_kegg_functional_category"] == rows[:3] + ["...", rows[-1]]
+    # the head + tail form still checks clean against live; a wrong tail drifts
+    shown = rx.parse_shown_response(rx.format_response(live))
+    assert rx.compare(shown, live) == []
+    bad = {"by_kegg_functional_category": rows[:3] + [{"kegg_functional_category": "not classified", "count": 1}]}
+    assert rx.compare(bad, live)
+
+
+def test_trim_config_is_configurable():
+    cfg = rx.TrimConfig(max_rows=1, max_items=2, max_dict_keys=1, min_nulls_to_elide=1, max_string_len=10)
+    t = rx.trim_response(
+        {"results": [{"a": None}] * 3, "l": [1, 2, 3], "d": {"x": 1, "y": 2}, "s": "z" * 20}, cfg
+    )
+    assert t["results"] == [{"...": "1 null fields omitted (a)"}, "..."]
+    assert t["l"] == [1, 2, "..."]
+    assert t["d"] == {"x": 1, "...": "+1 more"}
+    assert t["s"] == "z" * 7 + "..."
+
+
+def test_trimmed_response_parses_back_as_subset_and_is_idempotent():
+    live = {
+        "total_matching": 9,
+        "by_x": {f"k{i}": i for i in range(9)},
+        "top": [{"id": i, "a": None, "b": None, "c": None, "ec": list(range(6))} for i in range(5)],
+        "results": [{"locus_tag": f"P{i}", **{c: None for c in "abcde"}} for i in range(5)],
+    }
+    text = rx.format_response(live)
+    assert '"...": "3 null fields omitted (a, b, c)"' in text and '"...": "+3 more"' in text
+    assert '"...": "5 null fields omitted"' in text  # > MAX_NAMED_ELISIONS: count only
+    shown = rx.parse_shown_response(text)
+    assert shown is not None
+    assert rx.compare(shown, live) == []  # every shown leaf matches live
+    assert shown["results"] == [{"locus_tag": f"P{i}"} for i in range(3)]
+    assert rx.format_response(live) == text  # deterministic
+    # the generator lint sees real envelope keys only
+    import re
+    keys = set(re.findall(r'(?:"|\b)([A-Za-z_][A-Za-z0-9_]*)"?\s*:', text))
+    assert {"total_matching", "by_x", "top", "results"} <= keys
 
 
 def test_format_response_is_pretty_json_with_bare_ellipsis():

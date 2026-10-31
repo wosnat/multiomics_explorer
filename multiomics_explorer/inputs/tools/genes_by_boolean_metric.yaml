@@ -25,8 +25,7 @@ examples:
           {"gene_category": "Unknown", "count": 12},
           {"gene_category": "Stress response and adaptation", "count": 9},
           {"gene_category": "Cell wall and membrane", "count": 9},
-          {"gene_category": "Translation", "count": 6},
-          {"gene_category": "Post-translational modification", "count": 4}
+          ...
         ],
         "by_metric": [
           {
@@ -41,28 +40,11 @@ examples:
             "dm_true_count": 32,
             "dm_false_count": 0
           },
-          {
-            "derived_metric_id": "derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member",
-            "name": "MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)",
-            "metric_type": "vesicle_proteome_member",
-            "value_kind": "boolean",
-            "count": 27,
-            "true_count": 27,
-            "false_count": 0,
-            "dm_total_gene_count": 27,
-            "dm_true_count": 27,
-            "dm_false_count": 0
-          }
+          ...
         ],
         "genes_per_metric_max": 32,
         "genes_per_metric_median": 32.0,
-        "not_found_ids": [],
-        "not_matched_ids": [],
-        "not_found_metric_types": [],
-        "not_matched_metric_types": [],
-        "not_matched_organism": null,
-        "excluded_derived_metrics": [],
-        "warnings": [],
+        "...": "7 empty fields omitted",
         "returned": 25,
         "offset": 0,
         "truncated": true,
@@ -116,8 +98,7 @@ examples:
           {"gene_category": "Unknown", "count": 479},
           {"gene_category": "Stress response and adaptation", "count": 196},
           {"gene_category": "Coenzyme metabolism", "count": 152},
-          {"gene_category": "Translation", "count": 119},
-          {"gene_category": "Amino acid metabolism", "count": 93}
+          ...
         ],
         "by_metric": [
           {
@@ -135,13 +116,7 @@ examples:
         ],
         "genes_per_metric_max": 1651,
         "genes_per_metric_median": 1651.0,
-        "not_found_ids": [],
-        "not_matched_ids": [],
-        "not_found_metric_types": [],
-        "not_matched_metric_types": [],
-        "not_matched_organism": null,
-        "excluded_derived_metrics": [],
-        "warnings": [],
+        "...": "7 empty fields omitted",
         "returned": 25,
         "offset": 0,
         "truncated": true,
@@ -196,8 +171,7 @@ examples:
           {"gene_category": "Unknown", "count": 12},
           {"gene_category": "Stress response and adaptation", "count": 9},
           {"gene_category": "Cell wall and membrane", "count": 9},
-          {"gene_category": "Translation", "count": 6},
-          {"gene_category": "Post-translational modification", "count": 4}
+          ...
         ],
         "by_metric": [
           {
@@ -212,28 +186,11 @@ examples:
             "dm_true_count": 32,
             "dm_false_count": 0
           },
-          {
-            "derived_metric_id": "derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member",
-            "name": "MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)",
-            "metric_type": "vesicle_proteome_member",
-            "value_kind": "boolean",
-            "count": 27,
-            "true_count": 27,
-            "false_count": 0,
-            "dm_total_gene_count": 27,
-            "dm_true_count": 27,
-            "dm_false_count": 0
-          }
+          ...
         ],
         "genes_per_metric_max": 32,
         "genes_per_metric_median": 32.0,
-        "not_found_ids": [],
-        "not_matched_ids": [],
-        "not_found_metric_types": [],
-        "not_matched_metric_types": [],
-        "not_matched_organism": null,
-        "excluded_derived_metrics": [],
-        "warnings": [],
+        "...": "7 empty fields omitted",
         "returned": 0,
         "offset": 0,
         "truncated": true,
@@ -257,8 +214,7 @@ examples:
           {"gene_category": "Stress response and adaptation", "count": 17},
           {"gene_category": "Unknown", "count": 6},
           {"gene_category": "Coenzyme metabolism", "count": 5},
-          {"gene_category": "Photosynthesis", "count": 2},
-          {"gene_category": "Transcription", "count": 2}
+          ...
         ],
         "by_metric": [
           {
@@ -276,13 +232,7 @@ examples:
         ],
         "genes_per_metric_max": 38,
         "genes_per_metric_median": 38.0,
-        "not_found_ids": [],
-        "not_matched_ids": [],
-        "not_found_metric_types": [],
-        "not_matched_metric_types": [],
-        "not_matched_organism": null,
-        "excluded_derived_metrics": [],
-        "warnings": [],
+        "...": "7 empty fields omitted",
         "returned": 25,
         "offset": 0,
         "truncated": true,

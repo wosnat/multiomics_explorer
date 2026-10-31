@@ -23,6 +23,7 @@ examples:
           }
         ],
         "top_cog_categories": [{"id": "cog.category:L", "name": "Replication, recombination and repair", "count": 1}],
+        "warnings": [],
         "results": [
           {
             "locus_tag": "PMM0001",

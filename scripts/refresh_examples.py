@@ -13,8 +13,12 @@ the result is exactly what an MCP caller sees — MCP-side defaults such as
   per example ``ok`` / ``drift`` / ``error`` / ``empty`` / ``unparseable`` /
   ``skipped``; exits 1 when any drift / error / empty / unparseable exists.
 * ``--write``: rewrites the ``response:`` block from the live result with a
-  deterministic trim (see :func:`trim_response`), touching nothing else in
-  the YAML (text-level replacement of the block only).
+  deterministic trim (see :func:`trim_response` / :class:`TrimConfig`: ≤ 3
+  result rows, ≤ 3 entries per other list, ≤ 6 entries per dict-valued
+  envelope field, null-heavy rows' nulls folded into one ``"..."`` entry),
+  touching nothing else in the YAML (text-level replacement of the block
+  only). Caps are overridable (``--max-rows`` etc.). Rerunnable: an
+  unchanged KG rewrites identical text.
 
 Skipped examples: those carrying ``illustrative: true``, narratives (``steps:``)
 and examples without a ``call:``. In ``--check`` mode examples without a
@@ -54,9 +58,15 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 INPUTS_DIR = REPO_ROOT / "multiomics_explorer" / "inputs" / "tools"
 
 ELLIPSIS = "..."
-MAX_ROLLUP_ITEMS = 5
+MAX_ROLLUP_ITEMS = 3
 MAX_RESULT_ROWS = 3
-MAX_STRING_LEN = 120
+MAX_DICT_KEYS = 6
+MIN_NULLS_TO_ELIDE = 3
+MAX_WIDE_ITEMS = 1
+WIDE_ENTRY_KEYS = 8
+MIN_EMPTY_TO_ELIDE = 3
+MAX_STRING_LEN = 100
+MAX_NAMED_ELISIONS = 4
 RESPONSE_INDENT = "      "  # 6 spaces: `  - title:` (2) + key (4) + block body
 
 STATUS_OK = "ok"
@@ -230,7 +240,7 @@ def parse_call(call_str: str) -> tuple[str, dict[str, Any]]:
 # Shown-response parsing (lenient)
 # ---------------------------------------------------------------------------
 
-_ELLIPSIS_KEY_RE = re.compile(r'"\.\.\."\s*:\s*"\.\.\."')       # "...": "..."
+_ELLIPSIS_KEY_RE = re.compile(r'"\.\.\."\s*:\s*"[^"]*"')         # "...": "<elision note>"
 _ELLIPSIS_ITEM_RE = re.compile(r'(?<![\w"])\.\.\.(?![\w"])')      # bare ...
 _TRAILING_COMMA_RE = re.compile(r",(\s*[\]}])")
 _DOUBLE_COMMA_RE = re.compile(r",(\s*,)+")
@@ -408,6 +418,13 @@ def compare(shown: Any, live: Any, path: str = "$") -> list[Diff]:
                 diffs.append(Diff(f"{path}[{i}]", v, "<missing>"))
                 continue
             diffs.extend(compare(v, live[i], f"{path}[{i}]"))
+        if diffs and 1 < len(shown) < len(live):
+            # head + tail elision (`[a, b, ..., last]` — see trim_response's
+            # tail-bucket rule): the last shown item stands for live[-1].
+            alt = [d for i, v in enumerate(shown[:-1]) for d in compare(v, live[i], f"{path}[{i}]")]
+            alt += compare(shown[-1], live[-1], f"{path}[-1]")
+            if not alt:
+                return []
         return diffs
     if not _scalars_equal(shown, live):
         diffs.append(Diff(path, shown, live))
@@ -530,41 +547,154 @@ def check_example(ex: Example, runner: LiveRunner) -> CheckResult:
 # Write: deterministic trim + text-level YAML replacement
 # ---------------------------------------------------------------------------
 
-def _elide_str(s: str) -> str:
-    return s if len(s) <= MAX_STRING_LEN else s[: MAX_STRING_LEN - len(ELLIPSIS)] + ELLIPSIS
+@dataclass
+class TrimConfig:
+    """Caps applied by :func:`trim_response` (CLI-overridable).
+
+    * ``max_rows`` — ``results`` rows kept (then a bare ``...``)
+    * ``max_items`` — entries kept in every other list, at any depth
+      (``by_*`` / ``top_*`` rollups, ``not_found``, ``ec_numbers`` …)
+    * ``max_dict_keys`` — entries kept in a *mapping-valued* envelope field
+      (a dict-valued top-level key such as ``stereo_forms_added`` or a
+      ``by_*`` dict); the rest collapse into one ``"...": "+N more"`` entry.
+      Row / rollup-entry dicts are never key-capped (their keys are the
+      schema's field names).
+    * ``min_nulls_to_elide`` — a dict inside a list (a result row or rollup
+      entry) with at least this many ``null`` fields drops them and gets one
+      ``"...": "N null fields omitted (names…)"`` entry instead (polymorphic rows
+      carry many cross-arm nulls). Fewer nulls are shown as-is.
+    * ``max_wide_items`` / ``wide_entry_keys`` — a non-``results`` list whose
+      entries are dicts with more than ``wide_entry_keys`` fields (``top_genes``,
+      ``by_metabolite`` …) keeps only ``max_wide_items`` exemplar entries.
+    * ``min_empty_to_elide`` — when at least this many top-level envelope
+      fields are ``null`` / ``[]`` / ``{}`` (the empty arms of a polymorphic
+      envelope), they collapse into one ``"...": "N empty fields omitted (names…)"``
+      entry at the first one's position. Fields in :data:`KEEP_EMPTY_KEYS`
+      (``results``, ``not_found``, ``not_matched`` …) are always shown.
+    * ``max_string_len`` — longer strings are cut and end in ``...``.
+    """
+
+    max_rows: int = MAX_RESULT_ROWS
+    max_items: int = MAX_ROLLUP_ITEMS
+    max_dict_keys: int = MAX_DICT_KEYS
+    min_nulls_to_elide: int = MIN_NULLS_TO_ELIDE
+    max_string_len: int = MAX_STRING_LEN
+    max_wide_items: int = MAX_WIDE_ITEMS
+    wide_entry_keys: int = WIDE_ENTRY_KEYS
+    min_empty_to_elide: int = MIN_EMPTY_TO_ELIDE
 
 
-def _trim_value(v: Any, *, max_items: int | None) -> Any:
+# Envelope keys whose empty value is the point of many examples.
+KEEP_EMPTY_KEYS = frozenset({
+    "results", "returned", "total_matching", "truncated",
+    "not_found", "not_matched",
+})
+
+DEFAULT_TRIM = TrimConfig()
+
+
+def _elide_str(s: str, max_len: int = MAX_STRING_LEN) -> str:
+    return s if len(s) <= max_len else s[: max_len - len(ELLIPSIS)] + ELLIPSIS
+
+
+def _elide_nulls(d: dict, cfg: TrimConfig) -> dict:
+    nulls = [k for k, v in d.items() if v is None]
+    if len(nulls) < cfg.min_nulls_to_elide:
+        return d
+    out = {k: v for k, v in d.items() if v is not None}
+    out[ELLIPSIS] = _elision_note(len(nulls), "null", nulls)
+    return out
+
+
+def _elision_note(n: int, kind: str, names: list) -> str:
+    """``"3 null fields omitted (a, b, c)"`` — names listed when there are at
+    most :data:`MAX_NAMED_ELISIONS` of them, else just the count."""
+    note = f"{n} {kind} fields omitted"
+    if n <= MAX_NAMED_ELISIONS:
+        note += " (" + ", ".join(str(x) for x in names) + ")"
+    return note
+
+
+def _trim_value(v: Any, cfg: TrimConfig, *, in_list: bool = False) -> Any:
     if isinstance(v, str):
-        return _elide_str(v)
+        return _elide_str(v, cfg.max_string_len)
     if isinstance(v, dict):
-        return {k: _trim_value(x, max_items=max_items) for k, x in v.items()}
+        out = {k: _trim_value(x, cfg) for k, x in v.items()}
+        return _elide_nulls(out, cfg) if in_list else out
     if isinstance(v, list):
-        items = [_trim_value(x, max_items=max_items) for x in v]
-        if max_items is not None and len(items) > max_items:
-            return items[:max_items] + [ELLIPSIS]
+        cap = cfg.max_items
+        if v and all(isinstance(x, dict) and len(x) > cfg.wide_entry_keys for x in v):
+            cap = min(cap, cfg.max_wide_items)
+        items = [_trim_value(x, cfg, in_list=True) for x in v[:cap]]
+        if len(v) <= cap:
+            return items
+        items.append(ELLIPSIS)
+        if _is_tail_bucket(v[-1]):
+            items.append(_trim_value(v[-1], cfg, in_list=True))
         return items
     return v
 
 
-def trim_response(live: Any) -> Any:
-    """Deterministic trim of a live envelope for display.
+# Rollup tail buckets that docs tell the reader to look at (the KEGG-class
+# breakdowns end with a "not classified" entry): kept after the ``...``.
+TAIL_BUCKET_VALUES = frozenset({"not classified"})
 
-    * scalars kept as-is (strings > 120 chars elided)
-    * ``results`` → first 3 rows + ``"..."``
-    * every other list (``by_*`` / ``top_*`` rollups, ``not_found`` …) → first
-      5 entries + ``"..."`` (applied recursively)
+
+def _is_tail_bucket(x: Any) -> bool:
+    return isinstance(x, dict) and any(
+        isinstance(val, str) and val in TAIL_BUCKET_VALUES for val in x.values()
+    )
+
+
+def _is_empty(v: Any) -> bool:
+    return v is None or v == [] or v == {}
+
+
+def _cap_mapping(d: dict, cfg: TrimConfig) -> dict:
+    if len(d) <= cfg.max_dict_keys:
+        return d
+    out = dict(list(d.items())[: cfg.max_dict_keys])
+    out[ELLIPSIS] = f"+{len(d) - cfg.max_dict_keys} more"
+    return out
+
+
+def trim_response(live: Any, cfg: TrimConfig = DEFAULT_TRIM) -> Any:
+    """Deterministic trim of a live envelope for display (see :class:`TrimConfig`).
+
+    * top-level scalars kept as-is (strings > ``max_string_len`` elided)
+    * ``results`` → first ``max_rows`` rows + ``...``
+    * every other list, at any depth → first ``max_items`` entries + ``...``
+      (+ the last entry when it is a ``"not classified"`` tail bucket;
+      :func:`compare` accepts that head + tail form)
+    * dict-valued envelope fields → first ``max_dict_keys`` entries
+    * dicts inside lists with ≥ ``min_nulls_to_elide`` nulls → nulls dropped
+      behind one ``"...": "N null fields omitted (names…)"`` entry
+    * non-results lists of wide dicts → ``max_wide_items`` exemplar entries
+    * ≥ ``min_empty_to_elide`` empty top-level fields → one ``"..."`` entry
+
+    Elisions are ``...`` list items and ``"..."`` keys only, so every real
+    key stays a real field name and :func:`parse_shown_response` drops the
+    markers; the output is a subset of ``live`` (``--check`` passes on it).
+    Idempotent per live result: re-running on an unchanged KG rewrites the
+    same text.
     """
     if not isinstance(live, dict):
-        return _trim_value(live, max_items=MAX_ROLLUP_ITEMS)
+        return _trim_value(live, cfg)
+    empties = [k for k, v in live.items() if _is_empty(v) and k not in KEEP_EMPTY_KEYS]
+    elide_empties = len(empties) >= cfg.min_empty_to_elide
     out: dict[str, Any] = {}
     for k, v in live.items():
+        if elide_empties and k in empties:
+            if k == empties[0]:
+                out[ELLIPSIS] = _elision_note(len(empties), "empty", empties)
+            continue
         if k == "results" and isinstance(v, list):
-            out[k] = _trim_value(v, max_items=MAX_ROLLUP_ITEMS)
-            if len(v) > MAX_RESULT_ROWS:
-                out[k] = [_trim_value(x, max_items=MAX_ROLLUP_ITEMS) for x in v[:MAX_RESULT_ROWS]] + [ELLIPSIS]
+            rows = [_trim_value(x, cfg, in_list=True) for x in v[: cfg.max_rows]]
+            out[k] = rows + [ELLIPSIS] if len(v) > cfg.max_rows else rows
+        elif isinstance(v, dict):
+            out[k] = _cap_mapping(_trim_value(v, cfg), cfg)
         else:
-            out[k] = _trim_value(v, max_items=MAX_ROLLUP_ITEMS)
+            out[k] = _trim_value(v, cfg)
     return out
 
 
@@ -601,11 +731,11 @@ def _dump(v: Any, indent: int) -> str:
     return "[\n" + ",\n".join(pad + it for it in items) + "\n" + close + "]"
 
 
-def format_response(live: Any) -> str:
+def format_response(live: Any, cfg: TrimConfig = DEFAULT_TRIM) -> str:
     """JSON-ish text of the trimmed envelope: two-space indent, short
     dicts/lists inline, ``...`` items rendered bare (parseable back by
     :func:`parse_shown_response`)."""
-    return _dump(trim_response(live), 0)
+    return _dump(trim_response(live, cfg), 0)
 
 
 _EXAMPLES_KEY_RE = re.compile(r"^examples:\s*$", re.MULTILINE)
@@ -690,7 +820,7 @@ def summarize(results: list[CheckResult]) -> str:
     return f"examples={len(results)} " + " ".join(parts)
 
 
-def run_write(paths: list[Path], runner: LiveRunner) -> int:
+def run_write(paths: list[Path], runner: LiveRunner, cfg: TrimConfig = DEFAULT_TRIM) -> int:
     """Rewrite response blocks from live; returns number of blocks rewritten."""
     written = 0
     for path in paths:
@@ -708,7 +838,7 @@ def run_write(paths: list[Path], runner: LiveRunner) -> int:
                 print(f"[empty      ] {ex.id} — live result is empty (left untouched; fix the inputs)")
                 continue
             try:
-                text = replace_response_block(text, ex.index, format_response(live))
+                text = replace_response_block(text, ex.index, format_response(live, cfg))
             except ValueError as e:
                 print(f"[unwritable ] {ex.id} — {e}")
                 continue
@@ -725,7 +855,17 @@ def main(argv: list[str] | None = None) -> int:
     mode.add_argument("--write", nargs="*", metavar="TOOL", help="rewrite response blocks from live (optionally only these tools)")
     ap.add_argument("--tool", action="append", help="scope to this tool YAML (repeatable)")
     ap.add_argument("--quiet", action="store_true", help="only print the summary + failures")
+    ap.add_argument("--max-rows", type=int, default=MAX_RESULT_ROWS, help="--write: results rows kept (default %(default)s)")
+    ap.add_argument("--max-items", type=int, default=MAX_ROLLUP_ITEMS, help="--write: entries kept in other lists (default %(default)s)")
+    ap.add_argument("--max-dict-keys", type=int, default=MAX_DICT_KEYS, help="--write: entries kept in dict-valued envelope fields (default %(default)s)")
+    ap.add_argument("--min-nulls", type=int, default=MIN_NULLS_TO_ELIDE, help="--write: elide a row's nulls when it has at least this many (default %(default)s)")
     args = ap.parse_args(argv)
+    cfg = TrimConfig(
+        max_rows=args.max_rows,
+        max_items=args.max_items,
+        max_dict_keys=args.max_dict_keys,
+        min_nulls_to_elide=args.min_nulls,
+    )
 
     tools = list(args.tool or [])
     if args.write:
@@ -734,7 +874,7 @@ def main(argv: list[str] | None = None) -> int:
 
     with LiveRunner() as runner:
         if args.write is not None:
-            n = run_write(paths, runner)
+            n = run_write(paths, runner, cfg)
             print(f"rewrote {n} response block(s) in {len(paths)} file(s)")
             return 0
         results = run_check(paths, runner, verbose=not args.quiet)

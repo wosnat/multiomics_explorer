@@ -25,11 +25,7 @@ examples:
             "truncated": true
           }
         ],
-        "by_level": [],
-        "by_interpro_type": [],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [],
+        "...": "5 empty fields omitted",
         "results": [
           {
             "id": "go:0006260",
@@ -72,8 +68,7 @@ examples:
         "mode": "browse",
         "total_entries": 170,
         "total_matching": 107,
-        "score_max": null,
-        "score_median": null,
+        "...": "6 empty fields omitted",
         "returned": 5,
         "offset": 0,
         "truncated": true,
@@ -88,10 +83,6 @@ examples:
           }
         ],
         "by_level": [{"level": 1, "count": 107}],
-        "by_interpro_type": [],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [],
         "results": [
           {
             "id": "merops.family:S33",
@@ -135,8 +126,7 @@ examples:
         "mode": "browse",
         "total_entries": 9725,
         "total_matching": 8,
-        "score_max": null,
-        "score_median": null,
+        "...": "6 empty fields omitted",
         "returned": 5,
         "offset": 0,
         "truncated": true,
@@ -151,10 +141,6 @@ examples:
           }
         ],
         "by_level": [{"level": 2, "count": 8}],
-        "by_interpro_type": [],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [],
         "results": [
           {
             "id": "tcdb:3.A.1",
@@ -201,8 +187,7 @@ examples:
         "mode": "browse",
         "total_entries": 3411,
         "total_matching": 3411,
-        "score_max": null,
-        "score_median": null,
+        "...": "5 empty fields omitted",
         "returned": 3,
         "offset": 0,
         "truncated": true,
@@ -216,20 +201,8 @@ examples:
             "truncated": true
           }
         ],
-        "by_level": [
-          {"level": 0, "count": 1},
-          {"level": 1, "count": 16},
-          {"level": 2, "count": 115},
-          {"level": 3, "count": 338},
-          {"level": 4, "count": 686},
-          ...
-        ],
-        "by_interpro_type": [],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [
-          "Browse mode truncated with no narrowing filter — set level, min_gene_count, organism or a facet (tree / interpro_type..."
-        ],
+        "by_level": [{"level": 0, "count": 1}, {"level": 1, "count": 16}, {"level": 2, "count": 115}, ...],
+        "warnings": ["Browse mode truncated with no narrowing filter — set level, min_gene_count, organism or a facet (..."],
         "results": [
           {
             "id": "go:0008150",
@@ -272,8 +245,7 @@ examples:
         "mode": "browse",
         "total_entries": 5212,
         "total_matching": 5088,
-        "score_max": null,
-        "score_median": null,
+        "...": "7 empty fields omitted",
         "returned": 6,
         "offset": 0,
         "truncated": true,
@@ -295,11 +267,6 @@ examples:
             "truncated": true
           }
         ],
-        "by_level": [],
-        "by_interpro_type": [],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [],
         "results": [
           {
             "id": "ncbifam:TIGR00231",
@@ -365,11 +332,7 @@ examples:
             "truncated": true
           }
         ],
-        "by_level": [],
-        "by_interpro_type": [],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [],
+        "...": "5 empty fields omitted",
         "results": [
           {
             "id": "go:0006810",
@@ -442,29 +405,10 @@ examples:
             "returned": 1,
             "truncated": false
           },
-          {
-            "ontology": "ec",
-            "total_entries": 7337,
-            "total_matching": 7,
-            "score_max": 3.41845965385437,
-            "returned": 2,
-            "truncated": true
-          },
-          {
-            "ontology": "kegg",
-            "total_entries": 5107,
-            "total_matching": 20,
-            "score_max": 2.817457675933838,
-            "returned": 2,
-            "truncated": true
-          },
           ...
         ],
-        "by_level": [],
+        "...": "4 empty fields omitted (by_level, by_family_type, skipped_ontologies, warnings)",
         "by_interpro_type": [{"interpro_type": "FAMILY", "count": 2}],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [],
         "results": [
           {
             "id": "go:0042128",
@@ -525,11 +469,7 @@ examples:
             "truncated": false
           }
         ],
-        "by_level": [],
-        "by_interpro_type": [],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [],
+        "...": "5 empty fields omitted",
         "results": [
           {
             "id": "kegg.brite:ko02000.A2.B2.C3",
@@ -584,11 +524,7 @@ examples:
             "truncated": true
           }
         ],
-        "by_level": [],
-        "by_interpro_type": [],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [],
+        "...": "5 empty fields omitted",
         "results": [
           {
             "id": "tcdb:2.A.2.4.17",
@@ -647,11 +583,7 @@ examples:
             "truncated": false
           }
         ],
-        "by_level": [],
-        "by_interpro_type": [],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [],
+        "...": "5 empty fields omitted",
         "results": [
           {
             "id": "tcdb:3.A.1.4.4",
@@ -685,7 +617,7 @@ examples:
             "superfamily": "ArsA ATPase (ArsA) Superfamily",
             "tcdb_substrate_count": 3,
             "direction": "uptake",
-            "proteins": "UrtA-E of Corynebacterium glutamicum; UrtA (R) CAF19637; UrtB (M) CAF19636; UrtC (M) CAF19638; UrtD (C) CAF19639; Urt..."
+            "proteins": "UrtA-E of Corynebacterium glutamicum; UrtA (R) CAF19637; UrtB (M) CAF19636; UrtC (M) CAF19638; Ur..."
           }
         ]
       }
@@ -712,11 +644,8 @@ examples:
             "truncated": true
           }
         ],
-        "by_level": [],
+        "...": "4 empty fields omitted (by_level, by_family_type, skipped_ontologies, warnings)",
         "by_interpro_type": [{"interpro_type": "HOMOLOGOUS_SUPERFAMILY", "count": 5}],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [],
         "results": [
           {
             "id": "interpro:IPR027417",
@@ -762,8 +691,7 @@ examples:
         "mode": "browse",
         "total_entries": 5042,
         "total_matching": 13,
-        "score_max": null,
-        "score_median": null,
+        "...": "5 empty fields omitted",
         "returned": 5,
         "offset": 0,
         "truncated": true,
@@ -778,56 +706,47 @@ examples:
           }
         ],
         "by_level": [{"level": 0, "count": 13}],
-        "by_interpro_type": [],
         "by_family_type": [
           {"family_type": "domain", "count": 3},
           {"family_type": "superfamily", "count": 1},
           {"family_type": "subfamily", "count": 1}
         ],
-        "skipped_ontologies": [],
-        "warnings": [],
         "results": [
           {
             "id": "ncbifam:TIGR00231",
             "name": "GTP-binding protein",
             "ontology_type": "ncbifam",
-            "score": null,
             "level": 0,
             "is_informative": true,
             "gene_count": 1232,
             "organism_count": 118,
-            "description": "Proteins with a small GTP-binding domain recognized by this model include Ras, RhoA, Rab11, translation elongation fa...",
-            "level_kind": null,
+            "description": "Proteins with a small GTP-binding domain recognized by this model include Ras, RhoA, Rab11, trans...",
             "family_type": "domain",
-            "gene_symbol": null
+            "...": "3 null fields omitted (score, level_kind, gene_symbol)"
           },
           {
             "id": "ncbifam:TIGR02937",
             "name": "sigma-70 family RNA polymerase sigma factor",
             "ontology_type": "ncbifam",
-            "score": null,
             "level": 0,
             "is_informative": true,
             "gene_count": 991,
             "organism_count": 118,
-            "description": "This model encompasses all varieties of the sigma-70 type sigma factors including the ECF subfamily. A number of sigm...",
-            "level_kind": null,
+            "description": "This model encompasses all varieties of the sigma-70 type sigma factors including the ECF subfami...",
             "family_type": "superfamily",
-            "gene_symbol": null
+            "...": "3 null fields omitted (score, level_kind, gene_symbol)"
           },
           {
             "id": "ncbifam:TIGR03798",
             "name": "Nif11-like leader peptide family RiPP precursor",
             "ontology_type": "ncbifam",
-            "score": null,
             "level": 0,
             "is_informative": true,
             "gene_count": 793,
             "organism_count": 97,
-            "description": "This model describes a conserved, fairly long (about 65 residue) leader peptide region for a family of ribosomally sy...",
-            "level_kind": null,
+            "description": "This model describes a conserved, fairly long (about 65 residue) leader peptide region for a fami...",
             "family_type": "subfamily",
-            "gene_symbol": null
+            "...": "3 null fields omitted (score, level_kind, gene_symbol)"
           },
           ...
         ]
@@ -855,11 +774,7 @@ examples:
             "truncated": true
           }
         ],
-        "by_level": [],
-        "by_interpro_type": [],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [],
+        "...": "5 empty fields omitted",
         "results": [
           {
             "id": "merops.family:M50",
@@ -917,11 +832,7 @@ examples:
             "truncated": false
           }
         ],
-        "by_level": [],
-        "by_interpro_type": [],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [],
+        "...": "5 empty fields omitted",
         "results": [
           {
             "id": "psortb_OuterMembrane",
@@ -959,11 +870,7 @@ examples:
             "truncated": true
           }
         ],
-        "by_level": [],
-        "by_interpro_type": [],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [],
+        "...": "5 empty fields omitted",
         "results": [
           {
             "id": "kegg.subcategory:09131",
@@ -1024,11 +931,7 @@ examples:
             "truncated": false
           }
         ],
-        "by_level": [],
-        "by_interpro_type": [],
-        "by_family_type": [],
-        "skipped_ontologies": [],
-        "warnings": [],
+        "...": "5 empty fields omitted",
         "results": [
           {
             "id": "kegg.pathway:ko00710",
