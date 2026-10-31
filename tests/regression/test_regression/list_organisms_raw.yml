@@ -102,38 +102,42 @@ rows:
   treatment_types:
   - compartment
 - clade: null
-  experiment_count: 12
+  experiment_count: 13
   gene_count: 4136
   genus: Alteromonas
   ncbi_taxon_id: 28108
   omics_types:
+  - BIOINFORMATIC
   - EXOPROTEOMICS
   - PROTEOMICS
   - RNASEQ
   organism_name: Alteromonas macleodii EZ55
-  publication_count: 3
+  publication_count: 4
   species: Alteromonas macleodii
   strain: EZ55
   treatment_types:
   - carbon
   - coculture
   - compartment
+  - genomic_analysis
 - clade: null
-  experiment_count: 8
+  experiment_count: 9
   gene_count: 4028
   genus: Alteromonas
   ncbi_taxon_id: 28108
   omics_types:
+  - BIOINFORMATIC
   - PROTEOMICS
   - RNASEQ
   - VESICLE_PROTEOMICS
   organism_name: Alteromonas macleodii HOT1A3
-  publication_count: 3
+  publication_count: 4
   species: Alteromonas macleodii
   strain: HOT1A3
   treatment_types:
   - coculture
   - compartment
+  - genomic_analysis
   - nitrogen
 - clade: null
   experiment_count: 6

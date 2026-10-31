@@ -173,10 +173,12 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - vesicle
-  derived_metric_count: 3
+  - whole_cell
+  derived_metric_count: 4
   derived_metric_value_kinds:
+  - boolean
   - numeric
-  experiment_count: 8
+  experiment_count: 9
   gene_count: 4028
   genus: Alteromonas
   go_transport_metabolite_count: 88
@@ -189,6 +191,7 @@ rows:
   ncbifam_gene_count: 1678
   nonpeptidase_homolog_gene_count: 33
   omics_types:
+  - BIOINFORMATIC
   - PROTEOMICS
   - RNASEQ
   - VESICLE_PROTEOMICS
@@ -196,7 +199,7 @@ rows:
   organism_type: genome_strain
   partner_experiment_count: 6
   peptidase_gene_count: 118
-  publication_count: 3
+  publication_count: 4
   reaction_count: 1266
   reference_database: null
   reference_proteome: null
@@ -206,6 +209,7 @@ rows:
   treatment_types:
   - coculture
   - compartment
+  - genomic_analysis
   - nitrogen
 - background_factors:
   - axenic

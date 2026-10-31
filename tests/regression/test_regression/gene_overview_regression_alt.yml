@@ -4,7 +4,7 @@ rows:
 - annotation_quality: 0
   annotation_state: no_evidence
   annotation_types: []
-  boolean_metric_count: 0
+  boolean_metric_count: 1
   catalyzed_metabolite_count: 0
   categorical_metric_count: 0
   cazy_family_count: 0

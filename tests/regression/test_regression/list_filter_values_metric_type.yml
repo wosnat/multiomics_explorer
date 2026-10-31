@@ -15,7 +15,7 @@ rows:
   value: prop_abund_cells_percent
 - count: 6
   value: prop_abund_mvs_percent
-- count: 4
+- count: 6
   value: strain_unique_gene_koch2020
 - count: 2
   value: antisense_tss_count

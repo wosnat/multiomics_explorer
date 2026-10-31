@@ -286,10 +286,10 @@ rows:
   compartments:
   - exoproteome
   - whole_cell
-  derived_metric_count: 14
+  derived_metric_count: 15
   derived_metric_value_kinds:
   - boolean
-  experiment_count: 12
+  experiment_count: 13
   gene_count: 4136
   genus: Alteromonas
   go_transport_metabolite_count: 101
@@ -302,6 +302,7 @@ rows:
   ncbifam_gene_count: 1701
   nonpeptidase_homolog_gene_count: 34
   omics_types:
+  - BIOINFORMATIC
   - EXOPROTEOMICS
   - PROTEOMICS
   - RNASEQ
@@ -309,7 +310,7 @@ rows:
   organism_type: genome_strain
   partner_experiment_count: 4
   peptidase_gene_count: 124
-  publication_count: 3
+  publication_count: 4
   reaction_count: 1348
   reference_database: null
   reference_proteome: null
@@ -320,6 +321,7 @@ rows:
   - carbon
   - coculture
   - compartment
+  - genomic_analysis
 - background_factors:
   - axenic
   - coculture
@@ -331,10 +333,12 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - vesicle
-  derived_metric_count: 3
+  - whole_cell
+  derived_metric_count: 4
   derived_metric_value_kinds:
+  - boolean
   - numeric
-  experiment_count: 8
+  experiment_count: 9
   gene_count: 4028
   genus: Alteromonas
   go_transport_metabolite_count: 88
@@ -347,6 +351,7 @@ rows:
   ncbifam_gene_count: 1678
   nonpeptidase_homolog_gene_count: 33
   omics_types:
+  - BIOINFORMATIC
   - PROTEOMICS
   - RNASEQ
   - VESICLE_PROTEOMICS
@@ -354,7 +359,7 @@ rows:
   organism_type: genome_strain
   partner_experiment_count: 6
   peptidase_gene_count: 118
-  publication_count: 3
+  publication_count: 4
   reaction_count: 1266
   reference_database: null
   reference_proteome: null
@@ -364,6 +369,7 @@ rows:
   treatment_types:
   - coculture
   - compartment
+  - genomic_analysis
   - nitrogen
 - background_factors:
   - axenic

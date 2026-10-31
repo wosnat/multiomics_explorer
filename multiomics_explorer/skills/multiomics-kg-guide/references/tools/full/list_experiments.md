@@ -133,8 +133,8 @@ list_experiments(summary=True)
 
 ```example-response
 {
-  "total_entries": 338,
-  "total_matching": 338,
+  "total_entries": 340,
+  "total_matching": 340,
   "returned": 0,
   "offset": 0,
   "truncated": true,
@@ -148,7 +148,7 @@ list_experiments(summary=True)
   ],
   "by_organism_truncated": null,
   "by_treatment_type": [
-    {"treatment_type": "genomic_analysis", "count": 100},
+    {"treatment_type": "genomic_analysis", "count": 102},
     {"treatment_type": "carbon", "count": 88},
     {"treatment_type": "coculture", "count": 39},
     {"treatment_type": "compartment", "count": 25},
@@ -166,7 +166,7 @@ list_experiments(summary=True)
   ],
   "by_background_factors_truncated": null,
   "by_omics_type": [
-    {"omics_type": "BIOINFORMATIC", "count": 100},
+    {"omics_type": "BIOINFORMATIC", "count": 102},
     {"omics_type": "PROTEOMICS", "count": 82},
     {"omics_type": "RNASEQ", "count": 79},
     {"omics_type": "MICROARRAY", "count": 33},
@@ -211,7 +211,7 @@ list_experiments(summary=True)
   "by_value_kind": [
     {"value_kind": "categorical", "count": 113},
     {"value_kind": "numeric", "count": 26},
-    {"value_kind": "boolean", "count": 18}
+    {"value_kind": "boolean", "count": 20}
   ],
   "by_metric_type": [
     {"metric_type": "sbp_nutrient_class", "count": 95},
@@ -223,7 +223,7 @@ list_experiments(summary=True)
   ],
   "by_metric_type_truncated": null,
   "by_compartment": [
-    {"compartment": "whole_cell", "count": 303},
+    {"compartment": "whole_cell", "count": 305},
     {"compartment": "exoproteome", "count": 19},
     {"compartment": "vesicle", "count": 13},
     {"compartment": "extracellular", "count": 3}
@@ -278,7 +278,7 @@ list_experiments(control_timing=["baseline", "mixed"], summary=True)
 
 ```example-response
 {
-  "total_entries": 338,
+  "total_entries": 340,
   "total_matching": 26,
   "returned": 0,
   "offset": 0,
@@ -396,7 +396,7 @@ list_experiments(compartment="vesicle", limit=2)
 
 ```example-response
 {
-  "total_entries": 338,
+  "total_entries": 340,
   "total_matching": 13,
   "returned": 2,
   "offset": 0,
@@ -541,7 +541,7 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
 
 ```example-response
 {
-  "total_entries": 338,
+  "total_entries": 340,
   "total_matching": 2,
   "returned": 2,
   "offset": 0,

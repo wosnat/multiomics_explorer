@@ -188,7 +188,7 @@ list_filter_values(filter_type="value_kind")
   "results": [
     {"value": "categorical", "count": 210},
     {"value": "numeric", "count": 58},
-    {"value": "boolean", "count": 32}
+    {"value": "boolean", "count": 34}
   ]
 }
 ```
@@ -208,7 +208,7 @@ list_filter_values(filter_type="compartment")
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "whole_cell", "count": 303},
+    {"value": "whole_cell", "count": 305},
     {"value": "exoproteome", "count": 19},
     {"value": "vesicle", "count": 13},
     ...
@@ -231,7 +231,7 @@ list_filter_values(filter_type="omics_type")
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "BIOINFORMATIC", "count": 100},
+    {"value": "BIOINFORMATIC", "count": 102},
     {"value": "DNASEQ", "count": 1},
     {"value": "EXOPROTEOMICS", "count": 19},
     ...

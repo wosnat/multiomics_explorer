@@ -125,7 +125,7 @@ list_organisms()
   "by_value_kind": [
     {"value_kind": "categorical", "count": 98},
     {"value_kind": "numeric", "count": 19},
-    {"value_kind": "boolean", "count": 8}
+    {"value_kind": "boolean", "count": 9}
   ],
   "by_metric_type": [
     {"metric_type": "sbp_nutrient_class", "count": 95},
@@ -137,7 +137,7 @@ list_organisms()
   ],
   "by_metric_type_truncated": true,
   "by_compartment": [
-    {"compartment": "whole_cell", "count": 101},
+    {"compartment": "whole_cell", "count": 102},
     {"compartment": "exoproteome", "count": 10},
     {"compartment": "vesicle", "count": 9}
   ],
@@ -356,7 +356,7 @@ list_organisms(summary=True)
   "by_value_kind": [
     {"value_kind": "categorical", "count": 98},
     {"value_kind": "numeric", "count": 19},
-    {"value_kind": "boolean", "count": 8}
+    {"value_kind": "boolean", "count": 9}
   ],
   "by_metric_type": [
     {"metric_type": "sbp_nutrient_class", "count": 95},
@@ -368,7 +368,7 @@ list_organisms(summary=True)
   ],
   "by_metric_type_truncated": null,
   "by_compartment": [
-    {"compartment": "whole_cell", "count": 101},
+    {"compartment": "whole_cell", "count": 102},
     {"compartment": "exoproteome", "count": 10},
     {"compartment": "vesicle", "count": 9}
   ],
@@ -786,19 +786,19 @@ list_organisms(compartment="vesicle")
   "by_organism_type": [{"organism_type": "genome_strain", "count": 9}],
   "by_value_kind": [
     {"value_kind": "numeric", "count": 9},
-    {"value_kind": "boolean", "count": 5},
+    {"value_kind": "boolean", "count": 6},
     {"value_kind": "categorical", "count": 4}
   ],
   "by_metric_type": [
     {"metric_type": "log2_mv_cell_enrichment", "count": 6},
     {"metric_type": "prop_abund_cells_percent", "count": 6},
     {"metric_type": "prop_abund_mvs_percent", "count": 6},
+    {"metric_type": "strain_unique_gene_koch2020", "count": 4},
     {"metric_type": "sbp_nutrient_class", "count": 3},
-    {"metric_type": "sbp_predicted_substrate", "count": 3},
     ...
   ],
   "by_metric_type_truncated": true,
-  "by_compartment": [{"compartment": "vesicle", "count": 9}, {"compartment": "whole_cell", "count": 6}],
+  "by_compartment": [{"compartment": "vesicle", "count": 9}, {"compartment": "whole_cell", "count": 7}],
   "top_metabolic_capability": [
     {
       "organism_name": "Alteromonas macleodii MIT1002",
@@ -1012,7 +1012,7 @@ list_organisms(summary=True)
   "by_value_kind": [
     {"value_kind": "categorical", "count": 98},
     {"value_kind": "numeric", "count": 19},
-    {"value_kind": "boolean", "count": 8}
+    {"value_kind": "boolean", "count": 9}
   ],
   "by_metric_type": [
     {"metric_type": "sbp_nutrient_class", "count": 95},
@@ -1024,7 +1024,7 @@ list_organisms(summary=True)
   ],
   "by_metric_type_truncated": null,
   "by_compartment": [
-    {"compartment": "whole_cell", "count": 101},
+    {"compartment": "whole_cell", "count": 102},
     {"compartment": "exoproteome", "count": 10},
     {"compartment": "vesicle", "count": 9}
   ],
@@ -1146,7 +1146,7 @@ list_organisms(summary=True)
   "by_value_kind": [
     {"value_kind": "categorical", "count": 98},
     {"value_kind": "numeric", "count": 19},
-    {"value_kind": "boolean", "count": 8}
+    {"value_kind": "boolean", "count": 9}
   ],
   "by_metric_type": [
     {"metric_type": "sbp_nutrient_class", "count": 95},
@@ -1158,7 +1158,7 @@ list_organisms(summary=True)
   ],
   "by_metric_type_truncated": null,
   "by_compartment": [
-    {"compartment": "whole_cell", "count": 101},
+    {"compartment": "whole_cell", "count": 102},
     {"compartment": "exoproteome", "count": 10},
     {"compartment": "vesicle", "count": 9}
   ],

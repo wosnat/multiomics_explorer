@@ -376,7 +376,7 @@ class TestExperimentListPropsDense:
             "MATCH (e:Experiment) RETURN count(e) AS n, "
             "count(e.treatment_type) AS tt"
         )[0]
-        assert row["n"] == 338
+        assert row["n"] == 340
         assert row["tt"] == row["n"], (
             f"{row['n'] - row['tt']} Experiment(s) have no treatment_type — "
             "the dense-list fix (experiment-list-props-dense.md) is not on "
@@ -411,7 +411,7 @@ class TestExperimentListPropsDense:
             "count(e.table_scope) AS with_scope, "
             "sum(CASE WHEN e.table_scope = '' THEN 1 ELSE 0 END) AS empty_string"
         )[0]
-        assert (row["n"], row["with_scope"], row["empty_string"]) == (338, 220, 0)
+        assert (row["n"], row["with_scope"], row["empty_string"]) == (340, 220, 0)
 
     def test_clustering_analysis_treatment_type_dense(self, run_query):
         """Same contract on ClusteringAnalysis — the Steglich decay analysis

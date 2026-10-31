@@ -883,13 +883,13 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
-  derived_metric_count: 4
+  derived_metric_count: 6
   derived_metric_value_kinds:
   - boolean
   discussed_gene_count: 1
   discussed_pathway_count: 5
   doi: 10.1038/s41598-020-57526-5
-  experiment_count: 4
+  experiment_count: 6
   growth_phases: []
   journal: Scientific Reports
   metabolite_assay_count: 0
@@ -901,6 +901,8 @@ rows:
   - Alteromonas macleodii 83-1
   - Alteromonas macleodii AD45
   - Alteromonas macleodii ATCC27126
+  - Alteromonas macleodii EZ55
+  - Alteromonas macleodii HOT1A3
   - Alteromonas macleodii MIT1002
   study_type: Genomics|Metabolomics|Phenotypic assays|Exometabolomics|Co-culture experiments
   title: Genomic, metabolic and phenotypic variability shapes ecological differentiation

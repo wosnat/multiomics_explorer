@@ -7,8 +7,8 @@ examples:
     call: list_experiments(summary=True)
     response: |
       {
-        "total_entries": 338,
-        "total_matching": 338,
+        "total_entries": 340,
+        "total_matching": 340,
         "returned": 0,
         "offset": 0,
         "truncated": true,
@@ -22,7 +22,7 @@ examples:
         ],
         "by_organism_truncated": null,
         "by_treatment_type": [
-          {"treatment_type": "genomic_analysis", "count": 100},
+          {"treatment_type": "genomic_analysis", "count": 102},
           {"treatment_type": "carbon", "count": 88},
           {"treatment_type": "coculture", "count": 39},
           {"treatment_type": "compartment", "count": 25},
@@ -40,7 +40,7 @@ examples:
         ],
         "by_background_factors_truncated": null,
         "by_omics_type": [
-          {"omics_type": "BIOINFORMATIC", "count": 100},
+          {"omics_type": "BIOINFORMATIC", "count": 102},
           {"omics_type": "PROTEOMICS", "count": 82},
           {"omics_type": "RNASEQ", "count": 79},
           {"omics_type": "MICROARRAY", "count": 33},
@@ -85,7 +85,7 @@ examples:
         "by_value_kind": [
           {"value_kind": "categorical", "count": 113},
           {"value_kind": "numeric", "count": 26},
-          {"value_kind": "boolean", "count": 18}
+          {"value_kind": "boolean", "count": 20}
         ],
         "by_metric_type": [
           {"metric_type": "sbp_nutrient_class", "count": 95},
@@ -97,7 +97,7 @@ examples:
         ],
         "by_metric_type_truncated": null,
         "by_compartment": [
-          {"compartment": "whole_cell", "count": 303},
+          {"compartment": "whole_cell", "count": 305},
           {"compartment": "exoproteome", "count": 19},
           {"compartment": "vesicle", "count": 13},
           {"compartment": "extracellular", "count": 3}
@@ -131,7 +131,7 @@ examples:
     note: "Timepoint labels and growth_phase describe the treatment arm. On these experiments some or all contrasts compare against a control sampled at another time — read each row's design_notes (detail mode) before comparing timepoints. Values: list_filter_values(filter_type='control_timing')."
     response: |
       {
-        "total_entries": 338,
+        "total_entries": 340,
         "total_matching": 26,
         "returned": 0,
         "offset": 0,
@@ -236,7 +236,7 @@ examples:
     call: list_experiments(compartment="vesicle", limit=2)
     response: |
       {
-        "total_entries": 338,
+        "total_entries": 340,
         "total_matching": 13,
         "returned": 2,
         "offset": 0,
@@ -376,7 +376,7 @@ examples:
     call: list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell", "10.1073/pnas.2213271120_chitosan_addition_mit9313_metabolomics"])
     response: |
       {
-        "total_entries": 338,
+        "total_entries": 340,
         "total_matching": 2,
         "returned": 2,
         "offset": 0,

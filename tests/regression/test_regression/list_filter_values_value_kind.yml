@@ -5,5 +5,5 @@ rows:
   value: categorical
 - count: 58
   value: numeric
-- count: 32
+- count: 34
   value: boolean

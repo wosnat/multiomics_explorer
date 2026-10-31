@@ -21,7 +21,7 @@ rows:
   - '{''count'': 13, ''item'': ''vesicle''}'
   - '{''count'': 19, ''item'': ''exoproteome''}'
   - '{''count'': 3, ''item'': ''extracellular''}'
-  - '{''count'': 303, ''item'': ''whole_cell''}'
+  - '{''count'': 305, ''item'': ''whole_cell''}'
   by_control_timing:
   - '{''count'': 167, ''item'': ''matched''}'
   - '{''count'': 22, ''item'': ''baseline''}'
@@ -98,10 +98,10 @@ rows:
   - '{''count'': 2, ''item'': ''tss_distance_to_cds''}'
   - '{''count'': 2, ''item'': ''vesicle_abundance_biovolume_normalized''}'
   - '{''count'': 2, ''item'': ''vesicle_proteome_member''}'
-  - '{''count'': 4, ''item'': ''strain_unique_gene_koch2020''}'
   - '{''count'': 6, ''item'': ''log2_mv_cell_enrichment''}'
   - '{''count'': 6, ''item'': ''prop_abund_cells_percent''}'
   - '{''count'': 6, ''item'': ''prop_abund_mvs_percent''}'
+  - '{''count'': 6, ''item'': ''strain_unique_gene_koch2020''}'
   - '{''count'': 95, ''item'': ''sbp_nutrient_class''}'
   - '{''count'': 95, ''item'': ''sbp_predicted_substrate''}'
   by_omics_type:
@@ -109,7 +109,7 @@ rows:
   - '{''count'': 1, ''item'': ''PAIRED_RNASEQ_PROTEOME''}'
   - '{''count'': 1, ''item'': ''VESICLE_DNASEQ''}'
   - '{''count'': 10, ''item'': ''VESICLE_PROTEOMICS''}'
-  - '{''count'': 100, ''item'': ''BIOINFORMATIC''}'
+  - '{''count'': 102, ''item'': ''BIOINFORMATIC''}'
   - '{''count'': 12, ''item'': ''METABOLOMICS''}'
   - '{''count'': 19, ''item'': ''EXOPROTEOMICS''}'
   - '{''count'': 33, ''item'': ''MICROARRAY''}'
@@ -196,8 +196,8 @@ rows:
   - '{''count'': 1, ''item'': ''Thermosynechococcus vestitus BP-1''}'
   - '{''count'': 10, ''item'': ''Prochlorococcus NATL2A''}'
   - '{''count'': 11, ''item'': ''Ruegeria pomeroyi DSS-3''}'
-  - '{''count'': 12, ''item'': ''Alteromonas macleodii EZ55''}'
   - '{''count'': 12, ''item'': ''Synechococcus WH7803''}'
+  - '{''count'': 13, ''item'': ''Alteromonas macleodii EZ55''}'
   - '{''count'': 17, ''item'': ''Synechococcus WH8102''}'
   - '{''count'': 19, ''item'': ''Prochlorococcus MIT9313''}'
   - '{''count'': 2, ''item'': ''Alteromonas macleodii AD45''}'
@@ -226,7 +226,7 @@ rows:
   - '{''count'': 6, ''item'': ''Alteromonas macleodii MIT1002''}'
   - '{''count'': 6, ''item'': ''Synechococcus sp. BL107''}'
   - '{''count'': 7, ''item'': ''Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)''}'
-  - '{''count'': 8, ''item'': ''Alteromonas macleodii HOT1A3''}'
+  - '{''count'': 9, ''item'': ''Alteromonas macleodii HOT1A3''}'
   - '{''count'': 9, ''item'': ''Prochlorococcus MIT9312''}'
   by_publication:
   - '{''count'': 1, ''item'': ''10.1002/mbo3.1150''}'
@@ -272,7 +272,6 @@ rows:
   - '{''count'': 3, ''item'': ''10.1186/2046-9063-8-7''}'
   - '{''count'': 4, ''item'': ''10.1038/ismej.2011.49''}'
   - '{''count'': 4, ''item'': ''10.1038/ismej.2015.36''}'
-  - '{''count'': 4, ''item'': ''10.1038/s41598-020-57526-5''}'
   - '{''count'': 4, ''item'': ''10.1038/s42003-019-0410-x''}'
   - '{''count'': 4, ''item'': ''10.1038/s42003-024-06098-5''}'
   - '{''count'': 4, ''item'': ''10.1039/d6sc02372j''}'
@@ -283,6 +282,7 @@ rows:
   - '{''count'': 5, ''item'': ''10.1038/s41396-018-0252-4''}'
   - '{''count'': 6, ''item'': ''10.1038/ismej.2014.69''}'
   - '{''count'': 6, ''item'': ''10.1038/msb4100087''}'
+  - '{''count'': 6, ''item'': ''10.1038/s41598-020-57526-5''}'
   - '{''count'': 6, ''item'': ''10.1093/femsml/uqac025''}'
   - '{''count'': 6, ''item'': ''10.1111/1462-2920.15834''}'
   - '{''count'': 6, ''item'': ''10.1128/JB.01097-06''}'
@@ -301,7 +301,7 @@ rows:
   - '{''count'': 1, ''item'': ''rna_decay''}'
   - '{''count'': 1, ''item'': ''temperature''}'
   - '{''count'': 10, ''item'': ''phosphorus''}'
-  - '{''count'': 100, ''item'': ''genomic_analysis''}'
+  - '{''count'': 102, ''item'': ''genomic_analysis''}'
   - '{''count'': 11, ''item'': ''growth_phase''}'
   - '{''count'': 13, ''item'': ''light''}'
   - '{''count'': 16, ''item'': ''nitrogen''}'
@@ -319,7 +319,7 @@ rows:
   - '{''count'': 88, ''item'': ''carbon''}'
   by_value_kind:
   - '{''count'': 113, ''item'': ''categorical''}'
-  - '{''count'': 18, ''item'': ''boolean''}'
+  - '{''count'': 20, ''item'': ''boolean''}'
   - '{''count'': 26, ''item'': ''numeric''}'
   time_course_count: 41
-  total_matching: 338
+  total_matching: 340

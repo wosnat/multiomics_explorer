@@ -11,7 +11,7 @@ by_cluster_type:
   count: 1
 by_compartment:
 - compartment: whole_cell
-  count: 101
+  count: 102
 - compartment: exoproteome
   count: 10
 - compartment: vesicle
@@ -34,7 +34,7 @@ by_metric_type:
   metric_type: prop_abund_cells_percent
 - count: 6
   metric_type: prop_abund_mvs_percent
-- count: 4
+- count: 6
   metric_type: strain_unique_gene_koch2020
 - count: 2
   metric_type: antisense_tss_count
@@ -158,7 +158,7 @@ by_value_kind:
   value_kind: categorical
 - count: 19
   value_kind: numeric
-- count: 8
+- count: 9
   value_kind: boolean
 case_id: list_organisms_summary_capability
 not_found: []

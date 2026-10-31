@@ -50,13 +50,13 @@
     OPTIONAL MATCH (d)-[e:Derived_metric_flags_gene]->()
     WITH d, sum(CASE WHEN e.value = 'not_flagged' THEN 1 ELSE 0 END) AS nf
     RETURN count(d) AS boolean_dms, sum(CASE WHEN nf > 0 THEN 1 ELSE 0 END) AS storing_not_flagged
-  expect: {boolean_dms: 32, storing_not_flagged: 11}
+  expect: {boolean_dms: 34, storing_not_flagged: 11}
   used_in:
     - CLAUDE.md
     - multiomics_explorer/inputs/tools/genes_by_boolean_metric.yaml
     - multiomics_explorer/inputs/tools/metabolites_by_flags_assay.yaml
     - multiomics_explorer/mcp_server/tools.py
-  note: "genes_by_boolean_metric flag_value=False returns rows on 11 of 32 boolean DMs"
+  note: "genes_by_boolean_metric flag_value=False returns rows on 11 of 34 boolean DMs"
 
 - id: publications_discusses_split
   cypher: >
@@ -494,7 +494,7 @@
            sum(CASE WHEN d.value_kind = 'categorical' THEN 1 ELSE 0 END) AS categorical,
            count(DISTINCT d.metric_type) AS metric_types,
            sum(CASE WHEN d.compartment = 'whole_cell' THEN 1 ELSE 0 END) AS whole_cell
-  expect: {dms: 300, numeric: 58, boolean: 32, categorical: 210, metric_types: 63, whole_cell: 246}
+  expect: {dms: 302, numeric: 58, boolean: 34, categorical: 210, metric_types: 63, whole_cell: 248}
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/derived_metrics.md
-  note: "DM live snapshot (300 DMs: 58/32/210; 63 metric_types; whole_cell 246) — paper-batch build 2026-10-31"
+  note: "DM live snapshot (302 DMs: 58/34/210; 63 metric_types; whole_cell 248) — Koch 2020 EZ55 + HOT1A3 build 2026-10-31T14:01Z"

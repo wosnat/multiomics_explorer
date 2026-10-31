@@ -1,5 +1,5 @@
 case_id: list_derived_metrics_all
-row_count: 300
+row_count: 302
 rows:
 - allowed_categories: null
   background_factors: []
@@ -798,6 +798,50 @@ rows:
   total_gene_count: 70
   treatment_type:
   - carbon
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors: []
+  compartment: whole_cell
+  derived_metric_id: derived_metric:s41598-020-57526-5:unique_genes_ez55_table:strain_unique_gene_koch2020
+  experiment_id: 10.1038/s41598-020-57526-5_unique_genes_ez55
+  field_description: Flagged when Koch 2020 Table S7 lists the gene as present in
+    this strain and absent from the other 11 Alteromonas macleodii genomes of its
+    pangenome (anvio). Genes not in the list carry no edge. Uniqueness is relative
+    to those 12 genomes only.
+  growth_phases: []
+  has_p_value: false
+  metric_type: strain_unique_gene_koch2020
+  name: Strain-unique gene among 12 A. macleodii genomes (Koch 2020)
+  omics_type: BIOINFORMATIC
+  organism_name: Alteromonas macleodii EZ55
+  publication_doi: 10.1038/s41598-020-57526-5
+  rankable: false
+  total_gene_count: 158
+  treatment_type:
+  - genomic_analysis
+  unit: ''
+  value_kind: boolean
+- allowed_categories: null
+  background_factors: []
+  compartment: whole_cell
+  derived_metric_id: derived_metric:s41598-020-57526-5:unique_genes_hot1a3_table:strain_unique_gene_koch2020
+  experiment_id: 10.1038/s41598-020-57526-5_unique_genes_hot1a3
+  field_description: Flagged when Koch 2020 Table S7 lists the gene as present in
+    this strain and absent from the other 11 Alteromonas macleodii genomes of its
+    pangenome (anvio). Genes not in the list carry no edge. Uniqueness is relative
+    to those 12 genomes only.
+  growth_phases: []
+  has_p_value: false
+  metric_type: strain_unique_gene_koch2020
+  name: Strain-unique gene among 12 A. macleodii genomes (Koch 2020)
+  omics_type: BIOINFORMATIC
+  organism_name: Alteromonas macleodii HOT1A3
+  publication_doi: 10.1038/s41598-020-57526-5
+  rankable: false
+  total_gene_count: 63
+  treatment_type:
+  - genomic_analysis
   unit: ''
   value_kind: boolean
 - allowed_categories: null
