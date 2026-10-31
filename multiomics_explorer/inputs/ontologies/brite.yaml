@@ -56,9 +56,10 @@ pitfalls: |
     ontology list).
   - Term IDs carry the tree code; a level-3 node in `transporters` and one
     in `enzymes` are unrelated even when their names look similar.
-  - For substrate-level transporter questions use TCDB (`tcdb`) or the
-    chemistry layer; BRITE transporter families are KO groupings, not
-    substrate calls.
+  - For substrate-level transporter questions use `genes_by_metabolite` /
+    `metabolites_by_gene` (TCDB and GO transport routes,
+    `docs://analysis/transport`); BRITE transporter families are KO
+    groupings, not substrate calls.
   - Trust filters on `brite` do nothing (single rung) and `min_evidence_score`
     raises.
 
@@ -72,6 +73,7 @@ typical_questions:
 see_also:
   - docs://ontologies/kegg
   - docs://ontologies/tcdb
+  - docs://analysis/transport
   - docs://guide/conventions
   - docs://analysis/enrichment
   - docs://tools/list_filter_values

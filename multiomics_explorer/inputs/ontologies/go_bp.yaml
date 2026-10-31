@@ -19,7 +19,7 @@ method: |
   rewards agreement between sources; the rung semantics are defined once
   in `docs://analysis/annotation_evidence`. On this edge type the live
   mapping is: eggNOG-only edges read `family_inferred` (the bulk of the
-  edges, ~434k), curated sources (`cyanorak` / `ncbi` / `uniprot`) read
+  edges, about three quarters), curated sources (`cyanorak` / `ncbi` / `uniprot`) read
   `curated`, and InterProScan-only edges read `family_inferred` or
   `domain_inferred`.
   Annotation is propagated: a gene annotated to a specific term counts
@@ -42,7 +42,7 @@ hierarchy: |
   `gene_count`s do not sum to the parent's.
 
 interpretation: |
-  `curated` now means a reference source (`cyanorak` / `ncbi` / `uniprot`);
+  `curated` means a reference source (`cyanorak` / `ncbi` / `uniprot`);
   an eggNOG orthology transfer reads `family_inferred` with
   `evidence_score` 0.333, so rank by `evidence_score` when two annotations
   of one gene compete. Use `evidence_score` to *rank* competing annotations of one
@@ -52,6 +52,11 @@ interpretation: |
   level-8 term with three genes in one organism is a curiosity, not a
   signal. For enrichment, level 3-5 usually balances coverage against term
   size — confirm with `ontology_landscape(ontology=['go_bp'])`.
+  Transport-process terms that GO defines with a substrate
+  (`Biological_process_transports_metabolite` / `…_chemical_role`) feed
+  the `go_transport` route of `genes_by_metabolite` /
+  `metabolites_by_gene`, which reads them by default: a term definition,
+  not a gene fact; reading rules in `docs://analysis/transport`.
 
 informativeness_rule: |
   The root `biological_process` (`go:0008150`) is flagged uninformative and
@@ -72,6 +77,9 @@ pitfalls: |
     links — walk it from the `tcdb` term, or use `run_cypher` over
     `Tcdb_family_involved_in_biological_process` for the reverse
     direction.
+  - A BP transport term (e.g. "iron ion transport") does not make a gene a
+    transporter (MED4 ferritin reaches iron this way); prefer MF rows —
+    `docs://analysis/transport`.
 
 typical_questions:
   - "Which MED4 genes are annotated to response to oxidative stress, and how strong is each annotation? — `genes_by_ontology(ontology='go_bp', organism='MED4', term_ids=['go:0006979'], verbose=True)`"
@@ -82,6 +90,8 @@ typical_questions:
 see_also:
   - docs://ontologies/go_mf
   - docs://ontologies/go_cc
+  - docs://ontologies/tcdb
+  - docs://analysis/transport
   - docs://analysis/annotation_evidence
   - docs://analysis/enrichment
   - docs://guide/conventions

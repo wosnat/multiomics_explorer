@@ -218,6 +218,24 @@ def _type_string(prop: dict) -> str:
     return t
 
 
+_VERBOSE_ONLY_RE = re.compile(r"(?i)^\s*verbose\b|verbose[- ]only|verbose mode only")
+
+
+def _compact_result_fields(result_fields: list[dict], input_data: dict | None) -> list[dict]:
+    """Result fields present on compact rows.
+
+    Drops fields listed in the YAML ``verbose_fields`` and fields whose
+    Pydantic description marks them verbose-only ("Verbose only …",
+    "(verbose only)", "Verbose, … rows only").
+    """
+    verbose_fields = set((input_data or {}).get("verbose_fields") or [])
+    return [
+        f for f in result_fields
+        if f["name"] not in verbose_fields
+        and not _VERBOSE_ONLY_RE.search(f.get("description") or "")
+    ]
+
+
 def extract_response_fields(schema: dict) -> tuple[list[dict], list[dict]]:
     """Extract envelope fields and per-result fields from output schema.
 
@@ -502,9 +520,10 @@ def render_brief(tool_name: str, schema: dict, input_data: dict | None) -> str:
     always = [f["name"] for f in envelope if f["name"] not in CONDITIONAL_ENVELOPE_KEYS]
     response_section.append(", ".join(always) + (", results" if has_results else ""))
     response_section += ["```", ""]
-    if result_fields:
-        row = [f["name"] for f in result_fields][:12]
-        more = "" if len(result_fields) <= 12 else ", …"
+    compact_fields = _compact_result_fields(result_fields, input_data)
+    if compact_fields:
+        row = [f["name"] for f in compact_fields][:12]
+        more = "" if len(compact_fields) <= 12 else ", …"
         response_section.append(f"Result row: `{', '.join(row)}{more}`")
         response_section.append("")
 
@@ -876,7 +895,7 @@ _NODE_PROP_NOTES = {
     "member_ko_count": "KOs listed under this BRITE category upstream (source membership, not KG genes)",
     "tcdb_id": "bare TC number (e.g. `3.A.1.14`); `id` is the `tcdb:` CURIE",
     "tc_class_id": "CURIE of the level-0 TC class this node sits under (e.g. `tcdb:3`) — for grouping without walking the hierarchy",
-    "superfamily": "TCDB's own superfamily label, copied as is (sparse); unreliable for whole groups — TCDB files every ABC `3.A.1.*` row under ArsA",
+    "superfamily": "TCDB's own superfamily label, copied as is (sparse); unreliable for whole groups — most ABC `3.A.1.*` systems (and `tcdb:3.A.1` itself) read ArsA",
     "proteins": "`tc_system` only (sparse): TCDB's protein cell — gene symbols, accessions and source organism, lines joined by `; ` (e.g. `UrtA (R); UrtB (M)`); indexed by the TCDB full-text search",
     "metabolite_count": "KEGG: metabolites in the pathway",
     "tcdb_substrate_count": "distinct Metabolite + ChemicalRole substrates TCDB curates on the `tc_system` nodes in this node's subtree (TCDB's range; on a system, its own count, 0 when none)",
@@ -1008,6 +1027,31 @@ def _vocab_applies_to(key: str, cfg: dict) -> list[str]:
         out.append(cfg["parent_label"])
     for rel, _target, _kind in cfg.get("bridges_out") or []:
         out.append(rel)
+    return out
+
+
+# Vocab snapshot rows on ontology pages: property names never listed (noise —
+# enumerations the node-property table / hierarchy prose already covers), and
+# the per-row value cap before "… full list via list_filter_values".
+_VOCAB_SNAPSHOT_SKIP_PROPS = frozenset({"cleavage_p1_residues", "level_kind"})
+_VOCAB_SNAPSHOT_MAX = 12
+
+
+def _snapshot_vocab_rows(vocab_values: dict | None) -> dict[str, list]:
+    """Vocab entries worth printing on an ontology page.
+
+    Drops single-value sentinel flags (``is_uninformative: true``,
+    ``level_is_best_effort: true``) and the ``_VOCAB_SNAPSHOT_SKIP_PROPS``
+    properties.
+    """
+    out: dict[str, list] = {}
+    for name, values in (vocab_values or {}).items():
+        prop = name.rsplit(".", 1)[-1]
+        if prop in _VOCAB_SNAPSHOT_SKIP_PROPS:
+            continue
+        if len(values) == 1 and str(values[0]).lower() in {"true", "false"}:
+            continue
+        out[name] = list(values)
     return out
 
 
@@ -1224,9 +1268,14 @@ def render_ontology(key: str, data: dict, vocab_values: dict | None = None) -> s
             scope = "" if ft in _UNSCOPED_FILTER_TYPES else f', ontology="{key}"'
             L.append(f'- `{ft}` — `list_filter_values(filter_type="{ft}"{scope})`')
         L.append("")
+        shown_vocab = _snapshot_vocab_rows(vocab_values)
+        values_note = (
+            "the list below is a build-time snapshot and may lag the KG."
+            if shown_vocab else "this page does not list them."
+        )
         L.append(
-            "Values are read live from the KG's `ControlledVocabulary` nodes at "
-            "call time; this page never quotes them. `trust_axes` "
+            "Values are read live from the KG's `ControlledVocabulary` nodes "
+            f"(`list_filter_values`); {values_note} `trust_axes` "
             f"(`list_filter_values(filter_type=\"trust_axes\", ontology=\"{key}\")`) "
             "lists which comparable axes the gene edge carries."
         )
@@ -1238,12 +1287,17 @@ def render_ontology(key: str, data: dict, vocab_values: dict | None = None) -> s
             "other tools' filters are still read live from the KG's "
             "`ControlledVocabulary` nodes at call time."
         )
-    if vocab_values:
+    shown_vocab = _snapshot_vocab_rows(vocab_values)
+    if shown_vocab:
         L.append("")
-        L.append("Snapshot of vocabulary values at build time (`--live-vocab`):")
+        L.append("Vocabulary snapshot (build time):")
         L.append("")
-        for name in sorted(vocab_values):
-            L.append(f"- `{name}`: " + ", ".join(f"`{v}`" for v in vocab_values[name]))
+        for name in sorted(shown_vocab):
+            values = shown_vocab[name]
+            head = ", ".join(f"`{v}`" for v in values[:_VOCAB_SNAPSHOT_MAX])
+            if len(values) > _VOCAB_SNAPSHOT_MAX:
+                head += f", … ({len(values)} values; full list via `list_filter_values`)"
+            L.append(f"- `{name}`: {head}")
     L.append("")
 
     # --- human sections ----------------------------------------------------
