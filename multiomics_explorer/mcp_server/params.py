@@ -97,7 +97,7 @@ SummaryParam = Annotated[bool, Field(
 )]
 
 VerboseParam = Annotated[bool, Field(
-    description="True adds the fields listed under verbose_fields on this tool's docs://tools/ page.",
+    description="True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full.",
 )]
 
 TreatmentTypeParam = Annotated[list[str] | None, Field(

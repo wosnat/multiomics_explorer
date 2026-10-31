@@ -495,7 +495,7 @@ exactly one row per organism (level=0).
 
 BRITE is a meta-ontology of a dozen independent classification trees
 (~2,700 terms total). Running all-BRITE enrichment without `tree=` is
-dominated by the largest tree (enzymes, ~2,100 terms), drowning
+dominated by the largest tree (enzymes, ~2,200 terms), drowning
 smaller-tree signal. Every BRITE-aware tool (`genes_by_ontology`,
 `gene_ontology_terms`, `search_ontology`, `ontology_landscape`,
 `pathway_enrichment`, `cluster_enrichment`) accepts `tree=` — discover
@@ -509,7 +509,7 @@ valid names via `list_filter_values(filter_type='brite_tree')`.
 `"Prochlorococcus MED4"`) and equals `Gene.organism_name`. Scalar
 `organism=` resolves the same way everywhere: **word match** — every
 space-split input word must be a case-insensitive substring of
-`preferred_name` or a `name_synonym` (`"MED4"`, `"med4"`,
+`preferred_name` or an entry of `name_synonyms` (`"MED4"`, `"med4"`,
 `"Prochlorococcus MED4"` all resolve; `"MED 4"` does not); **genes
 required** — genus-level nodes, phages and treatment-only taxa (a
 coculture partner not sequenced here) never match, even by exact name;

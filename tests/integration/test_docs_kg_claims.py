@@ -75,6 +75,15 @@ def _registry_value(source: str) -> dict:
         from tests.unit.test_docs_lint import registered_tool_names
 
         return {"tools": len(registered_tool_names())}
+    if source == "summary_tools":
+        from scripts.build_about_content import get_tool_schemas
+
+        schemas = get_tool_schemas()
+        with_summary = [
+            n for n, s in schemas.items()
+            if "summary" in ((s.get("parameters") or {}).get("properties") or {})
+        ]
+        return {"summary_tools": len(with_summary), "tools": len(schemas)}
     raise ValueError(f"unknown claim source {source!r}")
 
 

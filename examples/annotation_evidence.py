@@ -24,10 +24,10 @@ Notes:
 """
 # CONTENTS
 #   1. scenario_merops_call_class      — peptidase clan census (call_class) (line ~58)
-#   2. scenario_tcdb_gate              — gated leaf rows vs include_weak_tcdb_hits (line ~96)
-#   3. scenario_interpro_enrichment    — interpro_type required on enrichment (line ~138)
-#   4. scenario_trust_filtered_tcdb    — evidence + max_tier + tcdb_call before enrichment (line ~175)
-#   5. scenario_organism_rollups       — per-organism protease/domain coverage (line ~220)
+#   2. scenario_tcdb_gate              — gated leaf rows vs include_weak_tcdb_hits (line ~98)
+#   3. scenario_interpro_enrichment    — interpro_type required on enrichment (line ~141)
+#   4. scenario_trust_filtered_tcdb    — evidence + max_tier + tcdb_call before enrichment (line ~178)
+#   5. scenario_organism_rollups       — per-organism protease/domain coverage (line ~252)
 from __future__ import annotations
 
 import argparse

@@ -9,10 +9,16 @@
 #   cypher      RETURN exactly one row; column names == `expect` keys
 #   expect      {column: value} — numbers, strings or booleans
 #   tolerance   optional {abs: x} or {rel: fraction} applied to numeric columns
+#   quoted      literal phrasings of the fact in prose; every `used_in` file
+#               must contain at least one (whitespace-insensitive) —
+#               `build_about_content.py --lint` / lint_kg_claims_quoted. When
+#               the number changes, edit the prose, `expect` and `quoted`
+#               together.
 #   used_in     list of repo-relative paths that quote the number
 #   note        free text (what the number means / how the docs phrase it)
-#   source      optional "ontology_config" — value computed from the explorer
-#               registry rather than Cypher (cypher omitted)
+#   source      optional "ontology_config" / "tool_registry" /
+#               "summary_tools" — value computed from the explorer registry
+#               rather than Cypher (cypher omitted)
 
 - id: numeric_assay_not_detected_share
   cypher: >
@@ -22,8 +28,12 @@
     RETURN total, nd, round(100.0 * nd / total, 1) AS not_detected_pct
   expect: {total: 1480, nd: 1046, not_detected_pct: 70.7}
   tolerance: {rel: 0.02}
+  quoted:
+    - '70.7%'
+    - 'About 70% of numeric'
+    - 'about 70% of numeric'
   used_in:
-    - CLAUDE.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
     - multiomics_explorer/inputs/tools/metabolites_by_quantifies_assay.yaml
     - multiomics_explorer/mcp_server/tools.py
@@ -37,8 +47,12 @@
     RETURN total, f AS false_n, round(100.0 * f / total, 1) AS false_pct
   expect: {total: 186, false_n: 128, false_pct: 68.8}
   tolerance: {rel: 0.02}
+  quoted:
+    - '68.8%'
+    - 'about 69% of'
+    - '~69% of'
   used_in:
-    - CLAUDE.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
     - multiomics_explorer/inputs/tools/metabolites_by_flags_assay.yaml
     - multiomics_explorer/mcp_server/tools.py
@@ -51,8 +65,9 @@
     WITH d, sum(CASE WHEN e.value = 'not_flagged' THEN 1 ELSE 0 END) AS nf
     RETURN count(d) AS boolean_dms, sum(CASE WHEN nf > 0 THEN 1 ELSE 0 END) AS storing_not_flagged
   expect: {boolean_dms: 34, storing_not_flagged: 11}
+  quoted:
+    - '11 of 34'
   used_in:
-    - CLAUDE.md
     - multiomics_explorer/inputs/tools/genes_by_boolean_metric.yaml
     - multiomics_explorer/mcp_server/tools.py
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/derived_metrics.md
@@ -68,11 +83,12 @@
            sum(CASE WHEN n > 0 THEN 1 ELSE 0 END) AS has_discusses,
            sum(CASE WHEN n = 0 THEN 1 ELSE 0 END) AS no_discusses
   expect: {publications: 60, has_discusses: 56, no_discusses: 4}
+  quoted:
+    - '"no_discusses": 4'
+    - '4 such publications'
   used_in:
-    - CLAUDE.md
     - multiomics_explorer/inputs/tools/list_publications.yaml
     - multiomics_explorer/inputs/tools/discussed_by_publication.yaml
-    - multiomics_explorer/mcp_server/tools.py
   note: "by_discusses_coverage split 56 vs 4 of 60; 'not_matched' pubs = 4"
 
 - id: metabolomics_layer_counts
@@ -87,11 +103,12 @@
            count(DISTINCT m) AS metabolites
   expect: {publications: 3, experiments: 12, assays: 14, organisms: 5, metabolites: 135}
   tolerance: {abs: 0}
+  quoted:
+    - '14 assays'
+    - '~135 distinct metabolites'
+    - '"total_entries": 14'
   used_in:
-    - CLAUDE.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
-    - multiomics_explorer/inputs/tools/list_publications.yaml
-    - multiomics_explorer/inputs/tools/list_experiments.yaml
     - multiomics_explorer/inputs/tools/list_metabolite_assays.yaml
   note: "'the 3 metabolomics publications' / '12 metabolomics experiments' / 14 assays / 5 organisms / ~135 measured metabolites"
 
@@ -103,9 +120,10 @@
     RETURN count(o) AS nodes, count(DISTINCT o.preferred_name) AS distinct_names,
            sum(CASE WHEN n > 0 THEN 1 ELSE 0 END) AS with_genes
   expect: {nodes: 123, distinct_names: 123, with_genes: 118}
+  quoted:
+    - '123 `OrganismTaxon` nodes'
+    - '"total_entries": 123'
   used_in:
-    - CLAUDE.md
-    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/concepts.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
     - multiomics_explorer/inputs/tools/list_organisms.yaml
   note: "123 OrganismTaxon rows / 123 distinct preferred_name (74 Ford 2021 Cyanorak strains 2026-10-28; A. macleodii 83-1 + T. pseudonana 2026-10-31) / 118 carry genes"
@@ -113,6 +131,11 @@
 - id: ontology_count
   source: ontology_config
   expect: {ontologies: 17}
+  quoted:
+    - '17 ontologies'
+    - '17 supported ontologies'
+    - 'of the 17'
+    - 'all 17'
   used_in:
     - CLAUDE.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/start_here.md
@@ -124,6 +147,9 @@
 - id: tool_count
   source: tool_registry
   expect: {tools: 42}
+  quoted:
+    - '42 tools'
+    - '42 API functions'
   used_in:
     - multiomics_explorer/mcp_server/server.py
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/start_here.md
@@ -136,6 +162,10 @@
     MATCH (g:Gene {locus_tag: 'PMM0372'})
     RETURN g.transported_metabolite_count AS transported, g.tcdb_assignment_count AS assignments
   expect: {transported: 3, assignments: 2}
+  quoted:
+    - '3 distinct metabolites'
+    - 'reaches 3 metabolites'
+    - 'transported_metabolite_count = 3'
   used_in:
     - multiomics_explorer/inputs/tools/metabolites_by_gene.yaml
     - multiomics_explorer/inputs/tools/gene_overview.yaml
@@ -148,8 +178,9 @@
     WHERE e.call_class = 'peptidase'
     RETURN count(DISTINCT g) AS peptidase_gene_count
   expect: {peptidase_gene_count: 148}
+  quoted:
+    - '"peptidase_gene_count": 148'
   used_in:
-    - CLAUDE.md
     - multiomics_explorer/inputs/tools/list_organisms.yaml
   note: "top_annotation_capability leader: 'Alteromonas (MarRef v6) leads at 148'"
 
@@ -161,6 +192,8 @@
            sum(CASE WHEN e.tcdb_gate = 'below_gate' THEN 1 ELSE 0 END) AS below_gate
     RETURN below_gate > direct + annotated AS below_gate_majority
   expect: {below_gate_majority: true}
+  quoted:
+    - 'Most edges are `below_gate`'
   used_in:
     - multiomics_explorer/inputs/ontologies/tcdb.yaml
   note: "KG-wide Gene_has_tcdb_family edges: most are below_gate (tcdb page 'Most edges are below_gate')"
@@ -175,6 +208,9 @@
            sum(CASE WHEN reaches THEN 1 ELSE 0 END) AS direct_substrate_genes,
            sum(CASE WHEN gated AND NOT has_direct THEN 1 ELSE 0 END) AS gated_no_direct
   expect: {gated_genes: 203, direct_substrate_genes: 56, gated_no_direct: 98}
+  quoted:
+    - '203 carry a gate-passing TCDB call'
+    - '203 genes carry a gate-passing TCDB call'
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/transport.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
@@ -186,6 +222,8 @@
     WHERE coalesce(g.tcdb_assignment_count, 0) = 0
     RETURN count(DISTINCT g) AS weak_only_genes
   expect: {weak_only_genes: 159}
+  quoted:
+    - '159 genes have only `below_gate` TCDB edges'
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/annotation_evidence.md
   note: "MED4 genes whose only TCDB edges are below_gate"
@@ -195,6 +233,9 @@
     MATCH (:Gene {locus_tag: 'PMM0024'})-[r:Gene_has_tcdb_family]->(:TcdbFamily {id: 'tcdb:8.A.159'})
     RETURN r.identity AS identity, r.tcdb_gate AS gate
   expect: {identity: 28.5, gate: below_gate}
+  quoted:
+    - '28.5%'
+    - 'gains its one tier-3 hit'
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/annotation_evidence.md
     - multiomics_explorer/inputs/tools/gene_ontology_terms.yaml
@@ -205,6 +246,8 @@
     MATCH (a:TcdbFamily {id: 'tcdb:3.A.1'}), (m:TcdbFamily {id: 'tcdb:2.A.1'})
     RETURN a.tcdb_substrate_count AS abc, m.tcdb_substrate_count AS mfs
   expect: {abc: 546, mfs: 468}
+  quoted:
+    - '546'
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/transport.md
     - multiomics_explorer/inputs/ontologies/tcdb.yaml
@@ -222,6 +265,10 @@
       AND (t = a OR (t)-[:Tcdb_family_is_a_tcdb_family*1..4]->(a))
     RETURN children, count(DISTINCT g) AS med4_gated_genes
   expect: {children: 97, med4_gated_genes: 52}
+  quoted:
+    - '97 children'
+    - '"children_total": 97'
+    - '"organism_gene_count": 52'
   used_in:
     - multiomics_explorer/inputs/ontologies/tcdb.yaml
     - multiomics_explorer/inputs/tools/search_ontology.yaml
@@ -234,6 +281,10 @@
     WHERE g.locus_tag STARTS WITH 'PMM'
     RETURN count(DISTINCT g) AS med4_genes
   expect: {med4_genes: 119}
+  quoted:
+    - '119 genes'
+    - '"max_genes_per_term": 119'
+    - '"total_matching": 119'
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/annotation_evidence.md
     - multiomics_explorer/inputs/tools/genes_by_ontology.yaml
@@ -247,6 +298,8 @@
            sum(CASE WHEN k.id STARTS WITH 'kegg.orthology:' THEN 1 ELSE 0 END) AS prefixed,
            sum(CASE WHEN k.id =~ 'kegg:K\\d+' THEN 1 ELSE 0 END) AS retired_prefix
   expect: {retired_prefix: 0}
+  quoted:
+    - 'kegg.orthology:'
   used_in:
     - multiomics_explorer/inputs/ontologies/kegg.yaml
     - multiomics_explorer/inputs/ontologies/brite.yaml
@@ -256,18 +309,22 @@
 - id: kegg_uninformative_by_level_kind
   cypher: >
     MATCH (k:KeggTerm)
-    WHERE k.is_uninformative = 'true'
-    RETURN sum(CASE WHEN k.level_kind = 'ko' THEN 1 ELSE 0 END) AS ko_flagged,
-           sum(CASE WHEN k.level_kind = 'pathway' THEN 1 ELSE 0 END) AS pathway_flagged
-  expect: {ko_flagged: 212, pathway_flagged: 11}
+    RETURN sum(CASE WHEN k.level_kind = 'ko' AND k.is_uninformative = 'true' THEN 1 ELSE 0 END) AS ko_flagged,
+           sum(CASE WHEN k.level_kind = 'ko' THEN 1 ELSE 0 END) AS ko_terms,
+           sum(CASE WHEN k.level_kind = 'pathway' AND k.is_uninformative = 'true' THEN 1 ELSE 0 END) AS pathway_flagged
+  expect: {ko_flagged: 216, ko_terms: 4808, pathway_flagged: 11}
   tolerance: {rel: 0.05}
+  quoted:
+    - '216 of 4,808 KOs'
+    - '11 of the 13'
+    - 'flagged uninformative'
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/enrichment.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
     - multiomics_explorer/inputs/ontologies/kegg.yaml
     - examples/pathway_enrichment.py
   note: >
-    KO-level catch-alls (212) plus 11 of the 13 parentless global / overview pathway maps
+    KO-level catch-alls (216 of 4,808 KOs) plus 11 of the 13 parentless global / overview pathway maps
     (ko01100 …; ko01310 / ko01320 kept informative) carry is_uninformative (KG DOC-002, 2026-08-29).
 
 - id: tigr_role_levels
@@ -276,6 +333,11 @@
     RETURN sum(CASE WHEN t.level = 0 THEN 1 ELSE 0 END) AS level0,
            sum(CASE WHEN t.level = 1 THEN 1 ELSE 0 END) AS level1
   expect: {level0: 21, level1: 115}
+  quoted:
+    - '21 roots'
+    - '21 mainroles'
+    - '21 main roles'
+    - '115'
   used_in:
     - multiomics_explorer/inputs/ontologies/tigr_role.yaml
     - multiomics_explorer/inputs/tools/search_ontology.yaml
@@ -286,6 +348,8 @@
   cypher: "MATCH (:NcbifamFamily)-[r:Ncbifam_family_in_interpro_entry]->(:InterproEntry) RETURN count(r) AS links"
   expect: {links: 2630}
   tolerance: {rel: 0.05}
+  quoted:
+    - 'about half'
   used_in:
     - multiomics_explorer/inputs/ontologies/ncbifam.yaml
   note: "NcbifamFamily → InterproEntry membership links (~2.6k; the ncbifam page's 'about half of families link to InterPro' claim)"
@@ -296,11 +360,10 @@
     RETURN count(g.ec_numbers) AS ec_numbers, count(g.ko_terms) AS ko_terms,
            count(g.kegg_ids) AS kegg_ids, count(g.cog_categories) AS cog_categories
   expect: {ec_numbers: 0, ko_terms: 0, kegg_ids: 0, cog_categories: 0}
+  quoted:
+    - 'ko_terms'
   used_in:
     - multiomics_explorer/inputs/tools/gene_details.yaml
-    - multiomics_explorer/inputs/tools/gene_homologs.yaml
-    - multiomics_explorer/inputs/tools/search_homolog_groups.yaml
-    - multiomics_explorer/mcp_server/tools.py
   note: >
     Gene.ec_numbers / ko_terms / kegg_ids / cog_categories are null on every gene —
     docs must not advertise them as gene_details payload. If any becomes non-null
@@ -314,6 +377,9 @@
     RETURN count(p) AS parentless,
            sum(CASE WHEN p.is_uninformative = 'true' THEN 1 ELSE 0 END) AS flagged
   expect: {parentless: 13, flagged: 11}
+  quoted:
+    - '11 of the 13'
+    - 'ko01100'
   used_in:
     - CLAUDE.md
     - multiomics_explorer/mcp_server/tools.py
@@ -338,6 +404,8 @@
            sum(CASE WHEN r.evidence = 'curated' THEN 1 ELSE 0 END) AS read_curated,
            sum(CASE WHEN r.evidence = 'family_inferred' THEN 1 ELSE 0 END) AS read_family_inferred
   expect: {read_curated: 0}
+  quoted:
+    - 'family_inferred'
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/annotation_evidence.md
     - multiomics_explorer/inputs/ontologies/go_bp.yaml
@@ -358,6 +426,8 @@
     RETURN [r IN rows WHERE r.org = 'Alteromonas (MarRef v6)'][0].contigs AS marref_contigs,
            [r IN rows WHERE r.org = 'Alteromonas macleodii HOT1A3'][0].contigs AS hot1a3_contigs
   expect: {marref_contigs: 573, hot1a3_contigs: 2}
+  quoted:
+    - '573 contigs'
   used_in:
     - multiomics_explorer/inputs/tools/gene_neighbors.yaml
   note: "gene_neighbors fragmentation exemplars (docs-review 2026-09-15): MarRef v6 has 573 contigs; HOT1A3 is closed (chromosome + plasmid)"
@@ -370,6 +440,10 @@
              AS with_functional_category
   expect: {metabolites: 3243, with_functional_category: 335}
   tolerance: {rel: 0.05}
+  quoted:
+    - '335 of 3,243'
+    - '~10%'
+    - '~90%'
   used_in:
     - multiomics_explorer/mcp_server/tools.py
     - multiomics_explorer/api/functions.py
@@ -391,6 +465,10 @@
              AS with_either
   expect: {metabolites: 3243, with_brite_class: 652, with_either: 884}
   tolerance: {rel: 0.05}
+  quoted:
+    - '652 of 3,243'
+    - '~20%'
+    - '~80%'
   used_in:
     - multiomics_explorer/mcp_server/tools.py
     - multiomics_explorer/api/functions.py
@@ -410,6 +488,8 @@
            sum(CASE WHEN f OR b THEN 1 ELSE 0 END) AS catalysed_with_either
   expect: {catalysed: 2221, catalysed_without_category: 1974, catalysed_with_either: 687}
   tolerance: {rel: 0.05}
+  quoted:
+    - '1,974 metabolites with catalyst genes'
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
   note: >
@@ -429,6 +509,8 @@
       [r IN rows WHERE r[0] = 'chebi:33709'][0][1] = 0 AS amino_acid_unlinked,
       [r IN rows WHERE r[0] = 'kegg.compound:C10906'][0][1] = 0 AS keto_fructose_unlinked
   expect: {glucose_linked: true, mannose_linked: true, isoleucine_linked: true, amino_acid_unlinked: true, keto_fructose_unlinked: true}
+  quoted:
+    - "'amino acid'"
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
     - multiomics_explorer/inputs/tools/genes_by_metabolite.yaml
@@ -441,6 +523,8 @@
     RETURN count(m) AS go_transport_metabolites
   expect: {go_transport_metabolites: 218}
   tolerance: {rel: 0.05}
+  quoted:
+    - '~220'
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
   note: >
@@ -453,6 +537,8 @@
     RETURN count(DISTINCT g) AS med4_go_transport_genes
   expect: {med4_go_transport_genes: 59}
   tolerance: {rel: 0.05}
+  quoted:
+    - '59 genes reach at least one GO transport target'
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/transport.md
   note: >
@@ -466,6 +552,10 @@
                      AND coalesce(t.direction_basis, '') <> 'abc_numbering' THEN 1 ELSE 0 END) AS non_system_named,
            sum(CASE WHEN t.direction = 'export' AND t.direction_basis = 'abc_numbering' THEN 1 ELSE 0 END) AS abc_export
   expect: {non_system_named: 0, abc_export: 0}
+  quoted:
+    - '`uptake` / `export` / `unknown`'
+    - '`uptake`, `export` or `unknown`'
+    - 'Direction is conservative'
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/transport.md
     - multiomics_explorer/inputs/ontologies/tcdb.yaml
@@ -482,6 +572,9 @@
              AND all(x IN s.go_transport_excluded_targets WHERE x IN s.tcdb_substrate_excluded_targets) AS tcdb_superset,
            COUNT { (:TcdbFamily)-[:Tcdb_family_transports_metabolite]->(:Metabolite {id: 'kegg.compound:C00080'}) } AS h_edges
   expect: {tcdb_superset: true, h_edges: 0}
+  quoted:
+    - 'H+'
+    - 'coupling ions'
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/transport.md
     - multiomics_explorer/inputs/ontologies/tcdb.yaml
@@ -497,6 +590,160 @@
            count(DISTINCT d.metric_type) AS metric_types,
            sum(CASE WHEN d.compartment = 'whole_cell' THEN 1 ELSE 0 END) AS whole_cell
   expect: {dms: 302, numeric: 58, boolean: 34, categorical: 210, metric_types: 63, whole_cell: 248}
+  quoted:
+    - '302 DMs: 58 numeric, 34 boolean, 210'
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/derived_metrics.md
   note: "DM live snapshot (302 DMs: 58/34/210; 63 metric_types; whole_cell 248) — Koch 2020 EZ55 + HOT1A3 build 2026-10-31T14:01Z"
+
+# --- numbers the guide / analysis pages quote (backlog 3.17) ---
+
+- id: eggnog_only_edge_counts
+  cypher: >
+    MATCH ()-[r]->()
+    WHERE type(r) IN ['Gene_involved_in_biological_process', 'Gene_enables_molecular_function',
+                      'Gene_located_in_cellular_component', 'Gene_catalyzes_ec_number',
+                      'Gene_has_pfam', 'Gene_has_cazy_family']
+      AND r.sources = ['eggnog']
+    WITH type(r) AS t, count(r) AS n
+    WITH collect([t, n]) AS rows
+    RETURN [x IN rows WHERE x[0] = 'Gene_involved_in_biological_process'][0][1] AS go_bp,
+           [x IN rows WHERE x[0] = 'Gene_enables_molecular_function'][0][1] AS go_mf,
+           [x IN rows WHERE x[0] = 'Gene_located_in_cellular_component'][0][1] AS go_cc,
+           [x IN rows WHERE x[0] = 'Gene_catalyzes_ec_number'][0][1] AS ec,
+           [x IN rows WHERE x[0] = 'Gene_has_pfam'][0][1] AS pfam,
+           [x IN rows WHERE x[0] = 'Gene_has_cazy_family'][0][1] AS cazy
+  expect: {go_bp: 776199, go_mf: 311457, go_cc: 209281, ec: 23371, pfam: 51558, cazy: 1982}
+  tolerance: {rel: 0.1}
+  quoted:
+    - "GO-BP ~776k edges, GO-MF ~311k, GO-CC ~209k, EC ~23k, Pfam ~52k, CAZy ~2k"
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/annotation_evidence.md
+  note: "eggNOG-only (family_inferred) edge counts per ontology in the evidence-ladder 'Live state' paragraph"
+
+- id: ncbifam_tigr_role_router_edges
+  cypher: >
+    MATCH (n:NcbifamFamily)-[r:Ncbifam_family_has_tigr_role]->(:TigrRole)
+    RETURN count(r) AS edges,
+           sum(CASE WHEN n.id CONTAINS 'TIGR' THEN 1 ELSE 0 END) = count(r) AS all_tigr_prefixed
+  expect: {edges: 1865, all_tigr_prefixed: true}
+  tolerance: {rel: 0.02}
+  quoted:
+    - "1,865 edges, all from `TIGR*`-prefixed"
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/annotation_evidence.md
+  note: "NCBIfam → TIGR role router edges, all from TIGR*-prefixed families"
+
+- id: ecfa1_weak_tcdb_systems
+  cypher: >
+    MATCH (:Gene {locus_tag: 'PMM0125'})-[r:Gene_has_tcdb_family {tcdb_gate: 'below_gate'}]->(t:TcdbFamily {level_kind: 'tc_system'})
+    WHERE r.tcdb_call = 'diamond_best_hit'
+    RETURN count(r) AS systems, min(r.identity) >= 33 AND max(r.identity) < 36 AS identity_33_35
+  expect: {systems: 3, identity_33_35: true}
+  quoted:
+    - "ecfA1 gains 3 best-hit systems at 33-35% identity"
+    - "gains 3 best-hit system rows"
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/annotation_evidence.md
+    - multiomics_explorer/inputs/tools/gene_ontology_terms.yaml
+  note: "include_weak_tcdb_hits=True worked example: ecfA1 (PMM0125) gains 3 below-gate best-hit systems at 33-35% identity"
+
+- id: med4_gene_universe_and_global_map
+  cypher: >
+    MATCH (g:Gene {organism_name: 'Prochlorococcus MED4'})
+    WITH count(g) AS med4_genes
+    MATCH (g:Gene {organism_name: 'Prochlorococcus MED4'})-[:Gene_has_kegg_ko]->(:KeggTerm)
+          -[:Kegg_term_is_a_kegg_term*1..3]->(:KeggTerm {id: 'kegg.pathway:ko01100'})
+    RETURN med4_genes, count(DISTINCT g) AS metabolic_pathways_genes
+  expect: {med4_genes: 1973, metabolic_pathways_genes: 519}
+  tolerance: {rel: 0.02}
+  quoted:
+    - "519 of 1,973 MED4 genes"
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/enrichment.md
+  note: "MED4 gene universe (1,973) and the ko01100 'Metabolic pathways' map's MED4 reach (519, 26%)"
+
+- id: med4_nstarvation_clustering
+  cypher: >
+    MATCH (:ClusteringAnalysis {id: 'clustering_analysis:msb4100087:med4_kmeans_nstarvation'})
+          -[:ClusteringAnalysisHasGeneCluster]->(c:GeneCluster)-[:Gene_in_gene_cluster]-(g:Gene)
+    RETURN count(DISTINCT c) AS clusters, count(DISTINCT g) AS genes
+  expect: {clusters: 9, genes: 410}
+  quoted:
+    - "9 clusters, 410 genes"
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/enrichment.md
+  note: "cluster-membership enrichment worked example (MED4 k-means N-starvation analysis)"
+
+- id: brite_tree_sizes
+  cypher: >
+    MATCH (b:BriteCategory)
+    RETURN count(b) AS terms, count(DISTINCT b.tree) AS trees,
+           sum(CASE WHEN b.tree = 'enzymes' THEN 1 ELSE 0 END) AS enzymes,
+           sum(CASE WHEN b.tree = 'transporters' THEN 1 ELSE 0 END) AS transporters
+  expect: {terms: 2767, trees: 12, enzymes: 2186, transporters: 195}
+  tolerance: {rel: 0.05}
+  quoted:
+    - "12 independent trees"
+    - "~2,700 terms total"
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/enrichment.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
+  note: "BRITE: 12 trees, ~2,700 terms; enzymes ~2,200 terms, ~10× transporters"
+
+- id: discusses_router_gene_share
+  cypher: >
+    MATCH (:Publication)-[:Publication_discusses_gene]->(g:Gene)
+    WITH count(DISTINCT g) AS discussed
+    MATCH (g:Gene)
+    WITH discussed, count(g) AS genes
+    RETURN discussed >= 300 AND discussed <= 3000 AS order_of_a_thousand,
+           discussed < 0.01 * genes AS under_one_percent
+  expect: {order_of_a_thousand: true, under_one_percent: true}
+  quoted:
+    - "under 1% of all genes"
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/concepts.md
+  note: "discusses edges name on the order of a thousand distinct genes, under 1% of all genes"
+
+- id: pep_tested_absent
+  cypher: >
+    MATCH (:Metabolite {id: 'kegg.compound:C00074'})<-[e:Assay_quantifies_metabolite|Assay_flags_metabolite]-(a:MetaboliteAssay)
+    RETURN count(e) AS measurements,
+           sum(CASE WHEN e.detection_status = 'not_detected' OR e.flag_value = 'not_detected' THEN 1 ELSE 0 END) AS tested_absent,
+           count(DISTINCT a) AS assays
+  expect: {measurements: 20, tested_absent: 14, assays: 10}
+  quoted:
+    - "14 of 20 measurements (70%) are tested-absent across the 10 assays"
+    - "covered by 10 of the 14 assays"
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
+    - multiomics_explorer/inputs/tools/list_metabolite_assays.yaml
+  note: "PEP: 20 measurement edges over 10 assays, 14 tested-absent (12 numeric not_detected + 2 boolean false)"
+
+- id: dm_worked_example_counts
+  cypher: >
+    MATCH (:DerivedMetric {metric_type: 'periodic_in_axenic_LD'})-[f:Derived_metric_flags_gene {value: 'flagged'}]->()
+    WITH count(f) AS periodic
+    MATCH (:DerivedMetric {metric_type: 'diel_amplitude_transcript_log2'})-[q:Derived_metric_quantifies_gene]->()
+    WHERE q.value >= 2.0
+    WITH periodic, count(q) AS amp_ge_2
+    MATCH (:DerivedMetric {metric_type: 'log2_vesicle_cell_enrichment'})-[v:Derived_metric_quantifies_gene]->()
+    WHERE v.value >= 1.0
+    RETURN periodic, amp_ge_2, count(v) AS vesicle_ge_1
+  expect: {periodic: 1377, amp_ge_2: 91, vesicle_ge_1: 11}
+  quoted:
+    - "# 1,377 genes"
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/derived_metrics.md
+  note: "DM worked path outputs: periodic_in_axenic_LD flagged 1,377; amplitude >= 2 → 91; vesicle enrichment >= 1 → 11 genes"
+
+- id: summary_param_tools
+  source: summary_tools
+  expect: {summary_tools: 36, tools: 42}
+  quoted:
+    - "36 of 42 tools accept `summary=True`"
+  used_in:
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/start_here.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
+  note: "registered tools whose MCP input schema has a `summary` param"
