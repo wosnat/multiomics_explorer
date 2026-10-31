@@ -761,10 +761,10 @@ class GeneReactionMetaboliteTriplet(SparseRow):
     ec_numbers: list[str] | None = Field(
         default=None,
         description="EC classification(s) for this reaction. Empty list on "
-        "reactions without an EC annotation. None on transport rows.")
+        "reactions without an EC annotation. None on TCDB and GO rows.")
     mass_balance: Literal["balanced", "unbalanced"] | None = Field(
         default=None,
-        description="Reaction mass-balance status. None on transport rows.")
+        description="Reaction mass-balance status. None on TCDB and GO rows.")
 
     # transport-arm fields (None on metabolism rows)
     tcdb_family_id: str | None = Field(
@@ -1191,8 +1191,8 @@ class GenesByMetaboliteResponse(BaseModel):
         default_factory=list,
         description="Diagnostics: stereo relatives with rows (first); genes "
         "reachable only via a family call (pass "
-        "include_tcdb_family_substrates=True); breadth-capped superfamily "
-        "starts; removed / chemical-role ids; unknown gene_categories.")
+        "include_tcdb_family_substrates=True); removed / chemical-role "
+        "ids; unknown gene_categories.")
     stereo_relatives: dict[str, list[StereoRelative]] = Field(
         default_factory=dict,
         description="Input id -> its stereo forms with rows in this organism "
@@ -1227,10 +1227,9 @@ class GenesByMetaboliteResponse(BaseModel):
         "the slice (≤3 entries).")
     by_evidence_source_combination: list[EvidenceSourceCombination] = Field(
         default_factory=list,
-        description="Gene x metabolite pairs per set of agreeing sources, "
-        "pair_count desc. Agreement = independent routes naming the same "
-        "pair; correlated (shared homology), so it raises confidence but "
-        "does not prove. [] on empty.")
+        description="Gene x metabolite pairs per set of routes naming "
+        "them, pair_count desc. Routes share homology, so agreement raises "
+        "confidence but does not prove. [] on empty.")
     by_tcdb_route: list[GbmByTcdbRoute] = Field(
         default_factory=list,
         description="Frequency over `tcdb_route` across transport rows "
@@ -1245,8 +1244,9 @@ class GenesByMetaboliteResponse(BaseModel):
     tcdb_family_substrates_skipped: list[TcdbFamilySubstrateSkipped] = Field(
         default_factory=list,
         description="Genes whose family-walk start was removed by the "
-        "200-substrate breadth cap (superfamily call, substrate unknown), "
-        "e.g. ABC 3.A.1. Always computed.")
+        "200-substrate breadth cap (superfamily call, e.g. ABC 3.A.1). "
+        "Always computed; the same genes recur across many compounds. "
+        "Read as 'substrate unknown', not as candidates for this one.")
     rows_by_go_term_depth: list[RowsByGoTermDepth] | None = Field(
         default=None,
         description="GO route rows per `go_term_depth`, sorted by depth "
@@ -1267,8 +1267,9 @@ class GenesByMetaboliteResponse(BaseModel):
         description="Top 10 gene categories by gene_count across all arms.")
     top_genes: list[GbmTopGene] = Field(
         default_factory=list,
-        description="Top 10 genes by combined reaction + transporter "
-        "breadth (GO rows in go_transport_rows). summary=True returns the full ranked list.")
+        description="Top 10 genes by reaction_count + transporter_count; "
+        "GO-only genes rank last (their GO rows are counted in "
+        "go_transport_rows). summary=True returns the full ranked list.")
     top_genes_truncated: bool | None = Field(default=None, description="True when the list was capped at 10 — `summary=True` returns the full list.")
     gene_count_total: int = Field(
         description="Distinct genes in the filtered slice (across all arms).")
@@ -1644,10 +1645,9 @@ class MetabolitesByGeneResponse(BaseModel):
         "the slice (≤3 entries).")
     by_evidence_source_combination: list[EvidenceSourceCombination] = Field(
         default_factory=list,
-        description="Gene x metabolite pairs per set of agreeing sources, "
-        "pair_count desc. Agreement = independent routes naming the same "
-        "pair; correlated (shared homology), so it raises confidence but "
-        "does not prove. [] on empty.")
+        description="Gene x metabolite pairs per set of routes naming "
+        "them, pair_count desc. Routes share homology, so agreement raises "
+        "confidence but does not prove. [] on empty.")
     by_tcdb_route: list[MbgByTcdbRoute] = Field(
         default_factory=list,
         description="Frequency over `tcdb_route` across transport rows "
@@ -8422,7 +8422,7 @@ def register_tools(mcp: FastMCP):
             description="Element-presence filter (Hill-notation symbols, "
             "e.g. 'Fe', 'N'). AND of presence — ['N', 'P'] matches "
             "metabolites containing BOTH. A case-insensitive symbol ('n', "
-            "'fe') or a full element name ('Nitrogen') for one of the ~12 "
+            "'fe') or a full element name ('Nitrogen') for one of the 15 "
             "elements this KG's chemistry layer carries (C, H, N, O, P, S, "
             "Fe, Mg, Mn, Zn, Cu, Co, Mo, Ni, Se) is normalized silently; "
             "anything else is dropped from the filter and reported in "
@@ -8485,7 +8485,7 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> ListMetabolitesResponse:
-        """Browse the chemistry layer — KEGG-curated metabolism, TCDB-curated transport substrates, and compounds measured by a MetaboliteAssay.
+        """Browse the chemistry layer — KEGG metabolism, TCDB transport substrates, GO transport targets, and compounds measured by an assay.
 
         Use as the compound-side entry point; genes via `genes_by_metabolite`, measurements via `assays_by_metabolite`.
         Filters: search_text, metabolite_ids (+exclude), xref IDs, elements, mass, organism_names, pathway_ids, evidence_sources, structure_kind, kegg_functional_categories, kegg_brite_classes.
@@ -8683,11 +8683,11 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 10,
         offset: OffsetParam = 0,
     ) -> GenesByMetaboliteResponse:
-        """Metabolite / `chebi.role:` IDs to genes in ONE organism via KEGG, TCDB and GO transport (GO rows: term definitions, not gene facts).
+        """Metabolite / `chebi.role:` IDs to genes in ONE organism via KEGG, TCDB, GO transport (GO rows = term definitions, not gene facts).
 
-        Use for compound → genes; mirror metabolites_by_gene; docs://analysis/transport.
-        Filters: metabolite_ids (+exclude, +stereo), ec_numbers, metabolite_pathway_ids, evidence_sources, include_tcdb_family_substrates, go_*.
-        Returns: by_metabolite, by_evidence_source(_combination), by_tcdb_route, tcdb_family_substrates_not_shown, top_genes/reactions/tcdb_families; row = gene × reaction|TCDB node|GO term × compound.
+        Use for compound → genes; mirror metabolites_by_gene; TCDB rows = direct systems, empty ≠ no transporter (see tcdb_family_substrates_not_shown); docs://analysis/transport.
+        Filters: metabolite_ids (+exclude, +stereo), evidence_sources, include_tcdb_family_substrates, go_*.
+        Returns: by_metabolite, by_evidence_source(_combination), by_tcdb_route, top_genes/reactions/tcdb_families; row = gene × route × compound.
         docs://tools/genes_by_metabolite; summary=True first.
         """
         await ctx.info(
@@ -8829,14 +8829,10 @@ def register_tools(mcp: FastMCP):
         )],
         organism: Annotated[OrganismRequiredParam, Field(min_length=1)],
         metabolite_elements: Annotated[list[str] | None, Field(
-            description="Filter to rows where the metabolite contains "
-            "ALL of the given element symbols (AND-of-presence). "
-            "E.g. `['N']` keeps only N-bearing metabolites — the "
-            "headline N-source workflow primitive. `['N', 'P']` requires "
-            "both. Anchored on `Metabolite.elements` (KG-A3 Hill-parsed "
-            "presence list); applies uniformly to all three arms. Never "
-            "substring-match on `formula` (Hill notation has element-"
-            "clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). "
+            description="Keep rows whose metabolite contains ALL these "
+            "element symbols (presence, e.g. ['N'], ['N', 'P']); "
+            "formula-less metabolites never match (see "
+            "no_formula_excluded). Applies to all three arms. "
             "`not_found.metabolite_elements` lists symbols that don't "
             "exist on any KG metabolite.",
         )] = None,
@@ -8920,12 +8916,12 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 10,
         offset: OffsetParam = 0,
     ) -> MetabolitesByGeneResponse:
-        """Metabolites a gene batch reaches in ONE organism via KEGG, TCDB and GO transport (GO rows: term definitions, not gene facts).
+        """Metabolites genes reach in ONE organism via KEGG, TCDB, GO transport (GO rows = term definitions, not gene facts).
 
-        Use for gene → compounds; mirror genes_by_metabolite; docs://analysis/transport.
-        Filters: locus_tags, metabolite_elements, metabolite_ids (+exclude, roles ok), ec_numbers, evidence_sources, include_tcdb_family_substrates, go_*.
-        Returns: by_gene, by_element, by_evidence_source(_combination), by_tcdb_route, tcdb_family_substrates_not_shown, top_metabolites; row = gene × reaction|TCDB|GO term × compound.
-        docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
+        Use for gene → compounds; mirror genes_by_metabolite; TCDB rows = direct systems, empty ≠ no transporter (see tcdb_family_substrates_not_shown); docs://analysis/transport.
+        Filters: metabolite_elements, metabolite_ids (+exclude), evidence_sources, include_tcdb_family_substrates, go_*.
+        Returns: by_gene, by_element, by_evidence_source(_combination), by_tcdb_route, top_metabolites; row = gene × route × compound.
+        docs://tools/metabolites_by_gene; summary=True for 50+ genes.
         """
         await ctx.info(
             f"metabolites_by_gene locus_tags={locus_tags} "
@@ -9312,11 +9308,8 @@ def register_tools(mcp: FastMCP):
         )] = None,
         organism: OrganismParam = None,
         metric_types: Annotated[list[str] | None, Field(
-            description="Filter by metric_type tags. Live values: "
-                        "'cellular_concentration', "
-                        "'extracellular_concentration', "
-                        "'presence_flag_intracellular', "
-                        "'presence_flag_extracellular'.",
+            description="Filter by metric_type tag(s). Values: this "
+                        "tool's `top_metric_types` (summary=True).",
         )] = None,
         value_kind: Annotated[Literal["numeric", "boolean"] | None, Field(
             description="'numeric' → metabolites_by_quantifies_assay "
@@ -10059,12 +10052,9 @@ def register_tools(mcp: FastMCP):
         background_factors: BackgroundFactorsParam = None,
         growth_phases: GrowthPhasesParam = None,
         flag_value: Annotated[bool | None, Field(
-            description="Filter by flag presence — `True` (presence flagged), "
-                        "`False` (absence flagged — *tested-absent*, real biology), "
-                        "`None` (both). `Assay_flags_metabolite` always stores "
-                        "both states (unlike the DM layer, where only 11 of 34 "
-                        "boolean DMs store `not_flagged`), so `flag_value=False` "
-                        "returns real rows (about 69% of boolean rows).",
+            description="True / False / None (both). Both states are "
+                        "stored: False = tested-absent, real rows (~69% of "
+                        "boolean rows).",
         )] = None,
         stereo_assignment: Annotated[list[str] | None, Field(
             description="Stereo-form provenance (OR): 'as_reported' = the "
@@ -10369,11 +10359,10 @@ def register_tools(mcp: FastMCP):
         )] = None,
         exclude_metabolite_ids: ExcludeMetaboliteIdsParam = None,
         metric_types: Annotated[list[str] | None, Field(
-            description="Filter by metric_type tag(s) on the parent assay. "
-                        "E.g. ['cellular_concentration', "
-                        "'extracellular_concentration', "
-                        "'presence_flag_intracellular', "
-                        "'presence_flag_extracellular'].",
+            description="Filter by metric_type tag(s) on the parent assay, "
+                        "e.g. ['cellular_concentration']. Values: "
+                        "`list_metabolite_assays(summary=True)` → "
+                        "`top_metric_types`.",
         )] = None,
         compartment: CompartmentParam = None,
         stereo_assignment: Annotated[list[str] | None, Field(

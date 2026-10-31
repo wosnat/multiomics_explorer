@@ -54,7 +54,6 @@
   used_in:
     - CLAUDE.md
     - multiomics_explorer/inputs/tools/genes_by_boolean_metric.yaml
-    - multiomics_explorer/inputs/tools/metabolites_by_flags_assay.yaml
     - multiomics_explorer/mcp_server/tools.py
   note: "genes_by_boolean_metric flag_value=False returns rows on 11 of 34 boolean DMs"
 

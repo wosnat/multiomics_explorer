@@ -61,7 +61,7 @@ examples:
     call: list_metabolite_assays(value_kind="numeric", rankable=True)
 
   - title: Find assays measuring a specific metabolite
-    call: list_metabolite_assays(metabolite_ids=["kegg.compound:C00074"])  # PEP — covered by all 14 assays
+    call: list_metabolite_assays(metabolite_ids=["kegg.compound:C00074"])  # PEP — covered by 10 of the 14 assays (8 numeric + 2 boolean)
 
   - title: Per-paper inventory
     call: list_metabolite_assays(publication_dois=["10.1073/pnas.2213271120"])
@@ -78,14 +78,11 @@ chaining:
   - "list_metabolite_assays → list_metabolites(metabolite_ids=[...])  # chemistry context for measured compounds"
 
 mistakes:
-  - wrong: "Filter out value=0 / flag_value=false rows on drill-downs assuming they're noise."
-    right: "Those rows are tested-absent — the metabolite was *assayed and not found*. Real biology. Keep them unless explicitly investigating presence-only."
-
-  - wrong: "A metabolite missing from drill-down results means it was not detected."
-    right: "Missing means *unmeasured* (not in the assay's scope). For 'tested and not found,' look for value=0 / flag_value=false / detection_status='not_detected' rows in the drill-down output."
+  - wrong: "Drop value=0 / flag_value=False rows as noise, or read a metabolite missing from the results as 'not detected'."
+    right: "value=0 / flag_value=False / detection_status='not_detected' rows are tested-absent (assayed, not found): real biology, kept by default. A metabolite missing from the results is unmeasured in this scope. See docs://analysis/metabolites, 'Tested-absent vs unmeasured'."
 
   - wrong: "growth_phases=[] means the assay has no growth-state metadata."
-    right: "growth_phases=[] reflects unpopulated KG state (KG-side backfill pending). The schema field exists; values populate without explorer-side code change when the upstream backfill lands."
+    right: "growth_phase is not yet recorded on any metabolomics experiment in the KG, so `by_growth_phase` is empty and a `growth_phases` filter matches nothing; don't read that as 'no growth phase'."
 
   - wrong: "metabolite_count_total = total distinct metabolites across matching assays."
     right: "metabolite_count_total is *cumulative*: same metabolite measured by N assays counts N times. For distinct counts route to assays_by_metabolite(metabolite_ids=..., summary=True) → metabolites_matched, or list_metabolites(metabolite_ids=...)."
@@ -94,18 +91,6 @@ mistakes:
     right: "Call list_metabolite_assays(value_kind='numeric', rankable=True) first. Drill-down's rankable-gated filters raise if every selected assay has rankable=False, soft-exclude on mixed input."
 
   - wrong: "list_metabolite_assays(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'"
-    right: |
-      Metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are normalised and
-      looked up in every identifier the metabolite carries before the query runs:
-      `C00064` / `kegg.compound:c00064` → `kegg.compound:C00064`, `CHEBI:17234` /
-      `17234` → `chebi:17234`; `HMDB0000122`, `MNXM732398` and bare InChIKeys resolve
-      the same way. Retired ids of merged or re-keyed nodes resolve to the surviving
-      node (`chebi:14654` → nitrate `kegg.compound:C00244`). Every input that isn't
-      already canonical is listed in envelope `resolved_aliases`
-      (`{input: [canonical, ...]}`). A removed compound whose measurements moved to
-      another compound, and a chemical-role id (`chebi:10004`, 'vitamin (role)'),
-      stay verbatim in `not_found` with a `warnings` entry naming the replacement or
-      the role. Other unresolved inputs stay verbatim in `not_found` in the form you
-      passed.
-  - "See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/conventions` for tested-absent semantics across the metabolomics layer."
+    right: "IDs in any form (bare, prefixed, ChEBI / HMDB / MNX / InChIKey, retired) resolve before the query; read `resolved_aliases`. Removed compounds and chemical-role ids stay in `not_found` with a warning. See docs://analysis/metabolites, 'Metabolite ID forms'."
+  - "See `docs://analysis/metabolites` (evidence sources: metabolism, TCDB transport, GO transport, metabolomics) and `docs://guide/conventions` for tested-absent semantics across the metabolomics layer."
   - "A genus word alone in `organism=` (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous."
