@@ -407,13 +407,7 @@ result = metabolites_by_gene(
 
 ### g — Direct vs family substrates
 
-TCDB curates substrates on **systems** (5-part TC numbers such as `tcdb:3.A.1.4.4`, level kind `tc_system`) and nowhere else. The KG stamps every gene → TCDB edge with a gate (`tcdb_gate`):
-
-| `tcdb_gate` | Which calls | What it feeds |
-|---|---|---|
-| `direct` | a rank-1 DIAMOND best hit at tier ≤ 2 (≥ 40% identity), a tier-1 DIAMOND call, or an eggNOG call onto a system | transport rows, `transported_metabolite_count`, `transporter_gene_count` |
-| `annotated` | other eggNOG calls; tier-2 DIAMOND calls (family / subfamily) | the TCDB annotation (`tcdb_assignment_count`, ontology rows, TERM2GENE) and family-walk starts |
-| `below_gate` | tier-3 calls, near-tie best hits, best hits under 40% identity | nothing; evidence only (`include_weak_tcdb_hits=True` on `gene_ontology_terms`) |
+TCDB curates substrates on **systems** (5-part TC numbers such as `tcdb:3.A.1.4.4`, level kind `tc_system`) and nowhere else. Every gene → TCDB edge carries a `tcdb_gate`: `direct` feeds transport rows and the transport counts, `annotated` feeds the TCDB annotation and family-walk starts, `below_gate` feeds nothing (gate definitions: `docs://ontologies/tcdb`).
 
 **Direct rows (default).** One row per gene × system × metabolite, from `direct` edges only. Distinct Metabolite targets across a gene's direct rows equal `gene_overview.transported_metabolite_count`, and distinct genes across a metabolite's direct rows, summed over organisms, equal `list_metabolites.transporter_gene_count`. Rank within the route by `tcdb_identity` (percent identity of the representative DIAMOND edge; null on eggNOG-only calls), then by `tcdb_calls` (eggNOG plus a DIAMOND kind is independent agreement; `diamond_best_hit` and `diamond_tier` come from one DIAMOND run).
 

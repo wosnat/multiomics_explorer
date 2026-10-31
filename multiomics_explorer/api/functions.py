@@ -5333,9 +5333,9 @@ def gene_response_profile(
         groups_responded, groups_not_responded, groups_tested_not_responded,
         groups_not_known, response_summary.
         groups_tested_not_responded: groups where the gene has no expression
-        edges but all experiments in the group have full-coverage scopes
-        (significant_only or significant_any_timepoint), implying the gene
-        was measured but did not respond significantly.
+        edges and every experiment in the group is a significant-only table
+        (significant_only or significant_any_timepoint): the gene missed the
+        cutoff or was not detected — not a tested negative.
         no_expression: gene has NO Changes_expression_of edge at all in the
         organism. filtered_out: gene has edges but none survive the active
         treatment_type / background_factors filters (e.g. a treatment_type

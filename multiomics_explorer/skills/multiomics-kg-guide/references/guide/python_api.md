@@ -207,7 +207,7 @@ df = to_dataframe(list_clustering_analyses(organism="MED4"))
 ### Notes
 
 - Avoid `pd.DataFrame(result["results"])` directly — it doesn't process list/dict columns, so anything non-scalar causes downstream pain.
-- Unrecognized nested columns (rare) get dropped with a `UserWarning`; the three known nested-content tools auto-dispatch.
+- Unrecognized nested columns (rare) get dropped with a `UserWarning`; the three known nested-content tools auto-dispatch. `list_experiments` verbose `coculture_partners` flattens to `name (role) | …`.
 
 ---
 
@@ -321,7 +321,9 @@ inputs = de_enrichment_inputs(
 
 # 2. Fetch TERM2GENE for the chosen (ontology, level).
 term2gene = to_dataframe(
-    genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
+    # no size filter here — fisher_ora applies it per background
+    genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1,
+                      min_gene_set_size=1, max_gene_set_size=None)
 )
 
 # 3. Run Fisher ORA — returns EnrichmentResult.

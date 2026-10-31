@@ -170,7 +170,7 @@ for example_name, example_description in [
     ("pathway_enrichment.py", "Runnable example script for pathway enrichment"),
     (
         "metabolites.py",
-        "Runnable metabolites workflow examples (3 source pipelines × 7 scenarios)",
+        "Runnable metabolites workflow examples (7 scenarios)",
     ),
     (
         "ontology_terms.py",
