@@ -181,7 +181,7 @@ gene_homologs(locus_tags='PMM0001')
 ```
 
 ```correction
-gene_homologs(locus_tags=['PMM0001']) — always a list
+gene_homologs(locus_tags=['PMM0001']) — lists everywhere (MCP rejects a bare string; the Python API wraps it)
 ```
 
 - `limit` defaults to every input gene × 5 groups (min 25) rather than a small page — pass an explicit number to page.

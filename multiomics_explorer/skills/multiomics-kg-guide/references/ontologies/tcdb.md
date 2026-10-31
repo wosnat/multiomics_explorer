@@ -22,20 +22,20 @@ Each source's call is its own `Gene_has_tcdb_family` edge, tagged
 `family_inferred`), `diamond_tier` (a DIAMOND search against TCDB
 proteins, truncated by tier: tier 1 → system, 2 → subfamily, 3 → family)
 and `diamond_best_hit` (the top DIAMOND systems, rank 1 plus near-ties);
-both DIAMOND kinds read `homology`. The KG stamps every edge with an
-ordered `tcdb_gate`: `direct` (a rank-1 best hit at tier 1-2, a tier-1
-call, or an eggNOG call onto a system; always onto a system), `annotated`
-(other eggNOG calls, tier-2 calls) or `below_gate` (tier-3 calls,
-near-tie best hits, best hits under 40% identity); KG-wide that is
-25,007 direct, 47,444 annotated and 101,806 below-gate edges, so most
-edges are weak hits. Every gene-side tool
-reads gated edges only (`direct` + `annotated`); the transport arm reads
-`direct` only. Trust axes are `sources`, `evidence` and `tier` (null on
-eggNOG; on the two DIAMOND kinds it is derived differently, so never
+both DIAMOND kinds read `homology` with `sources=['tcdb_diamond']`. The
+KG stamps every edge with an ordered `tcdb_gate`:
+
+| `tcdb_gate` | Which calls | Feeds |
+|---|---|---|
+| `direct` | a rank-1 DIAMOND best hit at tier 1-2 (i.e. ≥ 40% identity), a tier-1 call, or an eggNOG call onto a system — always onto a system | every gene-side tool; the default substrate rows of `genes_by_metabolite` / `metabolites_by_gene` |
+| `annotated` | other eggNOG calls, tier-2 calls | every gene-side tool; the opt-in family walk starts here |
+| `below_gate` | tier-3 calls, near-tie best hits, best hits under 40% identity | nothing by default (`include_weak_tcdb_hits=True`) |
+
+Most edges are `below_gate`. Trust axes are `sources`, `evidence` and
+`tier` (null on eggNOG; the consensus tier on `diamond_tier`, the
+identity band on `diamond_best_hit` — 1 ≥ 70%, 2 ≥ 40% — so never
 compare it across kinds), plus the `tcdb_call` filter. There is no
-evidence score. Verbose DIAMOND detail: `identity`, `qcov` (both
-percent), `evalue`, `tcdb_scov`, `tcdb_best_hit_rank`, `tcdb_bitscore`,
-`tcdb_bitscore_ratio`. Families also bridge *out* to the Pfam domains and
+evidence score. Families also bridge *out* to the Pfam domains and
 GO terms that characterise them (composition, with `curated_tcids`
 naming the curated members behind each link).
 
@@ -71,8 +71,9 @@ subfamily names never set it, so every family, and every subfamily outside
 the ABC uptake range, reads `unknown`; hedged, organelle or two-way names
 and a curated override list also leave `unknown`. `superfamily` is TCDB's
 own label, copied as is and unreliable for whole groups (most ABC
-`3.A.1.*` node reads "ArsA ATPase (ArsA) Superfamily"). The ABC superfamily has 97 children, so
-`ontology_term_details` truncates its `children[]`.
+`3.A.1.*` systems read "ArsA ATPase (ArsA) Superfamily"). The ABC
+superfamily has 97 children, so `ontology_term_details` truncates its
+`children[]` (`children_total: 97`, `children_truncated: true`).
 
 ## Graph shape (from the registry)
 
@@ -110,7 +111,7 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 | `organism_count` | int | organisms with at least one gene annotated to the term (subtree-inclusive where `gene_count` is) |
 | `preferred_id` | string | same value as `id` |
 | `proteins` | string | `tc_system` only (sparse): TCDB's protein cell — gene symbols, accessions and source organism, lines joined by `; ` (e.g. `UrtA (R); UrtB (M)`); indexed by the TCDB full-text search |
-| `superfamily` | string | TCDB's own superfamily label, copied as is (sparse); unreliable for whole groups — TCDB files every ABC `3.A.1.*` row under ArsA |
+| `superfamily` | string | TCDB's own superfamily label, copied as is (sparse); unreliable for whole groups — most ABC `3.A.1.*` systems (and `tcdb:3.A.1` itself) read ArsA |
 | `tc_class_id` | string | CURIE of the level-0 TC class this node sits under (e.g. `tcdb:3`) — for grouping without walking the hierarchy |
 | `tcdb_id` | string | bare TC number (e.g. `3.A.1.14`); `id` is the `tcdb:` CURIE |
 | `tcdb_substrate_count` | int | distinct Metabolite + ChemicalRole substrates TCDB curates on the `tc_system` nodes in this node's subtree (TCDB's range; on a system, its own count, 0 when none) |
@@ -126,9 +127,9 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 - `direction` — `list_filter_values(filter_type="direction", ontology="tcdb")`
 - `link_kinds` — `list_filter_values(filter_type="link_kinds")`
 
-Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="tcdb")`) lists which comparable axes the gene edge carries.
+Values are read live from the KG's `ControlledVocabulary` nodes (`list_filter_values`); the list below is a build-time snapshot and may lag the KG. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="tcdb")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
+Vocabulary snapshot (build time):
 
 - `Gene_has_tcdb_family.evidence`: `family_inferred`, `homology`
 - `Gene_has_tcdb_family.sources`: `eggnog`, `tcdb_diamond`
@@ -136,7 +137,6 @@ Snapshot of vocabulary values at build time (`--live-vocab`):
 - `Gene_has_tcdb_family.tcdb_gate`: `direct`, `annotated`, `below_gate`
 - `TcdbFamily.direction`: `uptake`, `export`, `unknown`
 - `TcdbFamily.direction_basis`: `abc_numbering`, `tcdb_name`
-- `TcdbFamily.level_kind`: `tc_class`, `tc_subclass`, `tc_family`, `tc_subfamily`, `tc_system`
 
 ## Interpretation
 
@@ -144,17 +144,13 @@ A gene's leaf rows (`gene_ontology_terms`, default leaf mode) are its
 gated targets minus any that is an ancestor of another, so their count is
 `gene_overview.tcdb_assignment_count`; most are systems or subfamilies.
 Several sibling rows per gene are normal (an eggNOG call often names
-several TC ids). Each row reports one edge by precedence (best hit, tier,
-eggNOG; then identity) and lists in `tcdb_calls` every call kind on its
+several TC ids). Each row lists in `tcdb_calls` every call kind on its
 lineage. eggNOG plus a DIAMOND kind is independent agreement; the two
 DIAMOND kinds come from one DIAMOND run. Rank DIAMOND rows by `identity`;
-never filter on it. For "what does this gene transport" go through
-`metabolites_by_gene`; for "which genes could transport X" go through
-`genes_by_metabolite`. Both return direct rows (the gene's own system)
-by default and family rows with `include_tcdb_family_substrates=True`, a
-walk from the gene's family or subfamily call down to TCDB's curated
-systems. The family-anchored route via `genes_by_ontology` misses
-cross-family substrate hits. Weak hits (`below_gate`) appear only with
+never filter on it. For substrates — "what does this gene move", "which
+genes move X" — use `metabolites_by_gene` / `genes_by_metabolite`; how
+their TCDB rows read (direct vs family rows, empty answers, curation
+caveats) is in `docs://analysis/transport`. Weak hits (`below_gate`) appear only with
 `include_weak_tcdb_hits=True` on `gene_ontology_terms` /
 `genes_by_ontology`; enrichment never uses them.
 
@@ -168,18 +164,10 @@ superfamily behave as catch-alls by size; enrich at `level=2` (family) or
 
 - Do not re-derive the gate from `tcdb_call`, `tier` or `rank`; read
   `tcdb_gate`. A weak hit is evidence only and feeds no count.
-- A gene called only at family or subfamily level has no default
-  substrate row. That is not "no transporter": read the
-  `tcdb_family_substrates_not_shown` hint on the metabolite tools.
-- A gene called only on the ABC or MFS superfamily (over 200 curated
-  substrates) gets no family walk at all: its substrate is unknown, and
-  `tcdb_family_substrates_skipped` lists it.
-- TCDB curation is reported as-is: the Pst phosphate system
-  `tcdb:3.A.1.7.6` is curated with triphosphate only, and catch-all
-  substrates ("Peptide", "Protein") appear on some systems. Coupling
-  ions (H+, Na+) and placeholders ("molecule", "ion") are filtered out
-  (`Schema_info.tcdb_substrate_excluded_targets`), so Na+/H+ antiporters
-  reach no metabolite.
+- An empty TCDB substrate answer is often curation or call depth, not
+  biology (family-only calls, ABC / MFS superfamily calls, excluded
+  coupling ions, Pst curated with triphosphate): read
+  `docs://analysis/transport` (what an empty answer means).
 - `direction` is node-level and TCDB-stated, not a per-gene measurement;
   most nodes read `unknown`.
 - `tcdb_substrate_count` is TCDB's curated range for the node, not what
@@ -191,12 +179,13 @@ superfamily behave as catch-alls by size; enrich at `level=2` (family) or
   such as "— subfamily 3.A.1.118" is not searchable. Find the family by its
   own name (quote multi-word phrases: `'"ABC Superfamily"'`) or by id with
   `ontology_term_details(['tcdb:3.A.1'])`;
-  `genes_by_ontology(term_ids=['tcdb:3.A.1'])` expands down to its unnamed
-  subfamilies.
+  `genes_by_ontology(term_ids=['tcdb:3.A.1'])` collects the genes of its
+  unnamed subfamilies and systems (rows report `tcdb:3.A.1`; use
+  `level=3` without `term_ids` to see them per subfamily).
 
 ## Typical questions
 
-- Which ABC-transporter subfamilies does MED4 carry, and how is each call supported? — `genes_by_ontology(ontology='tcdb', organism='MED4', term_ids=['tcdb:3.A.1'], level=3, verbose=True)`
+- Which ABC-transporter subfamilies does MED4 carry, and how is each call supported? — `genes_by_ontology(ontology='tcdb', organism='MED4', level=3, min_gene_set_size=1, verbose=True)` and keep `term_id` under `tcdb:3.A.1.` (with `level=3`, a `term_ids` list must hold level-3 ids)
 - Which TC systems is cynD (`PMM0372`) called to, and what do they transport? — `gene_ontology_terms(locus_tags=['PMM0372'], organism='MED4', ontology=['tcdb'])` then `metabolites_by_gene(locus_tags=['PMM0372'], organism='MED4')`
 - Which Pfam domains and GO terms characterise `tcdb:3.A.1`, and how broad is its substrate range? — `ontology_term_details(term_ids=['tcdb:3.A.1'])` (`tcdb_substrate_count`)
 - Which transporter families are enriched among genes up under phosphorus limitation, restricted to DIAMOND calls? — `pathway_enrichment(..., ontology='tcdb', level=2, direction='up', evidence=['homology'])`

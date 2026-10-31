@@ -241,7 +241,7 @@ gene_neighbors(locus_tags=["ACZ81_08860"], window=2, same_strand=True)
 }
 ```
 
-### Example 4: not_found vs a placed anchor (A9601_09441 is a Cyanorak-only gene — coordinates from Cyanorak, so it now has a neighborhood; not_matched stays empty)
+### Example 4: not_found vs a placed anchor (A9601_09441 is a Cyanorak-only gene with Cyanorak coordinates, so it has a neighborhood; not_matched stays empty)
 
 ```example-call
 gene_neighbors(locus_tags=["ACZ81_08860", "A9601_09441", "NOTAREAL"])
@@ -366,7 +366,7 @@ Sweeping a whole genome's coordinates with one huge call, e.g. gene_neighbors(lo
 ```
 
 ```correction
-window is capped at 100 and len(locus_tags) × 2 × window at 100,000 rows (the detail query builds every row before `limit` applies; the uncapped call exhausted Neo4j memory). For genome-wide contig/start/end/strand use gene_details over the organism's locus tags; batch larger anchor sets.
+window is capped at 100 and len(locus_tags) × 2 × window at 100,000 rows (the detail query builds every row before `limit` applies). For genome-wide contig/start/end/strand use gene_details over the organism's locus tags; batch larger anchor sets.
 ```
 
 - `limit` defaults to every anchor × (2×window+1) neighbors (min 25) rather than a small page — pass an explicit number to page.

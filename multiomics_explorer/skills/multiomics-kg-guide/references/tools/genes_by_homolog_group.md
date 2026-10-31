@@ -34,7 +34,7 @@ genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"])
 total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, resolved_aliases, warnings, returned, truncated, results
 ```
 
-Result row: `locus_tag, gene_name, product, organism_name, gene_category, group_id, gene_summary, function_description, consensus_product, source`
+Result row: `locus_tag, gene_name, product, organism_name, gene_category, group_id`
 
 ## Common mistakes
 
@@ -42,7 +42,7 @@ Result row: `locus_tag, gene_name, product, organism_name, gene_category, group_
 
 - A gene in multiple input groups appears once per group — rows are gene × group, not distinct genes. Use total_genes for the deduplicated count.
 
-- organisms is a list, not a string — use ['MED4'] not 'MED4'
+- organisms is a list — ['MED4'], not 'MED4' (MCP rejects a bare string; the Python API wraps it)
 
 ## Chaining patterns
 

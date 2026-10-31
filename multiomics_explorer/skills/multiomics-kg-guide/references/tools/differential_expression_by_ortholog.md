@@ -16,7 +16,7 @@ docs://tools/differential_expression_by_ortholog; summary=True first.
 | group_ids | list[string] | — | Ortholog group IDs (from search_homolog_groups or gene_homologs). E.g. ['cyanorak:CK_00000570']. Bare ids are accepted (e.g. 'CK_00000570', 'COG0592@2') and coerced to canonical (see `resolved_aliases`). |
 | organisms | list[string] \| None | None | Organisms, each word-matched as `organism`. Omit for all. |
 | experiment_ids | list[string] \| None | None | Filter to these experiments. Get IDs from list_experiments. |
-| direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` is unchanged. |
+| direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` = all statuses. |
 | significant_only | bool | False | If true, return only statistically significant rows. |
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
@@ -46,11 +46,11 @@ Result row: `group_id, consensus_gene_name, consensus_product, experiment_id, tr
 
 ## Common mistakes
 
+- A DE timepoint label (e.g. 'day 18') and `growth_phase` describe the treatment arm; check the row's `control_timing`, and `design_notes` via list_experiments(experiment_ids=[...]), before reading it as both arms' state. See docs://guide/conventions.
+
 - Bare group ids ('CK_00000570', 'COG0592@2') are accepted and coerced to canonical — check `resolved_aliases` for the mapping; prefer the prefixed form ('cyanorak:CK_00000570') to skip coercion.
 
-- organisms is a list, not a string — use ['MED4'] not 'MED4'
-
-- This tool does NOT enforce single organism — that is the point
+- MCP: pass `organisms` as a list (['MED4']) — a bare string is rejected by the schema (the Python API accepts it as one element).
 
 ## Chaining patterns
 

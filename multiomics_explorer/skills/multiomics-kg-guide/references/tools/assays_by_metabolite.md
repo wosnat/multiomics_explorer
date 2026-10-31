@@ -17,7 +17,7 @@ docs://tools/assays_by_metabolite; summary=True first for 50+ IDs.
 | organism | string \| None | None | Organism: case-insensitive substring match on the organism name ('MED4'); a genus word matches every strain. See list_organisms. |
 | evidence_kind | string ('quantifies', 'flags') \| None | None | Filter by edge type. `'quantifies'` = numeric arm only (rows carry value, detection_status, timepoint*). `'flags'` = boolean arm only (rows carry flag_value, n_positive). Default `None` = both arms merged (polymorphic rows; cross-arm fields explicit `None`). |
 | exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
-| metric_types | list[string] \| None | None | Filter by metric_type tag(s) on the parent assay. E.g. ['cellular_concentration', 'extracellular_concentration', 'presence_flag_intracellular', 'presence_flag_extracellular']. |
+| metric_types | list[string] \| None | None | Filter by metric_type tag(s) on the parent assay, e.g. ['cellular_concentration']. Values: `list_metabolite_assays(summary=True)` → `top_metric_types`. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
 | stereo_assignment | list[string] \| None | None | Stereo-form provenance (OR): 'as_reported' = the paper named the form; 'dominant_form_assumed' = it named none and the KG placed it on the dominant form (e.g. 'Alanine' on L-Alanine). ['as_reported'] drops assumed rows. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
@@ -65,13 +65,11 @@ matters to the claim, or quote assumed rows as "L-form assumed".
 ```
 
 ```mistake
-Filter out value=0 / flag_value=false rows assuming they are noise.
+Drop value=0 / flag_value=False rows as noise, or read a metabolite missing from the results as 'not detected'.
 ```
 
 ```correction
-These rows are tested-absent — the metabolite was assayed and not found.
-They are biology. Keep them unless explicitly investigating presence-only.
-
+value=0 / flag_value=False / detection_status='not_detected' rows are tested-absent (assayed, not found): real biology, kept by default. A metabolite missing from the results is unmeasured in this scope. See docs://analysis/metabolites, 'Tested-absent vs unmeasured'.
 ```
 
 ## Chaining patterns

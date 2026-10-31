@@ -148,11 +148,11 @@ list_derived_metrics → genes_by_<kind>_metric → metabolites_by_gene — insp
 
 ## Common mistakes
 
-- Call this FIRST before drill-downs. Inspect rankable / has_p_value / value_kind / allowed_categories / compartment here — the downstream drill-down tools (genes_by_numeric_metric, genes_by_boolean_metric, genes_by_categorical_metric) hard-fail (by design) when the selected DM set doesn't support the requested filter. E.g. passing metric_bucket=['top_decile'] with a non-rankable DM raises; passing significant_only=True when no selected DM has has_p_value=True raises.
+- Call this FIRST before drill-downs. Inspect rankable / value_kind / allowed_categories here (`verbose=True` adds has_p_value / compartment) — the downstream drill-down tools (genes_by_numeric_metric, genes_by_boolean_metric, genes_by_categorical_metric) hard-fail (by design) when the selected DM set doesn't support the requested filter. E.g. passing metric_bucket=['top_decile'] with a non-rankable DM raises; passing significant_only=True when no selected DM has has_p_value=True raises.
 
 - metric_type is a category tag, not a primary key — the same metric_type can appear across organisms or publications (periodic_in_coculture_LD exists once for NATL2A and once for MIT1002). Use derived_metric_ids to pin one specific DM; use metric_types to union across every DM with that tag.
 
-- has_p_value=True returns zero rows in the current KG — no DM currently carries p-values. The filter exists for forward-compat; drill-down p-value filters (significant_only, max_adjusted_p_value) will raise with a diagnostic error.
+- has_p_value=True returns zero rows in the current KG — no DM currently carries p-values. The filter is kept so p-value-gated drill-downs can be pre-checked; drill-down p-value filters (significant_only, max_adjusted_p_value) will raise with a diagnostic error.
 
 - allowed_categories is non-null only when value_kind='categorical'. For boolean and numeric DMs it is null — not a bug.
 

@@ -52,11 +52,11 @@ Result row: `experiment_id, experiment_name, publication_doi, authors, organism_
 
 ## Common mistakes
 
-- If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this experiment.
+- `coculture_partner` lists every organism sharing the culture: treatment partners (their presence is the contrast) AND background partners (the culture was a coculture, the contrast is something else). `treatment_type=['coculture']` keeps only the coculture-vs-axenic contrasts and drops the background cocultures. Use `coculture_role='treatment'` / `'background'` to choose explicitly (values: `list_filter_values(filter_type='partner_role')`); verbose `coculture_partners[].role` shows the role per partner.
 
-- Default is detail (summary=false) — use summary=true to see only breakdowns. When summary=true, verbose and limit have no effect.
+- `table_scope` decides whether a missing gene means 'not affected' or 'not reported': `all_detected_genes` keeps tested-absent rows, every other scope collapses them. Filter with `table_scope=['all_detected_genes']` to keep only experiments fair for cross-experiment comparison. See docs://guide/conventions.
 
-- gene_count is total genes with expression data, not total significant genes — use genes_by_status for the breakdown.
+- A DE timepoint label (e.g. 'day 18') and `growth_phase` describe the treatment arm; check `control_timing` / `design_notes` before reading it as both arms' state. See docs://guide/conventions.
 
 ## Chaining patterns
 
@@ -66,7 +66,7 @@ Result row: `experiment_id, experiment_name, publication_doi, authors, organism_
 - list_experiments(search_text=..., verbose=True) → classify → list_experiments(experiment_ids=[...]) for the picked subset
 - list_experiments → differential_expression_by_gene
 - list_experiments → list_clustering_analyses(experiment_ids=[...])
-- list_experiments(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
+- list_experiments(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric (docs://analysis/derived_metrics)
 - list_filter_values(filter_type='metric_type') → list_experiments(search_text='<metric_type>') to find experiments with that metric
 - list_experiments (per-row `metabolite_count > 0`) → list_metabolite_assays(experiment_ids=[...]) to inspect the experiment's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup).
 - list_experiments → list_derived_metrics(experiment_ids=[...]) for the experiment's non-DE, column-level evidence (rhythmicity flags, amplitudes, trait classes)

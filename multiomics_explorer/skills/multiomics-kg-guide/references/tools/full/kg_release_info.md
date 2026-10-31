@@ -6,7 +6,7 @@ KG release identity (Schema_info version, built_at, node counts) plus a compatib
 
 Use as the first call of a session; for the graph shape use `kg_schema`, for live vocabulary values `list_filter_values`.
 Filters: none.
-Returns: verdict, explorer_version, kg, asserts, summary; no row list. `warn` means quoted value lists may be stale, never that calls fail.
+Returns: verdict, explorer_version, kg (incl. go_transport_excluded_targets / tcdb_substrate_excluded_targets — they explain an empty transport answer), asserts, summary; no row list. `warn` means quoted value lists may be stale, never that calls fail.
 docs://tools/kg_release_info.
 
 ## Parameters
@@ -61,7 +61,7 @@ kg_release_info()
 # reads this verbatim rather than inferring dev-vs-prod from host/port.
 ```
 
-### Example 2: Vocabulary set differs from the pinned one (sixth assert fails, verdict warn) (illustrative — not a live response)
+### Example 2: Vocabulary set differs from the pinned one (controlled_vocabularies_hash assert fails, verdict warn) (illustrative — not a live response)
 
 ```example-call
 kg_release_info()
@@ -75,7 +75,7 @@ kg_release_info()
 # sparse, expected_empty, exhaustive, min_value, max_value,
 # signal_count, signals}. `description` is excluded, so doc-only
 # vocabulary edits do not change it. The explorer pins the hash of the
-# KG it was built against; the sixth assert bucket compares the two.
+# KG it was built against; the controlled_vocabularies_hash assert compares the two.
 {"verdict": "warn", "kg": {"controlled_vocabularies_hash": "sha256:e81d...efd4", "...": "..."}, "asserts": ["...16 schema asserts, all passed...", {"name": "controlled_vocabularies_hash", "kind": "controlled_vocabularies_hash", "passed": false, "expected": "sha256:6170...e0ae", "actual": "sha256:e81d...efd4", "detail": "Schema_info.controlled_vocabularies_hash is sha256:e81d...efd4, explorer was built against sha256:6170...e0ae."}], "summary": "WARN: ... Vocabulary set differs from the one this explorer was built against — filters still validate live and list_filter_values reads live, but docs://ontologies/{key} pages and parameter descriptions may list stale values."}
 
 # What this warn means in practice: nothing is broken. Every filter
@@ -130,7 +130,7 @@ Expecting kg_release_info to catch ontology-label mismatches (KeggTerm, EcTerm, 
 ```
 
 ```correction
-EXPECTED_KG_SHAPE only asserts the load-bearing core labels (Gene, Experiment, OrthologGroup, Publication, Schema_info). Ontology-specific labels are not asserted — they fail gracefully at query time. If verdict='ok' but a specific ontology tool errors, the issue is tool-side, not compat-check-side.
+Only the load-bearing core labels are asserted (Gene, Experiment, OrthologGroup, Publication, Schema_info). Ontology-specific labels are not asserted — they fail gracefully at query time. If verdict='ok' but a specific ontology tool errors, the issue is tool-side, not compat-check-side.
 ```
 
 ```mistake
@@ -141,15 +141,7 @@ Treating a failed controlled_vocabularies_hash assert as a broken KG and refusin
 It is a warn, never worse. The hash covers the vocabulary VALUE SETS (ids, values, closed/sparse flags, score signals) — not descriptions. A mismatch means the docs://ontologies/{key} pages and parameter descriptions may list stale values; filters still validate live and list_filter_values reads live. Keep working; prefer list_filter_values over any quoted value list.
 ```
 
-```mistake
-Expecting the pinned hash to follow a KG rebuild
-```
-
-```correction
-The pin lives in the explorer (EXPECTED_KG_SHAPE) and is set at explorer release time to equal the live KG's hash at cut time — that equality is a release-time rule. A dev KG build that adds a vocabulary value (e.g. a new treatment_type) fails this bucket until the next explorer release re-pins it; expected during development.
-```
-
-- `kg.controlled_vocabularies_hash` is passed through from Schema_info like every other identity field; it is null on KGs built before the vocabulary contract existed, and the sixth assert then fails with detail 'KG predates the vocabulary contract' (still a warn).
+- `kg.controlled_vocabularies_hash` is passed through from Schema_info like every other identity field; it is null on KGs built before the vocabulary contract existed, and the controlled_vocabularies_hash assert then fails with detail 'KG predates the vocabulary contract' (still a warn).
 
 - Verdict `unknown` means the check could not be evaluated at all — no `Schema_info` node in the KG (a build without release metadata, or the wrong database). Treat quoted value lists the same way as under `warn`. On any non-`ok` verdict the tool also emits a `ctx.warning` so the MCP client surfaces it.
 

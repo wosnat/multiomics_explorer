@@ -15,7 +15,7 @@ docs://tools/list_metabolite_assays; summary=True first.
 |---|---|---|---|
 | search_text | string \| None | None | Full-text search over MetaboliteAssay name, field_description, treatment, experimental_context. E.g. 'chitosan', 'cellular concentration', 'KEGG export'. |
 | organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
-| metric_types | list[string] \| None | None | Filter by metric_type tags. Live values: 'cellular_concentration', 'extracellular_concentration', 'presence_flag_intracellular', 'presence_flag_extracellular'. |
+| metric_types | list[string] \| None | None | Filter by metric_type tag(s). Values: this tool's `top_metric_types` (summary=True). |
 | value_kind | string ('numeric', 'boolean') \| None | None | 'numeric' → metabolites_by_quantifies_assay drill-down; 'boolean' → metabolites_by_flags_assay. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
 | treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
@@ -195,19 +195,11 @@ list_metabolite_assays → list_metabolites(metabolite_ids=[...])  # chemistry c
 ## Common mistakes
 
 ```mistake
-Filter out value=0 / flag_value=false rows on drill-downs assuming they're noise.
+Drop value=0 / flag_value=False rows as noise, or read a metabolite missing from the results as 'not detected'.
 ```
 
 ```correction
-Those rows are tested-absent — the metabolite was *assayed and not found*. Real biology. Keep them unless explicitly investigating presence-only.
-```
-
-```mistake
-A metabolite missing from drill-down results means it was not detected.
-```
-
-```correction
-Missing means *unmeasured* (not in the assay's scope). For 'tested and not found,' look for value=0 / flag_value=false / detection_status='not_detected' rows in the drill-down output.
+value=0 / flag_value=False / detection_status='not_detected' rows are tested-absent (assayed, not found): real biology, kept by default. A metabolite missing from the results is unmeasured in this scope. See docs://analysis/metabolites, 'Tested-absent vs unmeasured'.
 ```
 
 ```mistake
@@ -215,7 +207,7 @@ growth_phases=[] means the assay has no growth-state metadata.
 ```
 
 ```correction
-growth_phases=[] reflects unpopulated KG state (KG-side backfill pending). The schema field exists; values populate without explorer-side code change when the upstream backfill lands.
+growth_phase is not yet recorded on any metabolomics experiment in the KG, so `by_growth_phase` is empty and a `growth_phases` filter matches nothing; don't read that as 'no growth phase'.
 ```
 
 ```mistake
@@ -239,22 +231,10 @@ list_metabolite_assays(metabolite_ids=['C00064'])  # then treating `C00064` in `
 ```
 
 ```correction
-Metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are normalised and
-looked up in every identifier the metabolite carries before the query runs:
-`C00064` / `kegg.compound:c00064` → `kegg.compound:C00064`, `CHEBI:17234` /
-`17234` → `chebi:17234`; `HMDB0000122`, `MNXM732398` and bare InChIKeys resolve
-the same way. Retired ids of merged or re-keyed nodes resolve to the surviving
-node (`chebi:14654` → nitrate `kegg.compound:C00244`). Every input that isn't
-already canonical is listed in envelope `resolved_aliases`
-(`{input: [canonical, ...]}`). A removed compound whose measurements moved to
-another compound, and a chemical-role id (`chebi:10004`, 'vitamin (role)'),
-stay verbatim in `not_found` with a `warnings` entry naming the replacement or
-the role. Other unresolved inputs stay verbatim in `not_found` in the form you
-passed.
-
+IDs in any form (bare, prefixed, ChEBI / HMDB / MNX / InChIKey, retired) resolve before the query; read `resolved_aliases`. Removed compounds and chemical-role ids stay in `not_found` with a warning. See docs://analysis/metabolites, 'Metabolite ID forms'.
 ```
 
-- See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/conventions` for tested-absent semantics across the metabolomics layer.
+- See `docs://analysis/metabolites` (evidence sources: metabolism, TCDB transport, GO transport, metabolomics) and `docs://guide/conventions` for tested-absent semantics across the metabolomics layer.
 
 - A genus word alone in `organism=` (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous.
 

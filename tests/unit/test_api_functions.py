@@ -19050,7 +19050,7 @@ class TestR2GeneResponseProfileTreatmentTypeRename:
 #     (before the detail query / existence probes).
 # ---------------------------------------------------------------------------
 
-_GBO_SIZE_HINT = "min_gene_set_size=1, max_gene_set_size=None"
+_GBO_SIZE_HINT = "min_gene_set_size=1 and a large max_gene_set_size"
 
 
 class TestGenesByOntologySizeFiltered:

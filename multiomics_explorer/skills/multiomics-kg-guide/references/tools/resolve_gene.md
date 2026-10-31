@@ -4,10 +4,10 @@
 
 Resolve a gene identifier (locus tag, gene name, old locus tag, RefSeq protein ID; case-insensitive) to matching Gene nodes.
 
-Use when the input is a name or partial label; for what a gene does use `gene_overview`, for free-text search `genes_by_function`.
+Use when the input is an exact name, locus tag or alias (no partial matching); for partial / free-text use `genes_by_function`, for what a gene does `gene_overview`.
 Filters: identifier, organism.
 Returns: total_matching, by_organism; one row = one Gene match (locus_tag, gene_name, product, organism_name).
-docs://tools/resolve_gene; summary=True first when a name may hit many strains.
+docs://tools/resolve_gene; summary=True returns by_organism uncapped (larger than the default call).
 
 ## Parameters
 
@@ -41,9 +41,9 @@ Result row: `locus_tag, gene_name, product, organism_name`
 
 - Sibling tools: resolve_gene answers 'which node is this identifier?' (locus_tag / gene_name / alias → gene rows, no annotation payload). For 'what do I know about this gene' use gene_overview(locus_tags=[...]); for 'which genes do X' use genes_by_function(search_text=...).
 
-- Case-insensitive matching: 'pmm0001', 'PMM0001', and 'Pmm0001' all work
+- Matching is exact and case-insensitive ('pmm0001', 'PMM0001' and 'Pmm0001' all work); a partial identifier ('PMM000') matches nothing — use genes_by_function for partial or free-text input.
 
-- The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works, as does 'Prochlorococcus MED4'. A genus word alone ('Prochlorococcus') matches every strain of that genus — here that just widens the result set (this tool never raises on ambiguity; the single-organism expression tools do).
+- not_found is not reported — an identifier with no match simply yields total_matching=0 and results=[]. See docs://guide/conventions for the not_found / not_matched shapes on batch tools.
 
 ## Chaining patterns
 

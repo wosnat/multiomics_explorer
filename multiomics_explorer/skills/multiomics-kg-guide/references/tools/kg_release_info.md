@@ -6,7 +6,7 @@ KG release identity (Schema_info version, built_at, node counts) plus a compatib
 
 Use as the first call of a session; for the graph shape use `kg_schema`, for live vocabulary values `list_filter_values`.
 Filters: none.
-Returns: verdict, explorer_version, kg, asserts, summary; no row list. `warn` means quoted value lists may be stale, never that calls fail.
+Returns: verdict, explorer_version, kg (incl. go_transport_excluded_targets / tcdb_substrate_excluded_targets — they explain an empty transport answer), asserts, summary; no row list. `warn` means quoted value lists may be stale, never that calls fail.
 docs://tools/kg_release_info.
 
 ## Parameters
@@ -43,7 +43,7 @@ Expecting kg_release_info to catch ontology-label mismatches (KeggTerm, EcTerm, 
 ```
 
 ```correction
-EXPECTED_KG_SHAPE only asserts the load-bearing core labels (Gene, Experiment, OrthologGroup, Publication, Schema_info). Ontology-specific labels are not asserted — they fail gracefully at query time. If verdict='ok' but a specific ontology tool errors, the issue is tool-side, not compat-check-side.
+Only the load-bearing core labels are asserted (Gene, Experiment, OrthologGroup, Publication, Schema_info). Ontology-specific labels are not asserted — they fail gracefully at query time. If verdict='ok' but a specific ontology tool errors, the issue is tool-side, not compat-check-side.
 ```
 
 ```mistake

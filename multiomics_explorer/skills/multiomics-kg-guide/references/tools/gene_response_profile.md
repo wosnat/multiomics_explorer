@@ -42,6 +42,8 @@ Result row: `locus_tag, gene_name, product, gene_category, groups_responded, gro
 
 ## Common mistakes
 
+- A treatment group can mix experiments whose control was sampled alongside the treatment (`control_timing='matched'`) with ones compared to an early reference (`baseline` / `mixed`); check `control_timing` via list_experiments(experiment_ids=[...]) before reading a group's direction as one contrast.
+
 - Sibling tools: gene_response_profile is the cross-experiment ROLLUP (one row per gene, responses bucketed per treatment group, timepoints collapsed). differential_expression_by_gene is the row-level view (gene × experiment × timepoint with log2fc / padj). Profile first to see which treatments matter, then drill into one experiment with differential_expression_by_gene.
 
 ```mistake
@@ -49,10 +51,8 @@ Assuming groups_not_known means 'gene does not respond to this treatment'
 ```
 
 ```correction
-groups_not_known means no expression data exists — the gene was not profiled or not reported for that treatment. Check experiments_total in the response_summary for coverage. groups_tested_not_responded is the stronger 'absent but inferred-tested' bucket (all experiments in the group report a full-coverage scope).
+groups_not_known means no expression data exists — the gene was not profiled or not reported for that treatment. Check experiments_total in the response_summary for coverage. groups_tested_not_responded is the groups where every experiment is a significant-only table (`significant_only` / `significant_any_timepoint`) and the gene has no row: it missed the paper's cutoff or was not detected — the table cannot tell which. A weaker 'probably not responding', not a tested negative.
 ```
-
-- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums. An unknown treatment_type value (e.g. 'Fe' instead of 'iron') reports in the envelope `warnings` (e.g. "treatment_type value 'Fe' matched nothing — valid values: ... (list_filter_values(filter_type='treatment_type'))") — check `warnings` before trusting an empty or reduced result. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. Here the group keys of response_summary and the treatment_type filter use those values.
 
 ## Chaining patterns
 

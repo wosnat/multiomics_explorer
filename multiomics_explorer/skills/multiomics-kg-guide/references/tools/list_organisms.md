@@ -7,7 +7,7 @@ Every organism with taxonomy and per-organism capability rollups — gene, publi
 Use to pick an organism or check what data it carries before scoping another tool; for gene lookup use `resolve_gene`.
 Filters: organism_names, compartment.
 Returns: by_organism_type, top_metabolic_capability, top_annotation_capability, by_measurement_capability, not_found; one row = one OrganismTaxon.
-docs://tools/list_organisms; summary=True first.
+docs://tools/list_organisms; summary=True is uncapped (larger than the default call).
 
 ## Parameters
 
@@ -38,11 +38,11 @@ Result row: `organism_name, organism_type, genus, species, strain, clade, ncbi_t
 
 ## Common mistakes
 
-- If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this organism.
+- `experiment_count` counts only experiments that profile this organism. experiment_count=0 on a treatment taxon (e.g. a phage or a coculture helper) does not mean it is absent from the experimental data — experiments where it is the coculture partner (either `coculture_role`) are counted in `partner_experiment_count` and listed via list_experiments(coculture_partner=organism_name). The two counts are disjoint; a profiled strain can carry both.
 
-- gene_count and publication_count are counts of data in the KG, not biological totals.
+- `catalyzed_metabolite_count` counts catalysis capability only — distinct metabolites reachable through Gene → Reaction → Metabolite. Transport reach is the separate `transported_metabolite_count` (distinct metabolites curated on the TC systems the organism's genes point at directly, `tcdb_gate='direct'`; family-level calls and weak hits do not count). Measurement-side coverage is `measured_metabolite_count`. catalyzed_metabolite_count=0 means no catalysis path in this organism, not that chemistry is absent from the KG.
 
-- Organisms with gene_count=0 are the organism_type='treatment' taxa (non-genomic coculture partners / phage; some genus-level like 'Alteromonas', most strain-level).
+- `go_transport_metabolite_count` counts metabolites reached through direct GO transport terms (chemical roles and is_a-inherited targets excluded). It is a separate route from `transported_metabolite_count` (TCDB); the two overlap and do not add up to a total transport reach.
 
 ## Chaining patterns
 
@@ -51,7 +51,7 @@ Result row: `organism_name, organism_type, genus, species, strain, clade, ncbi_t
 - list_organisms → resolve_gene
 - list_organisms → genes_by_ontology
 - list_organisms → list_clustering_analyses(organism=...)
-- list_organisms(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
+- list_organisms(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric (docs://analysis/derived_metrics)
 - list_organisms (per-row catalyzed_metabolite_count > 0) → list_metabolites(organism_names=[organism_name]) for chemistry drill-down
 - list_organisms(summary=True) → top_annotation_capability → genes_by_ontology(ontology='merops', organism=..., call_class=['peptidase']) for the peptidase genes behind peptidase_gene_count
 - list_organisms → per-row interpro_gene_count / ncbifam_gene_count → ontology_landscape(organism=..., ontology=['interpro', 'ncbifam']) before enrichment on a domain ontology

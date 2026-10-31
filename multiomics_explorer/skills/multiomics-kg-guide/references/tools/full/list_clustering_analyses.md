@@ -149,7 +149,7 @@ response['total_matching']  # use total, not len — results may be truncated
 
 - `treatment_type` is dense and never empty. A characterization study with no perturbation names what was measured — `rna_decay` (decay_pattern clusters from an mRNA half-life survey), `genomic_analysis` (sequence-predicted genomic-island sets) — so `treatment_type=[...]` filters reach it. `background_factors` is `[]` only on the genomic_island analyses (sequence-only, no experimental context); every expression-derived analysis carries at least one factor.
 
-- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows and reports in the envelope `warnings` — check `warnings` before trusting an empty result. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. On analyses the same short nouns apply (darkness, viral, iron, nitrogen, diel, temperature, light, oxygen, rna_decay, genomic_analysis).
+- Unknown `treatment_type` / `background_factors` / `growth_phases` values return 0 rows and land in `warnings`; live value sets via list_filter_values, semantics in docs://guide/conventions.
 
 - `organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works.
 

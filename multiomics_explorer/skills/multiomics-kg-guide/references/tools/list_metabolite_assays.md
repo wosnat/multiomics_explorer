@@ -15,7 +15,7 @@ docs://tools/list_metabolite_assays; summary=True first.
 |---|---|---|---|
 | search_text | string \| None | None | Full-text search over MetaboliteAssay name, field_description, treatment, experimental_context. E.g. 'chitosan', 'cellular concentration', 'KEGG export'. |
 | organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
-| metric_types | list[string] \| None | None | Filter by metric_type tags. Live values: 'cellular_concentration', 'extracellular_concentration', 'presence_flag_intracellular', 'presence_flag_extracellular'. |
+| metric_types | list[string] \| None | None | Filter by metric_type tag(s). Values: this tool's `top_metric_types` (summary=True). |
 | value_kind | string ('numeric', 'boolean') \| None | None | 'numeric' → metabolites_by_quantifies_assay drill-down; 'boolean' → metabolites_by_flags_assay. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
 | treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
@@ -53,19 +53,11 @@ Result row: `assay_id, name, metric_type, value_kind, rankable, unit, field_desc
 ## Common mistakes
 
 ```mistake
-Filter out value=0 / flag_value=false rows on drill-downs assuming they're noise.
+Drop value=0 / flag_value=False rows as noise, or read a metabolite missing from the results as 'not detected'.
 ```
 
 ```correction
-Those rows are tested-absent — the metabolite was *assayed and not found*. Real biology. Keep them unless explicitly investigating presence-only.
-```
-
-```mistake
-A metabolite missing from drill-down results means it was not detected.
-```
-
-```correction
-Missing means *unmeasured* (not in the assay's scope). For 'tested and not found,' look for value=0 / flag_value=false / detection_status='not_detected' rows in the drill-down output.
+value=0 / flag_value=False / detection_status='not_detected' rows are tested-absent (assayed, not found): real biology, kept by default. A metabolite missing from the results is unmeasured in this scope. See docs://analysis/metabolites, 'Tested-absent vs unmeasured'.
 ```
 
 ```mistake
@@ -73,7 +65,15 @@ growth_phases=[] means the assay has no growth-state metadata.
 ```
 
 ```correction
-growth_phases=[] reflects unpopulated KG state (KG-side backfill pending). The schema field exists; values populate without explorer-side code change when the upstream backfill lands.
+growth_phase is not yet recorded on any metabolomics experiment in the KG, so `by_growth_phase` is empty and a `growth_phases` filter matches nothing; don't read that as 'no growth phase'.
+```
+
+```mistake
+metabolite_count_total = total distinct metabolites across matching assays.
+```
+
+```correction
+metabolite_count_total is *cumulative*: same metabolite measured by N assays counts N times. For distinct counts route to assays_by_metabolite(metabolite_ids=..., summary=True) → metabolites_matched, or list_metabolites(metabolite_ids=...).
 ```
 
 ## Chaining patterns

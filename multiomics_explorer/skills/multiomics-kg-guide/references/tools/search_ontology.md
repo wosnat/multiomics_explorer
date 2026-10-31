@@ -23,7 +23,7 @@ docs://tools/search_ontology and docs://ontologies/{key}; summary=True first.
 | informative_only | bool | False | True drops terms the KG flags uninformative (roots, catch-alls). |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type. Applies to 'interpro' only; raises if 'interpro' is not in the set. |
-| min_gene_count | int \| None | None | Keep terms with gene_count >= this (subtree organism_gene_count when `organism` is set). Narrows browse mode. |
+| min_gene_count | int \| None | None | Keep terms with gene_count >= this (subtree organism_gene_count when `organism` is set). Works in search and browse mode. |
 | organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
 
 **Discovery:** use `list_organisms` for valid organism names.
@@ -42,7 +42,7 @@ search_ontology(search_text="replication", ontology=["go_bp"])
 mode, total_entries, total_matching, score_max, score_median, returned, offset, truncated, by_ontology, by_level, by_interpro_type, by_family_type, skipped_ontologies, warnings, results
 ```
 
-Result row: `id, name, ontology_type, score, level, is_informative, tree, tree_code, interpro_type, discussed_by_n_publications, discussed_in_publications, gene_count, …`
+Result row: `id, name, ontology_type, score, level, is_informative, tree, tree_code, interpro_type, discussed_by_n_publications, gene_count, organism_count, …`
 
 ## Common mistakes
 

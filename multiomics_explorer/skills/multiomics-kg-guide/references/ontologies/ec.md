@@ -82,9 +82,9 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 - `evidence` — `list_filter_values(filter_type="evidence", ontology="ec")`
 - `sources` — `list_filter_values(filter_type="sources", ontology="ec")`
 
-Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="ec")`) lists which comparable axes the gene edge carries.
+Values are read live from the KG's `ControlledVocabulary` nodes (`list_filter_values`); the list below is a build-time snapshot and may lag the KG. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="ec")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
+Vocabulary snapshot (build time):
 
 - `Gene_catalyzes_ec_number.evidence`: `curated`, `family_inferred`
 - `Gene_catalyzes_ec_number.sources`: `cyanorak`, `eggnog`, `interproscan`, `uniprot`

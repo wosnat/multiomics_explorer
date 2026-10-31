@@ -2,11 +2,11 @@
 
 ## What it does
 
-Metabolite / `chebi.role:` IDs to genes in ONE organism via KEGG, TCDB and GO transport (GO rows: term definitions, not gene facts).
+Metabolite / `chebi.role:` IDs to genes in ONE organism via KEGG, TCDB, GO transport (GO rows = term definitions, not gene facts).
 
-Use for compound → genes; mirror metabolites_by_gene; docs://analysis/transport.
-Filters: metabolite_ids (+exclude, +stereo), ec_numbers, metabolite_pathway_ids, evidence_sources, include_tcdb_family_substrates, go_*.
-Returns: by_metabolite, by_evidence_source(_combination), by_tcdb_route, tcdb_family_substrates_not_shown, top_genes/reactions/tcdb_families; row = gene × reaction|TCDB node|GO term × compound.
+Use for compound → genes; mirror metabolites_by_gene; TCDB rows = direct systems, empty ≠ no transporter (see tcdb_family_substrates_not_shown); docs://analysis/transport.
+Filters: metabolite_ids (+exclude, +stereo), evidence_sources, include_tcdb_family_substrates, go_*.
+Returns: by_metabolite, by_evidence_source(_combination), by_tcdb_route, top_genes/reactions/tcdb_families; row = gene × route × compound.
 docs://tools/genes_by_metabolite; summary=True first.
 
 ## Parameters
@@ -51,7 +51,7 @@ Result row: `locus_tag, gene_name, product, evidence_source, tcdb_route, tcdb_ca
 
 ## Common mistakes
 
-- Metabolite-anchored (metabolite → genes). The gene-anchored mirror is `metabolites_by_gene` (locus_tags → metabolites); both share the same row class, discriminators and per-arm filter scope, so read whichever matches your anchor rather than post-filtering the other.
+- An empty TCDB arm is not "no transporter". TCDB rows are direct systems by default, and many genes are placed by TCDB only at family or subfamily level (`tcdb_gate='annotated'`), which never produces a default row. Read `tcdb_family_substrates_not_shown` and the warning, then re-run with `include_tcdb_family_substrates=True`: orthophosphate in MED4 has 0 direct genes, and the walk adds phnC/D/E and PMM0717 through subfamily tcdb:3.A.1.9. `tcdb_family_substrates_skipped` lists genes whose only call is on a superfamily curated with over 200 substrates (ABC tcdb:3.A.1, MFS tcdb:2.A.1). The same genes recur across many compounds: read them as "substrate unknown", not "candidate for this compound". See `docs://analysis/transport`.
 
 Chaining patterns: see `docs://tools/genes_by_metabolite/full`.
 

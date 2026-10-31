@@ -37,7 +37,7 @@ genes_in_cluster(cluster_ids=["cluster:msb4100087:med4_kmeans_nstarvation:8"])
 total_matching, analysis_name, by_organism, by_cluster, top_categories, genes_per_cluster_max, genes_per_cluster_median, not_found_clusters, not_matched_clusters, not_matched_organism, not_found_analysis, warnings, returned, offset, truncated, results
 ```
 
-Result row: `locus_tag, gene_name, product, gene_category, organism_name, cluster_id, cluster_name, membership_score, gene_function_description, gene_summary, p_value, cluster_functional_description, …`
+Result row: `locus_tag, gene_name, product, gene_category, organism_name, cluster_id, cluster_name, membership_score`
 
 ## Common mistakes
 

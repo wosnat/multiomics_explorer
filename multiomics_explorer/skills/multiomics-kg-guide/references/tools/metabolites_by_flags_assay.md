@@ -23,7 +23,7 @@ docs://tools/metabolites_by_flags_assay; summary=True first.
 | treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
 | background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
-| flag_value | bool \| None | None | Filter by flag presence — `True` (presence flagged), `False` (absence flagged — *tested-absent*, real biology), `None` (both). `Assay_flags_metabolite` always stores both states (unlike the DM layer, where only 11 of 34 boolean DMs store `not_flagged`), so `flag_value=False` returns real rows (about 69% of boolean rows). |
+| flag_value | bool \| None | None | True / False / None (both). Both states are stored: False = tested-absent, real rows (~69% of boolean rows). |
 | stereo_assignment | list[string] \| None | None | Stereo-form provenance (OR): 'as_reported' = the paper named the form; 'dominant_form_assumed' = it named none and the KG placed it on the dominant form (e.g. 'Alanine' on L-Alanine). ['as_reported'] drops assumed rows. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
@@ -46,7 +46,7 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
 total_matching, by_value, by_stereo_assignment, by_assay, by_compartment, by_organism, by_metric, excluded_assays, warnings, resolved_aliases, not_found, returned, truncated, offset, results
 ```
 
-Result row: `metabolite_id, name, kegg_compound_id, flag_value, n_positive, stereo_assignment, n_replicates, metric_type, condition_label, assay_id, organism_name, compartment, …`
+Result row: `metabolite_id, name, kegg_compound_id, flag_value, n_positive, stereo_assignment, n_replicates, metric_type, condition_label, assay_id, organism_name, compartment`
 
 ## Common mistakes
 
@@ -57,16 +57,7 @@ metabolites_by_flags_assay(assay_ids=[...])  # then citing an L-amino-acid row a
 ```
 
 ```correction
-`stereo_assignment` on every row says who chose the stereo form:
-`as_reported` = the paper named it (or the compound has no stereo
-variant); `dominant_form_assumed` = the paper gave no form and the KG
-placed the row on one form of the stereo family (usually the one with
-the most catalysing genes — 'Alanine' lands on L-alanine
-`kegg.compound:C00041`). The envelope's `by_stereo_assignment` counts
-both over the matched set and a `warnings` entry fires when any row is
-assumed. Pass `stereo_assignment=['as_reported']` when the stereo form
-matters to the claim, or quote assumed rows as "L-form assumed".
-
+`stereo_assignment` says who chose the stereo form: `as_reported` (the paper) or `dominant_form_assumed` (the KG placed an unspecified name such as 'Alanine' on L-alanine). Pass `stereo_assignment=['as_reported']` when the form matters, or quote assumed rows as 'L-form assumed'. Full reading: `assays_by_metabolite` docs and docs://analysis/metabolites.
 ```
 
 ```mistake

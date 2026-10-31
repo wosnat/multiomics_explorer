@@ -45,7 +45,7 @@ genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'],
 total_matching, total_derived_metrics, total_genes, by_organism, by_compartment, by_publication, by_experiment, by_category, top_categories, by_metric, genes_per_metric_max, genes_per_metric_median, not_found_ids, not_matched_ids, not_found_metric_types, not_matched_metric_types, not_matched_organism, excluded_derived_metrics, warnings, returned, offset, truncated, results
 ```
 
-Result row: `locus_tag, gene_name, product, gene_category, organism_name, derived_metric_id, name, value_kind, rankable, has_p_value, value, metric_type, …`
+Result row: `locus_tag, gene_name, product, gene_category, derived_metric_id, value`
 
 ## Common mistakes
 

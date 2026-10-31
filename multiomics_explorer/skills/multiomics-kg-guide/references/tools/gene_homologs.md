@@ -36,7 +36,7 @@ gene_homologs(locus_tags=["PMM0001"])
 total_matching, by_organism, by_source, returned, offset, truncated, not_found, no_groups, top_cyanorak_roles, top_cog_categories, warnings, results
 ```
 
-Result row: `locus_tag, organism_name, group_id, consensus_gene_name, consensus_product, taxonomic_level, source, specificity_rank, member_count, organism_count, genera, has_cross_genus_members, …`
+Result row: `locus_tag, organism_name, group_id, consensus_gene_name, consensus_product, taxonomic_level, source, specificity_rank`
 
 ## Common mistakes
 

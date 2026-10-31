@@ -296,7 +296,7 @@ discussed_by_publication(entity_kind='kegg_pathway') → genes_by_ontology(ontol
 
 ## Common mistakes
 
-- This is a recall-biased narrative literature index — the genes and pathways a paper names in prose, NOT exhaustive coverage and NOT the supplementary DE-table expression data. Only about 1,000 distinct genes are named across the whole corpus (out of ~127k). For expression, use differential_expression_by_gene.
+- This is a recall-biased narrative literature index — the genes and pathways a paper names in prose, NOT exhaustive coverage and NOT the supplementary DE-table expression data. Only ~2,000 genes (well under 1% of the KG's genes) are named anywhere in the corpus. For expression, use differential_expression_by_gene.
 
 - It returns the KEGG pathway terms the paper discusses verbatim — it does NOT expand a pathway to its member genes. To get genes in a discussed pathway, chain into genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...).
 

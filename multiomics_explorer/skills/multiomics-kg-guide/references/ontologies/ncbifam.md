@@ -85,14 +85,13 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 - `ncbifam_family_type` — `list_filter_values(filter_type="ncbifam_family_type", ontology="ncbifam")`
 - `link_kinds` — `list_filter_values(filter_type="link_kinds")`
 
-Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="ncbifam")`) lists which comparable axes the gene edge carries.
+Values are read live from the KG's `ControlledVocabulary` nodes (`list_filter_values`); the list below is a build-time snapshot and may lag the KG. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="ncbifam")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
+Vocabulary snapshot (build time):
 
 - `Gene_has_ncbifam_family.evidence`: `signature`
 - `Gene_has_ncbifam_family.sources`: `interproscan`
-- `NcbifamFamily.family_type`: `PfamAutoEq`, `PfamEq`, `domain`, `equivalog`, `equivalog_domain`, `exception`, `hypoth_equivalog`, `hypoth_equivalog_domain`, `paralog`, `paralog_domain`, `repeat`, `retired`, `signature`, `subfamily`, `subfamily_domain`, `superfamily`
-- `NcbifamFamily.is_uninformative`: `true`
+- `NcbifamFamily.family_type`: `PfamAutoEq`, `PfamEq`, `domain`, `equivalog`, `equivalog_domain`, `exception`, `hypoth_equivalog`, `hypoth_equivalog_domain`, `paralog`, `paralog_domain`, `repeat`, `retired`, … (16 values; full list via `list_filter_values`)
 
 ## Interpretation
 

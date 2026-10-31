@@ -42,6 +42,18 @@ had 6 / 46 / 447 / 4,644 from an earlier build. Was the drop in categories, subc
 intentional, e.g. pruning to nodes with organism genes? If yes, nothing to do. The explorer docs are
 being updated to the live values.
 
+## K5 — unverified: empty `metric_type` on an assay (P3)
+
+Reported by a reviewer, not yet re-checked (Neo4j was down mid-review): `metabolites_by_quantifies_assay`
+`by_metric[*].metric_type` is `""` for the MIT9313 PNAS assay. Check
+`MATCH (a:MetaboliteAssay) WHERE a.metric_type IS NULL OR a.metric_type = '' RETURN a.id`.
+
+## K6 — unverified: TCDB `tier` wording in the `trust_axes` vocabulary (P3)
+
+`Gene_has_tcdb_family.tier`'s own description is correct (consensus tier on `diamond_tier`, identity band
+on `diamond_best_hit`, absent on eggNOG). A reviewer reports the `trust_axes` value description for TCDB
+still reads "Diamond-truncation depth". If so, align it with the edge-property description.
+
 ## Not KG-side (recorded for completeness)
 
 - `tcdb_family_substrates_skipped` lists the same 4 MED4 ABC genes (PMM0449/0450/0913/0977 →

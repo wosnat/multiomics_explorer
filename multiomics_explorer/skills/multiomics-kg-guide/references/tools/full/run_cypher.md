@@ -78,7 +78,6 @@ run_cypher(query="MATCH (g:Gene)-[:HAS_FUNCTION]->(f:Function) RETURN g.locus_ta
 
 ```
 kg_schema → run_cypher (use schema to write correct queries)
-run_cypher → formalize into query builder once pattern is validated
 ```
 
 ## Common mistakes

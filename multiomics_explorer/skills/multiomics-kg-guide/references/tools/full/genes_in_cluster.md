@@ -137,7 +137,7 @@ genes_in_cluster(cluster_ids='cluster:msb4100087:med4_kmeans_nstarvation:8')
 ```
 
 ```correction
-genes_in_cluster(cluster_ids=['cluster:msb4100087:med4_kmeans_nstarvation:8']) — always a list
+genes_in_cluster(cluster_ids=['cluster:msb4100087:med4_kmeans_nstarvation:8']) — MCP needs a list (the Python API accepts a bare string as one element)
 ```
 
 ## Package import equivalent

@@ -16,7 +16,7 @@ docs://tools/differential_expression_by_gene; summary=True first.
 | organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
 | locus_tags | list[string] \| None | None | Gene locus tags. E.g. ['PMM0001', 'PMM0845']. Get these from resolve_gene / gene_overview. |
 | experiment_ids | list[string] \| None | None | Experiment IDs to restrict to. Get these from list_experiments. |
-| direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` is unchanged. |
+| direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` = all statuses. |
 | significant_only | bool | False | If true, return only statistically significant results. |
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
@@ -46,28 +46,22 @@ Result row: `locus_tag, gene_name, experiment_id, treatment_type, timepoint, tim
 
 ## Common mistakes
 
+- A DE timepoint label (e.g. 'day 18') and `growth_phase` describe the treatment arm; check `control_timing` / `design_notes` before reading it as both arms' state. See docs://guide/conventions.
+
+```mistake
+Interpreting a missing gene as 'not affected' without checking table_scope
+```
+
+```correction
+Check the experiment's table_scope — if significant_only or top_n, the gene may simply not have been reported. Only all_detected_genes experiments can distinguish 'not affected' from 'not reported'.
+```
+
 ```mistake
 Interpreting absence of a row as 'no change' when truncated=true
 ```
 
 ```correction
 Check truncated flag; use summary=True for reliable counts or increase limit
-```
-
-```mistake
-Assuming no_expression means 'not differentially expressed'
-```
-
-```correction
-no_expression means no data available — gene may not have been profiled in those experiments
-```
-
-```mistake
-Reading an empty `results=[]` as 'no DE response' when experiment_ids was passed
-```
-
-```correction
-Check not_found_experiments (typo'd id) and not_matched_experiments (id real but no edges satisfy the filter — e.g. vesicle proteomics, or a too-strict significant_only). Empty results + non-empty not_matched_experiments means the filter eliminated every row, not that the gene didn't respond.
 ```
 
 ## Chaining patterns

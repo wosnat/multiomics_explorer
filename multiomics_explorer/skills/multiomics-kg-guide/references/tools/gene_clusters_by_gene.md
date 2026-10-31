@@ -41,7 +41,7 @@ gene_clusters_by_gene(locus_tags=["PMM0370", "PMM0920", "PMM0958"])
 total_matching, total_clusters, genes_with_clusters, genes_without_clusters, not_found, not_matched, by_cluster_type, by_treatment_type, by_background_factors, by_analysis, returned, offset, truncated, warnings, results
 ```
 
-Result row: `locus_tag, gene_name, cluster_id, cluster_name, cluster_type, membership_score, analysis_id, analysis_name, treatment_type, background_factors, cluster_method, member_count, …`
+Result row: `locus_tag, gene_name, cluster_id, cluster_name, cluster_type, membership_score, analysis_id, analysis_name, treatment_type, background_factors`
 
 ## Common mistakes
 

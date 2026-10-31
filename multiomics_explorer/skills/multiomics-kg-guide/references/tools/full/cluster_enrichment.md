@@ -32,10 +32,10 @@ docs://tools/cluster_enrichment; summary=True first.
 | informative_only | bool | True | True drops terms the KG flags uninformative (roots, catch-alls). |
 | sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See list_filter_values('sources'). |
 | evidence | list[string] \| None | None | Keep rows whose compact evidence-ladder value is in this list. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See docs://analysis/annotation_evidence. |
-| max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (1-3; null always kept, e.g. TCDB eggnog). tcdb, merops only. TCDB tier is consensus tier on diamond_tier, identity band on diamond_best_hit; never compare across kinds or ontologies. |
+| max_tier | int \| None | None | Keep rows with tier <= this OR tier null (1-3; e.g. TCDB eggnog). tcdb, merops only. TCDB: consensus tier on diamond_tier, identity band on diamond_best_hit; gated rows are never tier 3. Never compare tiers across kinds or ontologies. |
 | min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, merops; TCDB carries no evidence_score (raises). |
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
-| tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked. Leaf mode still drops ancestors via all edges, so a call kind only on an ancestor term yields no row. Values: list_filter_values('tcdb_call'). |
+| tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked, so an ancestor-term row reports a surviving call kind. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
 
 **Discovery:** use `list_organisms` for valid organism names.
@@ -197,9 +197,9 @@ See `docs://analysis/annotation_evidence` for the trust-axis registry and rank-v
 
 - cluster_enrichment is cluster-anchored (needs `analysis_id`); for DE gene sets use `pathway_enrichment(experiment_ids=...)`. `enrichment_params` (incl. `term2gene_row_count`) echoes what was tested, same as pathway_enrichment.
 
-- No rows ≠ nothing tested: read `n_significant`, always the full tested-set count. [ENR] Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`); `total_matching` then counts just that pageable subset (== `n_significant`), so an empty `results` page always means `total_matching=0`. Pass `include_nonsignificant=True` to page through every tested row — `total_matching` then covers all of them; `n_significant` is unaffected either way.
+- No rows ≠ nothing tested: read `n_significant`, always the full tested-set count. Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`); `total_matching` then counts just that pageable subset (== `n_significant`), so an empty `results` page always means `total_matching=0`. Pass `include_nonsignificant=True` to page through every tested row — `total_matching` then covers all of them; `n_significant` is unaffected either way.
 
-- [ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions.
+- `informative_only=True` (default) changes the tested term set, and with it the BH-adjusted p-values. For results comparable to a run that kept every term, pass `informative_only=False` and post-filter on `is_informative`. See docs://guide/conventions.
 
 - Default background is `cluster_union` (union of all clustered genes, including size-filtered). Use `'organism'` only when clustering covers the full genome.
 
@@ -213,11 +213,11 @@ See `docs://analysis/annotation_evidence` for the trust-axis registry and rank-v
 
 - `min/max_gene_set_size` is the pathway M filter (per-cluster, clusterProfiler semantics). `min/max_cluster_size` is the cluster membership filter.
 
-- For BRITE, scope to a specific tree with `tree=`. Use `list_filter_values('brite_tree')` to discover trees.
+- `ontology='brite'` requires `tree=` (raises without it). Use `list_filter_values('brite_tree')` to discover trees.
 
 - When a KEGG pathway is significantly enriched in a cluster, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. The cluster's gene-KO membership and the pathway's compound-membership reach the same KEGG map via different relations — name the anchor when answering. See docs://analysis/metabolites.
 
-- `ontology='interpro'` requires `interpro_type` (one of the 8 InterPro types) — omitting it raises. Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`) shape the per-cluster TERM2GENE mapping identically to `pathway_enrichment`; defaults never filter. See `docs://analysis/annotation_evidence`.
+- `ontology='interpro'` requires `interpro_type` (one of the 8 InterPro types) — omitting it raises. Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call`) shape the per-cluster TERM2GENE mapping identically to `pathway_enrichment`; defaults never filter. See `docs://analysis/annotation_evidence`.
 
 ```mistake
 cluster_enrichment(..., background='table_scope')  # not valid

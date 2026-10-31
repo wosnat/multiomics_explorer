@@ -47,6 +47,5 @@ run_cypher(query="MATCH (g:Gene) WHERE g.locus_tag = 'PMM0001' RETURN g")
 ## Chaining patterns
 
 - kg_schema → run_cypher (use schema to write correct queries)
-- run_cypher → formalize into query builder once pattern is validated
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/run_cypher/full`

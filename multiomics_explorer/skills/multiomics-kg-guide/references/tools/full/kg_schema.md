@@ -174,7 +174,7 @@ kg_schema(relationship_types=['Biological_process_transports_metabolite', ...]) 
 
 ## Common mistakes
 
-- Calling kg_schema() with no arguments dumps every node label and relationship type in the KG (100+ KB) — pass labels / relationship_types / section to scope the call to what you actually need before validating a run_cypher query.
+- Calling kg_schema() with no arguments dumps every node label and relationship type in the KG (~45 KB, ~11k tokens) — pass labels / relationship_types / section to scope the call to what you actually need before validating a run_cypher query.
 
 - Schema does not include node counts — use run_cypher for counts (or kg_release_info for the headline gene / organism / experiment / paper counts)
 

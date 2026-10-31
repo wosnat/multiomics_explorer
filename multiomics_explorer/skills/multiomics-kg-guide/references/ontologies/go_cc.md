@@ -18,7 +18,7 @@ merged into one edge per (gene, term) with `sources[]`, compact `evidence`
 (`curated` / `family_inferred` / `domain_inferred`) and `evidence_score`;
 rung semantics in `docs://analysis/annotation_evidence`. Live on this
 edge type: eggNOG-only edges read `family_inferred` (the majority,
-~100k), curated sources read `curated`, InterProScan-only edges read
+about 60%), curated sources read `curated`, InterProScan-only edges read
 `family_inferred` or `domain_inferred`.
 
 ## Identifier form
@@ -71,12 +71,10 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 - `evidence` — `list_filter_values(filter_type="evidence", ontology="go_cc")`
 - `sources` — `list_filter_values(filter_type="sources", ontology="go_cc")`
 
-Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="go_cc")`) lists which comparable axes the gene edge carries.
+Values are read live from the KG's `ControlledVocabulary` nodes (`list_filter_values`); the list below is a build-time snapshot and may lag the KG. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="go_cc")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
+Vocabulary snapshot (build time):
 
-- `CellularComponent.is_uninformative`: `true`
-- `CellularComponent.level_is_best_effort`: `true`
 - `Gene_located_in_cellular_component.evidence`: `curated`, `family_inferred`, `domain_inferred`
 - `Gene_located_in_cellular_component.sources`: `cyanorak`, `eggnog`, `interproscan`, `ncbi`, `uniprot`
 
@@ -129,6 +127,7 @@ unflagged but covers nearly everything; pass `level>=2` or
 - `docs://ontologies/go_mf`
 - `docs://ontologies/subcellular_localization`
 - `docs://ontologies/signal_peptide_type`
+- `docs://ontologies/tcdb`
 - `docs://analysis/annotation_evidence`
 - `docs://analysis/enrichment`
 - `docs://tools/ontology_term_details`

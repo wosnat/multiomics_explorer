@@ -64,16 +64,7 @@ metabolites_by_quantifies_assay(assay_ids=[...])  # then citing an L-amino-acid 
 ```
 
 ```correction
-`stereo_assignment` on every row says who chose the stereo form:
-`as_reported` = the paper named it (or the compound has no stereo
-variant); `dominant_form_assumed` = the paper gave no form and the KG
-placed the row on one form of the stereo family (usually the one with
-the most catalysing genes — 'Alanine' lands on L-alanine
-`kegg.compound:C00041`). The envelope's `by_stereo_assignment` counts
-both over the matched set and a `warnings` entry fires when any row is
-assumed. Pass `stereo_assignment=['as_reported']` when the stereo form
-matters to the claim, or quote assumed rows as "L-form assumed".
-
+`stereo_assignment` says who chose the stereo form: `as_reported` (the paper) or `dominant_form_assumed` (the KG placed an unspecified name such as 'Alanine' on L-alanine). Pass `stereo_assignment=['as_reported']` when the form matters, or quote assumed rows as 'L-form assumed'. Full reading: `assays_by_metabolite` docs and docs://analysis/metabolites.
 ```
 
 ```mistake

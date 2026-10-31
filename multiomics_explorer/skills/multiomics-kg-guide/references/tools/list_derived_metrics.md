@@ -48,15 +48,15 @@ list_derived_metrics(summary=True)
 total_entries, total_matching, by_organism, by_value_kind, by_metric_type, by_compartment, by_omics_type, by_treatment_type, by_background_factors, by_growth_phase, score_max, score_median, returned, offset, truncated, warnings, results
 ```
 
-Result row: `derived_metric_id, name, metric_type, value_kind, rankable, has_p_value, unit, allowed_categories, field_description, organism_name, experiment_id, publication_doi, …`
+Result row: `derived_metric_id, name, metric_type, value_kind, rankable, unit, allowed_categories, organism_name, total_gene_count, score`
 
 ## Common mistakes
 
-- Call this FIRST before drill-downs. Inspect rankable / has_p_value / value_kind / allowed_categories / compartment here — the downstream drill-down tools (genes_by_numeric_metric, genes_by_boolean_metric, genes_by_categorical_metric) hard-fail (by design) when the selected DM set doesn't support the requested filter. E.g. passing metric_bucket=['top_decile'] with a non-rankable DM raises; passing significant_only=True when no selected DM has has_p_value=True raises.
+- Call this FIRST before drill-downs. Inspect rankable / value_kind / allowed_categories here (`verbose=True` adds has_p_value / compartment) — the downstream drill-down tools (genes_by_numeric_metric, genes_by_boolean_metric, genes_by_categorical_metric) hard-fail (by design) when the selected DM set doesn't support the requested filter. E.g. passing metric_bucket=['top_decile'] with a non-rankable DM raises; passing significant_only=True when no selected DM has has_p_value=True raises.
 
 - metric_type is a category tag, not a primary key — the same metric_type can appear across organisms or publications (periodic_in_coculture_LD exists once for NATL2A and once for MIT1002). Use derived_metric_ids to pin one specific DM; use metric_types to union across every DM with that tag.
 
-- has_p_value=True returns zero rows in the current KG — no DM currently carries p-values. The filter exists for forward-compat; drill-down p-value filters (significant_only, max_adjusted_p_value) will raise with a diagnostic error.
+- has_p_value=True returns zero rows in the current KG — no DM currently carries p-values. The filter is kept so p-value-gated drill-downs can be pre-checked; drill-down p-value filters (significant_only, max_adjusted_p_value) will raise with a diagnostic error.
 
 ## Chaining patterns
 

@@ -7,7 +7,7 @@ Every organism with taxonomy and per-organism capability rollups — gene, publi
 Use to pick an organism or check what data it carries before scoping another tool; for gene lookup use `resolve_gene`.
 Filters: organism_names, compartment.
 Returns: by_organism_type, top_metabolic_capability, top_annotation_capability, by_measurement_capability, not_found; one row = one OrganismTaxon.
-docs://tools/list_organisms; summary=True first.
+docs://tools/list_organisms; summary=True is uncapped (larger than the default call).
 
 ## Parameters
 
@@ -80,8 +80,6 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 | nonpeptidase_homolog_gene_count | int (optional) | Genes with a MEROPS 'nonpeptidase_homolog' call (a gene can carry both classes). Precomputed OrganismTaxon.nonpeptidase_homolog_gene_count; 0 when none. |
 | interpro_gene_count | int (optional) | Genes with at least one InterPro entry. Precomputed OrganismTaxon.interpro_gene_count; 0 when none. Coverage count for reading, not selecting. |
 | ncbifam_gene_count | int (optional) | Genes with at least one NCBIfam family. Precomputed OrganismTaxon.ncbifam_gene_count; 0 when none. Coverage count for reading, not selecting. |
-| derived_metric_gene_count | int \| None (optional) | Total gene-level DM annotation count (verbose-only). |
-| derived_metric_types | list[string] \| None (optional) | Distinct metric_type tags observed (verbose-only). |
 | reference_database | string \| None (optional) | Reference database used for matching (e.g. 'MarRef v6'). Only on reference_proteome_match organisms. |
 | reference_proteome | string \| None (optional) | Accession of matched reference proteome (e.g. 'GCA_003513035.1'). Only on reference_proteome_match organisms. |
 
@@ -97,6 +95,8 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 | superkingdom | string \| None (optional) | Taxonomic superkingdom (e.g. 'Bacteria'). |
 | lineage | string \| None (optional) | Full NCBI taxonomy lineage string. |
 | cluster_count | int \| None (optional) | Total gene clusters across analyses (verbose-only). |
+| derived_metric_gene_count | int \| None (optional) | Total gene-level DM annotation count (verbose-only). |
+| derived_metric_types | list[string] \| None (optional) | Distinct metric_type tags observed (verbose-only). |
 
 ## Few-shot examples
 
@@ -331,7 +331,7 @@ list_organisms()
 }
 ```
 
-### Example 2: Read the annotation-capability ranking (protease and domain coverage per organism)
+### Example 2: Capability rankings: top_metabolic_capability / top_annotation_capability / by_measurement_capability
 
 ```example-call
 list_organisms(summary=True)
@@ -993,133 +993,7 @@ list_organisms(compartment="vesicle")
 list_organisms(summary=True)
 ```
 
-```example-response
-{
-  "total_entries": 123,
-  "total_matching": 123,
-  "by_cluster_type": [
-    {"cluster_type": "genomic_island", "count": 11},
-    {"cluster_type": "time_course", "count": 3},
-    {"cluster_type": "condition_comparison", "count": 3},
-    {"cluster_type": "diel", "count": 2},
-    {"cluster_type": "decay_pattern", "count": 1}
-  ],
-  "by_organism_type": [
-    {"organism_type": "genome_strain", "count": 116},
-    {"organism_type": "treatment", "count": 5},
-    {"organism_type": "reference_proteome_match", "count": 2}
-  ],
-  "by_value_kind": [
-    {"value_kind": "categorical", "count": 98},
-    {"value_kind": "numeric", "count": 19},
-    {"value_kind": "boolean", "count": 9}
-  ],
-  "by_metric_type": [
-    {"metric_type": "sbp_nutrient_class", "count": 95},
-    {"metric_type": "sbp_predicted_substrate", "count": 95},
-    {"metric_type": "exoproteome_avg_pct_nsaf", "count": 9},
-    {"metric_type": "exoproteome_detection_status", "count": 9},
-    {"metric_type": "log2_mv_cell_enrichment", "count": 6},
-    ...
-  ],
-  "by_metric_type_truncated": null,
-  "by_compartment": [
-    {"compartment": "whole_cell", "count": 102},
-    {"compartment": "exoproteome", "count": 10},
-    {"compartment": "vesicle", "count": 9}
-  ],
-  "top_metabolic_capability": [
-    {
-      "organism_name": "Pseudomonas putida KT2440",
-      "reaction_count": 1449,
-      "catalyzed_metabolite_count": 1489,
-      "transported_metabolite_count": 279,
-      "go_transport_metabolite_count": 147
-    },
-    {
-      "organism_name": "Ruegeria pomeroyi DSS-3",
-      "reaction_count": 1377,
-      "catalyzed_metabolite_count": 1466,
-      "transported_metabolite_count": 154,
-      "go_transport_metabolite_count": 83
-    },
-    {
-      "organism_name": "Alteromonas macleodii EZ55",
-      "reaction_count": 1348,
-      "catalyzed_metabolite_count": 1426,
-      "transported_metabolite_count": 147,
-      "go_transport_metabolite_count": 101
-    },
-    {
-      "organism_name": "Alteromonas (MarRef v6)",
-      "reaction_count": 1263,
-      "catalyzed_metabolite_count": 1356,
-      "transported_metabolite_count": 128,
-      "go_transport_metabolite_count": 75
-    },
-    {
-      "organism_name": "Alteromonas macleodii MIT1002",
-      "reaction_count": 1288,
-      "catalyzed_metabolite_count": 1352,
-      "transported_metabolite_count": 142,
-      "go_transport_metabolite_count": 91
-    },
-    ...
-  ],
-  "top_metabolic_capability_truncated": null,
-  "top_annotation_capability": [
-    {
-      "preferred_name": "Alteromonas (MarRef v6)",
-      "organism_name": "Alteromonas (MarRef v6)",
-      "peptidase_gene_count": 148,
-      "nonpeptidase_homolog_gene_count": 31,
-      "interpro_gene_count": 3746,
-      "ncbifam_gene_count": 1379
-    },
-    {
-      "preferred_name": "Alteromonas macleodii AD45",
-      "organism_name": "Alteromonas macleodii AD45",
-      "peptidase_gene_count": 129,
-      "nonpeptidase_homolog_gene_count": 32,
-      "interpro_gene_count": 3495,
-      "ncbifam_gene_count": 1611
-    },
-    {
-      "preferred_name": "Shewanella sp. W3-18-1",
-      "organism_name": "Shewanella sp. W3-18-1",
-      "peptidase_gene_count": 128,
-      "nonpeptidase_homolog_gene_count": 23,
-      "interpro_gene_count": 3636,
-      "ncbifam_gene_count": 1853
-    },
-    {
-      "preferred_name": "Alteromonas macleodii 83-1",
-      "organism_name": "Alteromonas macleodii 83-1",
-      "peptidase_gene_count": 127,
-      "nonpeptidase_homolog_gene_count": 33,
-      "interpro_gene_count": 3605,
-      "ncbifam_gene_count": 1656
-    },
-    {
-      "preferred_name": "Alteromonas macleodii BGP6",
-      "organism_name": "Alteromonas macleodii BGP6",
-      "peptidase_gene_count": 127,
-      "nonpeptidase_homolog_gene_count": 33,
-      "interpro_gene_count": 3608,
-      "ncbifam_gene_count": 1656
-    },
-    ...
-  ],
-  "top_annotation_capability_truncated": null,
-  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 118},
-  "returned": 0,
-  "offset": 0,
-  "truncated": true,
-  "not_found": [],
-  "warnings": [],
-  "results": []
-}
-```
+*Same call as the capability-rankings example above: read `top_metabolic_capability` (sorted by catalyzed_metabolite_count; transported counts carried as columns).*
 
 ### Example 9: Survey measurement coverage across organisms
 
@@ -1127,133 +1001,7 @@ list_organisms(summary=True)
 list_organisms(summary=True)
 ```
 
-```example-response
-{
-  "total_entries": 123,
-  "total_matching": 123,
-  "by_cluster_type": [
-    {"cluster_type": "genomic_island", "count": 11},
-    {"cluster_type": "time_course", "count": 3},
-    {"cluster_type": "condition_comparison", "count": 3},
-    {"cluster_type": "diel", "count": 2},
-    {"cluster_type": "decay_pattern", "count": 1}
-  ],
-  "by_organism_type": [
-    {"organism_type": "genome_strain", "count": 116},
-    {"organism_type": "treatment", "count": 5},
-    {"organism_type": "reference_proteome_match", "count": 2}
-  ],
-  "by_value_kind": [
-    {"value_kind": "categorical", "count": 98},
-    {"value_kind": "numeric", "count": 19},
-    {"value_kind": "boolean", "count": 9}
-  ],
-  "by_metric_type": [
-    {"metric_type": "sbp_nutrient_class", "count": 95},
-    {"metric_type": "sbp_predicted_substrate", "count": 95},
-    {"metric_type": "exoproteome_avg_pct_nsaf", "count": 9},
-    {"metric_type": "exoproteome_detection_status", "count": 9},
-    {"metric_type": "log2_mv_cell_enrichment", "count": 6},
-    ...
-  ],
-  "by_metric_type_truncated": null,
-  "by_compartment": [
-    {"compartment": "whole_cell", "count": 102},
-    {"compartment": "exoproteome", "count": 10},
-    {"compartment": "vesicle", "count": 9}
-  ],
-  "top_metabolic_capability": [
-    {
-      "organism_name": "Pseudomonas putida KT2440",
-      "reaction_count": 1449,
-      "catalyzed_metabolite_count": 1489,
-      "transported_metabolite_count": 279,
-      "go_transport_metabolite_count": 147
-    },
-    {
-      "organism_name": "Ruegeria pomeroyi DSS-3",
-      "reaction_count": 1377,
-      "catalyzed_metabolite_count": 1466,
-      "transported_metabolite_count": 154,
-      "go_transport_metabolite_count": 83
-    },
-    {
-      "organism_name": "Alteromonas macleodii EZ55",
-      "reaction_count": 1348,
-      "catalyzed_metabolite_count": 1426,
-      "transported_metabolite_count": 147,
-      "go_transport_metabolite_count": 101
-    },
-    {
-      "organism_name": "Alteromonas (MarRef v6)",
-      "reaction_count": 1263,
-      "catalyzed_metabolite_count": 1356,
-      "transported_metabolite_count": 128,
-      "go_transport_metabolite_count": 75
-    },
-    {
-      "organism_name": "Alteromonas macleodii MIT1002",
-      "reaction_count": 1288,
-      "catalyzed_metabolite_count": 1352,
-      "transported_metabolite_count": 142,
-      "go_transport_metabolite_count": 91
-    },
-    ...
-  ],
-  "top_metabolic_capability_truncated": null,
-  "top_annotation_capability": [
-    {
-      "preferred_name": "Alteromonas (MarRef v6)",
-      "organism_name": "Alteromonas (MarRef v6)",
-      "peptidase_gene_count": 148,
-      "nonpeptidase_homolog_gene_count": 31,
-      "interpro_gene_count": 3746,
-      "ncbifam_gene_count": 1379
-    },
-    {
-      "preferred_name": "Alteromonas macleodii AD45",
-      "organism_name": "Alteromonas macleodii AD45",
-      "peptidase_gene_count": 129,
-      "nonpeptidase_homolog_gene_count": 32,
-      "interpro_gene_count": 3495,
-      "ncbifam_gene_count": 1611
-    },
-    {
-      "preferred_name": "Shewanella sp. W3-18-1",
-      "organism_name": "Shewanella sp. W3-18-1",
-      "peptidase_gene_count": 128,
-      "nonpeptidase_homolog_gene_count": 23,
-      "interpro_gene_count": 3636,
-      "ncbifam_gene_count": 1853
-    },
-    {
-      "preferred_name": "Alteromonas macleodii 83-1",
-      "organism_name": "Alteromonas macleodii 83-1",
-      "peptidase_gene_count": 127,
-      "nonpeptidase_homolog_gene_count": 33,
-      "interpro_gene_count": 3605,
-      "ncbifam_gene_count": 1656
-    },
-    {
-      "preferred_name": "Alteromonas macleodii BGP6",
-      "organism_name": "Alteromonas macleodii BGP6",
-      "peptidase_gene_count": 127,
-      "nonpeptidase_homolog_gene_count": 33,
-      "interpro_gene_count": 3608,
-      "ncbifam_gene_count": 1656
-    },
-    ...
-  ],
-  "top_annotation_capability_truncated": null,
-  "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 118},
-  "returned": 0,
-  "offset": 0,
-  "truncated": true,
-  "not_found": [],
-  "warnings": [],
-  "results": []
-}
-```
+*Same call as the capability-rankings example above: read the `by_measurement_capability` rollup ({has_metabolomics, no_metabolomics}).*
 
 ### Example 10: GO-route reach per organism
 
@@ -1406,7 +1154,7 @@ list_organisms → list_publications
 list_organisms → resolve_gene
 list_organisms → genes_by_ontology
 list_organisms → list_clustering_analyses(organism=...)
-list_organisms(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
+list_organisms(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric (docs://analysis/derived_metrics)
 list_organisms (per-row catalyzed_metabolite_count > 0) → list_metabolites(organism_names=[organism_name]) for chemistry drill-down
 list_organisms(summary=True) → top_annotation_capability → genes_by_ontology(ontology='merops', organism=..., call_class=['peptidase']) for the peptidase genes behind peptidase_gene_count
 list_organisms → per-row interpro_gene_count / ncbifam_gene_count → ontology_landscape(organism=..., ontology=['interpro', 'ncbifam']) before enrichment on a domain ontology
@@ -1417,19 +1165,19 @@ list_organisms (per-row partner_experiment_count > 0) → list_experiments(cocul
 
 ## Common mistakes
 
-- If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this organism.
+- `experiment_count` counts only experiments that profile this organism. experiment_count=0 on a treatment taxon (e.g. a phage or a coculture helper) does not mean it is absent from the experimental data — experiments where it is the coculture partner (either `coculture_role`) are counted in `partner_experiment_count` and listed via list_experiments(coculture_partner=organism_name). The two counts are disjoint; a profiled strain can carry both.
+
+- `catalyzed_metabolite_count` counts catalysis capability only — distinct metabolites reachable through Gene → Reaction → Metabolite. Transport reach is the separate `transported_metabolite_count` (distinct metabolites curated on the TC systems the organism's genes point at directly, `tcdb_gate='direct'`; family-level calls and weak hits do not count). Measurement-side coverage is `measured_metabolite_count`. catalyzed_metabolite_count=0 means no catalysis path in this organism, not that chemistry is absent from the KG.
+
+- `go_transport_metabolite_count` counts metabolites reached through direct GO transport terms (chemical roles and is_a-inherited targets excluded). It is a separate route from `transported_metabolite_count` (TCDB); the two overlap and do not add up to a total transport reach.
 
 - gene_count and publication_count are counts of data in the KG, not biological totals.
 
 - Organisms with gene_count=0 are the organism_type='treatment' taxa (non-genomic coculture partners / phage; some genus-level like 'Alteromonas', most strain-level).
 
-- `experiment_count` counts only experiments that profile this organism. experiment_count=0 on a treatment taxon (e.g. a phage or a coculture helper) does not mean it is absent from the experimental data — experiments where it is the coculture partner (either `coculture_role`) are counted in `partner_experiment_count` and listed via list_experiments(coculture_partner=organism_name). The two counts are disjoint; a profiled strain can carry both.
-
 - reference_database and reference_proteome are sparse — only present on reference_proteome_match organisms, absent from others.
 
 - organism_type values: 'genome_strain' (real genome assembly), 'treatment' (non-genomic coculture partners), 'reference_proteome_match' (identified via reference database matching).
-
-- `catalyzed_metabolite_count` counts catalysis capability only — distinct metabolites reachable through Gene → Reaction → Metabolite. Transport reach is the separate `transported_metabolite_count` (distinct metabolites curated on the TC systems the organism's genes point at directly, `tcdb_gate='direct'`; family-level calls and weak hits do not count). Measurement-side coverage is `measured_metabolite_count`. catalyzed_metabolite_count=0 means no catalysis path in this organism, not that chemistry is absent from the KG.
 
 - top_metabolic_capability is sorted by catalyzed_metabolite_count descending (transported_metabolite_count is carried as a column, not a sort key); organisms with zero chemistry are excluded. Detail calls cap it to the first 10 (top_metabolic_capability_truncated=true when capped); summary=True returns the full ranking uncapped. Use it to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...]).
 
@@ -1442,8 +1190,6 @@ list_organisms (per-row partner_experiment_count > 0) → list_experiments(cocul
 - `organism_names=` uses the same word-based, case-insensitive match on preferred_name + name_synonyms as every other tool's organism param ('MED4' works); unknown names land in `not_found`.
 
 - `compartment` keeps organisms with at least one experiment in that compartment — it is not a per-organism property.
-
-- `go_transport_metabolite_count` counts metabolites reached through direct GO transport terms (chemical roles and is_a-inherited targets excluded). It is a separate route from `transported_metabolite_count` (TCDB); the two overlap and do not add up to a total transport reach.
 
 ## Package import equivalent
 

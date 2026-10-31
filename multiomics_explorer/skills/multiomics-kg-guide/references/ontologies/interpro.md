@@ -37,8 +37,8 @@ on the node.
 
 InterPro's parent/child relationships (`Interpro_entry_is_a_interpro_entry`)
 give up to three levels, `level` 0-2; `level_kind` has no natural names
-and is left empty. The hierarchy is sparse and top-heavy: 11,431
-entries at level 0, 1,490 at level 1, 79 at level 2. `gene_count` / `organism_count` are subtree-inclusive;
+and is left empty. The hierarchy is sparse and top-heavy: about
+88% of entries sit at level 0, 11% at level 1, under 1% at level 2. `gene_count` / `organism_count` are subtree-inclusive;
 `direct_gene_count` is node-local. Entries of different `interpro_type`
 can sit in one parent–child chain, so the hierarchy is not a type
 hierarchy.
@@ -85,16 +85,15 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 - `interpro_type` — `list_filter_values(filter_type="interpro_type", ontology="interpro")`
 - `link_kinds` — `list_filter_values(filter_type="link_kinds")`
 
-Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="interpro")`) lists which comparable axes the gene edge carries.
+Values are read live from the KG's `ControlledVocabulary` nodes (`list_filter_values`); the list below is a build-time snapshot and may lag the KG. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="interpro")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
+Vocabulary snapshot (build time):
 
-- `Gene_has_interpro_entry.evalue_library`: `CDD`, `GENE3D`, `HAMAP`, `NCBIFAM`, `PANTHER`, `PFAM`, `PIRSF`, `PRINTS`, `PROSITE_PATTERNS`, `PROSITE_PROFILES`, `SFLD`, `SMART`, `SUPERFAMILY`
+- `Gene_has_interpro_entry.evalue_library`: `CDD`, `GENE3D`, `HAMAP`, `NCBIFAM`, `PANTHER`, `PFAM`, `PIRSF`, `PRINTS`, `PROSITE_PATTERNS`, `PROSITE_PROFILES`, `SFLD`, `SMART`, … (13 values; full list via `list_filter_values`)
 - `Gene_has_interpro_entry.evidence`: `signature`
-- `Gene_has_interpro_entry.libraries`: `CDD`, `GENE3D`, `HAMAP`, `NCBIFAM`, `PANTHER`, `PFAM`, `PIRSF`, `PRINTS`, `PROSITE_PATTERNS`, `PROSITE_PROFILES`, `SFLD`, `SMART`, `SUPERFAMILY`
+- `Gene_has_interpro_entry.libraries`: `CDD`, `GENE3D`, `HAMAP`, `NCBIFAM`, `PANTHER`, `PFAM`, `PIRSF`, `PRINTS`, `PROSITE_PATTERNS`, `PROSITE_PROFILES`, `SFLD`, `SMART`, … (13 values; full list via `list_filter_values`)
 - `Gene_has_interpro_entry.sources`: `interproscan`
 - `InterproEntry.interpro_type`: `FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`, `ACTIVE_SITE`, `BINDING_SITE`, `PTM`
-- `InterproEntry.is_uninformative`: `true`
 
 ## Interpretation
 

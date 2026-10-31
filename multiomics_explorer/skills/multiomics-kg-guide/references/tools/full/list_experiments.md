@@ -103,9 +103,6 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | metabolite_assay_count | int (optional) | Distinct MetaboliteAssay edges anchored to this experiment (precomputed). |
 | metabolite_compartments | list[string] (optional) | Wet-lab compartments measured for metabolomics in this experiment (subset of {'whole_cell', 'extracellular', 'vesicle'}). Populated only when metabolite_assay_count > 0. |
 | score | float \| None (optional) | Lucene relevance score, present only when search_text is used. |
-| derived_metric_gene_count | int \| None (optional) | Number of distinct genes with DerivedMetric annotations in this experiment (verbose-only). |
-| derived_metric_types | list[string] \| None (optional) | Distinct DerivedMetric metric_type values for this experiment (verbose-only). |
-| reports_derived_metric_types | list[string] \| None (optional) | DerivedMetric types reported by (not just associated with) this experiment (verbose-only). |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -121,6 +118,9 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 | statistical_test | string \| None (optional) | Statistical method (verbose-only). |
 | experimental_context | string \| None (optional) | Context summary (verbose-only). |
 | cluster_count | int \| None (optional) | Total gene clusters across analyses (verbose-only). |
+| derived_metric_gene_count | int \| None (optional) | Number of distinct genes with DerivedMetric annotations in this experiment (verbose-only). |
+| derived_metric_types | list[string] \| None (optional) | Distinct DerivedMetric metric_type values for this experiment (verbose-only). |
+| reports_derived_metric_types | list[string] \| None (optional) | DerivedMetric types reported by (not just associated with) this experiment (verbose-only). |
 | coculture_partners | list[CoculturePartner] (optional) | Verbose only. One entry per coculture partner with its role (name, role, organism_id, organism_type), sorted by name; [] when axenic. Omitted from compact rows. |
 
 ## Few-shot examples
@@ -266,7 +266,7 @@ list_experiments(organism="Prochlorococcus", coculture_partner="Alteromonas", co
 list_experiments(organism="MED4", treatment_type=["nitrogen"], time_course_only=True)
 ```
 
-*treatment_type values are short nouns from a live vocabulary ('nitrogen', not 'nitrogen_stress') — an unknown value returns 0 rows, not an error.*
+*treatment_type values are short nouns from a live vocabulary ('nitrogen', not 'nitrogen_stress') — an unknown value returns 0 rows with a warning listing the valid values, not an error.*
 
 ### Example 6: Experiments whose control was sampled at another time
 
@@ -355,7 +355,7 @@ list_experiments(control_timing=["baseline", "mixed"], summary=True)
 ### Example 7: From publication to expression data
 
 ```
-Step 1: list_publications(search_text="Biller")
+Step 1: list_publications(author="Biller")
         → get DOI from results
 
 Step 2: list_experiments(publication_dois=["10.1038/ismej.2016.70"])
@@ -675,7 +675,7 @@ list_filter_values → list_experiments
 list_experiments(search_text=..., verbose=True) → classify → list_experiments(experiment_ids=[...]) for the picked subset
 list_experiments → differential_expression_by_gene
 list_experiments → list_clustering_analyses(experiment_ids=[...])
-list_experiments(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
+list_experiments(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric (docs://analysis/derived_metrics)
 list_filter_values(filter_type='metric_type') → list_experiments(search_text='<metric_type>') to find experiments with that metric
 list_experiments (per-row `metabolite_count > 0`) → list_metabolite_assays(experiment_ids=[...]) to inspect the experiment's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup).
 list_experiments → list_derived_metrics(experiment_ids=[...]) for the experiment's non-DE, column-level evidence (rhythmicity flags, amplitudes, trait classes)
@@ -686,51 +686,29 @@ list_filter_values(filter_type='partner_role') → list_experiments(coculture_ro
 
 ## Common mistakes
 
-- If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this experiment.
+- `coculture_partner` lists every organism sharing the culture: treatment partners (their presence is the contrast) AND background partners (the culture was a coculture, the contrast is something else). `treatment_type=['coculture']` keeps only the coculture-vs-axenic contrasts and drops the background cocultures. Use `coculture_role='treatment'` / `'background'` to choose explicitly (values: `list_filter_values(filter_type='partner_role')`); verbose `coculture_partners[].role` shows the role per partner.
 
-- Default is detail (summary=false) — use summary=true to see only breakdowns. When summary=true, verbose and limit have no effect.
+- `table_scope` decides whether a missing gene means 'not affected' or 'not reported': `all_detected_genes` keeps tested-absent rows, every other scope collapses them. Filter with `table_scope=['all_detected_genes']` to keep only experiments fair for cross-experiment comparison. See docs://guide/conventions.
 
-- gene_count is total genes with expression data, not total significant genes — use genes_by_status for the breakdown.
+- A DE timepoint label (e.g. 'day 18') and `growth_phase` describe the treatment arm; check `control_timing` / `design_notes` before reading it as both arms' state. See docs://guide/conventions.
+
+- `background_factors` containing both `axenic` and `coculture` marks a pooled design (axenic and coculture arms analyzed together) — a background partner on such an experiment was present in some arms, not all.
 
 - timepoints is omitted for non-time-course experiments, not an empty list.
 
 - `table_scope` is sparse: absent on an experiment means the experiment has no differential-expression table at all (a characterization or metabolomics-only experiment), never an empty string. `by_table_scope` has no '' bucket; `table_scope=[...]` filters simply never match those experiments.
 
-- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or a summary=True call's by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical.
-
 - `treatment_type` is dense and never empty on Experiment — a non-empty list is the marker of a real experiment. A characterization study with no perturbation names what was measured: `rna_decay` (mRNA half-life survey), `tss_mapping` (promoter / TSS survey), `growth_phase` (growth-curve profiling), `compartment` (vesicle vs whole-cell fractionation). Filter on those values to list characterization experiments; do not look for `treatment_type == []`. `genomic_analysis` marks annotation-only experiments (`omics_type='BIOINFORMATIC'`: computed from genome sequence or annotation, no sample, no culture — e.g. Ford 2021's per-genome SBP survey, which carries categorical DMs and no expression). `background_factors` is never null on Experiment and is non-empty on every wet-lab experiment; it is `[]` only on these `BIOINFORMATIC` / `genomic_analysis` experiments (and on the sequence-only genomic-island clustering analyses). Pass `omics_type=[...]` without `BIOINFORMATIC` to list wet-lab experiments only.
 
 - `growth_phase` values (on `timepoints[].growth_phase` and the `growth_phases` filter) are an OPEN vocabulary — new papers add new labels. Enumerate live from the data rather than assuming a fixed set.
-
-- For time-course experiments, top-level `gene_count` is the cumulative row count across timepoints (= `sum(time_point_totals)`). A 6-TP experiment with 1697 genes/TP has `gene_count=10182`. Use `distinct_gene_count` for detection-power or pathway-background reasoning — that's the unique-genes count regardless of timepoint. Per-TP detail lives in `timepoints[].gene_count`.
 
 - `authors` is on every result row — no need to join with list_publications when you only need author attribution. list_publications is still the right call for richer publication metadata (abstract, journal, year).
 
 - `organism=` filters the profiled organism only (word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works). It does NOT match coculture partners — for partner-side filtering use `coculture_partner=`. The two filters AND-compose. A genus word alone ('Prochlorococcus') matches every strain of the genus — fine here, but the single-organism expression tools raise on it.
 
-- `coculture_partner` lists every organism sharing the culture: treatment partners (their presence is the contrast) AND background partners (the culture was a coculture, the contrast is something else). `treatment_type=['coculture']` keeps only the coculture-vs-axenic contrasts and drops the background cocultures. Use `coculture_role='treatment'` / `'background'` to choose explicitly (values: `list_filter_values(filter_type='partner_role')`); verbose `coculture_partners[].role` shows the role per partner.
-
-- `background_factors` containing both `axenic` and `coculture` marks a pooled design (axenic and coculture arms analyzed together) — a background partner on such an experiment was present in some arms, not all (the partner_role vocabulary description says 'every arm'; pooled designs are the exception).
-
 - Phage infection is a treatment partner: role `treatment` with `treatment_type=['viral']`, not `['coculture']`. `coculture_role='treatment'` therefore returns phage experiments too unless you also pass `coculture_partner=` or `treatment_type=`.
 
 - metabolite_count > 0 indicates a metabolomics-paired experiment. Drill into MetaboliteAssay nodes via list_metabolite_assays(experiment_ids=[...]).
-
-```mistake
-list_experiments(omics_type='RNASEQ')  # bare string
-```
-
-```correction
-list_experiments(omics_type=['RNASEQ'])  # treatment_type / background_factors / omics_type / table_scope / publication_dois / experiment_ids are lists; a bare string is iterated character by character and silently matches 0 rows
-```
-
-```mistake
-list_experiments(publication='Biller 2018')
-```
-
-```correction
-list_publications(search_text='Biller') then list_experiments(publication_dois=['10.1038/...'])
-```
 
 ```mistake
 result['results'][0]['time_point_growth_phases']
@@ -742,9 +720,19 @@ result['results'][0]['time_point_growth_phases']
 
 - DataFrame conversion: `to_dataframe(result)` auto-dispatches and returns one row per experiment × timepoint (with `timepoints` unwound and `genes_by_status` inlined at both experiment + timepoint level). See `docs://guide/python_api`.
 
-- `table_scope` decides whether a missing gene means 'not affected' or 'not reported': `all_detected_genes` keeps tested-absent rows, every other scope collapses them. Filter with `table_scope=['all_detected_genes']` to keep only experiments fair for cross-experiment comparison. See docs://guide/conventions.
+- `gene_count` = DE rows summed over timepoints (all statuses, not just significant; a 6-TP experiment with 1697 genes/TP has `gene_count=10182`). Use `distinct_gene_count` for unique genes (detection power, pathway background), `genes_by_status` for the status split, `timepoints[].gene_count` for per-TP detail.
 
-- A DE timepoint label (e.g. 'day 18') and `growth_phase` describe the treatment arm; check `control_timing` / `design_notes` before reading it as both arms' state. See docs://guide/conventions.
+- Unknown treatment_type / background_factors / growth_phases values return 0 rows with a warning listing the valid values; check list_filter_values first.
+
+```mistake
+list_experiments(publication='Biller 2018')
+```
+
+```correction
+list_publications(author='Biller') then list_experiments(publication_dois=['10.1038/...'])
+```
+
+- Default is detail (summary=false) — use summary=true to see only breakdowns. When summary=true, verbose and limit have no effect.
 
 ## Package import equivalent
 

@@ -23,7 +23,7 @@ docs://tools/metabolites_by_flags_assay; summary=True first.
 | treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
 | background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
-| flag_value | bool \| None | None | Filter by flag presence — `True` (presence flagged), `False` (absence flagged — *tested-absent*, real biology), `None` (both). `Assay_flags_metabolite` always stores both states (unlike the DM layer, where only 11 of 34 boolean DMs store `not_flagged`), so `flag_value=False` returns real rows (about 69% of boolean rows). |
+| flag_value | bool \| None | None | True / False / None (both). Both states are stored: False = tested-absent, real rows (~69% of boolean rows). |
 | stereo_assignment | list[string] \| None | None | Stereo-form provenance (OR): 'as_reported' = the paper named the form; 'dominant_form_assumed' = it named none and the KG placed it on the dominant form (e.g. 'Alanine' on L-Alanine). ['as_reported'] drops assumed rows. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
@@ -190,6 +190,8 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
 metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular", "metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_extracellular"])
 ```
 
+*`by_assay` carries one row per assay (intracellular vs extracellular flags). Read the compartment from the assay's metric_type (`presence_flag_extracellular`): both assays currently carry compartment='whole_cell', so `by_compartment` does not split them. Useful for asking "does this metabolite show up inside the cell, outside, or both?" on the msystems panel.*
+
 ### Example 6: Metabolite-anchored — does PEP show up at all on the boolean assays?
 
 ```example-call
@@ -250,16 +252,7 @@ metabolites_by_flags_assay(assay_ids=[...])  # then citing an L-amino-acid row a
 ```
 
 ```correction
-`stereo_assignment` on every row says who chose the stereo form:
-`as_reported` = the paper named it (or the compound has no stereo
-variant); `dominant_form_assumed` = the paper gave no form and the KG
-placed the row on one form of the stereo family (usually the one with
-the most catalysing genes — 'Alanine' lands on L-alanine
-`kegg.compound:C00041`). The envelope's `by_stereo_assignment` counts
-both over the matched set and a `warnings` entry fires when any row is
-assumed. Pass `stereo_assignment=['as_reported']` when the stereo form
-matters to the claim, or quote assumed rows as "L-form assumed".
-
+`stereo_assignment` says who chose the stereo form: `as_reported` (the paper) or `dominant_form_assumed` (the KG placed an unspecified name such as 'Alanine' on L-alanine). Pass `stereo_assignment=['as_reported']` when the form matters, or quote assumed rows as 'L-form assumed'. Full reading: `assays_by_metabolite` docs and docs://analysis/metabolites.
 ```
 
 ```mistake
@@ -276,24 +269,11 @@ naming `metabolites_by_quantifies_assay` as the tool to use instead.
 ```
 
 ```mistake
-Filter out value=0 / flag_value=false rows assuming they are noise.
+Drop value=0 / flag_value=False rows as noise, or read a metabolite missing from the results as 'not detected'.
 ```
 
 ```correction
-These rows are tested-absent — the metabolite was assayed and not found.
-They are biology. Keep them unless explicitly investigating presence-only.
-
-```
-
-```mistake
-A metabolite missing from results means it was not detected.
-```
-
-```correction
-Missing means unmeasured (out of scope for this assay). For 'tested and
-not found,' look for a value=0 / flag_value=false / detection_status='not_detected'
-row.
-
+value=0 / flag_value=False / detection_status='not_detected' rows are tested-absent (assayed, not found): real biology, kept by default. A metabolite missing from the results is unmeasured in this scope. See docs://analysis/metabolites, 'Tested-absent vs unmeasured'.
 ```
 
 ```mistake
@@ -313,12 +293,7 @@ Expect not_found to be a flat list[str].
 ```
 
 ```correction
-Drill-downs use a structured NotFound (4 keys: assay_ids, metabolite_ids,
-experiment_ids, publication_dois) — multi-batch input → structured.
-Inspect each bucket separately to see which input was bad. Mirrors
-`MetNotFound` on `list_metabolites` and `GbmNotFound` on
-`genes_by_metabolite`.
-
+`not_found` is a dict keyed by input: assay_ids, metabolite_ids, experiment_ids, publication_dois. Inspect each bucket to see which input was bad.
 ```
 
 ```mistake
@@ -326,12 +301,11 @@ flag_value=False returns 0 rows like genes_by_boolean_metric does.
 ```
 
 ```correction
-`Assay_flags_metabolite` ALWAYS stores both states (KG literals
-'detected' / 'not_detected', bool on the surface) — about 69% of
+`Assay_flags_metabolite` always stores both states — about 69% of
 boolean rows are `flag_value=false`, and flag_value=False returns real
-rows. On the DM side only 11 of 34 boolean DMs store `not_flagged`
-edges (the rest are positive-only), so `genes_by_boolean_metric(flag_value=False)`
-is DM-dependent — read its `by_metric[*].dm_false_count` first.
+rows. On the derived-metric side only some boolean DMs store
+`not_flagged` edges, so `genes_by_boolean_metric(flag_value=False)` is
+DM-dependent — read its `by_metric[*].dm_false_count` first.
 
 ```
 
@@ -345,8 +319,7 @@ envelope-shape consistency with `metabolites_by_quantifies_assay`.
 Boolean assays have no `rankable` gate to probe. `warnings` carries only
 metabolite-ID notes (a removed compound or a chemical-role id in
 `metabolite_ids`) and the assumed-stereo-form count (see
-`stereo_assignment`). Mirrors `genes_by_boolean_metric`
-vs `genes_by_numeric_metric`.
+`stereo_assignment`).
 
 ```
 
@@ -355,12 +328,7 @@ growth_phase populated on every row.
 ```
 
 ```correction
-growth_phase is currently null on every row — the schema field exists
-on Experiment, but `time_point_growth_phases[]` is empty for every
-metabolomics experiment in the current KG (KG-side backfill pending).
-Forward-compat surface; values populate without explorer-side code
-change when the upstream backfill lands.
-
+growth_phase is null on every metabolomics row (not yet recorded in the KG); don't read null as 'no growth phase'.
 ```
 
 ```mistake
@@ -368,22 +336,10 @@ metabolites_by_flags_assay(metabolite_ids=['C00064'])  # then treating `C00064` 
 ```
 
 ```correction
-Metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are normalised and
-looked up in every identifier the metabolite carries before the query runs:
-`C00064` / `kegg.compound:c00064` → `kegg.compound:C00064`, `CHEBI:17234` /
-`17234` → `chebi:17234`; `HMDB0000122`, `MNXM732398` and bare InChIKeys resolve
-the same way. Retired ids of merged or re-keyed nodes resolve to the surviving
-node (`chebi:14654` → nitrate `kegg.compound:C00244`). Every input that isn't
-already canonical is listed in envelope `resolved_aliases`
-(`{input: [canonical, ...]}`). A removed compound whose measurements moved to
-another compound, and a chemical-role id (`chebi:10004`, 'vitamin (role)'),
-stay verbatim in `not_found` with a `warnings` entry naming the replacement or
-the role. Other unresolved inputs stay verbatim in `not_found` in the form you
-passed.
-
+IDs in any form (bare, prefixed, ChEBI / HMDB / MNX / InChIKey, retired) resolve before the query; read `resolved_aliases`. Removed compounds and chemical-role ids stay in `not_found` with a warning. See docs://analysis/metabolites, 'Metabolite ID forms'.
 ```
 
-- See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for tested-absent semantics (about 69% of boolean rows are flag_value=False, kept by default; on the DM side only 11 of 34 boolean DMs store `not_flagged` edges).
+- See `docs://analysis/metabolites` (evidence sources: metabolism, TCDB transport, GO transport, metabolomics) and `docs://guide/conventions` for tested-absent semantics (about 69% of boolean rows are flag_value=False, kept by default).
 
 - `organism` here matches by case-insensitive CONTAINS, not the word-based match the gene tools use; cross-organism is the default.
 

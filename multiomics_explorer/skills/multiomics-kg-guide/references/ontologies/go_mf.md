@@ -18,9 +18,9 @@ merged into one edge per (gene, term) with `sources[]`, a compact
 `evidence` rung (`curated` / `family_inferred` / `domain_inferred`) and an
 `evidence_score` in [0, 1] — rung semantics in
 `docs://analysis/annotation_evidence`. Live on this edge type: eggNOG-only
-edges read `family_inferred` (most of the branch, ~180k), curated sources
-read `curated`, InterProScan-only edges read `domain_inferred` or
-`family_inferred`.
+edges read `family_inferred` (about 40% of the branch); curated sources
+read `curated` (the largest rung on this branch); InterProScan-only edges
+read `domain_inferred` or `family_inferred`.
 Molecular function is the branch where `domain_inferred` is most common,
 because a Pfam/InterPro domain maps naturally onto an activity (a kinase
 domain implies kinase activity).
@@ -75,14 +75,12 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 - `evidence` — `list_filter_values(filter_type="evidence", ontology="go_mf")`
 - `sources` — `list_filter_values(filter_type="sources", ontology="go_mf")`
 
-Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="go_mf")`) lists which comparable axes the gene edge carries.
+Values are read live from the KG's `ControlledVocabulary` nodes (`list_filter_values`); the list below is a build-time snapshot and may lag the KG. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="go_mf")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
+Vocabulary snapshot (build time):
 
 - `Gene_enables_molecular_function.evidence`: `curated`, `family_inferred`, `domain_inferred`
 - `Gene_enables_molecular_function.sources`: `cyanorak`, `eggnog`, `interproscan`, `ncbi`, `uniprot`
-- `MolecularFunction.is_uninformative`: `true`
-- `MolecularFunction.level_is_best_effort`: `true`
 
 ## Interpretation
 
@@ -94,6 +92,13 @@ correct but broad (`ATP binding` on every P-loop protein); rank by
 (`cyanorak` / `uniprot` / `ncbi`), an eggNOG-only transfer reads
 `family_inferred`. For enrichment, level 3-5 is the
 usual working range — check `ontology_landscape` first.
+Transporter-activity terms that GO defines with a substrate (a few
+hundred terms, `Molecular_function_transports_metabolite` /
+`…_chemical_role`) feed the `go_transport` route of `genes_by_metabolite`
+/ `metabolites_by_gene`, which reads them by default: a term definition,
+not a gene fact. Ask substrate questions there
+(`go_namespace=['molecular_function']`), not through `genes_by_ontology`;
+reading rules in `docs://analysis/transport`.
 
 ## Informativeness rule
 
@@ -106,10 +111,11 @@ instead of trusting them.
 
 - Binding terms (`ATP binding`, `metal ion binding`) dominate any
   unfiltered enrichment — expect them and look past them.
-- For transporter activity questions, TCDB families bridge *out* to GO
-  molecular-function terms (`Tcdb_family_enables_molecular_function`);
-  the bridge is forward-only — visible on the `tcdb` term, never on the
-  GO term. For the reverse direction use `run_cypher`.
+- For "which genes move compound X" use `genes_by_metabolite` (the
+  `go_transport` route reads these terms; `docs://analysis/transport`).
+  TCDB families also bridge *out* to MF terms
+  (`Tcdb_family_enables_molecular_function`, composition, forward-only —
+  read it on the `tcdb` term, never on the GO term).
 - Do not compare `evidence_score` to MEROPS scores — each is a
   within-ontology composite (TCDB carries no evidence score).
 
@@ -117,6 +123,7 @@ instead of trusting them.
 
 - Which genes in MIT9313 have a non-domain-inferred oxidoreductase activity annotation? — `genes_by_ontology(ontology='go_mf', organism='MIT9313', term_ids=['go:0016491'], evidence=['curated','family_inferred'])`
 - Which molecular functions are enriched in a co-expression cluster? — `cluster_enrichment(organism='MED4', analysis_id=..., ontology='go_mf', level=3)`
+- Which MED4 genes carry an MF term defined as moving urea? — `genes_by_metabolite(metabolite_ids=['kegg.compound:C00086'], organism='MED4', evidence_sources=['go_transport'], go_namespace=['molecular_function'])`
 - What is the sub-hierarchy under `go:0016491` oxidoreductase activity, and how many genes sit at each child? — `ontology_term_details(term_ids=['go:0016491'])` and read `children[]`
 - Which TCDB families are characterised by `go:0005215` transporter activity? — the bridge runs from `tcdb` to GO only, so `run_cypher` over `Tcdb_family_enables_molecular_function`, or start from a `tcdb` term with `ontology_term_details`
 
@@ -132,6 +139,8 @@ instead of trusting them.
 - `docs://ontologies/go_bp`
 - `docs://ontologies/go_cc`
 - `docs://ontologies/ec`
+- `docs://ontologies/tcdb`
+- `docs://analysis/transport`
 - `docs://analysis/annotation_evidence`
 - `docs://analysis/enrichment`
 - `docs://tools/genes_by_ontology`

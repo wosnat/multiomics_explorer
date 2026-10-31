@@ -7,7 +7,7 @@ Batch gene triage: identity plus per-gene data-availability signals — expressi
 Use to decide which drill-down has evidence for a gene batch; for the raw node dump use `gene_details`.
 Filters: locus_tags.
 Returns: by_organism, by_category, by_annotation_type, has_* batch counts, top_discussing_publications, not_found; one row = one gene's routing counts.
-docs://tools/gene_overview; summary=True first.
+docs://tools/gene_overview; summary=True for batches over a few hundred genes.
 
 ## Parameters
 
@@ -37,11 +37,11 @@ Result row: `locus_tag, gene_name, product, gene_category, annotation_quality, o
 
 ## Common mistakes
 
-- annotation_quality / min_quality semantics shifted in 2026-05 KG release. Existing notebooks using min_quality may select a different gene set than before. See docs://guide/conventions.
+- TCDB routing rule: `transported_metabolite_count > 0` means the gene points directly (`tcdb_gate='direct'`) at a TC system that TCDB curates with substrates; drill with `metabolites_by_gene`. `tcdb_assignment_count > 0` with `transported_metabolite_count = 0` and no `transport` tag means TCDB placed the gene only at family or subfamily level (or at a system with no curated substrate): its substrate candidates come from `metabolites_by_gene(..., include_tcdb_family_substrates=True)`, a recall expansion. `tcdb_assignment_count = 0` with a TCDB edge means weak DIAMOND hits only; `gene_ontology_terms(..., include_weak_tcdb_hits=True)` shows them.
 
-- If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this gene.
+- The `transport` tag in `evidence_sources` (and `has_chemistry`) includes direct TCDB systems curated only with chemical roles, such as efflux pumps whose substrate is the 'drug' role. `transported_metabolite_count` counts metabolites only, so a gene can read `transport` with `transported_metabolite_count = 0` and no family-level call: drill with `metabolites_by_gene`, whose rows for it carry `target_kind='chemical_role'`.
 
-- annotation_types lists which ontology types have data — use gene_ontology_terms to get the actual terms.
+- The `go_transport` tag in `evidence_sources` means the gene carries a GO term that GO defines as moving some compound or role (a term definition, not a measured transport activity). It is separate from `transport` (TCDB) and does not change `transported_metabolite_count`, `tcdb_*` counts or `catalyzed_metabolite_count`. A biological-process term can tag a gene that is not a transporter (MED4 `ftn` reaches iron through "iron ion transport"). Read `docs://analysis/transport` before combining the routes.
 
 ## Chaining patterns
 
@@ -51,7 +51,7 @@ Result row: `locus_tag, gene_name, product, gene_category, annotation_quality, o
 - gene_overview → gene_homologs
 - gene_overview → differential_expression_by_gene
 - gene_overview → gene_clusters_by_gene
-- gene_overview(locus_tags=...) → for genes with derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric; for ['numeric'] use genes_by_numeric_metric; for ['categorical'] use genes_by_categorical_metric
+- gene_overview(locus_tags=...) → for genes with derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric; for ['numeric'] use genes_by_numeric_metric; for ['categorical'] use genes_by_categorical_metric (docs://analysis/derived_metrics)
 - gene_overview(verbose=True) → see compartments_observed for vesicle/whole-cell triage
 - gene_overview (per-row `evidence_sources` non-empty) → metabolites_by_gene OR genes_by_metabolite for chemistry drill-down.
 - gene_overview (per-row `transported_metabolite_count` > 0) → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['transport']) — distinct Metabolite targets in the direct rows equal `transported_metabolite_count`.
@@ -60,7 +60,6 @@ Result row: `locus_tag, gene_name, product, gene_category, annotation_quality, o
 - gene_overview (per-row `tcdb_assignment_count` > 0) → gene_ontology_terms(locus_tags=[...], ontology=['tcdb']) for the TC ids, `tcdb_call` / `tcdb_gate` and evidence; `cazy_family_count` > 0 → gene_ontology_terms(locus_tags=[...], ontology=['cazy']), or genes_by_ontology(ontology='cazy', organism=...) for peers.
 - gene_overview envelope `has_tcdb` / `has_cazy` = batch triage (how many input genes carry a transporter-family / carbohydrate-active-enzyme call) before deciding whether a pathway_enrichment(ontology='tcdb'|'cazy') run is worth it.
 - gene_overview (per-row `merops_classes` non-empty) → gene_ontology_terms(locus_tags=[...], ontology=['merops'], verbose=True) for the confidence_score / pfam_support detail behind the call, or genes_by_ontology(ontology='merops', call_class=['peptidase']) to find peers.
-- `merops_classes` is a list (`[]` default) because a gene can carry both a `peptidase` and a `nonpeptidase_homolog` MEROPS call on different families — don't assume at most one value. `merops_evidence_score_max` is sparse and uncoalesced (null = no MEROPS call at all) — rank by it, never filter by it.
 - gene_overview (per-row derived_metric_count > 0) → gene_derived_metrics(locus_tags=[...], organism=...) for the gene's full DM profile across numeric, boolean and categorical kinds
 - gene_overview → evidence_sources contains 'go_transport' → metabolites_by_gene(locus_tags=[...], organism=..., evidence_sources=['go_transport']) for the GO term and target behind the tag
 

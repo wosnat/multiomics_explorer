@@ -52,13 +52,13 @@ genes_by_numeric_metric(metric_types=['damping_ratio'], metric_bucket=['top_deci
 total_matching, total_derived_metrics, total_genes, by_organism, by_compartment, by_publication, by_experiment, by_metric, top_categories, genes_per_metric_max, genes_per_metric_median, not_found_ids, not_matched_ids, not_found_metric_types, not_matched_metric_types, not_matched_organism, excluded_derived_metrics, warnings, returned, offset, truncated, results
 ```
 
-Result row: `locus_tag, gene_name, product, gene_category, organism_name, derived_metric_id, name, value_kind, rankable, has_p_value, value, rank_by_metric, …`
+Result row: `locus_tag, gene_name, product, gene_category, derived_metric_id, value, rank_by_metric, metric_percentile, metric_bucket, adjusted_p_value, significant`
 
 ## Common mistakes
 
 - Non-rankable DM + rankable-gated filter. Calling with `metric_types=['peak_time_transcript_h']` + `metric_bucket=['top_decile']` raises — `peak_time_transcript_h` is non-rankable. Inspect `list_derived_metrics(value_kind='numeric', rankable=True)` to see which DMs support `metric_bucket` / `min_percentile` / `max_percentile` / `max_rank`. Mixed rankable/non-rankable DM sets don't raise — instead the envelope's `excluded_derived_metrics` + `warnings` pinpoint the excluded ones.
 
-- P-value filter on current KG. `significant_only=True` or `max_adjusted_p_value=0.05` raises in the current KG because no DM has `has_p_value='p_value'`. The surface exists for future DMs; check `list_derived_metrics(has_p_value=True)` first.
+- P-value filter on current KG. `significant_only=True` or `max_adjusted_p_value=0.05` raises in the current KG because no DM has `has_p_value=True`. Check `list_derived_metrics(has_p_value=True)` first.
 
 - Sparse columns in results. `rank_by_metric` / `metric_percentile` / `metric_bucket` are null in rows from non-rankable DMs (e.g. `peak_time_*_h`); don't treat null as missing data — it's gate-driven. Per-row `rankable` (echoed from the parent DM) tells you which to expect.
 

@@ -2,12 +2,12 @@
 
 ## What it does
 
-Metabolites a gene batch reaches in ONE organism via KEGG, TCDB and GO transport (GO rows: term definitions, not gene facts).
+Metabolites genes reach in ONE organism via KEGG, TCDB, GO transport (GO rows = term definitions, not gene facts).
 
-Use for gene → compounds; mirror genes_by_metabolite; docs://analysis/transport.
-Filters: locus_tags, metabolite_elements, metabolite_ids (+exclude, roles ok), ec_numbers, evidence_sources, include_tcdb_family_substrates, go_*.
-Returns: by_gene, by_element, by_evidence_source(_combination), by_tcdb_route, tcdb_family_substrates_not_shown, top_metabolites; row = gene × reaction|TCDB|GO term × compound.
-docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
+Use for gene → compounds; mirror genes_by_metabolite; TCDB rows = direct systems, empty ≠ no transporter (see tcdb_family_substrates_not_shown); docs://analysis/transport.
+Filters: metabolite_elements, metabolite_ids (+exclude), evidence_sources, include_tcdb_family_substrates, go_*.
+Returns: by_gene, by_element, by_evidence_source(_combination), by_tcdb_route, top_metabolites; row = gene × route × compound.
+docs://tools/metabolites_by_gene; summary=True for 50+ genes.
 
 ## Parameters
 
@@ -15,7 +15,7 @@ docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags to drill into (case-sensitive). E.g. ['PMM0963', 'PMM0964', 'PMM0965'] for urease α/β/γ subunits. `not_found.locus_tags` lists tags that don't resolve to any Gene in the requested organism; `not_matched` lists tags that DO resolve but have no chemistry path (no reaction, TCDB or GO transport row). |
 | organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
-| metabolite_elements | list[string] \| None | None | Filter to rows where the metabolite contains ALL of the given element symbols (AND-of-presence). E.g. `['N']` keeps only N-bearing metabolites — the headline N-source workflow primitive. `['N', 'P']` requires both. Anchored on `Metabolite.elements` (KG-A3 Hill-parsed presence list); applies uniformly to all three arms. Never substring-match on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). `not_found.metabolite_elements` lists symbols that don't exist on any KG metabolite. |
+| metabolite_elements | list[string] \| None | None | Keep rows whose metabolite contains ALL these element symbols (presence, e.g. ['N'], ['N', 'P']); formula-less metabolites never match (see no_formula_excluded). Applies to all three arms. `not_found.metabolite_elements` lists symbols that don't exist on any KG metabolite. |
 | metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds warn. `chebi.role:` ids reach TCDB / GO role edges. docs://analysis/transport. |
 | exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
 | ec_numbers | list[string] \| None | None | Narrow metabolism rows to those whose Reaction carries any of these EC numbers. **Metabolism arm only — does not affect TCDB or GO transport rows**, which are returned unchanged. To restrict to metabolism rows alone, combine with `evidence_sources=['metabolism']`. E.g. ['3.5.1.5'] for urease. |
@@ -36,7 +36,7 @@ docs://tools/metabolites_by_gene; summary=True first for 50+ genes.
 
 ## Example
 
-### Single-gene drill-down — a direct transporter (Workflow D)
+### Single-gene drill-down — a direct transporter
 
 ```python
 metabolites_by_gene(locus_tags=["PMM0372"], organism="Prochlorococcus MED4", evidence_sources=["transport"])
@@ -52,7 +52,7 @@ Result row: `locus_tag, gene_name, product, evidence_source, tcdb_route, tcdb_ca
 
 ## Common mistakes
 
-- Gene-anchored (locus_tags → metabolites). The metabolite-anchored mirror is `genes_by_metabolite` (metabolite → genes); both share the same row class, discriminators and per-arm filter scope.
+- An empty TCDB arm is not "no transporter". TCDB rows are direct systems by default, and for a gene with a TCDB call an empty arm has two readings; the warning names which applies. (1) The gene is placed only at family or subfamily level: read `tcdb_family_substrates_not_shown`, then pass `include_tcdb_family_substrates=True` for `tcdb_route='family'` rows (phnD PMM0673 → 5 metabolites via tcdb:3.A.1.9). (2) Its only usable call is on a superfamily curated with over 200 substrates (ABC tcdb:3.A.1, MFS tcdb:2.A.1): it is listed in `tcdb_family_substrates_skipped` and its substrate is unknown. Genes with only weak DIAMOND hits (`below_gate`) reach no substrate here; `gene_ontology_terms(..., include_weak_tcdb_hits=True)` shows them. See `docs://analysis/transport`.
 
 Chaining patterns: see `docs://tools/metabolites_by_gene/full`.
 

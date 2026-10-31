@@ -20,7 +20,7 @@ match — the native Pfam rung), `curated` or `family_inferred`, with an `eviden
 `docs://analysis/annotation_evidence`. Live on this edge type:
 InterProScan-only and eggNOG+InterProScan edges read `signature` (the
 HMM hit is kept even when eggNOG agrees); eggNOG-only edges read
-`family_inferred` (~25k); any edge with a `cyanorak` or `uniprot` source
+`family_inferred` (a minority); any edge with a `cyanorak` or `uniprot` source
 reads `curated`. Clan membership is a term-side edge
 (`Pfam_in_pfam_clan`), so a gene's clan count is a rollup of its
 domain hits. Pfam entries also bridge *out* to InterPro
@@ -80,9 +80,9 @@ Parent label `PfamClan`: `gene_count`, `id`, `level`, `name`, `organism_count`, 
 - `sources` — `list_filter_values(filter_type="sources", ontology="pfam")`
 - `link_kinds` — `list_filter_values(filter_type="link_kinds")`
 
-Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="pfam")`) lists which comparable axes the gene edge carries.
+Values are read live from the KG's `ControlledVocabulary` nodes (`list_filter_values`); the list below is a build-time snapshot and may lag the KG. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="pfam")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
+Vocabulary snapshot (build time):
 
 - `Gene_has_pfam.evidence`: `curated`, `signature`, `family_inferred`
 - `Gene_has_pfam.sources`: `cyanorak`, `eggnog`, `interproscan`, `uniprot`
@@ -117,8 +117,8 @@ enrichment; use `max_gene_set_size` or `min_gene_count` to manage them.
 - TCDB and MEROPS families bridge *to* Pfam (composition) — those links
   are read from the `tcdb` / `merops` term, not from the Pfam term.
 - Pfam evidence tells you a domain is present, not that the protein is
-  active — combine with MEROPS `call_class` or the TCDB `tcdb_gate`
-  (a `direct` system call) for functional calls.
+  active — combine with the MEROPS `call_class` filter, or read the TCDB
+  row's `tcdb_gate` (`direct` = a system call), for functional calls.
 
 ## Typical questions
 

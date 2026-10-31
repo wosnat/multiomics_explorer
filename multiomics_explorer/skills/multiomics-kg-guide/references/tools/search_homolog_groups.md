@@ -38,7 +38,7 @@ search_homolog_groups(search_text="photosynthesis")
 total_entries, total_matching, by_source, by_level, score_max, score_median, top_cyanorak_roles, top_cog_categories, returned, offset, truncated, results
 ```
 
-Result row: `group_id, group_name, consensus_gene_name, consensus_product, source, taxonomic_level, specificity_rank, member_count, organism_count, score, description, functional_description, …`
+Result row: `group_id, group_name, consensus_gene_name, consensus_product, source, taxonomic_level, specificity_rank, member_count, organism_count, score`
 
 ## Common mistakes
 
@@ -52,7 +52,7 @@ len(results)  # actual result count
 response['total_matching']  # use total, not len
 ```
 
-- Hyphens in search text are Lucene operators — use spaces instead (e.g. 'beta glycosyltransferase' not 'beta-glycosyltransferase')
+- A leading '-' (e.g. '-kinase') is Lucene NOT; mid-word hyphens are fine ('beta-glycosyltransferase' and 'beta glycosyltransferase' return the same groups).
 
 ## Chaining patterns
 

@@ -2,7 +2,7 @@
 
 ## What it does
 
-Browse the chemistry layer — KEGG-curated metabolism, TCDB-curated transport substrates, and compounds measured by a MetaboliteAssay.
+Browse the chemistry layer — KEGG metabolism, TCDB transport substrates, GO transport targets, and compounds measured by an assay.
 
 Use as the compound-side entry point; genes via `genes_by_metabolite`, measurements via `assays_by_metabolite`.
 Filters: search_text, metabolite_ids (+exclude), xref IDs, elements, mass, organism_names, pathway_ids, evidence_sources, structure_kind, kegg_functional_categories, kegg_brite_classes.
@@ -20,7 +20,7 @@ docs://tools/list_metabolites; summary=True first.
 | chebi_ids | list[string] \| None | None | ChEBI ids, bare digits or 'CHEBI:' form (e.g. ['4167', 'CHEBI:15422']). Matches any of the metabolite's identifiers, including secondary and retired ones. |
 | hmdb_ids | list[string] \| None | None | HMDB ids (e.g. ['HMDB0000122']; short 'HMDB02878' is padded). Matches any of the metabolite's identifiers, including secondary and retired ones. |
 | mnxm_ids | list[string] \| None | None | MetaNetX ids (e.g. ['MNXM1364061']). Matches any of the metabolite's identifiers, including secondary and retired ones. |
-| elements | list[string] \| None | None | Element-presence filter (Hill-notation symbols, e.g. 'Fe', 'N'). AND of presence — ['N', 'P'] matches metabolites containing BOTH. A case-insensitive symbol ('n', 'fe') or a full element name ('Nitrogen') for one of the ~12 elements this KG's chemistry layer carries (C, H, N, O, P, S, Fe, Mg, Mn, Zn, Cu, Co, Mo, Ni, Se) is normalized silently; anything else is dropped from the filter and reported in `not_found.elements` with a warning. Use this rather than substring-matching on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Empty/null formula metabolites never match. |
+| elements | list[string] \| None | None | Element-presence filter (Hill-notation symbols, e.g. 'Fe', 'N'). AND of presence — ['N', 'P'] matches metabolites containing BOTH. A case-insensitive symbol ('n', 'fe') or a full element name ('Nitrogen') for one of the 15 elements this KG's chemistry layer carries (C, H, N, O, P, S, Fe, Mg, Mn, Zn, Cu, Co, Mo, Ni, Se) is normalized silently; anything else is dropped from the filter and reported in `not_found.elements` with a warning. Use this rather than substring-matching on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Empty/null formula metabolites never match. |
 | min_mass | float \| None | None | Minimum monoisotopic mass (Da). Excludes metabolites with null `mass` (~22%). E.g. 60.0. |
 | max_mass | float \| None | None | Maximum monoisotopic mass (Da). E.g. 1000.0. |
 | organism_names | list[string] \| None | None | Metabolites reached by ANY of these organisms (case-insensitive `preferred_name`), by any route. With `evidence_sources`, a listed organism must reach it by one of those routes. E.g. ['Prochlorococcus MED4']. Unknown: `not_found.organism_names`. |
@@ -52,7 +52,7 @@ Result row: `metabolite_id, name, formula, elements, mass, catalyst_gene_count, 
 
 ## Common mistakes
 
-- Direction-agnostic — KEGG equation order is unreliable upstream, so joins through Reaction_has_metabolite (catalysis) and Tcdb_family_transports_metabolite (transport) do NOT distinguish substrates from products. Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate. See docs://analysis/metabolites.
+- Direction-agnostic — KEGG equation order is unreliable upstream, so the catalysis join does NOT distinguish substrates from products, and the transport counts here carry no direction (TCDB's node-level `tcdb_direction` hint is on `genes_by_metabolite` rows, mostly `unknown`). Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate. See docs://analysis/metabolites.
 
 ## Chaining patterns
 

@@ -34,10 +34,10 @@ docs://tools/pathway_enrichment; summary=True first.
 | informative_only | bool | True | True drops terms the KG flags uninformative (roots, catch-alls). |
 | sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See list_filter_values('sources'). |
 | evidence | list[string] \| None | None | Keep rows whose compact evidence-ladder value is in this list. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See docs://analysis/annotation_evidence. |
-| max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (1-3; null always kept, e.g. TCDB eggnog). tcdb, merops only. TCDB tier is consensus tier on diamond_tier, identity band on diamond_best_hit; never compare across kinds or ontologies. |
+| max_tier | int \| None | None | Keep rows with tier <= this OR tier null (1-3; e.g. TCDB eggnog). tcdb, merops only. TCDB: consensus tier on diamond_tier, identity band on diamond_best_hit; gated rows are never tier 3. Never compare tiers across kinds or ontologies. |
 | min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, merops; TCDB carries no evidence_score (raises). |
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
-| tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked. Leaf mode still drops ancestors via all edges, so a call kind only on an ancestor term yields no row. Values: list_filter_values('tcdb_call'). |
+| tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked, so an ancestor-term row reports a surviving call kind. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
 
 **Discovery:** use `list_organisms` for valid organism names.
@@ -521,13 +521,13 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
 }
 ```
 
-### Example 10: Trust-filtered TCDB enrichment (evidence + max_tier; TCDB gene sets are gated)
+### Example 10: Trust-filtered TCDB enrichment (evidence; TCDB gene sets are gated)
 
 ```example-call
-pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="tcdb", level=2, evidence=["homology"], max_tier=2)
+pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="tcdb", level=2, evidence=["homology"])
 ```
 
-*TCDB TERM2GENE uses gated edges only (`tcdb_gate` direct or annotated), so each family's gene set matches its `gene_count`; weak below-gate DIAMOND hits never enter enrichment. The trust filters shape the gene sets and the background identically: here DIAMOND calls at tier 1-2. TCDB has no evidence score, so `min_evidence_score` raises; `tcdb_call=[...]` restricts by call kind.*
+*TCDB TERM2GENE uses gated edges only (`tcdb_gate` direct or annotated), so each family's gene set matches its `gene_count`; weak below-gate DIAMOND hits never enter enrichment. The trust filters shape the gene sets and the background identically: here DIAMOND calls only (`evidence=['homology']` drops the eggNOG rows). Gated rows are tier 1, 2 or null, so `max_tier=2` changes nothing here; `max_tier=1` keeps tier-1 calls (plus tier-null eggNOG rows unless `evidence` drops them). TCDB has no evidence score, so `min_evidence_score` raises; `tcdb_call=[...]` restricts by call kind.*
 
 ```example-response
 {
@@ -677,12 +677,12 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
     "term2gene_row_count": 159,
     "n_unique_terms": 55,
     "multitest_method": "fdr_bh",
-    "filters_applied": {"evidence": ["homology"], "max_tier": 2},
+    "filters_applied": {"evidence": ["homology"]},
     "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
     "background_filtered": true,
     "interpro_type": null
   },
-  "filters_applied": {"evidence": ["homology"], "max_tier": 2},
+  "filters_applied": {"evidence": ["homology"]},
   "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
   "background_filtered": true,
   "interpro_type": null,
@@ -968,9 +968,9 @@ See `docs://analysis/annotation_evidence` for the trust-axis registry (which fil
 
 - pathway_enrichment is DE-anchored (needs `experiment_ids`); for a clustering analysis use `cluster_enrichment(analysis_id=...)`, for ortholog groups / custom lists use the Python `fisher_ora` primitive.
 
-- No rows ≠ nothing tested: read `n_significant`, always the full tested-set count (also recoverable per-experiment from `by_experiment[].n_tests`). [ENR] Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`); `total_matching` then counts just that pageable subset (== `n_significant`), so an empty `results` page always means `total_matching=0`. Pass `include_nonsignificant=True` to page through every tested row — `total_matching` then covers all of them; `n_significant` is unaffected either way.
+- No rows ≠ nothing tested: read `n_significant`, always the full tested-set count (also recoverable per-experiment from `by_experiment[].n_tests`). Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`); `total_matching` then counts just that pageable subset (== `n_significant`), so an empty `results` page always means `total_matching=0`. Pass `include_nonsignificant=True` to page through every tested row — `total_matching` then covers all of them; `n_significant` is unaffected either way.
 
-- [ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions.
+- `informative_only=True` (default) changes the tested term set, and with it the BH-adjusted p-values. For results comparable to a run that kept every term, pass `informative_only=False` and post-filter on `is_informative`. See docs://guide/conventions.
 
 - `informative_only=True` shrinks the TERM2GENE mapping, and `enrichment_params.term2gene_row_count` shows by how much — MED4 KEGG at `level=3`: 1124 rows with `informative_only=False`, 1094 with the default. Compare `enrichment_params` across runs before comparing p-values. For KEGG the flag also covers the global / overview maps (`kegg.pathway:ko01100` and kin), so a `level=2` run drops those rows too.
 
@@ -988,7 +988,7 @@ See `docs://analysis/annotation_evidence` for the trust-axis registry (which fil
 
 - `min/max_gene_set_size` here means **M** — pathway size within each cluster's background (clusterProfiler semantics). This differs from `ontology_landscape`'s filter, which is organism-scoped. A pathway may be tested in one cluster and dropped in another when `background='table_scope'`.
 
-- For brite enrichment, use `tree` to scope to a single BRITE tree (e.g. `tree='transporters'`). Without `tree`, all-BRITE enrichment is dominated by the `enzymes` tree (by far the largest). Pick a specific level: `level=1` (BRITE category) or `level=2` (BRITE sub-category) are the most useful. Use `list_filter_values('brite_tree')` to discover trees → `ontology_landscape(ontology='brite', tree=...)` to pick level → `pathway_enrichment(ontology='brite', tree=..., level=...)` for enrichment.
+- `ontology='brite'` requires `tree=` (raises without it). Pick a specific level: `level=1` (BRITE category) or `level=2` (BRITE sub-category) are the most useful. Use `list_filter_values('brite_tree')` to discover trees → `ontology_landscape(ontology='brite', tree=...)` to pick level → `pathway_enrichment(ontology='brite', tree=..., level=...)` for enrichment.
 
 ```mistake
 pathway_enrichment(..., background='genome')  # not a valid string
@@ -1012,7 +1012,7 @@ pathway_enrichment(..., ontology='interpro', interpro_type='HOMOLOGOUS_SUPERFAMI
 
 - `ontology='interpro'` requires `interpro_type` — one of `FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`, `ACTIVE_SITE`, `BINDING_SITE`, `PTM`. Omitting it raises. Check sizing per type via `ontology_landscape(organism=..., ontology='interpro')` first.
 
-- Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`) shape the TERM2GENE mapping fed to Fisher, not the row output — they change which (gene × term) pairs are tested, applied identically to foreground and background. Defaults are `None` and never filter. `min_evidence_score` is the only numeric cutoff; there is no filter on native scalars (`evalue`, `bit_score`, `confidence_score`, ...). See `docs://analysis/annotation_evidence`.
+- Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call`) shape the TERM2GENE mapping fed to Fisher, not the row output — they change which (gene × term) pairs are tested, applied identically to foreground and background. Defaults are `None` and never filter. `min_evidence_score` is the only numeric cutoff; there is no filter on native scalars (`evalue`, `bit_score`, `confidence_score`, ...). See `docs://analysis/annotation_evidence`.
 
 - MEROPS `call_class=['peptidase']` excludes `nonpeptidase_homolog` rows (catalytically-dead homologs) from both the tested gene set and the pathway definitions — run it whenever the enrichment question is about peptidase activity, not sequence homology to a peptidase family.
 

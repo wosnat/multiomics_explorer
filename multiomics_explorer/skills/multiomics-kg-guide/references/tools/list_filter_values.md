@@ -38,7 +38,7 @@ Result row: `value, count, tree_code, source, applies_to, description`
 
 - count is summed across all organisms — a category with count=770 may cover genes in 10+ organisms
 
-- `count` is None on every vocabulary-sourced row: all the trust filter types (`evidence`, `sources`, `call_class`, `interpro_type`, ...) AND `cluster_type`. Only the pivoted / precomputed types (`gene_category`, `brite_tree`, `growth_phase`, `metric_type`, `value_kind`, `compartment`, `omics_type`, `evidence_source`) carry a count. Read `applies_to` / `description` on the count-less rows instead.
+- `count` is None on every ControlledVocabulary-backed row: the trust filter types (`evidence`, `sources`, `call_class`, `interpro_type`, ...), the experiment types (`treatment_type`, `background_factors`, `table_scope`, `control_timing`, `partner_role`), the chemistry types (`structure_kind`, `kegg_*`, `detection_status`, `stereo_assignment`), `expression_status` and `cluster_type`. Only the pivoted / precomputed types (`gene_category`, `brite_tree`, `growth_phase`, `metric_type`, `value_kind`, `compartment`, `omics_type`, `evidence_source`) carry a count. Read `applies_to` / `description` on the count-less rows instead.
 
 ## Chaining patterns
 

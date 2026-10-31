@@ -21,7 +21,7 @@ compact `evidence` rung (`curated` / `family_inferred` /
 rewards agreement between sources; the rung semantics are defined once
 in `docs://analysis/annotation_evidence`. On this edge type the live
 mapping is: eggNOG-only edges read `family_inferred` (the bulk of the
-edges, ~434k), curated sources (`cyanorak` / `ncbi` / `uniprot`) read
+edges, about three quarters), curated sources (`cyanorak` / `ncbi` / `uniprot`) read
 `curated`, and InterProScan-only edges read `family_inferred` or
 `domain_inferred`.
 Annotation is propagated: a gene annotated to a specific term counts
@@ -80,18 +80,16 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 - `evidence` — `list_filter_values(filter_type="evidence", ontology="go_bp")`
 - `sources` — `list_filter_values(filter_type="sources", ontology="go_bp")`
 
-Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="go_bp")`) lists which comparable axes the gene edge carries.
+Values are read live from the KG's `ControlledVocabulary` nodes (`list_filter_values`); the list below is a build-time snapshot and may lag the KG. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="go_bp")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
+Vocabulary snapshot (build time):
 
-- `BiologicalProcess.is_uninformative`: `true`
-- `BiologicalProcess.level_is_best_effort`: `true`
 - `Gene_involved_in_biological_process.evidence`: `curated`, `family_inferred`, `domain_inferred`
 - `Gene_involved_in_biological_process.sources`: `cyanorak`, `eggnog`, `interproscan`, `ncbi`, `uniprot`
 
 ## Interpretation
 
-`curated` now means a reference source (`cyanorak` / `ncbi` / `uniprot`);
+`curated` means a reference source (`cyanorak` / `ncbi` / `uniprot`);
 an eggNOG orthology transfer reads `family_inferred` with
 `evidence_score` 0.333, so rank by `evidence_score` when two annotations
 of one gene compete. Use `evidence_score` to *rank* competing annotations of one
@@ -101,6 +99,11 @@ organisms annotated to the same process at level 3 are comparable; a
 level-8 term with three genes in one organism is a curiosity, not a
 signal. For enrichment, level 3-5 usually balances coverage against term
 size — confirm with `ontology_landscape(ontology=['go_bp'])`.
+Transport-process terms that GO defines with a substrate
+(`Biological_process_transports_metabolite` / `…_chemical_role`) feed
+the `go_transport` route of `genes_by_metabolite` /
+`metabolites_by_gene`, which reads them by default: a term definition,
+not a gene fact; reading rules in `docs://analysis/transport`.
 
 ## Informativeness rule
 
@@ -123,6 +126,9 @@ organism's genes as a catch-all.
   links — walk it from the `tcdb` term, or use `run_cypher` over
   `Tcdb_family_involved_in_biological_process` for the reverse
   direction.
+- A BP transport term (e.g. "iron ion transport") does not make a gene a
+  transporter (MED4 ferritin reaches iron this way); prefer MF rows —
+  `docs://analysis/transport`.
 
 ## Typical questions
 
@@ -142,6 +148,8 @@ organism's genes as a catch-all.
 
 - `docs://ontologies/go_mf`
 - `docs://ontologies/go_cc`
+- `docs://ontologies/tcdb`
+- `docs://analysis/transport`
 - `docs://analysis/annotation_evidence`
 - `docs://analysis/enrichment`
 - `docs://guide/conventions`

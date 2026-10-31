@@ -17,7 +17,7 @@ docs://tools/assays_by_metabolite; summary=True first for 50+ IDs.
 | organism | string \| None | None | Organism: case-insensitive substring match on the organism name ('MED4'); a genus word matches every strain. See list_organisms. |
 | evidence_kind | string ('quantifies', 'flags') \| None | None | Filter by edge type. `'quantifies'` = numeric arm only (rows carry value, detection_status, timepoint*). `'flags'` = boolean arm only (rows carry flag_value, n_positive). Default `None` = both arms merged (polymorphic rows; cross-arm fields explicit `None`). |
 | exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
-| metric_types | list[string] \| None | None | Filter by metric_type tag(s) on the parent assay. E.g. ['cellular_concentration', 'extracellular_concentration', 'presence_flag_intracellular', 'presence_flag_extracellular']. |
+| metric_types | list[string] \| None | None | Filter by metric_type tag(s) on the parent assay, e.g. ['cellular_concentration']. Values: `list_metabolite_assays(summary=True)` → `top_metric_types`. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
 | stereo_assignment | list[string] \| None | None | Stereo-form provenance (OR): 'as_reported' = the paper named the form; 'dominant_form_assumed' = it named none and the KG placed it on the dominant form (e.g. 'Alanine' on L-Alanine). ['as_reported'] drops assumed rows. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
@@ -366,24 +366,11 @@ matters to the claim, or quote assumed rows as "L-form assumed".
 ```
 
 ```mistake
-Filter out value=0 / flag_value=false rows assuming they are noise.
+Drop value=0 / flag_value=False rows as noise, or read a metabolite missing from the results as 'not detected'.
 ```
 
 ```correction
-These rows are tested-absent — the metabolite was assayed and not found.
-They are biology. Keep them unless explicitly investigating presence-only.
-
-```
-
-```mistake
-A metabolite missing from results means it was not detected.
-```
-
-```correction
-Missing means unmeasured (out of scope for this assay). For 'tested and
-not found,' look for a value=0 / flag_value=false / detection_status='not_detected'
-row.
-
+value=0 / flag_value=False / detection_status='not_detected' rows are tested-absent (assayed, not found): real biology, kept by default. A metabolite missing from the results is unmeasured in this scope. See docs://analysis/metabolites, 'Tested-absent vs unmeasured'.
 ```
 
 ```mistake
@@ -407,7 +394,7 @@ Treat polymorphic rows as kind-uniform.
 Numeric rows carry value / value_sd / detection_status / timepoint /
 timepoint_hours / timepoint_order / metric_bucket / metric_percentile /
 rank_by_metric. Boolean rows carry flag_value / n_positive. Cross-arm
-fields are explicit `None` (union-shape padding) — branch on
+fields are explicit `None` — branch on
 `evidence_kind` ('quantifies' / 'flags') per row before reading
 arm-specific columns. Mirrors `gene_derived_metrics`'s polymorphic
 `value` column.
@@ -428,16 +415,11 @@ filtered-out arm's bucket lists are `[]`.
 ```
 
 ```mistake
-Expect not_found to be a structured Pydantic model.
+Expect not_found to be a dict keyed by input, as on the drill-downs.
 ```
 
 ```correction
-Reverse-lookup uses a flat `list[str]` for `not_found` because only
-`metabolite_ids` is a batch input — single batch → flat (deviating
-from the structured `MqaNotFound` / `MfaNotFound` on the drill-downs,
-where 4 inputs are batch). Both `not_found` and `not_matched` are
-flat lists here.
-
+Here `not_found` and `not_matched` are flat lists of metabolite ids: `metabolite_ids` is the only batch input. The assay drill-downs key `not_found` by input (assay_ids, metabolite_ids, experiment_ids, publication_dois).
 ```
 
 ```mistake
@@ -471,22 +453,10 @@ assays_by_metabolite(metabolite_ids=['C00064'])  # then treating `C00064` in `no
 ```
 
 ```correction
-Metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are normalised and
-looked up in every identifier the metabolite carries before the query runs:
-`C00064` / `kegg.compound:c00064` → `kegg.compound:C00064`, `CHEBI:17234` /
-`17234` → `chebi:17234`; `HMDB0000122`, `MNXM732398` and bare InChIKeys resolve
-the same way. Retired ids of merged or re-keyed nodes resolve to the surviving
-node (`chebi:14654` → nitrate `kegg.compound:C00244`). Every input that isn't
-already canonical is listed in envelope `resolved_aliases`
-(`{input: [canonical, ...]}`). A removed compound whose measurements moved to
-another compound, and a chemical-role id (`chebi:10004`, 'vitamin (role)'),
-stay verbatim in `not_found` with a `warnings` entry naming the replacement or
-the role. Other unresolved inputs stay verbatim in `not_found` in the form you
-passed.
-
+IDs in any form (bare, prefixed, ChEBI / HMDB / MNX / InChIKey, retired) resolve before the query; read `resolved_aliases`. Removed compounds and chemical-role ids stay in `not_found` with a warning. See docs://analysis/metabolites, 'Metabolite ID forms'.
 ```
 
-- See `docs://analysis/metabolites` for the 3 source pipelines decision tree and `docs://guide/conventions` for the not_found vs not_matched convention across batch tools.
+- See `docs://analysis/metabolites` (evidence sources: metabolism, TCDB transport, GO transport, metabolomics) and `docs://guide/conventions` for the not_found vs not_matched convention across batch tools.
 
 - `organism` here matches by case-insensitive CONTAINS, not the word-based match the gene tools use; cross-organism is the default.
 

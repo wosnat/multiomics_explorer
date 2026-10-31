@@ -35,11 +35,11 @@ discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"])
 total_entries, total_matching, returned, offset, truncated, by_entity_kind, by_prominence, top_kegg_pathways, top_publications, not_found, not_matched, results
 ```
 
-Result row: `doi, entity_kind, entity_id, entity_name, organism, prominence, evidence`
+Result row: `doi, entity_kind, entity_id, entity_name, organism, prominence`
 
 ## Common mistakes
 
-- This is a recall-biased narrative literature index — the genes and pathways a paper names in prose, NOT exhaustive coverage and NOT the supplementary DE-table expression data. Only about 1,000 distinct genes are named across the whole corpus (out of ~127k). For expression, use differential_expression_by_gene.
+- This is a recall-biased narrative literature index — the genes and pathways a paper names in prose, NOT exhaustive coverage and NOT the supplementary DE-table expression data. Only ~2,000 genes (well under 1% of the KG's genes) are named anywhere in the corpus. For expression, use differential_expression_by_gene.
 
 - It returns the KEGG pathway terms the paper discusses verbatim — it does NOT expand a pathway to its member genes. To get genes in a discussed pathway, chain into genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...).
 

@@ -19,16 +19,16 @@ docs://tools/genes_by_ontology; summary=True first.
 | level | int \| None | None | Hierarchy level to roll UP to (0 = broadest). At least one of `level` or `term_ids` must be provided. See docs://guide/conventions. |
 | term_ids | list[string] \| None | None | Ontology term IDs (from search_ontology). Without `level`: expand DOWN from each input term. With `level`: scope rollup to these level-N terms. Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced to canonical (see `resolved_aliases`). |
 | min_gene_set_size | int | 5 | Exclude terms with fewer organism-scoped genes than this. Matches `ontology_landscape`'s organism-scoped convention. |
-| max_gene_set_size | int | 500 | Exclude terms with more organism-scoped genes than this. Matches `ontology_landscape`'s organism-scoped convention. |
+| max_gene_set_size | int | 500 | Exclude terms with more organism-scoped genes than this. Matches `ontology_landscape`'s organism-scoped convention. Pass a large value (e.g. 100000) to disable. |
 | informative_only | bool | False | True drops terms the KG flags uninformative (roots, catch-alls). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See list_filter_values('sources'). |
 | evidence | list[string] \| None | None | Keep rows whose compact evidence-ladder value is in this list. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See docs://analysis/annotation_evidence. |
-| max_tier | int \| None | None | Keep rows with edge tier <= this value OR tier IS NULL (1-3; null always kept, e.g. TCDB eggnog). tcdb, merops only. TCDB tier is consensus tier on diamond_tier, identity band on diamond_best_hit; never compare across kinds or ontologies. |
+| max_tier | int \| None | None | Keep rows with tier <= this OR tier null (1-3; e.g. TCDB eggnog). tcdb, merops only. TCDB: consensus tier on diamond_tier, identity band on diamond_best_hit; gated rows are never tier 3. Never compare tiers across kinds or ontologies. |
 | min_evidence_score | float \| None | None | Keep rows with edge evidence_score >= this cutoff (0-1; the only native-scalar cutoff allowed). Valid on go_bp/mf/cc, ec, pfam, cazy, merops; TCDB carries no evidence_score (raises). |
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
-| tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked. Leaf mode still drops ancestors via all edges, so a call kind only on an ancestor term yields no row. Values: list_filter_values('tcdb_call'). |
+| tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked, so an ancestor-term row reports a surviving call kind. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
 | include_weak_tcdb_hits | bool | False | TCDB only: also return one row per weak hit (tcdb_gate='below_gate', diamond only), tagged in tcdb_gate. Adds rows; default rows are unchanged. No-op for other ontologies. |
 | limit | int | 50 | Max rows returned (paging). |
@@ -64,7 +64,7 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 - **wrong_ontology** (list[string]): Input term_ids present but in a different ontology label
 - **wrong_level** (list[string]): Input term_ids in the ontology but at wrong level (only when level + term_ids both set)
 - **filtered_out** (list[string]): Input term_ids valid but outside [min, max]_gene_set_size
-- **size_filtered_terms** (int): Terms passing every other filter but outside min/max_gene_set_size, dropped. >0 also adds a warning; pass min_gene_set_size=1, max_gene_set_size=None to enumerate all.
+- **size_filtered_terms** (int): Terms passing every other filter but outside min/max_gene_set_size, dropped. >0 also adds a warning; to enumerate all pass min_gene_set_size=1 and a large max_gene_set_size (e.g. 100000; Python also accepts None).
 - **size_filtered_genes** (int): Genes found only in size-dropped terms (missing from total_genes).
 - **resolved_aliases** (object): Bare term_ids (e.g. 'ko00910', 'GO:0006979') coerced to canonical CURIEs, {input: [canonical]}. Empty when none were coerced.
 - **returned** (int): Rows in this response
@@ -73,7 +73,7 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 - **trust_axes** (object): Trust axes this ontology carries, e.g. {'tcdb': ['sources','evidence','tier']} (TCDB has no evidence_score).
 - **warnings** (list[string]): Auto-warnings (e.g. nonpeptidase_homolog rows without a call_class filter).
 - **filters_applied** (object): Echo of the trust filters that were actually set on this call.
-- **skipped_ontologies** (list[object]): Empty for single-ontology tools; reserved for multi-ontology callers.
+- **skipped_ontologies** (list[object]): Always empty here (single ontology); same shape as gene_ontology_terms.skipped_ontologies.
 - **by_evidence** (list[object]): Rollup of the compact evidence column over every matching row, not just the page you are reading.
 - **by_tier** (list[object]): Rollup of tier over every matching row; carries an explicit 'null' bucket. Present in compact mode too, where tier itself is not on the row.
 - **by_sources** (list[object]): Membership counts per source value over every matching row.
@@ -100,7 +100,7 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 | signal_peptide_probability | float \| None (optional) | SignalP winning-class probability (sparse: only set when ontology='signal_peptide_type'). Range 0–1. |
 | signal_peptide_cleavage_site | int \| None (optional) | SignalP-predicted cleavage residue position (sparse: only set when ontology='signal_peptide_type'; absent when SignalP reports no cleavage site). |
 | signal_peptide_cleavage_probability | float \| None (optional) | SignalP cleavage-site probability (sparse: only set when ontology='signal_peptide_type' and cleavage_site present). |
-| evidence | string \| None (optional) | Compact trust ladder value (read it as-is; rung assignment is per ontology — see docs://analysis/annotation_evidence). Present on the 14 functional-edge ontologies; null on PSORTb/SignalP. |
+| evidence | string \| None (optional) | Compact trust ladder value (read it as-is; rung assignment is per ontology — see docs://analysis/annotation_evidence). Present on the 15 functional-edge ontologies; null on PSORTb/SignalP. |
 | call_class | string \| None (optional) | MEROPS peptidase call (sparse: merops only). 'nonpeptidase_homolog' rows are catalytically dead. |
 | tcdb_call | string \| None (optional) | TCDB call kind of the row's representative edge (precedence diamond_best_hit > diamond_tier > eggnog, then identity). Sparse: tcdb only. |
 | tcdb_gate | string \| None (optional) | KG gate of the representative TCDB edge: 'direct' / 'annotated' (default rows) or 'below_gate' (only with include_weak_tcdb_hits=True). Sparse: tcdb only. |
@@ -111,7 +111,7 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 
 | Field | Type | Description |
 |---|---|---|
-| sources | list[string] \| None (optional) | Provenance tags on this edge (verbose only; sparse outside the 14 functional-edge ontologies), e.g. ['eggnog']. |
+| sources | list[string] \| None (optional) | Provenance tags on this edge (verbose only; sparse outside the 15 functional-edge ontologies), e.g. ['eggnog']. |
 | evidence_score | float \| None (optional) | Composite trust score in [0,1] (verbose only; sparse: go_bp/mf/cc, ec, pfam, cazy, merops). |
 | tier | int \| None (optional) | Diamond tier 1-3 (verbose only; sparse: tcdb, merops). TCDB: consensus tier on diamond_tier, identity band on diamond_best_hit, null on eggnog; never compare across kinds or ontologies. |
 | confidence_score | float \| None (optional) | Native rank score (verbose only; sparse: merops only). |
@@ -1124,13 +1124,13 @@ genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1.4"], m
 }
 ```
 
-### Example 15: Trust filters on TCDB — DIAMOND calls at tier 1-2 only (evidence + max_tier + tcdb_call)
+### Example 15: Trust filters on TCDB — DIAMOND calls only (evidence + tcdb_call)
 
 ```example-call
-genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], evidence=["homology"], max_tier=2, tcdb_call=["diamond_best_hit", "diamond_tier"])
+genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], evidence=["homology"], tcdb_call=["diamond_best_hit", "diamond_tier"])
 ```
 
-*TCDB's trust axes are `sources`, `evidence` and `tier`, plus the `tcdb_call` filter; `min_evidence_score` raises on tcdb. `evidence=['homology']` and `tcdb_call` both drop the eggNOG rows here; `max_tier=2` keeps tier-null rows by design, so pair it with `evidence=['homology']` when you want DIAMOND calls only. `include_weak_tcdb_hits=True` would add the below-gate DIAMOND edges instead.*
+*TCDB's trust axes are `sources`, `evidence` and `tier`, plus the `tcdb_call` filter; `min_evidence_score` raises on tcdb. `evidence=['homology']` and `tcdb_call` both drop the eggNOG rows here. Default TCDB rows are gated, so their tier is 1, 2 or null (eggNOG): `max_tier=2` changes nothing unless `include_weak_tcdb_hits=True`. `max_tier=1` keeps tier-1 calls plus the tier-null eggNOG rows, so pair it with `evidence=['homology']`; on tcdb:3.A.1 in MED4 that leaves 4 genes, below the default `min_gene_set_size=5`, so also pass `min_gene_set_size=1`. `include_weak_tcdb_hits=True` adds the below-gate DIAMOND edges instead.*
 
 ```example-response
 {
@@ -1175,7 +1175,7 @@ genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], evi
   "truncated": false,
   "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
   "warnings": [],
-  "filters_applied": {"evidence": ["homology"], "max_tier": 2, "tcdb_call": ["diamond_best_hit", "diamond_tier"]},
+  "filters_applied": {"evidence": ["homology"], "tcdb_call": ["diamond_best_hit", "diamond_tier"]},
   "skipped_ontologies": [],
   "by_evidence": [{"count": 24, "evidence": "homology"}],
   "by_tier": [{"count": 20, "tier": 2}, {"count": 4, "tier": 1}],
@@ -1387,11 +1387,13 @@ genes_by_ontology(ontology='merops', call_class=['peptidase']) → pathway_enric
 
 - Term-anchored (term → genes). For 'which terms does this gene carry?' use `gene_ontology_terms(locus_tags=[...])` — same ontology surface, opposite anchor.
 
+- Default `min_gene_set_size=5` / `max_gene_set_size=500` suit enrichment and drop small and huge terms, which can hide most of a gene set (e.g. BRITE `tree='transporters'`, `level=2` in MED4). To enumerate every gene pass `min_gene_set_size=1` and a large `max_gene_set_size` (e.g. 100000 over MCP; `None` from Python). The envelope reports what was dropped: `size_filtered_terms` (terms outside the size bounds), `size_filtered_genes` (genes found only in those terms), and a `warnings` entry. `filtered_out` lists only input `term_ids`, so in `level` mode these fields are the only signal.
+
+- Substrate-anchored TCDB questions ('which genes transport sucrose?') chain via `genes_by_metabolite`, NOT `genes_by_ontology`. Use `genes_by_ontology(ontology='tcdb', term_ids=[...])` for *family*-level questions ('which genes are in voltage-gated ion channels?'). The metabolite-anchored route includes every TC system curated with the substrate (plus the opt-in family walk); the family-anchored route here is anchored on one TC id and misses cross-family substrate hits.
+
 - At least one of `level` or `term_ids` must be set — calling without either is an error.
 
 - Results are `(gene × term)` pairs, not distinct genes — use `total_genes` for the gene count. `total_matching` is the row count.
-
-- Default `min_gene_set_size=5` / `max_gene_set_size=500` suit enrichment and drop small and huge terms, which can hide most of a gene set (e.g. BRITE `tree='transporters'`, `level=2` in MED4). To enumerate every gene pass `min_gene_set_size=1, max_gene_set_size=None`. The envelope reports what was dropped: `size_filtered_terms` (terms outside the size bounds), `size_filtered_genes` (genes found only in those terms), and a `warnings` entry. `filtered_out` lists only input `term_ids`, so in `level` mode these fields are the only signal.
 
 - Gene-set-size filter is organism-scoped via descendants — count of distinct genes annotated to the term or any descendant for `$organism`. Matches `ontology_landscape`'s convention.
 
@@ -1411,11 +1413,11 @@ genes_by_ontology(ontology='merops', call_class=['peptidase']) → pathway_enric
 
 - Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`.
 
-- Trust surface: compact rows on the 14 functional-edge ontologies (everything except PSORTb/SignalP) carry `evidence` — a categorical ladder `curated > signature > homology > family_inferred > domain_inferred`. `sources`, `evidence_score` (not on TCDB), and `tier` (TCDB + MEROPS only) move to verbose. Filters `sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call` default to `None` and never narrow the result unless set; `min_evidence_score` is the only numeric cutoff anywhere in the surface. `call_class` (`peptidase` / `inhibitor` / `nonpeptidase_homolog`) is MEROPS-only and compact always (not verbose-gated) because it changes the biological reading. `interpro_type` is InterPro-only and compact always. `tcdb_call` (`eggnog` / `diamond_tier` / `diamond_best_hit`) is TCDB-only; TCDB rows also carry compact `tcdb_gate` and `tcdb_calls`. Passing an axis an ontology doesn't carry raises `ValueError` naming that ontology's axes. See `docs://analysis/annotation_evidence` for the full per-ontology profile.
+- Compact rows carry `evidence` on the 15 functional-edge ontologies (null on PSORTb/SignalP), plus `call_class` on MEROPS, `interpro_type` on InterPro and `tcdb_call` / `tcdb_gate` / `tcdb_calls` on TCDB. `sources` / `evidence_score` / `tier` and native scalars are verbose. Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call`) default to `None`; an axis the ontology lacks raises `ValueError`. Per-ontology table: `docs://analysis/annotation_evidence`.
 
 - `max_tier` keeps tier-null rows (`r.tier <= max_tier OR r.tier IS NULL`) — an eggNOG-only TCDB edge with no `tier` passes any `max_tier` filter. Check the envelope's `by_tier` `"null"` bucket to see how many rows that affects.
 
-- `sources` is set-membership ANY (`any(s IN $sources WHERE s IN r.sources)`), not exact match — an edge with `sources=['eggnog', 'blast']` matches `sources=['eggnog']`.
+- `sources` is set-membership ANY (`any(s IN $sources WHERE s IN r.sources)`), not exact match — an edge with `sources=['eggnog', 'uniprot']` matches `sources=['eggnog']`.
 
 - Row strip rule: a row only carries the columns its ontology owns. `tier` never appears on a `kegg` row (KEGG carries no `tier` axis); `interpro_type` never appears on a `tcdb` row. Owned-but-null stays — e.g. `tier` is present and `null` on a TCDB edge with only eggNOG support (no tier assigned).
 
@@ -1431,9 +1433,7 @@ list_filter_values(filter_type='trust_axes', ontology='go_bp')  # check axes fir
 
 - Many TCDB nodes are range-only: a system or subfamily TCDB curates but no gene in the KG is called to (`gene_count = 0`). They exist so a family's substrate range is complete; they bind no genes here.
 
-- CAZy is a small ontology (~64 terms, 6 classes / 58 families). `level=0` gives ~6 class-level rows (GH, GT, PL, CE, AA, CBM); `level=1` gives families. With default `min_gene_set_size=5`, many CAZy terms are filtered out — pass `min_gene_set_size=1` to see all.
-
-- Substrate-anchored TCDB questions ('which genes transport sucrose?') chain via `genes_by_metabolite`, NOT `genes_by_ontology`. Use `genes_by_ontology(ontology='tcdb', term_ids=[...])` for *family*-level questions ('which genes are in voltage-gated ion channels?'). The metabolite-anchored route includes every TC system curated with the substrate (plus the opt-in family walk); the family-anchored route here is anchored on one TC id and misses cross-family substrate hits.
+- CAZy is a small ontology (6 classes, ~90 families; `docs://ontologies/cazy`). `level=0` gives ~6 class-level rows (GH, GT, PL, CE, AA, CBM); `level=1` gives families. With default `min_gene_set_size=5`, many CAZy terms are filtered out — pass `min_gene_set_size=1` to see all.
 
 - Substrate-anchored EC questions ('which genes catalyse a reaction involving glucose?') chain via `genes_by_metabolite(metabolite_ids=[...], evidence_sources=['metabolism'])`, NOT `genes_by_ontology(ontology='ec', ...)`. The metabolite-anchored route reaches every EC number whose Reaction touches the compound; the EC-anchored route here is anchored on a single EC family and misses promiscuous reactions. See docs://analysis/metabolites for the full anchor-disambiguation.
 
@@ -1463,7 +1463,7 @@ response.total_genes  # distinct genes across all matches
 
 - `limit` defaults to 50 over MCP; the Python package defaults to unbounded (all rows), which `pathway_enrichment` / `cluster_enrichment` rely on for a complete TERM2GENE.
 
-- `tcdb_call` filters edges before the row's representative edge is chosen, so the same (gene, term) row can report a different `tcdb_call` under the filter: pstS (PMM0710) on tcdb:3.A.1.7 reads `diamond_best_hit` by default and `eggnog` with `tcdb_call=['eggnog']`. The filter selects genes with a call of that kind under the term; it does not rank them. (On `gene_ontology_terms` leaf mode the ancestor drop still uses all gated edges, so the same filter can return 0 rows there.)
+- `tcdb_call` filters edges before the row's representative edge is chosen, so the same (gene, term) row can report a different `tcdb_call` under the filter: pstS (PMM0710) on tcdb:3.A.1.7 reads `diamond_best_hit` by default and `eggnog` with `tcdb_call=['eggnog']`. The filter selects genes with a call of that kind under the term; it does not rank them.
 
 ## Package import equivalent
 

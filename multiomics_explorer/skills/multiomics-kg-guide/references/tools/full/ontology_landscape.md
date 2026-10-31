@@ -2,10 +2,10 @@
 
 ## What it does
 
-Rank (ontology × level) strata by enrichment suitability — term-size distribution, genome coverage, relevance_rank.
+Rank (ontology × level) strata by enrichment suitability — term sizes, genome coverage, relevance_rank.
 
 Use as the pre-flight that picks (ontology, level) for `pathway_enrichment` / `cluster_enrichment`; the terms are `search_ontology`, gene sets `genes_by_ontology`.
-Filters: organism, ontology, tree, experiment_ids, min/max_gene_set_size, informative_only, call_class, interpro_type.
+Filters: organism, ontology, tree, experiment_ids, min/max_gene_set_size, informative_only, call_class, tcdb_call, interpro_type.
 Returns: organism_gene_count, n_ontologies, by_ontology, not_found, not_matched; one row = one stratum (BRITE per tree, InterPro per type).
 docs://tools/ontology_landscape; summary=True first.
 
@@ -25,7 +25,7 @@ docs://tools/ontology_landscape; summary=True first.
 | max_gene_set_size | int | 500 | Exclude terms with more genes than this (default 500). |
 | informative_only | bool | True | True drops terms the KG flags uninformative (roots, catch-alls). |
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
-| tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked. Leaf mode still drops ancestors via all edges, so a call kind only on an ancestor term yields no row. Values: list_filter_values('tcdb_call'). |
+| tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked, so an ancestor-term row reports a surviving call kind. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
 
 **Discovery:** use `list_organisms` for valid organism names.
@@ -35,19 +35,23 @@ docs://tools/ontology_landscape; summary=True first.
 ### Envelope
 
 ```expected-keys
-organism_name, organism_gene_count, n_ontologies, by_ontology, not_found, not_matched, total_matching, returned, truncated, offset, results
+organism_name, organism_gene_count, n_ontologies, by_ontology, not_found, not_matched, total_matching, returned, truncated, offset, filters_applied, trust_axes, skipped_ontologies, warnings, results
 ```
 
 - **organism_name** (string)
 - **organism_gene_count** (int)
 - **n_ontologies** (int)
 - **by_ontology** (object)
-- **not_found** (list[string])
-- **not_matched** (list[string])
+- **not_found** (list[string]): experiment_ids absent from the KG
+- **not_matched** (list[string]): experiment_ids present but not in this organism
 - **total_matching** (int)
 - **returned** (int)
 - **truncated** (bool)
 - **offset** (int)
+- **filters_applied** (object): Echo of the trust filters that were actually set on this call.
+- **trust_axes** (object): Trust axes each surveyed ontology carries, keyed by ontology.
+- **skipped_ontologies** (list[object]): Multi-ontology: [{ontology, reason}] for ontologies dropped because a filter/facet only some of the queried ontologies own.
+- **warnings** (list[string]): Auto-warnings, incl. skipped-ontology and trust-filter notices.
 
 ### Per-result fields
 
@@ -58,8 +62,8 @@ organism_name, organism_gene_count, n_ontologies, by_ontology, not_found, not_ma
 | tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
 | tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
 | interpro_type | string \| None (optional) | InterPro entry type this stratum covers (sparse: interpro only). |
-| relevance_rank | int | 1-indexed rank by spec_score; stable under pagination |
-| n_terms_with_genes | int |  |
+| relevance_rank | int | 1 = best stratum: coverage (genome, or median experiment coverage with experiment_ids) x a size factor favouring median term sizes of 5-50 genes; stable under pagination |
+| n_terms_with_genes | int | Terms at this level within min/max_gene_set_size |
 | n_genes_at_level | int |  |
 | genome_coverage | float | n_genes_at_level / organism_gene_count |
 | min_genes_per_term | int |  |
@@ -69,10 +73,10 @@ organism_name, organism_gene_count, n_ontologies, by_ontology, not_found, not_ma
 | max_genes_per_term | int |  |
 | n_levels_in_ontology | int | Levels this ontology spans (1 = flat) |
 | best_effort_share | float \| None (optional) | Fraction of reached terms flagged level_is_best_effort (GO only; None for others) |
-| min_exp_coverage | float \| None (optional) |  |
-| median_exp_coverage | float \| None (optional) |  |
-| max_exp_coverage | float \| None (optional) |  |
-| n_experiments_with_coverage | int \| None (optional) |  |
+| min_exp_coverage | float \| None (optional) | Per-experiment share of quantified genes reached at this level, minimum (experiment_ids only) |
+| median_exp_coverage | float \| None (optional) | Same, median across experiments (experiment_ids only) |
+| max_exp_coverage | float \| None (optional) | Same, maximum (experiment_ids only) |
+| n_experiments_with_coverage | int \| None (optional) | Experiments contributing to the coverage stats (experiment_ids only) |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -854,7 +858,7 @@ ontology_landscape(organism="MED4", ontology="merops", call_class=["peptidase"])
 ontology_landscape(organism="MED4", informative_only=False)
 ```
 
-*`ontology_landscape` defaults to `informative_only=True` (the only ontology tool that does) — the ranking surface for enrichment should reflect informative terms only. Pass `informative_only=False` for an unfiltered census, e.g. when triaging coverage gaps or comparing unfiltered vs filtered genome_coverage. Term counts and genome_coverage rise slightly (MED4 KEGG level 3: 30 KO terms; at KEGG level 2 the global / overview maps such as ko01100 are flagged and drop out under the default).*
+*`ontology_landscape` defaults to `informative_only=True` (as do the two enrichment tools; `search_ontology` / `genes_by_ontology` / `gene_ontology_terms` default False) — the ranking surface for enrichment should reflect informative terms only. Pass `informative_only=False` for an unfiltered census, e.g. when triaging coverage gaps or comparing unfiltered vs filtered genome_coverage. Term counts and genome_coverage rise slightly (MED4 KEGG level 3: 30 KO terms; at KEGG level 2 the global / overview maps such as ko01100 are flagged and drop out under the default).*
 
 ```example-response
 {
@@ -1288,7 +1292,7 @@ results[0]['relevance_rank']
 
 - InterPro rows break down by `interpro_type` the same way BRITE rows break down by `tree` — without a specific `interpro_type`, `results` mixes all 8 InterPro types (HOMOLOGOUS_SUPERFAMILY, DOMAIN, FAMILY, REPEAT, CONSERVED_SITE, ACTIVE_SITE, BINDING_SITE, PTM), each carrying `interpro_type` per row (`by_ontology` still has a single `interpro` key).
 
-- CAZy is a small ontology (64 nodes — 6 classes + 58 families). With default `min_gene_set_size=5`, only a handful of CAZy terms ever pass the filter — typically 1–2 rows per organism. This is expected, not a bug. Pass `min_gene_set_size=1` to see all CAZy classes/families.
+- CAZy is a small ontology (6 classes, ~90 families; `docs://ontologies/cazy`). With default `min_gene_set_size=5`, only a handful of CAZy terms ever pass the filter — typically 1–2 rows per organism. This is expected, not a bug. Pass `min_gene_set_size=1` to see all CAZy classes/families.
 
 - TCDB and CAZy use organism-scoped term-size stats just like the other ontologies. TCDB has 5 levels (`tc_class`...`tc_system`); its term sizes and coverage count gated edges only (`tcdb_gate` direct or annotated); CAZy has 2 (`cazy_class`, `cazy_family`).
 
@@ -1314,7 +1318,7 @@ result['total_matching']
 from multiomics_explorer import ontology_landscape
 
 result = ontology_landscape(organism=...)
-# returns dict with keys: organism_name, organism_gene_count, n_ontologies, by_ontology, not_found, not_matched, total_matching, returned, truncated, offset, results
+# returns dict with keys: organism_name, organism_gene_count, n_ontologies, by_ontology, not_found, not_matched, total_matching, returned, truncated, offset, filters_applied, trust_axes, skipped_ontologies, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

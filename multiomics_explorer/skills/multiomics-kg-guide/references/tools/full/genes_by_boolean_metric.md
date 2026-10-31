@@ -459,7 +459,7 @@ genes_by_boolean_metric (no organism filter) → split via envelope by_organism 
 
 ## Common mistakes
 
-- Two storage conventions coexist. 11 of 34 boolean DMs (Biller 2022, Voigt 2014, Hennon 2015, Steglich 2010) store `r.value="not_flagged"` edges, so `flag_value=False` returns tested-absent rows there; the rest (Biller 2014 / 2018, Coe 2016) are positive-only and return 0 rows for `flag_value=False`. Read `by_metric[*].false_count` before reading an absent gene as "not flagged" rather than "not assessed"; `dm_false_count` is the full-DM precomputed twin (0 on positive-only DMs). Contrast `metabolites_by_flags_assay`, whose edges always store both states.
+- Two storage conventions coexist. 11 of 34 boolean DMs store `not_flagged` edges, so `flag_value=False` returns tested-absent rows there; the rest are positive-only and return 0 rows for `flag_value=False`. Read `by_metric[*].false_count` before reading an absent gene as "not flagged" rather than "not assessed"; `dm_false_count` is the full-DM precomputed twin (0 on positive-only DMs). Contrast `metabolites_by_flags_assay`, whose edges always store both states.
 
 - Sparse `rankable` / `has_p_value` echoes. Both are always `False` on every row from boolean DMs in the current KG — kept for cross-tool row-shape consistency with `genes_by_numeric_metric`, not because this tool reads them as a meaningful signal. Don't gate downstream logic on them.
 

@@ -41,6 +41,19 @@ Explorer-side items only; KG asks from the same log are §4 D. Template / method
 | 2c.12 | Next explorer release must carry the metabolite identity + stereo-form surface (CHANGELOG `[Unreleased]`); the KG release that ships the identity / ask-8 rebuilds sets `mcp_min_version` to that explorer version and stamps `breaking_changes`. | S | release coordination |
 | 2c.18 | Organism resolver: "Alteromonas mediterranea AltDE" is ambiguous with AltDE1 and the builders' word match leaks AltDE1 genes (pre-existing) | M | GO transport surface 2026-10-23 |
 
+## 2d. Docs review 2026-10-31 (Phase 1b, pre-release; findings in session scratchpad `docs_review_2026-10-31.md`)
+
+| # | Item | Size | Origin |
+|---|---|---|---|
+| 2d.1 | Cap pasted example responses in `refresh_examples.py` (≤ N rows, truncate nested dicts/lists) and refresh: ~5k YAML lines of untrimmed responses; `tools/full/genes_by_metabolite.md` ~23.6k tok, mostly responses. Then drop responses whose point the note already carries. | M | docs-review 2026-10-31 |
+| 2d.2 | Cap `summary=True` envelopes on `list_organisms` / `list_publications` / `resolve_gene` / `list_experiments` (larger than the default 5-row page today; docs now say so). Restores the "summary first" habit. | S | docs-review 2026-10-31 |
+| 2d.3 | Fold `analysis/metabolites.md` §g into `analysis/transport.md` (phnD / Pst examples, breadth cap, scale repeat). | S | docs-review 2026-10-31 |
+| 2d.4 | Split `analysis/metabolites.md` (~770 lines, release-by-release accretion): ID forms / stereo / structure_kind / KEGG categories → own page; reorder tested-absent section; drop hard-coded counts. Glutamine reading path ~24k → ~12k tok. | M | docs-review 2026-10-31 |
+| 2d.5 | `docs://index` read-when overrides in the generator (rows are each page's first sentence). | S | docs-review 2026-10-31 |
+| 2d.6 | `tcdb_family_substrates_skipped` lists the same breadth-capped genes (MED4 ABC `tcdb:3.A.1`: PMM0449/0450/0913/0977) for every compound — scope to genes whose family carries the queried metabolite, or say "skipped regardless of metabolite". | S | docs-review 2026-10-31 |
+| 2d.7 | `examples/metabolites.py --scenario n_source_de`: top hits are TCDB drug / macromolecule substrates, not N sources — restrict to a curated N-source set. | S | docs-review 2026-10-31 |
+| 2d.8 | `ontology_landscape` / `genes_by_ontology` size-filter warning fires on census-style calls; consider no warning when the caller passed explicit size bounds. Brief "Result row" field order (verbose-heavy models). | S | docs-review 2026-10-31 |
+
 ## 3. Older backlog — verified 2026-08-28
 
 Shipped since the last refresh (removed from the open set): 3.9 metabolomics-DM slice (KG owner decided 2026-08-29: not planned, no driver dataset — reopenable); 3.10 KG-MET-002 (comment landed in rebuild #3); 3.6 static resources (verified 2026-08-29: every `docs://` URI is a static `FunctionResource`, no templates); `_freq_rollup` helper extraction;
@@ -86,6 +99,10 @@ Filed in chat 2026-08-28; the non-release set (B1–B3, new B5 rebuild-#3 ping, 
 - D7. Culture-level measurement node type (cell counts, medium NH₄⁺/NO₃⁻, N biomass, DON): organism, condition, bottle id, time, growth phase, value, unit, measured/derived, extraction method. Medium nutrients can already go in as `spent_medium` metabolite assays. Researcher wants cell counts; it's not urgent.
 - D8 (note): no KEGG reactions on di-/tripeptides; KO coverage gaps on transporters (`amt1`, `focA`). These are annotation limits, no ask yet.
 - ~~D9~~ landed in the 2026-10-31T11:20:55Z rebuild (KG `d3020457`: the 38 retired InterPro accessions are dropped — `InterproEntry` 13,352 → 13,314, `Gene_has_interpro_entry` −1,665; B2 CHANGELOG notes added). The 2 held goldens regenerated in that absorb.
+
+**E — docs review 2026-10-31** (`docs/kg-specs/2026-10-31-docs-review-kg-asks.md`)
+- E1. `TcdbFamily.superfamily` names the wrong superfamily (ABC → ArsA; P-ATPase → "Heavy Metal Binding Domain"). P1.
+- E2. `presence_flag_extracellular` assay has `compartment='whole_cell'`. E3. genomic_island `ClusteringAnalysis.omics_type=''`. E4. confirm KEGG level-count drop is intended. E5/E6 unverified (KG down at review time): empty `metric_type` on the MIT9313 PNAS assay; TCDB `tier` wording in the `trust_axes` vocab.
 
 **C — notes, no action**: `expression_bin` declared but unused (drift test checks in-use ⊆ declared); `direct_gene_count` absent on PfamClan / BriteCategory (documented); 4 publications without `discusses` edges (pre-existing extraction gaps).
 

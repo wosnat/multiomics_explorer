@@ -7,7 +7,7 @@ Publications with experiment, DM, metabolomics and literature-index rollups.
 Use as the study-level discovery entry point; for per-experiment detail use `list_experiments(publication_dois=[...])`, for the entities a paper names `discussed_by_publication`.
 Filters: organism, search_text, author, publication_dois, compartment, plus the condition filters.
 Returns: by_organism, by_treatment_type, by_omics_type, by_compartment, by_discusses_coverage, not_found; one row = one publication.
-docs://tools/list_publications; summary=True first.
+docs://tools/list_publications; summary=True is uncapped (larger than the default call).
 
 ## Parameters
 
@@ -46,11 +46,11 @@ Result row: `doi, title, authors, year, journal, study_type, organisms, experime
 
 ## Common mistakes
 
-- If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this publication.
+- Use the dedicated author param for author filtering (e.g. author='Biller'), not search_text — search_text searches title, abstract, and description only.
 
-- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or a summary=True call's by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. On this tool the rollups come from an unfiltered list_publications() call.
+- experiment_count is per-publication — a publication with experiment_count=10 may span multiple organisms and treatment types.
 
-- `organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works.
+- metabolite_count > 0 indicates a metabolomics-bearing publication. Drill into MetaboliteAssay nodes via list_metabolite_assays(publication_dois=[...]); inspect compartments via metabolite_compartments per row.
 
 ## Chaining patterns
 
@@ -58,7 +58,7 @@ Result row: `doi, title, authors, year, journal, study_type, organisms, experime
 - list_publications → genes_by_function
 - list_publications → list_clustering_analyses(publication_dois=[...])
 - list_publications(search_text=..., verbose=True) → classify → list_publications(publication_dois=[...]) for the picked subset
-- list_publications(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
+- list_publications(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric (docs://analysis/derived_metrics)
 - list_filter_values(filter_type='metric_type') → list_publications(search_text='<metric_type>') to find publications with that metric
 - list_publications (per-row `metabolite_count > 0`) → list_metabolite_assays(publication_dois=[...]) to inspect the paper's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup).
 - list_publications (per-row `discussed_gene_count` or `discussed_pathway_count` > 0) → discussed_by_publication(publication_dois=[...]) to list the genes + KEGG pathways the paper names in prose.

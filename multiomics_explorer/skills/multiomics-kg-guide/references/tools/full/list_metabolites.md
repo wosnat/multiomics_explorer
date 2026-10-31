@@ -2,7 +2,7 @@
 
 ## What it does
 
-Browse the chemistry layer — KEGG-curated metabolism, TCDB-curated transport substrates, and compounds measured by a MetaboliteAssay.
+Browse the chemistry layer — KEGG metabolism, TCDB transport substrates, GO transport targets, and compounds measured by an assay.
 
 Use as the compound-side entry point; genes via `genes_by_metabolite`, measurements via `assays_by_metabolite`.
 Filters: search_text, metabolite_ids (+exclude), xref IDs, elements, mass, organism_names, pathway_ids, evidence_sources, structure_kind, kegg_functional_categories, kegg_brite_classes.
@@ -20,7 +20,7 @@ docs://tools/list_metabolites; summary=True first.
 | chebi_ids | list[string] \| None | None | ChEBI ids, bare digits or 'CHEBI:' form (e.g. ['4167', 'CHEBI:15422']). Matches any of the metabolite's identifiers, including secondary and retired ones. |
 | hmdb_ids | list[string] \| None | None | HMDB ids (e.g. ['HMDB0000122']; short 'HMDB02878' is padded). Matches any of the metabolite's identifiers, including secondary and retired ones. |
 | mnxm_ids | list[string] \| None | None | MetaNetX ids (e.g. ['MNXM1364061']). Matches any of the metabolite's identifiers, including secondary and retired ones. |
-| elements | list[string] \| None | None | Element-presence filter (Hill-notation symbols, e.g. 'Fe', 'N'). AND of presence — ['N', 'P'] matches metabolites containing BOTH. A case-insensitive symbol ('n', 'fe') or a full element name ('Nitrogen') for one of the ~12 elements this KG's chemistry layer carries (C, H, N, O, P, S, Fe, Mg, Mn, Zn, Cu, Co, Mo, Ni, Se) is normalized silently; anything else is dropped from the filter and reported in `not_found.elements` with a warning. Use this rather than substring-matching on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Empty/null formula metabolites never match. |
+| elements | list[string] \| None | None | Element-presence filter (Hill-notation symbols, e.g. 'Fe', 'N'). AND of presence — ['N', 'P'] matches metabolites containing BOTH. A case-insensitive symbol ('n', 'fe') or a full element name ('Nitrogen') for one of the 15 elements this KG's chemistry layer carries (C, H, N, O, P, S, Fe, Mg, Mn, Zn, Cu, Co, Mo, Ni, Se) is normalized silently; anything else is dropped from the filter and reported in `not_found.elements` with a warning. Use this rather than substring-matching on `formula` (Hill notation has element-clash footguns: 'Cl' contains 'C', 'Na' contains 'N'). Empty/null formula metabolites never match. |
 | min_mass | float \| None | None | Minimum monoisotopic mass (Da). Excludes metabolites with null `mass` (~22%). E.g. 60.0. |
 | max_mass | float \| None | None | Maximum monoisotopic mass (Da). E.g. 1000.0. |
 | organism_names | list[string] \| None | None | Metabolites reached by ANY of these organisms (case-insensitive `preferred_name`), by any route. With `evidence_sources`, a listed organism must reach it by one of those routes. E.g. ['Prochlorococcus MED4']. Unknown: `not_found.organism_names`. |
@@ -116,7 +116,7 @@ list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"], limit=
 list_metabolites(pathway_ids=["kegg.pathway:ko00910"], limit=10)
 ```
 
-### Example 3: Cross-organism survey — metabolites both partners reach
+### Example 3: Cross-organism survey — metabolites either partner reaches (union; intersect two single-organism calls for 'both')
 
 ```example-call
 list_metabolites(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MIT1002"], summary=True)
@@ -718,11 +718,13 @@ list_metabolites(kegg_brite_classes=["Lipids: Fatty acyls"], limit=3)
 }
 ```
 
-### Example 9: Transport-only metabolites (TCDB substrates without local catalysis)
+### Example 9: TCDB substrate catalogue (metabolite-level)
 
 ```example-call
 list_metabolites(evidence_sources=["transport"], summary=True)
 ```
+
+*Every compound some TCDB system lists as a substrate, catalysed or not: `evidence_sources` is ANY-match and catalogue-level. Transport-only = rows with `catalyst_gene_count = 0` and `transporter_gene_count > 0`; filter rows client-side.*
 
 ### Example 10: One organism's transport reach — organism_names + evidence_sources scope each other
 
@@ -1334,11 +1336,11 @@ list_metabolites(evidence_sources=['go_transport'], organism_names=[...]) → ge
 
 ## Common mistakes
 
-- Direction-agnostic — KEGG equation order is unreliable upstream, so joins through Reaction_has_metabolite (catalysis) and Tcdb_family_transports_metabolite (transport) do NOT distinguish substrates from products. Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate. See docs://analysis/metabolites.
+- Direction-agnostic — KEGG equation order is unreliable upstream, so the catalysis join does NOT distinguish substrates from products, and the transport counts here carry no direction (TCDB's node-level `tcdb_direction` hint is on `genes_by_metabolite` rows, mostly `unknown`). Layer DE direction (`differential_expression_by_gene`) and functional annotation to disambiguate. See docs://analysis/metabolites.
 
 - catalyst_gene_count counts the catalysis arm only (genes reaching the metabolite via Gene → Reaction → Metabolite). catalyst_gene_count = 0 does NOT mean metabolomics-only: transport-only metabolites (TCDB substrates with no local catalysis) also read 0. Discriminate via the paired counts: catalyst_gene_count = 0 with `transporter_gene_count > 0` is transport-only; both 0 with `evidence_sources == ['metabolomics']` is measurement-only (no gene path). `transporter_gene_count` counts distinct genes with a direct TCDB call (`tcdb_gate='direct'`) on a system curated with the metabolite, all organisms — it equals the distinct genes `genes_by_metabolite` returns in its default (direct) transport rows, unioned over organisms. `'transport'` in `evidence_sources` only means TCDB lists the metabolite as a substrate of a kept system; many such metabolites read `transporter_gene_count = 0`, so route on the count, not the tag.
 
-- A 0 `catalyst_gene_count` on a generic (stereo-unspecified) metabolite does not mean no enzyme acts on the compound. Stereo forms are separate nodes and no count combines across them: TCDB names substrates generically, so transport sits on 'Cysteine' (`kegg.compound:C00736`, 0 catalysts), while KEGG reactions use the specific form, so catalysis sits on 'L-Cysteine' (`kegg.compound:C00097`). Read the row's `stereo_relatives` (`relation` = `specific_form` / `unspecified_form` / `enantiomer`, each with its own `catalyst_gene_count` / `transporter_gene_count`), then use `genes_by_metabolite(..., include_stereo_forms=True)` for a per-organism transport ↔ catalysis join. A generic's `specific_form` relatives can include a D-form. Stereo links are incomplete (e.g. 'glucose' `chebi:17234` has none yet), so an absent `stereo_relatives` is not proof of no other form: `search_text` by name lists every form.
+- A 0 `catalyst_gene_count` on a generic (stereo-unspecified) metabolite does not mean no enzyme acts on the compound. Stereo forms are separate nodes and no count combines across them: TCDB names substrates generically, so transport sits on 'Cysteine' (`kegg.compound:C00736`, 0 catalysts), while KEGG reactions use the specific form, so catalysis sits on 'L-Cysteine' (`kegg.compound:C00097`). Read the row's `stereo_relatives` (`relation` = `specific_form` / `unspecified_form` / `enantiomer`, each with its own `catalyst_gene_count` / `transporter_gene_count`), then use `genes_by_metabolite(..., include_stereo_forms=True)` for a per-organism transport ↔ catalysis join. A generic's `specific_form` relatives can include a D-form. Stereo links cover the KG's curated generic → specific pairs only, so a missing `stereo_relatives` is not proof that no other form exists: `search_text` by name lists every form.
 
 ```mistake
 list_metabolites(organism_names=['Prochlorococcus MED4'], evidence_sources=['transport'])  # read as 'transport catalogue, plus MED4 reaches it somehow'
@@ -1382,7 +1384,7 @@ list_metabolites(elements=['Nitrogen'])  # or lowercase 'n'/'fe'
 
 ```correction
 Both are accepted and normalized silently to the correct symbol (`N`,
-`Fe`) for the ~12 elements this KG's chemistry layer carries. An
+`Fe`) for the 15 elements this KG's chemistry layer carries. An
 unrecognized element (not a known symbol or full name) is dropped from
 the filter, reported in `not_found.elements`, and adds a `warnings` entry.
 
@@ -1434,22 +1436,10 @@ list_metabolites(metabolite_ids=['C00064'])  # then treating `C00064` in `not_fo
 ```
 
 ```correction
-Metabolite IDs on `metabolite_ids` / `exclude_metabolite_ids` are normalised and
-looked up in every identifier the metabolite carries before the query runs:
-`C00064` / `kegg.compound:c00064` → `kegg.compound:C00064`, `CHEBI:17234` /
-`17234` → `chebi:17234`; `HMDB0000122`, `MNXM732398` and bare InChIKeys resolve
-the same way. Retired ids of merged or re-keyed nodes resolve to the surviving
-node (`chebi:14654` → nitrate `kegg.compound:C00244`). Every input that isn't
-already canonical is listed in envelope `resolved_aliases`
-(`{input: [canonical, ...]}`). A removed compound whose measurements moved to
-another compound, and a chemical-role id (`chebi:10004`, 'vitamin (role)'),
-stay verbatim in `not_found` with a `warnings` entry naming the replacement or
-the role. Other unresolved inputs stay verbatim in `not_found` in the form you
-passed. The xref filters (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`) normalise each value the same way and match any of the metabolite's identifiers, including secondary and retired ones; they are filters, so they add nothing to `resolved_aliases`.
-
+IDs in any form (bare, prefixed, ChEBI / HMDB / MNX / InChIKey, retired) resolve before the query; read `resolved_aliases`. Removed compounds and chemical-role ids stay in `not_found` with a warning (roles go to `genes_by_metabolite`). The xref filters normalise the same way but add nothing to `resolved_aliases`. See docs://analysis/metabolites, 'Metabolite ID forms'.
 ```
 
-- See `docs://analysis/metabolites` for the 3 source pipelines decision tree (metabolism / transport / metabolomics) and `docs://guide/concepts` for the chemistry layer overview.
+- See `docs://analysis/metabolites` (evidence sources: metabolism, TCDB transport, GO transport, metabolomics) and `docs://analysis/transport` for reading the transport routes; `docs://guide/concepts` has the chemistry layer overview.
 
 - `evidence_sources=['go_transport']` alone is a metabolite-level filter (a GO transport term names this compound). Combined with `organism_names`, the organism must be on the row's `go_transport_organism_names`; `organism_names` alone matches organisms on either the KEGG / TCDB / assay list or the GO list. `catalyst_gene_count`, `transporter_gene_count` and `organism_count` stay KEGG / TCDB / assay only (no blending), so a GO-only metabolite reads zero on all three. Drill the GO route with `genes_by_metabolite`. See `docs://analysis/transport`.
 

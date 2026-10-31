@@ -80,11 +80,10 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 - `sources` — `list_filter_values(filter_type="sources", ontology="brite")`
 - `brite_tree` — `list_filter_values(filter_type="brite_tree")`
 
-Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="brite")`) lists which comparable axes the gene edge carries.
+Values are read live from the KG's `ControlledVocabulary` nodes (`list_filter_values`); the list below is a build-time snapshot and may lag the KG. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="brite")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
+Vocabulary snapshot (build time):
 
-- `BriteCategory.level_kind`: `brite_class`, `brite_subclass`, `brite_family`, `brite_subfamily`
 - `BriteCategory.tree`: `enzymes`, `transporters`, `peptidases`, `transcription_factors`, `secretion`, `two_component`, `defense`, `chaperones`, `ribosome`, `translation_factors`, `trna_biogenesis`, `dna_replication`
 - `Gene_has_kegg_ko.evidence`: `family_inferred`
 - `Gene_has_kegg_ko.sources`: `eggnog`
@@ -113,9 +112,10 @@ rest.
   ontology list).
 - Term IDs carry the tree code; a level-3 node in `transporters` and one
   in `enzymes` are unrelated even when their names look similar.
-- For substrate-level transporter questions use TCDB (`tcdb`) or the
-  chemistry layer; BRITE transporter families are KO groupings, not
-  substrate calls.
+- For substrate-level transporter questions use `genes_by_metabolite` /
+  `metabolites_by_gene` (TCDB and GO transport routes,
+  `docs://analysis/transport`); BRITE transporter families are KO
+  groupings, not substrate calls.
 - Trust filters on `brite` do nothing (single rung) and `min_evidence_score`
   raises.
 
@@ -138,6 +138,7 @@ rest.
 
 - `docs://ontologies/kegg`
 - `docs://ontologies/tcdb`
+- `docs://analysis/transport`
 - `docs://guide/conventions`
 - `docs://analysis/enrichment`
 - `docs://tools/list_filter_values`

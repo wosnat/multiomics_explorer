@@ -63,11 +63,10 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 - `evidence` — `list_filter_values(filter_type="evidence", ontology="cog_category")`
 - `sources` — `list_filter_values(filter_type="sources", ontology="cog_category")`
 
-Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="cog_category")`) lists which comparable axes the gene edge carries.
+Values are read live from the KG's `ControlledVocabulary` nodes (`list_filter_values`); the list below is a build-time snapshot and may lag the KG. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="cog_category")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
+Vocabulary snapshot (build time):
 
-- `CogFunctionalCategory.is_uninformative`: `true`
 - `Gene_in_cog_category.evidence`: `family_inferred`
 - `Gene_in_cog_category.sources`: `eggnog`
 

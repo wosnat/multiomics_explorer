@@ -2,10 +2,10 @@
 
 ## What it does
 
-Rank (ontology × level) strata by enrichment suitability — term-size distribution, genome coverage, relevance_rank.
+Rank (ontology × level) strata by enrichment suitability — term sizes, genome coverage, relevance_rank.
 
 Use as the pre-flight that picks (ontology, level) for `pathway_enrichment` / `cluster_enrichment`; the terms are `search_ontology`, gene sets `genes_by_ontology`.
-Filters: organism, ontology, tree, experiment_ids, min/max_gene_set_size, informative_only, call_class, interpro_type.
+Filters: organism, ontology, tree, experiment_ids, min/max_gene_set_size, informative_only, call_class, tcdb_call, interpro_type.
 Returns: organism_gene_count, n_ontologies, by_ontology, not_found, not_matched; one row = one stratum (BRITE per tree, InterPro per type).
 docs://tools/ontology_landscape; summary=True first.
 
@@ -25,7 +25,7 @@ docs://tools/ontology_landscape; summary=True first.
 | max_gene_set_size | int | 500 | Exclude terms with more genes than this (default 500). |
 | informative_only | bool | True | True drops terms the KG flags uninformative (roots, catch-alls). |
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
-| tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked. Leaf mode still drops ancestors via all edges, so a call kind only on an ancestor term yields no row. Values: list_filter_values('tcdb_call'). |
+| tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked, so an ancestor-term row reports a surviving call kind. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
 
 **Discovery:** use `list_organisms` for valid organism names.
@@ -41,7 +41,7 @@ ontology_landscape(organism="MED4")
 ## Response sketch
 
 ```expected-keys
-organism_name, organism_gene_count, n_ontologies, by_ontology, not_found, not_matched, total_matching, returned, truncated, offset, results
+organism_name, organism_gene_count, n_ontologies, by_ontology, not_found, not_matched, total_matching, returned, truncated, offset, filters_applied, trust_axes, skipped_ontologies, warnings, results
 ```
 
 Result row: `ontology_type, level, tree, tree_code, interpro_type, relevance_rank, n_terms_with_genes, n_genes_at_level, genome_coverage, min_genes_per_term, q1_genes_per_term, median_genes_per_term, …`

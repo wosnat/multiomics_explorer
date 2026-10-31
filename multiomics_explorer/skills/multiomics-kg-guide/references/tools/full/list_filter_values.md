@@ -51,29 +51,28 @@ genes), `growth_phase` (timepoint-level culture state), `omics_type`
 (the full canonical enum incl. METABOLOMICS), `cluster_type`
 (ClusteringAnalysis.cluster_type from ControlledVocabulary, pivot
 fallback + warning), `expression_status` (the `Changes_expression_of`
-edge). DerivedMetric: `metric_type`, `value_kind`
-(`numeric` / `boolean` / `categorical`), `compartment` (wet-lab
-fraction), `table_scope` (Experiment.table_scope), `control_timing`
-(Experiment.control_timing — whether the control arm was sampled at
-the treatment arm's time or growth state). Chemistry:
+edge). Experiment: `table_scope`, `control_timing` (whether the
+control arm was sampled at the treatment arm's time or growth state),
+`partner_role` (`Tests_coculture_with` edge; feeds
+`list_experiments(coculture_role=...)`), and `treatment_type` /
+`background_factors`, which span four labels (Experiment,
+DerivedMetric, MetaboliteAssay, ClusteringAnalysis) — each row's
+`applies_to` lists only the labels that carry that value.
+DerivedMetric: `metric_type`, `value_kind` (`numeric` / `boolean` /
+`categorical`), `compartment` (wet-lab fraction). Chemistry:
 `evidence_source` (Metabolite.evidence_sources values),
 `structure_kind`, `kegg_functional_category` (KEGG br08001) and
 `kegg_brite_class` (the 7 other KEGG compound trees; no per-value
 descriptions, tree codes in the envelope `description`) on Metabolite,
 `detection_status` (the `Assay_quantifies_metabolite` edge) and
 `stereo_assignment` (both metabolomics assay edges).
-Coculture: `partner_role` (`Tests_coculture_with` edge; feeds
-`list_experiments(coculture_role=...)`).
 Annotation-trust: `evidence`, `sources`, `call_class`,
 `interpro_type`, `ncbifam_family_type`, `merops_catalytic_type`,
 `merops_family_class`, `best_hit_kind`, `pfam_support` (MEROPS),
 `tcdb_call`, `tcdb_gate` (`Gene_has_tcdb_family` edge) and `direction`
 (TcdbFamily) read ControlledVocabulary (pivot fallback + warning
 when the node is missing); `trust_axes` / `link_kinds` are
-config-derived and accept `ontology=` to scope. `treatment_type` and
-`background_factors` span four labels (Experiment, DerivedMetric,
-MetaboliteAssay, ClusteringAnalysis) — each row's `applies_to` lists
-only the labels that carry that value. See
+config-derived and accept `ontology=` to scope. See
 docs://analysis/annotation_evidence.
 
 
@@ -680,9 +679,9 @@ list_filter_values(filter_type='evidence_source') → pick 'go_transport' → li
 
 - count is summed across all organisms — a category with count=770 may cover genes in 10+ organisms
 
-- `count` is None on every vocabulary-sourced row: all the trust filter types (`evidence`, `sources`, `call_class`, `interpro_type`, ...) AND `cluster_type`. Only the pivoted / precomputed types (`gene_category`, `brite_tree`, `growth_phase`, `metric_type`, `value_kind`, `compartment`, `omics_type`, `evidence_source`) carry a count. Read `applies_to` / `description` on the count-less rows instead.
+- `count` is None on every ControlledVocabulary-backed row: the trust filter types (`evidence`, `sources`, `call_class`, `interpro_type`, ...), the experiment types (`treatment_type`, `background_factors`, `table_scope`, `control_timing`, `partner_role`), the chemistry types (`structure_kind`, `kegg_*`, `detection_status`, `stereo_assignment`), `expression_status` and `cluster_type`. Only the pivoted / precomputed types (`gene_category`, `brite_tree`, `growth_phase`, `metric_type`, `value_kind`, `compartment`, `omics_type`, `evidence_source`) carry a count. Read `applies_to` / `description` on the count-less rows instead.
 
-- treatment_type and background_factors are closed vocabularies on four labels (Experiment, DerivedMetric, MetaboliteAssay, ClusteringAnalysis) — read them here rather than from the by_treatment_type / by_background_factors rollups of list_experiments(summary=True); an unknown value passed to a filter returns 0 rows, not an error.
+- treatment_type and background_factors are closed vocabularies on four labels (Experiment, DerivedMetric, MetaboliteAssay, ClusteringAnalysis) — read them here rather than from the by_treatment_type / by_background_factors rollups of list_experiments(summary=True); an unknown value passed to a filter returns 0 rows with a warning listing the valid values, not an error.
 
 - For brite_tree: count is the number of ontology terms in the tree, not genes. Use ontology_landscape to check gene coverage.
 

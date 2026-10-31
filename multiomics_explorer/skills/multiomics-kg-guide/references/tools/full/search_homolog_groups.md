@@ -201,7 +201,7 @@ len(results)  # actual result count
 response['total_matching']  # use total, not len
 ```
 
-- Hyphens in search text are Lucene operators — use spaces instead (e.g. 'beta glycosyltransferase' not 'beta-glycosyltransferase')
+- A leading '-' (e.g. '-kinase') is Lucene NOT; mid-word hyphens are fine ('beta-glycosyltransferase' and 'beta glycosyltransferase' return the same groups).
 
 - `search_text` is Lucene — see docs://guide/conventions for syntax and scoring.
 

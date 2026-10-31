@@ -200,7 +200,7 @@ gene_homologs → genes_by_homolog_group
 
 - A gene in multiple input groups appears once per group — rows are gene × group, not distinct genes. Use total_genes for the deduplicated count.
 
-- organisms is a list, not a string — use ['MED4'] not 'MED4'
+- organisms is a list — ['MED4'], not 'MED4' (MCP rejects a bare string; the Python API wraps it)
 
 - Four diagnostic buckets, all flat lists: `not_found_groups` (group id absent from the KG) / `not_matched_groups` (group exists, no member passes the organisms filter) and `not_found_organisms` / `not_matched_organisms` (organism name unknown / known but has no member in these groups). The `_groups` / `_organisms` suffixes are this tool's spelling of the not_found / not_matched pair — See docs://guide/conventions for the shared not_found / not_matched semantics.
 

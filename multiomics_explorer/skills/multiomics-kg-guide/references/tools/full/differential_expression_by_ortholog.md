@@ -16,7 +16,7 @@ docs://tools/differential_expression_by_ortholog; summary=True first.
 | group_ids | list[string] | — | Ortholog group IDs (from search_homolog_groups or gene_homologs). E.g. ['cyanorak:CK_00000570']. Bare ids are accepted (e.g. 'CK_00000570', 'COG0592@2') and coerced to canonical (see `resolved_aliases`). |
 | organisms | list[string] \| None | None | Organisms, each word-matched as `organism`. Omit for all. |
 | experiment_ids | list[string] \| None | None | Filter to these experiments. Get IDs from list_experiments. |
-| direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` is unchanged. |
+| direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` = all statuses. |
 | significant_only | bool | False | If true, return only statistically significant rows. |
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
@@ -138,9 +138,11 @@ differential_expression_by_ortholog → genes_by_homolog_group(organisms=[...]) 
 
 ## Common mistakes
 
+- A DE timepoint label (e.g. 'day 18') and `growth_phase` describe the treatment arm; check the row's `control_timing`, and `design_notes` via list_experiments(experiment_ids=[...]), before reading it as both arms' state. See docs://guide/conventions.
+
 - Bare group ids ('CK_00000570', 'COG0592@2') are accepted and coerced to canonical — check `resolved_aliases` for the mapping; prefer the prefixed form ('cyanorak:CK_00000570') to skip coercion.
 
-- organisms is a list, not a string — use ['MED4'] not 'MED4'
+- MCP: pass `organisms` as a list (['MED4']) — a bare string is rejected by the schema (the Python API accepts it as one element).
 
 - This tool does NOT enforce single organism — that is the point
 
@@ -148,11 +150,9 @@ differential_expression_by_ortholog → genes_by_homolog_group(organisms=[...]) 
 
 - Diagnostics are suffixed flat lists: `not_found_groups` / `not_matched_groups`, `not_found_organisms` / `not_matched_organisms`, `not_found_experiments` / `not_matched_experiments`. See docs://guide/conventions for the shared not_found / not_matched semantics.
 
-- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows and reports in the envelope `warnings` (naming the valid set) — check `warnings` before trusting an empty result. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical.
+- Unknown `treatment_type` / `background_factors` / `growth_phases` values return 0 rows and land in `warnings`; live value sets via list_filter_values, semantics in docs://guide/conventions.
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
-
-- A DE timepoint label (e.g. 'day 18') and `growth_phase` describe the treatment arm; check `control_timing` / `design_notes` before reading it as both arms' state. See docs://guide/conventions.
 
 - For cross-experiment summarization patterns see `docs://analysis/expression` — covers `response_matrix` for gene × treatment-group pivots and `gene_set_compare` for two-set comparisons.
 

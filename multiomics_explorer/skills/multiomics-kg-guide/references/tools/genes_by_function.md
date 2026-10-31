@@ -16,7 +16,7 @@ docs://tools/genes_by_function; summary=True first.
 | search_text | string | — | Free-text query (Lucene syntax: quoted phrases, AND/OR, wildcards `*`, fuzzy `~`). E.g. 'photosystem', 'nitrogen AND transport', 'dnaN~'. Multi-word input is OR'd — quote the phrase or join with AND for an exact/combined match. See docs://guide/conventions for Lucene scoring details. |
 | organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
 | gene_categories | list[string] \| None | None | Filter by gene_category — matches any of the given values. E.g. ['Photosynthesis', 'Transport']. Use list_filter_values to see valid values. |
-| min_quality | int | 0 | Minimum annotation_quality (0..3 numeric encoding of `Gene.annotation_state`): 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Use 2 to skip hypothetical proteins; 3 for high-confidence. [AQ] Definition shifted in 2026-05 KG release; see docs://guide/conventions. |
+| min_quality | int | 0 | Minimum annotation_quality (0..3 numeric encoding of `Gene.annotation_state`): 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Use 2 to require at least one informative annotation source (a hypothetical protein with a Pfam / KO call still passes); 3 for multi-source support. [AQ] see docs://guide/conventions. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | limit | int | 5 | Max rows returned (paging). |
@@ -38,11 +38,9 @@ genes_by_function(search_text="photosystem")
 total_search_hits, total_matching, by_organism, by_category, score_max, score_median, returned, offset, truncated, warnings, results
 ```
 
-Result row: `locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, score, function_description, gene_summary`
+Result row: `locus_tag, gene_name, product, organism_name, gene_category, annotation_quality, score`
 
 ## Common mistakes
-
-- annotation_quality / min_quality semantics shifted in 2026-05 KG release. Existing notebooks using min_quality may select a different gene set than before. See docs://guide/conventions.
 
 ```mistake
 genes_by_function(search_text='GO:0015977')
@@ -58,6 +56,14 @@ len(result['results'])  # to count matches
 
 ```correction
 result['total_matching']  # results may be truncated
+```
+
+```mistake
+genes_by_function(search_text='ABC transporter permease', organism='HOT1A3', gene_categories=['Transport'])  # large total_search_hits, total_matching 1 -> 'no transporters in HOT1A3'
+```
+
+```correction
+`gene_categories` matches any of the given values against a curated Gene.gene_category value, and in Alteromonas most transporters sit under 'Inorganic ion transport' (Prochlorococcus / Synechococcus use Cyanorak's 'Transport'), so a category filter can miss most of them. A large total_search_hits with total_matching 0 is an empty intersection, not an absence — the envelope says so in `warnings` (a tiny non-zero count gets no warning; compare the two fields yourself). Re-run without `gene_categories` and read `by_category` to see where the hits fall, or go ontology-first (`genes_by_ontology` with a TCDB / GO term) to enumerate transporters.
 ```
 
 ## Chaining patterns

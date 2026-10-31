@@ -40,8 +40,8 @@ the KG's canonical form. `list_metabolites(pathway_ids=[...])` and
 
 ## Hierarchy
 
-Four levels, `level` 0-3 = `category` (6) → `subcategory` (46) →
-`pathway` (447) → `ko` (4,644). It is a DAG in practice: one KO belongs
+Four levels, `level` 0-3 = `category` → `subcategory` →
+`pathway` → `ko` (a few hundred pathways, a few thousand KOs). It is a DAG in practice: one KO belongs
 to many pathways (a glycolysis enzyme is also in several biosynthesis
 maps), so `gene_count` on a pathway is the union of its KOs' genes and
 sibling pathways overlap heavily. `direct_gene_count` is present on KO
@@ -89,14 +89,12 @@ Bridges are forward-only: `ontology_term_details` lists `links_out` on the sourc
 - `sources` — `list_filter_values(filter_type="sources", ontology="kegg")`
 - `link_kinds` — `list_filter_values(filter_type="link_kinds")`
 
-Values are read live from the KG's `ControlledVocabulary` nodes at call time; this page never quotes them. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="kegg")`) lists which comparable axes the gene edge carries.
+Values are read live from the KG's `ControlledVocabulary` nodes (`list_filter_values`); the list below is a build-time snapshot and may lag the KG. `trust_axes` (`list_filter_values(filter_type="trust_axes", ontology="kegg")`) lists which comparable axes the gene edge carries.
 
-Snapshot of vocabulary values at build time (`--live-vocab`):
+Vocabulary snapshot (build time):
 
 - `Gene_has_kegg_ko.evidence`: `family_inferred`
 - `Gene_has_kegg_ko.sources`: `eggnog`
-- `KeggTerm.is_uninformative`: `true`
-- `KeggTerm.level_kind`: `category`, `subcategory`, `pathway`, `ko`
 
 ## Interpretation
 
@@ -112,11 +110,11 @@ chemistry layer — the two memberships differ (see
 
 ## Informativeness rule
 
-Two kinds of term are flagged. At KO level, the 212 KOs named
+Two kinds of term are flagged. At KO level, the ~200 KOs named
 "uncharacterized protein" (`K00243; uncharacterized protein` and kin).
 At pathway level, 11 of the 13 parentless global / overview maps —
-`kegg.pathway:ko01100` Metabolic pathways (27,192 genes across the KG;
-about a quarter of the MED4 genome), `ko01110`, `ko01120` and the
+`kegg.pathway:ko01100` Metabolic pathways (about a quarter of the MED4
+genome), `ko01110`, `ko01120` and the
 `ko012xx` block — so `informative_only=True` drops them from an
 enrichment. `ko01310` Nitrogen cycle and `ko01320` Sulfur cycle are
 parentless too but stay informative: they are narrow, class-bearing

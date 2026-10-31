@@ -23,7 +23,7 @@ docs://tools/search_ontology and docs://ontologies/{key}; summary=True first.
 | informative_only | bool | False | True drops terms the KG flags uninformative (roots, catch-alls). |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type. Applies to 'interpro' only; raises if 'interpro' is not in the set. |
-| min_gene_count | int \| None | None | Keep terms with gene_count >= this (subtree organism_gene_count when `organism` is set). Narrows browse mode. |
+| min_gene_count | int \| None | None | Keep terms with gene_count >= this (subtree organism_gene_count when `organism` is set). Works in search and browse mode. |
 | organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
 
 **Discovery:** use `list_organisms` for valid organism names.
@@ -696,13 +696,13 @@ search_ontology(search_text="transport", ontology=["brite"], tree="transporters"
 search_ontology(search_text="oxido*", ontology=["kegg"], level=2)
 ```
 
-### Example 11: Find TCDB nodes that move sucrose
+### Example 11: TCDB nodes whose name mentions sucrose
 
 ```example-call
 search_ontology(search_text="sucrose", ontology=["tcdb"])
 ```
 
-*Most hits are `tc_system` nodes, and many read `gene_count = 0`: they are range-only systems TCDB curates but no gene in the KG is called to. They are legitimate discovery results (they carry the substrate edges a family walk reads), but to keep only gene-bearing terms read `gene_count`, or browse with `min_gene_count=1`. Verbose adds `tcdb_substrate_count` and TCDB's `direction`.*
+*A name match, not a substrate search: for what transports sucrose use `genes_by_metabolite`. Most hits are `tc_system` nodes, and many read `gene_count = 0`: they are range-only systems TCDB curates but no gene in the KG is called to. They are legitimate discovery results (they carry the substrate edges a family walk reads), but to keep only gene-bearing terms pass `min_gene_count=1` (works in search mode too: 35 → 12 here). Verbose adds `tcdb_substrate_count` and TCDB's `direction`.*
 
 ```example-response
 {
@@ -1287,7 +1287,7 @@ search_ontology(ontology=['interpro'], interpro_type=...) / ['ncbifam'] / ['mero
 
 - Use `level` to restrict results to a hierarchy depth (0 = broadest). PSORTb, SignalP, COG and NCBIfam are flat — `level=1` returns nothing for them. Pfam clans are level 0, domains level 1. TIGR is two-level: level 0 = the 21 main roles (`level_kind='tigr_mainrole'`), level 1 = sub roles (`level_kind='tigr_subrole'`).
 
-- TCDB is family-level transporter classification. For substrate-anchored questions ('which genes transport sucrose?'), chain via `genes_by_metabolite` instead — that tool surfaces the TCDB substrate edges directly.
+- TCDB is a 5-level transporter classification (class → system). For substrate-anchored questions ('which genes transport sucrose?'), chain via `genes_by_metabolite` instead — that tool surfaces the TCDB substrate edges directly.
 
 - PSORTb / SignalP are structural ontologies (where a protein is / how it is handled), not functional — use them for localization / secretion questions.
 

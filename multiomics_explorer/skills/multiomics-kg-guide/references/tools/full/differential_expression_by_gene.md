@@ -16,7 +16,7 @@ docs://tools/differential_expression_by_gene; summary=True first.
 | organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
 | locus_tags | list[string] \| None | None | Gene locus tags. E.g. ['PMM0001', 'PMM0845']. Get these from resolve_gene / gene_overview. |
 | experiment_ids | list[string] \| None | None | Experiment IDs to restrict to. Get these from list_experiments. |
-| direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` is unchanged. |
+| direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` = all statuses. |
 | significant_only | bool | False | If true, return only statistically significant results. |
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
@@ -408,6 +408,16 @@ differential_expression_by_gene → list_experiments(experiment_ids=[...], verbo
 
 ## Common mistakes
 
+- A DE timepoint label (e.g. 'day 18') and `growth_phase` describe the treatment arm; check `control_timing` / `design_notes` before reading it as both arms' state. See docs://guide/conventions.
+
+```mistake
+Interpreting a missing gene as 'not affected' without checking table_scope
+```
+
+```correction
+Check the experiment's table_scope — if significant_only or top_n, the gene may simply not have been reported. Only all_detected_genes experiments can distinguish 'not affected' from 'not reported'.
+```
+
 ```mistake
 Interpreting absence of a row as 'no change' when truncated=true
 ```
@@ -433,14 +443,6 @@ Check not_found_experiments (typo'd id) and not_matched_experiments (id real but
 ```
 
 ```mistake
-Interpreting a missing gene as 'not affected' without checking table_scope
-```
-
-```correction
-Check the experiment's table_scope — if significant_only or top_n, the gene may simply not have been reported. Only all_detected_genes experiments can distinguish 'not affected' from 'not reported'.
-```
-
-```mistake
 Mixing organisms in a single call (e.g. MED4 + HOT1A3 locus_tags)
 ```
 
@@ -458,14 +460,12 @@ differential_expression_by_gene(organism='MED4', summary=True)  # organism= is a
 
 - `direction` and `significant_only` interplay: when direction is 'up' / 'down' / 'both' it filters expression_status directly and `significant_only` is ignored (direction='up', significant_only=False still returns only significant_up rows). `significant_only=True` only matters with direction=None, where it drops not_significant rows — i.e. it equals direction='both'. Pick whichever spelling is clearer at the call site; default direction=None, significant_only=False returns everything.
 
-- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums. An unknown growth_phases value (e.g. 'log' instead of 'exponential') now reports in the envelope `warnings` (e.g. "growth_phases value 'log' matched nothing — valid values: ... (list_filter_values(filter_type='growth_phase'))") — check `warnings` before trusting an empty or reduced result. Check list_filter_values(filter_type='growth_phase') or list_experiments(summary=True)'s by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. Here they surface as the treatment_type / background_factors / growth_phases filters and the rows_by_treatment_type / rows_by_background_factors / rows_by_growth_phase summary keys.
-
 ```mistake
 Assuming a growth_phases typo silently returns 0 rows with no signal
 ```
 
 ```correction
-A growth_phases / treatment_type / background_factors value not in the live vocabulary lands in the envelope `warnings` (one entry per bad value), and any gene whose expression edges exist but fail to match direction / significant_only / growth_phases / treatment_type / background_factors lands in `filtered_out` — never in `no_expression`, which is reserved for a gene with NO Changes_expression_of edge at all in the organism.
+A growth_phases / treatment_type / background_factors value not in the live vocabulary lands in the envelope `warnings` (one entry per bad value), and any gene whose expression edges exist but fail to match direction / significant_only / growth_phases / treatment_type / background_factors lands in `filtered_out` — never in `no_expression`, which is reserved for a gene with NO Changes_expression_of edge at all in the organism. Live value sets: list_filter_values; semantics: docs://guide/conventions.
 ```
 
 - `no_expression` is this tool's name for the not_matched bucket — a gene exists but has NO Changes_expression_of edge at all in the organism; `filtered_out` is the DIFFERENT bucket for a gene that DOES have edges but none survive direction / significant_only / growth_phases / treatment_type / background_factors (including a vocabulary typo); `not_found` = locus_tag absent; experiment ids get their own `not_found_experiments` / `not_matched_experiments` pair. See docs://guide/conventions for the shared not_found / not_matched semantics.
@@ -482,11 +482,11 @@ They are populated ONLY on the significant subset — `rank_up` is non-null on s
 
 - Use summary=True first to see the landscape, then drill into specific genes/experiments
 
+- An organism-wide `summary=True` returns every experiment in `experiments[]` (uncapped, with design_notes) — for large organisms that is bigger than a detail call, whose `experiments[]` is capped. Narrow with experiment_ids / treatment_type first if you only need counts.
+
 - Check by_table_scope in the summary to understand data completeness before drawing conclusions
 
 - growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property
-
-- A DE timepoint label (e.g. 'day 18') and `growth_phase` describe the treatment arm; check `control_timing` / `design_notes` before reading it as both arms' state. See docs://guide/conventions.
 
 - For cross-experiment summarization (which treatments does this gene set respond to?) see `docs://analysis/expression` — `response_matrix` for gene × treatment pivots, `gene_set_compare` for two-set overlap. For pathway-level interpretation chain to `pathway_enrichment` (`docs://analysis/enrichment`).
 

@@ -7,7 +7,7 @@ Publications with experiment, DM, metabolomics and literature-index rollups.
 Use as the study-level discovery entry point; for per-experiment detail use `list_experiments(publication_dois=[...])`, for the entities a paper names `discussed_by_publication`.
 Filters: organism, search_text, author, publication_dois, compartment, plus the condition filters.
 Returns: by_organism, by_treatment_type, by_omics_type, by_compartment, by_discusses_coverage, not_found; one row = one publication.
-docs://tools/list_publications; summary=True first.
+docs://tools/list_publications; summary=True is uncapped (larger than the default call).
 
 ## Parameters
 
@@ -82,8 +82,6 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 | discussed_gene_count | int (optional) | Distinct genes this publication discusses in prose (precomputed Publication.discussed_gene_count). Recall-biased narrative index, NOT DE-table expression. When > 0, drill via discussed_by_publication(publication_dois=[doi]). |
 | discussed_pathway_count | int (optional) | Distinct KEGG pathways this publication discusses in prose (precomputed Publication.discussed_pathway_count). When > 0, drill via discussed_by_publication(publication_dois=[doi], entity_kind='kegg_pathway'). |
 | score | float \| None (optional) | Lucene relevance score (only with search_text). |
-| derived_metric_gene_count | int \| None (optional) | Total genes annotated by DerivedMetrics in this publication (verbose-only). |
-| derived_metric_types | list[string] \| None (optional) | Distinct DerivedMetric types in this publication (verbose-only). |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -92,6 +90,8 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 | abstract | string \| None (optional) | Publication abstract (verbose-only). |
 | description | string \| None (optional) | Curated study description (verbose-only). |
 | cluster_count | int \| None (optional) | Total gene clusters across analyses (verbose-only). |
+| derived_metric_gene_count | int \| None (optional) | Total genes annotated by DerivedMetrics in this publication (verbose-only). |
+| derived_metric_types | list[string] \| None (optional) | Distinct DerivedMetric types in this publication (verbose-only). |
 
 ## Few-shot examples
 
@@ -725,7 +725,7 @@ list_publications → list_experiments → differential_expression_by_gene
 list_publications → genes_by_function
 list_publications → list_clustering_analyses(publication_dois=[...])
 list_publications(search_text=..., verbose=True) → classify → list_publications(publication_dois=[...]) for the picked subset
-list_publications(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric
+list_publications(compartment=...) → use derived_metric_value_kinds per result row to route to genes_by_{boolean,numeric,categorical}_metric (docs://analysis/derived_metrics)
 list_filter_values(filter_type='metric_type') → list_publications(search_text='<metric_type>') to find publications with that metric
 list_publications (per-row `metabolite_count > 0`) → list_metabolite_assays(publication_dois=[...]) to inspect the paper's MetaboliteAssay nodes (numeric vs boolean, compartment, detection-status rollup).
 list_publications (per-row `discussed_gene_count` or `discussed_pathway_count` > 0) → discussed_by_publication(publication_dois=[...]) to list the genes + KEGG pathways the paper names in prose.
@@ -733,12 +733,6 @@ list_publications → list_derived_metrics(publication_dois=[doi]) for the paper
 ```
 
 ## Common mistakes
-
-- If a result row has derived_metric_value_kinds=['boolean'], drill down via genes_by_boolean_metric. For ['numeric'], use genes_by_numeric_metric. For ['categorical'], use genes_by_categorical_metric. Empty derived_metric_value_kinds means no DM evidence on this publication.
-
-- treatment_type / background_factors / growth_phase values are LIVE vocabularies read from the KG, not enums: an unknown value (e.g. 'nitrogen_stress' instead of 'nitrogen') returns 0 rows, never an error. Check list_filter_values(filter_type='growth_phase') or a summary=True call's by_treatment_type / by_background_factors rollup before filtering. Current treatment values are short nouns (nitrogen, light, carbon, iron, darkness, phosphorus, salt, viral, coculture, diel, ...); background_factors are light, axenic, coculture, darkness, diel, viral, chemical. On this tool the rollups come from an unfiltered list_publications() call.
-
-- `organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works.
 
 - Use the dedicated author param for author filtering (e.g. author='Biller'), not search_text — search_text searches title, abstract, and description only.
 
@@ -753,12 +747,16 @@ list_experiments(publication='Biller 2018')
 ```
 
 ```correction
-list_publications(search_text='Biller') then list_experiments(publication_dois=['10.1038/...'])
+list_publications(author='Biller') then list_experiments(publication_dois=['10.1038/...'])
 ```
 
 - `publication_dois` combines with the other filters via AND, and `not_found` lists any provided DOI that did not match — the same shape as `experiment_ids` on the sibling `list_*` tools.
 
-- `compartment` keeps publications with at least one experiment in that compartment — it is not a per-publication property. `summary=True` returns every `by_*` rollup uncapped, so call it first and then narrow filters.
+- `compartment` keeps publications with at least one experiment in that compartment — it is not a per-publication property. `summary=True` returns every `by_*` rollup uncapped (by_organism alone lists every organism with a paper), so it is larger than the default call; use it when you need the full breakdowns.
+
+- Unknown treatment_type / background_factors / growth_phases values return 0 rows with a warning listing the valid values; check list_filter_values first.
+
+- `organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works.
 
 ## Package import equivalent
 
