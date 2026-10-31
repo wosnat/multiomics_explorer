@@ -751,6 +751,16 @@ _CLOSED_VOCAB_PARAMS: dict[str, tuple[str, str, str] | None] = {
         "Metabolite", "kegg_brite_classes", "kegg_brite_class"),
 }
 
+# Params whose Cypher filters match case-insensitively (toLower / toUpper
+# on both sides) — their vocab check must too, or a value the filter
+# matched ('Nitrogen' vs 'nitrogen') is reported as matching nothing.
+# Every other closed param is matched exactly in Cypher, so its check
+# stays exact.
+_CASE_INSENSITIVE_VOCAB_PARAMS: frozenset[str] = frozenset({
+    "treatment_type", "treatment_types", "background_factors",
+    "growth_phases", "omics_type",
+})
+
 # Closed-vocabulary EDGE filter params -> the relationship types whose
 # ControlledVocabulary nodes hold the allowed values (unioned), plus the
 # list_filter_values filter_type. Kept apart from the node-only
@@ -791,7 +801,11 @@ def _closed_vocab_warnings(conn, **params) -> list[str]:
         valid = set(read["values"])
         if not valid:
             continue
-        bad = [v for v in values_list if v not in valid]
+        if param in _CASE_INSENSITIVE_VOCAB_PARAMS:
+            valid_ci = {str(x).lower() for x in valid}
+            bad = [v for v in values_list if str(v).lower() not in valid_ci]
+        else:
+            bad = [v for v in values_list if v not in valid]
         if not bad:
             continue
         shown = ", ".join(sorted(valid)[:8]) + (", …" if len(valid) > 8 else "")
@@ -810,7 +824,9 @@ def _closed_edge_vocab_warnings(
     """Edge-vocabulary twin of `_closed_vocab_warnings` for one param in
     `_CLOSED_EDGE_VOCAB_PARAMS`. Allowed values are unioned over
     `rel_types` (default: every relationship type registered for the
-    param). Never raises, never filters."""
+    param). Exact comparison — the edge filters (`stereo_assignment IN
+    $stereo_assignment`) match case-sensitively. Never raises, never
+    filters."""
     if not values:
         return []
     prop, default_rels, filter_type = _CLOSED_EDGE_VOCAB_PARAMS[param]
@@ -8267,9 +8283,9 @@ def _canonicalize_metabolite_ids(
             for r in roles:
                 _warn(
                     f"'{raw}' is the chemical role '{r.get('name')}' "
-                    f"({r['id']}), not a metabolite — TCDB families that "
-                    f"transport it are reachable through run_cypher "
-                    f"(see docs://analysis/metabolites)."
+                    f"({r['id']}), not a metabolite — pass it to "
+                    f"genes_by_metabolite / metabolites_by_gene for the genes "
+                    f"that transport it (see docs://analysis/metabolites)."
                 )
 
     return canonical, resolved, warnings

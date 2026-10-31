@@ -4415,6 +4415,30 @@ class TestOntologyLandscapeWrapper:
         assert result.by_ontology["cyanorak_role"].best_relevance_rank == 1
 
     @pytest.mark.asyncio
+    async def test_passes_through_skipped_ontologies_and_warnings(
+            self, tool_fns, mock_ctx):
+        data = {
+            **self._SAMPLE_API_RETURN,
+            "filters_applied": {"call_class": ["peptidase"]},
+            "trust_axes": {"merops": ["sources", "evidence"]},
+            "skipped_ontologies": [
+                {"ontology": "go_bp", "reason": "call_class is MEROPS-only"}],
+            "warnings": ["call_class applies to merops only; skipped go_bp"],
+        }
+        with patch(
+            "multiomics_explorer.api.functions.ontology_landscape",
+            return_value=data,
+        ):
+            result = await tool_fns["ontology_landscape"](
+                mock_ctx, organism="MED4", ontology=["merops", "go_bp"],
+                call_class=["peptidase"],
+            )
+        assert result.skipped_ontologies == data["skipped_ontologies"]
+        assert result.warnings == data["warnings"]
+        assert result.filters_applied == data["filters_applied"]
+        assert result.trust_axes == data["trust_axes"]
+
+    @pytest.mark.asyncio
     async def test_value_error_raises_tool_error(self, tool_fns, mock_ctx):
         with patch(
             "multiomics_explorer.api.functions.ontology_landscape",
