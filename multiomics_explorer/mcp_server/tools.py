@@ -4805,7 +4805,7 @@ def register_tools(mcp: FastMCP):
             "restrict to one arm. `'both'` is the union of significant up + "
             "significant down — functionally identical to "
             "`direction=None, significant_only=True`; pick whichever spelling "
-            "is clearer at the call site. Default `None` is unchanged.",
+            "is clearer at the call site. Default `None` = all statuses.",
         )] = None,
         significant_only: Annotated[bool, Field(
             description="If true, return only statistically significant"
@@ -5484,7 +5484,7 @@ def register_tools(mcp: FastMCP):
             "restrict to one arm. `'both'` is the union of significant up + "
             "significant down — functionally identical to "
             "`direction=None, significant_only=True`; pick whichever spelling "
-            "is clearer at the call site. Default `None` is unchanged.",
+            "is clearer at the call site. Default `None` = all statuses.",
         )] = None,
         significant_only: Annotated[bool, Field(
             description="If true, return only statistically significant"
@@ -5612,8 +5612,8 @@ def register_tools(mcp: FastMCP):
         gene_category: str | None = Field(description="Functional category (e.g. 'Inorganic ion transport')")
         groups_responded: list[str] = Field(description="Groups where gene is significant in at least one timepoint")
         groups_not_responded: list[str] = Field(description="Groups where expression edges exist but none significant")
-        groups_tested_not_responded: list[str] = Field(description="Groups where all experiments use full-coverage scope (significant_only/significant_any_timepoint) but gene has no expression edge — inferred as tested, not significant")
-        groups_not_known: list[str] = Field(description="Groups with no expression edge for this gene and scope does not confirm coverage")
+        groups_tested_not_responded: list[str] = Field(description="Groups where every experiment is a significant-only table (table_scope significant_only / significant_any_timepoint) and the gene has no row: it missed the paper's cutoff or was not detected — the table cannot tell which. A weaker 'probably not responding', not a tested negative.")
+        groups_not_known: list[str] = Field(description="Groups with no expression edge for this gene where at least one experiment is not a significant-only table — no basis for inference")
         response_summary: dict[str, GeneResponseGroupSummary] = Field(description="Per-group detail. Keys are treatment types or experiment IDs depending on group_by.")
 
     class GeneResponseProfileResponse(BaseModel):

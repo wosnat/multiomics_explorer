@@ -436,6 +436,28 @@ class TestExperimentsToDataFrame:
         assert isinstance(df, pd.DataFrame)
         assert len(df) == 0
 
+    def test_verbose_coculture_partners_flattened(self):
+        """Verbose list_experiments `coculture_partners` (list of dicts) is kept
+        as a "name (role)" string, not dropped with a warning."""
+        result = {"results": [
+            {"experiment_id": "exp1", "timepoints": None, "coculture_partners": [
+                {"organism_type": "genome_strain", "organism_id": "x",
+                 "name": "Alteromonas macleodii HOT1A3", "role": "treatment"},
+                {"organism_type": "genome_strain", "organism_id": "y",
+                 "name": "Other strain", "role": "background"},
+            ]},
+            {"experiment_id": "exp2", "timepoints": None, "coculture_partners": []},
+        ]}
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            df = experiments_to_dataframe(result)
+        row1 = df[df["experiment_id"] == "exp1"].iloc[0]
+        assert row1["coculture_partners"] == (
+            "Alteromonas macleodii HOT1A3 (treatment) | Other strain (background)"
+        )
+        row2 = df[df["experiment_id"] == "exp2"].iloc[0]
+        assert row2["coculture_partners"] in ("", None) or pd.isna(row2["coculture_partners"])
+
     def test_missing_results_key(self):
         with pytest.raises(ValueError, match="results"):
             experiments_to_dataframe({"data": []})

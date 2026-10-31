@@ -58,7 +58,7 @@ def response_matrix(
 
     Without group_map:
         Calls gene_response_profile with group_by="treatment_type".
-        Each column is a treatment type (e.g. "nitrogen_stress").
+        Each column is a treatment type (e.g. "nitrogen").
         Uses groups_not_responded and groups_not_known lists from the API result
         to fill in non-response cells.
 
@@ -154,7 +154,7 @@ def response_matrix(
                 else:
                     record[group_key] = _classify_direction(entry)
 
-            # Groups inferred as tested but not responded (no edge, full-coverage scope)
+            # Groups with no edge where every experiment is a significant-only table
             for group_key in tested_not_responded:
                 if group_key not in record:
                     record[group_key] = "not_responded"

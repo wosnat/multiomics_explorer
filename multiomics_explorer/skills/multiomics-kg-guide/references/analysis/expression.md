@@ -37,13 +37,10 @@ without per-timepoint log2FC; for the numbers behind a response, drop back to
 view across many genes and treatments at once, something none of the three
 MCP tools returns directly.
 
-**Read the experiment's `table_scope` before interpreting missing rows.** A
-gene absent from `differential_expression_by_gene` results can mean "not
-affected" or "not reported," and only an `all_detected_genes` experiment can
-tell the two apart — a `significant_only` or `top_n` experiment simply never
-reported genes that didn't clear its cutoff. Check `table_scope` (via
-`list_experiments` or the tool's own `experiments[]` envelope) before reading
-absence as biology.
+**Read the experiment's `table_scope` before interpreting missing rows** —
+only an `all_detected_genes` table can tell "not affected" from "not
+reported"; see "Tested-absent rows are real biology" in
+`docs://guide/conventions`.
 
 ---
 
@@ -59,8 +56,13 @@ default; pass `group_map` for custom groupings. Both share the
 | `"up"` | Only upregulated experiments in this group |
 | `"down"` | Only downregulated experiments |
 | `"mixed"` | Both up and down experiments |
-| `"not_responded"` | Expression edges exist but none significant, OR gene inferred as tested via full-coverage scope (`groups_tested_not_responded`) |
+| `"not_responded"` | Expression edges exist but none significant, OR the gene has no row and every experiment in the group is a significant-only table (`groups_tested_not_responded`: it missed the cutoff or was not detected — a weaker "probably not responding", not a tested negative) |
 | `"not_known"` | No expression data for this gene in this group |
+
+A group can mix experiments whose control was sampled alongside the
+treatment (`control_timing='matched'`) with ones compared to an early
+reference (`baseline` / `mixed`); check `list_experiments(control_timing=...)`
+before reading a group's direction as one contrast.
 
 ### `response_matrix(genes, organism=None, ...)` — gene × group pivot
 
@@ -124,7 +126,7 @@ df = response_matrix(genes=locus_tags, organism="MED4")
 | Passing `experiment_ids` when `group_map` is set | `group_map` overrides — pass experiments via `group_map` for custom grouping |
 | Expecting numeric values (log2FC, p-values) in cells | `response_matrix` cells are categorical strings. Use `gene_response_profile` for rank/log2FC, or `differential_expression_by_gene` for per-timepoint numerics |
 | Calling for a single gene | `gene_response_profile` directly returns richer per-group statistics |
-| Assuming `"not_responded"` always means edge-based | Can also be inference-based via `groups_tested_not_responded` (full-coverage scope). Use `gene_response_profile` to distinguish |
+| Assuming `"not_responded"` always means edge-based | Can also come from `groups_tested_not_responded` (no row in a significant-only table — not a tested negative). Use `gene_response_profile` to distinguish |
 
 ### `gene_set_compare(set_a, set_b, ...)` — two-set partition
 
