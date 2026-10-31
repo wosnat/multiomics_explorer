@@ -30,13 +30,13 @@ Notes:
   measured-and-transport-able metabolites in one call.
 """
 # CONTENTS
-#   1. scenario_discover            — element + organism filter (line ~74)
-#   2. scenario_compound_to_genes   — evidence_source split on glutamine (line ~113)
-#   3. scenario_gene_to_metabolites — element signature + top_metabolite_pathways (line ~204)
-#   4. scenario_cross_feeding       — bridge MED4 -> ALT (line ~257)
-#   5. scenario_n_source_de         — N-source primitive -> DE (line ~396)
-#   6. scenario_tcdb_chain          — direct vs family TCDB rows (line ~515)
-#   7. scenario_measurement         — P-stress metabolomics via MetaboliteAssay tools (line ~610)
+#   1. scenario_discover            — element + organism filter (line ~106)
+#   2. scenario_compound_to_genes   — evidence_source split on glutamine (line ~145)
+#   3. scenario_gene_to_metabolites — element signature + top_metabolite_pathways (line ~236)
+#   4. scenario_cross_feeding       — bridge MED4 -> ALT (line ~289)
+#   5. scenario_n_source_de         — curated N-source set -> DE (line ~428)
+#   6. scenario_tcdb_chain          — direct vs family TCDB rows (line ~548)
+#   7. scenario_measurement         — P-stress metabolomics via MetaboliteAssay tools (line ~643)
 from __future__ import annotations
 
 import argparse
@@ -70,6 +70,37 @@ CURRENCY_METABOLITES_MIN8: frozenset[str] = frozenset({
     "kegg.compound:C00005",  # NADPH
     "kegg.compound:C00006",  # NADP+
 })
+
+
+# Curated N-source set for scenario_n_source_de. A blind
+# `list_metabolites(elements=['N'], evidence_sources=['transport'])` ranks by
+# reach, so TCDB drug / peptide / macromolecule substrates (multidrug efflux,
+# Sec / Tat translocase "substrates") crowd out the nutrients. Name the
+# nutrients instead. MED4 has no nitrate / nitrite assimilation; the rows it
+# shows for them come from cynABD, whose TCDB system lists both.
+N_SOURCE_METABOLITES: dict[str, str] = {
+    # inorganic N
+    "kegg.compound:C00014": "Ammonia",
+    "kegg.compound:C00244": "Nitrate",
+    "kegg.compound:C00088": "Nitrite",
+    # small organic N
+    "kegg.compound:C00086": "Urea",
+    "kegg.compound:C01417": "Cyanate",
+    # amino acids (generic classes + the common N-rich / abundant ones)
+    "kegg.compound:C00045": "Amino acid",
+    "kegg.compound:C00151": "L-Amino acid",
+    "kegg.compound:C00302": "Glutamate",
+    "kegg.compound:C00025": "L-Glutamate",
+    "kegg.compound:C00064": "L-Glutamine",
+    "kegg.compound:C00049": "L-Aspartate",
+    "kegg.compound:C00152": "L-Asparagine",
+    "kegg.compound:C00062": "L-Arginine",
+    "kegg.compound:C00041": "L-Alanine",
+    "kegg.compound:C00037": "Glycine",
+    "kegg.compound:C00123": "L-Leucine",
+    "kegg.compound:C00407": "L-Isoleucine",
+    "kegg.compound:C00183": "L-Valine",
+}
 
 
 def scenario_discover() -> None:
@@ -401,7 +432,14 @@ def scenario_n_source_de() -> None:
 
     Three-tool cascade: list_metabolites → genes_by_metabolite → gene_response_profile.
     Demonstrates how the chemistry layer can scope a DE-style query without
-    requiring a hand-curated gene pool.
+    requiring a hand-curated gene pool — but the metabolite side IS curated
+    (N_SOURCE_METABOLITES: inorganic N, urea, cyanate, amino acids). Seeding
+    from `list_metabolites(elements=['N'], evidence_sources=['transport'])`
+    instead ranks by KG-wide transporter reach, which surfaces TCDB drug,
+    peptide and protein substrates (multidrug efflux, Sec / Tat, Clp) and
+    buries cyanate; the DE table then fills with translocases. Expected
+    result: cynABD, urtA/B and amt1 up under N stress; gltS and clc2 arrive
+    only as family rows.
 
     Important re: family rows — this scenario turns on
     include_tcdb_family_substrates=True (contrast with cross_feeding A4).
@@ -425,31 +463,19 @@ def scenario_n_source_de() -> None:
     print("Question class: 'which MED4 N-substrate transporters respond to N stress?'")
     print()
 
-    print("Step 1: list_metabolites — N-bearing compounds with transport annotations in MED4")
-    print("  (exclude_metabolite_ids=CURRENCY_METABOLITES_MIN8 — tool-side currency filter)")
-    metabs = list_metabolites(
-        elements=["N"],
-        organism_names=["Prochlorococcus MED4"],
-        evidence_sources=["transport"],   # filter at source, not post
-        exclude_metabolite_ids=list(CURRENCY_METABOLITES_MIN8),
-        limit=50,
-    )
-    # 'transport' in evidence_sources means TCDB lists the compound as a
-    # substrate of some kept system, not that a gene reaches it: route on
-    # transporter_gene_count > 0 (a KG-wide count) before drilling in.
-    candidates = [r for r in metabs["results"]
-                  if (r.get("transporter_gene_count") or 0) > 0][:10]
-    metabolite_ids = [row["metabolite_id"] for row in candidates]
-    print(f"  total_matching={metabs.get('total_matching')}  "
-          f"top-10: {len(metabolite_ids)}")
-    for row in candidates:
+    print("Step 1: list_metabolites — the curated N-source set (N_SOURCE_METABOLITES)")
+    print("  (named nutrients, not elements=['N']: an element filter ranks TCDB drug /")
+    print("   peptide substrates of efflux pumps and translocases above the nutrients)")
+    metabolite_ids = list(N_SOURCE_METABOLITES)
+    metabs = list_metabolites(metabolite_ids=metabolite_ids, limit=len(metabolite_ids))
+    for row in metabs["results"]:
         print(
-            f"    {row['metabolite_id']:<22} {(row.get('name') or '?'):<32} "
-            f"transporter_gene_count={row.get('transporter_gene_count')}"
+            f"    {row['metabolite_id']:<22} {(row.get('name') or '?'):<16} "
+            f"KG-wide transporter_gene_count={row.get('transporter_gene_count')}"
         )
     print()
 
-    print(f"Step 2: genes_by_metabolite — MED4 transporter genes for these {len(metabolite_ids)} substrates")
+    print(f"Step 2: genes_by_metabolite — MED4 transporter genes for these {len(metabolite_ids)} N sources")
     print("  (include_tcdb_family_substrates=True — see docstring; family rows are appropriate here)")
     g = genes_by_metabolite(
         metabolite_ids=metabolite_ids,
@@ -465,6 +491,12 @@ def scenario_n_source_de() -> None:
     })
     family_only = sorted(set(distinct_genes) - set(direct_genes))
     print(f"  total_matching={g['total_matching']}  distinct_genes={len(distinct_genes)}")
+    for m in g["by_metabolite"]:
+        print(f"    {m['name']:<14} genes={m['gene_count']:<3} direct_rows={m.get('tcdb_direct_rows')}  "
+              f"family_rows={m.get('tcdb_family_rows')}")
+    unmatched = g.get("not_matched") or []
+    print(f"  no MED4 transport route: {len(unmatched)} of {len(metabolite_ids)} "
+          f"(e.g. {', '.join(N_SOURCE_METABOLITES[i] for i in unmatched[:4])})")
     print(f"  direct rows:             {len(direct_genes)} genes (own TCDB system call)")
     print(f"  family rows only:        {len(family_only)} genes (family-level call; candidates)")
     if g.get("tcdb_family_substrates_skipped"):
