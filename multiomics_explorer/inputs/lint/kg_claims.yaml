@@ -155,13 +155,14 @@
 - id: tcdb_gate_edge_counts
   cypher: >
     MATCH ()-[e:Gene_has_tcdb_family]->()
-    RETURN sum(CASE WHEN e.tcdb_gate = 'direct' THEN 1 ELSE 0 END) AS direct,
+    WITH sum(CASE WHEN e.tcdb_gate = 'direct' THEN 1 ELSE 0 END) AS direct,
            sum(CASE WHEN e.tcdb_gate = 'annotated' THEN 1 ELSE 0 END) AS annotated,
            sum(CASE WHEN e.tcdb_gate = 'below_gate' THEN 1 ELSE 0 END) AS below_gate
-  expect: {direct: 25007, annotated: 47444, below_gate: 101806}
+    RETURN below_gate > direct + annotated AS below_gate_majority
+  expect: {below_gate_majority: true}
   used_in:
     - multiomics_explorer/inputs/ontologies/tcdb.yaml
-  note: "KG-wide Gene_has_tcdb_family edges per tcdb_gate (paper-batch + 83-1 build 2026-10-31)"
+  note: "KG-wide Gene_has_tcdb_family edges: most are below_gate (tcdb page 'Most edges are below_gate')"
 
 - id: med4_tcdb_gene_scale
   cypher: >

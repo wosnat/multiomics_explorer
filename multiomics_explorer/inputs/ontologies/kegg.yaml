@@ -35,8 +35,8 @@ id_form: |
   `term_ids` when anchoring on a KO.
 
 hierarchy: |
-  Four levels, `level` 0-3 = `category` (6) → `subcategory` (46) →
-  `pathway` (447) → `ko` (4,644). It is a DAG in practice: one KO belongs
+  Four levels, `level` 0-3 = `category` → `subcategory` →
+  `pathway` → `ko` (a few hundred pathways, a few thousand KOs). It is a DAG in practice: one KO belongs
   to many pathways (a glycolysis enzyme is also in several biosynthesis
   maps), so `gene_count` on a pathway is the union of its KOs' genes and
   sibling pathways overlap heavily. `direct_gene_count` is present on KO
@@ -60,11 +60,11 @@ interpretation: |
   `docs://analysis/metabolites`).
 
 informativeness_rule: |
-  Two kinds of term are flagged. At KO level, the 212 KOs named
+  Two kinds of term are flagged. At KO level, the ~200 KOs named
   "uncharacterized protein" (`K00243; uncharacterized protein` and kin).
   At pathway level, 11 of the 13 parentless global / overview maps —
-  `kegg.pathway:ko01100` Metabolic pathways (27,192 genes across the KG;
-  about a quarter of the MED4 genome), `ko01110`, `ko01120` and the
+  `kegg.pathway:ko01100` Metabolic pathways (about a quarter of the MED4
+  genome), `ko01110`, `ko01120` and the
   `ko012xx` block — so `informative_only=True` drops them from an
   enrichment. `ko01310` Nitrogen cycle and `ko01320` Sulfur cycle are
   parentless too but stay informative: they are narrow, class-bearing

@@ -15,7 +15,7 @@ method: |
   (`curated` / `family_inferred` / `domain_inferred`) and `evidence_score`;
   rung semantics in `docs://analysis/annotation_evidence`. Live on this
   edge type: eggNOG-only edges read `family_inferred` (the majority,
-  ~100k), curated sources read `curated`, InterProScan-only edges read
+  about 60%), curated sources read `curated`, InterProScan-only edges read
   `family_inferred` or `domain_inferred`.
 
 id_form: |
@@ -68,6 +68,7 @@ see_also:
   - docs://ontologies/go_mf
   - docs://ontologies/subcellular_localization
   - docs://ontologies/signal_peptide_type
+  - docs://ontologies/tcdb
   - docs://analysis/annotation_evidence
   - docs://analysis/enrichment
   - docs://tools/ontology_term_details

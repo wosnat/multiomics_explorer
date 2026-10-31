@@ -672,6 +672,33 @@ class TestOntologiesGeneratorStage:
             vocab_values={"call_class": ["peptidase", "nonpeptidase_homolog"]})
         assert "nonpeptidase_homolog" in out
 
+    def test_vocab_snapshot_is_coherent_and_drops_noise(self):
+        """The filter-types note never claims "never quotes them" above a
+        snapshot; single-value flags and denylisted enumerations are dropped;
+        long lists are capped with a list_filter_values pointer."""
+        from scripts.build_about_content import render_ontology
+        data = {k: "x" for k in _ONTOLOGY_YAML_KEYS}
+        data["typical_questions"] = ["q"]
+        data["see_also"] = ["docs://guide/concepts"]
+        vocab = {
+            "Gene_has_merops_family.call_class": ["peptidase", "inhibitor"],
+            "MeropsFamily.is_uninformative": ["true"],
+            "MeropsFamily.cleavage_p1_residues": ["Ala", "Arg"],
+            "MeropsFamily.level_kind": ["merops_clan", "merops_family"],
+            "MeropsFamily.catalytic_type": [f"v{i}" for i in range(20)],
+        }
+        out = render_ontology("merops", data, vocab_values=vocab)
+        assert "never quotes them" not in out
+        assert "build-time snapshot" in out
+        assert "`inhibitor`" in out
+        assert "is_uninformative`:" not in out
+        assert "cleavage_p1_residues`:" not in out
+        assert "level_kind`:" not in out
+        assert "`v11`" in out and "`v12`" not in out
+        assert "20 values; full list via `list_filter_values`" in out
+        plain = render_ontology("merops", data, vocab_values=None)
+        assert "build-time snapshot" not in plain
+
     def test_render_ontology_index_lists_every_key(self):
         from scripts.build_about_content import render_ontology_index
         inputs = {k: {"what_it_is": f"about {k}"} for k in _ONTOLOGY_KEYS}
@@ -911,6 +938,25 @@ def test_brief_page_structure_and_pointer(tool_schemas):
         assert section in brief, section
     assert f"docs://tools/{name}/full" in brief
     assert len(brief) <= 8000
+
+
+def test_brief_result_row_lists_compact_fields_only(tool_schemas):
+    """The brief "Result row:" sketch omits YAML verbose_fields and fields
+    whose description marks them verbose-only."""
+    import re as _re
+    from scripts.build_about_content import extract_response_fields, render_brief
+
+    for name in ("genes_in_cluster", "list_derived_metrics"):
+        input_data = _yaml3b.safe_load((_INPUTS_DIR / f"{name}.yaml").read_text())
+        brief = render_brief(name, tool_schemas[name], input_data)
+        m = _re.search(r"^Result row: `([^`]*)`", brief, _re.M)
+        assert m, name
+        row = {f.strip() for f in m.group(1).replace("…", "").split(",") if f.strip()}
+        _, fields = extract_response_fields(tool_schemas[name])
+        verbose = set(input_data.get("verbose_fields") or []) | {
+            f["name"] for f in fields if "verbose only" in (f["description"] or "").lower()
+        }
+        assert row and not (row & verbose), (name, row & verbose)
 
 
 def test_full_render_unchanged(tool_schemas):

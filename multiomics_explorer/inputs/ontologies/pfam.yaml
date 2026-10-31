@@ -17,7 +17,7 @@ method: |
   `docs://analysis/annotation_evidence`. Live on this edge type:
   InterProScan-only and eggNOG+InterProScan edges read `signature` (the
   HMM hit is kept even when eggNOG agrees); eggNOG-only edges read
-  `family_inferred` (~25k); any edge with a `cyanorak` or `uniprot` source
+  `family_inferred` (a minority); any edge with a `cyanorak` or `uniprot` source
   reads `curated`. Clan membership is a term-side edge
   (`Pfam_in_pfam_clan`), so a gene's clan count is a rollup of its
   domain hits. Pfam entries also bridge *out* to InterPro
@@ -65,8 +65,8 @@ pitfalls: |
   - TCDB and MEROPS families bridge *to* Pfam (composition) — those links
     are read from the `tcdb` / `merops` term, not from the Pfam term.
   - Pfam evidence tells you a domain is present, not that the protein is
-    active — combine with MEROPS `call_class` or the TCDB `tcdb_gate`
-    (a `direct` system call) for functional calls.
+    active — combine with the MEROPS `call_class` filter, or read the TCDB
+    row's `tcdb_gate` (`direct` = a system call), for functional calls.
 
 typical_questions:
   - "Which Pfam domains are enriched among genes up in the vesicle proteome?"
