@@ -215,7 +215,7 @@ chaining:
   - "discussed_by_publication(entity_kind='kegg_pathway') → genes_by_ontology(ontology='kegg', term_ids=[pathway_id]) → pathway_enrichment"
 
 mistakes:
-  - "This is a recall-biased narrative literature index — the genes and pathways a paper names in prose, NOT exhaustive coverage and NOT the supplementary DE-table expression data. Only about 1,000 distinct genes are named across the whole corpus (out of ~127k). For expression, use differential_expression_by_gene."
+  - "This is a recall-biased narrative literature index — the genes and pathways a paper names in prose, NOT exhaustive coverage and NOT the supplementary DE-table expression data. Only ~2,000 genes (well under 1% of the KG's genes) are named anywhere in the corpus. For expression, use differential_expression_by_gene."
   - "It returns the KEGG pathway terms the paper discusses verbatim — it does NOT expand a pathway to its member genes. To get genes in a discussed pathway, chain into genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)."
   - "entity_id is the raw node id: gene rows carry the bare locus_tag (e.g. PMT2118); kegg_pathway rows carry the prefixed id (e.g. kegg.pathway:ko00710). Feed gene ids to gene_overview, pathway ids to genes_by_ontology(ontology='kegg')."
   - "Rows are polymorphic: organism is populated only on gene rows; on kegg_pathway rows it is null (union padding). Likewise entity_name is the gene's gene_name (falling back to product) on gene rows and the pathway name on pathway rows."

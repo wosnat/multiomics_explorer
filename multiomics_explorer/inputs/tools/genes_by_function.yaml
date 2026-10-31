@@ -121,13 +121,12 @@ chaining:
   - "search_ontology → genes_by_ontology (ontology-first route, alternative to genes_by_function)"
 
 mistakes:
-  - "annotation_quality / min_quality semantics shifted in 2026-05 KG release. Existing notebooks using min_quality may select a different gene set than before. See docs://guide/conventions."
   - wrong: "genes_by_function(search_text='GO:0015977')"
     right: "genes_by_ontology(ontology='go_bp', organism='MED4', term_ids=['go:0015977']) for ontology term lookup (ontology + organism required); genes_by_function is for free-text search."
   - wrong: "len(result['results'])  # to count matches"
     right: "result['total_matching']  # results may be truncated"
-  - wrong: "genes_by_function(search_text='ABC transporter permease', organism='HOT1A3', gene_categories=['Transport'])  # total_search_hits 8705, total_matching 1 -> 'no transporters in HOT1A3'"
-    right: "`gene_categories` matches any of the given values against a curated Gene.gene_category value, and 'Transport' is a real but small category (most transporters sit under 'Inorganic ion transport'). A large total_search_hits with total_matching 0 is an empty intersection, not an absence — the envelope says so in `warnings` (a tiny non-zero count gets no warning; compare the two fields yourself). Re-run without `gene_categories` and read `by_category` to see where the hits fall, or go ontology-first (`genes_by_ontology` with a TCDB / GO term) to enumerate transporters."
+  - wrong: "genes_by_function(search_text='ABC transporter permease', organism='HOT1A3', gene_categories=['Transport'])  # large total_search_hits, total_matching 1 -> 'no transporters in HOT1A3'"
+    right: "`gene_categories` matches any of the given values against a curated Gene.gene_category value, and in Alteromonas most transporters sit under 'Inorganic ion transport' (Prochlorococcus / Synechococcus use Cyanorak's 'Transport'), so a category filter can miss most of them. A large total_search_hits with total_matching 0 is an empty intersection, not an absence — the envelope says so in `warnings` (a tiny non-zero count gets no warning; compare the two fields yourself). Re-run without `gene_categories` and read `by_category` to see where the hits fall, or go ontology-first (`genes_by_ontology` with a TCDB / GO term) to enumerate transporters."
   - >-
     A hit on a `[tcdb_best_hit]` line of `alternate_functional_descriptions` is homology to a
     characterised TCDB system (the gene's best TCDB hit), not proof that the gene transports
@@ -136,6 +135,6 @@ mistakes:
     or `metabolites_by_gene`. To search a TCDB id, quote it as a phrase
     (`search_text='"3.A.1.4.4"'`): unquoted, the analyzer splits it into tokens.
   - "Use summary=True to get organism/category breakdowns without fetching gene rows."
-  - "Use min_quality=2 to skip hypothetical proteins and get better-annotated results."
+  - "`min_quality` counts informative annotation sources, not product-name quality: min_quality=2 requires at least one informative source (a hypothetical protein with a Pfam / KO call still passes), 3 requires multi-source support. To drop hypotheticals, filter the returned rows on `product` yourself. See docs://guide/conventions [AQ]."
   - "The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works. A genus word alone ('Prochlorococcus') matches every strain of that genus."
   - "`search_text` is Lucene: fuzzy `~`, wildcards `*`, quoted phrases and AND / OR are supported — see docs://guide/conventions for syntax and scoring."
