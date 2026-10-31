@@ -165,7 +165,7 @@ EvidenceParam = Annotated[list[str] | None, Field(
 )]
 
 MaxTierParam = Annotated[int | None, Field(
-    description="Keep rows with edge tier <= this value OR tier IS NULL (1-3; null always kept, e.g. TCDB eggnog). tcdb, merops only. TCDB tier is consensus tier on diamond_tier, identity band on diamond_best_hit; never compare across kinds or ontologies.",
+    description="Keep rows with tier <= this OR tier null (1-3; e.g. TCDB eggnog). tcdb, merops only. TCDB: consensus tier on diamond_tier, identity band on diamond_best_hit; gated rows are never tier 3. Never compare tiers across kinds or ontologies.",
     ge=1, le=3,
 )]
 
@@ -179,5 +179,5 @@ CallClassParam = Annotated[list[CallClass] | None, Field(
 )]
 
 TcdbCallParam = Annotated[list[str] | None, Field(
-    description="TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked. Leaf mode still drops ancestors via all edges, so a call kind only on an ancestor term yields no row. Values: list_filter_values('tcdb_call').",
+    description="TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked, so an ancestor-term row reports a surviving call kind. Values: list_filter_values('tcdb_call').",
 )]

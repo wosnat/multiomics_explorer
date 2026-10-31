@@ -32,7 +32,9 @@ Facts with the *same meaning* wherever they occur:
   `uniprot`, `cyanorak`, ...).
 - `evidence` — the five-rung ladder, see "The evidence ladder" below.
 - `evidence_score` — a `[0, 1]` composite; MEROPS, GO×3, EC, Pfam, CAZy (not TCDB).
-- `tier` — 1–3, diamond-truncation depth of the ortholog call; TCDB / MEROPS.
+- `tier` — 1–3; MEROPS: diamond-truncation depth; TCDB: consensus tier on
+  `diamond_tier`, identity band on `diamond_best_hit`, null on eggNOG. Never
+  compare across kinds.
 
 Where they live: `evidence` is compact on every row of the 15 functional-edge
 ontologies — all but PSORTb / SignalP, which carry no trust axes (brite
@@ -116,9 +118,7 @@ GO-CC ~100k, EC 11.7k, Pfam 24.7k, CAZy 744 are eggNOG-only); InterProScan-only
 `['eggnog','interproscan']` pair reads `signature` on Pfam (the HMM hit is the
 native rung) but `family_inferred` on GO / EC / CAZy. So `evidence=['curated']`
 selects reference assertions everywhere, and `evidence_score` on an eggNOG-only
-edge is 0.333 (single source, transferred). Older builds read eggNOG-only
-GO / EC / Pfam / CAZy edges as `curated`; `kg_release_info` says which build
-you are on. The per-ontology pages
+edge is 0.333 (single source, transferred). The per-ontology pages
 (`docs://ontologies/{key}`) link here rather than restating the rungs.
 
 ---
@@ -178,17 +178,20 @@ Three consequences worth holding on to:
   the gene's annotations under that ancestor is curated; it says nothing
   about the others.
 - **Filters win over the tiebreak.** The trust filters apply to the
-  candidate edges before the best one is picked, so a `max_tier=2` row can
-  never report `tier=3` by way of an edge the filter already removed. The
+  candidate edges before the best one is picked, so a `max_tier=1` row can
+  never report `tier=2` by way of an edge the filter already removed. The
   gene simply drops out if nothing under that term survives.
-- **Leaf mode does not need any of this.** In `gene_ontology_terms(mode=
+- **Leaf mode needs this only for TCDB.** In `gene_ontology_terms(mode=
   'leaf')` the term IS the attachment, so the row's trust columns are that
-  edge's own facts. TCDB narrows further: leaf rows are the gene's
-  gate-passing targets minus any that is an ancestor of another, one row per
-  (gene, term) — see scenario `tcdb_gate` below.
+  edge's own facts — except on TCDB, where one (gene, node) can carry up to
+  three edges, one per call kind. The row reports one by precedence and lists
+  all kinds in `tcdb_calls`. TCDB leaf rows are also the gene's gate-passing
+  targets minus any that is an ancestor of another — see scenario `tcdb_gate`
+  below.
 
 To see the individual annotations rather than the best one, drop to leaf
-mode (`gene_ontology_terms`), where each attachment is its own row.
+mode (`gene_ontology_terms`), where each attachment is its own row (on TCDB,
+read `tcdb_calls`).
 
 ---
 
@@ -391,10 +394,8 @@ it, never the reverse (`links_in` does not exist). Walk them with
 `ontology_term_details(term_ids=[...])`: each row carries `links_out[]`
 (`{rel, link_kind, target_id, target_ontology, target_name}`; verbose adds the
 edge props — `curated_tcids` on TCDB composition links, `member_id_count` on
-MEROPS → Pfam, and `router_ambiguous` on InterPro router links — not a KG
-property but computed by `ontology_term_details` at verbose time as
-`links_total(router) > 1 OR interpro_type <> 'FAMILY'`, on InterPro links
-only),
+MEROPS → Pfam, and `router_ambiguous` on InterPro router links — computed: several
+targets, or a non-FAMILY entry),
 and `link_kinds=[...]` narrows to one kind. A two-hop walk
 (`tcdb:3.A.1` → Pfam domains → InterPro entries) is scenario `bridge_walk`
 in `docs://examples/ontology_terms.py`. To reach a *source* term from its
@@ -440,17 +441,12 @@ Read `by_call_class` on either call to see the split without a second query.
 TCDB is the one ontology where each source keeps its own gene → term edge:
 `tcdb_call` is `diamond_best_hit` (the DIAMOND top hit, on a system),
 `diamond_tier` (the DIAMOND consensus call, truncated by tier to system,
-subfamily or family) or `eggnog`. The KG stamps every edge with an ordered
-`tcdb_gate`:
-
-| `tcdb_gate` | Calls | Used for |
-|---|---|---|
-| `direct` | rank-1 best hit at ≥ 40% identity, tier-1 DIAMOND call, eggNOG call onto a system | transport rows (`docs://analysis/transport`) and everything below |
-| `annotated` | other eggNOG calls, tier-2 DIAMOND calls | ontology rows, `tcdb_assignment_count`, `TcdbFamily.gene_count`, enrichment TERM2GENE |
-| `below_gate` | tier-3 calls, near-tie best hits, best hits under 40% identity | nothing by default (`include_weak_tcdb_hits=True`) |
-
-Never re-derive the gate from `tier`, `identity` or the call kind; read
-`tcdb_gate`.
+subfamily or family) or `eggnog`. The KG stamps each edge `tcdb_gate` =
+`direct` / `annotated` / `below_gate` (definitions: `docs://ontologies/tcdb`,
+live `list_filter_values('tcdb_gate')`); default rows read direct +
+annotated, and only `direct` edges feed the transport rows
+(`docs://analysis/transport`). Never re-derive the gate from `tier`,
+`identity` or the call kind; read `tcdb_gate`.
 
 ```python
 genes = ["PMM0372", "PMM0710", "PMM0125", "PMM0024"]   # cynD, pstS, ecfA1, thiL
@@ -544,9 +540,12 @@ axes = list_filter_values(filter_type="trust_axes", ontology="tcdb")
 
 filtered = genes_by_ontology(
     ontology="tcdb", organism="MED4", level=2,
-    evidence=["homology"], max_tier=2,
+    evidence=["homology"], max_tier=1,
 )
-# Keeps (gene, term) rows backed by a DIAMOND call at tier <= 2.
+# evidence=['homology'] keeps DIAMOND calls only; max_tier=1 keeps tier-1 ones.
+# max_tier=2 alone changes nothing: gated TCDB rows are tier 1, 2 or null
+# (eggNOG), so it only bites with include_weak_tcdb_hits=True. Tier-null eggNOG
+# rows pass any max_tier, hence the evidence filter.
 
 best_hits = genes_by_ontology(
     ontology="tcdb", organism="MED4", level=2,
@@ -557,7 +556,7 @@ best_hits = genes_by_ontology(
 enrichment = pathway_enrichment(
     organism="MED4", experiment_ids=[...],
     ontology="tcdb", level=2,
-    evidence=["homology"], max_tier=2,
+    evidence=["homology"],
 )
 # The same filters shape the enrichment TERM2GENE mapping AND the
 # background identically, so gene set and background stay apples-to-apples —
@@ -593,7 +592,7 @@ annotation
 ├─ "Compare trust across ontologies" → evidence (compact, every functional edge)
 ├─ "Rank within one ontology by corroboration" → evidence_score (verbose; MEROPS/GO×3/EC/Pfam/CAZy only; TCDB: tcdb_calls + identity)
 ├─ "One hard cutoff on corroboration" → min_evidence_score (the only numeric filter; not on TCDB; check evidence_score_signals)
-├─ "Diamond-truncation depth of the ortholog call" → tier (TCDB/MEROPS only; max_tier keeps tier-null rows)
+├─ "Diamond tier of the call" → tier (TCDB/MEROPS only; meaning differs per TCDB call kind; max_tier keeps tier-null rows)
 ├─ "Is this actually a peptidase, not just homologous to one" → call_class (MEROPS only, compact always)
 ├─ "Which InterPro structural type" → interpro_type (compact always; REQUIRED on interpro enrichment)
 ├─ "Native e-value / bit score / identity / confidence_score" → verbose-only, per-ontology name, never a filter

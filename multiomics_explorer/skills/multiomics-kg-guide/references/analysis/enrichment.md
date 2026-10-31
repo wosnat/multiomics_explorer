@@ -260,9 +260,10 @@ directly; the envelope is for wrapper output.
 
 ## 8. BRITE, InterPro, TCDB — scope the universe
 
-**BRITE** is 12 independent trees; `enzymes` alone has 2,114 terms (1,831 at
-level 3) against 188 for `transporters`, so an unscoped run is an enzyme run.
-Always pass `tree=` (`list_filter_values("brite_tree")` lists them):
+**BRITE** is 12 independent trees; `enzymes` alone has ~10× the terms of
+`transporters`, so mixing trees would make every run an enzyme run. Both
+enrichment tools require `tree=` on BRITE (`list_filter_values("brite_tree")`
+lists them):
 
 ```python
 term2gene = to_dataframe(genes_by_ontology(
@@ -354,10 +355,13 @@ set), `trust_axes` (what this ontology can be filtered on),
 ```python
 result = pathway_enrichment(
     organism="MED4", experiment_ids=experiment_ids,
-    ontology="tcdb", level=2, evidence=["homology"], max_tier=2,
+    ontology="tcdb", level=2, evidence=["homology"],
 )
 result.to_envelope(summary=True)["background_filtered"]   # True
 ```
+
+On TCDB, `max_tier` bites only at `max_tier=1`: gated gene sets hold tier 1,
+tier 2 and tier-null (eggNOG) rows, and tier-null rows pass any `max_tier`.
 
 `evidence_score_signals` (what the composite is made of) is not on the
 enrichment envelope — read it from a `genes_by_ontology` call with the same
