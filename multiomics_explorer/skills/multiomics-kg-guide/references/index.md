@@ -3,7 +3,7 @@
 ## Guides
 
 - `docs://guide/concepts` — ~6596 tok — Read when an entity in a tool output is unfamiliar: what each node and edge means…
-- `docs://guide/conventions` — ~7088 tok — Read when a cross-tool behaviour surprises you: envelopes, filters, not_found vs not_matched, paging.
+- `docs://guide/conventions` — ~7030 tok — Read when a cross-tool behaviour surprises you: envelopes, filters, not_found vs not_matched, paging.
 - `docs://guide/python_api` — ~4167 tok — Read before scripting: Python vs MCP, imports, the three return shapes, DataFrame conversion.
 - `docs://guide/start_here` — ~4019 tok — Read first: the tool families, a question-shape decision tree, and when to call summary=True.
 
