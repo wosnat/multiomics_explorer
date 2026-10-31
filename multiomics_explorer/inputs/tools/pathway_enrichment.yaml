@@ -344,9 +344,9 @@ examples:
         ]
       }
 
-  - title: "Trust-filtered TCDB enrichment (evidence + max_tier; TCDB gene sets are gated)"
-    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="tcdb", level=2, evidence=["homology"], max_tier=2)
-    note: "TCDB TERM2GENE uses gated edges only (`tcdb_gate` direct or annotated), so each family's gene set matches its `gene_count`; weak below-gate DIAMOND hits never enter enrichment. The trust filters shape the gene sets and the background identically: here DIAMOND calls at tier 1-2. TCDB has no evidence score, so `min_evidence_score` raises; `tcdb_call=[...]` restricts by call kind."
+  - title: "Trust-filtered TCDB enrichment (evidence; TCDB gene sets are gated)"
+    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="tcdb", level=2, evidence=["homology"])
+    note: "TCDB TERM2GENE uses gated edges only (`tcdb_gate` direct or annotated), so each family's gene set matches its `gene_count`; weak below-gate DIAMOND hits never enter enrichment. The trust filters shape the gene sets and the background identically: here DIAMOND calls only (`evidence=['homology']` drops the eggNOG rows). Gated rows are tier 1, 2 or null, so `max_tier=2` changes nothing here; `max_tier=1` keeps tier-1 calls (plus tier-null eggNOG rows unless `evidence` drops them). TCDB has no evidence score, so `min_evidence_score` raises; `tcdb_call=[...]` restricts by call kind."
     response: |
       {
         "organism_name": "Prochlorococcus MED4",
@@ -495,12 +495,12 @@ examples:
           "term2gene_row_count": 159,
           "n_unique_terms": 55,
           "multitest_method": "fdr_bh",
-          "filters_applied": {"evidence": ["homology"], "max_tier": 2},
+          "filters_applied": {"evidence": ["homology"]},
           "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
           "background_filtered": true,
           "interpro_type": null
         },
-        "filters_applied": {"evidence": ["homology"], "max_tier": 2},
+        "filters_applied": {"evidence": ["homology"]},
         "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
         "background_filtered": true,
         "interpro_type": null,
@@ -811,8 +811,8 @@ chaining:
 
 mistakes:
   - "pathway_enrichment is DE-anchored (needs `experiment_ids`); for a clustering analysis use `cluster_enrichment(analysis_id=...)`, for ortholog groups / custom lists use the Python `fisher_ora` primitive."
-  - "No rows ≠ nothing tested: read `n_significant`, always the full tested-set count (also recoverable per-experiment from `by_experiment[].n_tests`). [ENR] Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`); `total_matching` then counts just that pageable subset (== `n_significant`), so an empty `results` page always means `total_matching=0`. Pass `include_nonsignificant=True` to page through every tested row — `total_matching` then covers all of them; `n_significant` is unaffected either way."
-  - "[ENR] `informative_only=True` default flipped in the 2026-05 KG release. BH-adjusted p-values depend on the term set tested per cluster — locked baselines need `informative_only=False` + post-filter on `is_informative`. See docs://guide/conventions."
+  - "No rows ≠ nothing tested: read `n_significant`, always the full tested-set count (also recoverable per-experiment from `by_experiment[].n_tests`). Default `limit=25` + `include_nonsignificant=False` return only significant rows (`p_adjust < pvalue_cutoff`); `total_matching` then counts just that pageable subset (== `n_significant`), so an empty `results` page always means `total_matching=0`. Pass `include_nonsignificant=True` to page through every tested row — `total_matching` then covers all of them; `n_significant` is unaffected either way."
+  - "`informative_only=True` (default) changes the tested term set, and with it the BH-adjusted p-values. For results comparable to a run that kept every term, pass `informative_only=False` and post-filter on `is_informative`. See docs://guide/conventions."
   - "`informative_only=True` shrinks the TERM2GENE mapping, and `enrichment_params.term2gene_row_count` shows by how much — MED4 KEGG at `level=3`: 1124 rows with `informative_only=False`, 1094 with the default. Compare `enrichment_params` across runs before comparing p-values. For KEGG the flag also covers the global / overview maps (`kegg.pathway:ko01100` and kin), so a `level=2` run drops those rows too."
   - "Default background is `table_scope` (per-experiment quantified set). `'organism'` inflates the denominator and underestimates enrichment. See `docs://analysis/enrichment` for the full methodology note."
   - "BH correction is per-cluster (experiment × timepoint × direction), NOT across clusters. Cross-experiment FDR is biological replication, not statistical."
@@ -821,7 +821,7 @@ mistakes:
   - "For cluster-membership / ortholog-group / custom-list enrichment, use the Python `fisher_ora` primitive (see `docs://analysis/enrichment`). The MCP tool is the DE-wired convenience only. Idiom: `term2gene = to_dataframe(genes_by_ontology(...))` then `fisher_ora(gene_sets, background, term2gene)` — no manual column munging."
   - "At least one of `level` or `term_ids` must be provided (matches `genes_by_ontology`)."
   - "`min/max_gene_set_size` here means **M** — pathway size within each cluster's background (clusterProfiler semantics). This differs from `ontology_landscape`'s filter, which is organism-scoped. A pathway may be tested in one cluster and dropped in another when `background='table_scope'`."
-  - "For brite enrichment, use `tree` to scope to a single BRITE tree (e.g. `tree='transporters'`). Without `tree`, all-BRITE enrichment is dominated by the `enzymes` tree (by far the largest). Pick a specific level: `level=1` (BRITE category) or `level=2` (BRITE sub-category) are the most useful. Use `list_filter_values('brite_tree')` to discover trees → `ontology_landscape(ontology='brite', tree=...)` to pick level → `pathway_enrichment(ontology='brite', tree=..., level=...)` for enrichment."
+  - "`ontology='brite'` requires `tree=` (raises without it). Pick a specific level: `level=1` (BRITE category) or `level=2` (BRITE sub-category) are the most useful. Use `list_filter_values('brite_tree')` to discover trees → `ontology_landscape(ontology='brite', tree=...)` to pick level → `pathway_enrichment(ontology='brite', tree=..., level=...)` for enrichment."
   - wrong: "pathway_enrichment(..., background='genome')  # not a valid string"
     right: "pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or a locus_tag list"
   - wrong: "pathway_enrichment(..., ontology='interpro', level=0)  # missing interpro_type — raises"
@@ -829,7 +829,7 @@ mistakes:
   - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"
   - "For DAG ontologies (`go_*`), `level=N`-only enrichment silently drops biologically-meaningful terms at heterogeneous depths. For narrow research questions, hand-curate a `term_ids` panel via `search_ontology(ontology='go_bp', search_text=...)` and pass it directly. Use `level` only when surveying a whole branch."
   - "`ontology='interpro'` requires `interpro_type` — one of `FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`, `ACTIVE_SITE`, `BINDING_SITE`, `PTM`. Omitting it raises. Check sizing per type via `ontology_landscape(organism=..., ontology='interpro')` first."
-  - "Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`) shape the TERM2GENE mapping fed to Fisher, not the row output — they change which (gene × term) pairs are tested, applied identically to foreground and background. Defaults are `None` and never filter. `min_evidence_score` is the only numeric cutoff; there is no filter on native scalars (`evalue`, `bit_score`, `confidence_score`, ...). See `docs://analysis/annotation_evidence`."
+  - "Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call`) shape the TERM2GENE mapping fed to Fisher, not the row output — they change which (gene × term) pairs are tested, applied identically to foreground and background. Defaults are `None` and never filter. `min_evidence_score` is the only numeric cutoff; there is no filter on native scalars (`evalue`, `bit_score`, `confidence_score`, ...). See `docs://analysis/annotation_evidence`."
   - "MEROPS `call_class=['peptidase']` excludes `nonpeptidase_homolog` rows (catalytically-dead homologs) from both the tested gene set and the pathway definitions — run it whenever the enrichment question is about peptidase activity, not sequence homology to a peptidase family."
   - "When a KEGG pathway is significantly enriched, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. This answers 'what compounds does the enriched pathway involve?' — a different anchor than the gene-KO membership the enrichment is built on. The same KEGG pathway map (e.g. `kegg.pathway:ko00910` Nitrogen metabolism) reaches the same map from compound-membership vs gene-KO-membership; a gene whose KO is in pathway X may not catalyse any reaction whose metabolites are in pathway X (and vice versa). See docs://analysis/metabolites."
   - "Unknown `experiment_ids` and an out-of-range `level` raise `ValueError` instead of returning a vacuous empty envelope. A partial batch (some ids unknown) keeps running — the unknown ones land in `not_found_experiments`; the call only raises when EVERY requested `experiment_id` is unknown. Flat ontologies (e.g. `cog_category`) only accept `level=0`; the raise message says so."

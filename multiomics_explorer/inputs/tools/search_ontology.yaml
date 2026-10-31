@@ -561,9 +561,9 @@ examples:
   - title: Filter search results by hierarchy level
     call: search_ontology(search_text="oxido*", ontology=["kegg"], level=2)
 
-  - title: Find TCDB nodes that move sucrose
+  - title: TCDB nodes whose name mentions sucrose
     call: search_ontology(search_text="sucrose", ontology=["tcdb"])
-    note: "Most hits are `tc_system` nodes, and many read `gene_count = 0`: they are range-only systems TCDB curates but no gene in the KG is called to. They are legitimate discovery results (they carry the substrate edges a family walk reads), but to keep only gene-bearing terms read `gene_count`, or browse with `min_gene_count=1`. Verbose adds `tcdb_substrate_count` and TCDB's `direction`."
+    note: "A name match, not a substrate search: for what transports sucrose use `genes_by_metabolite`. Most hits are `tc_system` nodes, and many read `gene_count = 0`: they are range-only systems TCDB curates but no gene in the KG is called to. They are legitimate discovery results (they carry the substrate edges a family walk reads), but to keep only gene-bearing terms pass `min_gene_count=1` (works in search mode too: 35 → 12 here). Verbose adds `tcdb_substrate_count` and TCDB's `direction`."
     response: |
       {
         "mode": "search",
@@ -1105,7 +1105,7 @@ mistakes:
   - "`interpro_type` scopes InterPro to one of the 8 types (`FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`, `ACTIVE_SITE`, `BINDING_SITE`, `PTM`); the envelope's `by_interpro_type` (and `by_family_type` for NCBIfam) shows the mix when you don't."
   - "Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`. Each has a reference page at docs://ontologies/{key} (identifier form, levels, what `gene_count` means there)."
   - "Use `level` to restrict results to a hierarchy depth (0 = broadest). PSORTb, SignalP, COG and NCBIfam are flat — `level=1` returns nothing for them. Pfam clans are level 0, domains level 1. TIGR is two-level: level 0 = the 21 main roles (`level_kind='tigr_mainrole'`), level 1 = sub roles (`level_kind='tigr_subrole'`)."
-  - "TCDB is family-level transporter classification. For substrate-anchored questions ('which genes transport sucrose?'), chain via `genes_by_metabolite` instead — that tool surfaces the TCDB substrate edges directly."
+  - "TCDB is a 5-level transporter classification (class → system). For substrate-anchored questions ('which genes transport sucrose?'), chain via `genes_by_metabolite` instead — that tool surfaces the TCDB substrate edges directly."
   - "PSORTb / SignalP are structural ontologies (where a protein is / how it is handled), not functional — use them for localization / secretion questions."
   - "discussed_by_n_publications (how many papers name the pathway in prose) is present only for `kegg`. It is a recall-biased literature index, NOT DE-table expression. verbose=True adds the per-term {doi, prominence, evidence} list; route DOIs into discussed_by_publication."
   - "Use this to assemble a custom `term_ids=[...]` list for `pathway_enrichment` / `cluster_enrichment` when relevant terms live at different depths (GO is graph-shaped). See docs://analysis/enrichment."

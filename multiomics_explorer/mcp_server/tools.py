@@ -3123,7 +3123,7 @@ def register_tools(mcp: FastMCP):
         )] = None,
         min_gene_count: Annotated[int | None, Field(
             description="Keep terms with gene_count >= this (subtree organism_gene_count "
-                        "when `organism` is set). Narrows browse mode.",
+                        "when `organism` is set). Works in search and browse mode.",
             ge=0,
         )] = None,
         organism: OrganismSingleParam = None,
@@ -3324,10 +3324,10 @@ def register_tools(mcp: FastMCP):
         )],
         organism: OrganismSingleParam = None,
         link_kinds: Annotated[list[Literal["composition", "membership", "router"]] | None, Field(
-            description="Keep links_out of these kinds: 'composition' = built from "
-                        "target (tcdb/merops -> pfam); 'membership' = belongs to "
+            description="Keep links_out of these kinds (None: all): 'composition' = built from "
+                        "target (tcdb -> pfam/go, merops -> pfam); 'membership' = member of "
                         "(pfam/ncbifam -> interpro, kegg -> brite); 'router' = recall-biased "
-                        "(interpro -> ec/cazy, ncbifam TIGR* -> tigr.role). Default all.",
+                        "(interpro -> ec/cazy, ncbifam -> tigr.role).",
         )] = None,
         verbose: VerboseParam = False,
         limit: LimitParam = 50,
@@ -3407,7 +3407,7 @@ def register_tools(mcp: FastMCP):
             description="Compact trust ladder value (read it as-is; rung "
                         "assignment is per ontology — see "
                         "docs://analysis/annotation_evidence). Present on the "
-                        "14 functional-edge ontologies; null on PSORTb/SignalP.")
+                        "15 functional-edge ontologies; null on PSORTb/SignalP.")
         call_class: str | None = Field(default=None,
             description="MEROPS peptidase call (sparse: merops only). "
                         "'nonpeptidase_homolog' rows are catalytically dead.")
@@ -3431,7 +3431,7 @@ def register_tools(mcp: FastMCP):
         # comparison; rank within one ontology only).
         sources: list[str] | None = Field(default=None,
             description="Provenance tags on this edge (verbose only; sparse "
-                        "outside the 14 functional-edge ontologies), e.g. ['eggnog'].")
+                        "outside the 15 functional-edge ontologies), e.g. ['eggnog'].")
         evidence_score: float | None = Field(default=None,
             description="Composite trust score in [0,1] (verbose only; sparse: "
                         "go_bp/mf/cc, ec, pfam, cazy, merops).")
@@ -3536,7 +3536,7 @@ def register_tools(mcp: FastMCP):
         filtered_out: list[str] = Field(default_factory=list,
             description="Input term_ids valid but outside [min, max]_gene_set_size")
         size_filtered_terms: int = Field(default=0,
-            description="Terms passing every other filter but outside min/max_gene_set_size, dropped. >0 also adds a warning; pass min_gene_set_size=1, max_gene_set_size=None to enumerate all.")
+            description="Terms passing every other filter but outside min/max_gene_set_size, dropped. >0 also adds a warning; to enumerate all pass min_gene_set_size=1 and a large max_gene_set_size (e.g. 100000; Python also accepts None).")
         size_filtered_genes: int = Field(default=0,
             description="Genes found only in size-dropped terms (missing from total_genes).")
         resolved_aliases: dict[str, list[str]] = Field(default_factory=dict,
@@ -3555,7 +3555,7 @@ def register_tools(mcp: FastMCP):
         filters_applied: dict = Field(default_factory=dict,
             description="Echo of the trust filters that were actually set on this call.")
         skipped_ontologies: list[dict] = Field(default_factory=list,
-            description="Empty for single-ontology tools; reserved for multi-ontology callers.")
+            description="Always empty here (single ontology); same shape as gene_ontology_terms.skipped_ontologies.")
         by_evidence: list[dict] = Field(default_factory=list,
             description="Rollup of the compact evidence column over every "
                         "matching row, not just the page you are reading.")
@@ -3617,7 +3617,8 @@ def register_tools(mcp: FastMCP):
         )] = 5,
         max_gene_set_size: Annotated[int, Field(
             description="Exclude terms with more organism-scoped genes than this. "
-                        "Matches `ontology_landscape`'s organism-scoped convention.",
+                        "Matches `ontology_landscape`'s organism-scoped convention. "
+                        "Pass a large value (e.g. 100000) to disable.",
             ge=1,
         )] = 500,
         informative_only: InformativeOnlyParam = False,
@@ -3723,7 +3724,7 @@ def register_tools(mcp: FastMCP):
             description="Compact trust ladder value (read it as-is; rung "
                         "assignment is per ontology — see "
                         "docs://analysis/annotation_evidence). Present on the "
-                        "14 functional-edge ontologies; null on PSORTb/SignalP.")
+                        "15 functional-edge ontologies; null on PSORTb/SignalP.")
         call_class: str | None = Field(default=None,
             description="MEROPS peptidase call (sparse: merops only).")
         tcdb_call: str | None = Field(default=None,
@@ -3898,7 +3899,13 @@ def register_tools(mcp: FastMCP):
         max_tier: MaxTierParam = None,
         min_evidence_score: MinEvidenceScoreParam = None,
         call_class: CallClassParam = None,
-        tcdb_call: TcdbCallParam = None,
+        tcdb_call: Annotated[list[str] | None, Field(
+            description="TCDB only: keep edges whose tcdb_call is in this list, "
+                        "applied before the representative edge is picked. Leaf "
+                        "mode drops ancestors via all gated edges, so a kind only "
+                        "on an ancestor yields no row. Values: "
+                        "list_filter_values('tcdb_call').",
+        )] = None,
         interpro_type: Annotated[_INTERPRO_TYPES | None, Field(
             description=(
                 "Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful."
@@ -3915,8 +3922,8 @@ def register_tools(mcp: FastMCP):
         """Reverse lookup: locus_tags to their ontology annotations in ONE organism, most-specific leaves (default) or rolled up to a level.
 
         Use for what a gene carries; for which genes carry a term use `genes_by_ontology`, to find term IDs `search_ontology`.
-        Filters: locus_tags, organism, ontology, mode, level, tree, informative_only, include_weak_tcdb_hits, trust filters (+tcdb_call).
-        Returns: by_ontology, by_term, terms-per-gene stats, trust rollups, skipped_ontologies, not_found, no_terms; one row = (locus_tag, term_id, evidence).
+        Filters: locus_tags, organism, ontology, mode, level, tree, informative_only, include_weak_tcdb_hits, trust filters.
+        Returns: by_ontology, by_term, terms-per-gene stats, trust rollups (not with summary=True), skipped_ontologies, not_found, no_terms; one row = (locus_tag, term_id, evidence).
         docs://tools/gene_ontology_terms; summary=True first.
         """
         await ctx.info(
@@ -6839,9 +6846,14 @@ def register_tools(mcp: FastMCP):
         interpro_type: str | None = Field(default=None,
             description="InterPro entry type this stratum covers (sparse: interpro only).")
         relevance_rank: int = Field(
-            description="1-indexed rank by spec_score; stable under pagination",
+            description="1 = best stratum: coverage (genome, or median "
+                        "experiment coverage with experiment_ids) x a size "
+                        "factor favouring median term sizes of 5-50 genes; "
+                        "stable under pagination",
         )
-        n_terms_with_genes: int
+        n_terms_with_genes: int = Field(
+            description="Terms at this level within min/max_gene_set_size",
+        )
         n_genes_at_level: int
         genome_coverage: float = Field(
             description="n_genes_at_level / organism_gene_count",
@@ -6863,10 +6875,16 @@ def register_tools(mcp: FastMCP):
             default=None,
             description="Top 3 terms by gene count (verbose only)",
         )
-        min_exp_coverage: float | None = Field(default=None)
-        median_exp_coverage: float | None = Field(default=None)
-        max_exp_coverage: float | None = Field(default=None)
-        n_experiments_with_coverage: int | None = Field(default=None)
+        min_exp_coverage: float | None = Field(default=None,
+            description="Per-experiment share of quantified genes reached at "
+                        "this level, minimum (experiment_ids only)")
+        median_exp_coverage: float | None = Field(default=None,
+            description="Same, median across experiments (experiment_ids only)")
+        max_exp_coverage: float | None = Field(default=None,
+            description="Same, maximum (experiment_ids only)")
+        n_experiments_with_coverage: int | None = Field(default=None,
+            description="Experiments contributing to the coverage stats "
+                        "(experiment_ids only)")
 
     class OntologySummary(BaseModel):
         best_level: int
@@ -6945,10 +6963,10 @@ def register_tools(mcp: FastMCP):
             ),
         )] = None,
     ) -> OntologyLandscapeResponse:
-        """Rank (ontology × level) strata by enrichment suitability — term-size distribution, genome coverage, relevance_rank.
+        """Rank (ontology × level) strata by enrichment suitability — term sizes, genome coverage, relevance_rank.
 
         Use as the pre-flight that picks (ontology, level) for `pathway_enrichment` / `cluster_enrichment`; the terms are `search_ontology`, gene sets `genes_by_ontology`.
-        Filters: organism, ontology, tree, experiment_ids, min/max_gene_set_size, informative_only, call_class, interpro_type.
+        Filters: organism, ontology, tree, experiment_ids, min/max_gene_set_size, informative_only, call_class, tcdb_call, interpro_type.
         Returns: organism_gene_count, n_ontologies, by_ontology, not_found, not_matched; one row = one stratum (BRITE per tree, InterPro per type).
         docs://tools/ontology_landscape; summary=True first.
         """

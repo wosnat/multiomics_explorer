@@ -11,7 +11,7 @@ Scenarios:
   1. merops_call_class    — peptidase-only clan census vs. unfiltered (call_class)
   2. tcdb_gate            — gated TCDB leaf rows vs include_weak_tcdb_hits (tcdb_gate / tcdb_calls)
   3. interpro_enrichment  — interpro_type required on enrichment, then supplied
-  4. trust_filtered_tcdb  — evidence/max_tier/tcdb_call before enrichment
+  4. trust_filtered_tcdb  — evidence/max_tier/tcdb_call before enrichment (max_tier=2 is a no-op on gated TCDB rows)
   5. organism_rollups     — per-organism protease / domain coverage (list_organisms)
 
 Notes:
@@ -193,14 +193,27 @@ def scenario_trust_filtered_tcdb() -> None:
     unfiltered = genes_by_ontology(ontology="tcdb", organism="MED4", level=2)
     print(f"unfiltered (gated): total_matching={unfiltered.get('total_matching')}")
 
+    homology = genes_by_ontology(
+        ontology="tcdb", organism="MED4", level=2, evidence=["homology"],
+    )
+    print(f"evidence=['homology']: total_matching={homology.get('total_matching')}")
+
+    # Gated TCDB rows are tier 1, 2 or null (eggNOG), so max_tier=2 is a
+    # no-op on default rows; it only bites with include_weak_tcdb_hits=True.
+    tier2 = genes_by_ontology(
+        ontology="tcdb", organism="MED4", level=2, max_tier=2,
+    )
+    print(f"max_tier=2 alone: total_matching={tier2.get('total_matching')} "
+          f"(same as unfiltered: no default row carries tier 3)")
+
     filtered = genes_by_ontology(
         ontology="tcdb",
         organism="MED4",
         level=2,
         evidence=["homology"],
-        max_tier=2,
+        max_tier=1,
     )
-    print(f"evidence=['homology'] AND max_tier=2: "
+    print(f"evidence=['homology'] AND max_tier=1: "
           f"total_matching={filtered.get('total_matching')}")
 
     best_hits = genes_by_ontology(
@@ -228,7 +241,6 @@ def scenario_trust_filtered_tcdb() -> None:
         ontology="tcdb",
         level=2,
         evidence=["homology"],
-        max_tier=2,
     )
     envelope = enrichment.to_envelope(limit=5)
     print(f"pathway_enrichment with the same filters: "
