@@ -14924,3 +14924,10 @@ class TestReleasePrepNotFoundPublicationDoisWrapper:
             result = await tool_fns["metabolites_by_flags_assay"](
                 mock_ctx, assay_ids=["bogus_assay"], summary=True)
         self._assert_model(result.not_found)
+
+
+@pytest.mark.parametrize("tool_name", ["pathway_enrichment", "cluster_enrichment"])
+def test_enrichment_background_describes_annotated_mode(tool_fns, tool_name):
+    """backlog 3.12: the background param names the annotated mode."""
+    desc = _param_description(tool_fns, tool_name, "background")
+    assert "'annotated'" in desc, desc

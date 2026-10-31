@@ -7040,8 +7040,9 @@ def register_tools(mcp: FastMCP):
         )] = True,
         background: Annotated[str | list[str], Field(
             description="'table_scope' (default, per-cluster quantified set), 'organism' "
-                        "(full genome — inflates denominator), or explicit locus_tag list. "
-                        "See docs://analysis/enrichment for the full background semantics.",
+                        "(full genome — inflates denominator), 'annotated' (genes with "
+                        ">=1 edge in this ontology under the same filters), or explicit "
+                        "locus_tag list. See docs://analysis/enrichment.",
         )] = "table_scope",
         min_gene_set_size: Annotated[int, Field(
             description="Per-cluster M filter: drop pathways with fewer members in the background.",
@@ -7177,9 +7178,9 @@ def register_tools(mcp: FastMCP):
                         "`term_validation.resolved_aliases`).")] = None,
         background: Annotated[str | list[str], Field(
             description="'cluster_union' (default — union of all clustered genes; differs "
-                        "from `pathway_enrichment`'s 'table_scope' default), 'organism', or "
-                        "explicit locus_tag list. See docs://analysis/enrichment for the "
-                        "full background semantics.")] = "cluster_union",
+                        "from `pathway_enrichment`'s 'table_scope' default), 'organism', "
+                        "'annotated' (genes with >=1 edge in this ontology under the same "
+                        "filters), or explicit locus_tag list. See docs://analysis/enrichment.")] = "cluster_union",
         min_gene_set_size: Annotated[int, Field(description="Per-cluster M filter: drop pathways with fewer members.", ge=0)] = 5,
         max_gene_set_size: Annotated[int | None, Field(description="Per-cluster M filter upper bound. None disables.", ge=1)] = 500,
         min_cluster_size: Annotated[int, Field(description="Skip clusters with fewer members than this.", ge=0)] = 3,

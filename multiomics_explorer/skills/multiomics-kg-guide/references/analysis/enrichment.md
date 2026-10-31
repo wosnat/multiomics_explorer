@@ -301,10 +301,27 @@ the process that produced the gene set? It matters more than the ontology.
 | `table_scope` (DE default) | Gene sets came from a DE table. Each experiment quantifies a subset of the genome (`distinct_gene_count` on `list_experiments`); unquantified genes cannot be DE and would inflate `N`. | `de_enrichment_inputs` sets it per gene set; `pathway_enrichment(background="table_scope")`. |
 | `cluster_union` (cluster default) | Gene sets are clusters of one analysis; the universe is what was clustered. | `cluster_enrichment_inputs`; `cluster_enrichment(background="cluster_union")`. |
 | `organism` | Genome-wide partitions: ortholog groups, sequence features, curated lists. | `background="organism"` on either wrapper, or the `run_cypher` one-liner in section 6 for the primitives. |
+| `annotated` | The ontology covers only part of the genome and unannotated genes should not count as "drawn but not in any term". | `background="annotated"` on either wrapper. |
 | explicit list | You know the candidate pool. | `background=[...]` on either wrapper (shared across sets), or a per-set dict on `EnrichmentInputs`. |
 
 Backgrounds are per gene set, so `N` differs between sets and
 `fold_enrichment` is not comparable across experiments. That is intended.
+
+**`annotated` — correcting for annotation coverage.** Under `table_scope` or
+`organism`, a gene with no edge in the ontology still counts in `N` and
+dilutes every term. That matters when coverage is partial and uneven — the
+motivating case is `tigr_role`, whose roles cover only part of the genome, skewed toward
+well-characterised genes, so DE sets rich in poorly annotated
+genes look depleted everywhere. `background="annotated"` sets the universe to
+the genes with at least one edge in the chosen ontology, built by the same
+rules as TERM2GENE: the same trust filters, `tree`, `interpro_type` and
+`informative_only`, before the gene-set size filter. With `level` it spans
+every term at that level, even when `term_ids` narrows the tested terms; with
+`term_ids` alone it is the union of their genes. Gene-set genes outside the
+universe drop out of `n`. It is organism-wide (not intersected with the
+experiment's quantified genes) and shared by every gene set; for "annotated
+and quantified", pass that list explicitly. Before this mode existed the
+workaround was exactly that: an explicit `background=` list.
 
 ---
 

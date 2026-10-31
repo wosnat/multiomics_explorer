@@ -7598,6 +7598,22 @@ def _check_enrichment_level(ontology: str, level: int | None, conn: "GraphConnec
         )
 
 
+def _annotated_background(term2gene, gbo_kwargs: dict) -> list[str]:
+    """`background='annotated'` universe (backlog 3.12): genes that reach at
+    least one term of the ontology under the run's own TERM2GENE rules —
+    same trust filters, tree, interpro_type and informative_only, before the
+    gene-set size filter. With `level` + `term_ids` the universe is every
+    term at that level (one extra genes_by_ontology call), not only the
+    requested terms; with `term_ids` alone it is their union."""
+    if gbo_kwargs.get("term_ids") and gbo_kwargs.get("level") is not None:
+        from multiomics_explorer.analysis.frames import to_dataframe
+        term2gene = to_dataframe(
+            genes_by_ontology(**{**gbo_kwargs, "term_ids": None}))
+    if term2gene.empty or "locus_tag" not in term2gene.columns:
+        return []
+    return sorted(set(term2gene["locus_tag"].dropna()))
+
+
 # ---------------------------------------------------------------------------
 # pathway_enrichment public function
 # ---------------------------------------------------------------------------
@@ -7645,6 +7661,14 @@ def pathway_enrichment(
     types are separate strata, not levels of one hierarchy, and pooling
     them mixes families with domains and superfamilies.
 
+    ``background``: ``'table_scope'`` (default, the genes each experiment
+    quantified), ``'organism'`` (every gene), ``'annotated'`` (genes with at
+    least one edge in the chosen ontology under the same trust filters /
+    tree / interpro_type / informative_only as TERM2GENE — counters
+    annotation-coverage bias such as TIGR roles covering only part of the
+    genome; with ``level`` + ``term_ids`` it spans every term at that level,
+    with ``term_ids`` alone their union), or an explicit locus-tag list.
+
     ``include_nonsignificant`` (default True — the package returns the
     full ranked list) is stored on ``result.params`` and consumed by
     ``result.to_envelope(...)``: when False, rows with ``p_adjust >=
@@ -7678,17 +7702,18 @@ def pathway_enrichment(
     if direction not in {"up", "down", "both"}:
         raise ValueError(f"direction must be 'up'|'down'|'both'; got {direction!r}")
     if isinstance(background, str):
-        if background not in {"table_scope", "organism"}:
+        if background not in {"table_scope", "organism", "annotated"}:
             raise ValueError(
-                f"background must be 'table_scope', 'organism', or a list; got {background!r}"
+                "background must be 'table_scope', 'organism', 'annotated', "
+                f"or a list; got {background!r}"
             )
     elif isinstance(background, list):
         if not background:
             raise ValueError("background list must be non-empty")
     else:
         raise ValueError(
-            f"background must be 'table_scope', 'organism', or a list; "
-            f"got {type(background).__name__}"
+            "background must be 'table_scope', 'organism', 'annotated', or a "
+            f"list; got {type(background).__name__}"
         )
     if min_gene_set_size < 0:
         raise ValueError("min_gene_set_size must be >= 0.")
@@ -7737,6 +7762,10 @@ def pathway_enrichment(
         org_locus_tags = org_rows[0]["locus_tags"] if org_rows else []
         resolved_bg = {c: list(org_locus_tags) for c in inputs.gene_sets}
         background_mode = "organism"
+    elif background == "annotated":
+        # Filled in once TERM2GENE is built (_annotated_background).
+        resolved_bg = {c: [] for c in inputs.gene_sets}
+        background_mode = "annotated"
     else:
         resolved_bg = {c: list(background) for c in inputs.gene_sets}
         background_mode = {
@@ -7747,7 +7776,7 @@ def pathway_enrichment(
 
     inputs.background = resolved_bg
 
-    gbo_result = genes_by_ontology(
+    gbo_kwargs = dict(
         ontology=ontology, organism=inputs.organism_name,
         level=level, term_ids=term_ids,
         min_gene_set_size=0, max_gene_set_size=None,
@@ -7757,8 +7786,12 @@ def pathway_enrichment(
         conn=conn,
         **trust_filters,
     )
+    gbo_result = genes_by_ontology(**gbo_kwargs)
     from multiomics_explorer.analysis.frames import to_dataframe
     term2gene = to_dataframe(gbo_result)
+    if background == "annotated":
+        annotated = _annotated_background(term2gene, gbo_kwargs)
+        inputs.background = {c: list(annotated) for c in inputs.gene_sets}
 
     if term2gene.empty or not inputs.gene_sets:
         result = EnrichmentResult(
@@ -7881,6 +7914,10 @@ def cluster_enrichment(
     pathway_enrichment.
     ``interpro_type`` is required when ``ontology='interpro'``.
 
+    ``background``: ``'cluster_union'`` (default), ``'organism'``,
+    ``'annotated'`` (genes with at least one edge in the chosen ontology,
+    built exactly as in pathway_enrichment), or an explicit locus-tag list.
+
     ``include_nonsignificant`` (default True) behaves exactly as in
     ``pathway_enrichment``: stored on ``result.params``, consumed by
     ``result.to_envelope(...)`` to drop non-significant rows before
@@ -7908,17 +7945,18 @@ def cluster_enrichment(
     if level is None and not term_ids:
         raise ValueError("At least one of `level` or `term_ids` must be provided.")
     if isinstance(background, str):
-        if background not in {"cluster_union", "organism"}:
+        if background not in {"cluster_union", "organism", "annotated"}:
             raise ValueError(
-                f"background must be 'cluster_union', 'organism', or a list; got {background!r}"
+                "background must be 'cluster_union', 'organism', 'annotated', "
+                f"or a list; got {background!r}"
             )
     elif isinstance(background, list):
         if not background:
             raise ValueError("background list must be non-empty")
     else:
         raise ValueError(
-            f"background must be 'cluster_union', 'organism', or a list; "
-            f"got {type(background).__name__}"
+            "background must be 'cluster_union', 'organism', 'annotated', or "
+            f"a list; got {type(background).__name__}"
         )
     if min_gene_set_size < 0:
         raise ValueError("min_gene_set_size must be >= 0.")
@@ -7966,6 +8004,10 @@ def cluster_enrichment(
         org_locus_tags = org_rows[0]["locus_tags"] if org_rows else []
         resolved_bg = {c: list(org_locus_tags) for c in inputs.gene_sets}
         background_mode = "organism"
+    elif background == "annotated":
+        # Filled in once TERM2GENE is built (_annotated_background).
+        resolved_bg = {c: [] for c in inputs.gene_sets}
+        background_mode = "annotated"
     else:
         resolved_bg = {c: list(background) for c in inputs.gene_sets}
         background_mode = {
@@ -8002,7 +8044,7 @@ def cluster_enrichment(
         )
         return result
 
-    gbo_result = genes_by_ontology(
+    gbo_kwargs = dict(
         ontology=ontology, organism=inputs.organism_name,
         level=level, term_ids=term_ids,
         min_gene_set_size=0, max_gene_set_size=None,
@@ -8012,8 +8054,12 @@ def cluster_enrichment(
         conn=conn,
         **trust_filters,
     )
+    gbo_result = genes_by_ontology(**gbo_kwargs)
     from multiomics_explorer.analysis.frames import to_dataframe
     term2gene = to_dataframe(gbo_result)
+    if background == "annotated":
+        annotated = _annotated_background(term2gene, gbo_kwargs)
+        inputs.background = {c: list(annotated) for c in inputs.gene_sets}
 
     if term2gene.empty:
         result = EnrichmentResult(

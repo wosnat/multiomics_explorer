@@ -24149,3 +24149,114 @@ class TestTrustAxisTierDescription:
         for s in ("diamond_tier", "diamond_best_hit", "identity band",
                   "eggNOG", "MEROPS"):
             assert s in desc, s
+
+
+# ---------------------------------------------------------------------------
+# backlog 3.12 — background='annotated' on pathway_enrichment / cluster_enrichment
+# ---------------------------------------------------------------------------
+class TestEnrichmentAnnotatedBackground:
+    """`background='annotated'`: the universe is the genes that reach at
+    least one term of the run's TERM2GENE scope (same trust filters / tree /
+    interpro_type / informative_only); with `level` + `term_ids` it widens
+    to every term at that level."""
+
+    @pytest.fixture(autouse=True)
+    def _enrichment_preflight(self, monkeypatch):
+        _patch_enrichment_preflight(monkeypatch)
+
+    _T2G = [
+        {"term_id": "T1", "term_name": "Term1", "locus_tag": "PMM0001", "level": 1},
+        {"term_id": "T1", "term_name": "Term1", "locus_tag": "PMM0002", "level": 1},
+        {"term_id": "T2", "term_name": "Term2", "locus_tag": "PMM0002", "level": 1},
+        {"term_id": "T2", "term_name": "Term2", "locus_tag": "PMM0005", "level": 1},
+    ]
+    _WIDE = _T2G + [
+        {"term_id": "T9", "term_name": "Term9", "locus_tag": "PMM0009", "level": 1},
+    ]
+
+    @staticmethod
+    def _de_inputs():
+        from multiomics_explorer.analysis.enrichment import EnrichmentInputs
+        return EnrichmentInputs(
+            organism_name="MED4",
+            gene_sets={"exp1|T0|up": ["PMM0001", "PMM0007"]},
+            background={"exp1|T0|up": ["PMM0001", "PMM0007", "PMM0008"]},
+            cluster_metadata={"exp1|T0|up": {
+                "experiment_id": "exp1", "timepoint": "T0", "direction": "up"}},
+            not_found=[], not_matched=[], no_expression=[],
+            not_found_experiments=[],
+        )
+
+    def _wire(self, monkeypatch, *, kind):
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+        gbo_calls, seen = [], {}
+
+        def _gbo(**kw):
+            gbo_calls.append(kw)
+            rows = self._WIDE if kw.get("term_ids") is None else self._T2G
+            return TestPathwayEnrichment._stub_gbo_result(rows=rows)
+
+        def _fisher(inputs, term2gene, **kw):
+            seen["background"] = {k: sorted(v) for k, v in inputs.background.items()}
+            return _fake_fisher_ora_three_rows(next(iter(inputs.gene_sets)))(
+                inputs, term2gene, **kw)
+
+        monkeypatch.setattr(f, "genes_by_ontology", _gbo)
+        monkeypatch.setattr(enr, "fisher_ora", _fisher)
+        if kind == "pathway":
+            monkeypatch.setattr(enr, "de_enrichment_inputs",
+                                lambda **_: self._de_inputs())
+        else:
+            monkeypatch.setattr(enr, "cluster_enrichment_inputs",
+                                lambda **_: TestClusterEnrichment._stub_inputs())
+        return gbo_calls, seen
+
+    def _call(self, kind, **kw):
+        from multiomics_explorer.api import cluster_enrichment, pathway_enrichment
+        if kind == "pathway":
+            return pathway_enrichment(
+                organism="MED4", experiment_ids=["exp1"],
+                ontology="cyanorak_role", min_gene_set_size=0, **kw)
+        return cluster_enrichment(
+            analysis_id="ca:test", organism="MED4",
+            ontology="cyanorak_role", min_gene_set_size=0, **kw)
+
+    @pytest.mark.parametrize("kind", ["pathway", "cluster"])
+    def test_background_is_annotated_genes_of_term2gene(self, monkeypatch, kind):
+        gbo_calls, seen = self._wire(monkeypatch, kind=kind)
+        result = self._call(kind, level=1, background="annotated")
+        assert len(gbo_calls) == 1
+        (bg,) = seen["background"].values()
+        assert bg == ["PMM0001", "PMM0002", "PMM0005", "PMM0009"]
+        assert result.params["background_mode"] == "annotated"
+
+    @pytest.mark.parametrize("kind", ["pathway", "cluster"])
+    def test_level_plus_term_ids_widens_to_the_whole_level(
+            self, monkeypatch, kind):
+        gbo_calls, seen = self._wire(monkeypatch, kind=kind)
+        self._call(kind, level=1, term_ids=["T1", "T2"],
+                   background="annotated", sources=["eggnog"])
+        assert len(gbo_calls) == 2
+        tested, universe = gbo_calls
+        assert tested["term_ids"] == ["T1", "T2"]
+        assert universe["term_ids"] is None
+        strip = lambda d: {k: v for k, v in d.items() if k != "term_ids"}  # noqa: E731
+        assert strip(tested) == strip(universe)
+        assert universe["sources"] == ["eggnog"]
+        (bg,) = seen["background"].values()
+        assert "PMM0009" in bg
+
+    @pytest.mark.parametrize("kind", ["pathway", "cluster"])
+    def test_term_ids_only_uses_union_of_requested_terms(
+            self, monkeypatch, kind):
+        gbo_calls, seen = self._wire(monkeypatch, kind=kind)
+        self._call(kind, term_ids=["T1", "T2"], background="annotated")
+        assert len(gbo_calls) == 1
+        (bg,) = seen["background"].values()
+        assert bg == ["PMM0001", "PMM0002", "PMM0005"]
+
+    @pytest.mark.parametrize("kind", ["pathway", "cluster"])
+    def test_validation_message_names_annotated(self, kind):
+        with pytest.raises(ValueError, match="'annotated'"):
+            self._call(kind, level=1, background="genome")
