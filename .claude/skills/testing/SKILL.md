@@ -20,6 +20,7 @@ and [regression guide](references/regression-guide.md) for golden-file tests.
 | `tests/unit/test_write_blocking.py` | Write keyword regex | No |
 | `tests/unit/test_about_content.py` | About-file consistency with Pydantic schemas (expected-keys, param names) | No |
 | `tests/unit/test_docs_lint.py` | Docs hygiene: `docs://` links resolve, stale identifiers (`inputs/lint/stale_identifiers.yaml`), quoted vocab values vs `inputs/lint/vocab_snapshot.yaml`, CLAUDE.md table shape, tool inventory | No |
+| `tests/unit/test_docs_surface_guards.py` | `--lint` guards: brief sections, index size, kg_claims `quoted` in `used_in`, example CONTENTS pins, outfacing identifiers, flat-ontology claims, index read-when overrides | No |
 | `tests/unit/test_refresh_examples.py` | Parser / comparator / formatter of `scripts/refresh_examples.py` | No |
 | `tests/integration/test_cyver_queries.py` | CyVer schema/property validation of all builders | Yes |
 | `tests/integration/test_tool_correctness_kg.py` | Fixture-based correctness (live KG) | Yes |

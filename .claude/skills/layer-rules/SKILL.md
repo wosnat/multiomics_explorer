@@ -82,13 +82,16 @@ point cannot be reproduced live (a `warn` verdict, a tool bug).
 once and pointed at `list_filter_values`; `tests/unit/test_docs_lint.py`
 checks every quoted value against `inputs/lint/vocab_snapshot.yaml`. A KG
 number quoted in prose (a percentage, a count) needs an entry in
-`inputs/lint/kg_claims.yaml` with the file in `used_in` (evaluated live by
+`inputs/lint/kg_claims.yaml` with the file in `used_in` and the phrasing in
+`quoted` (`--lint` checks each `used_in` file contains one; evaluated live by
 `tests/integration/test_docs_kg_claims.py`). The same register holds
 **behavioural** claims — a sentence like "`informative_only` drops the KEGG
 global maps" or "eggNOG-only edges read `family_inferred`" gets a boolean /
 count claim (`expect: {flagged: 13}`), so a KG rebuild that flips the
 behaviour fails the test and names the prose to rewrite. Every `docs://`
-link must resolve.
+link must resolve. Backtick-quoted snake_case identifiers must be real params /
+fields / vocab values (`--lint`); intentional exceptions go in
+`inputs/lint/identifier_allowlist.yaml` with a reason.
 
 **Rename cascade.** When a field / param / envelope key / tool is removed or
 renamed, add the old identifier to `inputs/lint/stale_identifiers.yaml` in the
