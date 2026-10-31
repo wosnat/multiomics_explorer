@@ -100,9 +100,9 @@ a gene does not make it part of the gene's function.
 
 ## Worked path: discover → gene lookup → tested-absent drill-down
 
-The one path to know. Boolean DMs are the trap: 16 of the 27 store only
+The one path to know. Boolean DMs are the trap: most store only
 `flagged` edges, so `flag_value=False` returns 0 rows there and the absence of a
-flag means nothing. The other 11 store `not_flagged` too, and there
+flag means nothing. The rest (about a third) store `not_flagged` too, and there
 `flag_value=False` is real tested-absent biology.
 
 ```python
@@ -142,7 +142,7 @@ absent["total_matching"]          # 920
 absent["by_value"]                # [{'value': 'not_flagged', 'count': 920}]
 absent["by_metric"][0]["dm_true_count"], absent["by_metric"][0]["dm_false_count"]
 # (1010, 920)  <- full-DM counts; dm_false_count == 0 means "positive-only, don't
-#                 read flag_value=False as absence" on the other 16 boolean DMs
+#                 read flag_value=False as absence" on the positive-only boolean DMs
 ```
 
 Read `by_metric[*].dm_false_count` before interpreting a `flag_value=False` result:
@@ -163,7 +163,7 @@ med4["compartments"]                 # ['vesicle', 'whole_cell']
 
 # verbose=True — has_p_value is a verbose-only field.
 for dm in list_derived_metrics(
-        organism="MED4", verbose=True, limit=None)["results"]:   # 26 DMs
+        organism="MED4", verbose=True, limit=None)["results"]:
     print(dm["metric_type"], dm["value_kind"], dm["rankable"], dm["has_p_value"])
 ```
 
@@ -222,7 +222,7 @@ vesicle = genes_by_numeric_metric(
 - **Boolean tested-absent storage is per DM.** `genes_by_boolean_metric(flag_value=False)`
   returns rows only on the 11 of 34 boolean DMs that store `not_flagged`
   edges — Steglich 2010 `expressed_above_background` (1), Voigt 2014
-  `has_primary_tss` (MED4 + MIT9313, 2), Hennon 2015 `rapid_recovery_*` (2),
+  `has_primary_tss` (MED4 + MIT9313, 2), Bagby 2015 `rapid_recovery_*` (2),
   and the Alteromonas EZ55 `whole_cell_detected_*` / `exoproteome_detected_*`
   set (6); the rest are positive-only. Read the
   filtered-slice `by_metric[*].false_count` or the full-DM `dm_false_count`.

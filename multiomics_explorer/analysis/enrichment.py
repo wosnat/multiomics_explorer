@@ -837,7 +837,7 @@ def cluster_enrichment_inputs(
     Parameters
     ----------
     analysis_id : str
-        Clustering analysis identifier (e.g. ``"ca:..."``) to pull from.
+        Clustering analysis identifier (e.g. ``"clustering_analysis:msb4100087:med4_kmeans_nstarvation"``) to pull from.
     organism : str
         Single organism name (fuzzy-matched).
     min_cluster_size : int, default 3

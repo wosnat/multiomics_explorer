@@ -91,7 +91,8 @@ def experiments_to_dataframe(result: dict) -> pd.DataFrame:
     -------
     pd.DataFrame
         One row per experiment × timepoint. Non-time-course experiments produce
-        a single row with NaN timepoint fields.
+        a single row with NaN timepoint fields. Verbose ``coculture_partners``
+        becomes a ``"name (role) | ..."`` string.
 
     Raises
     ------
@@ -113,6 +114,13 @@ def experiments_to_dataframe(result: dict) -> pd.DataFrame:
         if isinstance(gbs, dict):
             for status_key, count in gbs.items():
                 base[f"genes_by_status_{status_key}"] = count
+        partners = exp.get("coculture_partners")
+        if isinstance(partners, list):
+            # verbose: list of {name, role, ...} -> "name (role) | ..."
+            base["coculture_partners"] = _LIST_DELIMITER.join(
+                f"{p.get('name')} ({p.get('role')})" if isinstance(p, dict) else str(p)
+                for p in partners
+            )
         timepoints = exp.get("timepoints")
         if timepoints:
             for tp in timepoints:
