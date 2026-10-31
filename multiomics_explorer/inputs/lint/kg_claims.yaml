@@ -57,6 +57,7 @@
     - multiomics_explorer/inputs/tools/metabolites_by_flags_assay.yaml
     - multiomics_explorer/mcp_server/tools.py
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/derived_metrics.md
+    - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
   note: "genes_by_boolean_metric flag_value=False returns rows on 11 of 34 boolean DMs"
 
 - id: publications_discusses_split
@@ -439,13 +440,13 @@
   cypher: >
     MATCH (m:Metabolite) WHERE 'go_transport' IN coalesce(m.evidence_sources, [])
     RETURN count(m) AS go_transport_metabolites
-  expect: {go_transport_metabolites: 208}
+  expect: {go_transport_metabolites: 218}
   tolerance: {rel: 0.05}
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/metabolites.md
   note: >
-    GO transport substrates (KG build 2026-10-18T18:40Z): 208 metabolites carry
-    evidence_sources 'go_transport'. Fails ⇒ rewrite the "fourth value" paragraph.
+    GO transport substrates (KG build 2026-10-31T14:01Z): 218 metabolites carry
+    evidence_sources 'go_transport'; the source table quotes "~220". Fails ⇒ update that row.
 
 - id: go_transport_med4_genes
   cypher: >

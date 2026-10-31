@@ -63,15 +63,15 @@ genuine top-10 in both modes, no `_truncated` companion key.
 only the envelope (`results=[]`, `returned=0`; `truncated` is `true`
 whenever rows were withheld and `false` when nothing matched). Use it as the **first call** for any
 question that doesn't already specify exact IDs. Pattern: `summary=True`
-→ narrow filters → drop `summary=True` for detail. Exception: on
+→ narrow filters → drop `summary=True` for detail. The envelope is
+usually smaller than a 5-row page, but larger on `list_organisms`,
+`list_publications`, `list_experiments` and `resolve_gene`. On
 `metabolites_by_gene` the envelope is computed over the whole locus-tag
-batch, so `summary=True` on 50+ genes costs as much as a detail call —
-use it because the envelope is the artifact, not to save time.
+batch, so `summary=True` on 50+ genes costs as much as a detail call.
 
 The 6 tools without `summary=` — `kg_schema`, `kg_release_info`,
 `ontology_term_details`, `list_filter_values`, `gene_response_profile`,
-`run_cypher` — either return small fixed sets, are themselves summaries,
-take a bounded batch, or have raw / shape-specific output.
+`run_cypher` — return small or bounded output already.
 
 ### `warnings`: advisory diagnostics
 
@@ -115,14 +115,23 @@ on what's being filtered:
   seven chemistry / metabolomics tools, typically used to strip currency
   cofactors (ATP, NADH, water). Accepts the same alias forms as
   `metabolite_ids` — `docs://analysis/metabolites`.
-- **Controlled-vocabulary filters** (`treatment_type`, `background_factors`,
-  `compartment`, `growth_phases`, `omics_type`, `cluster_type`, the trust
-  vocabularies) match whole values, case-insensitively. An unknown value
-  returns 0 rows plus (on most tools) a `warnings` entry — read the live
-  set with `list_filter_values(filter_type=...)`.
+- **Controlled-vocabulary filters** match whole values — see "Live
+  vocabularies" below.
 
 When in doubt, the tool's parameter description states the semantics
 explicitly.
+
+### Live vocabularies
+
+Experiment, DM, chemistry and trust vocabularies (`treatment_type`,
+`background_factors`, `growth_phases`, `compartment`, `omics_type`,
+`cluster_type`, …) are read live from the KG, not fixed enums; value
+lists quoted in tool docs are examples and may lag. Read the current set
+with `list_filter_values(filter_type=...)`. An unknown value returns 0
+rows, never an error, plus (on most tools) a `warnings` entry naming the
+valid values — check `warnings` before trusting an empty result. Pass
+values as `list_filter_values` spells them: `treatment_type` /
+`background_factors` / `growth_phases` ignore case, the rest match exactly.
 
 ### Single-organism vs cross-organism
 
@@ -140,10 +149,10 @@ more than one organism: `differential_expression_by_gene`,
 `organism=` / `organisms=[...]` is an optional narrowing filter on the
 remaining discovery / drill-down tools; list `organism_names=[...]` is
 **only** on `list_organisms` and `list_metabolites` (unknown names land
-in `not_found`); a handful of gene-batch tools
-(`gene_overview`, `gene_details`, `gene_homologs`, `gene_aa_sequence`,
-`gene_neighbors`, `search_homolog_groups`, `discussed_by_publication`)
-take no organism parameter at all (gene rows still carry per-row
+in `not_found`); a handful of tools take no organism parameter at all
+(gene-batch: `gene_overview`, `gene_details`, `gene_homologs`,
+`gene_aa_sequence`, `gene_neighbors`; plus `search_homolog_groups`,
+`discussed_by_publication`) (gene rows still carry per-row
 `organism`).
 
 The pattern: anything needing a precomputed organism-scoped index
@@ -213,7 +222,7 @@ ortholog coverage on a heterotroph.
 In the metabolomics layer (`MetaboliteAssay` edges), the KG stores
 **tested-and-not-detected** rows alongside tested-and-detected ones:
 `Assay_quantifies_metabolite.detection_status ∈ {detected, not_detected,
-...}` (about 70% of numeric edges are `not_detected`) and
+sporadic}` (about 70% of numeric edges are `not_detected`) and
 `Assay_flags_metabolite.flag_value` (`detected`/`not_detected` in the KG,
 surfaced as `True`/`False`; about 69% of boolean edges are `False`). Both
 are a deliberate biological signal — looked for and not found, in
@@ -221,7 +230,8 @@ contrast to "not measured at all".
 
 **Tools default to keeping tested-absent rows.** Filter them out only
 when you have a specific reason. Envelope rollups
-(`by_detection_status`, `by_flag_value`) surface this composition as
+(`by_detection_status`; `by_value` on `metabolites_by_flags_assay`,
+`by_flag_value` on `assays_by_metabolite`) surface this composition as
 the primary headline. See `docs://analysis/metabolites`.
 
 ### Expression: `table_scope` decides what absence means
@@ -277,7 +287,7 @@ Boolean-like properties are stored as **two-state strings** in the KG
 `Assay_flags_metabolite.flag_value`: `detected` / `not_detected`). Tool
 parameters and most output columns stay `bool`; a couple of rollups
 surface the KG literal instead. Tested-absent (`not_flagged`) edges exist
-on only 11 of 32 boolean DMs — the rest are positive-only, so
+on only 11 of 34 boolean DMs — the rest are positive-only, so
 `genes_by_boolean_metric(flag_value=False)` is DM-dependent (read
 `by_metric[*].false_count`). `Assay_flags_metabolite` always stores both
 states.
@@ -289,14 +299,9 @@ states.
 `Gene.annotation_quality` is a 0..3 numeric encoding of
 `Gene.annotation_state` (informative-evidence count): `0` = `no_evidence`,
 `1` = `catch_all_only` (catch-all name/product), `2` = `informative_single`,
-`3` = `informative_multi`. `min_quality=2` skips hypothetical proteins;
-`min_quality=3` for high-confidence gene sets.
-
-**Drift caveat.** Earlier KG releases encoded product-name quality in the
-same field — old `min_quality` filters now silently select a different
-gene set, with no deprecation warning. Affected tools:
-`genes_by_function`, `gene_details`, `gene_overview`, plus any tool
-filtering on `annotation_quality`.
+`3` = `informative_multi`. `min_quality=2` requires at least one
+informative annotation source (a hypothetical protein with a Pfam / KO
+call still passes); `min_quality=3` requires multi-source support.
 
 ---
 
@@ -320,11 +325,10 @@ maps stay informative, and category/subcategory nodes are never flagged
 — no `map…` form. Which terms an ontology flags and why:
 `docs://ontologies/{key}` "Informativeness rule".
 
-**Reproducibility caveat.** BH-adjusted p-values depend on the term set
-tested in each cluster — runs including uninformative terms differ from
-runs excluding them, even on identical inputs (the raw `pvalue` is
-unaffected). For locked baselines, pass `informative_only=False` and
-post-filter on `is_informative`. Full methodology:
+**Reproducibility caveat.** BH-adjusted p-values depend on the tested
+term set, so runs with and without uninformative terms differ (raw
+`pvalue` does not). For locked baselines pass `informative_only=False`
+and post-filter on `is_informative`. Methodology:
 `docs://analysis/enrichment`.
 
 ---
@@ -353,17 +357,21 @@ exclusions in `excluded_assays`).
 
 ## Chemistry conventions
 
-Chemistry / metabolomics tools share four conventions: TCDB transport rows
-are direct by default (`tcdb_route='direct'`, a `tcdb_gate='direct'` call
-onto a system; `tcdb_route='family'` rows only with
-`include_tcdb_family_substrates=True`), ranked by `tcdb_identity` then
-`tcdb_calls`; undirected KEGG reaction joins; id resolution on
-`metabolite_ids` via `Metabolite.all_identifiers` (CURIEs such as
-`chebi:14654`; `Gene.all_identifiers` is bare), so retired ids resolve
-into `resolved_aliases` and removed or role ids warn; and **stereo forms
-are separate nodes** (Cysteine, L-Cysteine), no count crosses them: read
-`stereo_relatives`, or use `include_stereo_forms`. Detail:
-`docs://analysis/metabolites`.
+- **Routes stay separate** (`evidence_source`): `metabolism` (KEGG;
+  undirected — never "produces"), `transport` (TCDB), `go_transport` (a
+  GO term definition, not a gene fact). No count merges them.
+  `docs://analysis/transport`.
+- **TCDB rows are direct by default**; family-walk rows only with
+  `include_tcdb_family_substrates=True`. Rank with `tcdb_identity`,
+  qualify with `tcdb_calls`.
+- **Any id form resolves** on `metabolite_ids` (`Metabolite.all_identifiers`);
+  retired ids land in `resolved_aliases`, removed ones warn. Role ids
+  (`chebi.role:`) resolve on the two gene tools; `list_metabolites` and
+  the metabolomics tools put them in `not_found`.
+- **Stereo forms are separate nodes** (Cysteine ≠ L-Cysteine): read
+  `stereo_relatives`, or pass `include_stereo_forms=True`.
+
+Detail: `docs://analysis/metabolites`.
 
 ## Ontology term / ortholog-group ID forms
 
@@ -450,20 +458,16 @@ The choice of background matters more than the choice of ontology.
 
 ## Trust surface summary (ontology tools)
 
-**15 of the 17 ontologies carry the trust surface** — every one except
-`subcellular_localization` (PSORTb) / `signal_peptide_type` (SignalP).
-Every gene→term row on the other 15 carries a compact `evidence` column
-(five-rung ladder) plus verbose `sources[]` / `evidence_score` / `tier`;
-native scalars (TCDB's `tcdb_bitscore`, MEROPS's `pfam_support`,
-InterPro's `evalue`, ...) are verbose-only and never filterable (scales
-differ across ontologies). Rank by `evidence_score` (filter only via `min_evidence_score`); use
-`evidence=` / `sources=` / `max_tier=` to narrow the *kind* of evidence
-(TCDB: `tcdb_call=`, no `evidence_score`; rows are pre-gated by
-`tcdb_gate`, weak hits only via `include_weak_tcdb_hits`);
-pass `interpro_type=` whenever enriching on InterPro (it raises
-otherwise). Full per-ontology trust profile, the rank-vs-filter rule, the
-sparse-row convention, MEROPS `call_class`, and why InterPro enrichment
-requires `interpro_type`: `docs://analysis/annotation_evidence`.
+**15 of the 17 ontologies carry the trust surface** (all but PSORTb
+`subcellular_localization` / SignalP `signal_peptide_type`): a compact
+`evidence` ladder on every gene→term row, verbose `sources[]` /
+`evidence_score` / `tier`; native scalars (`tcdb_bitscore`, `evalue`, ...)
+are verbose-only and never filterable. Rank by `evidence_score`; narrow
+the *kind* of evidence with `evidence=` / `sources=` / `max_tier=` (TCDB:
+`tcdb_call=`, no `evidence_score`; weak hits only via
+`include_weak_tcdb_hits`). InterPro enrichment requires `interpro_type=`.
+Per-ontology profile, the rank-vs-filter rule and MEROPS `call_class`:
+`docs://analysis/annotation_evidence`.
 
 ---
 
