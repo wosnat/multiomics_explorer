@@ -19195,16 +19195,30 @@ class TestGenesByOntologySizeFiltered:
         assert "were dropped" in w
         assert "The defaults suit enrichment" in w
 
-    def test_warning_reports_max_none(self):
+    @pytest.mark.parametrize("bounds", [
+        {"min_gene_set_size": 5, "max_gene_set_size": None},
+        {"min_gene_set_size": 5, "max_gene_set_size": 500},
+        {"min_gene_set_size": 2},
+        {"max_gene_set_size": 100},
+    ])
+    def test_explicit_bounds_suppress_warning_keep_counts(self, bounds):
+        """backlog 2d.8: the caller chose the window, so the drop is not
+        silent — counts stay, the warning does not fire."""
         out, _ = self._run(
-            level=2, summary=True, min_gene_set_size=5,
-            max_gene_set_size=None,
+            level=2, summary=True, **bounds,
             pt_sized=self._pt("t1"), pg_sized=self._pg("g1"),
             pt_all=self._pt("t1", "t2"), pg_all=self._pg("g1", "g2"),
         )
-        ws = self._size_warnings(out)
-        assert len(ws) == 1, out["warnings"]
-        assert "min_gene_set_size=5 / max_gene_set_size=None" in ws[0]
+        assert out["size_filtered_terms"] == 1
+        assert out["size_filtered_genes"] == 1
+        assert self._size_warnings(out) == [], out["warnings"]
+
+    def test_default_bounds_are_plain_int_values(self):
+        import inspect
+        sig = inspect.signature(api.genes_by_ontology)
+        assert sig.parameters["min_gene_set_size"].default == 5
+        assert sig.parameters["max_gene_set_size"].default == 500
+        assert repr(sig.parameters["min_gene_set_size"].default) == "5"
 
     def test_warning_fires_in_detail_mode_too(self):
         """Non-summary path rewrites `warnings` after the detail query —

@@ -3537,7 +3537,7 @@ def register_tools(mcp: FastMCP):
         filtered_out: list[str] = Field(default_factory=list,
             description="Input term_ids valid but outside [min, max]_gene_set_size")
         size_filtered_terms: int = Field(default=0,
-            description="Terms passing every other filter but outside min/max_gene_set_size, dropped. >0 also adds a warning; to enumerate all pass min_gene_set_size=1 and a large max_gene_set_size (e.g. 100000; Python also accepts None).")
+            description="Terms passing every other filter but outside min/max_gene_set_size, dropped. >0 adds a warning when both bounds were left at their defaults; to enumerate all pass min_gene_set_size=1 and a large max_gene_set_size (e.g. 100000; Python also accepts None).")
         size_filtered_genes: int = Field(default=0,
             description="Genes found only in size-dropped terms (missing from total_genes).")
         resolved_aliases: dict[str, list[str]] = Field(default_factory=dict,
@@ -3615,13 +3615,13 @@ def register_tools(mcp: FastMCP):
             description="Exclude terms with fewer organism-scoped genes than this. "
                         "Matches `ontology_landscape`'s organism-scoped convention.",
             ge=0,
-        )] = 5,
+        )] = api.GENE_SET_SIZE_MIN_DEFAULT,
         max_gene_set_size: Annotated[int, Field(
             description="Exclude terms with more organism-scoped genes than this. "
                         "Matches `ontology_landscape`'s organism-scoped convention. "
                         "Pass a large value (e.g. 100000) to disable.",
             ge=1,
-        )] = 500,
+        )] = api.GENE_SET_SIZE_MAX_DEFAULT,
         informative_only: InformativeOnlyParam = False,
         summary: SummaryParam = False,
         verbose: VerboseParam = False,
@@ -3682,7 +3682,8 @@ def register_tools(mcp: FastMCP):
                     f"genes_by_ontology: {len(data['wrong_level'])} "
                     f"term_ids at wrong level (see response.wrong_level)"
                 )
-            if data.get("size_filtered_terms"):
+            if data.get("size_filtered_terms") and any(
+                    "fell outside" in w for w in data.get("warnings") or []):
                 await ctx.warning(
                     f"genes_by_ontology: {data['size_filtered_terms']} "
                     f"terms outside min/max_gene_set_size were dropped "

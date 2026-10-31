@@ -3929,14 +3929,43 @@ def ontology_term_details(
     }
 
 
+class _DefaultGeneSetSize(int):
+    """An int that remembers it is a default (backlog 2d.8).
+
+    genes_by_ontology warns about size-dropped terms only when the caller
+    left both size bounds at their defaults: an explicit window (even one
+    equal to the defaults) is a deliberate choice, not a silent drop. The
+    value behaves as a plain int everywhere else (repr, arithmetic, JSON).
+    """
+
+    __slots__ = ()
+
+    @classmethod
+    def __get_pydantic_core_schema__(cls, source, handler):
+        # Lets the MCP wrapper use these markers as parameter defaults: the
+        # JSON schema then shows a plain integer default (5 / 500).
+        from pydantic_core import core_schema
+        return core_schema.int_schema(
+            serialization=core_schema.plain_serializer_function_ser_schema(int),
+        )
+
+
+GENE_SET_SIZE_MIN_DEFAULT = _DefaultGeneSetSize(5)
+GENE_SET_SIZE_MAX_DEFAULT = _DefaultGeneSetSize(500)
+
+
+def _is_default_size(value) -> bool:
+    return isinstance(value, _DefaultGeneSetSize)
+
+
 @listify_bare_str
 def genes_by_ontology(
     ontology: str,
     organism: str,
     level: int | None = None,
     term_ids: list[str] | None = None,
-    min_gene_set_size: int = 5,
-    max_gene_set_size: int | None = 500,
+    min_gene_set_size: int = GENE_SET_SIZE_MIN_DEFAULT,
+    max_gene_set_size: int | None = GENE_SET_SIZE_MAX_DEFAULT,
     summary: bool = False,
     verbose: bool = False,
     limit: int | None = None,
@@ -4004,8 +4033,10 @@ def genes_by_ontology(
     window, and distinct genes lost from ``total_genes`` because they sit
     only in those terms. Both are 0 when nothing is dropped or when the size
     filters are no-ops (``min_gene_set_size <= 1`` and
-    ``max_gene_set_size=None``). A warning fires when terms were dropped;
-    pass ``min_gene_set_size=1, max_gene_set_size=None`` to enumerate every
+    ``max_gene_set_size=None``). A warning fires when terms were dropped
+    and both bounds were left at their defaults (an explicitly passed
+    window, even 5 / 500, is a deliberate choice and gets no warning); pass
+    ``min_gene_set_size=1, max_gene_set_size=None`` to enumerate every
     gene.
 
     Raises ValueError when the ontology does not carry a filter you set.
@@ -4133,7 +4164,8 @@ def genes_by_ontology(
                 len(unfiltered_per_gene) - len(per_gene), 0)
 
     size_warnings: list[str] = []
-    if size_filtered_terms > 0:
+    if (size_filtered_terms > 0 and _is_default_size(min_gene_set_size)
+            and _is_default_size(max_gene_set_size)):
         size_warnings.append(
             f"{size_filtered_terms} terms ({size_filtered_genes} genes not "
             f"otherwise covered) fell outside "
