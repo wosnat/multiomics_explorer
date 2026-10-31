@@ -16,7 +16,7 @@ docs://tools/genes_by_homolog_group; summary=True first.
 | group_ids | list[string] | — | Ortholog group IDs (from search_homolog_groups or gene_homologs). E.g. ['cyanorak:CK_00000570']. Bare ids are accepted (e.g. 'CK_00000570', 'COG0592@2') and coerced to canonical (see `resolved_aliases`). |
 | organisms | list[string] \| None | None | Organisms, each word-matched as `organism`. Omit for all. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -86,18 +86,11 @@ genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"])
     {"organism_name": "Cyanobium NS01", "count": 1},
     {"organism_name": "Cyanobium PCC6307", "count": 1},
     {"organism_name": "Cyanobium PCC7001", "count": 1},
-    {"organism_name": "Prochlorococcus AS9601", "count": 1},
-    {"organism_name": "Prochlorococcus EQPAC1", "count": 1},
     ...
   ],
   "top_categories": [{"category": "Photosynthesis", "count": 96}],
   "top_groups": [{"group_id": "cyanorak:CK_00000570", "count": 96}],
-  "not_found_groups": [],
-  "not_matched_groups": [],
-  "not_found_organisms": [],
-  "not_matched_organisms": [],
-  "resolved_aliases": {},
-  "warnings": [],
+  "...": "6 empty fields omitted",
   "returned": 5,
   "truncated": true,
   "results": [
@@ -154,18 +147,11 @@ genes_by_homolog_group(group_ids=["cyanorak:CK_00000570", "eggnog:COG0592@2"], s
     {"organism_name": "Cyanobium NS01", "count": 2},
     {"organism_name": "Cyanobium PCC6307", "count": 2},
     {"organism_name": "Cyanobium PCC7001", "count": 2},
-    {"organism_name": "Prochlorococcus AS9601", "count": 2},
-    {"organism_name": "Prochlorococcus EQPAC1", "count": 2},
     ...
   ],
   "top_categories": [{"category": "Replication and repair", "count": 118}, {"category": "Photosynthesis", "count": 96}],
   "top_groups": [{"group_id": "eggnog:COG0592@2", "count": 118}, {"group_id": "cyanorak:CK_00000570", "count": 96}],
-  "not_found_groups": [],
-  "not_matched_groups": [],
-  "not_found_organisms": [],
-  "not_matched_organisms": [],
-  "resolved_aliases": {},
-  "warnings": [],
+  "...": "6 empty fields omitted",
   "returned": 0,
   "truncated": true,
   "results": []

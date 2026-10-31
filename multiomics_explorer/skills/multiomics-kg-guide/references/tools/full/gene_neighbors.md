@@ -264,17 +264,7 @@ gene_neighbors(locus_tags=["ACZ81_08860", "A9601_09441", "NOTAREAL"])
       "neighbors_returned": 10,
       "dropped_null_strand": 0
     },
-    {
-      "locus_tag": "ACZ81_08860",
-      "organism_name": "Alteromonas macleodii HOT1A3",
-      "contig": "NZ_CP012202.1",
-      "start": 2042340,
-      "end": 2043803,
-      "strand": "+",
-      "product": "PepSY-associated TM helix domain-containing protein",
-      "neighbors_returned": 10,
-      "dropped_null_strand": 0
-    }
+    ...
   ],
   "by_organism": [
     {"organism_name": "Prochlorococcus AS9601", "count": 10},

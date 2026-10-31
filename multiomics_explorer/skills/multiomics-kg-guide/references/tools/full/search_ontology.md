@@ -21,7 +21,7 @@ docs://tools/search_ontology and docs://ontologies/{key}; summary=True first.
 | level | int \| None | None | Hierarchy level filter (0 = broadest). See docs://guide/conventions for the level convention. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Applies to 'brite' only; raises if 'brite' is not in the ontology set. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | informative_only | bool | False | True drops terms the KG flags uninformative (roots, catch-alls). |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type. Applies to 'interpro' only; raises if 'interpro' is not in the set. |
 | min_gene_count | int \| None | None | Keep terms with gene_count >= this (subtree organism_gene_count when `organism` is set). Works in search and browse mode. |
 | organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
@@ -115,11 +115,7 @@ search_ontology(search_text="replication", ontology=["go_bp"])
       "truncated": true
     }
   ],
-  "by_level": [],
-  "by_interpro_type": [],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [],
+  "...": "5 empty fields omitted",
   "results": [
     {
       "id": "go:0006260",
@@ -167,8 +163,7 @@ search_ontology(ontology=["merops"], level=1)
   "mode": "browse",
   "total_entries": 170,
   "total_matching": 107,
-  "score_max": null,
-  "score_median": null,
+  "...": "6 empty fields omitted",
   "returned": 5,
   "offset": 0,
   "truncated": true,
@@ -183,10 +178,6 @@ search_ontology(ontology=["merops"], level=1)
     }
   ],
   "by_level": [{"level": 1, "count": 107}],
-  "by_interpro_type": [],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [],
   "results": [
     {
       "id": "merops.family:S33",
@@ -236,8 +227,7 @@ search_ontology(ontology=["tcdb"], level=2, organism="MED4", min_gene_count=5)
   "mode": "browse",
   "total_entries": 9725,
   "total_matching": 8,
-  "score_max": null,
-  "score_median": null,
+  "...": "6 empty fields omitted",
   "returned": 5,
   "offset": 0,
   "truncated": true,
@@ -252,10 +242,6 @@ search_ontology(ontology=["tcdb"], level=2, organism="MED4", min_gene_count=5)
     }
   ],
   "by_level": [{"level": 2, "count": 8}],
-  "by_interpro_type": [],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [],
   "results": [
     {
       "id": "tcdb:3.A.1",
@@ -308,8 +294,7 @@ search_ontology(ontology=["go_bp"], limit=3)
   "mode": "browse",
   "total_entries": 3411,
   "total_matching": 3411,
-  "score_max": null,
-  "score_median": null,
+  "...": "5 empty fields omitted",
   "returned": 3,
   "offset": 0,
   "truncated": true,
@@ -323,20 +308,8 @@ search_ontology(ontology=["go_bp"], limit=3)
       "truncated": true
     }
   ],
-  "by_level": [
-    {"level": 0, "count": 1},
-    {"level": 1, "count": 16},
-    {"level": 2, "count": 115},
-    {"level": 3, "count": 338},
-    {"level": 4, "count": 686},
-    ...
-  ],
-  "by_interpro_type": [],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [
-    "Browse mode truncated with no narrowing filter — set level, min_gene_count, organism or a facet (tree / interpro_type..."
-  ],
+  "by_level": [{"level": 0, "count": 1}, {"level": 1, "count": 16}, {"level": 2, "count": 115}, ...],
+  "warnings": ["Browse mode truncated with no narrowing filter — set level, min_gene_count, organism or a facet (..."],
   "results": [
     {
       "id": "go:0008150",
@@ -385,8 +358,7 @@ search_ontology(ontology=["merops", "ncbifam"], level=0, limit=3)
   "mode": "browse",
   "total_entries": 5212,
   "total_matching": 5088,
-  "score_max": null,
-  "score_median": null,
+  "...": "7 empty fields omitted",
   "returned": 6,
   "offset": 0,
   "truncated": true,
@@ -408,11 +380,6 @@ search_ontology(ontology=["merops", "ncbifam"], level=0, limit=3)
       "truncated": true
     }
   ],
-  "by_level": [],
-  "by_interpro_type": [],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [],
   "results": [
     {
       "id": "ncbifam:TIGR00231",
@@ -483,11 +450,7 @@ search_ontology(search_text="transport", ontology=["go_bp", "tcdb"], limit=5)
       "truncated": true
     }
   ],
-  "by_level": [],
-  "by_interpro_type": [],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [],
+  "...": "5 empty fields omitted",
   "results": [
     {
       "id": "go:0006810",
@@ -565,29 +528,10 @@ search_ontology(search_text="nitrate", limit=2)
       "returned": 1,
       "truncated": false
     },
-    {
-      "ontology": "ec",
-      "total_entries": 7337,
-      "total_matching": 7,
-      "score_max": 3.41845965385437,
-      "returned": 2,
-      "truncated": true
-    },
-    {
-      "ontology": "kegg",
-      "total_entries": 5107,
-      "total_matching": 20,
-      "score_max": 2.817457675933838,
-      "returned": 2,
-      "truncated": true
-    },
     ...
   ],
-  "by_level": [],
+  "...": "4 empty fields omitted (by_level, by_family_type, skipped_ontologies, warnings)",
   "by_interpro_type": [{"interpro_type": "FAMILY", "count": 2}],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [],
   "results": [
     {
       "id": "go:0042128",
@@ -656,11 +600,7 @@ search_ontology(search_text="transport", ontology=["brite"], tree="transporters"
       "truncated": false
     }
   ],
-  "by_level": [],
-  "by_interpro_type": [],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [],
+  "...": "5 empty fields omitted",
   "results": [
     {
       "id": "kegg.brite:ko02000.A2.B2.C3",
@@ -724,11 +664,7 @@ search_ontology(search_text="sucrose", ontology=["tcdb"])
       "truncated": true
     }
   ],
-  "by_level": [],
-  "by_interpro_type": [],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [],
+  "...": "5 empty fields omitted",
   "results": [
     {
       "id": "tcdb:2.A.2.4.17",
@@ -793,11 +729,7 @@ search_ontology(search_text="UrtA", ontology=["tcdb"], verbose=True, limit=2)
       "truncated": false
     }
   ],
-  "by_level": [],
-  "by_interpro_type": [],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [],
+  "...": "5 empty fields omitted",
   "results": [
     {
       "id": "tcdb:3.A.1.4.4",
@@ -831,7 +763,7 @@ search_ontology(search_text="UrtA", ontology=["tcdb"], verbose=True, limit=2)
       "superfamily": "ArsA ATPase (ArsA) Superfamily",
       "tcdb_substrate_count": 3,
       "direction": "uptake",
-      "proteins": "UrtA-E of Corynebacterium glutamicum; UrtA (R) CAF19637; UrtB (M) CAF19636; UrtC (M) CAF19638; UrtD (C) CAF19639; Urt..."
+      "proteins": "UrtA-E of Corynebacterium glutamicum; UrtA (R) CAF19637; UrtB (M) CAF19636; UrtC (M) CAF19638; Ur..."
     }
   ]
 }
@@ -863,11 +795,8 @@ search_ontology(search_text="P-loop", ontology=["interpro"], interpro_type="HOMO
       "truncated": true
     }
   ],
-  "by_level": [],
+  "...": "4 empty fields omitted (by_level, by_family_type, skipped_ontologies, warnings)",
   "by_interpro_type": [{"interpro_type": "HOMOLOGOUS_SUPERFAMILY", "count": 5}],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [],
   "results": [
     {
       "id": "interpro:IPR027417",
@@ -918,8 +847,7 @@ search_ontology(ontology=["ncbifam"], min_gene_count=300, verbose=True)
   "mode": "browse",
   "total_entries": 5042,
   "total_matching": 13,
-  "score_max": null,
-  "score_median": null,
+  "...": "5 empty fields omitted",
   "returned": 5,
   "offset": 0,
   "truncated": true,
@@ -934,56 +862,47 @@ search_ontology(ontology=["ncbifam"], min_gene_count=300, verbose=True)
     }
   ],
   "by_level": [{"level": 0, "count": 13}],
-  "by_interpro_type": [],
   "by_family_type": [
     {"family_type": "domain", "count": 3},
     {"family_type": "superfamily", "count": 1},
     {"family_type": "subfamily", "count": 1}
   ],
-  "skipped_ontologies": [],
-  "warnings": [],
   "results": [
     {
       "id": "ncbifam:TIGR00231",
       "name": "GTP-binding protein",
       "ontology_type": "ncbifam",
-      "score": null,
       "level": 0,
       "is_informative": true,
       "gene_count": 1232,
       "organism_count": 118,
-      "description": "Proteins with a small GTP-binding domain recognized by this model include Ras, RhoA, Rab11, translation elongation fa...",
-      "level_kind": null,
+      "description": "Proteins with a small GTP-binding domain recognized by this model include Ras, RhoA, Rab11, trans...",
       "family_type": "domain",
-      "gene_symbol": null
+      "...": "3 null fields omitted (score, level_kind, gene_symbol)"
     },
     {
       "id": "ncbifam:TIGR02937",
       "name": "sigma-70 family RNA polymerase sigma factor",
       "ontology_type": "ncbifam",
-      "score": null,
       "level": 0,
       "is_informative": true,
       "gene_count": 991,
       "organism_count": 118,
-      "description": "This model encompasses all varieties of the sigma-70 type sigma factors including the ECF subfamily. A number of sigm...",
-      "level_kind": null,
+      "description": "This model encompasses all varieties of the sigma-70 type sigma factors including the ECF subfami...",
       "family_type": "superfamily",
-      "gene_symbol": null
+      "...": "3 null fields omitted (score, level_kind, gene_symbol)"
     },
     {
       "id": "ncbifam:TIGR03798",
       "name": "Nif11-like leader peptide family RiPP precursor",
       "ontology_type": "ncbifam",
-      "score": null,
       "level": 0,
       "is_informative": true,
       "gene_count": 793,
       "organism_count": 97,
-      "description": "This model describes a conserved, fairly long (about 65 residue) leader peptide region for a family of ribosomally sy...",
-      "level_kind": null,
+      "description": "This model describes a conserved, fairly long (about 65 residue) leader peptide region for a fami...",
       "family_type": "subfamily",
-      "gene_symbol": null
+      "...": "3 null fields omitted (score, level_kind, gene_symbol)"
     },
     ...
   ]
@@ -1016,11 +935,7 @@ search_ontology(search_text="serine protease", ontology=["merops"])
       "truncated": true
     }
   ],
-  "by_level": [],
-  "by_interpro_type": [],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [],
+  "...": "5 empty fields omitted",
   "results": [
     {
       "id": "merops.family:M50",
@@ -1083,11 +998,7 @@ search_ontology(search_text="outer", ontology=["subcellular_localization"])
       "truncated": false
     }
   ],
-  "by_level": [],
-  "by_interpro_type": [],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [],
+  "...": "5 empty fields omitted",
   "results": [
     {
       "id": "psortb_OuterMembrane",
@@ -1131,11 +1042,7 @@ search_ontology(search_text="transport", ontology=["kegg"], informative_only=Tru
       "truncated": true
     }
   ],
-  "by_level": [],
-  "by_interpro_type": [],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [],
+  "...": "5 empty fields omitted",
   "results": [
     {
       "id": "kegg.subcategory:09131",
@@ -1201,11 +1108,7 @@ search_ontology(search_text="calvin", ontology=["kegg"])
       "truncated": false
     }
   ],
-  "by_level": [],
-  "by_interpro_type": [],
-  "by_family_type": [],
-  "skipped_ontologies": [],
-  "warnings": [],
+  "...": "5 empty fields omitted",
   "results": [
     {
       "id": "kegg.pathway:ko00710",

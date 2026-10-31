@@ -27,7 +27,7 @@ docs://tools/genes_by_metabolite; summary=True first.
 | go_evidence | list[string] \| None | None | GO arm only: keep GO rows whose gene->GO edge evidence is in this list (e.g. ['curated']; family_inferred, domain_inferred). Unknown values raise. TCDB / KEGG rows untouched; result is a subset of the unfiltered one. |
 | include_stereo_forms | bool | False | Also query the generic <-> specific stereo forms of each metabolite_id (e.g. Cysteine <-> L-Cysteine; TCDB lists generic names, KEGG reactions use specific forms). Added rows carry via_stereo_form_of. Enantiomers are never added. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 10 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -51,7 +51,7 @@ Result row: `locus_tag, gene_name, product, evidence_source, tcdb_route, tcdb_ca
 
 ## Common mistakes
 
-- An empty TCDB arm is not "no transporter". TCDB rows are direct systems by default, and many genes are placed by TCDB only at family or subfamily level (`tcdb_gate='annotated'`), which never produces a default row. Read `tcdb_family_substrates_not_shown` and the warning, then re-run with `include_tcdb_family_substrates=True`: orthophosphate in MED4 has 0 direct genes, and the walk adds phnC/D/E and PMM0717 through subfamily tcdb:3.A.1.9. `tcdb_family_substrates_skipped` lists genes whose only call is on a superfamily curated with over 200 substrates (ABC tcdb:3.A.1, MFS tcdb:2.A.1). The same genes recur across many compounds: read them as "substrate unknown", not "candidate for this compound". See `docs://analysis/transport`.
+- An empty TCDB arm is not "no transporter". TCDB rows are direct systems by default, and many genes are placed by TCDB only at family or subfamily level (`tcdb_gate='annotated'`), which never produces a default row. Read `tcdb_family_substrates_not_shown` and the warning, then re-run with `include_tcdb_family_substrates=True`: orthophosphate in MED4 has 0 direct genes, and the walk adds phnC/D/E and PMM0717 through subfamily tcdb:3.A.1.9. `tcdb_family_substrates_skipped` lists genes whose only call is on a superfamily curated with over 200 substrates (ABC tcdb:3.A.1, MFS tcdb:2.A.1) and whose superfamily carries the queried compound in at least one system. ABC tcdb:3.A.1 carries hundreds of substrates, so its genes recur across many compounds: read them as "substrate unknown", not "candidate for this compound". See `docs://analysis/transport`.
 
 Chaining patterns: see `docs://tools/genes_by_metabolite/full`.
 

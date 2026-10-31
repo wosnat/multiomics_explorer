@@ -22,7 +22,7 @@ docs://tools/differential_expression_by_ortholog; summary=True first.
 | treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
 | background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 

@@ -33,7 +33,7 @@ docs://tools/metabolites_by_quantifies_assay; summary=True first.
 | max_rank | int \| None | None | Cap on `rank_by_metric` (1 = highest). Top-N drill-down. **Rankable-gated.** Tested-absent rows (`detection_status='not_detected'`) never match — their `rank_by_metric` is nulled for display. |
 | stereo_assignment | list[string] \| None | None | Stereo-form provenance (OR): 'as_reported' = the paper named the form; 'dominant_form_assumed' = it named none and the KG placed it on the dominant form (e.g. 'Alanine' on L-Alanine). ['as_reported'] drops assumed rows. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -195,7 +195,7 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:met
     {"bucket": "mid", "count": 32},
     {"bucket": "low", "count": 16},
     {"bucket": "top_quartile", "count": 9},
-    {"bucket": "top_decile", "count": 7}
+    ...
   ],
   "by_assay": [
     {
@@ -222,9 +222,7 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:pnas.2213271120:met
     }
   ],
   "excluded_assays": [],
-  "warnings": [
-    "4 of 64 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on L-Alanine); filter s..."
-  ],
+  "warnings": ["4 of 64 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on ..."],
   "resolved_aliases": {},
   "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_dois": []},
   "returned": 5,
@@ -279,15 +277,10 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:1462-2920.15834:s7_
     {"detection_status": "not_detected", "count": 5}
   ],
   "by_stereo_assignment": [{"stereo_assignment": "as_reported", "count": 43}],
-  "by_metric_bucket": [
-    {"bucket": "mid", "count": 23},
-    {"bucket": "low", "count": 14},
-    {"bucket": "top_decile", "count": 4},
-    {"bucket": "top_quartile", "count": 2}
-  ],
+  "by_metric_bucket": [{"bucket": "mid", "count": 23}, {"bucket": "low", "count": 14}, {"bucket": "top_decile", "count": 4}, ...],
   "by_assay": [
     {
-      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9313:relative_peak_area_biovolume_normalized",
+      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9313:relative_peak_area_biovolume_normal...",
       "count": 43
     }
   ],
@@ -295,7 +288,7 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:1462-2920.15834:s7_
   "by_organism": [{"organism_name": "Prochlorococcus MIT9313", "count": 43}],
   "by_metric": [
     {
-      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9313:relative_peak_area_biovolume_normalized",
+      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9313:relative_peak_area_biovolume_normal...",
       "name": "MIT9313 whole-cell targeted metabolite relative peak area (biovolume-normalized)",
       "metric_type": "",
       "count": 43,
@@ -309,9 +302,7 @@ metabolites_by_quantifies_assay(assay_ids=["metabolite_assay:1462-2920.15834:s7_
       "rankable": true
     }
   ],
-  "excluded_assays": [],
-  "warnings": [],
-  "resolved_aliases": {},
+  "...": "3 empty fields omitted (excluded_assays, warnings, resolved_aliases)",
   "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_dois": []},
   "returned": 0,
   "truncated": true,

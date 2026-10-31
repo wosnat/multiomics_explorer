@@ -21,7 +21,7 @@ docs://tools/gene_ontology_terms; summary=True first.
 | tree | string \| None | None | BRITE tree name filter. Narrows brite and leaves any other ontology in the list untouched; raises when brite is not among them. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | informative_only | bool | False | True drops terms the KG flags uninformative (roots, catch-alls). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | sources | list[string] \| None | None | Keep rows whose edge sources[] contains any of these values. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See list_filter_values('sources'). |
 | evidence | list[string] \| None | None | Keep rows whose compact evidence-ladder value is in this list. Valid on the 15 functional-edge ontologies (all but PSORTb/SignalP; brite shares kegg's edge). See docs://analysis/annotation_evidence. |
 | max_tier | int \| None | None | Keep rows with tier <= this OR tier null (1-3; e.g. TCDB eggnog). tcdb, merops only. TCDB: consensus tier on diamond_tier, identity band on diamond_best_hit; gated rows are never tier 3. Never compare tiers across kinds or ontologies. |
@@ -49,7 +49,7 @@ gene_ontology_terms(locus_tags=["PMM0001"], organism="MED4", ontology="go_bp")
 total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_min, terms_per_gene_max, terms_per_gene_median, returned, offset, truncated, not_found, no_terms, trust_axes, by_evidence, by_tier, by_sources, by_call_class, by_tcdb_call, evidence_score_stats, filters_applied, skipped_ontologies, warnings, results
 ```
 
-Result row: `locus_tag, term_id, term_name, level, is_informative, ontology_type, tree, tree_code, localization_score, signal_peptide_probability, signal_peptide_cleavage_site, signal_peptide_cleavage_probability, …`
+Result row: `locus_tag, term_id, term_name, level, is_informative, ontology_type, tree, tree_code, evidence, call_class, tcdb_call, tcdb_gate, …`
 
 ## Common mistakes
 

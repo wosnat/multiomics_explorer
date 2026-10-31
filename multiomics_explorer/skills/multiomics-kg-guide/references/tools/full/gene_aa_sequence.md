@@ -63,7 +63,7 @@ gene_aa_sequence(locus_tags=["ACZ81_08860", "ACZ81_08855"])
   "returned": 2,
   "truncated": false,
   "by_organism": [{"organism_name": "Alteromonas macleodii HOT1A3", "count": 2}],
-  "sequence_length_stats": {"count": 2, "min": 178, "q1": 178.0, "median": 178.0, "q3": 487.0, "max": 487, "mean": 332.5},
+  "sequence_length_stats": {"count": 2, "min": 178, "q1": 178.0, "median": 178.0, "q3": 487.0, "max": 487, "...": "+1 more"},
   "not_found": [],
   "not_matched": [],
   "warnings": [],
@@ -76,7 +76,7 @@ gene_aa_sequence(locus_tags=["ACZ81_08860", "ACZ81_08855"])
       "product": "hypothetical protein",
       "protein_id": "WP_049586664.1",
       "sequence_length": 178,
-      "sequence": "MLSVAAGGLTLAALGVIYKSWRAQASTYLYLGLVVWLVAAVCWSYAQGWEFGVLYALCIPSILVWPFIAFNQTHLPQPKNVPQPRSFDFSRRTVLGNIANYIVVLVVLLVVSVLLTL..."
+      "sequence": "MLSVAAGGLTLAALGVIYKSWRAQASTYLYLGLVVWLVAAVCWSYAQGWEFGVLYALCIPSILVWPFIAFNQTHLPQPKNVPQPRSFDFSRRTVLGN..."
     },
     {
       "locus_tag": "ACZ81_08860",
@@ -85,7 +85,7 @@ gene_aa_sequence(locus_tags=["ACZ81_08860", "ACZ81_08855"])
       "product": "PepSY-associated TM helix domain-containing protein",
       "protein_id": "WP_061485747.1",
       "sequence_length": 487,
-      "sequence": "MDKITKQNALNAHTWVGVFLSVLLFLVCLSGTVAVFHLEFERWEQPHIEEMKNVSPDVVEKAMDTFLAQNTQESHHLYVVFPTSDIPRLVVENDHAAYFADSEGNLLEQESVSFTEM..."
+      "sequence": "MDKITKQNALNAHTWVGVFLSVLLFLVCLSGTVAVFHLEFERWEQPHIEEMKNVSPDVVEKAMDTFLAQNTQESHHLYVVFPTSDIPRLVVENDHAA..."
     }
   ]
 }
@@ -103,11 +103,11 @@ gene_aa_sequence(locus_tags=["ACZ81_08860", "ACZ81_08855"], fasta=True)
   "returned": 2,
   "truncated": false,
   "by_organism": [{"organism_name": "Alteromonas macleodii HOT1A3", "count": 2}],
-  "sequence_length_stats": {"count": 2, "min": 178, "q1": 178.0, "median": 178.0, "q3": 487.0, "max": 487, "mean": 332.5},
+  "sequence_length_stats": {"count": 2, "min": 178, "q1": 178.0, "median": 178.0, "q3": 487.0, "max": 487, "...": "+1 more"},
   "not_found": [],
   "not_matched": [],
   "warnings": [],
-  "fasta": ">ACZ81_08855 Alteromonas macleodii HOT1A3|WP_049586664.1|hypothetical protein\nMLSVAAGGLTLAALGVIYKSWRAQASTYLYLGLVVWLVA...",
+  "fasta": ">ACZ81_08855 Alteromonas macleodii HOT1A3|WP_049586664.1|hypothetical protein\nMLSVAAGGLTLAALGVIYK...",
   "results": [
     {
       "locus_tag": "ACZ81_08855",
@@ -146,7 +146,7 @@ gene_aa_sequence(locus_tags=["ACZ81_08860", "A9601_09441", "NOTAREAL"])
     {"organism_name": "Alteromonas macleodii HOT1A3", "count": 1},
     {"organism_name": "Prochlorococcus AS9601", "count": 1}
   ],
-  "sequence_length_stats": {"count": 2, "min": 43, "q1": 43.0, "median": 43.0, "q3": 487.0, "max": 487, "mean": 265.0},
+  "sequence_length_stats": {"count": 2, "min": 43, "q1": 43.0, "median": 43.0, "q3": 487.0, "max": 487, "...": "+1 more"},
   "not_found": ["NOTAREAL"],
   "not_matched": [],
   "warnings": [],
@@ -159,7 +159,7 @@ gene_aa_sequence(locus_tags=["ACZ81_08860", "A9601_09441", "NOTAREAL"])
       "product": "PepSY-associated TM helix domain-containing protein",
       "protein_id": "WP_061485747.1",
       "sequence_length": 487,
-      "sequence": "MDKITKQNALNAHTWVGVFLSVLLFLVCLSGTVAVFHLEFERWEQPHIEEMKNVSPDVVEKAMDTFLAQNTQESHHLYVVFPTSDIPRLVVENDHAAYFADSEGNLLEQESVSFTEM..."
+      "sequence": "MDKITKQNALNAHTWVGVFLSVLLFLVCLSGTVAVFHLEFERWEQPHIEEMKNVSPDVVEKAMDTFLAQNTQESHHLYVVFPTSDIPRLVVENDHAA..."
     },
     {
       "locus_tag": "A9601_09441",

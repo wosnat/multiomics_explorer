@@ -330,7 +330,7 @@ list_filter_values(filter_type="kegg_functional_category")
 ```example-response
 {
   "filter_type": "kegg_functional_category",
-  "description": "Level-0 categories of KEGG compound BRITE br08001 (compounds with biological roles) that list this metabolite. Sparse...",
+  "description": "Level-0 categories of KEGG compound BRITE br08001 (compounds with biological roles) that list thi...",
   "total_entries": 9,
   "returned": 9,
   "truncated": false,
@@ -353,7 +353,7 @@ list_filter_values(filter_type="kegg_brite_class")
 ```example-response
 {
   "filter_type": "kegg_brite_class",
-  "description": "Top-level classes of the seven KEGG compound BRITE trees other than br08001 that contain this metabolite, as \"<Tree>:...",
+  "description": "Top-level classes of the seven KEGG compound BRITE trees other than br08001 that contain this met...",
   "total_entries": 28,
   "returned": 28,
   "truncated": false,
@@ -400,7 +400,7 @@ list_filter_values(filter_type="stereo_assignment")
       "value": "dominant_form_assumed",
       "source": "vocabulary",
       "applies_to": ["Assay_flags_metabolite", "Assay_quantifies_metabolite"],
-      "description": "the name in the paper gives no stereo form, but the metabolite node is one specific stereo form, chosen either as the..."
+      "description": "the name in the paper gives no stereo form, but the metabolite node is one specific stereo form, ..."
     }
   ]
 }
@@ -415,7 +415,7 @@ list_filter_values(filter_type="evidence")
 ```example-response
 {
   "filter_type": "evidence",
-  "description": "Inference strength on the shared ladder curated > signature > homology > family_inferred > domain_inferred (homology ...",
+  "description": "Inference strength on the shared ladder curated > signature > homology > family_inferred > domain...",
   "total_entries": 5,
   "returned": 5,
   "truncated": false,
@@ -428,11 +428,9 @@ list_filter_values(filter_type="evidence")
         "Gene_involved_in_biological_process",
         "Gene_enables_molecular_function",
         "Gene_located_in_cellular_component",
-        "Gene_catalyzes_ec_number",
-        "Gene_has_cyanorak_role",
         ...
       ],
-      "description": "assigned by a human curator or a curated reference annotation (Cyanorak, UniProt, NCBI); strongest rung"
+      "description": "assigned by a human curator or a curated reference annotation (Cyanorak, UniProt, NCBI); stronges..."
     },
     {
       "value": "family_inferred",
@@ -441,11 +439,9 @@ list_filter_values(filter_type="evidence")
         "Gene_involved_in_biological_process",
         "Gene_enables_molecular_function",
         "Gene_located_in_cellular_component",
-        "Gene_catalyzes_ec_number",
-        "Gene_has_kegg_ko",
         ...
       ],
-      "description": "transferred from an ortholog family or a single-function protein family (eggNOG orthology transfer, InterPro FAMILY e..."
+      "description": "transferred from an ortholog family or a single-function protein family (eggNOG orthology transfe..."
     },
     {
       "value": "domain_inferred",
@@ -454,9 +450,9 @@ list_filter_values(filter_type="evidence")
         "Gene_involved_in_biological_process",
         "Gene_enables_molecular_function",
         "Gene_located_in_cellular_component",
-        "Gene_has_cazy_family"
+        ...
       ],
-      "description": "transferred from a shared domain (InterPro DOMAIN entry); weakest rung, since a domain can occur outside the annotate..."
+      "description": "transferred from a shared domain (InterPro DOMAIN entry); weakest rung, since a domain can occur ..."
     },
     ...
   ]
@@ -496,7 +492,7 @@ list_filter_values(filter_type="trust_axes", ontology="tcdb")
       "value": "tier",
       "source": "config",
       "applies_to": ["tcdb"],
-      "description": "Diamond-truncation depth 1..3; null means the edge was never truncated (for TCDB, an eggNOG call)."
+      "description": "Confidence band 1..3. TCDB: consensus tier on diamond_tier edges, identity band on diamond_best_h..."
     }
   ]
 }
@@ -511,7 +507,7 @@ list_filter_values(filter_type="call_class")
 ```example-response
 {
   "filter_type": "call_class",
-  "description": "Read-first verdict for one MEROPS candidate: inhibitor when the family is an I-family, nonpeptidase_homolog when the ...",
+  "description": "Read-first verdict for one MEROPS candidate: inhibitor when the family is an I-family, nonpeptida...",
   "total_entries": 3,
   "returned": 3,
   "truncated": false,
@@ -548,7 +544,7 @@ list_filter_values(filter_type="interpro_type")
 ```example-response
 {
   "filter_type": "interpro_type",
-  "description": "InterPro entry class (FAMILY, DOMAIN, HOMOLOGOUS_SUPERFAMILY, CONSERVED_SITE, ACTIVE_SITE, REPEAT, BINDING_SITE, PTM)...",
+  "description": "InterPro entry class (FAMILY, DOMAIN, HOMOLOGOUS_SUPERFAMILY, CONSERVED_SITE, ACTIVE_SITE, REPEAT...",
   "total_entries": 8,
   "returned": 8,
   "truncated": false,
@@ -571,7 +567,7 @@ list_filter_values(filter_type="merops_catalytic_type")
 ```example-response
 {
   "filter_type": "merops_catalytic_type",
-  "description": "Catalytic mechanism of a peptidase family, the MEROPS single-letter code spelled out (S = serine, C = cysteine, M = m...",
+  "description": "Catalytic mechanism of a peptidase family, the MEROPS single-letter code spelled out (S = serine,...",
   "total_entries": 9,
   "returned": 9,
   "truncated": false,
@@ -594,7 +590,7 @@ list_filter_values(filter_type="cluster_type")
 ```example-response
 {
   "filter_type": "cluster_type",
-  "description": "What kind of gene grouping the analysis is: time_course, diel, condition_comparison, expression_bin, decay_pattern (m...",
+  "description": "What kind of gene grouping the analysis is: time_course, diel, condition_comparison, expression_b...",
   "total_entries": 6,
   "returned": 6,
   "truncated": false,
@@ -617,7 +613,7 @@ list_filter_values(filter_type="treatment_type")
 ```example-response
 {
   "filter_type": "treatment_type",
-  "description": "The manipulated variable(s) of the experiment — nitrogen, phosphorus, iron, carbon, salt, light, temperature, plastic...",
+  "description": "The manipulated variable(s) of the experiment — nitrogen, phosphorus, iron, carbon, salt, light, ...",
   "total_entries": 21,
   "returned": 21,
   "truncated": false,
@@ -626,17 +622,17 @@ list_filter_values(filter_type="treatment_type")
     {
       "value": "carbon",
       "source": "vocabulary",
-      "applies_to": ["ClusteringAnalysis", "DerivedMetric", "Experiment", "MetaboliteAssay"]
+      "applies_to": ["ClusteringAnalysis", "DerivedMetric", "Experiment", ...]
     },
     {
       "value": "chemical",
       "source": "vocabulary",
-      "applies_to": ["ClusteringAnalysis", "DerivedMetric", "Experiment", "MetaboliteAssay"]
+      "applies_to": ["ClusteringAnalysis", "DerivedMetric", "Experiment", ...]
     },
     {
       "value": "coculture",
       "source": "vocabulary",
-      "applies_to": ["ClusteringAnalysis", "DerivedMetric", "Experiment", "MetaboliteAssay"]
+      "applies_to": ["ClusteringAnalysis", "DerivedMetric", "Experiment", ...]
     },
     ...
   ]

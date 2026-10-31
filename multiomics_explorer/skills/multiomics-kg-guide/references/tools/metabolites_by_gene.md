@@ -28,7 +28,7 @@ docs://tools/metabolites_by_gene; summary=True for 50+ genes.
 | go_namespace | list[string ('molecular_function', 'biological_process')] \| None | None | GO arm only: keep GO rows whose gene->GO edge is in these namespaces. TCDB / KEGG rows untouched. Filtered result is always a subset of the unfiltered one. |
 | go_evidence | list[string] \| None | None | GO arm only: keep GO rows whose gene->GO edge evidence is in this list (e.g. ['curated']; family_inferred, domain_inferred). Unknown values raise. TCDB / KEGG rows untouched; result is a subset of the unfiltered one. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 10 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -52,7 +52,7 @@ Result row: `locus_tag, gene_name, product, evidence_source, tcdb_route, tcdb_ca
 
 ## Common mistakes
 
-- An empty TCDB arm is not "no transporter". TCDB rows are direct systems by default, and for a gene with a TCDB call an empty arm has two readings; the warning names which applies. (1) The gene is placed only at family or subfamily level: read `tcdb_family_substrates_not_shown`, then pass `include_tcdb_family_substrates=True` for `tcdb_route='family'` rows (phnD PMM0673 → 5 metabolites via tcdb:3.A.1.9). (2) Its only usable call is on a superfamily curated with over 200 substrates (ABC tcdb:3.A.1, MFS tcdb:2.A.1): it is listed in `tcdb_family_substrates_skipped` and its substrate is unknown. Genes with only weak DIAMOND hits (`below_gate`) reach no substrate here; `gene_ontology_terms(..., include_weak_tcdb_hits=True)` shows them. See `docs://analysis/transport`.
+- An empty TCDB arm is not "no transporter". TCDB rows are direct systems by default, and for a gene with a TCDB call an empty arm has two readings; the warning names which applies. (1) The gene is placed only at family or subfamily level: read `tcdb_family_substrates_not_shown`, then pass `include_tcdb_family_substrates=True` for `tcdb_route='family'` rows (phnD PMM0673 → 5 metabolites via tcdb:3.A.1.9). (2) Its only usable call is on a superfamily curated with over 200 substrates (ABC tcdb:3.A.1, MFS tcdb:2.A.1): it is listed in `tcdb_family_substrates_skipped` and its substrate is unknown. With a metabolite filter (`metabolite_ids`, `metabolite_elements`, ...) the list keeps only superfamilies that carry a matching metabolite. Genes with only weak DIAMOND hits (`below_gate`) reach no substrate here; `gene_ontology_terms(..., include_weak_tcdb_hits=True)` shows them. See `docs://analysis/transport`.
 
 Chaining patterns: see `docs://tools/metabolites_by_gene/full`.
 

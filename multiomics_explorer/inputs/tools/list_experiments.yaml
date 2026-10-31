@@ -18,13 +18,14 @@ examples:
           {"organism_name": "Marinobacter (MarRef v6)", "count": 20},
           ...
         ],
-        "...": "8 empty fields omitted",
+        "by_organism_truncated": true,
         "by_treatment_type": [
           {"treatment_type": "genomic_analysis", "count": 102},
           {"treatment_type": "carbon", "count": 88},
           {"treatment_type": "coculture", "count": 39},
           ...
         ],
+        "...": "5 empty fields omitted",
         "by_background_factors": [
           {"background_factor": "light", "count": 135},
           {"background_factor": "axenic", "count": 107},
@@ -43,6 +44,7 @@ examples:
           {"publication_doi": "10.1111/1462-2920.12822", "count": 12},
           ...
         ],
+        "by_publication_truncated": true,
         "by_table_scope": [
           {"table_scope": "all_detected_genes", "count": 129},
           {"table_scope": "significant_only", "count": 41},
@@ -77,6 +79,7 @@ examples:
           {"metric_type": "exoproteome_avg_pct_nsaf", "count": 10},
           ...
         ],
+        "by_metric_type_truncated": true,
         "by_compartment": [
           {"compartment": "whole_cell", "count": 305},
           {"compartment": "exoproteome", "count": 19},
@@ -120,7 +123,7 @@ examples:
           {"organism_name": "Synechococcus WH7803", "count": 3},
           ...
         ],
-        "...": "10 empty fields omitted",
+        "...": "9 empty fields omitted",
         "by_treatment_type": [
           {"treatment_type": "nitrogen", "count": 9},
           {"treatment_type": "growth_phase", "count": 5},
@@ -144,6 +147,7 @@ examples:
           {"publication_doi": "10.1038/ismej.2011.49", "count": 3},
           ...
         ],
+        "by_publication_truncated": true,
         "by_table_scope": [
           {"table_scope": "all_detected_genes", "count": 17},
           {"table_scope": "filtered_subset", "count": 4},

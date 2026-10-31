@@ -21,7 +21,7 @@ docs://tools/pathway_enrichment; summary=True first.
 | term_ids | list[string] \| None | None | Specific term IDs to test. Combines with level to scope rollup. Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced to canonical (see `term_validation.resolved_aliases`). |
 | direction | string ('up', 'down', 'both') | both | DE direction(s) to include in gene_sets. |
 | significant_only | bool | True | If true, only significant DE rows count as foreground. |
-| background | string \| list[string] | table_scope | 'table_scope' (default, per-cluster quantified set), 'organism' (full genome — inflates denominator), or explicit locus_tag list. See docs://analysis/enrichment for the full background semantics. |
+| background | string \| list[string] | table_scope | 'table_scope' (default, per-cluster quantified set), 'organism' (full genome — inflates denominator), 'annotated' (genes with >=1 edge in this ontology under the same filters), or explicit locus_tag list. See docs://analysis/enrichment. |
 | min_gene_set_size | int | 5 | Per-cluster M filter: drop pathways with fewer members in the background. |
 | max_gene_set_size | int \| None | 500 | Per-cluster M filter upper bound. None disables. |
 | pvalue_cutoff | float | 0.05 | Significance threshold for `p_adjust`. |
@@ -214,313 +214,6 @@ pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_d
 
 *call_class shapes the TERM2GENE mapping and the background identically (both go through the same gene->leaf MATCH), so foreground and background stay apples-to-apples. Omitting call_class tests nonpeptidase_homolog rows alongside real peptidases, inflating clan term sizes with catalytically-dead hits. Pick the experiment with list_experiments(organism='MIT1002', omics_type='rnaseq') — a MIT9301 metabolomics experiment passed here would return 0 rows.*
 
-```example-response
-{
-  "organism_name": "Alteromonas macleodii MIT1002",
-  "ontology": "merops",
-  "level": 0,
-  "total_matching": 5,
-  "returned": 5,
-  "truncated": false,
-  "offset": 0,
-  "n_significant": 5,
-  "by_experiment": [
-    {
-      "experiment_id": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq",
-      "name": "MIT1002 Dark-tolerant co-culture under 13:11 diel light:dark cycle vs Parental co-culture under 13:11 diel light:dark...",
-      "omics_type": "RNASEQ",
-      "table_scope": "all_detected_genes",
-      "treatment_type": ["darkness"],
-      "background_factors": ["coculture", "diel"],
-      "is_time_course": true,
-      "n_tests": 98,
-      "n_significant": 5,
-      "n_clusters": 14
-    }
-  ],
-  "by_experiment_truncated": null,
-  "by_direction": [
-    {"direction": "down", "n_tests": 49, "n_significant": 5},
-    {"direction": "up", "n_tests": 49, "n_significant": 0}
-  ],
-  "by_omics_type": [{"omics_type": "RNASEQ", "n_tests": 98, "n_significant": 5}],
-  "cluster_summary": {
-    "n_clusters": 14,
-    "n_tests_min": 7,
-    "n_tests_median": 7.0,
-    "n_tests_max": 7,
-    "n_significant_min": 0,
-    "n_significant_median": 0.0,
-    "n_significant_max": 1,
-    "universe_size_min": 3856,
-    "universe_size_median": 3856.0,
-    "universe_size_max": 3856
-  },
-  "top_clusters_by_min_padj": [
-    {
-      "cluster": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq|4h|down",
-      "experiment_id": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq",
-      "name": "MIT1002 Dark-tolerant co-culture under 13:11 diel light:dark cycle vs Parental co-culture under 13:11 diel light:dark...",
-      "timepoint": "4h",
-      "timepoint_hours": 4.0,
-      "timepoint_order": 2,
-      "direction": "down",
-      "omics_type": "RNASEQ",
-      "table_scope": "all_detected_genes",
-      "treatment_type": ["darkness"],
-      "background_factors": ["coculture", "diel"],
-      "is_time_course": true,
-      "n_tests": 7,
-      "n_significant": 1,
-      "universe_size": 3856,
-      "min_padj": 0.0002629517773314062
-    },
-    {
-      "cluster": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq|20h|down",
-      "experiment_id": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq",
-      "name": "MIT1002 Dark-tolerant co-culture under 13:11 diel light:dark cycle vs Parental co-culture under 13:11 diel light:dark...",
-      "timepoint": "20h",
-      "timepoint_hours": 20.0,
-      "timepoint_order": 6,
-      "direction": "down",
-      "omics_type": "RNASEQ",
-      "table_scope": "all_detected_genes",
-      "treatment_type": ["darkness"],
-      "background_factors": ["coculture", "diel"],
-      "is_time_course": true,
-      "n_tests": 7,
-      "n_significant": 1,
-      "universe_size": 3856,
-      "min_padj": 0.008692801673555146
-    },
-    {
-      "cluster": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq|16h|down",
-      "experiment_id": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq",
-      "name": "MIT1002 Dark-tolerant co-culture under 13:11 diel light:dark cycle vs Parental co-culture under 13:11 diel light:dark...",
-      "timepoint": "16h",
-      "timepoint_hours": 16.0,
-      "timepoint_order": 5,
-      "direction": "down",
-      "omics_type": "RNASEQ",
-      "table_scope": "all_detected_genes",
-      "treatment_type": ["darkness"],
-      "background_factors": ["coculture", "diel"],
-      "is_time_course": true,
-      "n_tests": 7,
-      "n_significant": 1,
-      "universe_size": 3856,
-      "min_padj": 0.010203101803113903
-    },
-    {
-      "cluster": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq|0h|down",
-      "experiment_id": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq",
-      "name": "MIT1002 Dark-tolerant co-culture under 13:11 diel light:dark cycle vs Parental co-culture under 13:11 diel light:dark...",
-      "timepoint": "0h",
-      "timepoint_hours": 0.0,
-      "timepoint_order": 1,
-      "direction": "down",
-      "omics_type": "RNASEQ",
-      "table_scope": "all_detected_genes",
-      "treatment_type": ["darkness"],
-      "background_factors": ["coculture", "diel"],
-      "is_time_course": true,
-      "n_tests": 7,
-      "n_significant": 1,
-      "universe_size": 3856,
-      "min_padj": 0.01418211730594244
-    },
-    {
-      "cluster": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq|8h|down",
-      "experiment_id": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq",
-      "name": "MIT1002 Dark-tolerant co-culture under 13:11 diel light:dark cycle vs Parental co-culture under 13:11 diel light:dark...",
-      "timepoint": "8h",
-      "timepoint_hours": 8.0,
-      "timepoint_order": 3,
-      "direction": "down",
-      "omics_type": "RNASEQ",
-      "table_scope": "all_detected_genes",
-      "treatment_type": ["darkness"],
-      "background_factors": ["coculture", "diel"],
-      "is_time_course": true,
-      "n_tests": 7,
-      "n_significant": 1,
-      "universe_size": 3856,
-      "min_padj": 0.024018322030219336
-    }
-  ],
-  "top_pathways_by_padj": [
-    {
-      "cluster": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq|4h|down",
-      "term_id": "merops.clan:SB",
-      "term_name": "SB",
-      "p_adjust": 0.0002629517773314062,
-      "signed_score": -3.5801238893775684
-    },
-    {
-      "cluster": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq|20h|down",
-      "term_id": "merops.clan:SB",
-      "term_name": "SB",
-      "p_adjust": 0.008692801673555146,
-      "signed_score": -2.060840228699125
-    },
-    {
-      "cluster": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq|16h|down",
-      "term_id": "merops.clan:SB",
-      "term_name": "SB",
-      "p_adjust": 0.010203101803113903,
-      "signed_score": -1.9912677800819054
-    },
-    {
-      "cluster": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq|0h|down",
-      "term_id": "merops.clan:SB",
-      "term_name": "SB",
-      "p_adjust": 0.01418211730594244,
-      "signed_score": -1.8482589267239409
-    },
-    {
-      "cluster": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq|8h|down",
-      "term_id": "merops.clan:SB",
-      "term_name": "SB",
-      "p_adjust": 0.024018322030219336,
-      "signed_score": -1.6194573365863747
-    },
-    ...
-  ],
-  "not_found": [],
-  "not_matched": [],
-  "warnings": [],
-  "no_expression": [],
-  "not_found_experiments": [],
-  "term_validation": {"not_found": [], "wrong_ontology": [], "wrong_level": [], "filtered_out": [], "resolved_aliases": {}},
-  "clusters_skipped": [],
-  "enrichment_params": {
-    "organism": "MIT1002",
-    "ontology": "merops",
-    "level": 0,
-    "term_ids": null,
-    "tree": null,
-    "informative_only": true,
-    "min_gene_set_size": 5,
-    "max_gene_set_size": 500,
-    "pvalue_cutoff": 0.05,
-    "include_nonsignificant": false,
-    "background_mode": "table_scope",
-    "experiment_ids": ["10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq"],
-    "direction": "both",
-    "significant_only": true,
-    "timepoint_filter": null,
-    "growth_phases": null,
-    "n_clusters_input": 14,
-    "n_clusters_tested": 14,
-    "n_clusters_skipped": 0,
-    "term2gene_row_count": 118,
-    "n_unique_terms": 27,
-    "multitest_method": "fdr_bh",
-    "filters_applied": {"call_class": ["peptidase"]},
-    "trust_axes": {"merops": ["sources", "evidence", "evidence_score", "tier"]},
-    "background_filtered": true,
-    "interpro_type": null
-  },
-  "filters_applied": {"call_class": ["peptidase"]},
-  "trust_axes": {"merops": ["sources", "evidence", "evidence_score", "tier"]},
-  "background_filtered": true,
-  "interpro_type": null,
-  "results": [
-    {
-      "cluster": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq|4h|down",
-      "experiment_id": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq",
-      "name": "MIT1002 Dark-tolerant co-culture under 13:11 diel light:dark cycle vs Parental co-culture under 13:11 diel light:dark...",
-      "timepoint": "4h",
-      "timepoint_hours": 4.0,
-      "timepoint_order": 2,
-      "direction": "down",
-      "omics_type": "RNASEQ",
-      "table_scope": "all_detected_genes",
-      "treatment_type": ["darkness"],
-      "background_factors": ["coculture", "diel"],
-      "is_time_course": true,
-      "growth_phase": "diel",
-      "term_id": "merops.clan:SB",
-      "term_name": "SB",
-      "level": 0,
-      "is_informative": true,
-      "gene_ratio": "3/49",
-      "gene_ratio_numeric": 0.061224489795918366,
-      "bg_ratio": "6/3856",
-      "bg_ratio_numeric": 0.0015560165975103733,
-      "rich_factor": 0.5,
-      "fold_enrichment": 39.3469387755102,
-      "pvalue": 3.7564539618772316e-05,
-      "p_adjust": 0.0002629517773314062,
-      "count": 3,
-      "bg_count": 6,
-      "signed_score": -3.5801238893775684
-    },
-    {
-      "cluster": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq|20h|down",
-      "experiment_id": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq",
-      "name": "MIT1002 Dark-tolerant co-culture under 13:11 diel light:dark cycle vs Parental co-culture under 13:11 diel light:dark...",
-      "timepoint": "20h",
-      "timepoint_hours": 20.0,
-      "timepoint_order": 6,
-      "direction": "down",
-      "omics_type": "RNASEQ",
-      "table_scope": "all_detected_genes",
-      "treatment_type": ["darkness"],
-      "background_factors": ["coculture", "diel"],
-      "is_time_course": true,
-      "growth_phase": "diel",
-      "term_id": "merops.clan:SB",
-      "term_name": "SB",
-      "level": 0,
-      "is_informative": true,
-      "gene_ratio": "2/36",
-      "gene_ratio_numeric": 0.05555555555555555,
-      "bg_ratio": "6/3856",
-      "bg_ratio_numeric": 0.0015560165975103733,
-      "rich_factor": 0.3333333333333333,
-      "fold_enrichment": 35.7037037037037,
-      "pvalue": 0.0012418288105078778,
-      "p_adjust": 0.008692801673555146,
-      "count": 2,
-      "bg_count": 6,
-      "signed_score": -2.060840228699125
-    },
-    {
-      "cluster": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq|16h|down",
-      "experiment_id": "10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq",
-      "name": "MIT1002 Dark-tolerant co-culture under 13:11 diel light:dark cycle vs Parental co-culture under 13:11 diel light:dark...",
-      "timepoint": "16h",
-      "timepoint_hours": 16.0,
-      "timepoint_order": 5,
-      "direction": "down",
-      "omics_type": "RNASEQ",
-      "table_scope": "all_detected_genes",
-      "treatment_type": ["darkness"],
-      "background_factors": ["coculture", "diel"],
-      "is_time_course": true,
-      "growth_phase": "diel",
-      "term_id": "merops.clan:SB",
-      "term_name": "SB",
-      "level": 0,
-      "is_informative": true,
-      "gene_ratio": "2/39",
-      "gene_ratio_numeric": 0.05128205128205128,
-      "bg_ratio": "6/3856",
-      "bg_ratio_numeric": 0.0015560165975103733,
-      "rich_factor": 0.3333333333333333,
-      "fold_enrichment": 32.95726495726496,
-      "pvalue": 0.0014575859718734146,
-      "p_adjust": 0.010203101803113903,
-      "count": 2,
-      "bg_count": 6,
-      "signed_score": -1.9912677800819054
-    },
-    ...
-  ]
-}
-```
-
 ### Example 10: Trust-filtered TCDB enrichment (evidence; TCDB gene sets are gated)
 
 ```example-call
@@ -553,7 +246,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "n_clusters": 2
     }
   ],
-  "by_experiment_truncated": null,
+  "...": "6 empty fields omitted",
   "by_direction": [
     {"direction": "down", "n_tests": 8, "n_significant": 3},
     {"direction": "up", "n_tests": 8, "n_significant": 1}
@@ -566,10 +259,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
     "n_tests_max": 8,
     "n_significant_min": 1,
     "n_significant_median": 2.0,
-    "n_significant_max": 3,
-    "universe_size_min": 1849,
-    "universe_size_median": 1849.0,
-    "universe_size_max": 1849
+    "...": "+4 more"
   },
   "top_clusters_by_min_padj": [
     {
@@ -590,24 +280,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "universe_size": 1849,
       "min_padj": 0.0004830036897397715
     },
-    {
-      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|up",
-      "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
-      "name": "MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
-      "timepoint": "day 14",
-      "timepoint_hours": 336.0,
-      "timepoint_order": 1,
-      "direction": "up",
-      "omics_type": "RNASEQ",
-      "table_scope": "all_detected_genes",
-      "treatment_type": ["nitrogen"],
-      "background_factors": ["axenic", "light"],
-      "is_time_course": false,
-      "n_tests": 8,
-      "n_significant": 1,
-      "universe_size": 1849,
-      "min_padj": 0.0046282318134565955
-    }
+    ...
   ],
   "top_pathways_by_padj": [
     {
@@ -631,29 +304,11 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "p_adjust": 0.0022952216330654855,
       "signed_score": -2.639175371403444
     },
-    {
-      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|up",
-      "term_id": "tcdb:3.D.1",
-      "term_name": "The H+ or Na+-translocating NADH Dehydrogenase (NDH) Family",
-      "p_adjust": 0.0046282318134565955,
-      "signed_score": 2.334584896741953
-    },
-    {
-      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
-      "term_id": "tcdb:3.D.3",
-      "term_name": "The Proton-translocating Quinol:Cytochrome c Reductase (QCR) Superfamily",
-      "p_adjust": 0.13027578388471775,
-      "signed_score": -0.8851363049523497
-    },
     ...
   ],
   "not_found": [],
   "not_matched": [],
-  "warnings": [],
-  "no_expression": [],
-  "not_found_experiments": [],
   "term_validation": {"not_found": [], "wrong_ontology": [], "wrong_level": [], "filtered_out": [], "resolved_aliases": {}},
-  "clusters_skipped": [],
   "enrichment_params": {
     "organism": "MED4",
     "ontology": "tcdb",
@@ -661,31 +316,11 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
     "term_ids": null,
     "tree": null,
     "informative_only": true,
-    "min_gene_set_size": 5,
-    "max_gene_set_size": 500,
-    "pvalue_cutoff": 0.05,
-    "include_nonsignificant": false,
-    "background_mode": "table_scope",
-    "experiment_ids": ["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"],
-    "direction": "both",
-    "significant_only": true,
-    "timepoint_filter": null,
-    "growth_phases": null,
-    "n_clusters_input": 2,
-    "n_clusters_tested": 2,
-    "n_clusters_skipped": 0,
-    "term2gene_row_count": 159,
-    "n_unique_terms": 55,
-    "multitest_method": "fdr_bh",
-    "filters_applied": {"evidence": ["homology"]},
-    "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
-    "background_filtered": true,
-    "interpro_type": null
+    "...": "+20 more"
   },
   "filters_applied": {"evidence": ["homology"]},
   "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
   "background_filtered": true,
-  "interpro_type": null,
   "results": [
     {
       "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
@@ -814,7 +449,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "n_clusters": 2
     }
   ],
-  "by_experiment_truncated": null,
+  "...": "7 empty fields omitted",
   "by_direction": [
     {"direction": "down", "n_tests": 67, "n_significant": 7},
     {"direction": "up", "n_tests": 67, "n_significant": 2}
@@ -827,10 +462,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
     "n_tests_max": 67,
     "n_significant_min": 2,
     "n_significant_median": 4.5,
-    "n_significant_max": 7,
-    "universe_size_min": 1849,
-    "universe_size_median": 1849.0,
-    "universe_size_max": 1849
+    "...": "+4 more"
   },
   "top_clusters_by_min_padj": [
     {
@@ -851,24 +483,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "universe_size": 1849,
       "min_padj": 5.10897928140805e-14
     },
-    {
-      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|up",
-      "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
-      "name": "MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
-      "timepoint": "day 14",
-      "timepoint_hours": 336.0,
-      "timepoint_order": 1,
-      "direction": "up",
-      "omics_type": "RNASEQ",
-      "table_scope": "all_detected_genes",
-      "treatment_type": ["nitrogen"],
-      "background_factors": ["axenic", "light"],
-      "is_time_course": false,
-      "n_tests": 67,
-      "n_significant": 2,
-      "universe_size": 1849,
-      "min_padj": 0.040984080388401734
-    }
+    ...
   ],
   "top_pathways_by_padj": [
     {
@@ -892,29 +507,11 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
       "p_adjust": 0.00016973650268072902,
       "signed_score": -3.7702247504456174
     },
-    {
-      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
-      "term_id": "cyanorak.role:J.7",
-      "term_name": "Photosynthesis and respiration > Photosystem I",
-      "p_adjust": 0.0002757287138003251,
-      "signed_score": -3.559518005037858
-    },
-    {
-      "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
-      "term_id": "cyanorak.role:J.2",
-      "term_name": "Photosynthesis and respiration > CO2 fixation",
-      "p_adjust": 0.001961794968180273,
-      "signed_score": -2.707346383725117
-    },
     ...
   ],
   "not_found": [],
   "not_matched": [],
-  "warnings": [],
-  "no_expression": [],
-  "not_found_experiments": [],
   "term_validation": {"not_found": [], "wrong_ontology": [], "wrong_level": [], "filtered_out": [], "resolved_aliases": {}},
-  "clusters_skipped": [],
   "enrichment_params": {
     "organism": "MED4",
     "ontology": "cyanorak_role",
@@ -922,31 +519,10 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
     "term_ids": null,
     "tree": null,
     "informative_only": true,
-    "min_gene_set_size": 5,
-    "max_gene_set_size": 500,
-    "pvalue_cutoff": 0.05,
-    "include_nonsignificant": false,
-    "background_mode": "table_scope",
-    "experiment_ids": ["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"],
-    "direction": "both",
-    "significant_only": true,
-    "timepoint_filter": null,
-    "growth_phases": null,
-    "n_clusters_input": 2,
-    "n_clusters_tested": 2,
-    "n_clusters_skipped": 0,
-    "term2gene_row_count": 1487,
-    "n_unique_terms": 106,
-    "multitest_method": "fdr_bh",
-    "filters_applied": {},
-    "trust_axes": {"cyanorak_role": ["sources", "evidence"]},
-    "background_filtered": false,
-    "interpro_type": null
+    "...": "+20 more"
   },
-  "filters_applied": {},
   "trust_axes": {"cyanorak_role": ["sources", "evidence"]},
   "background_filtered": false,
-  "interpro_type": null,
   "results": []
 }
 ```
@@ -974,7 +550,7 @@ See `docs://analysis/annotation_evidence` for the trust-axis registry (which fil
 
 - `informative_only=True` shrinks the TERM2GENE mapping, and `enrichment_params.term2gene_row_count` shows by how much — MED4 KEGG at `level=3`: 1124 rows with `informative_only=False`, 1094 with the default. Compare `enrichment_params` across runs before comparing p-values. For KEGG the flag also covers the global / overview maps (`kegg.pathway:ko01100` and kin), so a `level=2` run drops those rows too.
 
-- Default background is `table_scope` (per-experiment quantified set). `'organism'` inflates the denominator and underestimates enrichment. See `docs://analysis/enrichment` for the full methodology note.
+- Default background is `table_scope` (per-experiment quantified set). `'organism'` inflates the denominator and underestimates enrichment. `'annotated'` keeps only genes with at least one edge in the chosen ontology (same trust filters / `tree` / `interpro_type` / `informative_only` as the gene sets) — use it when coverage is partial, e.g. `tigr_role`. It is organism-wide, not intersected with the quantified set. See `docs://analysis/enrichment` for the full methodology note.
 
 - BH correction is per-cluster (experiment × timepoint × direction), NOT across clusters. Cross-experiment FDR is biological replication, not statistical.
 
@@ -995,7 +571,7 @@ pathway_enrichment(..., background='genome')  # not a valid string
 ```
 
 ```correction
-pathway_enrichment(..., background='organism')  # or 'table_scope' (default), or a locus_tag list
+pathway_enrichment(..., background='organism')  # or 'table_scope' (default), 'annotated', or a locus_tag list
 ```
 
 ```mistake

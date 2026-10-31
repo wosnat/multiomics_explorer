@@ -21,7 +21,7 @@ docs://tools/pathway_enrichment; summary=True first.
 | term_ids | list[string] \| None | None | Specific term IDs to test. Combines with level to scope rollup. Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced to canonical (see `term_validation.resolved_aliases`). |
 | direction | string ('up', 'down', 'both') | both | DE direction(s) to include in gene_sets. |
 | significant_only | bool | True | If true, only significant DE rows count as foreground. |
-| background | string \| list[string] | table_scope | 'table_scope' (default, per-cluster quantified set), 'organism' (full genome — inflates denominator), or explicit locus_tag list. See docs://analysis/enrichment for the full background semantics. |
+| background | string \| list[string] | table_scope | 'table_scope' (default, per-cluster quantified set), 'organism' (full genome — inflates denominator), 'annotated' (genes with >=1 edge in this ontology under the same filters), or explicit locus_tag list. See docs://analysis/enrichment. |
 | min_gene_set_size | int | 5 | Per-cluster M filter: drop pathways with fewer members in the background. |
 | max_gene_set_size | int \| None | 500 | Per-cluster M filter upper bound. None disables. |
 | pvalue_cutoff | float | 0.05 | Significance threshold for `p_adjust`. |
@@ -62,15 +62,6 @@ Result row: `cluster, experiment_id, name, timepoint, timepoint_hours, timepoint
 
 - pathway_enrichment is DE-anchored (needs `experiment_ids`); for a clustering analysis use `cluster_enrichment(analysis_id=...)`, for ortholog groups / custom lists use the Python `fisher_ora` primitive.
 
-## Chaining patterns
-
-- DE-anchored ORA: pathway_enrichment tests DE gene sets per experiment × timepoint × direction; the sibling cluster_enrichment runs the same Fisher + BH test over a clustering analysis's cluster membership (no direction). Same row/envelope shape.
-- ontology_landscape → genes_by_ontology(level=N) → pathway_enrichment
-- pathway_enrichment → gene_overview
-- differential_expression_by_gene → pathway_enrichment
-- pathway_enrichment(ontology='kegg', ...) → list_metabolites(pathway_ids=[<enriched_pathway_id>]) — inspect the chemistry of an enriched KEGG pathway (compound-anchored membership, distinct from the gene-KO membership the enrichment used). See docs://analysis/metabolites for the pathway-anchor disambiguation.
-- See `docs://analysis/enrichment` for the full methodology and the `informative_only` filter semantics.
-- ontology_landscape(ontology='interpro') → pathway_enrichment(ontology='interpro', interpro_type=..., level=...) — pick the InterPro type before enrichment; the param is required.
-- See `docs://analysis/annotation_evidence` for the trust-axis registry (which filters apply to which ontology) and rank-vs-filter guidance for evidence_score.
+Chaining patterns: see `docs://tools/pathway_enrichment/full`.
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/pathway_enrichment/full`

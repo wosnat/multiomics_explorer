@@ -21,7 +21,7 @@ docs://tools/assays_by_metabolite; summary=True first for 50+ IDs.
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
 | stereo_assignment | list[string] \| None | None | Stereo-form provenance (OR): 'as_reported' = the paper named the form; 'dominant_form_assumed' = it named none and the KG placed it on the dominant form (e.g. 'Alanine' on L-Alanine). ['as_reported'] drops assumed rows. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 

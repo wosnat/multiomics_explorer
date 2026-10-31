@@ -28,7 +28,7 @@ docs://tools/list_experiments; summary=True first.
 | control_timing | list[string] \| None | None | Keep experiments whose control arm timing is one of: 'matched' (same time or growth state), 'baseline' (control sampled at another time), 'mixed'. Experiments without DE never match. Live values: list_filter_values('control_timing'). |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -48,21 +48,21 @@ total_entries, total_matching, returned, offset, truncated, by_organism, by_trea
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if results were truncated by limit or summary=true.
 - **by_organism** (list[OrganismBreakdown]): Experiment counts per organism, sorted desc.
-- **by_organism_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
+- **by_organism_truncated** (bool | None): True when the list was capped at 10 (detail and summary calls alike).
 - **by_treatment_type** (list[TreatmentTypeBreakdown]): Experiment counts per treatment type, sorted desc.
 - **by_treatment_type_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_background_factors** (list[BackgroundFactorBreakdown]): Experiment counts per background factor, sorted desc.
 - **by_background_factors_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
 - **by_omics_type** (list[OmicsTypeBreakdown]): Experiment counts per omics platform, sorted desc.
 - **by_publication** (list[PublicationBreakdown]): Experiment counts per publication, sorted desc.
-- **by_publication_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
+- **by_publication_truncated** (bool | None): True when the list was capped at 10 (detail and summary calls alike).
 - **by_table_scope** (list[TableScopeBreakdown]): Experiment counts per table scope, sorted desc.
 - **by_control_timing** (list[ControlTimingBreakdown]): Experiment counts per control_timing, sorted desc. Experiments without DE (null control_timing) are not counted.
 - **by_cluster_type** (list[ClusterTypeBreakdown]): Experiment counts per cluster type, sorted desc.
 - **by_growth_phase** (list[GrowthPhaseBreakdown]): Experiment counts per growth phase, sorted desc.
 - **by_value_kind** (list[ExpValueKindBreakdown]): Experiment counts by DerivedMetric value_kind across matching experiments.
 - **by_metric_type** (list[ExpMetricTypeBreakdown]): Experiment counts by DerivedMetric metric_type across matching experiments.
-- **by_metric_type_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
+- **by_metric_type_truncated** (bool | None): True when the list was capped at 10 (detail and summary calls alike).
 - **by_compartment** (list[ExpCompartmentBreakdown]): Experiment counts per wet-lab compartment.
 - **by_coculture_role** (list[CocultureRoleBreakdown]): Matching experiments per coculture partner role, sorted desc. An experiment counts once per distinct role among its partners; axenic experiments count in none, so the sum need not equal total_matching.
 - **time_course_count** (int): Number of time-course experiments in matching set.
@@ -142,52 +142,40 @@ list_experiments(summary=True)
     {"organism_name": "Prochlorococcus MED4", "count": 45},
     {"organism_name": "Alteromonas (MarRef v6)", "count": 20},
     {"organism_name": "Marinobacter (MarRef v6)", "count": 20},
-    {"organism_name": "Prochlorococcus MIT9313", "count": 19},
-    {"organism_name": "Synechococcus WH8102", "count": 17},
     ...
   ],
-  "by_organism_truncated": null,
+  "by_organism_truncated": true,
   "by_treatment_type": [
     {"treatment_type": "genomic_analysis", "count": 102},
     {"treatment_type": "carbon", "count": 88},
     {"treatment_type": "coculture", "count": 39},
-    {"treatment_type": "compartment", "count": 25},
-    {"treatment_type": "nitrogen", "count": 16},
     ...
   ],
-  "by_treatment_type_truncated": null,
+  "...": "5 empty fields omitted",
   "by_background_factors": [
     {"background_factor": "light", "count": 135},
     {"background_factor": "axenic", "count": 107},
     {"background_factor": "coculture", "count": 77},
-    {"background_factor": "darkness", "count": 39},
-    {"background_factor": "diel", "count": 33},
     ...
   ],
-  "by_background_factors_truncated": null,
   "by_omics_type": [
     {"omics_type": "BIOINFORMATIC", "count": 102},
     {"omics_type": "PROTEOMICS", "count": 82},
     {"omics_type": "RNASEQ", "count": 79},
-    {"omics_type": "MICROARRAY", "count": 33},
-    {"omics_type": "EXOPROTEOMICS", "count": 19},
     ...
   ],
   "by_publication": [
     {"publication_doi": "10.1042/BST20200244", "count": 95},
     {"publication_doi": "10.1128/spectrum.03275-22", "count": 60},
     {"publication_doi": "10.1111/1462-2920.12822", "count": 12},
-    {"publication_doi": "10.1038/s43705-022-00197-2", "count": 11},
-    {"publication_doi": "10.1101/2025.11.24.690089", "count": 10},
     ...
   ],
-  "by_publication_truncated": null,
+  "by_publication_truncated": true,
   "by_table_scope": [
     {"table_scope": "all_detected_genes", "count": 129},
     {"table_scope": "significant_only", "count": 41},
     {"table_scope": "filtered_subset", "count": 34},
-    {"table_scope": "significant_any_timepoint", "count": 9},
-    {"table_scope": "top_n", "count": 7}
+    ...
   ],
   "by_control_timing": [
     {"control_timing": "matched", "count": 167},
@@ -198,14 +186,12 @@ list_experiments(summary=True)
     {"cluster_type": "time_course", "count": 8},
     {"cluster_type": "diel", "count": 2},
     {"cluster_type": "condition_comparison", "count": 2},
-    {"cluster_type": "decay_pattern", "count": 1}
+    ...
   ],
   "by_growth_phase": [
     {"growth_phase": "exponential", "count": 79},
     {"growth_phase": "darkness", "count": 34},
     {"growth_phase": "acute_stress", "count": 26},
-    {"growth_phase": "nutrient_limited", "count": 21},
-    {"growth_phase": "acclimated_steady_state", "count": 20},
     ...
   ],
   "by_value_kind": [
@@ -217,23 +203,18 @@ list_experiments(summary=True)
     {"metric_type": "sbp_nutrient_class", "count": 95},
     {"metric_type": "sbp_predicted_substrate", "count": 95},
     {"metric_type": "exoproteome_avg_pct_nsaf", "count": 10},
-    {"metric_type": "exoproteome_detection_status", "count": 10},
-    {"metric_type": "log2_mv_cell_enrichment", "count": 6},
     ...
   ],
-  "by_metric_type_truncated": null,
+  "by_metric_type_truncated": true,
   "by_compartment": [
     {"compartment": "whole_cell", "count": 305},
     {"compartment": "exoproteome", "count": 19},
     {"compartment": "vesicle", "count": 13},
-    {"compartment": "extracellular", "count": 3}
+    ...
   ],
   "by_coculture_role": [{"coculture_role": "background", "count": 77}, {"coculture_role": "treatment", "count": 47}],
   "time_course_count": 41,
-  "score_max": null,
-  "score_median": null,
   "not_found": [],
-  "warnings": [],
   "results": []
 }
 ```
@@ -287,46 +268,38 @@ list_experiments(control_timing=["baseline", "mixed"], summary=True)
     {"organism_name": "Prochlorococcus MED4", "count": 8},
     {"organism_name": "Alteromonas macleodii HOT1A3", "count": 4},
     {"organism_name": "Synechococcus WH7803", "count": 3},
-    {"organism_name": "Alteromonas macleodii MIT1002", "count": 2},
-    {"organism_name": "Prochlorococcus MIT9313", "count": 2},
     ...
   ],
-  "by_organism_truncated": null,
+  "...": "9 empty fields omitted",
   "by_treatment_type": [
     {"treatment_type": "nitrogen", "count": 9},
     {"treatment_type": "growth_phase", "count": 5},
     {"treatment_type": "coculture", "count": 4},
-    {"treatment_type": "iron", "count": 3},
-    {"treatment_type": "carbon", "count": 2},
     ...
   ],
-  "by_treatment_type_truncated": null,
   "by_background_factors": [
     {"background_factor": "light", "count": 24},
     {"background_factor": "axenic", "count": 14},
     {"background_factor": "coculture", "count": 6}
   ],
-  "by_background_factors_truncated": null,
   "by_omics_type": [
     {"omics_type": "RNASEQ", "count": 10},
     {"omics_type": "MICROARRAY", "count": 7},
     {"omics_type": "EXOPROTEOMICS", "count": 5},
-    {"omics_type": "PROTEOMICS", "count": 4}
+    ...
   ],
   "by_publication": [
     {"publication_doi": "10.1101/2025.11.24.690089", "count": 8},
     {"publication_doi": "10.1111/1462-2920.14012", "count": 4},
     {"publication_doi": "10.1038/ismej.2011.49", "count": 3},
-    {"publication_doi": "10.1038/ismej.2016.82", "count": 2},
-    {"publication_doi": "10.1038/s41396-018-0252-4", "count": 2},
     ...
   ],
-  "by_publication_truncated": null,
+  "by_publication_truncated": true,
   "by_table_scope": [
     {"table_scope": "all_detected_genes", "count": 17},
     {"table_scope": "filtered_subset", "count": 4},
     {"table_scope": "significant_any_timepoint", "count": 3},
-    {"table_scope": "significant_only", "count": 2}
+    ...
   ],
   "by_control_timing": [{"control_timing": "baseline", "count": 22}, {"control_timing": "mixed", "count": 4}],
   "by_cluster_type": [{"cluster_type": "time_course", "count": 6}],
@@ -334,20 +307,12 @@ list_experiments(control_timing=["baseline", "mixed"], summary=True)
     {"growth_phase": "nutrient_limited", "count": 12},
     {"growth_phase": "acclimated_steady_state", "count": 4},
     {"growth_phase": "exponential", "count": 4},
-    {"growth_phase": "acute_stress", "count": 3},
-    {"growth_phase": "recovery", "count": 3},
     ...
   ],
-  "by_value_kind": [],
-  "by_metric_type": [],
-  "by_metric_type_truncated": null,
   "by_compartment": [{"compartment": "whole_cell", "count": 21}, {"compartment": "exoproteome", "count": 5}],
   "by_coculture_role": [{"coculture_role": "background", "count": 6}, {"coculture_role": "treatment", "count": 6}],
   "time_course_count": 17,
-  "score_max": null,
-  "score_median": null,
   "not_found": [],
-  "warnings": [],
   "results": []
 }
 ```
@@ -405,19 +370,15 @@ list_experiments(compartment="vesicle", limit=2)
     {"organism_name": "Prochlorococcus MIT9313", "count": 3},
     {"organism_name": "Prochlorococcus MED4", "count": 2},
     {"organism_name": "Prochlorococcus MIT9312", "count": 2},
-    {"organism_name": "Alteromonas macleodii AD45", "count": 1},
-    {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
     ...
   ],
-  "by_organism_truncated": null,
+  "...": "12 empty fields omitted",
   "by_treatment_type": [{"treatment_type": "compartment", "count": 13}],
-  "by_treatment_type_truncated": null,
   "by_background_factors": [
     {"background_factor": "axenic", "count": 13},
     {"background_factor": "light", "count": 7},
     {"background_factor": "darkness", "count": 6}
   ],
-  "by_background_factors_truncated": null,
   "by_omics_type": [
     {"omics_type": "VESICLE_PROTEOMICS", "count": 10},
     {"omics_type": "METABOLOMICS", "count": 2},
@@ -428,15 +389,11 @@ list_experiments(compartment="vesicle", limit=2)
     {"publication_doi": "10.1111/1462-2920.15834", "count": 4},
     {"publication_doi": "10.1126/science.1243457", "count": 3}
   ],
-  "by_publication_truncated": null,
   "by_table_scope": [
     {"table_scope": "top_n", "count": 7},
     {"table_scope": "significant_only", "count": 2},
     {"table_scope": "all_detected_genes", "count": 2}
   ],
-  "by_control_timing": [],
-  "by_cluster_type": [],
-  "by_growth_phase": [],
   "by_value_kind": [
     {"value_kind": "numeric", "count": 11},
     {"value_kind": "boolean", "count": 2},
@@ -446,31 +403,17 @@ list_experiments(compartment="vesicle", limit=2)
     {"metric_type": "log2_mv_cell_enrichment", "count": 6},
     {"metric_type": "prop_abund_cells_percent", "count": 6},
     {"metric_type": "prop_abund_mvs_percent", "count": 6},
-    {"metric_type": "mascot_identification_probability", "count": 2},
-    {"metric_type": "predicted_subcellular_localization", "count": 2},
     ...
   ],
-  "by_metric_type_truncated": null,
   "by_compartment": [{"compartment": "vesicle", "count": 13}],
-  "by_coculture_role": [],
   "time_course_count": 0,
-  "score_max": null,
-  "score_median": null,
   "not_found": [],
-  "warnings": [],
   "results": [
     {
       "experiment_id": "10.1093/femsml/uqac025_vesicle_proteomics_ad45",
       "experiment_name": "AD45 vesicle vs whole-cell proteome (label-free LC-MS/MS)",
       "publication_doi": "10.1093/femsml/uqac025",
-      "authors": [
-        "Eduard Fadeev",
-        "Cécile Carpaneto Bastos",
-        "Jennifer H. Hennenfeind",
-        "Steven J. Biller",
-        "Daniel Sher",
-        ...
-      ],
+      "authors": ["Eduard Fadeev", "Cécile Carpaneto Bastos", "Jennifer H. Hennenfeind", ...],
       "organism_name": "Alteromonas macleodii AD45",
       "treatment_type": ["compartment"],
       "background_factors": ["axenic", "darkness"],
@@ -478,7 +421,7 @@ list_experiments(compartment="vesicle", limit=2)
       "omics_type": "VESICLE_PROTEOMICS",
       "is_time_course": false,
       "table_scope": "top_n",
-      "table_scope_detail": "Top-N most-abundant MV proteins per strain; complementary cell-fraction percentages provided where the protein was al...",
+      "table_scope_detail": "Top-N most-abundant MV proteins per strain; complementary cell-fraction percentages provided wher...",
       "control_timing": null,
       "gene_count": 0,
       "distinct_gene_count": 0,
@@ -498,14 +441,7 @@ list_experiments(compartment="vesicle", limit=2)
       "experiment_id": "10.1093/femsml/uqac025_vesicle_proteomics_atcc27126",
       "experiment_name": "ATCC27126 vesicle vs whole-cell proteome (label-free LC-MS/MS)",
       "publication_doi": "10.1093/femsml/uqac025",
-      "authors": [
-        "Eduard Fadeev",
-        "Cécile Carpaneto Bastos",
-        "Jennifer H. Hennenfeind",
-        "Steven J. Biller",
-        "Daniel Sher",
-        ...
-      ],
+      "authors": ["Eduard Fadeev", "Cécile Carpaneto Bastos", "Jennifer H. Hennenfeind", ...],
       "organism_name": "Alteromonas macleodii ATCC27126",
       "treatment_type": ["compartment"],
       "background_factors": ["axenic", "darkness"],
@@ -513,7 +449,7 @@ list_experiments(compartment="vesicle", limit=2)
       "omics_type": "VESICLE_PROTEOMICS",
       "is_time_course": false,
       "table_scope": "top_n",
-      "table_scope_detail": "Top-N most-abundant MV proteins per strain; complementary cell-fraction percentages provided where the protein was al...",
+      "table_scope_detail": "Top-N most-abundant MV proteins per strain; complementary cell-fraction percentages provided wher...",
       "control_timing": null,
       "gene_count": 0,
       "distinct_gene_count": 0,
@@ -550,57 +486,33 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
     {"organism_name": "Prochlorococcus MIT9301", "count": 1},
     {"organism_name": "Prochlorococcus MIT9313", "count": 1}
   ],
-  "by_organism_truncated": null,
+  "...": "15 empty fields omitted",
   "by_treatment_type": [{"treatment_type": "phosphorus", "count": 1}, {"treatment_type": "carbon", "count": 1}],
-  "by_treatment_type_truncated": null,
   "by_background_factors": [{"background_factor": "axenic", "count": 2}, {"background_factor": "light", "count": 1}],
-  "by_background_factors_truncated": null,
   "by_omics_type": [{"omics_type": "METABOLOMICS", "count": 2}],
   "by_publication": [
     {"publication_doi": "10.1128/msystems.01261-22", "count": 1},
     {"publication_doi": "10.1073/pnas.2213271120", "count": 1}
   ],
-  "by_publication_truncated": null,
-  "by_table_scope": [],
-  "by_control_timing": [],
-  "by_cluster_type": [],
-  "by_growth_phase": [],
-  "by_value_kind": [],
-  "by_metric_type": [],
-  "by_metric_type_truncated": null,
   "by_compartment": [{"compartment": "whole_cell", "count": 2}],
-  "by_coculture_role": [],
   "time_course_count": 0,
-  "score_max": null,
-  "score_median": null,
   "not_found": [],
-  "warnings": [],
   "results": [
     {
       "experiment_id": "10.1128/msystems.01261-22_kujawinski_metabolomics_9301_whole_cell",
       "experiment_name": "MIT9301 metabolite diversity (intracellular pool)",
       "publication_doi": "10.1128/msystems.01261-22",
-      "authors": [
-        "Elizabeth B. Kujawinski",
-        "Rogier Braakman",
-        "Krista Longnecker",
-        "Jamie W. Becker",
-        "Sallie W. Chisholm",
-        ...
-      ],
+      "authors": ["Elizabeth B. Kujawinski", "Rogier Braakman", "Krista Longnecker", ...],
       "organism_name": "Prochlorococcus MIT9301",
       "treatment_type": ["phosphorus"],
       "background_factors": ["axenic"],
       "coculture_partner": [],
       "omics_type": "METABOLOMICS",
       "is_time_course": false,
-      "table_scope": null,
       "table_scope_detail": "",
-      "control_timing": null,
       "gene_count": 0,
       "distinct_gene_count": 0,
       "genes_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 0},
-      "timepoints": null,
       "clustering_analysis_count": 0,
       "cluster_types": [],
       "growth_phases": [],
@@ -609,33 +521,24 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
       "compartment": "whole_cell",
       "metabolite_count": 96,
       "metabolite_assay_count": 2,
-      "metabolite_compartments": ["whole_cell"]
+      "metabolite_compartments": ["whole_cell"],
+      "...": "3 null fields omitted (table_scope, control_timing, timepoints)"
     },
     {
       "experiment_id": "10.1073/pnas.2213271120_chitosan_addition_mit9313_metabolomics",
       "experiment_name": "MIT9313 chitosan addition — intracellular metabolomics",
       "publication_doi": "10.1073/pnas.2213271120",
-      "authors": [
-        "Giovanna Capovilla",
-        "Rogier Braakman",
-        "Gregory P. Fournier",
-        "Thomas Hackl",
-        "Julia Schwartzman",
-        ...
-      ],
+      "authors": ["Giovanna Capovilla", "Rogier Braakman", "Gregory P. Fournier", ...],
       "organism_name": "Prochlorococcus MIT9313",
       "treatment_type": ["carbon"],
       "background_factors": ["axenic", "light"],
       "coculture_partner": [],
       "omics_type": "METABOLOMICS",
       "is_time_course": false,
-      "table_scope": null,
       "table_scope_detail": "",
-      "control_timing": null,
       "gene_count": 0,
       "distinct_gene_count": 0,
       "genes_by_status": {"significant_up": 0, "significant_down": 0, "not_significant": 0},
-      "timepoints": null,
       "clustering_analysis_count": 0,
       "cluster_types": [],
       "growth_phases": [],
@@ -644,7 +547,8 @@ list_experiments(experiment_ids=["10.1128/msystems.01261-22_kujawinski_metabolom
       "compartment": "whole_cell",
       "metabolite_count": 16,
       "metabolite_assay_count": 1,
-      "metabolite_compartments": ["whole_cell"]
+      "metabolite_compartments": ["whole_cell"],
+      "...": "3 null fields omitted (table_scope, control_timing, timepoints)"
     }
   ]
 }

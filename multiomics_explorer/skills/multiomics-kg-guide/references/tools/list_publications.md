@@ -7,7 +7,7 @@ Publications with experiment, DM, metabolomics and literature-index rollups.
 Use as the study-level discovery entry point; for per-experiment detail use `list_experiments(publication_dois=[...])`, for the entities a paper names `discussed_by_publication`.
 Filters: organism, search_text, author, publication_dois, compartment, plus the condition filters.
 Returns: by_organism, by_treatment_type, by_omics_type, by_compartment, by_discusses_coverage, not_found; one row = one publication.
-docs://tools/list_publications; summary=True is uncapped (larger than the default call).
+docs://tools/list_publications; summary=True caps the same rollups (smaller than the default call).
 
 ## Parameters
 
@@ -21,7 +21,7 @@ docs://tools/list_publications; summary=True is uncapped (larger than the defaul
 | author | string \| None | None | Filter by author name (case-insensitive). E.g. 'Sher', 'Chisholm'. |
 | publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |

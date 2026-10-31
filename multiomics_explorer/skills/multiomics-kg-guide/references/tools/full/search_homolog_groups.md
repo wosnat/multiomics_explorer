@@ -20,7 +20,7 @@ docs://tools/search_homolog_groups; summary=True first.
 | cyanorak_roles | list[string] \| None | None | Filter by CyanorakRole term IDs. OR within list. E.g. ['cyanorak.role:G.3', 'cyanorak.role:J.8']. |
 | cog_categories | list[string] \| None | None | Filter by CogFunctionalCategory term IDs. OR within list. E.g. ['cog.category:C', 'cog.category:J']. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -87,8 +87,6 @@ search_homolog_groups(search_text="photosynthesis")
     {"taxonomic_level": "Cyanobacteria", "count": 373},
     {"taxonomic_level": "curated", "count": 274},
     {"taxonomic_level": "Bacteria", "count": 260},
-    {"taxonomic_level": "Synechococcus", "count": 236},
-    {"taxonomic_level": "Prochloraceae", "count": 223},
     ...
   ],
   "score_max": 6.71514892578125,
@@ -101,19 +99,13 @@ search_homolog_groups(search_text="photosynthesis")
     },
     {"id": "cyanorak.role:G.2", "name": "Energy metabolism > Electron transport", "count": 267},
     {"id": "cyanorak.role:J.8", "name": "Photosynthesis and respiration > Photosystem II", "count": 264},
-    {"id": "cyanorak.role:J", "name": "Photosynthesis and respiration", "count": 191},
-    {"id": "cyanorak.role:J.2", "name": "Photosynthesis and respiration > CO2 fixation", "count": 173}
+    ...
   ],
   "top_cog_categories": [
     {"id": "cog.category:S", "name": "Function unknown", "count": 495},
     {"id": "cog.category:C", "name": "Energy production and conversion", "count": 470},
     {"id": "cog.category:H", "name": "Coenzyme transport and metabolism", "count": 83},
-    {
-      "id": "cog.category:U",
-      "name": "Intracellular trafficking, secretion, and vesicular transport",
-      "count": 63
-    },
-    {"id": "cog.category:G", "name": "Carbohydrate transport and metabolism", "count": 59}
+    ...
   ],
   "returned": 5,
   "offset": 0,

@@ -343,7 +343,7 @@ examples:
             "value": "tier",
             "source": "config",
             "applies_to": ["tcdb"],
-            "description": "Confidence band 1..3. TCDB: consensus tier on diamond_tier edges, identity band on diamond_best_hit edges (never compare across call kinds), null on eggNOG calls. MEROPS: diamond truncation depth."
+            "description": "Confidence band 1..3. TCDB: consensus tier on diamond_tier edges, identity band on diamond_best_h..."
           }
         ]
       }

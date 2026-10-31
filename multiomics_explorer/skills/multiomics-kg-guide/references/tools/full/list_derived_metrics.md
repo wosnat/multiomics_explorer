@@ -28,7 +28,7 @@ docs://tools/list_derived_metrics; summary=True first.
 | rankable | bool \| None | None | Filter to DMs that support rank / percentile / bucket analysis. Set to True before calling `genes_by_numeric_metric` with `metric_bucket`, `min/max_percentile`, or `max_rank` — those filters require rankable=True on every selected DM. See `docs://guide/conventions` (DM family gating). |
 | has_p_value | bool \| None | None | Filter to DMs that carry statistical p-values. Set to True before using `significant_only` / `max_adjusted_p_value` on drill-downs. No DM in the current KG carries p-values, so has_p_value=True returns zero rows — kept because drill-down p-value filters raise when no selected DM supports them. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 20 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 

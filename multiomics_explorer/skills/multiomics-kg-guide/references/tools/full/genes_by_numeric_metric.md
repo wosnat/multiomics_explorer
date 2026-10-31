@@ -32,7 +32,7 @@ docs://tools/genes_by_numeric_metric; summary=True first.
 | significant_only | bool | False | Filter to `r.significant='significant'`. **has_p_value-gated** — raises in the current KG (no DM has p-values yet). Forward-compat surface; check `list_derived_metrics(has_p_value=True)` before using. |
 | max_adjusted_p_value | float \| None | None | Upper bound on `r.adjusted_p_value`. **has_p_value-gated**. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 25 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -150,18 +150,11 @@ genes_by_numeric_metric(metric_types=['damping_ratio'], metric_bucket=['top_deci
     {"gene_category": "Translation", "count": 6},
     {"gene_category": "Carbohydrate metabolism", "count": 5},
     {"gene_category": "Photosynthesis", "count": 5},
-    {"gene_category": "Unknown", "count": 3},
-    {"gene_category": "Stress response and adaptation", "count": 2}
+    ...
   ],
   "genes_per_metric_max": 32,
   "genes_per_metric_median": 32.0,
-  "not_found_ids": [],
-  "not_matched_ids": [],
-  "not_found_metric_types": [],
-  "not_matched_metric_types": [],
-  "not_matched_organism": null,
-  "excluded_derived_metrics": [],
-  "warnings": [],
+  "...": "7 empty fields omitted",
   "returned": 25,
   "offset": 0,
   "truncated": true,
@@ -244,16 +237,12 @@ genes_by_numeric_metric(metric_types=['damping_ratio', 'peak_time_protein_h'], m
     {"gene_category": "Translation", "count": 6},
     {"gene_category": "Carbohydrate metabolism", "count": 5},
     {"gene_category": "Photosynthesis", "count": 5},
-    {"gene_category": "Unknown", "count": 3},
-    {"gene_category": "Stress response and adaptation", "count": 2}
+    ...
   ],
   "genes_per_metric_max": 32,
   "genes_per_metric_median": 32.0,
-  "not_found_ids": [],
-  "not_matched_ids": [],
-  "not_found_metric_types": [],
+  "...": "4 empty fields omitted (not_found_ids, not_matched_ids, not_found_metric_types, not_matched_organism)",
   "not_matched_metric_types": ["peak_time_protein_h"],
-  "not_matched_organism": null,
   "excluded_derived_metrics": [
     {
       "derived_metric_id": "derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:peak_time_protein_h",
@@ -347,42 +336,17 @@ genes_by_numeric_metric(metric_types=['cell_abundance_biovolume_normalized'], me
       "rank_min": 107,
       "rank_max": 263
     },
-    {
-      "derived_metric_id": "derived_metric:1462-2920.15834:s3_mit9312_abundance:cell_abundance_biovolume_normalized",
-      "name": "MIT9312 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)",
-      "metric_type": "cell_abundance_biovolume_normalized",
-      "value_kind": "numeric",
-      "count": 153,
-      "value_min": 2.01e-08,
-      "value_q1": 2.39e-08,
-      "value_median": 2.92e-08,
-      "value_q3": 3.51e-08,
-      "value_max": 4.66e-08,
-      "dm_value_min": 8.85e-10,
-      "dm_value_q1": 3.25e-09,
-      "dm_value_median": 7.67e-09,
-      "dm_value_q3": 2.01e-08,
-      "dm_value_max": 8.02e-07,
-      "rank_min": 103,
-      "rank_max": 255
-    }
+    ...
   ],
   "top_categories": [
     {"gene_category": "Translation", "count": 52},
     {"gene_category": "Unknown", "count": 41},
     {"gene_category": "Stress response and adaptation", "count": 34},
-    {"gene_category": "Carbohydrate metabolism", "count": 34},
-    {"gene_category": "Coenzyme metabolism", "count": 24}
+    ...
   ],
   "genes_per_metric_max": 157,
   "genes_per_metric_median": 157.0,
-  "not_found_ids": [],
-  "not_matched_ids": [],
-  "not_found_metric_types": [],
-  "not_matched_metric_types": [],
-  "not_matched_organism": null,
-  "excluded_derived_metrics": [],
-  "warnings": [],
+  "...": "7 empty fields omitted",
   "returned": 25,
   "offset": 0,
   "truncated": true,
@@ -465,18 +429,11 @@ genes_by_numeric_metric(metric_types=['damping_ratio'], summary=True)
     {"gene_category": "Translation", "count": 47},
     {"gene_category": "Amino acid metabolism", "count": 30},
     {"gene_category": "Unknown", "count": 30},
-    {"gene_category": "Photosynthesis", "count": 29},
-    {"gene_category": "Carbohydrate metabolism", "count": 28}
+    ...
   ],
   "genes_per_metric_max": 312,
   "genes_per_metric_median": 312.0,
-  "not_found_ids": [],
-  "not_matched_ids": [],
-  "not_found_metric_types": [],
-  "not_matched_metric_types": [],
-  "not_matched_organism": null,
-  "excluded_derived_metrics": [],
-  "warnings": [],
+  "...": "7 empty fields omitted",
   "returned": 0,
   "offset": 0,
   "truncated": true,

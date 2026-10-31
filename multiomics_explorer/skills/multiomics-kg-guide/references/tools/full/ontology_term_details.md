@@ -16,7 +16,7 @@ docs://tools/ontology_term_details; per-ontology semantics docs://ontologies/{ke
 | term_ids | list[string] | — | Self-prefixed term IDs, any ontology mix (e.g. 'go:0006979', 'tcdb:3.A.1', 'interpro:IPR000362', 'pfam:PF00005', 'kegg.pathway:ko00010'). Rows return in input order. Bare ids accepted (e.g. 'ko00910', 'GO:0006979') — see `resolved_aliases`. |
 | organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
 | link_kinds | list[string ('composition', 'membership', 'router')] \| None | None | Keep links_out of these kinds (None: all): 'composition' = built from target (tcdb -> pfam/go, merops -> pfam); 'membership' = member of (pfam/ncbifam -> interpro, kegg -> brite); 'router' = recall-biased (interpro -> ec/cazy, ncbifam -> tigr.role). |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 50 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -121,8 +121,7 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
     {"ontology": "tcdb", "count": 1},
     {"ontology": "merops", "count": 1},
     {"ontology": "interpro", "count": 1},
-    {"ontology": "ncbifam", "count": 1},
-    {"ontology": "go_bp", "count": 1}
+    ...
   ],
   "links_out_total": 20,
   "by_link_kind": [
@@ -138,7 +137,6 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
       "ontology": "tcdb",
       "label": "TcdbFamily",
       "name": "The ATP-binding Cassette (ABC) Superfamily",
-      "description": null,
       "level": 2,
       "level_kind": "tc_family",
       "is_informative": true,
@@ -151,15 +149,11 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
       "superfamily": "ArsA ATPase (ArsA) Superfamily",
       "tcdb_substrate_count": 546,
       "direction": "unknown",
-      "direction_basis": null,
-      "proteins": null,
       "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters", "level": 1}],
       "children": [
         {"id": "tcdb:3.A.1.1", "name": "The Carbohydrate Uptake Transporter-1 (CUT1) Family", "level": 3},
         {"id": "tcdb:3.A.1.10", "name": "The Ferric Iron Uptake Transporter (FeT) Family", "level": 3},
         {"id": "tcdb:3.A.1.101", "name": "The Capsular Polysaccharide Exporter (CPSE) Family", "level": 3},
-        {"id": "tcdb:3.A.1.102", "name": "The Lipooligosaccharide Exporter (LOSE) Family", "level": 3},
-        {"id": "tcdb:3.A.1.103", "name": "The Lipopolysaccharide Exporter (LPSE) Family", "level": 3},
         ...
       ],
       "children_total": 97,
@@ -186,22 +180,9 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
           "target_ontology": "go_cc",
           "target_name": "membrane"
         },
-        {
-          "rel": "Tcdb_family_enables_molecular_function",
-          "link_kind": "composition",
-          "target_id": "go:0016887",
-          "target_ontology": "go_mf",
-          "target_name": "ATP hydrolysis activity"
-        },
-        {
-          "rel": "Tcdb_family_involved_in_biological_process",
-          "link_kind": "composition",
-          "target_id": "go:0030153",
-          "target_ontology": "go_bp",
-          "target_name": "bacteriocin immunity"
-        },
         ...
-      ]
+      ],
+      "...": "3 null fields omitted (description, direction_basis, proteins)"
     },
     {
       "term_id": "merops.family:S14",
@@ -243,7 +224,7 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
       "ontology": "interpro",
       "label": "InterproEntry",
       "name": "Fumarate lyase family",
-      "description": "A number of enzymes, belonging to the lyase class, for which fumarate is a substrate, have been shown to share a shor...",
+      "description": "A number of enzymes, belonging to the lyase class, for which fumarate is a substrate, have been s...",
       "level": 0,
       "level_kind": null,
       "is_informative": true,
@@ -258,7 +239,7 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
         {"id": "interpro:IPR004708", "name": "Aspartate ammonia-lyase", "level": 1},
         {"id": "interpro:IPR005677", "name": "Fumarate hydratase, class II", "level": 1},
         {"id": "interpro:IPR009049", "name": "Argininosuccinate lyase", "level": 1},
-        {"id": "interpro:IPR012789", "name": "3-carboxy-cis,cis-muconate cycloisomerase-like", "level": 1}
+        ...
       ],
       "children_total": 4,
       "children_truncated": false,
@@ -284,20 +265,7 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
           "target_ontology": "ec",
           "target_name": "argininosuccinate lyase"
         },
-        {
-          "rel": "Interpro_entry_related_to_ec_number",
-          "link_kind": "router",
-          "target_id": "ec:4.3.2.2",
-          "target_ontology": "ec",
-          "target_name": "adenylosuccinate lyase"
-        },
-        {
-          "rel": "Interpro_entry_related_to_ec_number",
-          "link_kind": "router",
-          "target_id": "ec:5.5.1.2",
-          "target_ontology": "ec",
-          "target_name": "3-carboxy-cis,cis-muconate cycloisomerase"
-        }
+        ...
       ]
     },
     ...
@@ -322,9 +290,7 @@ ontology_term_details(term_ids=["tigr.role:energy_metabolism"])
   "not_found": [],
   "by_ontology": [{"ontology": "tigr_role", "count": 1}],
   "links_out_total": 0,
-  "by_link_kind": [],
-  "resolved_aliases": {},
-  "warnings": [],
+  "...": "3 empty fields omitted (by_link_kind, resolved_aliases, warnings)",
   "results": [
     {
       "term_id": "tigr.role:energy_metabolism",
@@ -348,12 +314,6 @@ ontology_term_details(term_ids=["tigr.role:energy_metabolism"])
         },
         {"id": "tigr.role:108", "name": "Energy metabolism / Aerobic", "level": 1},
         {"id": "tigr.role:109", "name": "Energy metabolism / Amino acids and amines", "level": 1},
-        {"id": "tigr.role:110", "name": "Energy metabolism / Anaerobic", "level": 1},
-        {
-          "id": "tigr.role:111",
-          "name": "Energy metabolism / ATP-proton motive force interconversion",
-          "level": 1
-        },
         ...
       ],
       "children_total": 16,
@@ -388,7 +348,6 @@ ontology_term_details(term_ids=["tcdb:3.A.1"], link_kinds=["composition"])
       "ontology": "tcdb",
       "label": "TcdbFamily",
       "name": "The ATP-binding Cassette (ABC) Superfamily",
-      "description": null,
       "level": 2,
       "level_kind": "tc_family",
       "is_informative": true,
@@ -401,15 +360,11 @@ ontology_term_details(term_ids=["tcdb:3.A.1"], link_kinds=["composition"])
       "superfamily": "ArsA ATPase (ArsA) Superfamily",
       "tcdb_substrate_count": 546,
       "direction": "unknown",
-      "direction_basis": null,
-      "proteins": null,
       "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters", "level": 1}],
       "children": [
         {"id": "tcdb:3.A.1.1", "name": "The Carbohydrate Uptake Transporter-1 (CUT1) Family", "level": 3},
         {"id": "tcdb:3.A.1.10", "name": "The Ferric Iron Uptake Transporter (FeT) Family", "level": 3},
         {"id": "tcdb:3.A.1.101", "name": "The Capsular Polysaccharide Exporter (CPSE) Family", "level": 3},
-        {"id": "tcdb:3.A.1.102", "name": "The Lipooligosaccharide Exporter (LOSE) Family", "level": 3},
-        {"id": "tcdb:3.A.1.103", "name": "The Lipopolysaccharide Exporter (LPSE) Family", "level": 3},
         ...
       ],
       "children_total": 97,
@@ -436,22 +391,9 @@ ontology_term_details(term_ids=["tcdb:3.A.1"], link_kinds=["composition"])
           "target_ontology": "go_cc",
           "target_name": "membrane"
         },
-        {
-          "rel": "Tcdb_family_enables_molecular_function",
-          "link_kind": "composition",
-          "target_id": "go:0016887",
-          "target_ontology": "go_mf",
-          "target_name": "ATP hydrolysis activity"
-        },
-        {
-          "rel": "Tcdb_family_involved_in_biological_process",
-          "link_kind": "composition",
-          "target_id": "go:0030153",
-          "target_ontology": "go_bp",
-          "target_name": "bacteriocin immunity"
-        },
         ...
-      ]
+      ],
+      "...": "3 null fields omitted (description, direction_basis, proteins)"
     }
   ]
 }
@@ -481,7 +423,7 @@ ontology_term_details(term_ids=["interpro:IPR000362"], verbose=True)
       "ontology": "interpro",
       "label": "InterproEntry",
       "name": "Fumarate lyase family",
-      "description": "A number of enzymes, belonging to the lyase class, for which fumarate is a substrate, have been shown to share a shor...",
+      "description": "A number of enzymes, belonging to the lyase class, for which fumarate is a substrate, have been s...",
       "level": 0,
       "level_kind": null,
       "is_informative": true,
@@ -496,7 +438,7 @@ ontology_term_details(term_ids=["interpro:IPR000362"], verbose=True)
         {"id": "interpro:IPR004708", "name": "Aspartate ammonia-lyase", "level": 1},
         {"id": "interpro:IPR005677", "name": "Fumarate hydratase, class II", "level": 1},
         {"id": "interpro:IPR009049", "name": "Argininosuccinate lyase", "level": 1},
-        {"id": "interpro:IPR012789", "name": "3-carboxy-cis,cis-muconate cycloisomerase-like", "level": 1}
+        ...
       ],
       "children_total": 4,
       "children_truncated": false,
@@ -525,22 +467,7 @@ ontology_term_details(term_ids=["interpro:IPR000362"], verbose=True)
           "target_name": "argininosuccinate lyase",
           "props": {"id": "IPR000362-related_ec-4.3.2.1", "router_ambiguous": true}
         },
-        {
-          "rel": "Interpro_entry_related_to_ec_number",
-          "link_kind": "router",
-          "target_id": "ec:4.3.2.2",
-          "target_ontology": "ec",
-          "target_name": "adenylosuccinate lyase",
-          "props": {"id": "IPR000362-related_ec-4.3.2.2", "router_ambiguous": true}
-        },
-        {
-          "rel": "Interpro_entry_related_to_ec_number",
-          "link_kind": "router",
-          "target_id": "ec:5.5.1.2",
-          "target_ontology": "ec",
-          "target_name": "3-carboxy-cis,cis-muconate cycloisomerase",
-          "props": {"id": "IPR000362-related_ec-5.5.1.2", "router_ambiguous": true}
-        }
+        ...
       ],
       "properties": {
         "id": "interpro:IPR000362",
@@ -549,7 +476,7 @@ ontology_term_details(term_ids=["interpro:IPR000362"], verbose=True)
         "member_count": 4,
         "organism_count": 118,
         "direct_gene_count": 360,
-        "description": "A number of enzymes, belonging to the lyase class, for which fumarate is a substrate, have been shown to share a shor...",
+        "description": "A number of enzymes, belonging to the lyase class, for which fumarate is a substrate, have been s...",
         "name": "Fumarate lyase family",
         "interpro_id": "IPR000362",
         "interpro_type": "FAMILY",
@@ -559,8 +486,6 @@ ontology_term_details(term_ids=["interpro:IPR000362"], verbose=True)
         {"organism": "Pseudomonas putida KT2440", "gene_count": 6},
         {"organism": "Meiothermus ruber", "gene_count": 5},
         {"organism": "Ruegeria pomeroyi DSS-3", "gene_count": 5},
-        {"organism": "Alteromonas macleodii 83-1", "gene_count": 3},
-        {"organism": "Alteromonas macleodii AD45", "gene_count": 3},
         ...
       ]
     }
@@ -575,152 +500,6 @@ ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", ve
 ```
 
 *With organism= set ('MED4' resolves to 'Prochlorococcus MED4'), compact rows gain organism_gene_count (subtree count, term + descendants — the same number search_ontology(organism=...) shows: 52 for tcdb:3.A.1 on both tools, gated TCDB edges only) and the verbose genes_by_organism[] holds only that organism.*
-
-```example-response
-{
-  "total_matching": 2,
-  "returned": 2,
-  "offset": 0,
-  "truncated": false,
-  "not_found": [],
-  "by_ontology": [{"ontology": "go_bp", "count": 1}, {"ontology": "tcdb", "count": 1}],
-  "links_out_total": 11,
-  "by_link_kind": [{"link_kind": "composition", "count": 11}],
-  "resolved_aliases": {},
-  "warnings": [],
-  "results": [
-    {
-      "term_id": "go:0006979",
-      "ontology": "go_bp",
-      "label": "BiologicalProcess",
-      "name": "response to oxidative stress",
-      "description": null,
-      "level": 3,
-      "level_kind": null,
-      "is_informative": true,
-      "gene_count": 2370,
-      "organism_count": 118,
-      "direct_gene_count": 1984,
-      "organism_gene_count": 18,
-      "parents": [{"id": "go:0006950", "name": "response to stress", "level": 2}],
-      "children": [
-        {"id": "go:0000302", "name": "response to reactive oxygen species", "level": 4},
-        {"id": "go:0033194", "name": "response to hydroperoxide", "level": 4},
-        {"id": "go:0034599", "name": "cellular response to oxidative stress", "level": 4}
-      ],
-      "children_total": 3,
-      "children_truncated": false,
-      "links_out": [],
-      "properties": {
-        "id": "go:0006979",
-        "level": 3,
-        "gene_count": 2370,
-        "organism_count": 118,
-        "direct_gene_count": 1984,
-        "name": "response to oxidative stress",
-        "preferred_id": "go"
-      },
-      "genes_by_organism": [{"organism": "Prochlorococcus MED4", "gene_count": 18}]
-    },
-    {
-      "term_id": "tcdb:3.A.1",
-      "ontology": "tcdb",
-      "label": "TcdbFamily",
-      "name": "The ATP-binding Cassette (ABC) Superfamily",
-      "description": null,
-      "level": 2,
-      "level_kind": "tc_family",
-      "is_informative": true,
-      "gene_count": 9192,
-      "organism_count": 118,
-      "direct_gene_count": 1656,
-      "organism_gene_count": 52,
-      "tcdb_id": "3.A.1",
-      "tc_class_id": "tcdb:3",
-      "member_count": 97,
-      "superfamily": "ArsA ATPase (ArsA) Superfamily",
-      "tcdb_substrate_count": 546,
-      "direction": "unknown",
-      "direction_basis": null,
-      "proteins": null,
-      "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters", "level": 1}],
-      "children": [
-        {"id": "tcdb:3.A.1.1", "name": "The Carbohydrate Uptake Transporter-1 (CUT1) Family", "level": 3},
-        {"id": "tcdb:3.A.1.10", "name": "The Ferric Iron Uptake Transporter (FeT) Family", "level": 3},
-        {"id": "tcdb:3.A.1.101", "name": "The Capsular Polysaccharide Exporter (CPSE) Family", "level": 3},
-        {"id": "tcdb:3.A.1.102", "name": "The Lipooligosaccharide Exporter (LOSE) Family", "level": 3},
-        {"id": "tcdb:3.A.1.103", "name": "The Lipopolysaccharide Exporter (LPSE) Family", "level": 3},
-        ...
-      ],
-      "children_total": 97,
-      "children_truncated": true,
-      "links_out": [
-        {
-          "rel": "Tcdb_family_enables_molecular_function",
-          "link_kind": "composition",
-          "target_id": "go:0005524",
-          "target_ontology": "go_mf",
-          "target_name": "ATP binding",
-          "props": {"id": "3.A.1-has_go-GO:0005524", "curated_tcids": ["3.A.1.118.1", "3.A.1.138.1"]}
-        },
-        {
-          "rel": "Tcdb_family_located_in_cellular_component",
-          "link_kind": "composition",
-          "target_id": "go:0005886",
-          "target_ontology": "go_cc",
-          "target_name": "plasma membrane",
-          "props": {"id": "3.A.1-has_go-GO:0005886", "curated_tcids": ["3.A.1.118.1", "3.A.1.155.1", "3.A.1.155.3"]}
-        },
-        {
-          "rel": "Tcdb_family_located_in_cellular_component",
-          "link_kind": "composition",
-          "target_id": "go:0016020",
-          "target_ontology": "go_cc",
-          "target_name": "membrane",
-          "props": {
-            "id": "3.A.1-has_go-GO:0016020",
-            "curated_tcids": ["3.A.1.155.2", "3.A.1.207.1", "3.A.1.207.2", "3.A.1.207.3", "3.A.1.207.4"]
-          }
-        },
-        {
-          "rel": "Tcdb_family_enables_molecular_function",
-          "link_kind": "composition",
-          "target_id": "go:0016887",
-          "target_ontology": "go_mf",
-          "target_name": "ATP hydrolysis activity",
-          "props": {"id": "3.A.1-has_go-GO:0016887", "curated_tcids": ["3.A.1.138.1"]}
-        },
-        {
-          "rel": "Tcdb_family_involved_in_biological_process",
-          "link_kind": "composition",
-          "target_id": "go:0030153",
-          "target_ontology": "go_bp",
-          "target_name": "bacteriocin immunity",
-          "props": {"id": "3.A.1-has_go-GO:0030153", "curated_tcids": ["3.A.1.118.1"]}
-        },
-        ...
-      ],
-      "properties": {
-        "level_kind": "tc_family",
-        "tcdb_id": "3.A.1",
-        "gene_count": 9192,
-        "member_count": 97,
-        "direct_gene_count": 1656,
-        "superfamily": "ArsA ATPase (ArsA) Superfamily",
-        "direction": "unknown",
-        "tcdb_substrate_count": 546,
-        "preferred_id": "tcdb",
-        "id": "tcdb:3.A.1",
-        "tc_class_id": "tcdb:3",
-        "level": 2,
-        "organism_count": 118,
-        "name": "The ATP-binding Cassette (ABC) Superfamily"
-      },
-      "genes_by_organism": [{"organism": "Prochlorococcus MED4", "gene_count": 52}]
-    }
-  ]
-}
-```
 
 ### Example 6: From an enrichment table to term context to genes
 

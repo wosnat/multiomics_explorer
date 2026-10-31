@@ -21,7 +21,7 @@ docs://tools/assays_by_metabolite; summary=True first for 50+ IDs.
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
 | stereo_assignment | list[string] \| None | None | Stereo-form provenance (OR): 'as_reported' = the paper named the form; 'dominant_form_assumed' = it named none and the KG placed it on the dominant form (e.g. 'Alanine' on L-Alanine). ['as_reported'] drops assumed rows. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -106,7 +106,7 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
     {
       "metabolite_id": "kegg.compound:C00074",
       "metabolite_name": "Phosphoenolpyruvate",
-      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_0801_extracellular:extracellular_concentration",
+      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_0801_extracellular:extracellular_conce...",
       "assay_name": "MIT0801 extracellular metabolite concentration (mol/cell)",
       "evidence_kind": "quantifies",
       "n_replicates": 1,
@@ -119,19 +119,8 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
       "stereo_assignment": "as_reported",
       "value": 0.0,
       "value_sd": 0.0,
-      "metric_bucket": null,
-      "metric_percentile": null,
-      "rank_by_metric": null,
       "detection_status": "not_detected",
-      "timepoint": null,
-      "timepoint_hours": null,
-      "timepoint_order": null,
-      "growth_phase": null,
-      "flag_value": null,
-      "n_positive": null,
-      "assay_field_description": null,
-      "replicate_values": null,
-      "experimental_context": null
+      "...": "12 null fields omitted"
     },
     {
       "metabolite_id": "kegg.compound:C00074",
@@ -149,24 +138,13 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
       "stereo_assignment": "as_reported",
       "value": 0.0,
       "value_sd": 0.0,
-      "metric_bucket": null,
-      "metric_percentile": null,
-      "rank_by_metric": null,
       "detection_status": "not_detected",
-      "timepoint": null,
-      "timepoint_hours": null,
-      "timepoint_order": null,
-      "growth_phase": null,
-      "flag_value": null,
-      "n_positive": null,
-      "assay_field_description": null,
-      "replicate_values": null,
-      "experimental_context": null
+      "...": "12 null fields omitted"
     },
     {
       "metabolite_id": "kegg.compound:C00074",
       "metabolite_name": "Phosphoenolpyruvate",
-      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_extracellular:extracellular_concentration",
+      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_extracellular:extracellular_conce...",
       "assay_name": "MIT9301 extracellular metabolite concentration (mol/cell)",
       "evidence_kind": "quantifies",
       "n_replicates": 1,
@@ -179,19 +157,8 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
       "stereo_assignment": "as_reported",
       "value": 0.0,
       "value_sd": 0.0,
-      "metric_bucket": null,
-      "metric_percentile": null,
-      "rank_by_metric": null,
       "detection_status": "not_detected",
-      "timepoint": null,
-      "timepoint_hours": null,
-      "timepoint_order": null,
-      "growth_phase": null,
-      "flag_value": null,
-      "n_positive": null,
-      "assay_field_description": null,
-      "replicate_values": null,
-      "experimental_context": null
+      "...": "12 null fields omitted"
     },
     ...
   ],
@@ -201,7 +168,7 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
     {"organism_name": "Prochlorococcus MIT9313", "count": 8},
     {"organism_name": "Prochlorococcus MIT9301", "count": 8},
     {"organism_name": "Prochlorococcus MIT0801", "count": 2},
-    {"organism_name": "Prochlorococcus MIT9303", "count": 2}
+    ...
   ],
   "by_compartment": [{"compartment": "whole_cell", "count": 13}, {"compartment": "extracellular", "count": 7}],
   "by_assay": [
@@ -210,20 +177,12 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
       "count": 4
     },
     {
-      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_extracellular:extracellular_concentration",
+      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_extracellular:extracellular_conce...",
       "count": 3
     },
     {
       "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9301_intracellular:cellular_concentration",
       "count": 3
-    },
-    {
-      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_extracellular:extracellular_concentration",
-      "count": 2
-    },
-    {
-      "assay_id": "metabolite_assay:msystems.01261-22:metabolites_kegg_export_9313_intracellular:cellular_concentration",
-      "count": 2
     },
     ...
   ],
@@ -235,12 +194,10 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00074"])
   "by_flag_value": [{"flag_value": false, "count": 2}],
   "by_stereo_assignment": [{"stereo_assignment": "as_reported", "count": 20}],
   "metabolites_with_evidence": ["kegg.compound:C00074"],
-  "metabolites_without_evidence": [],
+  "...": "3 empty fields omitted (metabolites_without_evidence, resolved_aliases, warnings)",
   "metabolites_matched": 1,
   "not_found": [],
   "not_matched": [],
-  "resolved_aliases": {},
-  "warnings": [],
   "returned": 5,
   "truncated": true,
   "offset": 0
@@ -300,23 +257,15 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00041"], summary=True)
   ],
   "by_assay": [
     {
-      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_vesicles_mit9313:relative_peak_area_biovolume_normalized",
+      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_vesicles_mit9313:relative_peak_area_biovolume_nor...",
       "count": 1
     },
     {
-      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_vesicles_mit9312:relative_peak_area_biovolume_normalized",
+      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_vesicles_mit9312:relative_peak_area_biovolume_nor...",
       "count": 1
     },
     {
-      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9313:relative_peak_area_biovolume_normalized",
-      "count": 1
-    },
-    {
-      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9312:relative_peak_area_biovolume_normalized",
-      "count": 1
-    },
-    {
-      "assay_id": "metabolite_assay:msystems.01261-22:presence_flags_table_s2_extracellular:presence_flag_extracellular",
+      "assay_id": "metabolite_assay:1462-2920.15834:s7_metabolites_cells_mit9313:relative_peak_area_biovolume_normal...",
       "count": 1
     },
     ...
@@ -330,9 +279,7 @@ assays_by_metabolite(metabolite_ids=["kegg.compound:C00041"], summary=True)
   "not_found": [],
   "not_matched": [],
   "resolved_aliases": {},
-  "warnings": [
-    "6 of 6 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on L-Alanine); filter st..."
-  ],
+  "warnings": ["6 of 6 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on L..."],
   "returned": 0,
   "truncated": true,
   "offset": 0

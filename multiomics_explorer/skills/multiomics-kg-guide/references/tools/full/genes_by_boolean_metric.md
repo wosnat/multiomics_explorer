@@ -25,7 +25,7 @@ docs://tools/genes_by_boolean_metric; summary=True first.
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | flag_value | bool \| None | None | Filter on `r.value`: True keeps `'flagged'` edges, False keeps `'not_flagged'` edges (tested-absent — real biology, stored on 11 of 34 boolean DMs; the rest are positive-only and return 0 rows for False). Check `by_metric[*].false_count` before reading an absent gene as 'not flagged' vs 'not assessed'. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 25 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -124,8 +124,7 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
     {"gene_category": "Unknown", "count": 12},
     {"gene_category": "Stress response and adaptation", "count": 9},
     {"gene_category": "Cell wall and membrane", "count": 9},
-    {"gene_category": "Translation", "count": 6},
-    {"gene_category": "Post-translational modification", "count": 4}
+    ...
   ],
   "by_metric": [
     {
@@ -140,28 +139,11 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'])
       "dm_true_count": 32,
       "dm_false_count": 0
     },
-    {
-      "derived_metric_id": "derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member",
-      "name": "MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)",
-      "metric_type": "vesicle_proteome_member",
-      "value_kind": "boolean",
-      "count": 27,
-      "true_count": 27,
-      "false_count": 0,
-      "dm_total_gene_count": 27,
-      "dm_true_count": 27,
-      "dm_false_count": 0
-    }
+    ...
   ],
   "genes_per_metric_max": 32,
   "genes_per_metric_median": 32.0,
-  "not_found_ids": [],
-  "not_matched_ids": [],
-  "not_found_metric_types": [],
-  "not_matched_metric_types": [],
-  "not_matched_organism": null,
-  "excluded_derived_metrics": [],
-  "warnings": [],
+  "...": "7 empty fields omitted",
   "returned": 25,
   "offset": 0,
   "truncated": true,
@@ -220,8 +202,7 @@ genes_by_boolean_metric(metric_types=['periodic_in_coculture_LD'], organism='NAT
     {"gene_category": "Unknown", "count": 479},
     {"gene_category": "Stress response and adaptation", "count": 196},
     {"gene_category": "Coenzyme metabolism", "count": 152},
-    {"gene_category": "Translation", "count": 119},
-    {"gene_category": "Amino acid metabolism", "count": 93}
+    ...
   ],
   "by_metric": [
     {
@@ -239,13 +220,7 @@ genes_by_boolean_metric(metric_types=['periodic_in_coculture_LD'], organism='NAT
   ],
   "genes_per_metric_max": 1651,
   "genes_per_metric_median": 1651.0,
-  "not_found_ids": [],
-  "not_matched_ids": [],
-  "not_found_metric_types": [],
-  "not_matched_metric_types": [],
-  "not_matched_organism": null,
-  "excluded_derived_metrics": [],
-  "warnings": [],
+  "...": "7 empty fields omitted",
   "returned": 25,
   "offset": 0,
   "truncated": true,
@@ -305,8 +280,7 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'], summary=True)
     {"gene_category": "Unknown", "count": 12},
     {"gene_category": "Stress response and adaptation", "count": 9},
     {"gene_category": "Cell wall and membrane", "count": 9},
-    {"gene_category": "Translation", "count": 6},
-    {"gene_category": "Post-translational modification", "count": 4}
+    ...
   ],
   "by_metric": [
     {
@@ -321,28 +295,11 @@ genes_by_boolean_metric(metric_types=['vesicle_proteome_member'], summary=True)
       "dm_true_count": 32,
       "dm_false_count": 0
     },
-    {
-      "derived_metric_id": "derived_metric:science.1243457:s3_mit9313_vesicle_proteome:vesicle_proteome_member",
-      "name": "MIT9313 protein detected in vesicle proteome (Biller 2014 Table S3)",
-      "metric_type": "vesicle_proteome_member",
-      "value_kind": "boolean",
-      "count": 27,
-      "true_count": 27,
-      "false_count": 0,
-      "dm_total_gene_count": 27,
-      "dm_true_count": 27,
-      "dm_false_count": 0
-    }
+    ...
   ],
   "genes_per_metric_max": 32,
   "genes_per_metric_median": 32.0,
-  "not_found_ids": [],
-  "not_matched_ids": [],
-  "not_found_metric_types": [],
-  "not_matched_metric_types": [],
-  "not_matched_organism": null,
-  "excluded_derived_metrics": [],
-  "warnings": [],
+  "...": "7 empty fields omitted",
   "returned": 0,
   "offset": 0,
   "truncated": true,
@@ -372,8 +329,7 @@ genes_by_boolean_metric(metric_types=['rapid_recovery_low_co2_shock'], flag_valu
     {"gene_category": "Stress response and adaptation", "count": 17},
     {"gene_category": "Unknown", "count": 6},
     {"gene_category": "Coenzyme metabolism", "count": 5},
-    {"gene_category": "Photosynthesis", "count": 2},
-    {"gene_category": "Transcription", "count": 2}
+    ...
   ],
   "by_metric": [
     {
@@ -391,13 +347,7 @@ genes_by_boolean_metric(metric_types=['rapid_recovery_low_co2_shock'], flag_valu
   ],
   "genes_per_metric_max": 38,
   "genes_per_metric_median": 38.0,
-  "not_found_ids": [],
-  "not_matched_ids": [],
-  "not_found_metric_types": [],
-  "not_matched_metric_types": [],
-  "not_matched_organism": null,
-  "excluded_derived_metrics": [],
-  "warnings": [],
+  "...": "7 empty fields omitted",
   "returned": 25,
   "offset": 0,
   "truncated": true,

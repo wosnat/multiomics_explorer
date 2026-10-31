@@ -28,7 +28,7 @@ docs://tools/list_experiments; summary=True first.
 | control_timing | list[string] \| None | None | Keep experiments whose control arm timing is one of: 'matched' (same time or growth state), 'baseline' (control sampled at another time), 'mixed'. Experiments without DE never match. Live values: list_filter_values('control_timing'). |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 

@@ -7,7 +7,7 @@ Resolve a gene identifier (locus tag, gene name, old locus tag, RefSeq protein I
 Use when the input is an exact name, locus tag or alias (no partial matching); for partial / free-text use `genes_by_function`, for what a gene does `gene_overview`.
 Filters: identifier, organism.
 Returns: total_matching, by_organism; one row = one Gene match (locus_tag, gene_name, product, organism_name).
-docs://tools/resolve_gene; summary=True returns by_organism uncapped (larger than the default call).
+docs://tools/resolve_gene; summary=True caps by_organism at 10 too (smaller than the default call).
 
 ## Parameters
 

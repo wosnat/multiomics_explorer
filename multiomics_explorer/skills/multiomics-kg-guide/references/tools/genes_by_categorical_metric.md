@@ -25,7 +25,7 @@ docs://tools/genes_by_categorical_metric; summary=True first.
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | categories | list[string] \| None | None | Filter on `r.value`: keep rows whose value is in this set. Validated against the union of the selected DMs' `allowed_categories` — unknown values raise `ValueError` listing the allowed set. E.g. ['Outer Membrane', 'Periplasmic'] for `predicted_subcellular_localization`. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 25 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 

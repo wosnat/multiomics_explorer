@@ -18,7 +18,7 @@ docs://tools/ontology_landscape.
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Narrows brite and leaves any other ontology in the list untouched; raises when brite is not among them. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | experiment_ids | list[string] \| None | None | Restrict coverage computation to genes quantified in these experiments. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int \| None | 15 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 | min_gene_set_size | int | 5 | Exclude terms with fewer genes than this (default 5). |
@@ -154,195 +154,7 @@ ontology_landscape(organism="MED4")
       "tree_code": null,
       "best_interpro_type": null
     },
-    "go_cc": {
-      "best_level": 2,
-      "best_genome_coverage": 0.40496705524581855,
-      "best_relevance_rank": 11,
-      "n_levels": 6,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "ec": {
-      "best_level": 1,
-      "best_genome_coverage": 0.40293968575772937,
-      "best_relevance_rank": 12,
-      "n_levels": 4,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "kegg": {
-      "best_level": 1,
-      "best_genome_coverage": 0.3841865179929042,
-      "best_relevance_rank": 15,
-      "n_levels": 3,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "interpro": {
-      "best_level": 0,
-      "best_genome_coverage": 0.33046122655854027,
-      "best_relevance_rank": 18,
-      "n_levels": 2,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": "HOMOLOGOUS_SUPERFAMILY"
-    },
-    "brite:enzymes": {
-      "best_level": 1,
-      "best_genome_coverage": 0.31779016725798276,
-      "best_relevance_rank": 20,
-      "n_levels": 4,
-      "tree": "enzymes",
-      "tree_code": "ko01000",
-      "best_interpro_type": null
-    },
-    "subcellular_localization": {
-      "best_level": 0,
-      "best_genome_coverage": 0.1875316776482514,
-      "best_relevance_rank": 26,
-      "n_levels": 1,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "tcdb": {
-      "best_level": 0,
-      "best_genome_coverage": 0.10288900152052712,
-      "best_relevance_rank": 36,
-      "n_levels": 5,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "signal_peptide_type": {
-      "best_level": 0,
-      "best_genome_coverage": 0.05423213380638622,
-      "best_relevance_rank": 42,
-      "n_levels": 1,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "brite:transporters": {
-      "best_level": 0,
-      "best_genome_coverage": 0.04308160162189559,
-      "best_relevance_rank": 45,
-      "n_levels": 3,
-      "tree": "transporters",
-      "tree_code": "ko02000",
-      "best_interpro_type": null
-    },
-    "brite:trna_biogenesis": {
-      "best_level": 0,
-      "best_genome_coverage": 0.03294475418144957,
-      "best_relevance_rank": 48,
-      "n_levels": 3,
-      "tree": "trna_biogenesis",
-      "tree_code": "ko03016",
-      "best_interpro_type": null
-    },
-    "brite:ribosome": {
-      "best_level": 2,
-      "best_genome_coverage": 0.027369488089204256,
-      "best_relevance_rank": 50,
-      "n_levels": 3,
-      "tree": "ribosome",
-      "tree_code": "ko03011",
-      "best_interpro_type": null
-    },
-    "brite:peptidases": {
-      "best_level": 0,
-      "best_genome_coverage": 0.01926001013684744,
-      "best_relevance_rank": 57,
-      "n_levels": 1,
-      "tree": "peptidases",
-      "tree_code": "ko01002",
-      "best_interpro_type": null
-    },
-    "merops": {
-      "best_level": 0,
-      "best_genome_coverage": 0.017232640648758235,
-      "best_relevance_rank": 60,
-      "n_levels": 2,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "cazy": {
-      "best_level": 0,
-      "best_genome_coverage": 0.016218955904713634,
-      "best_relevance_rank": 62,
-      "n_levels": 2,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "brite:chaperones": {
-      "best_level": 0,
-      "best_genome_coverage": 0.012164216928535226,
-      "best_relevance_rank": 64,
-      "n_levels": 1,
-      "tree": "chaperones",
-      "tree_code": "ko03110",
-      "best_interpro_type": null
-    },
-    "brite:dna_replication": {
-      "best_level": 0,
-      "best_genome_coverage": 0.011150532184490624,
-      "best_relevance_rank": 65,
-      "n_levels": 4,
-      "tree": "dna_replication",
-      "tree_code": "ko03032",
-      "best_interpro_type": null
-    },
-    "brite:translation_factors": {
-      "best_level": 0,
-      "best_genome_coverage": 0.008109477952356817,
-      "best_relevance_rank": 67,
-      "n_levels": 2,
-      "tree": "translation_factors",
-      "tree_code": "ko03012",
-      "best_interpro_type": null
-    },
-    "ncbifam": {
-      "best_level": 0,
-      "best_genome_coverage": 0.008109477952356817,
-      "best_relevance_rank": 68,
-      "n_levels": 1,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "brite:transcription_factors": {
-      "best_level": 0,
-      "best_genome_coverage": 0.00506842372022301,
-      "best_relevance_rank": 73,
-      "n_levels": 2,
-      "tree": "transcription_factors",
-      "tree_code": "ko03000",
-      "best_interpro_type": null
-    },
-    "brite:secretion": {
-      "best_level": 0,
-      "best_genome_coverage": 0.00456158134820071,
-      "best_relevance_rank": 74,
-      "n_levels": 2,
-      "tree": "secretion",
-      "tree_code": "ko02044",
-      "best_interpro_type": null
-    },
-    "brite:two_component": {
-      "best_level": 0,
-      "best_genome_coverage": 0.0030410542321338066,
-      "best_relevance_rank": 79,
-      "n_levels": 1,
-      "tree": "two_component",
-      "tree_code": "ko02022",
-      "best_interpro_type": null
-    }
+    "...": "+21 more"
   },
   "not_found": [],
   "not_matched": [],
@@ -350,6 +162,16 @@ ontology_landscape(organism="MED4")
   "returned": 15,
   "truncated": true,
   "offset": 0,
+  "...": "3 empty fields omitted (filters_applied, skipped_ontologies, warnings)",
+  "trust_axes": {
+    "go_bp": ["sources", "evidence", "evidence_score"],
+    "go_mf": ["sources", "evidence", "evidence_score"],
+    "go_cc": ["sources", "evidence", "evidence_score"],
+    "ec": ["sources", "evidence", "evidence_score"],
+    "kegg": ["sources", "evidence"],
+    "cog_category": ["sources", "evidence"],
+    "...": "+11 more"
+  },
   "results": [
     {
       "ontology_type": "tigr_role",
@@ -429,6 +251,8 @@ ontology_landscape(organism="MED4", ontology="go_bp", verbose=True)
   "returned": 9,
   "truncated": false,
   "offset": 0,
+  "...": "3 empty fields omitted (filters_applied, skipped_ontologies, warnings)",
+  "trust_axes": {"go_bp": ["sources", "evidence", "evidence_score"]},
   "results": [
     {
       "ontology_type": "go_bp",
@@ -540,6 +364,8 @@ ontology_landscape(organism="MED4", ontology=["tcdb", "cazy"])
   "returned": 7,
   "truncated": false,
   "offset": 0,
+  "...": "3 empty fields omitted (filters_applied, skipped_ontologies, warnings)",
+  "trust_axes": {"tcdb": ["sources", "evidence", "tier"], "cazy": ["sources", "evidence", "evidence_score"]},
   "results": [
     {
       "ontology_type": "tcdb",
@@ -628,6 +454,8 @@ ontology_landscape(organism="MED4", ontology=["interpro", "merops"])
   "returned": 8,
   "truncated": false,
   "offset": 0,
+  "...": "3 empty fields omitted (filters_applied, skipped_ontologies, warnings)",
+  "trust_axes": {"interpro": ["sources", "evidence"], "merops": ["sources", "evidence", "evidence_score", ...]},
   "results": [
     {
       "ontology_type": "interpro",
@@ -690,105 +518,6 @@ ontology_landscape(organism="MED4", ontology="interpro", verbose=True)
 
 *Like BRITE's per-tree rows, InterPro rows are broken down per `interpro_type` instead of one pooled row — HOMOLOGOUS_SUPERFAMILY, DOMAIN, FAMILY, REPEAT, CONSERVED_SITE, ACTIVE_SITE, BINDING_SITE, PTM size very differently (MED4 level 0: HOMOLOGOUS_SUPERFAMILY 74 testable terms, DOMAIN 47, FAMILY 5, the rest ≤ 4). Pass `interpro_type=` to keep one type only.*
 
-```example-response
-{
-  "organism_name": "Prochlorococcus MED4",
-  "organism_gene_count": 1973,
-  "n_ontologies": 1,
-  "by_ontology": {
-    "interpro": {
-      "best_level": 0,
-      "best_genome_coverage": 0.33046122655854027,
-      "best_relevance_rank": 1,
-      "n_levels": 2,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": "HOMOLOGOUS_SUPERFAMILY"
-    }
-  },
-  "not_found": [],
-  "not_matched": [],
-  "total_matching": 6,
-  "returned": 6,
-  "truncated": false,
-  "offset": 0,
-  "results": [
-    {
-      "ontology_type": "interpro",
-      "level": 0,
-      "interpro_type": "HOMOLOGOUS_SUPERFAMILY",
-      "relevance_rank": 1,
-      "n_terms_with_genes": 74,
-      "n_genes_at_level": 652,
-      "genome_coverage": 0.33046122655854027,
-      "min_genes_per_term": 5,
-      "q1_genes_per_term": 6.0,
-      "median_genes_per_term": 7.0,
-      "q3_genes_per_term": 11.75,
-      "max_genes_per_term": 119,
-      "n_levels_in_ontology": 2,
-      "best_effort_share": null,
-      "example_terms": [
-        {
-          "term_id": "interpro:IPR027417",
-          "name": "P-loop containing nucleoside triphosphate hydrolase",
-          "n_genes": 119
-        },
-        {"term_id": "interpro:IPR036291", "name": "NAD(P)-binding domain superfamily", "n_genes": 54},
-        {"term_id": "interpro:IPR013785", "name": "Aldolase-type TIM barrel", "n_genes": 32}
-      ]
-    },
-    {
-      "ontology_type": "interpro",
-      "level": 0,
-      "interpro_type": "DOMAIN",
-      "relevance_rank": 2,
-      "n_terms_with_genes": 47,
-      "n_genes_at_level": 283,
-      "genome_coverage": 0.1434363912823112,
-      "min_genes_per_term": 5,
-      "q1_genes_per_term": 5.0,
-      "median_genes_per_term": 6.0,
-      "q3_genes_per_term": 7.0,
-      "max_genes_per_term": 49,
-      "n_levels_in_ontology": 2,
-      "best_effort_share": null,
-      "example_terms": [
-        {"term_id": "interpro:IPR003593", "name": "AAA+ ATPase domain", "n_genes": 49},
-        {"term_id": "interpro:IPR001509", "name": "NAD-dependent epimerase/dehydratase", "n_genes": 12},
-        {"term_id": "interpro:IPR001173", "name": "Glycosyltransferase 2-like", "n_genes": 12}
-      ]
-    },
-    {
-      "ontology_type": "interpro",
-      "level": 1,
-      "interpro_type": "DOMAIN",
-      "relevance_rank": 3,
-      "n_terms_with_genes": 4,
-      "n_genes_at_level": 46,
-      "genome_coverage": 0.02331474911302585,
-      "min_genes_per_term": 5,
-      "q1_genes_per_term": 5.75,
-      "median_genes_per_term": 7.0,
-      "q3_genes_per_term": 12.75,
-      "max_genes_per_term": 27,
-      "n_levels_in_ontology": 2,
-      "best_effort_share": null,
-      "example_terms": [
-        {"term_id": "interpro:IPR003439", "name": "ABC transporter-like, ATP-binding domain", "n_genes": 27},
-        {
-          "term_id": "interpro:IPR006638",
-          "name": "Elp3/MiaA/NifB-like, radical SAM core domain",
-          "n_genes": 8
-        },
-        {"term_id": "interpro:IPR011545", "name": "DEAD/DEAH-box helicase domain", "n_genes": 6}
-      ]
-    },
-    ...
-  ]
-}
-```
-
 ### Example 7: MEROPS landscape scoped to peptidase calls (call_class filter)
 
 ```example-call
@@ -817,6 +546,10 @@ ontology_landscape(organism="MED4", ontology="merops", call_class=["peptidase"])
   "returned": 2,
   "truncated": false,
   "offset": 0,
+  "filters_applied": {"call_class": ["peptidase"]},
+  "trust_axes": {"merops": ["sources", "evidence", "evidence_score", ...]},
+  "skipped_ontologies": [],
+  "warnings": [],
   "results": [
     {
       "ontology_type": "merops",
@@ -860,313 +593,6 @@ ontology_landscape(organism="MED4", informative_only=False)
 
 *`ontology_landscape` defaults to `informative_only=True` (as do the two enrichment tools; `search_ontology` / `genes_by_ontology` / `gene_ontology_terms` default False) — the ranking surface for enrichment should reflect informative terms only. Pass `informative_only=False` for an unfiltered census, e.g. when triaging coverage gaps or comparing unfiltered vs filtered genome_coverage. Term counts and genome_coverage rise slightly (MED4 KEGG level 3: 30 KO terms; at KEGG level 2 the global / overview maps such as ko01100 are flagged and drop out under the default).*
 
-```example-response
-{
-  "organism_name": "Prochlorococcus MED4",
-  "organism_gene_count": 1973,
-  "n_ontologies": 17,
-  "by_ontology": {
-    "tigr_role": {
-      "best_level": 1,
-      "best_genome_coverage": 0.8773441459706032,
-      "best_relevance_rank": 1,
-      "n_levels": 2,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "cyanorak_role": {
-      "best_level": 1,
-      "best_genome_coverage": 0.728839330968069,
-      "best_relevance_rank": 2,
-      "n_levels": 3,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "go_mf": {
-      "best_level": 2,
-      "best_genome_coverage": 0.5793208312214901,
-      "best_relevance_rank": 4,
-      "n_levels": 7,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "go_bp": {
-      "best_level": 3,
-      "best_genome_coverage": 0.5428281804358844,
-      "best_relevance_rank": 6,
-      "n_levels": 9,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "pfam": {
-      "best_level": 0,
-      "best_genome_coverage": 0.43740496705524584,
-      "best_relevance_rank": 11,
-      "n_levels": 2,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "cog_category": {
-      "best_level": 0,
-      "best_genome_coverage": 0.5641155600608211,
-      "best_relevance_rank": 12,
-      "n_levels": 1,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "go_cc": {
-      "best_level": 2,
-      "best_genome_coverage": 0.40496705524581855,
-      "best_relevance_rank": 13,
-      "n_levels": 6,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "ec": {
-      "best_level": 1,
-      "best_genome_coverage": 0.40293968575772937,
-      "best_relevance_rank": 14,
-      "n_levels": 4,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "kegg": {
-      "best_level": 1,
-      "best_genome_coverage": 0.3841865179929042,
-      "best_relevance_rank": 15,
-      "n_levels": 3,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "interpro": {
-      "best_level": 0,
-      "best_genome_coverage": 0.33046122655854027,
-      "best_relevance_rank": 18,
-      "n_levels": 2,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": "HOMOLOGOUS_SUPERFAMILY"
-    },
-    "brite:enzymes": {
-      "best_level": 1,
-      "best_genome_coverage": 0.31779016725798276,
-      "best_relevance_rank": 20,
-      "n_levels": 4,
-      "tree": "enzymes",
-      "tree_code": "ko01000",
-      "best_interpro_type": null
-    },
-    "subcellular_localization": {
-      "best_level": 0,
-      "best_genome_coverage": 0.1875316776482514,
-      "best_relevance_rank": 26,
-      "n_levels": 1,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "tcdb": {
-      "best_level": 0,
-      "best_genome_coverage": 0.10288900152052712,
-      "best_relevance_rank": 36,
-      "n_levels": 5,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "signal_peptide_type": {
-      "best_level": 0,
-      "best_genome_coverage": 0.05423213380638622,
-      "best_relevance_rank": 42,
-      "n_levels": 1,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "brite:transporters": {
-      "best_level": 0,
-      "best_genome_coverage": 0.04308160162189559,
-      "best_relevance_rank": 45,
-      "n_levels": 3,
-      "tree": "transporters",
-      "tree_code": "ko02000",
-      "best_interpro_type": null
-    },
-    "brite:trna_biogenesis": {
-      "best_level": 0,
-      "best_genome_coverage": 0.03294475418144957,
-      "best_relevance_rank": 48,
-      "n_levels": 3,
-      "tree": "trna_biogenesis",
-      "tree_code": "ko03016",
-      "best_interpro_type": null
-    },
-    "brite:ribosome": {
-      "best_level": 2,
-      "best_genome_coverage": 0.027369488089204256,
-      "best_relevance_rank": 50,
-      "n_levels": 3,
-      "tree": "ribosome",
-      "tree_code": "ko03011",
-      "best_interpro_type": null
-    },
-    "brite:peptidases": {
-      "best_level": 0,
-      "best_genome_coverage": 0.01926001013684744,
-      "best_relevance_rank": 58,
-      "n_levels": 1,
-      "tree": "peptidases",
-      "tree_code": "ko01002",
-      "best_interpro_type": null
-    },
-    "merops": {
-      "best_level": 0,
-      "best_genome_coverage": 0.017232640648758235,
-      "best_relevance_rank": 61,
-      "n_levels": 2,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "cazy": {
-      "best_level": 0,
-      "best_genome_coverage": 0.016218955904713634,
-      "best_relevance_rank": 63,
-      "n_levels": 2,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "brite:chaperones": {
-      "best_level": 0,
-      "best_genome_coverage": 0.012164216928535226,
-      "best_relevance_rank": 64,
-      "n_levels": 1,
-      "tree": "chaperones",
-      "tree_code": "ko03110",
-      "best_interpro_type": null
-    },
-    "brite:dna_replication": {
-      "best_level": 0,
-      "best_genome_coverage": 0.011150532184490624,
-      "best_relevance_rank": 65,
-      "n_levels": 4,
-      "tree": "dna_replication",
-      "tree_code": "ko03032",
-      "best_interpro_type": null
-    },
-    "brite:translation_factors": {
-      "best_level": 0,
-      "best_genome_coverage": 0.008109477952356817,
-      "best_relevance_rank": 67,
-      "n_levels": 2,
-      "tree": "translation_factors",
-      "tree_code": "ko03012",
-      "best_interpro_type": null
-    },
-    "ncbifam": {
-      "best_level": 0,
-      "best_genome_coverage": 0.008109477952356817,
-      "best_relevance_rank": 68,
-      "n_levels": 1,
-      "tree": null,
-      "tree_code": null,
-      "best_interpro_type": null
-    },
-    "brite:transcription_factors": {
-      "best_level": 0,
-      "best_genome_coverage": 0.00506842372022301,
-      "best_relevance_rank": 73,
-      "n_levels": 2,
-      "tree": "transcription_factors",
-      "tree_code": "ko03000",
-      "best_interpro_type": null
-    },
-    "brite:secretion": {
-      "best_level": 0,
-      "best_genome_coverage": 0.00456158134820071,
-      "best_relevance_rank": 74,
-      "n_levels": 2,
-      "tree": "secretion",
-      "tree_code": "ko02044",
-      "best_interpro_type": null
-    },
-    "brite:two_component": {
-      "best_level": 0,
-      "best_genome_coverage": 0.0030410542321338066,
-      "best_relevance_rank": 79,
-      "n_levels": 1,
-      "tree": "two_component",
-      "tree_code": "ko02022",
-      "best_interpro_type": null
-    }
-  },
-  "not_found": [],
-  "not_matched": [],
-  "total_matching": 81,
-  "returned": 15,
-  "truncated": true,
-  "offset": 0,
-  "results": [
-    {
-      "ontology_type": "tigr_role",
-      "level": 1,
-      "relevance_rank": 1,
-      "n_terms_with_genes": 79,
-      "n_genes_at_level": 1731,
-      "genome_coverage": 0.8773441459706032,
-      "min_genes_per_term": 5,
-      "q1_genes_per_term": 7.0,
-      "median_genes_per_term": 13.0,
-      "q3_genes_per_term": 24.0,
-      "max_genes_per_term": 456,
-      "n_levels_in_ontology": 2,
-      "best_effort_share": null
-    },
-    {
-      "ontology_type": "cyanorak_role",
-      "level": 1,
-      "relevance_rank": 2,
-      "n_terms_with_genes": 69,
-      "n_genes_at_level": 1438,
-      "genome_coverage": 0.728839330968069,
-      "min_genes_per_term": 5,
-      "q1_genes_per_term": 9.0,
-      "median_genes_per_term": 14.0,
-      "q3_genes_per_term": 23.0,
-      "max_genes_per_term": 340,
-      "n_levels_in_ontology": 3,
-      "best_effort_share": null
-    },
-    {
-      "ontology_type": "tigr_role",
-      "level": 0,
-      "relevance_rank": 3,
-      "n_terms_with_genes": 19,
-      "n_genes_at_level": 1763,
-      "genome_coverage": 0.8935631018753167,
-      "min_genes_per_term": 7,
-      "q1_genes_per_term": 39.5,
-      "median_genes_per_term": 76.0,
-      "q3_genes_per_term": 125.5,
-      "max_genes_per_term": 456,
-      "n_levels_in_ontology": 2,
-      "best_effort_share": null
-    },
-    ...
-  ]
-}
-```
-
 ### Example 9: Flat structural ontologies — PSORTb + SignalP have a single level 0
 
 ```example-call
@@ -1206,6 +632,8 @@ ontology_landscape(organism="MED4", ontology=["subcellular_localization", "signa
   "returned": 2,
   "truncated": false,
   "offset": 0,
+  "...": "3 empty fields omitted (filters_applied, skipped_ontologies, warnings)",
+  "trust_axes": {"subcellular_localization": [], "signal_peptide_type": []},
   "results": [
     {
       "ontology_type": "subcellular_localization",

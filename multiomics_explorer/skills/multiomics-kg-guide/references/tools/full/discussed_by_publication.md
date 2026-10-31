@@ -17,7 +17,7 @@ docs://tools/discussed_by_publication; summary=True first.
 | entity_kind | string ('gene', 'kegg_pathway') \| None | None | Restrict to one arm: 'gene' or 'kegg_pathway'. None = both. |
 | prominence | string ('central', 'peripheral') \| None | None | Filter edges by prominence: 'central' or 'peripheral'. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 50 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -79,14 +79,12 @@ discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"])
     {"id": "kegg.pathway:ko00010", "name": "Glycolysis / Gluconeogenesis", "n": 1},
     {"id": "kegg.pathway:ko00710", "name": "Carbon fixation by Calvin cycle", "n": 1},
     {"id": "kegg.pathway:ko00030", "name": "Pentose phosphate pathway", "n": 1},
-    {"id": "kegg.pathway:ko00061", "name": "Fatty acid biosynthesis", "n": 1},
-    {"id": "kegg.pathway:ko00860", "name": "Porphyrin metabolism", "n": 1},
     ...
   ],
   "top_publications": [
     {
       "doi": "10.1038/ismej.2016.70",
-      "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences between strains and ...",
+      "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences ...",
       "n": 37
     }
   ],
@@ -144,14 +142,12 @@ discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"], entity_kind
     {"id": "kegg.pathway:ko00010", "name": "Glycolysis / Gluconeogenesis", "n": 1},
     {"id": "kegg.pathway:ko00710", "name": "Carbon fixation by Calvin cycle", "n": 1},
     {"id": "kegg.pathway:ko00030", "name": "Pentose phosphate pathway", "n": 1},
-    {"id": "kegg.pathway:ko00061", "name": "Fatty acid biosynthesis", "n": 1},
-    {"id": "kegg.pathway:ko00860", "name": "Porphyrin metabolism", "n": 1},
     ...
   ],
   "top_publications": [
     {
       "doi": "10.1038/ismej.2016.70",
-      "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences between strains and ...",
+      "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences ...",
       "n": 8
     }
   ],
@@ -221,14 +217,12 @@ discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"], entity_kind
     {"id": "kegg.pathway:ko00010", "name": "Glycolysis / Gluconeogenesis", "n": 1},
     {"id": "kegg.pathway:ko00710", "name": "Carbon fixation by Calvin cycle", "n": 1},
     {"id": "kegg.pathway:ko00030", "name": "Pentose phosphate pathway", "n": 1},
-    {"id": "kegg.pathway:ko00061", "name": "Fatty acid biosynthesis", "n": 1},
-    {"id": "kegg.pathway:ko00860", "name": "Porphyrin metabolism", "n": 1},
     ...
   ],
   "top_publications": [
     {
       "doi": "10.1038/ismej.2016.70",
-      "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences between strains and ...",
+      "title": "Transcriptional response of Prochlorococcus to co-culture with a marine Alteromonas: differences ...",
       "n": 8
     }
   ],
@@ -242,7 +236,7 @@ discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"], entity_kind
       "entity_name": "Photosynthesis",
       "organism": null,
       "prominence": "central",
-      "evidence": "expression of genes involved in photosynthesis ... decreased in MED4 and increased in MIT9313 (Abstract, p1; Results,..."
+      "evidence": "expression of genes involved in photosynthesis ... decreased in MED4 and increased in MIT9313 (Ab..."
     },
     {
       "doi": "10.1038/ismej.2016.70",
@@ -251,7 +245,7 @@ discussed_by_publication(publication_dois=["10.1038/ismej.2016.70"], entity_kind
       "entity_name": "Biosynthesis of amino acids",
       "organism": null,
       "prominence": "central",
-      "evidence": "genes involved in the biosynthesis of amino acids ... less abundantly expressed in MED4+1A3 (p6, Results)"
+      "evidence": "genes involved in the biosynthesis of amino acids ... less abundantly expressed in MED4+1A3 (p6, ..."
     },
     {
       "doi": "10.1038/ismej.2016.70",

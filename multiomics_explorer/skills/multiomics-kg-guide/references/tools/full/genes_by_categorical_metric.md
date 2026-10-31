@@ -25,7 +25,7 @@ docs://tools/genes_by_categorical_metric; summary=True first.
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | categories | list[string] \| None | None | Filter on `r.value`: keep rows whose value is in this set. Validated against the union of the selected DMs' `allowed_categories` — unknown values raise `ValueError` listing the allowed set. E.g. ['Outer Membrane', 'Periplasmic'] for `predicted_subcellular_localization`. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 25 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -125,8 +125,7 @@ genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'],
     {"gene_category": "Cell wall and membrane", "count": 5},
     {"gene_category": "Post-translational modification", "count": 3},
     {"gene_category": "Stress response and adaptation", "count": 3},
-    {"gene_category": "Cell motility", "count": 1},
-    {"gene_category": "Signal transduction", "count": 1}
+    ...
   ],
   "by_metric": [
     {
@@ -136,43 +135,20 @@ genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'],
       "value_kind": "categorical",
       "count": 8,
       "by_category": [{"category": "Outer Membrane", "count": 5}, {"category": "Periplasmic", "count": 3}],
-      "allowed_categories": ["Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic", "Outer Membrane", "Extracellular", ...],
+      "allowed_categories": ["Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic", ...],
       "dm_total_gene_count": 32,
       "dm_by_category": [
         {"category": "Cytoplasmic", "count": 11},
         {"category": "Unknown", "count": 7},
         {"category": "Cytoplasmic Membrane", "count": 6},
-        {"category": "Outer Membrane", "count": 5},
-        {"category": "Periplasmic", "count": 3}
+        ...
       ]
     },
-    {
-      "derived_metric_id": "derived_metric:science.1243457:s3_mit9313_vesicle_proteome:predicted_subcellular_localization",
-      "name": "MIT9313 vesicle protein PSORTb predicted localization (Biller 2014 Table S3)",
-      "metric_type": "predicted_subcellular_localization",
-      "value_kind": "categorical",
-      "count": 6,
-      "by_category": [{"category": "Periplasmic", "count": 3}, {"category": "Outer Membrane", "count": 3}],
-      "allowed_categories": ["Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic", "Outer Membrane", "Extracellular", ...],
-      "dm_total_gene_count": 27,
-      "dm_by_category": [
-        {"category": "Unknown", "count": 15},
-        {"category": "Cytoplasmic", "count": 3},
-        {"category": "Extracellular", "count": 3},
-        {"category": "Outer Membrane", "count": 3},
-        {"category": "Periplasmic", "count": 3}
-      ]
-    }
+    ...
   ],
   "genes_per_metric_max": 8,
   "genes_per_metric_median": 8.0,
-  "not_found_ids": [],
-  "not_matched_ids": [],
-  "not_found_metric_types": [],
-  "not_matched_metric_types": [],
-  "not_matched_organism": null,
-  "excluded_derived_metrics": [],
-  "warnings": [],
+  "...": "7 empty fields omitted",
   "returned": 14,
   "offset": 0,
   "truncated": false,
@@ -231,8 +207,7 @@ genes_by_categorical_metric(metric_types=['darkness_survival_class'], categories
     {"gene_category": "Stress response and adaptation", "count": 25},
     {"gene_category": "Photosynthesis", "count": 13},
     {"gene_category": "Translation", "count": 10},
-    {"gene_category": "Unknown", "count": 10},
-    {"gene_category": "Coenzyme metabolism", "count": 5}
+    ...
   ],
   "by_metric": [
     {
@@ -257,13 +232,7 @@ genes_by_categorical_metric(metric_types=['darkness_survival_class'], categories
   ],
   "genes_per_metric_max": 95,
   "genes_per_metric_median": 95.0,
-  "not_found_ids": [],
-  "not_matched_ids": [],
-  "not_found_metric_types": [],
-  "not_matched_metric_types": [],
-  "not_matched_organism": null,
-  "excluded_derived_metrics": [],
-  "warnings": [],
+  "...": "7 empty fields omitted",
   "returned": 25,
   "offset": 0,
   "truncated": true,
@@ -322,16 +291,13 @@ genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'],
     {"category": "Unknown", "count": 22},
     {"category": "Cytoplasmic", "count": 14},
     {"category": "Outer Membrane", "count": 8},
-    {"category": "Cytoplasmic Membrane", "count": 6},
-    {"category": "Periplasmic", "count": 6},
     ...
   ],
   "top_categories": [
     {"gene_category": "Unknown", "count": 12},
     {"gene_category": "Stress response and adaptation", "count": 9},
     {"gene_category": "Cell wall and membrane", "count": 9},
-    {"gene_category": "Translation", "count": 6},
-    {"gene_category": "Post-translational modification", "count": 4}
+    ...
   ],
   "by_metric": [
     {
@@ -344,52 +310,22 @@ genes_by_categorical_metric(metric_types=['predicted_subcellular_localization'],
         {"category": "Cytoplasmic", "count": 11},
         {"category": "Unknown", "count": 7},
         {"category": "Cytoplasmic Membrane", "count": 6},
-        {"category": "Outer Membrane", "count": 5},
-        {"category": "Periplasmic", "count": 3}
+        ...
       ],
-      "allowed_categories": ["Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic", "Outer Membrane", "Extracellular", ...],
+      "allowed_categories": ["Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic", ...],
       "dm_total_gene_count": 32,
       "dm_by_category": [
         {"category": "Cytoplasmic", "count": 11},
         {"category": "Unknown", "count": 7},
         {"category": "Cytoplasmic Membrane", "count": 6},
-        {"category": "Outer Membrane", "count": 5},
-        {"category": "Periplasmic", "count": 3}
+        ...
       ]
     },
-    {
-      "derived_metric_id": "derived_metric:science.1243457:s3_mit9313_vesicle_proteome:predicted_subcellular_localization",
-      "name": "MIT9313 vesicle protein PSORTb predicted localization (Biller 2014 Table S3)",
-      "metric_type": "predicted_subcellular_localization",
-      "value_kind": "categorical",
-      "count": 27,
-      "by_category": [
-        {"category": "Unknown", "count": 15},
-        {"category": "Extracellular", "count": 3},
-        {"category": "Periplasmic", "count": 3},
-        {"category": "Cytoplasmic", "count": 3},
-        {"category": "Outer Membrane", "count": 3}
-      ],
-      "allowed_categories": ["Cytoplasmic", "Cytoplasmic Membrane", "Periplasmic", "Outer Membrane", "Extracellular", ...],
-      "dm_total_gene_count": 27,
-      "dm_by_category": [
-        {"category": "Unknown", "count": 15},
-        {"category": "Cytoplasmic", "count": 3},
-        {"category": "Extracellular", "count": 3},
-        {"category": "Outer Membrane", "count": 3},
-        {"category": "Periplasmic", "count": 3}
-      ]
-    }
+    ...
   ],
   "genes_per_metric_max": 32,
   "genes_per_metric_median": 32.0,
-  "not_found_ids": [],
-  "not_matched_ids": [],
-  "not_found_metric_types": [],
-  "not_matched_metric_types": [],
-  "not_matched_organism": null,
-  "excluded_derived_metrics": [],
-  "warnings": [],
+  "...": "7 empty fields omitted",
   "returned": 0,
   "offset": 0,
   "truncated": true,

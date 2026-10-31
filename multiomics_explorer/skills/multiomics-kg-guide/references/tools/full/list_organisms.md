@@ -7,7 +7,7 @@ Every organism with taxonomy and per-organism capability rollups — gene, publi
 Use to pick an organism or check what data it carries before scoping another tool; for gene lookup use `resolve_gene`.
 Filters: organism_names, compartment.
 Returns: by_organism_type, top_metabolic_capability, top_annotation_capability, by_measurement_capability, not_found; one row = one OrganismTaxon.
-docs://tools/list_organisms; summary=True is uncapped (larger than the default call).
+docs://tools/list_organisms; summary=True caps the same rollups at 10 (smaller than the default call).
 
 ## Parameters
 
@@ -16,7 +16,7 @@ docs://tools/list_organisms; summary=True is uncapped (larger than the default c
 | organism_names | list[string] \| None | None | Filter by organism: case-insensitive word match on preferred_name and name_synonyms, like every other tool's organism param ('MED4', 'Prochlorococcus MED4'; the synonym 'Meiothermus taiwanensis' resolves to 'Meiothermus ruber'); a genus word like 'Alteromonas' matches every strain. Unknown names are reported in not_found rather than raising. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -34,12 +34,12 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 - **by_organism_type** (list[OrgTypeBreakdown]): Organism counts per type over the matched set, sorted desc.
 - **by_value_kind** (list[OrgValueKindBreakdown]): DM value_kind frequency rollup across matched organisms.
 - **by_metric_type** (list[OrgMetricTypeBreakdown]): DM metric_type frequency rollup across matched organisms.
-- **by_metric_type_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
+- **by_metric_type_truncated** (bool | None): True when the list was capped at 10 (detail and summary calls alike).
 - **by_compartment** (list[OrgCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched organisms.
-- **top_metabolic_capability** (list[OrgMetabolicCapabilityBreakdown]): Top 10 organisms by catalyzed_metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites. `summary=True` returns the full ranked list.
-- **top_metabolic_capability_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
-- **top_annotation_capability** (list[OrgAnnotationCapabilityBreakdown]): Top 10 organisms (within matched set) by peptidase_gene_count desc, then preferred_name. Carries all four annotation counts; excludes organisms with all four = 0. [] when none. Coverage ranking for reading, not a filter. `summary=True` returns the full ranked list.
-- **top_annotation_capability_truncated** (bool | None): True when the list was capped at 10 — `summary=True` returns the full list.
+- **top_metabolic_capability** (list[OrgMetabolicCapabilityBreakdown]): Top 10 organisms by catalyzed_metabolite_count (within matched set), sorted desc. Filter excludes organisms with zero chemistry. [] when no matched organism has chemistry. Use list_metabolites(organism_names=[organism_name]) on top entries to enumerate their metabolites. Capped at 10 in summary mode too; every organism's counts are on its row.
+- **top_metabolic_capability_truncated** (bool | None): True when the list was capped at 10 (detail and summary calls alike).
+- **top_annotation_capability** (list[OrgAnnotationCapabilityBreakdown]): Top 10 organisms (within matched set) by peptidase_gene_count desc, then preferred_name. Carries all four annotation counts; excludes organisms with all four = 0. [] when none. Coverage ranking for reading, not a filter. Capped at 10 in summary mode too; every organism's counts are on its row.
+- **top_annotation_capability_truncated** (bool | None): True when the list was capped at 10 (detail and summary calls alike).
 - **by_measurement_capability** (OrgMeasurementCapability): Binary rollup of metabolomics measurement coverage across matched organisms: {has_metabolomics, no_metabolomics} (tool-specific deviation from list_/by_-style frequency rollups elsewhere — exactly two keys).
 - **returned** (int): Number of results returned.
 - **offset** (int): Offset into full result set.
@@ -114,8 +114,7 @@ list_organisms()
     {"cluster_type": "genomic_island", "count": 11},
     {"cluster_type": "time_course", "count": 3},
     {"cluster_type": "condition_comparison", "count": 3},
-    {"cluster_type": "diel", "count": 2},
-    {"cluster_type": "decay_pattern", "count": 1}
+    ...
   ],
   "by_organism_type": [
     {"organism_type": "genome_strain", "count": 116},
@@ -131,8 +130,6 @@ list_organisms()
     {"metric_type": "sbp_nutrient_class", "count": 95},
     {"metric_type": "sbp_predicted_substrate", "count": 95},
     {"metric_type": "exoproteome_avg_pct_nsaf", "count": 9},
-    {"metric_type": "exoproteome_detection_status", "count": 9},
-    {"metric_type": "log2_mv_cell_enrichment", "count": 6},
     ...
   ],
   "by_metric_type_truncated": true,
@@ -163,20 +160,6 @@ list_organisms()
       "transported_metabolite_count": 147,
       "go_transport_metabolite_count": 101
     },
-    {
-      "organism_name": "Alteromonas (MarRef v6)",
-      "reaction_count": 1263,
-      "catalyzed_metabolite_count": 1356,
-      "transported_metabolite_count": 128,
-      "go_transport_metabolite_count": 75
-    },
-    {
-      "organism_name": "Alteromonas macleodii MIT1002",
-      "reaction_count": 1288,
-      "catalyzed_metabolite_count": 1352,
-      "transported_metabolite_count": 142,
-      "go_transport_metabolite_count": 91
-    },
     ...
   ],
   "top_metabolic_capability_truncated": true,
@@ -205,22 +188,6 @@ list_organisms()
       "interpro_gene_count": 3636,
       "ncbifam_gene_count": 1853
     },
-    {
-      "preferred_name": "Alteromonas macleodii 83-1",
-      "organism_name": "Alteromonas macleodii 83-1",
-      "peptidase_gene_count": 127,
-      "nonpeptidase_homolog_gene_count": 33,
-      "interpro_gene_count": 3605,
-      "ncbifam_gene_count": 1656
-    },
-    {
-      "preferred_name": "Alteromonas macleodii BGP6",
-      "organism_name": "Alteromonas macleodii BGP6",
-      "peptidase_gene_count": 127,
-      "nonpeptidase_homolog_gene_count": 33,
-      "interpro_gene_count": 3608,
-      "ncbifam_gene_count": 1656
-    },
     ...
   ],
   "top_annotation_capability_truncated": true,
@@ -235,9 +202,6 @@ list_organisms()
       "organism_name": "Alteromonas",
       "organism_type": "treatment",
       "genus": "Alteromonas",
-      "species": null,
-      "strain": null,
-      "clade": null,
       "ncbi_taxon_id": 28108,
       "gene_count": 0,
       "publication_count": 0,
@@ -260,7 +224,8 @@ list_organisms()
       "peptidase_gene_count": 0,
       "nonpeptidase_homolog_gene_count": 0,
       "interpro_gene_count": 0,
-      "ncbifam_gene_count": 0
+      "ncbifam_gene_count": 0,
+      "...": "3 null fields omitted (species, strain, clade)"
     },
     {
       "organism_name": "Alteromonas (MarRef v6)",
@@ -345,8 +310,7 @@ list_organisms(summary=True)
     {"cluster_type": "genomic_island", "count": 11},
     {"cluster_type": "time_course", "count": 3},
     {"cluster_type": "condition_comparison", "count": 3},
-    {"cluster_type": "diel", "count": 2},
-    {"cluster_type": "decay_pattern", "count": 1}
+    ...
   ],
   "by_organism_type": [
     {"organism_type": "genome_strain", "count": 116},
@@ -362,11 +326,9 @@ list_organisms(summary=True)
     {"metric_type": "sbp_nutrient_class", "count": 95},
     {"metric_type": "sbp_predicted_substrate", "count": 95},
     {"metric_type": "exoproteome_avg_pct_nsaf", "count": 9},
-    {"metric_type": "exoproteome_detection_status", "count": 9},
-    {"metric_type": "log2_mv_cell_enrichment", "count": 6},
     ...
   ],
-  "by_metric_type_truncated": null,
+  "by_metric_type_truncated": true,
   "by_compartment": [
     {"compartment": "whole_cell", "count": 102},
     {"compartment": "exoproteome", "count": 10},
@@ -394,23 +356,9 @@ list_organisms(summary=True)
       "transported_metabolite_count": 147,
       "go_transport_metabolite_count": 101
     },
-    {
-      "organism_name": "Alteromonas (MarRef v6)",
-      "reaction_count": 1263,
-      "catalyzed_metabolite_count": 1356,
-      "transported_metabolite_count": 128,
-      "go_transport_metabolite_count": 75
-    },
-    {
-      "organism_name": "Alteromonas macleodii MIT1002",
-      "reaction_count": 1288,
-      "catalyzed_metabolite_count": 1352,
-      "transported_metabolite_count": 142,
-      "go_transport_metabolite_count": 91
-    },
     ...
   ],
-  "top_metabolic_capability_truncated": null,
+  "top_metabolic_capability_truncated": true,
   "top_annotation_capability": [
     {
       "preferred_name": "Alteromonas (MarRef v6)",
@@ -436,25 +384,9 @@ list_organisms(summary=True)
       "interpro_gene_count": 3636,
       "ncbifam_gene_count": 1853
     },
-    {
-      "preferred_name": "Alteromonas macleodii 83-1",
-      "organism_name": "Alteromonas macleodii 83-1",
-      "peptidase_gene_count": 127,
-      "nonpeptidase_homolog_gene_count": 33,
-      "interpro_gene_count": 3605,
-      "ncbifam_gene_count": 1656
-    },
-    {
-      "preferred_name": "Alteromonas macleodii BGP6",
-      "organism_name": "Alteromonas macleodii BGP6",
-      "peptidase_gene_count": 127,
-      "nonpeptidase_homolog_gene_count": 33,
-      "interpro_gene_count": 3608,
-      "ncbifam_gene_count": 1656
-    },
     ...
   ],
-  "top_annotation_capability_truncated": null,
+  "top_annotation_capability_truncated": true,
   "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 118},
   "returned": 0,
   "offset": 0,
@@ -479,7 +411,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
     {"cluster_type": "genomic_island", "count": 1},
     {"cluster_type": "decay_pattern", "count": 1},
     {"cluster_type": "diel", "count": 1},
-    {"cluster_type": "time_course", "count": 1}
+    ...
   ],
   "by_organism_type": [{"organism_type": "genome_strain", "count": 2}],
   "by_value_kind": [
@@ -491,8 +423,6 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
     {"metric_type": "antisense_tss_count", "count": 1},
     {"metric_type": "damping_ratio", "count": 1},
     {"metric_type": "diel_amplitude_protein_log2", "count": 1},
-    {"metric_type": "diel_amplitude_transcript_log2", "count": 1},
-    {"metric_type": "expressed_above_background", "count": 1},
     ...
   ],
   "by_metric_type_truncated": true,
@@ -513,7 +443,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
       "go_transport_metabolite_count": 46
     }
   ],
-  "top_metabolic_capability_truncated": null,
+  "...": "3 empty fields omitted (top_metabolic_capability_truncated, top_annotation_capability_truncated, warnings)",
   "top_annotation_capability": [
     {
       "preferred_name": "Alteromonas macleodii MIT1002",
@@ -532,13 +462,11 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
       "ncbifam_gene_count": 744
     }
   ],
-  "top_annotation_capability_truncated": null,
   "by_measurement_capability": {"has_metabolomics": 0, "no_metabolomics": 2},
   "returned": 2,
   "offset": 0,
   "truncated": false,
   "not_found": [],
-  "warnings": [],
   "results": [
     {
       "organism_name": "Alteromonas macleodii MIT1002",
@@ -552,8 +480,8 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
       "publication_count": 5,
       "experiment_count": 6,
       "partner_experiment_count": 3,
-      "treatment_types": ["compartment", "darkness", "genomic_analysis", "growth_phase"],
-      "background_factors": ["axenic", "coculture", "darkness", "diel", "light"],
+      "treatment_types": ["compartment", "darkness", "genomic_analysis", ...],
+      "background_factors": ["axenic", "coculture", "darkness", ...],
       "omics_types": ["BIOINFORMATIC", "RNASEQ", "VESICLE_PROTEOMICS"],
       "clustering_analysis_count": 0,
       "cluster_types": [],
@@ -583,12 +511,12 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
       "publication_count": 21,
       "experiment_count": 45,
       "partner_experiment_count": 11,
-      "treatment_types": ["carbon", "coculture", "compartment", "darkness", "diel", ...],
-      "background_factors": ["axenic", "chemical", "coculture", "darkness", "diel", ...],
-      "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", "PROTEOMICS", "RNASEQ", ...],
+      "treatment_types": ["carbon", "coculture", "compartment", ...],
+      "background_factors": ["axenic", "chemical", "coculture", ...],
+      "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", ...],
       "clustering_analysis_count": 6,
-      "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
-      "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", "death", "diel", ...],
+      "cluster_types": ["genomic_island", "decay_pattern", "diel", ...],
+      "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", ...],
       "derived_metric_count": 28,
       "derived_metric_value_kinds": ["boolean", "categorical", "numeric"],
       "compartments": ["vesicle", "whole_cell"],
@@ -626,8 +554,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
     {"cluster_type": "genomic_island", "count": 2},
     {"cluster_type": "decay_pattern", "count": 1},
     {"cluster_type": "diel", "count": 1},
-    {"cluster_type": "time_course", "count": 1},
-    {"cluster_type": "condition_comparison", "count": 1}
+    ...
   ],
   "by_organism_type": [{"organism_type": "genome_strain", "count": 2}],
   "by_value_kind": [
@@ -639,8 +566,6 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
     {"metric_type": "sbp_nutrient_class", "count": 2},
     {"metric_type": "sbp_predicted_substrate", "count": 2},
     {"metric_type": "antisense_tss_count", "count": 1},
-    {"metric_type": "damping_ratio", "count": 1},
-    {"metric_type": "diel_amplitude_protein_log2", "count": 1},
     ...
   ],
   "by_metric_type_truncated": true,
@@ -661,7 +586,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
       "go_transport_metabolite_count": 46
     }
   ],
-  "top_metabolic_capability_truncated": null,
+  "...": "3 empty fields omitted (top_metabolic_capability_truncated, top_annotation_capability_truncated, warnings)",
   "top_annotation_capability": [
     {
       "preferred_name": "Prochlorococcus MED4",
@@ -680,13 +605,11 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
       "ncbifam_gene_count": 774
     }
   ],
-  "top_annotation_capability_truncated": null,
   "by_measurement_capability": {"has_metabolomics": 1, "no_metabolomics": 1},
   "returned": 2,
   "offset": 0,
   "truncated": false,
   "not_found": ["Bogus organism"],
-  "warnings": [],
   "results": [
     {
       "organism_name": "Prochlorococcus MED4",
@@ -700,12 +623,12 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
       "publication_count": 21,
       "experiment_count": 45,
       "partner_experiment_count": 11,
-      "treatment_types": ["carbon", "coculture", "compartment", "darkness", "diel", ...],
-      "background_factors": ["axenic", "chemical", "coculture", "darkness", "diel", ...],
-      "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", "PROTEOMICS", "RNASEQ", ...],
+      "treatment_types": ["carbon", "coculture", "compartment", ...],
+      "background_factors": ["axenic", "chemical", "coculture", ...],
+      "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", ...],
       "clustering_analysis_count": 6,
-      "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
-      "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", "death", "diel", ...],
+      "cluster_types": ["genomic_island", "decay_pattern", "diel", ...],
+      "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", ...],
       "derived_metric_count": 28,
       "derived_metric_value_kinds": ["boolean", "categorical", "numeric"],
       "compartments": ["vesicle", "whole_cell"],
@@ -731,7 +654,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
       "publication_count": 4,
       "experiment_count": 5,
       "partner_experiment_count": 0,
-      "treatment_types": ["genomic_analysis", "growth_phase", "phosphorus", "temperature"],
+      "treatment_types": ["genomic_analysis", "growth_phase", "phosphorus", ...],
       "background_factors": ["axenic", "diel", "light"],
       "omics_types": ["BIOINFORMATIC", "METABOLOMICS", "RNASEQ"],
       "clustering_analysis_count": 2,
@@ -781,7 +704,7 @@ list_organisms(compartment="vesicle")
     {"cluster_type": "genomic_island", "count": 3},
     {"cluster_type": "time_course", "count": 2},
     {"cluster_type": "decay_pattern", "count": 1},
-    {"cluster_type": "diel", "count": 1}
+    ...
   ],
   "by_organism_type": [{"organism_type": "genome_strain", "count": 9}],
   "by_value_kind": [
@@ -793,8 +716,6 @@ list_organisms(compartment="vesicle")
     {"metric_type": "log2_mv_cell_enrichment", "count": 6},
     {"metric_type": "prop_abund_cells_percent", "count": 6},
     {"metric_type": "prop_abund_mvs_percent", "count": 6},
-    {"metric_type": "strain_unique_gene_koch2020", "count": 4},
-    {"metric_type": "sbp_nutrient_class", "count": 3},
     ...
   ],
   "by_metric_type_truncated": true,
@@ -821,23 +742,9 @@ list_organisms(compartment="vesicle")
       "transported_metabolite_count": 142,
       "go_transport_metabolite_count": 88
     },
-    {
-      "organism_name": "Alteromonas macleodii AD45",
-      "reaction_count": 1259,
-      "catalyzed_metabolite_count": 1326,
-      "transported_metabolite_count": 144,
-      "go_transport_metabolite_count": 85
-    },
-    {
-      "organism_name": "Alteromonas macleodii ATCC27126",
-      "reaction_count": 1251,
-      "catalyzed_metabolite_count": 1307,
-      "transported_metabolite_count": 153,
-      "go_transport_metabolite_count": 89
-    },
     ...
   ],
-  "top_metabolic_capability_truncated": null,
+  "...": "3 empty fields omitted (top_metabolic_capability_truncated, top_annotation_capability_truncated, warnings)",
   "top_annotation_capability": [
     {
       "preferred_name": "Alteromonas macleodii AD45",
@@ -863,31 +770,13 @@ list_organisms(compartment="vesicle")
       "interpro_gene_count": 3456,
       "ncbifam_gene_count": 1598
     },
-    {
-      "preferred_name": "Alteromonas macleodii BS11",
-      "organism_name": "Alteromonas macleodii BS11",
-      "peptidase_gene_count": 123,
-      "nonpeptidase_homolog_gene_count": 29,
-      "interpro_gene_count": 3349,
-      "ncbifam_gene_count": 1577
-    },
-    {
-      "preferred_name": "Alteromonas macleodii MIT1002",
-      "organism_name": "Alteromonas macleodii MIT1002",
-      "peptidase_gene_count": 120,
-      "nonpeptidase_homolog_gene_count": 32,
-      "interpro_gene_count": 3584,
-      "ncbifam_gene_count": 1699
-    },
     ...
   ],
-  "top_annotation_capability_truncated": null,
   "by_measurement_capability": {"has_metabolomics": 2, "no_metabolomics": 7},
   "returned": 5,
   "offset": 0,
   "truncated": true,
   "not_found": [],
-  "warnings": [],
   "results": [
     {
       "organism_name": "Alteromonas macleodii AD45",
@@ -932,7 +821,7 @@ list_organisms(compartment="vesicle")
       "publication_count": 3,
       "experiment_count": 5,
       "partner_experiment_count": 0,
-      "treatment_types": ["carbon", "compartment", "genomic_analysis", "iron"],
+      "treatment_types": ["carbon", "compartment", "genomic_analysis", ...],
       "background_factors": ["axenic", "darkness"],
       "omics_types": ["BIOINFORMATIC", "RNASEQ", "VESICLE_PROTEOMICS"],
       "clustering_analysis_count": 0,
@@ -1019,7 +908,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Pseudomonas putida KT244
     {"cluster_type": "genomic_island", "count": 1},
     {"cluster_type": "decay_pattern", "count": 1},
     {"cluster_type": "diel", "count": 1},
-    {"cluster_type": "time_course", "count": 1}
+    ...
   ],
   "by_organism_type": [{"organism_type": "genome_strain", "count": 2}],
   "by_value_kind": [
@@ -1031,8 +920,6 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Pseudomonas putida KT244
     {"metric_type": "antisense_tss_count", "count": 1},
     {"metric_type": "damping_ratio", "count": 1},
     {"metric_type": "diel_amplitude_protein_log2", "count": 1},
-    {"metric_type": "diel_amplitude_transcript_log2", "count": 1},
-    {"metric_type": "expressed_above_background", "count": 1},
     ...
   ],
   "by_metric_type_truncated": true,
@@ -1053,7 +940,7 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Pseudomonas putida KT244
       "go_transport_metabolite_count": 46
     }
   ],
-  "top_metabolic_capability_truncated": null,
+  "...": "3 empty fields omitted (top_metabolic_capability_truncated, top_annotation_capability_truncated, warnings)",
   "top_annotation_capability": [
     {
       "preferred_name": "Pseudomonas putida KT2440",
@@ -1072,13 +959,11 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Pseudomonas putida KT244
       "ncbifam_gene_count": 744
     }
   ],
-  "top_annotation_capability_truncated": null,
   "by_measurement_capability": {"has_metabolomics": 0, "no_metabolomics": 2},
   "returned": 2,
   "offset": 0,
   "truncated": false,
   "not_found": [],
-  "warnings": [],
   "results": [
     {
       "organism_name": "Prochlorococcus MED4",
@@ -1092,12 +977,12 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Pseudomonas putida KT244
       "publication_count": 21,
       "experiment_count": 45,
       "partner_experiment_count": 11,
-      "treatment_types": ["carbon", "coculture", "compartment", "darkness", "diel", ...],
-      "background_factors": ["axenic", "chemical", "coculture", "darkness", "diel", ...],
-      "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", "PROTEOMICS", "RNASEQ", ...],
+      "treatment_types": ["carbon", "coculture", "compartment", ...],
+      "background_factors": ["axenic", "chemical", "coculture", ...],
+      "omics_types": ["BIOINFORMATIC", "MICROARRAY", "PAIRED_RNASEQ_PROTEOME", ...],
       "clustering_analysis_count": 6,
-      "cluster_types": ["genomic_island", "decay_pattern", "diel", "time_course"],
-      "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", "death", "diel", ...],
+      "cluster_types": ["genomic_island", "decay_pattern", "diel", ...],
+      "growth_phases": ["acclimated_steady_state", "acute_stress", "darkness", ...],
       "derived_metric_count": 28,
       "derived_metric_value_kinds": ["boolean", "categorical", "numeric"],
       "compartments": ["vesicle", "whole_cell"],
@@ -1179,13 +1064,13 @@ list_organisms (per-row partner_experiment_count > 0) → list_experiments(cocul
 
 - organism_type values: 'genome_strain' (real genome assembly), 'treatment' (non-genomic coculture partners), 'reference_proteome_match' (identified via reference database matching).
 
-- top_metabolic_capability is sorted by catalyzed_metabolite_count descending (transported_metabolite_count is carried as a column, not a sort key); organisms with zero chemistry are excluded. Detail calls cap it to the first 10 (top_metabolic_capability_truncated=true when capped); summary=True returns the full ranking uncapped. Use it to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...]).
+- top_metabolic_capability is sorted by catalyzed_metabolite_count descending (transported_metabolite_count is carried as a column, not a sort key); organisms with zero chemistry are excluded. It is capped to the first 10 on every call, summary=True included (top_metabolic_capability_truncated=true when capped); every organism's counts are on its row. Use it to identify chemistry-rich organisms before drilling in via list_metabolites(organism_names=[...]).
 
 - by_measurement_capability is a binary rollup ({has_metabolomics, no_metabolomics}) — tool-specific shape that deviates from the list[{key,count}] frequency rollups elsewhere. See docs://guide/conventions for the standard envelope shape.
 
 - The four annotation-coverage counts (`peptidase_gene_count`, `nonpeptidase_homolog_gene_count`, `interpro_gene_count`, `ncbifam_gene_count`) are distinct-gene counts per organism, zero-filled (never null). A gene carrying both a `peptidase` and a `nonpeptidase_homolog` MEROPS call counts once in each. They measure coverage, not annotation quality, and scale with genome size — rank Prochlorococcus strains against each other, not against a 4,000-gene heterotroph.
 
-- `top_annotation_capability` ranks the matched set by `peptidase_gene_count` descending, then `preferred_name`; the other three counts are carried as columns, not sort keys. All-zero rows are excluded from the ranking but still appear in `results`. Detail calls cap the ranking to the first 10 (`top_annotation_capability_truncated=true` when capped); `summary=True` returns the full ranking uncapped. There is no min-count filter — read the ranking, then drill in with genes_by_ontology(ontology='merops', call_class=['peptidase'], organism=...).
+- `top_annotation_capability` ranks the matched set by `peptidase_gene_count` descending, then `preferred_name`; the other three counts are carried as columns, not sort keys. All-zero rows are excluded from the ranking but still appear in `results`. The ranking is capped to the first 10 on every call, `summary=True` included (`top_annotation_capability_truncated=true` when capped); every organism's four counts are on its row. There is no min-count filter — read the ranking, then drill in with genes_by_ontology(ontology='merops', call_class=['peptidase'], organism=...).
 
 - `organism_names=` uses the same word-based, case-insensitive match on preferred_name + name_synonyms as every other tool's organism param ('MED4' works); unknown names land in `not_found`.
 

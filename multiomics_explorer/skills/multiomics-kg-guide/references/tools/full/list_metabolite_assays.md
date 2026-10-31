@@ -28,7 +28,7 @@ docs://tools/list_metabolite_assays; summary=True first.
 | exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
 | rankable | bool \| None | None | True → assays supporting rank/percentile/bucket on metabolites_by_quantifies_assay's rankable-gated filters. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 20 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -118,8 +118,7 @@ list_metabolite_assays(summary=True)
     {"organism_name": "Prochlorococcus MIT9313", "count": 5},
     {"organism_name": "Prochlorococcus MIT9301", "count": 4},
     {"organism_name": "Prochlorococcus MIT9312", "count": 2},
-    {"organism_name": "Prochlorococcus MIT0801", "count": 2},
-    {"organism_name": "Prochlorococcus MIT9303", "count": 1}
+    ...
   ],
   "by_value_kind": [{"value_kind": "numeric", "count": 12}, {"value_kind": "boolean", "count": 2}],
   "by_compartment": [
@@ -131,30 +130,25 @@ list_metabolite_assays(summary=True)
     {"metric_type": "cellular_concentration", "count": 5},
     {"metric_type": "relative_peak_area_biovolume_normalized", "count": 4},
     {"metric_type": "extracellular_concentration", "count": 3},
-    {"metric_type": "presence_flag_intracellular", "count": 1},
-    {"metric_type": "presence_flag_extracellular", "count": 1}
+    ...
   ],
   "by_treatment_type": [
     {"treatment_type": "compartment", "count": 4},
     {"treatment_type": "phosphorus", "count": 4},
     {"treatment_type": "growth_phase", "count": 4},
-    {"treatment_type": "carbon", "count": 2}
+    ...
   ],
   "by_background_factors": [{"background_factor": "axenic", "count": 14}, {"background_factor": "light", "count": 6}],
-  "by_growth_phase": [],
+  "...": "5 empty fields omitted",
   "by_detection_status": [
     {"detection_status": "not_detected", "count": 1046},
     {"detection_status": "detected", "count": 360},
     {"detection_status": "sporadic", "count": 74}
   ],
-  "score_max": null,
-  "score_median": null,
   "returned": 0,
   "offset": 0,
   "truncated": true,
   "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_dois": []},
-  "resolved_aliases": {},
-  "warnings": [],
   "results": []
 }
 ```

@@ -7,7 +7,7 @@ Publications with experiment, DM, metabolomics and literature-index rollups.
 Use as the study-level discovery entry point; for per-experiment detail use `list_experiments(publication_dois=[...])`, for the entities a paper names `discussed_by_publication`.
 Filters: organism, search_text, author, publication_dois, compartment, plus the condition filters.
 Returns: by_organism, by_treatment_type, by_omics_type, by_compartment, by_discusses_coverage, not_found; one row = one publication.
-docs://tools/list_publications; summary=True is uncapped (larger than the default call).
+docs://tools/list_publications; summary=True caps the same rollups (smaller than the default call).
 
 ## Parameters
 
@@ -21,7 +21,7 @@ docs://tools/list_publications; summary=True is uncapped (larger than the defaul
 | author | string \| None | None | Filter by author name (case-insensitive). E.g. 'Sher', 'Chisholm'. |
 | publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
@@ -39,14 +39,14 @@ total_entries, total_matching, by_organism, by_treatment_type, by_background_fac
 - **total_entries** (int): Total publications in KG (unfiltered).
 - **total_matching** (int): Publications matching filters.
 - **by_organism** (list[PubOrganismBreakdown]): Publication counts per organism, sorted desc.
-- **by_organism_truncated** (bool | None): True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown.
+- **by_organism_truncated** (bool | None): True when the list was capped at 10 (detail and summary calls alike).
 - **by_treatment_type** (list[PubTreatmentTypeBreakdown]): Publication counts per treatment type, sorted desc.
 - **by_background_factors** (list[PubBackgroundFactorBreakdown]): Publication counts per background factor, sorted desc.
 - **by_omics_type** (list[PubOmicsTypeBreakdown]): Publication counts per omics platform, sorted desc.
 - **by_cluster_type** (list[PubClusterTypeBreakdown]): Publication counts per cluster type, sorted desc.
 - **by_value_kind** (list[PubValueKindBreakdown]): DerivedMetric value kind frequency rollup across matched publications.
 - **by_metric_type** (list[PubMetricTypeBreakdown]): DerivedMetric type frequency rollup across matched publications.
-- **by_metric_type_truncated** (bool | None): True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown.
+- **by_metric_type_truncated** (bool | None): True when the list was capped at 10 (detail and summary calls alike).
 - **by_compartment** (list[PubCompartmentBreakdown]): Wet-lab compartment frequency rollup across matched publications.
 - **by_discusses_coverage** (PubDiscussesCoverageBreakdown): Binary split {has_discusses, no_discusses} of matched publications by whether they carry a narrative 'discusses' literature index (56 vs 4 in the current KG).
 - **returned** (int): Publications in this response (0 when summary=True).
@@ -109,8 +109,6 @@ list_publications()
     {"organism_name": "Prochlorococcus MED4", "count": 21},
     {"organism_name": "Prochlorococcus MIT9313", "count": 11},
     {"organism_name": "Synechococcus WH8102", "count": 9},
-    {"organism_name": "Synechococcus WH7803", "count": 8},
-    {"organism_name": "Prochlorococcus NATL2A", "count": 7},
     ...
   ],
   "by_organism_truncated": true,
@@ -118,32 +116,25 @@ list_publications()
     {"treatment_type": "coculture", "count": 14},
     {"treatment_type": "carbon", "count": 10},
     {"treatment_type": "growth_phase", "count": 6},
-    {"treatment_type": "light", "count": 6},
-    {"treatment_type": "compartment", "count": 5},
     ...
   ],
   "by_background_factors": [
     {"background_factor": "axenic", "count": 40},
     {"background_factor": "light", "count": 36},
     {"background_factor": "diel", "count": 12},
-    {"background_factor": "coculture", "count": 8},
-    {"background_factor": "darkness", "count": 4},
     ...
   ],
   "by_omics_type": [
     {"omics_type": "RNASEQ", "count": 30},
     {"omics_type": "MICROARRAY", "count": 12},
     {"omics_type": "PROTEOMICS", "count": 11},
-    {"omics_type": "EXOPROTEOMICS", "count": 4},
-    {"omics_type": "VESICLE_PROTEOMICS", "count": 3},
     ...
   ],
   "by_cluster_type": [
     {"cluster_type": "time_course", "count": 4},
     {"cluster_type": "diel", "count": 2},
     {"cluster_type": "condition_comparison", "count": 2},
-    {"cluster_type": "decay_pattern", "count": 1},
-    {"cluster_type": "genomic_island", "count": 1}
+    ...
   ],
   "by_value_kind": [
     {"value_kind": "boolean", "count": 9},
@@ -154,8 +145,6 @@ list_publications()
     {"metric_type": "exoproteome_avg_pct_nsaf", "count": 2},
     {"metric_type": "exoproteome_detection_status", "count": 2},
     {"metric_type": "expression_change_high_light_shock", "count": 1},
-    {"metric_type": "expression_change_low_co2_no_o2_shock", "count": 1},
-    {"metric_type": "expression_change_low_co2_shock", "count": 1},
     ...
   ],
   "by_metric_type_truncated": true,
@@ -163,7 +152,7 @@ list_publications()
     {"compartment": "whole_cell", "count": 55},
     {"compartment": "exoproteome", "count": 4},
     {"compartment": "vesicle", "count": 3},
-    {"compartment": "extracellular", "count": 1}
+    ...
   ],
   "by_discusses_coverage": {"has_discusses": 56, "no_discusses": 4},
   "returned": 5,
@@ -175,7 +164,7 @@ list_publications()
     {
       "doi": "10.1038/s41467-026-77598-7",
       "title": "Biofilm formation and dynamics in the marine cyanobacterium Prochlorococcus",
-      "authors": ["Maya I. Anjur-Dietrich", "Katelyn G. Jones", "James I. Mullet", "Nhi Vo", "Kurt G. Castro", ...],
+      "authors": ["Maya I. Anjur-Dietrich", "Katelyn G. Jones", "James I. Mullet", ...],
       "year": 2026,
       "journal": "Nature Communications",
       "study_type": "Physiology|Transcriptomics|Metagenomics|Ecology",
@@ -198,8 +187,8 @@ list_publications()
     },
     {
       "doi": "10.1039/d6sc02372j",
-      "title": "Chiral recognition of 2,3-dihydroxypropanesulfonate by bacterial transport proteins adapted to distinct ecological ni...",
-      "authors": ["Helen Barber", "Sabrina Borusak", "Adam W. E. Stewart", "Hamza Tahir", "Nichollas E. Scott", ...],
+      "title": "Chiral recognition of 2,3-dihydroxypropanesulfonate by bacterial transport proteins adapted to di...",
+      "authors": ["Helen Barber", "Sabrina Borusak", "Adam W. E. Stewart", ...],
       "year": 2026,
       "journal": "Chemical Science",
       "study_type": "Proteomics; Biophysical analysis; X-ray crystallography; Bioinformatics",
@@ -222,8 +211,8 @@ list_publications()
     },
     {
       "doi": "10.64898/2026.04.15.718746",
-      "title": "Extreme genome reduction selectively retains modular regulatory architecture in Prochlorococcus MED4: conserved trans...",
-      "authors": ["Zachary Johnson", "Natalie C. Sadler", "Marci R. Garcia", "Xiaolu Li", "Jordan Rozum", ...],
+      "title": "Extreme genome reduction selectively retains modular regulatory architecture in Prochlorococcus M...",
+      "authors": ["Zachary Johnson", "Natalie C. Sadler", "Marci R. Garcia", ...],
       "year": 2026,
       "journal": "bioRxiv",
       "study_type": "RNA-seq, Transcriptomics",
@@ -288,11 +277,9 @@ list_publications(compartment="vesicle")
     {"organism_name": "Prochlorococcus MIT9313", "count": 2},
     {"organism_name": "Prochlorococcus MED4", "count": 1},
     {"organism_name": "Prochlorococcus MIT9312", "count": 1},
-    {"organism_name": "Alteromonas macleodii AD45", "count": 1},
-    {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
     ...
   ],
-  "by_organism_truncated": null,
+  "...": "4 empty fields omitted (by_organism_truncated, by_cluster_type, by_metric_type_truncated, warnings)",
   "by_treatment_type": [{"treatment_type": "compartment", "count": 3}],
   "by_background_factors": [
     {"background_factor": "axenic", "count": 3},
@@ -304,7 +291,6 @@ list_publications(compartment="vesicle")
     {"omics_type": "VESICLE_DNASEQ", "count": 1},
     {"omics_type": "METABOLOMICS", "count": 1}
   ],
-  "by_cluster_type": [],
   "by_value_kind": [
     {"value_kind": "numeric", "count": 3},
     {"value_kind": "boolean", "count": 1},
@@ -314,41 +300,23 @@ list_publications(compartment="vesicle")
     {"metric_type": "mascot_identification_probability", "count": 1},
     {"metric_type": "predicted_subcellular_localization", "count": 1},
     {"metric_type": "vesicle_dna_avg_read_coverage", "count": 1},
-    {"metric_type": "vesicle_proteome_member", "count": 1},
-    {"metric_type": "cell_abundance_biovolume_normalized", "count": 1},
     ...
   ],
-  "by_metric_type_truncated": null,
   "by_compartment": [{"compartment": "vesicle", "count": 3}, {"compartment": "whole_cell", "count": 1}],
   "by_discusses_coverage": {"has_discusses": 2, "no_discusses": 1},
   "returned": 3,
   "offset": 0,
   "truncated": false,
   "not_found": [],
-  "warnings": [],
   "results": [
     {
       "doi": "10.1093/femsml/uqac025",
-      "title": "Characterization of membrane vesicles in Alteromonas macleodii indicates potential roles in their copiotrophic lifestyle",
-      "authors": [
-        "Eduard Fadeev",
-        "Cécile Carpaneto Bastos",
-        "Jennifer H. Hennenfeind",
-        "Steven J. Biller",
-        "Daniel Sher",
-        ...
-      ],
+      "title": "Characterization of membrane vesicles in Alteromonas macleodii indicates potential roles in their...",
+      "authors": ["Eduard Fadeev", "Cécile Carpaneto Bastos", "Jennifer H. Hennenfeind", ...],
       "year": 2023,
       "journal": "microLife",
       "study_type": "Proteomics, Microscopy, Extracellular vesicle analysis",
-      "organisms": [
-        "Alteromonas macleodii AD45",
-        "Alteromonas macleodii ATCC27126",
-        "Alteromonas macleodii BGP6",
-        "Alteromonas macleodii BS11",
-        "Alteromonas macleodii HOT1A3",
-        ...
-      ],
+      "organisms": ["Alteromonas macleodii AD45", "Alteromonas macleodii ATCC27126", "Alteromonas macleodii BGP6", ...],
       "experiment_count": 6,
       "treatment_types": ["compartment"],
       "background_factors": ["axenic", "darkness"],
@@ -368,7 +336,7 @@ list_publications(compartment="vesicle")
     {
       "doi": "10.1111/1462-2920.15834",
       "title": "Prochlorococcus extracellular vesicles: molecular composition and adsorption to diverse microbes",
-      "authors": ["Steven J. Biller", "Rachel A. Lundeen", "Laura R. Hmelo", "Kevin W. Becker", "Aldo A. Arellano", ...],
+      "authors": ["Steven J. Biller", "Rachel A. Lundeen", "Laura R. Hmelo", ...],
       "year": 2022,
       "journal": "Environmental Microbiology",
       "study_type": "Multi-omics (lipidomics, proteomics, metabolomics)",
@@ -392,14 +360,7 @@ list_publications(compartment="vesicle")
     {
       "doi": "10.1126/science.1243457",
       "title": "Bacterial Vesicles in Marine Ecosystems",
-      "authors": [
-        "Steven J. Biller",
-        "Florence Schubotz",
-        "Sara E. Roggensack",
-        "Anne W. Thompson",
-        "Roger E. Summons",
-        ...
-      ],
+      "authors": ["Steven J. Biller", "Florence Schubotz", "Sara E. Roggensack", ...],
       "year": 2014,
       "journal": "Science",
       "study_type": "Imaging, Proteomics, Genomics, Lipidomics, Nanoparticle tracking analysis",
@@ -438,15 +399,14 @@ list_publications(publication_dois=["10.1128/msystems.01261-22", "10.1073/pnas.2
     {"organism_name": "Prochlorococcus MIT9313", "count": 3},
     {"organism_name": "Prochlorococcus MIT9312", "count": 1},
     {"organism_name": "Prochlorococcus MIT9303", "count": 1},
-    {"organism_name": "Prochlorococcus MIT0801", "count": 1},
-    {"organism_name": "Prochlorococcus MIT9301", "count": 1}
+    ...
   ],
-  "by_organism_truncated": null,
+  "...": "4 empty fields omitted (by_organism_truncated, by_cluster_type, by_metric_type_truncated, warnings)",
   "by_treatment_type": [
     {"treatment_type": "compartment", "count": 1},
     {"treatment_type": "carbon", "count": 1},
     {"treatment_type": "growth_phase", "count": 1},
-    {"treatment_type": "phosphorus", "count": 1}
+    ...
   ],
   "by_background_factors": [{"background_factor": "axenic", "count": 3}, {"background_factor": "light", "count": 2}],
   "by_omics_type": [
@@ -454,14 +414,12 @@ list_publications(publication_dois=["10.1128/msystems.01261-22", "10.1073/pnas.2
     {"omics_type": "VESICLE_PROTEOMICS", "count": 1},
     {"omics_type": "RNASEQ", "count": 1}
   ],
-  "by_cluster_type": [],
   "by_value_kind": [{"value_kind": "numeric", "count": 1}],
   "by_metric_type": [
     {"metric_type": "cell_abundance_biovolume_normalized", "count": 1},
     {"metric_type": "log2_vesicle_cell_enrichment", "count": 1},
     {"metric_type": "vesicle_abundance_biovolume_normalized", "count": 1}
   ],
-  "by_metric_type_truncated": null,
   "by_compartment": [
     {"compartment": "whole_cell", "count": 3},
     {"compartment": "vesicle", "count": 1},
@@ -472,19 +430,11 @@ list_publications(publication_dois=["10.1128/msystems.01261-22", "10.1073/pnas.2
   "offset": 0,
   "truncated": false,
   "not_found": [],
-  "warnings": [],
   "results": [
     {
       "doi": "10.1073/pnas.2213271120",
       "title": "Chitin utilization by marine picocyanobacteria and the evolution of a planktonic lifestyle",
-      "authors": [
-        "Giovanna Capovilla",
-        "Rogier Braakman",
-        "Gregory P. Fournier",
-        "Thomas Hackl",
-        "Julia Schwartzman",
-        ...
-      ],
+      "authors": ["Giovanna Capovilla", "Rogier Braakman", "Gregory P. Fournier", ...],
       "year": 2023,
       "journal": "Proceedings of the National Academy of Sciences",
       "study_type": "Comparative genomics and enzymatic assays",
@@ -508,14 +458,7 @@ list_publications(publication_dois=["10.1128/msystems.01261-22", "10.1073/pnas.2
     {
       "doi": "10.1128/msystems.01261-22",
       "title": "Metabolite diversity among representatives of divergent Prochlorococcus ecotypes",
-      "authors": [
-        "Elizabeth B. Kujawinski",
-        "Rogier Braakman",
-        "Krista Longnecker",
-        "Jamie W. Becker",
-        "Sallie W. Chisholm",
-        ...
-      ],
+      "authors": ["Elizabeth B. Kujawinski", "Rogier Braakman", "Krista Longnecker", ...],
       "year": 2023,
       "journal": "mSystems",
       "study_type": "Metabolomics",
@@ -532,14 +475,14 @@ list_publications(publication_dois=["10.1128/msystems.01261-22", "10.1073/pnas.2
       "compartments": ["extracellular", "whole_cell"],
       "metabolite_count": 96,
       "metabolite_assay_count": 8,
-      "metabolite_compartments": ["whole_cell", "extracellular"],
+      "metabolite_compartments": ["extracellular", "whole_cell"],
       "discussed_gene_count": 9,
       "discussed_pathway_count": 4
     },
     {
       "doi": "10.1111/1462-2920.15834",
       "title": "Prochlorococcus extracellular vesicles: molecular composition and adsorption to diverse microbes",
-      "authors": ["Steven J. Biller", "Rachel A. Lundeen", "Laura R. Hmelo", "Kevin W. Becker", "Aldo A. Arellano", ...],
+      "authors": ["Steven J. Biller", "Rachel A. Lundeen", "Laura R. Hmelo", ...],
       "year": 2022,
       "journal": "Environmental Microbiology",
       "study_type": "Multi-omics (lipidomics, proteomics, metabolomics)",
@@ -578,8 +521,6 @@ list_publications()
     {"organism_name": "Prochlorococcus MED4", "count": 21},
     {"organism_name": "Prochlorococcus MIT9313", "count": 11},
     {"organism_name": "Synechococcus WH8102", "count": 9},
-    {"organism_name": "Synechococcus WH7803", "count": 8},
-    {"organism_name": "Prochlorococcus NATL2A", "count": 7},
     ...
   ],
   "by_organism_truncated": true,
@@ -587,32 +528,25 @@ list_publications()
     {"treatment_type": "coculture", "count": 14},
     {"treatment_type": "carbon", "count": 10},
     {"treatment_type": "growth_phase", "count": 6},
-    {"treatment_type": "light", "count": 6},
-    {"treatment_type": "compartment", "count": 5},
     ...
   ],
   "by_background_factors": [
     {"background_factor": "axenic", "count": 40},
     {"background_factor": "light", "count": 36},
     {"background_factor": "diel", "count": 12},
-    {"background_factor": "coculture", "count": 8},
-    {"background_factor": "darkness", "count": 4},
     ...
   ],
   "by_omics_type": [
     {"omics_type": "RNASEQ", "count": 30},
     {"omics_type": "MICROARRAY", "count": 12},
     {"omics_type": "PROTEOMICS", "count": 11},
-    {"omics_type": "EXOPROTEOMICS", "count": 4},
-    {"omics_type": "VESICLE_PROTEOMICS", "count": 3},
     ...
   ],
   "by_cluster_type": [
     {"cluster_type": "time_course", "count": 4},
     {"cluster_type": "diel", "count": 2},
     {"cluster_type": "condition_comparison", "count": 2},
-    {"cluster_type": "decay_pattern", "count": 1},
-    {"cluster_type": "genomic_island", "count": 1}
+    ...
   ],
   "by_value_kind": [
     {"value_kind": "boolean", "count": 9},
@@ -623,8 +557,6 @@ list_publications()
     {"metric_type": "exoproteome_avg_pct_nsaf", "count": 2},
     {"metric_type": "exoproteome_detection_status", "count": 2},
     {"metric_type": "expression_change_high_light_shock", "count": 1},
-    {"metric_type": "expression_change_low_co2_no_o2_shock", "count": 1},
-    {"metric_type": "expression_change_low_co2_shock", "count": 1},
     ...
   ],
   "by_metric_type_truncated": true,
@@ -632,7 +564,7 @@ list_publications()
     {"compartment": "whole_cell", "count": 55},
     {"compartment": "exoproteome", "count": 4},
     {"compartment": "vesicle", "count": 3},
-    {"compartment": "extracellular", "count": 1}
+    ...
   ],
   "by_discusses_coverage": {"has_discusses": 56, "no_discusses": 4},
   "returned": 5,
@@ -644,7 +576,7 @@ list_publications()
     {
       "doi": "10.1038/s41467-026-77598-7",
       "title": "Biofilm formation and dynamics in the marine cyanobacterium Prochlorococcus",
-      "authors": ["Maya I. Anjur-Dietrich", "Katelyn G. Jones", "James I. Mullet", "Nhi Vo", "Kurt G. Castro", ...],
+      "authors": ["Maya I. Anjur-Dietrich", "Katelyn G. Jones", "James I. Mullet", ...],
       "year": 2026,
       "journal": "Nature Communications",
       "study_type": "Physiology|Transcriptomics|Metagenomics|Ecology",
@@ -667,8 +599,8 @@ list_publications()
     },
     {
       "doi": "10.1039/d6sc02372j",
-      "title": "Chiral recognition of 2,3-dihydroxypropanesulfonate by bacterial transport proteins adapted to distinct ecological ni...",
-      "authors": ["Helen Barber", "Sabrina Borusak", "Adam W. E. Stewart", "Hamza Tahir", "Nichollas E. Scott", ...],
+      "title": "Chiral recognition of 2,3-dihydroxypropanesulfonate by bacterial transport proteins adapted to di...",
+      "authors": ["Helen Barber", "Sabrina Borusak", "Adam W. E. Stewart", ...],
       "year": 2026,
       "journal": "Chemical Science",
       "study_type": "Proteomics; Biophysical analysis; X-ray crystallography; Bioinformatics",
@@ -691,8 +623,8 @@ list_publications()
     },
     {
       "doi": "10.64898/2026.04.15.718746",
-      "title": "Extreme genome reduction selectively retains modular regulatory architecture in Prochlorococcus MED4: conserved trans...",
-      "authors": ["Zachary Johnson", "Natalie C. Sadler", "Marci R. Garcia", "Xiaolu Li", "Jordan Rozum", ...],
+      "title": "Extreme genome reduction selectively retains modular regulatory architecture in Prochlorococcus M...",
+      "authors": ["Zachary Johnson", "Natalie C. Sadler", "Marci R. Garcia", ...],
       "year": 2026,
       "journal": "bioRxiv",
       "study_type": "RNA-seq, Transcriptomics",
@@ -752,7 +684,7 @@ list_publications(author='Biller') then list_experiments(publication_dois=['10.1
 
 - `publication_dois` combines with the other filters via AND, and `not_found` lists any provided DOI that did not match — the same shape as `experiment_ids` on the sibling `list_*` tools.
 
-- `compartment` keeps publications with at least one experiment in that compartment — it is not a per-publication property. `summary=True` returns every `by_*` rollup uncapped (by_organism alone lists every organism with a paper), so it is larger than the default call; use it when you need the full breakdowns.
+- `compartment` keeps publications with at least one experiment in that compartment — it is not a per-publication property. `by_organism` and `by_metric_type` are capped at 10 entries on every call, `summary=True` included (`<key>_truncated: true` when trimmed). For a per-organism publication count across every organism, use list_organisms (`publication_count`).
 
 - Unknown treatment_type / background_factors / growth_phases values return 0 rows with a warning listing the valid values; check list_filter_values first.
 

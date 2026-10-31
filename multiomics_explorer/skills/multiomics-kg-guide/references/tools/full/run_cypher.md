@@ -67,8 +67,8 @@ run_cypher(query="MATCH (g:Gene)-[:HAS_FUNCTION]->(f:Function) RETURN g.locus_ta
   "returned": 0,
   "truncated": false,
   "warnings": [
-    "One of the relationship types in your query is not available in the database, make sure you didn't misspell it or tha...",
-    "One of the labels in your query is not available in the database, make sure you didn't misspell it or that the label ..."
+    "One of the labels in your query is not available in the database, make sure you didn't misspell i...",
+    "One of the relationship types in your query is not available in the database, make sure you didn'..."
   ],
   "results": []
 }

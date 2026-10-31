@@ -48,6 +48,7 @@ kg_schema(labels=['Gene'], section='nodes')
         "annotation_quality": "int",
         "annotation_state": "string",
         "annotation_types": "list",
+        "bigg_reaction": "list",
         "boolean_metric_count": "int",
         "boolean_metric_types_observed": "list",
         "catalytic_activities": "list",
@@ -69,6 +70,7 @@ kg_schema(labels=['Gene'], section='nodes')
         "function_description": "string",
         "gene_category": "string",
         "gene_name": "string",
+        "gene_name_synonyms": "list",
         "gene_summary": "string",
         "id": "string",
         "informative_annotation_types": "list",
@@ -90,6 +92,7 @@ kg_schema(labels=['Gene'], section='nodes')
         "seed_ortholog_evalue": "float",
         "sequence": "string",
         "sequence_source": "string",
+        "signal_peptide": "string",
         "signal_peptide_type": "string",
         "significant_down_count": "int",
         "significant_up_count": "int",
@@ -102,9 +105,7 @@ kg_schema(labels=['Gene'], section='nodes')
       }
     }
   },
-  "relationships": {},
-  "not_found_labels": [],
-  "not_found_relationship_types": []
+  "...": "3 empty fields omitted (relationships, not_found_labels, not_found_relationship_types)"
 }
 ```
 
@@ -116,11 +117,11 @@ kg_schema(section='relationships', relationship_types=['Changes_expression_of'])
 
 ```example-response
 {
-  "nodes": {},
+  "...": "3 empty fields omitted (nodes, not_found_labels, not_found_relationship_types)",
   "relationships": {
     "Changes_expression_of": {
       "source_labels": ["Experiment", "InvestigativeProcess"],
-      "target_labels": ["BiologicalEntity", "Entity", "Gene", "NamedThing"],
+      "target_labels": ["BiologicalEntity", "Entity", "Gene", ...],
       "properties": {
         "adjusted_p_value": "float",
         "expression_direction": "string",
@@ -129,15 +130,15 @@ kg_schema(section='relationships', relationship_types=['Changes_expression_of'])
         "id": "string",
         "log2_fold_change": "float",
         "rank_by_effect": "int",
+        "rank_down": "int",
+        "rank_up": "int",
         "significant": "string",
         "time_point": "string",
         "time_point_hours": "float",
         "time_point_order": "int"
       }
     }
-  },
-  "not_found_labels": [],
-  "not_found_relationship_types": []
+  }
 }
 ```
 
@@ -151,17 +152,15 @@ kg_schema(section='relationships', relationship_types=['Molecular_function_trans
 
 ```example-response
 {
-  "nodes": {},
+  "...": "3 empty fields omitted (nodes, not_found_labels, not_found_relationship_types)",
   "relationships": {
     "Molecular_function_transports_metabolite": {
-      "source_labels": ["BiologicalEntity", "BiologicalProcessOrActivity", "Entity", "MolecularFunction", "NamedThing"],
+      "source_labels": ["BiologicalEntity", "BiologicalProcessOrActivity", "Entity", ...],
       "target_labels": ["Entity", "Metabolite", "NamedThing"],
       "properties": {"go_chebi_ids": "list"},
-      "description": "GO defines this molecular-function term as a transporter activity whose primary input (RO:0004009) is this compound. ..."
+      "description": "GO defines this molecular-function term as a transporter activity whose primary input (RO:0004009..."
     }
-  },
-  "not_found_labels": [],
-  "not_found_relationship_types": []
+  }
 }
 ```
 

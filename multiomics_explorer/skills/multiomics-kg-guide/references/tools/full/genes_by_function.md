@@ -18,7 +18,7 @@ docs://tools/genes_by_function; summary=True first.
 | gene_categories | list[string] \| None | None | Filter by gene_category — matches any of the given values. E.g. ['Photosynthesis', 'Transport']. Use list_filter_values to see valid values. |
 | min_quality | int | 0 | Minimum annotation_quality (0..3 numeric encoding of `Gene.annotation_state`): 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Use 2 to require at least one informative annotation source (a hypothetical protein with a Pfam / KO call still passes); 3 for multi-source support. [AQ] see docs://guide/conventions. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -79,8 +79,6 @@ genes_by_function(search_text="photosystem")
     {"organism_name": "Synechococcus BIOS-U3-1", "count": 93},
     {"organism_name": "Synechococcus CC9616", "count": 92},
     {"organism_name": "Synechococcus KORDI-100", "count": 88},
-    {"organism_name": "Prochlorococcus MIT9303", "count": 87},
-    {"organism_name": "Synechococcus ROS8604", "count": 84},
     ...
   ],
   "by_organism_truncated": true,
@@ -88,8 +86,6 @@ genes_by_function(search_text="photosystem")
     {"category": "Photosynthesis", "count": 4484},
     {"category": "Stress response and adaptation", "count": 1302},
     {"category": "Energy production", "count": 464},
-    {"category": "Unknown", "count": 414},
-    {"category": "Post-translational modification", "count": 352},
     ...
   ],
   "score_max": 6.025513648986816,
@@ -151,8 +147,6 @@ genes_by_function(search_text="chaperone", summary=True)
     {"organism_name": "Pseudomonas putida KT2440", "count": 62},
     {"organism_name": "Shewanella sp. W3-18-1", "count": 54},
     {"organism_name": "Marinobacter (MarRef v6)", "count": 54},
-    {"organism_name": "Alteromonas (MarRef v6)", "count": 48},
-    {"organism_name": "Synechococcus WH5701", "count": 44},
     ...
   ],
   "by_organism_truncated": null,
@@ -160,8 +154,6 @@ genes_by_function(search_text="chaperone", summary=True)
     {"category": "Post-translational modification", "count": 1554},
     {"category": "Stress response and adaptation", "count": 898},
     {"category": "Coenzyme metabolism", "count": 385},
-    {"category": "Unknown", "count": 267},
-    {"category": "Cell wall and membrane", "count": 91},
     ...
   ],
   "score_max": 7.707810401916504,

@@ -32,7 +32,7 @@ docs://tools/genes_by_numeric_metric; summary=True first.
 | significant_only | bool | False | Filter to `r.significant='significant'`. **has_p_value-gated** — raises in the current KG (no DM has p-values yet). Forward-compat surface; check `list_derived_metrics(has_p_value=True)` before using. |
 | max_adjusted_p_value | float \| None | None | Upper bound on `r.adjusted_p_value`. **has_p_value-gated**. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 25 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 

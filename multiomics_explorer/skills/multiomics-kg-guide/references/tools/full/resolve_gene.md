@@ -7,7 +7,7 @@ Resolve a gene identifier (locus tag, gene name, old locus tag, RefSeq protein I
 Use when the input is an exact name, locus tag or alias (no partial matching); for partial / free-text use `genes_by_function`, for what a gene does `gene_overview`.
 Filters: identifier, organism.
 Returns: total_matching, by_organism; one row = one Gene match (locus_tag, gene_name, product, organism_name).
-docs://tools/resolve_gene; summary=True returns by_organism uncapped (larger than the default call).
+docs://tools/resolve_gene; summary=True caps by_organism at 10 too (smaller than the default call).
 
 ## Parameters
 
@@ -31,7 +31,7 @@ total_matching, by_organism, returned, offset, truncated, results
 
 - **total_matching** (int): Total genes matching identifier + organism filter.
 - **by_organism** (list[ResolveOrganismBreakdown]): Match counts per organism, sorted desc.
-- **by_organism_truncated** (bool | None): True when the list was capped at 10 on a detail call — pass summary=True for the full breakdown, or organism= to narrow.
+- **by_organism_truncated** (bool | None): True when the list was capped at 10 (detail and summary calls alike) — pass organism= to narrow.
 - **returned** (int): Genes in this response (0 when summary=True).
 - **offset** (int): Offset into full result set.
 - **truncated** (bool): True if total_matching > returned.
@@ -85,8 +85,6 @@ resolve_gene(identifier="dnaN")
     {"organism_name": "Synechococcus KORDI-100", "count": 2},
     {"organism_name": "Alteromonas (MarRef v6)", "count": 1},
     {"organism_name": "Alteromonas macleodii 83-1", "count": 1},
-    {"organism_name": "Alteromonas macleodii AD45", "count": 1},
-    {"organism_name": "Alteromonas macleodii ATCC27126", "count": 1},
     ...
   ],
   "by_organism_truncated": true,
@@ -161,7 +159,7 @@ resolve_gene(identifier='PMM0001')  # exact identity resolution
 
 - The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works, as does 'Prochlorococcus MED4'. A genus word alone ('Prochlorococcus') matches every strain of that genus — here that just widens the result set (this tool never raises on ambiguity; the single-organism expression tools do).
 
-- `summary=True` returns `by_organism` uncapped with no `results` — on a name shared by many strains that is larger than the default call (which caps the rollup); use it when you need every organism.
+- `by_organism` is capped at 10 entries on every call, `summary=True` included (`by_organism_truncated: true` when trimmed). On a name shared by many strains, pass `organism=` or page the rows to see the rest.
 
 ## Package import equivalent
 

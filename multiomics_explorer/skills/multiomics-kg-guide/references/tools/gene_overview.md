@@ -15,7 +15,7 @@ docs://tools/gene_overview; summary=True for batches over a few hundred genes.
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags to look up. E.g. ['PMM0001', 'PMM0845']. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int \| None | None | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 

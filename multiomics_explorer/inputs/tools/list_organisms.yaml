@@ -222,7 +222,7 @@ examples:
           {"metric_type": "exoproteome_avg_pct_nsaf", "count": 9},
           ...
         ],
-        "...": "4 empty fields omitted (by_metric_type_truncated, top_metabolic_capability_truncated, top_annotation_capability_truncated, warnings)",
+        "by_metric_type_truncated": true,
         "by_compartment": [
           {"compartment": "whole_cell", "count": 102},
           {"compartment": "exoproteome", "count": 10},
@@ -252,6 +252,7 @@ examples:
           },
           ...
         ],
+        "top_metabolic_capability_truncated": true,
         "top_annotation_capability": [
           {
             "preferred_name": "Alteromonas (MarRef v6)",
@@ -279,11 +280,13 @@ examples:
           },
           ...
         ],
+        "top_annotation_capability_truncated": true,
         "by_measurement_capability": {"has_metabolomics": 5, "no_metabolomics": 118},
         "returned": 0,
         "offset": 0,
         "truncated": true,
         "not_found": [],
+        "warnings": [],
         "results": []
       }
 

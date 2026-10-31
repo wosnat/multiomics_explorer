@@ -26,7 +26,7 @@ docs://tools/metabolites_by_flags_assay; summary=True first.
 | flag_value | bool \| None | None | True / False / None (both). Both states are stored: False = tested-absent, real rows (~69% of boolean rows). |
 | stereo_assignment | list[string] \| None | None | Stereo-form provenance (OR): 'as_reported' = the paper named the form; 'dominant_form_assumed' = it named none and the KG placed it on the dominant form (e.g. 'Alanine' on L-Alanine). ['as_reported'] drops assumed rows. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -155,9 +155,7 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
     }
   ],
   "excluded_assays": [],
-  "warnings": [
-    "29 of 93 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on L-Alanine); filter ..."
-  ],
+  "warnings": ["29 of 93 rows assume the dominant stereo form — the paper named no form (e.g. 'Alanine' placed on..."],
   "resolved_aliases": {},
   "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_dois": []},
   "returned": 5,
@@ -224,9 +222,7 @@ metabolites_by_flags_assay(assay_ids=["metabolite_assay:msystems.01261-22:presen
       "count": 64
     }
   ],
-  "excluded_assays": [],
-  "warnings": [],
-  "resolved_aliases": {},
+  "...": "3 empty fields omitted (excluded_assays, warnings, resolved_aliases)",
   "not_found": {"assay_ids": [], "metabolite_ids": [], "experiment_ids": [], "publication_dois": []},
   "returned": 0,
   "truncated": true,

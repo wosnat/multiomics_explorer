@@ -18,7 +18,7 @@ docs://tools/gene_homologs; summary=True first.
 | taxonomic_level | string \| None | None | Filter by taxonomic level. E.g. 'curated', 'Prochloraceae', 'Bacteria'. |
 | max_specificity_rank | int \| None | None | Cap group breadth. 0=curated only, 1=+family, 2=+order, 3=+domain (all). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int \| None | None | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
@@ -94,6 +94,7 @@ gene_homologs(locus_tags=["PMM0001"])
     }
   ],
   "top_cog_categories": [{"id": "cog.category:L", "name": "Replication, recombination and repair", "count": 1}],
+  "warnings": [],
   "results": [
     {
       "locus_tag": "PMM0001",

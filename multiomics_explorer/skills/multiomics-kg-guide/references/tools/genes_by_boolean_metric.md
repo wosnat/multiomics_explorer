@@ -25,7 +25,7 @@ docs://tools/genes_by_boolean_metric; summary=True first.
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
 | flag_value | bool \| None | None | Filter on `r.value`: True keeps `'flagged'` edges, False keeps `'not_flagged'` edges (tested-absent — real biology, stored on 11 of 34 boolean DMs; the rest are positive-only and return 0 rows for False). Check `by_metric[*].false_count` before reading an absent gene as 'not flagged' vs 'not assessed'. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
-| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's docs://tools/ page. |
+| verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 25 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 
