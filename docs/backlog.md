@@ -7,15 +7,12 @@ here and let the CHANGELOG carry the record — this file is only ever the *open
 Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · **L** multi-day, full
 `/add-or-update-tool` cycle · **KG** needs a KG-side change first.
 
-## 1. Now — next release (explorer 0.1.0-alpha.6, breaking)
-
-`[Unreleased]` already carries breaking changes (alpha.5 alias removal, TCDB cleanup, `coculture_partner` list, `not_found.publication_dois`, `kg_release_info` kw-only) plus the metabolite identity / stereo surface, GO transport arm and `control_timing`.
+## 1. Now
 
 | # | Item | Size | Notes |
 |---|---|---|---|
-| 1.1 | Cut alpha.6 with `/release-explorer` (CHANGELOG `[Unreleased]` → dated section; polish the Breaking list). | S | was 2c.12 |
-| 1.2 | KG-side coordination for that cut: next official KG release sets `mcp_min_version` to the alpha.6 version and stamps `release_highlights` / `release_breaking` (alpha.7 shipped with both null; live dev build still null). Asks C1–C4 in `docs/kg-specs/2026-11-01-kg-changelog-review-asks.md` (short Breaking section, figures, schema follow-ups). | KG | §5 A1 |
-| 1.3 | Decide whether 2b.6 consolidation rides this breaking release or becomes a separate alpha.7 (it was deferred from alpha.5 to avoid two breaking releases in a row — alpha.6 is already breaking). | — | decision |
+| 1.2 | KG release notes never reach `Schema_info` (compose files don't forward `KG_RELEASE_HIGHLIGHTS` / `KG_RELEASE_BREAKING` / `KG_RELEASE_NOTES_URL`); alpha.7 and alpha.8 shipped with null highlights / breaking. Ask R1 in `docs/kg-specs/2026-11-01-kg-release-notes-not-stamped-asks.md`; after the KG fix, check `kg_release_info` shows both on alpha.8. | KG | R1 |
+| 1.3 | Decide when the 2b.6 consolidation ships (kept out of alpha.6). | — | decision |
 
 ## 2. Next — small, concrete
 
