@@ -393,7 +393,7 @@ rows:
   locus_tag: BL107_06114
   organism_name: Synechococcus sp. BL107
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: crcB1
@@ -801,7 +801,7 @@ rows:
   locus_tag: BL107_08781
   organism_name: Synechococcus sp. BL107
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -991,7 +991,7 @@ rows:
   locus_tag: BL107_10282
   organism_name: Synechococcus sp. BL107
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -1012,7 +1012,7 @@ rows:
   locus_tag: BL107_10426
   organism_name: Synechococcus sp. BL107
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
@@ -1026,7 +1026,7 @@ rows:
   locus_tag: BL107_10791
   organism_name: Synechococcus sp. BL107
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lepA
@@ -1174,7 +1174,7 @@ rows:
   locus_tag: BL107_11776
   organism_name: Synechococcus sp. BL107
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: lytR
@@ -1357,7 +1357,7 @@ rows:
   locus_tag: BL107_13580
   organism_name: Synechococcus sp. BL107
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -1665,7 +1665,7 @@ rows:
   locus_tag: BL107_16480
   organism_name: Synechococcus sp. BL107
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -1833,7 +1833,7 @@ rows:
   locus_tag: CB0101_RS0100160
   organism_name: Synechococcus CB0101
   product: conserved hypothetical protein
-  score: 7.5748
+  score: 7.5747
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscL
@@ -1896,7 +1896,7 @@ rows:
   locus_tag: CB0101_RS0100935
   organism_name: Synechococcus CB0101
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: lytR
@@ -1924,7 +1924,7 @@ rows:
   locus_tag: CB0101_RS0101200
   organism_name: Synechococcus CB0101
   product: conserved hypothetical protein
-  score: 7.5748
+  score: 7.5747
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: labA
@@ -2017,7 +2017,7 @@ rows:
   locus_tag: CB0101_RS0101845
   organism_name: Synechococcus CB0101
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murA
@@ -2095,7 +2095,7 @@ rows:
   locus_tag: CB0101_RS0102330
   organism_name: Synechococcus CB0101
   product: chromosome segregation protein
-  score: 5.2394
+  score: 5.2393
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -2123,7 +2123,7 @@ rows:
   locus_tag: CB0101_RS0102575
   organism_name: Synechococcus CB0101
   product: RND transporter, hydrophobe/amphiphile efflux-1 family protein
-  score: 6.3265
+  score: 6.3264
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mdtA
@@ -2368,7 +2368,7 @@ rows:
   locus_tag: CB0101_RS0105500
   organism_name: Synechococcus CB0101
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
@@ -2396,7 +2396,7 @@ rows:
   locus_tag: CB0101_RS0105640
   organism_name: Synechococcus CB0101
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -2530,7 +2530,7 @@ rows:
   locus_tag: CB0101_RS0106580
   organism_name: Synechococcus CB0101
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: nlpD
@@ -2810,7 +2810,7 @@ rows:
   locus_tag: CB0101_RS0110340
   organism_name: Synechococcus CB0101
   product: septum formation protein
-  score: 4.6442
+  score: 4.6441
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: zipN
@@ -3055,7 +3055,7 @@ rows:
   locus_tag: CB0101_RS0112885
   organism_name: Synechococcus CB0101
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -4120,7 +4120,7 @@ rows:
   locus_tag: CB0205_RS0103115
   organism_name: Synechococcus CB0205
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -4440,7 +4440,7 @@ rows:
   locus_tag: CB0205_RS0104600
   organism_name: Synechococcus CB0205
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
@@ -4552,7 +4552,7 @@ rows:
   locus_tag: CB0205_RS0105875
   organism_name: Synechococcus CB0205
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -4814,7 +4814,7 @@ rows:
   locus_tag: CB0205_RS0108850
   organism_name: Synechococcus CB0205
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
@@ -4842,7 +4842,7 @@ rows:
   locus_tag: CB0205_RS0108980
   organism_name: Synechococcus CB0205
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -4898,7 +4898,7 @@ rows:
   locus_tag: CB0205_RS0109310
   organism_name: Synechococcus CB0205
   product: conserved hypothetical protein
-  score: 7.5748
+  score: 7.5747
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: glmU
@@ -4962,7 +4962,7 @@ rows:
   locus_tag: CB0205_RS0109855
   organism_name: Synechococcus CB0205
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: nlpD
@@ -5207,14 +5207,14 @@ rows:
   locus_tag: CB0205_RS0112775
   organism_name: Synechococcus CB0205
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: sepF
   locus_tag: CB0205_RS0113015
   organism_name: Synechococcus CB0205
   product: conserved hypothetical protein
-  score: 7.5748
+  score: 7.5747
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: labA
@@ -5300,7 +5300,7 @@ rows:
   locus_tag: CB0205_RS0113645
   organism_name: Synechococcus CB0205
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murA
@@ -5938,7 +5938,7 @@ rows:
   locus_tag: H6G84_05090
   organism_name: Synechococcus elongatus PCC 7942
   product: glutamine--fructose-6-phosphate transaminase (isomerizing)
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lptB
@@ -6227,7 +6227,7 @@ rows:
   locus_tag: H6G84_10885
   organism_name: Synechococcus elongatus PCC 7942
   product: UDP-3-O-(3-hydroxymyristoyl)glucosamine N-acyltransferase
-  score: 2.1516
+  score: 2.1515
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: H6G84_RS10930
@@ -6509,7 +6509,7 @@ rows:
   locus_tag: KR100_01640
   organism_name: Synechococcus KORDI-100
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -6853,7 +6853,7 @@ rows:
   locus_tag: KR100_03520
   organism_name: Synechococcus KORDI-100
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -7043,7 +7043,7 @@ rows:
   locus_tag: KR100_05180
   organism_name: Synechococcus KORDI-100
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -7071,7 +7071,7 @@ rows:
   locus_tag: KR100_05615
   organism_name: Synechococcus KORDI-100
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
@@ -7218,7 +7218,7 @@ rows:
   locus_tag: KR100_07500
   organism_name: Synechococcus KORDI-100
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rlpA
@@ -7443,7 +7443,7 @@ rows:
   locus_tag: KR100_09470
   organism_name: Synechococcus KORDI-100
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -7836,7 +7836,7 @@ rows:
   locus_tag: KR100_13310
   organism_name: Synechococcus KORDI-100
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -8273,7 +8273,7 @@ rows:
   locus_tag: KR100_RS16715
   organism_name: Synechococcus KORDI-100
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
@@ -8525,7 +8525,7 @@ rows:
   locus_tag: KR49_02760
   organism_name: Synechococcus KORDI-49
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -8631,7 +8631,7 @@ rows:
   locus_tag: KR49_03565
   organism_name: Synechococcus KORDI-49
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: psr
@@ -8925,7 +8925,7 @@ rows:
   locus_tag: KR49_06065
   organism_name: Synechococcus KORDI-49
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -9454,7 +9454,7 @@ rows:
   locus_tag: KR49_09470
   organism_name: Synechococcus KORDI-49
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -9798,7 +9798,7 @@ rows:
   locus_tag: KR49_11080
   organism_name: Synechococcus KORDI-49
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -9967,7 +9967,7 @@ rows:
   locus_tag: KR49_12570
   organism_name: Synechococcus KORDI-49
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -9988,7 +9988,7 @@ rows:
   locus_tag: KR49_12715
   organism_name: Synechococcus KORDI-49
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
@@ -10016,7 +10016,7 @@ rows:
   locus_tag: KR49_13010
   organism_name: Synechococcus KORDI-49
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
@@ -10304,7 +10304,7 @@ rows:
   locus_tag: KR52_00420
   organism_name: Synechococcus KORDI-52
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
@@ -10599,7 +10599,7 @@ rows:
   locus_tag: KR52_02015
   organism_name: Synechococcus KORDI-52
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: crcB1
@@ -11085,7 +11085,7 @@ rows:
   locus_tag: KR52_05355
   organism_name: Synechococcus KORDI-52
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -11344,7 +11344,7 @@ rows:
   locus_tag: KR52_08065
   organism_name: Synechococcus KORDI-52
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rlpA
@@ -11547,7 +11547,7 @@ rows:
   locus_tag: KR52_10450
   organism_name: Synechococcus KORDI-52
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -11808,7 +11808,7 @@ rows:
   locus_tag: KR52_13085
   organism_name: Synechococcus KORDI-52
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
@@ -11822,7 +11822,7 @@ rows:
   locus_tag: KR52_13335
   organism_name: Synechococcus KORDI-52
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -11843,7 +11843,7 @@ rows:
   locus_tag: KR52_13485
   organism_name: Synechococcus KORDI-52
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
@@ -12468,7 +12468,7 @@ rows:
   locus_tag: M744_05600
   organism_name: Synechococcus elongatus UTEX 2973
   product: glycosyltransferase family 2 protein
-  score: 3.1962
+  score: 3.1961
 - annotation_quality: 3
   gene_category: Carbohydrate metabolism
   gene_name: glmM
@@ -12650,7 +12650,7 @@ rows:
   locus_tag: M744_09325
   organism_name: Synechococcus elongatus UTEX 2973
   product: UDP-3-O-(3-hydroxymyristoyl)glucosamine N-acyltransferase
-  score: 2.1516
+  score: 2.1515
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: psr
@@ -12854,7 +12854,7 @@ rows:
   locus_tag: RS9916_25874
   organism_name: Synechococcus RS9916
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -12959,7 +12959,7 @@ rows:
   locus_tag: RS9916_27099
   organism_name: Synechococcus RS9916
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -12980,7 +12980,7 @@ rows:
   locus_tag: RS9916_27239
   organism_name: Synechococcus RS9916
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -13205,7 +13205,7 @@ rows:
   locus_tag: RS9916_29239
   organism_name: Synechococcus RS9916
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: pilD
@@ -13422,7 +13422,7 @@ rows:
   locus_tag: RS9916_31362
   organism_name: Synechococcus RS9916
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: phoR
@@ -13760,7 +13760,7 @@ rows:
   locus_tag: RS9916_34357
   organism_name: Synechococcus RS9916
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -14253,7 +14253,7 @@ rows:
   locus_tag: RS9916_38057
   organism_name: Synechococcus RS9916
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -14744,7 +14744,7 @@ rows:
   locus_tag: RS9916_40051
   organism_name: Synechococcus RS9916
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -14940,14 +14940,14 @@ rows:
   locus_tag: RS9917_00962
   organism_name: Synechococcus RS9917
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: phoR
   locus_tag: RS9917_01032
   organism_name: Synechococcus RS9917
   product: two-component system sensor histidine kinase, phosphate sensing PhoR
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: lytR
@@ -15144,7 +15144,7 @@ rows:
   locus_tag: RS9917_02406
   organism_name: Synechococcus RS9917
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: dgdA
@@ -15242,7 +15242,7 @@ rows:
   locus_tag: RS9917_03003
   organism_name: Synechococcus RS9917
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
@@ -15741,7 +15741,7 @@ rows:
   locus_tag: RS9917_05280
   organism_name: Synechococcus RS9917
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: crcB1
@@ -16220,7 +16220,7 @@ rows:
   locus_tag: RS9917_08571
   organism_name: Synechococcus RS9917
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -16410,7 +16410,7 @@ rows:
   locus_tag: RS9917_09776
   organism_name: Synechococcus RS9917
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -16431,7 +16431,7 @@ rows:
   locus_tag: RS9917_09906
   organism_name: Synechococcus RS9917
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 1
   gene_category: Unknown
   gene_name: null
@@ -17182,7 +17182,7 @@ rows:
   locus_tag: SYN9616_RS0100970
   organism_name: Synechococcus CC9616
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -17203,7 +17203,7 @@ rows:
   locus_tag: SYN9616_RS0101105
   organism_name: Synechococcus CC9616
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
@@ -17217,7 +17217,7 @@ rows:
   locus_tag: SYN9616_RS0101385
   organism_name: Synechococcus CC9616
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
@@ -17343,7 +17343,7 @@ rows:
   locus_tag: SYN9616_RS0103135
   organism_name: Synechococcus CC9616
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rlpA
@@ -17547,7 +17547,7 @@ rows:
   locus_tag: SYN9616_RS0105105
   organism_name: Synechococcus CC9616
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -17884,7 +17884,7 @@ rows:
   locus_tag: SYN9616_RS0108660
   organism_name: Synechococcus CC9616
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -18356,7 +18356,7 @@ rows:
   locus_tag: SYN9616_RS0112275
   organism_name: Synechococcus CC9616
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -18672,7 +18672,7 @@ rows:
   locus_tag: SYN9616_RS0114035
   organism_name: Synechococcus CC9616
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -18987,7 +18987,7 @@ rows:
   locus_tag: SYNCC9902_RS08290
   organism_name: Synechococcus CC9902
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -19661,7 +19661,7 @@ rows:
   locus_tag: SYNRCC307_RS11690
   organism_name: Synechococcus RCC307
   product: beta-barrel porin-like outer membrane protein
-  score: 1.1173
+  score: 1.1999
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -19796,7 +19796,7 @@ rows:
   locus_tag: SYNW0098
   organism_name: Synechococcus WH8102
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
@@ -19957,7 +19957,7 @@ rows:
   locus_tag: SYNW0199
   organism_name: Synechococcus WH8102
   product: UDP-glucose 6-dehydrogenase
-  score: 1.3477
+  score: 1.3476
 - annotation_quality: 3
   gene_category: Carbohydrate metabolism
   gene_name: null
@@ -20344,7 +20344,7 @@ rows:
   locus_tag: SYNW0537
   organism_name: Synechococcus WH8102
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -20596,7 +20596,7 @@ rows:
   locus_tag: SYNW0934
   organism_name: Synechococcus WH8102
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpC
@@ -20737,7 +20737,7 @@ rows:
   locus_tag: SYNW1112
   organism_name: Synechococcus WH8102
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -21039,7 +21039,7 @@ rows:
   locus_tag: SYNW1690
   organism_name: Synechococcus WH8102
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
@@ -21608,7 +21608,7 @@ rows:
   locus_tag: Syn8016DRAFT_0183
   organism_name: Synechococcus WH8016
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: SYN8016DRAFT_RS00895
@@ -22085,7 +22085,7 @@ rows:
   locus_tag: Syn8016DRAFT_1237
   organism_name: Synechococcus WH8016
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -22106,7 +22106,7 @@ rows:
   locus_tag: Syn8016DRAFT_1262
   organism_name: Synechococcus WH8016
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Transport
   gene_name: SYN8016DRAFT_RS06015
@@ -22402,7 +22402,7 @@ rows:
   locus_tag: Syn8016DRAFT_1622
   organism_name: Synechococcus WH8016
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: SYN8016DRAFT_RS07590
@@ -22641,7 +22641,7 @@ rows:
   locus_tag: Syn8016DRAFT_1799
   organism_name: Synechococcus WH8016
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: crcB1
@@ -22879,7 +22879,7 @@ rows:
   locus_tag: Syn8016DRAFT_2142
   organism_name: Synechococcus WH8016
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -23159,7 +23159,7 @@ rows:
   locus_tag: Syn8016DRAFT_2573
   organism_name: Synechococcus WH8016
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: dgdA
@@ -23243,7 +23243,7 @@ rows:
   locus_tag: Syn8016DRAFT_2721
   organism_name: Synechococcus WH8016
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -24418,7 +24418,7 @@ rows:
   locus_tag: SynA15127_00115
   organism_name: Synechococcus A15-127
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -24762,7 +24762,7 @@ rows:
   locus_tag: SynA15127_00462
   organism_name: Synechococcus A15-127
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -24931,7 +24931,7 @@ rows:
   locus_tag: SynA15127_00744
   organism_name: Synechococcus A15-127
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -24952,7 +24952,7 @@ rows:
   locus_tag: SynA15127_00773
   organism_name: Synechococcus A15-127
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
@@ -24980,7 +24980,7 @@ rows:
   locus_tag: SynA15127_00845
   organism_name: Synechococcus A15-127
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
@@ -25345,7 +25345,7 @@ rows:
   locus_tag: SynA15127_01577
   organism_name: Synechococcus A15-127
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -25451,7 +25451,7 @@ rows:
   locus_tag: SynA15127_01742
   organism_name: Synechococcus A15-127
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: psr
@@ -25724,7 +25724,7 @@ rows:
   locus_tag: SynA15127_02271
   organism_name: Synechococcus A15-127
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -25955,7 +25955,7 @@ rows:
   locus_tag: SynA15127_02486
   organism_name: Synechococcus A15-127
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 2
   gene_category: Stress response and adaptation
   gene_name: null
@@ -26462,7 +26462,7 @@ rows:
   locus_tag: SynA1524_00163
   organism_name: Synechococcus A15-24
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -26869,7 +26869,7 @@ rows:
   locus_tag: SynA1524_00568
   organism_name: Synechococcus A15-24
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -27149,7 +27149,7 @@ rows:
   locus_tag: SynA1524_01009
   organism_name: Synechococcus A15-24
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rlpA
@@ -27248,7 +27248,7 @@ rows:
   locus_tag: SynA1524_01195
   organism_name: Synechococcus A15-24
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -27543,7 +27543,7 @@ rows:
   locus_tag: SynA1524_01826
   organism_name: Synechococcus A15-24
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
@@ -27564,7 +27564,7 @@ rows:
   locus_tag: SynA1524_01891
   organism_name: Synechococcus A15-24
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -27585,7 +27585,7 @@ rows:
   locus_tag: SynA1524_01917
   organism_name: Synechococcus A15-24
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: pta
@@ -27747,7 +27747,7 @@ rows:
   locus_tag: SynA1524_02248
   organism_name: Synechococcus A15-24
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
@@ -28199,7 +28199,7 @@ rows:
   locus_tag: SynA1528_00115
   organism_name: Synechococcus A15-28
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -28606,7 +28606,7 @@ rows:
   locus_tag: SynA1528_00545
   organism_name: Synechococcus A15-28
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -28865,7 +28865,7 @@ rows:
   locus_tag: SynA1528_00970
   organism_name: Synechococcus A15-28
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rlpA
@@ -28971,7 +28971,7 @@ rows:
   locus_tag: SynA1528_01185
   organism_name: Synechococcus A15-28
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -29280,7 +29280,7 @@ rows:
   locus_tag: SynA1528_01839
   organism_name: Synechococcus A15-28
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
@@ -29301,7 +29301,7 @@ rows:
   locus_tag: SynA1528_01907
   organism_name: Synechococcus A15-28
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
@@ -29329,7 +29329,7 @@ rows:
   locus_tag: SynA1528_01935
   organism_name: Synechococcus A15-28
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: pta
@@ -29491,7 +29491,7 @@ rows:
   locus_tag: SynA1528_02270
   organism_name: Synechococcus A15-28
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
@@ -29921,7 +29921,7 @@ rows:
   locus_tag: SynA1544_00096
   organism_name: Synechococcus A15-44
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -30216,7 +30216,7 @@ rows:
   locus_tag: SynA1544_00409
   organism_name: Synechococcus A15-44
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -30406,7 +30406,7 @@ rows:
   locus_tag: SynA1544_00774
   organism_name: Synechococcus A15-44
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -30427,7 +30427,7 @@ rows:
   locus_tag: SynA1544_00803
   organism_name: Synechococcus A15-44
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
@@ -30441,7 +30441,7 @@ rows:
   locus_tag: SynA1544_00851
   organism_name: Synechococcus A15-44
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lepA
@@ -30596,7 +30596,7 @@ rows:
   locus_tag: SynA1544_01266
   organism_name: Synechococcus A15-44
   product: signal transduction histidine kinase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -30702,7 +30702,7 @@ rows:
   locus_tag: SynA1544_01403
   organism_name: Synechococcus A15-44
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -30940,7 +30940,7 @@ rows:
   locus_tag: SynA1544_01942
   organism_name: Synechococcus A15-44
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: psr
@@ -31213,7 +31213,7 @@ rows:
   locus_tag: SynA1544_02602
   organism_name: Synechococcus A15-44
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -31967,7 +31967,7 @@ rows:
   locus_tag: SynA1560_00160
   organism_name: Synechococcus A15-60
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -32128,7 +32128,7 @@ rows:
   locus_tag: SynA1560_00259
   organism_name: Synechococcus A15-60
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -32325,7 +32325,7 @@ rows:
   locus_tag: SynA1560_00501
   organism_name: Synechococcus A15-60
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -32521,7 +32521,7 @@ rows:
   locus_tag: SynA1560_00840
   organism_name: Synechococcus A15-60
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -32655,7 +32655,7 @@ rows:
   locus_tag: SynA1560_01104
   organism_name: Synechococcus A15-60
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -32676,7 +32676,7 @@ rows:
   locus_tag: SynA1560_01132
   organism_name: Synechococcus A15-60
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -33097,7 +33097,7 @@ rows:
   locus_tag: SynA1560_02263
   organism_name: Synechococcus A15-60
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: lytR
@@ -33272,7 +33272,7 @@ rows:
   locus_tag: SynA1560_02610
   organism_name: Synechococcus A15-60
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: dgdA
@@ -33602,7 +33602,7 @@ rows:
   locus_tag: SynA1560_RS08375
   organism_name: Synechococcus A15-60
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -33701,7 +33701,7 @@ rows:
   locus_tag: SynA1562_00098
   organism_name: Synechococcus A15-62
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -34059,7 +34059,7 @@ rows:
   locus_tag: SynA1562_00438
   organism_name: Synechococcus A15-62
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -34235,7 +34235,7 @@ rows:
   locus_tag: SynA1562_00737
   organism_name: Synechococcus A15-62
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -34256,7 +34256,7 @@ rows:
   locus_tag: SynA1562_00766
   organism_name: Synechococcus A15-62
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
@@ -34270,7 +34270,7 @@ rows:
   locus_tag: SynA1562_00821
   organism_name: Synechococcus A15-62
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -34531,7 +34531,7 @@ rows:
   locus_tag: SynA1562_01270
   organism_name: Synechococcus A15-62
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rlpA
@@ -34734,7 +34734,7 @@ rows:
   locus_tag: SynA1562_01726
   organism_name: Synechococcus A15-62
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: psr
@@ -35086,7 +35086,7 @@ rows:
   locus_tag: SynA1562_02286
   organism_name: Synechococcus A15-62
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -35980,7 +35980,7 @@ rows:
   locus_tag: SynA1825c_00131
   organism_name: Synechococcus A18-25c
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: SynA1825c_RS00645
@@ -36120,7 +36120,7 @@ rows:
   locus_tag: SynA1825c_00226
   organism_name: Synechococcus A18-25c
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: SynA1825c_RS01080
@@ -36317,7 +36317,7 @@ rows:
   locus_tag: SynA1825c_00472
   organism_name: Synechococcus A18-25c
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -36506,7 +36506,7 @@ rows:
   locus_tag: SynA1825c_00811
   organism_name: Synechococcus A18-25c
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -36647,7 +36647,7 @@ rows:
   locus_tag: SynA1825c_01095
   organism_name: Synechococcus A18-25c
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: SynA1825c_RS04990
@@ -36668,7 +36668,7 @@ rows:
   locus_tag: SynA1825c_01122
   organism_name: Synechococcus A18-25c
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: SynA1825c_RS05190
@@ -37096,7 +37096,7 @@ rows:
   locus_tag: SynA1825c_02224
   organism_name: Synechococcus A18-25c
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: SynA1825c_RS09785
@@ -37278,7 +37278,7 @@ rows:
   locus_tag: SynA1825c_02573
   organism_name: Synechococcus A18-25c
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: dgdA
@@ -37594,7 +37594,7 @@ rows:
   locus_tag: SynA1825c_RS13540
   organism_name: Synechococcus A18-25c
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -37714,7 +37714,7 @@ rows:
   locus_tag: SynA1840_00100
   organism_name: Synechococcus A18-40
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
@@ -38268,7 +38268,7 @@ rows:
   locus_tag: SynA1840_00562
   organism_name: Synechococcus A18-40
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -38541,7 +38541,7 @@ rows:
   locus_tag: SynA1840_00994
   organism_name: Synechococcus A18-40
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rlpA
@@ -38654,7 +38654,7 @@ rows:
   locus_tag: SynA1840_01169
   organism_name: Synechococcus A18-40
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -38942,7 +38942,7 @@ rows:
   locus_tag: SynA1840_01878
   organism_name: Synechococcus A18-40
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
@@ -38970,7 +38970,7 @@ rows:
   locus_tag: SynA1840_01938
   organism_name: Synechococcus A18-40
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -38991,7 +38991,7 @@ rows:
   locus_tag: SynA1840_01972
   organism_name: Synechococcus A18-40
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: pta
@@ -39167,7 +39167,7 @@ rows:
   locus_tag: SynA1840_02304
   organism_name: Synechococcus A18-40
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
@@ -39639,7 +39639,7 @@ rows:
   locus_tag: SynA18461_00102
   organism_name: Synechococcus A18-46.1
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
@@ -40130,7 +40130,7 @@ rows:
   locus_tag: SynA18461_00589
   organism_name: Synechococcus A18-46.1
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -40396,7 +40396,7 @@ rows:
   locus_tag: SynA18461_01038
   organism_name: Synechococcus A18-46.1
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rlpA
@@ -40531,7 +40531,7 @@ rows:
   locus_tag: SynA18461_01253
   organism_name: Synechococcus A18-46.1
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -40826,7 +40826,7 @@ rows:
   locus_tag: SynA18461_01963
   organism_name: Synechococcus A18-46.1
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
@@ -40847,7 +40847,7 @@ rows:
   locus_tag: SynA18461_02038
   organism_name: Synechococcus A18-46.1
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -40868,7 +40868,7 @@ rows:
   locus_tag: SynA18461_02069
   organism_name: Synechococcus A18-46.1
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: pta
@@ -41037,7 +41037,7 @@ rows:
   locus_tag: SynA18461_02395
   organism_name: Synechococcus A18-46.1
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
@@ -41929,7 +41929,7 @@ rows:
   locus_tag: SynBIOSE41_00127
   organism_name: Synechococcus BIOS-E4-1
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
@@ -42435,7 +42435,7 @@ rows:
   locus_tag: SynBIOSE41_00578
   organism_name: Synechococcus BIOS-E4-1
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -42540,7 +42540,7 @@ rows:
   locus_tag: SynBIOSE41_00736
   organism_name: Synechococcus BIOS-E4-1
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lepA
@@ -42820,7 +42820,7 @@ rows:
   locus_tag: SynBIOSE41_01692
   organism_name: Synechococcus BIOS-E4-1
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murF
@@ -42926,7 +42926,7 @@ rows:
   locus_tag: SynBIOSE41_02025
   organism_name: Synechococcus BIOS-E4-1
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -43213,7 +43213,7 @@ rows:
   locus_tag: SynBIOSE41_02885
   organism_name: Synechococcus BIOS-E4-1
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: phoR
@@ -43318,7 +43318,7 @@ rows:
   locus_tag: SynBIOSE41_03243
   organism_name: Synechococcus BIOS-E4-1
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -43339,7 +43339,7 @@ rows:
   locus_tag: SynBIOSE41_03272
   organism_name: Synechococcus BIOS-E4-1
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -43480,7 +43480,7 @@ rows:
   locus_tag: SynBIOSE41_03587
   organism_name: Synechococcus BIOS-E4-1
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -44134,7 +44134,7 @@ rows:
   locus_tag: SynBIOSU31_00131
   organism_name: Synechococcus BIOS-U3-1
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -44557,7 +44557,7 @@ rows:
   locus_tag: SynBIOSU31_00536
   organism_name: Synechococcus BIOS-U3-1
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -44662,7 +44662,7 @@ rows:
   locus_tag: SynBIOSU31_00702
   organism_name: Synechococcus BIOS-U3-1
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lepA
@@ -44858,7 +44858,7 @@ rows:
   locus_tag: SynBIOSU31_01161
   organism_name: Synechococcus BIOS-U3-1
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
@@ -45103,7 +45103,7 @@ rows:
   locus_tag: SynBIOSU31_01738
   organism_name: Synechococcus BIOS-U3-1
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -45356,7 +45356,7 @@ rows:
   locus_tag: SynBIOSU31_02432
   organism_name: Synechococcus BIOS-U3-1
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -45377,7 +45377,7 @@ rows:
   locus_tag: SynBIOSU31_02462
   organism_name: Synechococcus BIOS-U3-1
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -45539,7 +45539,7 @@ rows:
   locus_tag: SynBIOSU31_02779
   organism_name: Synechococcus BIOS-U3-1
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -46179,7 +46179,7 @@ rows:
   locus_tag: SynBMKMC1_00137
   organism_name: Synechococcus BMK-MC-1
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -46686,7 +46686,7 @@ rows:
   locus_tag: SynBMKMC1_00582
   organism_name: Synechococcus BMK-MC-1
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -46791,7 +46791,7 @@ rows:
   locus_tag: SynBMKMC1_00724
   organism_name: Synechococcus BMK-MC-1
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -46805,7 +46805,7 @@ rows:
   locus_tag: SynBMKMC1_00753
   organism_name: Synechococcus BMK-MC-1
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -46819,7 +46819,7 @@ rows:
   locus_tag: SynBMKMC1_00781
   organism_name: Synechococcus BMK-MC-1
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -46980,7 +46980,7 @@ rows:
   locus_tag: SynBMKMC1_01285
   organism_name: Synechococcus BMK-MC-1
   product: signal transduction histidine kinase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -47170,7 +47170,7 @@ rows:
   locus_tag: SynBMKMC1_01590
   organism_name: Synechococcus BMK-MC-1
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -47303,7 +47303,7 @@ rows:
   locus_tag: SynBMKMC1_01820
   organism_name: Synechococcus BMK-MC-1
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: phoR
@@ -47689,7 +47689,7 @@ rows:
   locus_tag: SynBMKMC1_02517
   organism_name: Synechococcus BMK-MC-1
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -48190,7 +48190,7 @@ rows:
   locus_tag: SynBOUM118_00101
   organism_name: Synechococcus BOUM118
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
@@ -48710,7 +48710,7 @@ rows:
   locus_tag: SynBOUM118_00555
   organism_name: Synechococcus BOUM118
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -48998,7 +48998,7 @@ rows:
   locus_tag: SynBOUM118_01009
   organism_name: Synechococcus BOUM118
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rlpA
@@ -49118,7 +49118,7 @@ rows:
   locus_tag: SynBOUM118_01182
   organism_name: Synechococcus BOUM118
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -49420,7 +49420,7 @@ rows:
   locus_tag: SynBOUM118_01840
   organism_name: Synechococcus BOUM118
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
@@ -49441,7 +49441,7 @@ rows:
   locus_tag: SynBOUM118_01899
   organism_name: Synechococcus BOUM118
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -49462,7 +49462,7 @@ rows:
   locus_tag: SynBOUM118_01932
   organism_name: Synechococcus BOUM118
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: pta
@@ -49645,7 +49645,7 @@ rows:
   locus_tag: SynBOUM118_02243
   organism_name: Synechococcus BOUM118
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
@@ -50412,7 +50412,7 @@ rows:
   locus_tag: SynM161_00111
   organism_name: Synechococcus M16.1
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -50679,7 +50679,7 @@ rows:
   locus_tag: SynM161_00395
   organism_name: Synechococcus M16.1
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -50841,7 +50841,7 @@ rows:
   locus_tag: SynM161_00676
   organism_name: Synechococcus M16.1
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -50862,7 +50862,7 @@ rows:
   locus_tag: SynM161_00704
   organism_name: Synechococcus M16.1
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
@@ -50876,7 +50876,7 @@ rows:
   locus_tag: SynM161_00754
   organism_name: Synechococcus M16.1
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lepA
@@ -51102,7 +51102,7 @@ rows:
   locus_tag: SynM161_01184
   organism_name: Synechococcus M16.1
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -51284,7 +51284,7 @@ rows:
   locus_tag: SynM161_01604
   organism_name: Synechococcus M16.1
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: psr
@@ -51494,7 +51494,7 @@ rows:
   locus_tag: SynM161_02025
   organism_name: Synechococcus M16.1
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -52036,7 +52036,7 @@ rows:
   locus_tag: SynMEDNS5_00095
   organism_name: Synechococcus MEDNS5
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -52472,7 +52472,7 @@ rows:
   locus_tag: SynMEDNS5_00472
   organism_name: Synechococcus MEDNS5
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -52584,7 +52584,7 @@ rows:
   locus_tag: SynMEDNS5_00623
   organism_name: Synechococcus MEDNS5
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -52598,7 +52598,7 @@ rows:
   locus_tag: SynMEDNS5_00654
   organism_name: Synechococcus MEDNS5
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -52619,7 +52619,7 @@ rows:
   locus_tag: SynMEDNS5_00682
   organism_name: Synechococcus MEDNS5
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -52963,7 +52963,7 @@ rows:
   locus_tag: SynMEDNS5_01367
   organism_name: Synechococcus MEDNS5
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -53117,7 +53117,7 @@ rows:
   locus_tag: SynMEDNS5_01626
   organism_name: Synechococcus MEDNS5
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: phoR
@@ -53461,7 +53461,7 @@ rows:
   locus_tag: SynMEDNS5_02190
   organism_name: Synechococcus MEDNS5
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -53982,7 +53982,7 @@ rows:
   locus_tag: SynMINOS11_00101
   organism_name: Synechococcus MINOS11
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -54485,7 +54485,7 @@ rows:
   locus_tag: SynMINOS11_00464
   organism_name: Synechococcus MINOS11
   product: conserved hypothetical protein
-  score: 7.5748
+  score: 7.5747
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: minE
@@ -54689,7 +54689,7 @@ rows:
   locus_tag: SynMINOS11_00706
   organism_name: Synechococcus MINOS11
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: sthA
@@ -54802,7 +54802,7 @@ rows:
   locus_tag: SynMINOS11_00869
   organism_name: Synechococcus MINOS11
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
@@ -54830,7 +54830,7 @@ rows:
   locus_tag: SynMINOS11_00926
   organism_name: Synechococcus MINOS11
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -54844,7 +54844,7 @@ rows:
   locus_tag: SynMINOS11_00957
   organism_name: Synechococcus MINOS11
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
@@ -55055,7 +55055,7 @@ rows:
   locus_tag: SynMINOS11_01367
   organism_name: Synechococcus MINOS11
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -55468,7 +55468,7 @@ rows:
   locus_tag: SynMINOS11_01986
   organism_name: Synechococcus MINOS11
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -55601,7 +55601,7 @@ rows:
   locus_tag: SynMINOS11_02249
   organism_name: Synechococcus MINOS11
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
@@ -56003,7 +56003,7 @@ rows:
   locus_tag: SynMITS9220_00099
   organism_name: Synechococcus MITS9220
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -56477,7 +56477,7 @@ rows:
   locus_tag: SynMITS9220_00485
   organism_name: Synechococcus MITS9220
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -56582,7 +56582,7 @@ rows:
   locus_tag: SynMITS9220_00649
   organism_name: Synechococcus MITS9220
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lepA
@@ -56850,7 +56850,7 @@ rows:
   locus_tag: SynMITS9220_01071
   organism_name: Synechococcus MITS9220
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: psr
@@ -57418,7 +57418,7 @@ rows:
   locus_tag: SynMITS9220_02208
   organism_name: Synechococcus MITS9220
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -57439,7 +57439,7 @@ rows:
   locus_tag: SynMITS9220_02237
   organism_name: Synechococcus MITS9220
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -57608,7 +57608,7 @@ rows:
   locus_tag: SynMITS9220_02492
   organism_name: Synechococcus MITS9220
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -58269,7 +58269,7 @@ rows:
   locus_tag: SynMVIR181_00111
   organism_name: Synechococcus MVIR-18-1
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -58670,7 +58670,7 @@ rows:
   locus_tag: SynMVIR181_00524
   organism_name: Synechococcus MVIR-18-1
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -58775,7 +58775,7 @@ rows:
   locus_tag: SynMVIR181_00725
   organism_name: Synechococcus MVIR-18-1
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -58978,7 +58978,7 @@ rows:
   locus_tag: SynMVIR181_01169
   organism_name: Synechococcus MVIR-18-1
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
@@ -59399,7 +59399,7 @@ rows:
   locus_tag: SynMVIR181_02147
   organism_name: Synechococcus MVIR-18-1
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -59420,7 +59420,7 @@ rows:
   locus_tag: SynMVIR181_02173
   organism_name: Synechococcus MVIR-18-1
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -59568,7 +59568,7 @@ rows:
   locus_tag: SynMVIR181_02438
   organism_name: Synechococcus MVIR-18-1
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -60123,7 +60123,7 @@ rows:
   locus_tag: SynNOUM97013_00120
   organism_name: Synechococcus NOUM97013
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -60270,7 +60270,7 @@ rows:
   locus_tag: SynNOUM97013_00207
   organism_name: Synechococcus NOUM97013
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -60622,7 +60622,7 @@ rows:
   locus_tag: SynNOUM97013_00492
   organism_name: Synechococcus NOUM97013
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -60727,7 +60727,7 @@ rows:
   locus_tag: SynNOUM97013_00632
   organism_name: Synechococcus NOUM97013
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -60937,7 +60937,7 @@ rows:
   locus_tag: SynNOUM97013_00987
   organism_name: Synechococcus NOUM97013
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
@@ -61407,7 +61407,7 @@ rows:
   locus_tag: SynNOUM97013_02049
   organism_name: Synechococcus NOUM97013
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -61428,7 +61428,7 @@ rows:
   locus_tag: SynNOUM97013_02077
   organism_name: Synechococcus NOUM97013
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -61590,7 +61590,7 @@ rows:
   locus_tag: SynNOUM97013_02322
   organism_name: Synechococcus NOUM97013
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -62644,7 +62644,7 @@ rows:
   locus_tag: SynPROS71_00170
   organism_name: Synechococcus PROS-7-1
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -63072,7 +63072,7 @@ rows:
   locus_tag: SynPROS71_00553
   organism_name: Synechococcus PROS-7-1
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -63177,7 +63177,7 @@ rows:
   locus_tag: SynPROS71_00688
   organism_name: Synechococcus PROS-7-1
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -63198,7 +63198,7 @@ rows:
   locus_tag: SynPROS71_00728
   organism_name: Synechococcus PROS-7-1
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -63345,7 +63345,7 @@ rows:
   locus_tag: SynPROS71_01173
   organism_name: Synechococcus PROS-7-1
   product: signal transduction histidine kinase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -63675,7 +63675,7 @@ rows:
   locus_tag: SynPROS71_01751
   organism_name: Synechococcus PROS-7-1
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: phoR
@@ -64026,7 +64026,7 @@ rows:
   locus_tag: SynPROS71_02254
   organism_name: Synechococcus PROS-7-1
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -64526,7 +64526,7 @@ rows:
   locus_tag: SynPROS91_00097
   organism_name: Synechococcus PROS-9-1
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -64996,7 +64996,7 @@ rows:
   locus_tag: SynPROS91_00488
   organism_name: Synechococcus PROS-9-1
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -65101,7 +65101,7 @@ rows:
   locus_tag: SynPROS91_00653
   organism_name: Synechococcus PROS-9-1
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -65283,7 +65283,7 @@ rows:
   locus_tag: SynPROS91_01032
   organism_name: Synechococcus PROS-9-1
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: psr
@@ -65655,7 +65655,7 @@ rows:
   locus_tag: SynPROS91_01906
   organism_name: Synechococcus PROS-9-1
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -65676,7 +65676,7 @@ rows:
   locus_tag: SynPROS91_01934
   organism_name: Synechococcus PROS-9-1
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: rseP
@@ -65796,7 +65796,7 @@ rows:
   locus_tag: SynPROS91_02187
   organism_name: Synechococcus PROS-9-1
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -66312,7 +66312,7 @@ rows:
   locus_tag: SynPROSU1_00158
   organism_name: Synechococcus PROS-U-1
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -66670,7 +66670,7 @@ rows:
   locus_tag: SynPROSU1_00509
   organism_name: Synechococcus PROS-U-1
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -66846,7 +66846,7 @@ rows:
   locus_tag: SynPROSU1_00860
   organism_name: Synechococcus PROS-U-1
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -66867,7 +66867,7 @@ rows:
   locus_tag: SynPROSU1_00889
   organism_name: Synechococcus PROS-U-1
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
@@ -66881,7 +66881,7 @@ rows:
   locus_tag: SynPROSU1_00958
   organism_name: Synechococcus PROS-U-1
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lepA
@@ -67324,7 +67324,7 @@ rows:
   locus_tag: SynPROSU1_01959
   organism_name: Synechococcus PROS-U-1
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: psr
@@ -67562,7 +67562,7 @@ rows:
   locus_tag: SynPROSU1_02499
   organism_name: Synechococcus PROS-U-1
   product: signal transduction histidine kinase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: null
@@ -67632,7 +67632,7 @@ rows:
   locus_tag: SynPROSU1_02585
   organism_name: Synechococcus PROS-U-1
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -68146,7 +68146,7 @@ rows:
   locus_tag: SynRCC2555_00114
   organism_name: Synechococcus WH8101
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -68602,7 +68602,7 @@ rows:
   locus_tag: SynRCC2555_00515
   organism_name: Synechococcus WH8101
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -68686,7 +68686,7 @@ rows:
   locus_tag: SynRCC2555_00662
   organism_name: Synechococcus WH8101
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lepA
@@ -68855,14 +68855,14 @@ rows:
   locus_tag: SynRCC2555_00945
   organism_name: Synechococcus WH8101
   product: two-component system sensor histidine kinase, phosphate sensing PhoR
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: uppS
   locus_tag: SynRCC2555_00959
   organism_name: Synechococcus WH8101
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
@@ -69374,7 +69374,7 @@ rows:
   locus_tag: SynRCC2555_02070
   organism_name: Synechococcus WH8101
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -69395,7 +69395,7 @@ rows:
   locus_tag: SynRCC2555_02096
   organism_name: Synechococcus WH8101
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -69564,7 +69564,7 @@ rows:
   locus_tag: SynRCC2555_02378
   organism_name: Synechococcus WH8101
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -70029,7 +70029,7 @@ rows:
   locus_tag: SynRCC307_0095
   organism_name: Synechococcus RCC307
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 2
   gene_category: Energy production
   gene_name: null
@@ -70503,7 +70503,7 @@ rows:
   locus_tag: SynRCC307_0433
   organism_name: Synechococcus RCC307
   product: conserved hypothetical protein
-  score: 7.5748
+  score: 7.5747
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: minE
@@ -70672,7 +70672,7 @@ rows:
   locus_tag: SynRCC307_0624
   organism_name: Synechococcus RCC307
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: sthA
@@ -70778,7 +70778,7 @@ rows:
   locus_tag: SynRCC307_0792
   organism_name: Synechococcus RCC307
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
@@ -70813,7 +70813,7 @@ rows:
   locus_tag: SynRCC307_0848
   organism_name: Synechococcus RCC307
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -70834,7 +70834,7 @@ rows:
   locus_tag: SynRCC307_0878
   organism_name: Synechococcus RCC307
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
@@ -71045,7 +71045,7 @@ rows:
   locus_tag: SynRCC307_1262
   organism_name: Synechococcus RCC307
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -71157,7 +71157,7 @@ rows:
   locus_tag: SynRCC307_1436
   organism_name: Synechococcus RCC307
   product: RND transporter, hydrophobe/amphiphile efflux-1 family protein
-  score: 6.3265
+  score: 6.3264
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -71269,7 +71269,7 @@ rows:
   locus_tag: SynRCC307_1697
   organism_name: Synechococcus RCC307
   product: septum formation protein
-  score: 4.6442
+  score: 4.6441
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: zipN
@@ -71521,7 +71521,7 @@ rows:
   locus_tag: SynRCC307_2085
   organism_name: Synechococcus RCC307
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
@@ -71958,7 +71958,7 @@ rows:
   locus_tag: SynROS8604_00120
   organism_name: Synechococcus ROS8604
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -72542,7 +72542,7 @@ rows:
   locus_tag: SynROS8604_00673
   organism_name: Synechococcus ROS8604
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -72661,7 +72661,7 @@ rows:
   locus_tag: SynROS8604_00875
   organism_name: Synechococcus ROS8604
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -72703,7 +72703,7 @@ rows:
   locus_tag: SynROS8604_00937
   organism_name: Synechococcus ROS8604
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: wcaJ
@@ -72892,7 +72892,7 @@ rows:
   locus_tag: SynROS8604_01409
   organism_name: Synechococcus ROS8604
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
@@ -73488,7 +73488,7 @@ rows:
   locus_tag: SynROS8604_02653
   organism_name: Synechococcus ROS8604
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -73509,7 +73509,7 @@ rows:
   locus_tag: SynROS8604_02678
   organism_name: Synechococcus ROS8604
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -73699,7 +73699,7 @@ rows:
   locus_tag: SynROS8604_03044
   organism_name: Synechococcus ROS8604
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -74234,7 +74234,7 @@ rows:
   locus_tag: SynRS9902_00096
   organism_name: Synechococcus RS9902
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -74543,7 +74543,7 @@ rows:
   locus_tag: SynRS9902_00403
   organism_name: Synechococcus RS9902
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -74851,7 +74851,7 @@ rows:
   locus_tag: SynRS9902_00736
   organism_name: Synechococcus RS9902
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -75217,7 +75217,7 @@ rows:
   locus_tag: SynRS9902_01271
   organism_name: Synechococcus RS9902
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: lytR
@@ -75455,7 +75455,7 @@ rows:
   locus_tag: SynRS9902_01763
   organism_name: Synechococcus RS9902
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -75758,7 +75758,7 @@ rows:
   locus_tag: SynRS9902_02313
   organism_name: Synechococcus RS9902
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
@@ -75772,7 +75772,7 @@ rows:
   locus_tag: SynRS9902_02366
   organism_name: Synechococcus RS9902
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -75793,7 +75793,7 @@ rows:
   locus_tag: SynRS9902_02396
   organism_name: Synechococcus RS9902
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
@@ -76252,7 +76252,7 @@ rows:
   locus_tag: SynRS9907_00097
   organism_name: Synechococcus RS9907
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -76547,7 +76547,7 @@ rows:
   locus_tag: SynRS9907_00390
   organism_name: Synechococcus RS9907
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -76730,7 +76730,7 @@ rows:
   locus_tag: SynRS9907_00689
   organism_name: Synechococcus RS9907
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -76751,7 +76751,7 @@ rows:
   locus_tag: SynRS9907_00717
   organism_name: Synechococcus RS9907
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
@@ -76765,7 +76765,7 @@ rows:
   locus_tag: SynRS9907_00765
   organism_name: Synechococcus RS9907
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lepA
@@ -76793,7 +76793,7 @@ rows:
   locus_tag: SynRS9907_00805
   organism_name: Synechococcus RS9907
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -76948,7 +76948,7 @@ rows:
   locus_tag: SynRS9907_01218
   organism_name: Synechococcus RS9907
   product: signal transduction histidine kinase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -77054,7 +77054,7 @@ rows:
   locus_tag: SynRS9907_01360
   organism_name: Synechococcus RS9907
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -77278,7 +77278,7 @@ rows:
   locus_tag: SynRS9907_01819
   organism_name: Synechococcus RS9907
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: psr
@@ -77586,7 +77586,7 @@ rows:
   locus_tag: SynRS9907_02398
   organism_name: Synechococcus RS9907
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -78346,7 +78346,7 @@ rows:
   locus_tag: SynRS9909_00107
   organism_name: Synechococcus RS9909
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -78852,7 +78852,7 @@ rows:
   locus_tag: SynRS9909_00565
   organism_name: Synechococcus RS9909
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -78957,7 +78957,7 @@ rows:
   locus_tag: SynRS9909_00692
   organism_name: Synechococcus RS9909
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lepA
@@ -79161,14 +79161,14 @@ rows:
   locus_tag: SynRS9909_00968
   organism_name: Synechococcus RS9909
   product: two-component system sensor histidine kinase, phosphate sensing PhoR
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: uppS
   locus_tag: SynRS9909_00982
   organism_name: Synechococcus RS9909
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
@@ -79631,7 +79631,7 @@ rows:
   locus_tag: SynRS9909_02001
   organism_name: Synechococcus RS9909
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -79652,7 +79652,7 @@ rows:
   locus_tag: SynRS9909_02027
   organism_name: Synechococcus RS9909
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -79821,7 +79821,7 @@ rows:
   locus_tag: SynRS9909_02281
   organism_name: Synechococcus RS9909
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -80321,7 +80321,7 @@ rows:
   locus_tag: SynRS9915_00109
   organism_name: Synechococcus RS9915
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
@@ -80826,7 +80826,7 @@ rows:
   locus_tag: SynRS9915_00595
   organism_name: Synechococcus RS9915
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -81113,7 +81113,7 @@ rows:
   locus_tag: SynRS9915_01079
   organism_name: Synechococcus RS9915
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rlpA
@@ -81240,7 +81240,7 @@ rows:
   locus_tag: SynRS9915_01260
   organism_name: Synechococcus RS9915
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -81591,7 +81591,7 @@ rows:
   locus_tag: SynRS9915_01975
   organism_name: Synechococcus RS9915
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
@@ -81619,7 +81619,7 @@ rows:
   locus_tag: SynRS9915_02037
   organism_name: Synechococcus RS9915
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -81640,7 +81640,7 @@ rows:
   locus_tag: SynRS9915_02070
   organism_name: Synechococcus RS9915
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: pta
@@ -81809,7 +81809,7 @@ rows:
   locus_tag: SynRS9915_02366
   organism_name: Synechococcus RS9915
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
@@ -82302,7 +82302,7 @@ rows:
   locus_tag: SynSYN20_00113
   organism_name: Synechococcus SYN20
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -82751,7 +82751,7 @@ rows:
   locus_tag: SynSYN20_00549
   organism_name: Synechococcus SYN20
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -82870,7 +82870,7 @@ rows:
   locus_tag: SynSYN20_00738
   organism_name: Synechococcus SYN20
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -83136,7 +83136,7 @@ rows:
   locus_tag: SynSYN20_01236
   organism_name: Synechococcus SYN20
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
@@ -83297,7 +83297,7 @@ rows:
   locus_tag: SynSYN20_01617
   organism_name: Synechococcus SYN20
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -83676,7 +83676,7 @@ rows:
   locus_tag: SynSYN20_02418
   organism_name: Synechococcus SYN20
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -83697,7 +83697,7 @@ rows:
   locus_tag: SynSYN20_02445
   organism_name: Synechococcus SYN20
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -83845,7 +83845,7 @@ rows:
   locus_tag: SynSYN20_02753
   organism_name: Synechococcus SYN20
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -84331,7 +84331,7 @@ rows:
   locus_tag: SynTAK9802_00096
   organism_name: Synechococcus TAK9802
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -84654,7 +84654,7 @@ rows:
   locus_tag: SynTAK9802_00399
   organism_name: Synechococcus TAK9802
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -84851,7 +84851,7 @@ rows:
   locus_tag: SynTAK9802_00742
   organism_name: Synechococcus TAK9802
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -84914,7 +84914,7 @@ rows:
   locus_tag: SynTAK9802_00832
   organism_name: Synechococcus TAK9802
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: psr
@@ -85187,7 +85187,7 @@ rows:
   locus_tag: SynTAK9802_01436
   organism_name: Synechococcus TAK9802
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -85455,7 +85455,7 @@ rows:
   locus_tag: SynTAK9802_01863
   organism_name: Synechococcus TAK9802
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
@@ -85469,7 +85469,7 @@ rows:
   locus_tag: SynTAK9802_01911
   organism_name: Synechococcus TAK9802
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: null
@@ -85588,7 +85588,7 @@ rows:
   locus_tag: SynTAK9802_02149
   organism_name: Synechococcus TAK9802
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -86244,7 +86244,7 @@ rows:
   locus_tag: SynWH7803_0150
   organism_name: Synechococcus WH7803
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -86588,7 +86588,7 @@ rows:
   locus_tag: SynWH7803_0459
   organism_name: Synechococcus WH7803
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -86707,7 +86707,7 @@ rows:
   locus_tag: SynWH7803_0594
   organism_name: Synechococcus WH7803
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -86721,7 +86721,7 @@ rows:
   locus_tag: SynWH7803_0621
   organism_name: Synechococcus WH7803
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -86742,7 +86742,7 @@ rows:
   locus_tag: SynWH7803_0647
   organism_name: Synechococcus WH7803
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
@@ -87051,7 +87051,7 @@ rows:
   locus_tag: SynWH7803_1311
   organism_name: Synechococcus WH7803
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -87191,7 +87191,7 @@ rows:
   locus_tag: SynWH7803_1531
   organism_name: Synechococcus WH7803
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: lytR
@@ -87247,7 +87247,7 @@ rows:
   locus_tag: SynWH7803_1656
   organism_name: Synechococcus WH7803
   product: septum formation protein
-  score: 4.6442
+  score: 4.6441
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
@@ -87576,7 +87576,7 @@ rows:
   locus_tag: SynWH7803_2166
   organism_name: Synechococcus WH7803
   product: RND transporter, hydrophobe/amphiphile efflux-1 family protein
-  score: 6.3265
+  score: 6.3264
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mdtA
@@ -88055,7 +88055,7 @@ rows:
   locus_tag: SynWH8103_00103
   organism_name: Synechococcus WH8103
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: null
@@ -88952,7 +88952,7 @@ rows:
   locus_tag: SynWH8103_01068
   organism_name: Synechococcus WH8103
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: rlpA
@@ -89072,7 +89072,7 @@ rows:
   locus_tag: SynWH8103_01246
   organism_name: Synechococcus WH8103
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Cell wall and membrane
   gene_name: null
@@ -89409,7 +89409,7 @@ rows:
   locus_tag: SynWH8103_01937
   organism_name: Synechococcus WH8103
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
@@ -89423,14 +89423,14 @@ rows:
   locus_tag: SynWH8103_01954
   organism_name: Synechococcus WH8103
   product: septum formation protein
-  score: 4.6442
+  score: 4.6441
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
   locus_tag: SynWH8103_01996
   organism_name: Synechococcus WH8103
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -89451,7 +89451,7 @@ rows:
   locus_tag: SynWH8103_02027
   organism_name: Synechococcus WH8103
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: pta
@@ -89627,7 +89627,7 @@ rows:
   locus_tag: SynWH8103_02349
   organism_name: Synechococcus WH8103
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
@@ -90080,7 +90080,7 @@ rows:
   locus_tag: Syncc8109_0117
   organism_name: Synechococcus WH8109
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -90235,7 +90235,7 @@ rows:
   locus_tag: Syncc8109_0260
   organism_name: Synechococcus WH8109
   product: alpha-mannosidases, glycoside hydrolase family 38
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: sll1424
@@ -90319,7 +90319,7 @@ rows:
   locus_tag: Syncc8109_0414
   organism_name: Synechococcus WH8109
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -90488,7 +90488,7 @@ rows:
   locus_tag: Syncc8109_0760
   organism_name: Synechococcus WH8109
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -90719,7 +90719,7 @@ rows:
   locus_tag: Syncc8109_1271
   organism_name: Synechococcus WH8109
   product: N-acetylmuramic acid 6-phosphate etherase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -90810,7 +90810,7 @@ rows:
   locus_tag: Syncc8109_1444
   organism_name: Synechococcus WH8109
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -91113,7 +91113,7 @@ rows:
   locus_tag: Syncc8109_1983
   organism_name: Synechococcus WH8109
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: null
@@ -91239,7 +91239,7 @@ rows:
   locus_tag: Syncc8109_2227
   organism_name: Synechococcus WH8109
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -91682,7 +91682,7 @@ rows:
   locus_tag: Syncc9605_0090
   organism_name: Synechococcus CC9605
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -92005,7 +92005,7 @@ rows:
   locus_tag: Syncc9605_0401
   organism_name: Synechococcus CC9605
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -92181,7 +92181,7 @@ rows:
   locus_tag: Syncc9605_0692
   organism_name: Synechococcus CC9605
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -92202,7 +92202,7 @@ rows:
   locus_tag: Syncc9605_0719
   organism_name: Synechococcus CC9605
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell cycle and division
   gene_name: maf
@@ -92216,7 +92216,7 @@ rows:
   locus_tag: Syncc9605_0790
   organism_name: Synechococcus CC9605
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -92477,7 +92477,7 @@ rows:
   locus_tag: Syncc9605_1246
   organism_name: Synechococcus CC9605
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -92659,7 +92659,7 @@ rows:
   locus_tag: Syncc9605_1631
   organism_name: Synechococcus CC9605
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: psr
@@ -92918,7 +92918,7 @@ rows:
   locus_tag: Syncc9605_2146
   organism_name: Synechococcus CC9605
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -93540,7 +93540,7 @@ rows:
   locus_tag: Syncc9902_0136
   organism_name: Synechococcus CC9902
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: mreB
@@ -94003,7 +94003,7 @@ rows:
   locus_tag: Syncc9902_0531
   organism_name: Synechococcus CC9902
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -94382,7 +94382,7 @@ rows:
   locus_tag: Syncc9902_1233
   organism_name: Synechococcus CC9902
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: vanY
@@ -94495,7 +94495,7 @@ rows:
   locus_tag: Syncc9902_1393
   organism_name: Synechococcus CC9902
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: manA
@@ -94636,7 +94636,7 @@ rows:
   locus_tag: Syncc9902_1587
   organism_name: Synechococcus CC9902
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Transport
   gene_name: mscS
@@ -94671,7 +94671,7 @@ rows:
   locus_tag: Syncc9902_1666
   organism_name: Synechococcus CC9902
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
@@ -94847,7 +94847,7 @@ rows:
   locus_tag: Syncc9902_1928
   organism_name: Synechococcus CC9902
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
@@ -95170,7 +95170,7 @@ rows:
   locus_tag: TX72_RS08795
   organism_name: Synechococcus WH8102
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: unk13
@@ -96007,7 +96007,7 @@ rows:
   locus_tag: WH5701_05805
   organism_name: Synechococcus WH5701
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -96176,7 +96176,7 @@ rows:
   locus_tag: WH5701_07451
   organism_name: Synechococcus WH5701
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -96444,7 +96444,7 @@ rows:
   locus_tag: WH5701_10365
   organism_name: Synechococcus WH5701
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -96556,7 +96556,7 @@ rows:
   locus_tag: WH5701_11884
   organism_name: Synechococcus WH5701
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
@@ -96584,7 +96584,7 @@ rows:
   locus_tag: WH5701_12009
   organism_name: Synechococcus WH5701
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -97061,7 +97061,7 @@ rows:
   locus_tag: WH5701_14756
   organism_name: Synechococcus WH5701
   product: conserved hypothetical protein
-  score: 7.5748
+  score: 7.5747
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: lnt
@@ -97117,7 +97117,7 @@ rows:
   locus_tag: WH5701_15006
   organism_name: Synechococcus WH5701
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -97776,7 +97776,7 @@ rows:
   locus_tag: WH7805_04436
   organism_name: Synechococcus WH7805
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: phoR
@@ -97972,7 +97972,7 @@ rows:
   locus_tag: WH7805_06146
   organism_name: Synechococcus WH7805
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -98091,7 +98091,7 @@ rows:
   locus_tag: WH7805_06846
   organism_name: Synechococcus WH7805
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: alr
@@ -98561,7 +98561,7 @@ rows:
   locus_tag: WH7805_08882
   organism_name: Synechococcus WH7805
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: crcB1
@@ -99082,7 +99082,7 @@ rows:
   locus_tag: WH7805_12768
   organism_name: Synechococcus WH7805
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: spoIID
@@ -99216,7 +99216,7 @@ rows:
   locus_tag: WH7805_13993
   organism_name: Synechococcus WH7805
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -99230,7 +99230,7 @@ rows:
   locus_tag: WH7805_14128
   organism_name: Synechococcus WH7805
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -99449,7 +99449,7 @@ rows:
   locus_tag: sync_0095
   organism_name: Synechococcus CC9311
   product: fluoride exporter
-  score: 6.0336
+  score: 6.0335
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -99828,7 +99828,7 @@ rows:
   locus_tag: sync_0465
   organism_name: Synechococcus CC9311
   product: rod shape determining protein
-  score: 6.8156
+  score: 6.8155
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: abpC
@@ -99947,7 +99947,7 @@ rows:
   locus_tag: sync_0632
   organism_name: Synechococcus CC9311
   product: UDP-N-acetylmuramoyl-L-alanyl-D-glutamate--2,6-diaminopimelate ligase
-  score: 2.5518
+  score: 2.5517
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: null
@@ -100143,7 +100143,7 @@ rows:
   locus_tag: sync_1031
   organism_name: Synechococcus CC9311
   product: di-trans,poly-cis-decaprenylcistransferase
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: null
@@ -100255,7 +100255,7 @@ rows:
   locus_tag: sync_1288
   organism_name: Synechococcus CC9311
   product: lipopolysaccharide export system, ATP-binding component LptB
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ftsH3
@@ -100648,7 +100648,7 @@ rows:
   locus_tag: sync_1997
   organism_name: Synechococcus CC9311
   product: putative membrane protein
-  score: 1.6747
+  score: 1.6746
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsI
@@ -100669,7 +100669,7 @@ rows:
   locus_tag: sync_2022
   organism_name: Synechococcus CC9311
   product: photosystem II manganese cluster assembly protein Psb27
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Transport
   gene_name: null
@@ -100803,7 +100803,7 @@ rows:
   locus_tag: sync_2250
   organism_name: Synechococcus CC9311
   product: cytochrome c-550
-  score: 0.8606
+  score: 0.8605
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD
@@ -101195,7 +101195,7 @@ rows:
   locus_tag: tll0032
   organism_name: Thermosynechococcus vestitus BP-1
   product: UDP-3-O-(3-hydroxymyristoyl)glucosamine N-acyltransferase
-  score: 2.1516
+  score: 2.1515
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: murD

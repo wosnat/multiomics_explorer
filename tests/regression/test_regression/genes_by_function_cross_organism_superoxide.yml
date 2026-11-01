@@ -315,7 +315,7 @@ rows:
   locus_tag: EU92_0413
   organism_name: Prochlorococcus MIT9107
   product: nickel-type superoxide dismutase maturation protease
-  score: 15.7089
+  score: 15.7088
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
@@ -336,14 +336,14 @@ rows:
   locus_tag: EU93_0321
   organism_name: Prochlorococcus MIT9116
   product: nickel-type superoxide dismutase maturation protease
-  score: 15.7089
+  score: 15.7088
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodX
   locus_tag: EU94_0850
   organism_name: Prochlorococcus MIT9123
   product: nickel-type superoxide dismutase maturation protease
-  score: 15.7089
+  score: 15.7088
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
@@ -441,7 +441,7 @@ rows:
   locus_tag: EV01_0717
   organism_name: Prochlorococcus MIT9401
   product: nickel-type superoxide dismutase maturation protease
-  score: 15.7089
+  score: 15.7088
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
@@ -518,14 +518,14 @@ rows:
   locus_tag: EV06_0117
   organism_name: Prochlorococcus MIT0602
   product: nickel-type superoxide dismutase maturation protease
-  score: 15.7089
+  score: 15.7088
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodX
   locus_tag: EV07_1442
   organism_name: Prochlorococcus MIT0603
   product: nickel-type superoxide dismutase maturation protease
-  score: 15.7089
+  score: 15.7088
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
@@ -686,7 +686,7 @@ rows:
   locus_tag: EZ55_03092
   organism_name: Alteromonas macleodii EZ55
   product: superoxide dismutase family protein
-  score: 17.2189
+  score: 17.2188
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: yceJ
@@ -840,7 +840,7 @@ rows:
   locus_tag: MADE_1015390
   organism_name: Alteromonas mediterranea AltDE
   product: superoxide dismutase family protein
-  score: 17.2189
+  score: 17.2188
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: yceJ
@@ -1197,7 +1197,7 @@ rows:
   locus_tag: SPO2340
   organism_name: Ruegeria pomeroyi DSS-3
   product: superoxide dismutase
-  score: 16.9765
+  score: 16.9764
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: null
@@ -1617,7 +1617,7 @@ rows:
   locus_tag: SynNOUM97013_00745
   organism_name: Synechococcus NOUM97013
   product: nickel-type superoxide dismutase maturation protease
-  score: 15.127
+  score: 15.1269
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: sodN
@@ -2037,11 +2037,11 @@ rows:
   locus_tag: tll1519
   organism_name: Thermosynechococcus vestitus BP-1
   product: superoxide dismutase
-  score: 16.9765
+  score: 16.9764
 - annotation_quality: 3
   gene_category: Inorganic ion transport
   gene_name: sodB
   locus_tag: tlr0036
   organism_name: Thermosynechococcus vestitus BP-1
   product: superoxide dismutase
-  score: 16.9765
+  score: 16.9764

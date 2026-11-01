@@ -129,47 +129,47 @@ top_metabolic_capability:
   organism_name: Pseudomonas putida KT2440
   reaction_count: 1449
   transported_metabolite_count: 279
-- catalyzed_metabolite_count: 1466
+- catalyzed_metabolite_count: 1464
   go_transport_metabolite_count: 83
   organism_name: Ruegeria pomeroyi DSS-3
   reaction_count: 1377
   transported_metabolite_count: 154
-- catalyzed_metabolite_count: 1426
+- catalyzed_metabolite_count: 1424
   go_transport_metabolite_count: 101
   organism_name: Alteromonas macleodii EZ55
   reaction_count: 1348
   transported_metabolite_count: 147
-- catalyzed_metabolite_count: 1356
+- catalyzed_metabolite_count: 1354
   go_transport_metabolite_count: 75
   organism_name: Alteromonas (MarRef v6)
   reaction_count: 1263
   transported_metabolite_count: 128
-- catalyzed_metabolite_count: 1352
+- catalyzed_metabolite_count: 1350
   go_transport_metabolite_count: 91
   organism_name: Alteromonas macleodii MIT1002
   reaction_count: 1288
   transported_metabolite_count: 142
-- catalyzed_metabolite_count: 1345
+- catalyzed_metabolite_count: 1342
   go_transport_metabolite_count: 106
   organism_name: Marinobacter (MarRef v6)
   reaction_count: 1278
   transported_metabolite_count: 161
-- catalyzed_metabolite_count: 1339
+- catalyzed_metabolite_count: 1337
   go_transport_metabolite_count: 96
   organism_name: Alteromonas macleodii 83-1
   reaction_count: 1275
   transported_metabolite_count: 151
-- catalyzed_metabolite_count: 1339
+- catalyzed_metabolite_count: 1337
   go_transport_metabolite_count: 96
   organism_name: Alteromonas macleodii BGP6
   reaction_count: 1275
   transported_metabolite_count: 151
-- catalyzed_metabolite_count: 1334
+- catalyzed_metabolite_count: 1332
   go_transport_metabolite_count: 88
   organism_name: Alteromonas macleodii HOT1A3
   reaction_count: 1266
   transported_metabolite_count: 142
-- catalyzed_metabolite_count: 1326
+- catalyzed_metabolite_count: 1324
   go_transport_metabolite_count: 85
   organism_name: Alteromonas macleodii AD45
   reaction_count: 1259

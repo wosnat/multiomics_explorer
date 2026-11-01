@@ -276,8 +276,8 @@ list_filter_values(filter_type="evidence_source")
   "truncated": false,
   "warnings": [],
   "results": [
-    {"value": "metabolism", "count": 2287},
-    {"value": "transport", "count": 1311},
+    {"value": "metabolism", "count": 2285},
+    {"value": "transport", "count": 1313},
     {"value": "go_transport", "count": 218},
     ...
   ]

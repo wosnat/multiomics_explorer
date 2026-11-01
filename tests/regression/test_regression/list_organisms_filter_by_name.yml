@@ -9,7 +9,7 @@ rows:
   - diel
   - light
   - viral
-  catalyzed_metabolite_count: 1039
+  catalyzed_metabolite_count: 1037
   clade: HLI
   cluster_types:
   - decay_pattern
@@ -83,7 +83,7 @@ rows:
   - axenic
   - diel
   - light
-  catalyzed_metabolite_count: 1052
+  catalyzed_metabolite_count: 1050
   clade: HLII
   cluster_types:
   - condition_comparison

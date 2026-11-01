@@ -42,7 +42,7 @@ rows:
   locus_tag: A9601_05531
   organism_name: Prochlorococcus AS9601
   product: major RNA polymerase sigma factor, type I
-  score: 5.3908
+  score: 5.3907
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: arsC
@@ -343,14 +343,14 @@ rows:
   locus_tag: ACZ81_05150
   organism_name: Alteromonas macleodii HOT1A3
   product: sigma-54 dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: fleR
   locus_tag: ACZ81_05160
   organism_name: Alteromonas macleodii HOT1A3
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: fliA
@@ -371,7 +371,7 @@ rows:
   locus_tag: ACZ81_05465
   organism_name: Alteromonas macleodii HOT1A3
   product: phage shock protein operon transcriptional activator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: tyrR
@@ -539,7 +539,7 @@ rows:
   locus_tag: ACZ81_11585
   organism_name: Alteromonas macleodii HOT1A3
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
@@ -917,14 +917,14 @@ rows:
   locus_tag: ALT831_01084
   organism_name: Alteromonas macleodii 83-1
   product: sigma-54 dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: fleR
   locus_tag: ALT831_01086
   organism_name: Alteromonas macleodii 83-1
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: fliA
@@ -938,7 +938,7 @@ rows:
   locus_tag: ALT831_01145
   organism_name: Alteromonas macleodii 83-1
   product: phage shock protein operon transcriptional activator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: tyrR
@@ -1050,7 +1050,7 @@ rows:
   locus_tag: ALT831_02367
   organism_name: Alteromonas macleodii 83-1
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -1414,14 +1414,14 @@ rows:
   locus_tag: ALTBGP6_01084
   organism_name: Alteromonas macleodii BGP6
   product: sigma-54 dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: fleR
   locus_tag: ALTBGP6_01086
   organism_name: Alteromonas macleodii BGP6
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: fliA
@@ -1435,7 +1435,7 @@ rows:
   locus_tag: ALTBGP6_01145
   organism_name: Alteromonas macleodii BGP6
   product: phage shock protein operon transcriptional activator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: tyrR
@@ -1547,7 +1547,7 @@ rows:
   locus_tag: ALTBGP6_02367
   organism_name: Alteromonas macleodii BGP6
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
@@ -1897,14 +1897,14 @@ rows:
   locus_tag: AMBAS45_05055
   organism_name: Alteromonas macleodii AD45
   product: sigma-54 dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: fleR
   locus_tag: AMBAS45_05065
   organism_name: Alteromonas macleodii AD45
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: fliA
@@ -1918,7 +1918,7 @@ rows:
   locus_tag: AMBAS45_05345
   organism_name: Alteromonas macleodii AD45
   product: phage shock protein operon transcriptional activator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: tyrR
@@ -2051,7 +2051,7 @@ rows:
   locus_tag: AMBAS45_11655
   organism_name: Alteromonas macleodii AD45
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
@@ -2394,14 +2394,14 @@ rows:
   locus_tag: AMBLS11_04935
   organism_name: Alteromonas macleodii BS11
   product: sigma-54 dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: fleR
   locus_tag: AMBLS11_04945
   organism_name: Alteromonas macleodii BS11
   product: sigma-54 dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: fliA
@@ -2415,7 +2415,7 @@ rows:
   locus_tag: AMBLS11_05225
   organism_name: Alteromonas macleodii BS11
   product: phage shock protein operon transcriptional activator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: tyrR
@@ -2520,7 +2520,7 @@ rows:
   locus_tag: AMBLS11_10880
   organism_name: Alteromonas macleodii BS11
   product: sigma-54 dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
@@ -2772,7 +2772,7 @@ rows:
   locus_tag: BL107_06324
   organism_name: Synechococcus sp. BL107
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
@@ -2856,7 +2856,7 @@ rows:
   locus_tag: BL107_12420
   organism_name: Synechococcus sp. BL107
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
@@ -3024,7 +3024,7 @@ rows:
   locus_tag: BSR22_02710
   organism_name: Prochlorococcus RSP50
   product: DNA polymerase III subunit delta
-  score: 6.0088
+  score: 6.0087
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: dnaX
@@ -3227,7 +3227,7 @@ rows:
   locus_tag: CB0101_RS0106270
   organism_name: Synechococcus CB0101
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -3402,7 +3402,7 @@ rows:
   locus_tag: CB0101_RS0115150
   organism_name: Synechococcus CB0101
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: pcnB
@@ -3479,7 +3479,7 @@ rows:
   locus_tag: CB0205_RS0102400
   organism_name: Synechococcus CB0205
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
@@ -3619,7 +3619,7 @@ rows:
   locus_tag: CB0205_RS0109555
   organism_name: Synechococcus CB0205
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -3766,7 +3766,7 @@ rows:
   locus_tag: CPCC7001_1319
   organism_name: Cyanobium PCC7001
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
@@ -4207,7 +4207,7 @@ rows:
   locus_tag: CyaNS01_01489
   organism_name: Cyanobium NS01
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -4396,7 +4396,7 @@ rows:
   locus_tag: Cyagr_0449
   organism_name: Cyanobium PCC6307
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -4557,7 +4557,7 @@ rows:
   locus_tag: Cyagr_2297
   organism_name: Cyanobium PCC6307
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
@@ -5005,7 +5005,7 @@ rows:
   locus_tag: DEH24_14710
   organism_name: Alteromonas (MarRef v6)
   product: RNA polymerase subunit sigma
-  score: 6.0088
+  score: 6.0087
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: null
@@ -5250,7 +5250,7 @@ rows:
   locus_tag: EU91_0891
   organism_name: Prochlorococcus GP2
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -5411,7 +5411,7 @@ rows:
   locus_tag: EU92_0075
   organism_name: Prochlorococcus MIT9107
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoD4
@@ -5537,7 +5537,7 @@ rows:
   locus_tag: EU92_1415
   organism_name: Prochlorococcus MIT9107
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -5642,7 +5642,7 @@ rows:
   locus_tag: EU93_0724
   organism_name: Prochlorococcus MIT9116
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: rpoD8
@@ -5698,7 +5698,7 @@ rows:
   locus_tag: EU93_1534
   organism_name: Prochlorococcus MIT9116
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -5838,7 +5838,7 @@ rows:
   locus_tag: EU94_0700
   organism_name: Prochlorococcus MIT9123
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoD6
@@ -5908,7 +5908,7 @@ rows:
   locus_tag: EU94_1845
   organism_name: Prochlorococcus MIT9123
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -5964,7 +5964,7 @@ rows:
   locus_tag: EU95_0235
   organism_name: Prochlorococcus MIT9201
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -6132,7 +6132,7 @@ rows:
   locus_tag: EU96_0510
   organism_name: Prochlorococcus MIT9302
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -6188,7 +6188,7 @@ rows:
   locus_tag: EU96_0724
   organism_name: Prochlorococcus MIT9302
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoD4
@@ -6307,7 +6307,7 @@ rows:
   locus_tag: EU97_0003
   organism_name: Prochlorococcus MIT9311
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -6475,7 +6475,7 @@ rows:
   locus_tag: EU97_1643
   organism_name: Prochlorococcus MIT9311
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -6517,7 +6517,7 @@ rows:
   locus_tag: EU98_0580
   organism_name: Prochlorococcus MIT9314
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -6685,7 +6685,7 @@ rows:
   locus_tag: EU99_0466
   organism_name: Prochlorococcus MIT9321
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -6783,7 +6783,7 @@ rows:
   locus_tag: EU99_1426
   organism_name: Prochlorococcus MIT9321
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoD4
@@ -6860,7 +6860,7 @@ rows:
   locus_tag: EV00_0169
   organism_name: Prochlorococcus MIT9322
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -7014,7 +7014,7 @@ rows:
   locus_tag: EV00_1438
   organism_name: Prochlorococcus MIT9322
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -7112,7 +7112,7 @@ rows:
   locus_tag: EV01_0822
   organism_name: Prochlorococcus MIT9401
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoD4
@@ -7196,7 +7196,7 @@ rows:
   locus_tag: EV01_1423
   organism_name: Prochlorococcus MIT9401
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -7315,7 +7315,7 @@ rows:
   locus_tag: EV02_0700
   organism_name: Prochlorococcus SB
   product: major RNA polymerase sigma factor, type I
-  score: 5.3908
+  score: 5.3907
 - annotation_quality: 2
   gene_category: Unknown
   gene_name: null
@@ -7602,7 +7602,7 @@ rows:
   locus_tag: EV03_1715
   organism_name: Prochlorococcus PAC1
   product: major RNA polymerase sigma factor, type I
-  score: 5.3908
+  score: 5.3907
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: arsC
@@ -7728,7 +7728,7 @@ rows:
   locus_tag: EV04_0878
   organism_name: Prochlorococcus LG
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -8022,7 +8022,7 @@ rows:
   locus_tag: EV05_1844
   organism_name: Prochlorococcus MIT0601
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -8085,7 +8085,7 @@ rows:
   locus_tag: EV06_0934
   organism_name: Prochlorococcus MIT0602
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -8148,7 +8148,7 @@ rows:
   locus_tag: EV06_1622
   organism_name: Prochlorococcus MIT0602
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -8260,7 +8260,7 @@ rows:
   locus_tag: EV07_0780
   organism_name: Prochlorococcus MIT0603
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -8365,7 +8365,7 @@ rows:
   locus_tag: EV07_1977
   organism_name: Prochlorococcus MIT0603
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoD4
@@ -8400,7 +8400,7 @@ rows:
   locus_tag: EV08_0445
   organism_name: Prochlorococcus SS2
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -8701,7 +8701,7 @@ rows:
   locus_tag: EV09_1354
   organism_name: Prochlorococcus SS35
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -8848,7 +8848,7 @@ rows:
   locus_tag: EV10_1149
   organism_name: Prochlorococcus SS51
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -9086,7 +9086,7 @@ rows:
   locus_tag: EV11_1677
   organism_name: Prochlorococcus SS52
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -9226,7 +9226,7 @@ rows:
   locus_tag: EV12_1466
   organism_name: Prochlorococcus MIT0701
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -9261,7 +9261,7 @@ rows:
   locus_tag: EV12_2182
   organism_name: Prochlorococcus MIT0701
   product: putative arsenate reductase
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: ntrX
@@ -9324,7 +9324,7 @@ rows:
   locus_tag: EV12_2704
   organism_name: Prochlorococcus MIT0701
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -9485,14 +9485,14 @@ rows:
   locus_tag: EV13_1797
   organism_name: Prochlorococcus MIT0702
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: arsC
   locus_tag: EV13_2168
   organism_name: Prochlorococcus MIT0702
   product: putative arsenate reductase
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: rpoD1
@@ -9548,7 +9548,7 @@ rows:
   locus_tag: EV13_2754
   organism_name: Prochlorococcus MIT0702
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -9702,14 +9702,14 @@ rows:
   locus_tag: EV14_2200
   organism_name: Prochlorococcus MIT0703
   product: putative arsenate reductase
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: EV14_2324
   organism_name: Prochlorococcus MIT0703
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -9765,7 +9765,7 @@ rows:
   locus_tag: EV14_2781
   organism_name: Prochlorococcus MIT0703
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -9891,7 +9891,7 @@ rows:
   locus_tag: EW14_0951
   organism_name: Prochlorococcus MIT0604
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -9996,7 +9996,7 @@ rows:
   locus_tag: EW14_2026
   organism_name: Prochlorococcus MIT0604
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoD4
@@ -10066,7 +10066,7 @@ rows:
   locus_tag: EW15_0959
   organism_name: Prochlorococcus MIT0801
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -10339,7 +10339,7 @@ rows:
   locus_tag: EZ55_01072
   organism_name: Alteromonas macleodii EZ55
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: fliA
@@ -10353,7 +10353,7 @@ rows:
   locus_tag: EZ55_01132
   organism_name: Alteromonas macleodii EZ55
   product: phage shock protein operon transcriptional activator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: tyrR
@@ -10472,7 +10472,7 @@ rows:
   locus_tag: EZ55_02378
   organism_name: Alteromonas macleodii EZ55
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
@@ -10901,7 +10901,7 @@ rows:
   locus_tag: H6G84_11285
   organism_name: Synechococcus elongatus PCC 7942
   product: sigma 54-interacting transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: H6G84_RS11380
@@ -11132,14 +11132,14 @@ rows:
   locus_tag: HP15_2328
   organism_name: Marinobacter (MarRef v6)
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: fleQ
   locus_tag: HP15_2330
   organism_name: Marinobacter (MarRef v6)
   product: sigma-54 dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoN
@@ -11258,7 +11258,7 @@ rows:
   locus_tag: HP15_3376
   organism_name: Marinobacter (MarRef v6)
   product: RNA polymerase-associated protein RapA
-  score: 4.4246
+  score: 4.4245
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: null
@@ -11398,7 +11398,7 @@ rows:
   locus_tag: HP15_523
   organism_name: Marinobacter (MarRef v6)
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Cell wall and membrane
   gene_name: ftsW
@@ -11503,7 +11503,7 @@ rows:
   locus_tag: KR100_01125
   organism_name: Synechococcus KORDI-100
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -11594,7 +11594,7 @@ rows:
   locus_tag: KR100_08245
   organism_name: Synechococcus KORDI-100
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: sigF2
@@ -11762,7 +11762,7 @@ rows:
   locus_tag: KR49_03095
   organism_name: Synechococcus KORDI-49
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -11881,7 +11881,7 @@ rows:
   locus_tag: KR49_09225
   organism_name: Synechococcus KORDI-49
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -12000,7 +12000,7 @@ rows:
   locus_tag: KR52_02165
   organism_name: Synechococcus KORDI-52
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
@@ -12140,7 +12140,7 @@ rows:
   locus_tag: KR52_10770
   organism_name: Synechococcus KORDI-52
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -12345,7 +12345,7 @@ rows:
   locus_tag: M744_08640
   organism_name: Synechococcus elongatus UTEX 2973
   product: sigma 54-interacting transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -12485,7 +12485,7 @@ rows:
   locus_tag: M8001_00675
   organism_name: Pseudomonas putida KT2440
   product: sigma-54-dependent response regulator transcription factor AlgB
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: foxI
@@ -13340,7 +13340,7 @@ rows:
   locus_tag: MADE_1003495
   organism_name: Alteromonas mediterranea AltDE
   product: RNA polymerase-associated protein RapA
-  score: 4.4246
+  score: 4.4245
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoN
@@ -13382,14 +13382,14 @@ rows:
   locus_tag: MADE_1005880
   organism_name: Alteromonas mediterranea AltDE
   product: sigma-54 dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: fleR
   locus_tag: MADE_1005890
   organism_name: Alteromonas mediterranea AltDE
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: fliA
@@ -13403,7 +13403,7 @@ rows:
   locus_tag: MADE_1006155
   organism_name: Alteromonas mediterranea AltDE
   product: phage shock protein operon transcriptional activator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: tyrR
@@ -13487,7 +13487,7 @@ rows:
   locus_tag: MADE_1011545
   organism_name: Alteromonas mediterranea AltDE
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: sigY
@@ -13753,14 +13753,14 @@ rows:
   locus_tag: MASE_04820
   organism_name: Alteromonas macleodii ATCC27126
   product: sigma-54 dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: fleR
   locus_tag: MASE_04830
   organism_name: Alteromonas macleodii ATCC27126
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: fliA
@@ -13774,7 +13774,7 @@ rows:
   locus_tag: MASE_05115
   organism_name: Alteromonas macleodii ATCC27126
   product: phage shock protein operon transcriptional activator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: tyrR
@@ -13886,7 +13886,7 @@ rows:
   locus_tag: MASE_11025
   organism_name: Alteromonas macleodii ATCC27126
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
@@ -14215,14 +14215,14 @@ rows:
   locus_tag: MIT1002_01081
   organism_name: Alteromonas macleodii MIT1002
   product: sigma-54 dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: fleR
   locus_tag: MIT1002_01083
   organism_name: Alteromonas macleodii MIT1002
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: fliA
@@ -14236,7 +14236,7 @@ rows:
   locus_tag: MIT1002_01142
   organism_name: Alteromonas macleodii MIT1002
   product: phage shock protein operon transcriptional activator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: tyrR
@@ -14362,7 +14362,7 @@ rows:
   locus_tag: MIT1002_02376
   organism_name: Alteromonas macleodii MIT1002
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
@@ -14614,7 +14614,7 @@ rows:
   locus_tag: NATL1_05531
   organism_name: Prochlorococcus NATL1A
   product: major RNA polymerase sigma factor, type I
-  score: 5.3908
+  score: 5.3907
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: arsC
@@ -14866,14 +14866,14 @@ rows:
   locus_tag: P9202_1880
   organism_name: Prochlorococcus MIT9202
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaX
   locus_tag: P9202_543
   organism_name: Prochlorococcus MIT9202
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -14978,7 +14978,7 @@ rows:
   locus_tag: P9211_04961
   organism_name: Prochlorococcus MIT9211
   product: major RNA polymerase sigma factor, type I
-  score: 5.3908
+  score: 5.3907
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: arsC
@@ -15034,7 +15034,7 @@ rows:
   locus_tag: P9211_08841
   organism_name: Prochlorococcus MIT9211
   product: PHP domain-containing protein
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: mfd
@@ -15174,7 +15174,7 @@ rows:
   locus_tag: P9215_05781
   organism_name: Prochlorococcus MIT9215
   product: major RNA polymerase sigma factor, type I
-  score: 5.3908
+  score: 5.3907
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: arsC
@@ -15370,7 +15370,7 @@ rows:
   locus_tag: P9301_05231
   organism_name: Prochlorococcus MIT9301
   product: major RNA polymerase sigma factor, type I
-  score: 5.3908
+  score: 5.3907
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: arsC
@@ -15601,7 +15601,7 @@ rows:
   locus_tag: P9303_07291
   organism_name: Prochlorococcus MIT9303
   product: major RNA polymerase sigma factor, type I
-  score: 5.3908
+  score: 5.3907
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: arsC
@@ -15804,7 +15804,7 @@ rows:
   locus_tag: P9515_05601
   organism_name: Prochlorococcus MIT9515
   product: major RNA polymerase sigma factor, type I
-  score: 5.3908
+  score: 5.3907
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: arsC
@@ -16385,7 +16385,7 @@ rows:
   locus_tag: PMM0496
   organism_name: Prochlorococcus MED4
   product: major RNA polymerase sigma factor, type I
-  score: 5.3908
+  score: 5.3907
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: arsC
@@ -16735,7 +16735,7 @@ rows:
   locus_tag: PMN2A_1829
   organism_name: Prochlorococcus NATL2A
   product: major RNA polymerase sigma factor, type I
-  score: 5.3908
+  score: 5.3907
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: arsC
@@ -17015,7 +17015,7 @@ rows:
   locus_tag: PMT9312_0497
   organism_name: Prochlorococcus MIT9312
   product: major RNA polymerase sigma factor, type I
-  score: 5.3908
+  score: 5.3907
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: arsC
@@ -17211,7 +17211,7 @@ rows:
   locus_tag: PROCH_0438
   organism_name: Prochlorococcus EQPAC1
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -17400,7 +17400,7 @@ rows:
   locus_tag: Pro0495
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: major RNA polymerase sigma factor, type I
-  score: 5.3908
+  score: 5.3907
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: arsC
@@ -17666,7 +17666,7 @@ rows:
   locus_tag: RH83_RS02670
   organism_name: Prochlorococcus HNLC2
   product: PHP domain-containing protein
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -17687,7 +17687,7 @@ rows:
   locus_tag: RH83_RS02970
   organism_name: Prochlorococcus HNLC2
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -17764,7 +17764,7 @@ rows:
   locus_tag: RH83_RS06850
   organism_name: Prochlorococcus HNLC2
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoD4
@@ -17841,7 +17841,7 @@ rows:
   locus_tag: RH84_RS02950
   organism_name: Prochlorococcus HNLC1
   product: PHP domain-containing protein
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuD
@@ -18016,7 +18016,7 @@ rows:
   locus_tag: RS9916_28869
   organism_name: Synechococcus RS9916
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -18184,7 +18184,7 @@ rows:
   locus_tag: RS9916_37882
   organism_name: Synechococcus RS9916
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -18345,7 +18345,7 @@ rows:
   locus_tag: RS9917_05490
   organism_name: Synechococcus RS9917
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Unknown
   gene_name: null
@@ -18471,7 +18471,7 @@ rows:
   locus_tag: RS9917_11545
   organism_name: Synechococcus RS9917
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -18674,7 +18674,7 @@ rows:
   locus_tag: SOI86_RS06225
   organism_name: Prochlorococcus MIT1314
   product: DNA polymerase III subunit delta
-  score: 6.0088
+  score: 6.0087
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: dnaX
@@ -19339,7 +19339,7 @@ rows:
   locus_tag: SYN9616_RS0103860
   organism_name: Synechococcus CC9616
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: null
@@ -19662,7 +19662,7 @@ rows:
   locus_tag: SYNPCC7002_A1475
   organism_name: Synechococcus PCC 7002
   product: sigma 54-interacting transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: pcnB
@@ -20026,7 +20026,7 @@ rows:
   locus_tag: SYNW1783
   organism_name: Synechococcus WH8102
   product: major RNA polymerase sigma factor, type I
-  score: 5.3908
+  score: 5.3907
 - annotation_quality: 3
   gene_category: Cellular processes
   gene_name: mrdB
@@ -20173,7 +20173,7 @@ rows:
   locus_tag: Sputw3181_0490
   organism_name: Shewanella sp. W3-18-1
   product: RNA polymerase sigma factor FliA
-  score: 6.5098
+  score: 6.5097
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rsd
@@ -20313,7 +20313,7 @@ rows:
   locus_tag: Sputw3181_1504
   organism_name: Shewanella sp. W3-18-1
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: sigV
@@ -20642,7 +20642,7 @@ rows:
   locus_tag: Syn8016DRAFT_0730
   organism_name: Synechococcus WH8016
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -20845,7 +20845,7 @@ rows:
   locus_tag: Syn8016DRAFT_2882
   organism_name: Synechococcus WH8016
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -20866,7 +20866,7 @@ rows:
   locus_tag: SynA15127_00064
   organism_name: Synechococcus A15-127
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -20978,7 +20978,7 @@ rows:
   locus_tag: SynA15127_01644
   organism_name: Synechococcus A15-127
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -21195,7 +21195,7 @@ rows:
   locus_tag: SynA1524_01120
   organism_name: Synechococcus A15-24
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -21447,7 +21447,7 @@ rows:
   locus_tag: SynA1528_01084
   organism_name: Synechococcus A15-28
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -21587,7 +21587,7 @@ rows:
   locus_tag: SynA1544_00064
   organism_name: Synechococcus A15-44
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -21713,7 +21713,7 @@ rows:
   locus_tag: SynA1544_01321
   organism_name: Synechococcus A15-44
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -21888,7 +21888,7 @@ rows:
   locus_tag: SynA1560_00064
   organism_name: Synechococcus A15-60
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -22021,7 +22021,7 @@ rows:
   locus_tag: SynA1560_01981
   organism_name: Synechococcus A15-60
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -22112,7 +22112,7 @@ rows:
   locus_tag: SynA1562_00068
   organism_name: Synechococcus A15-62
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -22210,7 +22210,7 @@ rows:
   locus_tag: SynA1562_01207
   organism_name: Synechococcus A15-62
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -22357,7 +22357,7 @@ rows:
   locus_tag: SynA1825c_00064
   organism_name: Synechococcus A18-25c
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -22490,7 +22490,7 @@ rows:
   locus_tag: SynA1825c_01960
   organism_name: Synechococcus A18-25c
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -22581,7 +22581,7 @@ rows:
   locus_tag: SynA1840_00064
   organism_name: Synechococcus A18-40
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -22714,7 +22714,7 @@ rows:
   locus_tag: SynA1840_01094
   organism_name: Synechococcus A18-40
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -22840,7 +22840,7 @@ rows:
   locus_tag: SynA18461_00064
   organism_name: Synechococcus A18-46.1
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -22973,7 +22973,7 @@ rows:
   locus_tag: SynA18461_01169
   organism_name: Synechococcus A18-46.1
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -23134,7 +23134,7 @@ rows:
   locus_tag: SynBIOSE41_00066
   organism_name: Synechococcus BIOS-E4-1
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -23218,7 +23218,7 @@ rows:
   locus_tag: SynBIOSE41_01903
   organism_name: Synechococcus BIOS-E4-1
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -23379,7 +23379,7 @@ rows:
   locus_tag: SynBIOSU31_00075
   organism_name: Synechococcus BIOS-U3-1
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -23498,7 +23498,7 @@ rows:
   locus_tag: SynBIOSU31_01845
   organism_name: Synechococcus BIOS-U3-1
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -23624,7 +23624,7 @@ rows:
   locus_tag: SynBMKMC1_00063
   organism_name: Synechococcus BMK-MC-1
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -23771,7 +23771,7 @@ rows:
   locus_tag: SynBMKMC1_01353
   organism_name: Synechococcus BMK-MC-1
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -23939,7 +23939,7 @@ rows:
   locus_tag: SynBOUM118_00065
   organism_name: Synechococcus BOUM118
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -24072,7 +24072,7 @@ rows:
   locus_tag: SynBOUM118_01111
   organism_name: Synechococcus BOUM118
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -24219,7 +24219,7 @@ rows:
   locus_tag: SynM161_00063
   organism_name: Synechococcus M16.1
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -24317,7 +24317,7 @@ rows:
   locus_tag: SynM161_01120
   organism_name: Synechococcus M16.1
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -24457,7 +24457,7 @@ rows:
   locus_tag: SynMEDNS5_00064
   organism_name: Synechococcus MEDNS5
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -24534,7 +24534,7 @@ rows:
   locus_tag: SynMEDNS5_01126
   organism_name: Synechococcus MEDNS5
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -24702,7 +24702,7 @@ rows:
   locus_tag: SynMINOS11_00068
   organism_name: Synechococcus MINOS11
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -24758,7 +24758,7 @@ rows:
   locus_tag: SynMINOS11_01426
   organism_name: Synechococcus MINOS11
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -24891,7 +24891,7 @@ rows:
   locus_tag: SynMITS9220_00068
   organism_name: Synechococcus MITS9220
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -25024,7 +25024,7 @@ rows:
   locus_tag: SynMITS9220_01649
   organism_name: Synechococcus MITS9220
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -25150,7 +25150,7 @@ rows:
   locus_tag: SynMVIR181_00066
   organism_name: Synechococcus MVIR-18-1
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -25297,7 +25297,7 @@ rows:
   locus_tag: SynMVIR181_01726
   organism_name: Synechococcus MVIR-18-1
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -25416,7 +25416,7 @@ rows:
   locus_tag: SynNOUM97013_00063
   organism_name: Synechococcus NOUM97013
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -25500,7 +25500,7 @@ rows:
   locus_tag: SynNOUM97013_01225
   organism_name: Synechococcus NOUM97013
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -25633,7 +25633,7 @@ rows:
   locus_tag: SynPROS71_00065
   organism_name: Synechococcus PROS-7-1
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -25738,7 +25738,7 @@ rows:
   locus_tag: SynPROS71_01242
   organism_name: Synechococcus PROS-7-1
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -25878,7 +25878,7 @@ rows:
   locus_tag: SynPROS91_00064
   organism_name: Synechococcus PROS-9-1
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -26011,7 +26011,7 @@ rows:
   locus_tag: SynPROS91_01544
   organism_name: Synechococcus PROS-9-1
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -26130,7 +26130,7 @@ rows:
   locus_tag: SynPROSU1_00066
   organism_name: Synechococcus PROS-U-1
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -26214,7 +26214,7 @@ rows:
   locus_tag: SynPROSU1_01381
   organism_name: Synechococcus PROS-U-1
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -26354,7 +26354,7 @@ rows:
   locus_tag: SynRCC2555_00081
   organism_name: Synechococcus WH8101
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -26522,7 +26522,7 @@ rows:
   locus_tag: SynRCC2555_01711
   organism_name: Synechococcus WH8101
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -26662,7 +26662,7 @@ rows:
   locus_tag: SynRCC307_0063
   organism_name: Synechococcus RCC307
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -26725,7 +26725,7 @@ rows:
   locus_tag: SynRCC307_1319
   organism_name: Synechococcus RCC307
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -26865,7 +26865,7 @@ rows:
   locus_tag: SynROS8604_00064
   organism_name: Synechococcus ROS8604
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -27068,7 +27068,7 @@ rows:
   locus_tag: SynROS8604_02168
   organism_name: Synechococcus ROS8604
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -27222,7 +27222,7 @@ rows:
   locus_tag: SynRS9902_00066
   organism_name: Synechococcus RS9902
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -27369,7 +27369,7 @@ rows:
   locus_tag: SynRS9902_01840
   organism_name: Synechococcus RS9902
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -27460,7 +27460,7 @@ rows:
   locus_tag: SynRS9907_00065
   organism_name: Synechococcus RS9907
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -27579,7 +27579,7 @@ rows:
   locus_tag: SynRS9907_01272
   organism_name: Synechococcus RS9907
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -27768,7 +27768,7 @@ rows:
   locus_tag: SynRS9909_00064
   organism_name: Synechococcus RS9909
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -27964,7 +27964,7 @@ rows:
   locus_tag: SynRS9909_01687
   organism_name: Synechococcus RS9909
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -28083,7 +28083,7 @@ rows:
   locus_tag: SynRS9915_00071
   organism_name: Synechococcus RS9915
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -28216,7 +28216,7 @@ rows:
   locus_tag: SynRS9915_01184
   organism_name: Synechococcus RS9915
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -28342,7 +28342,7 @@ rows:
   locus_tag: SynSYN20_00065
   organism_name: Synechococcus SYN20
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -28510,7 +28510,7 @@ rows:
   locus_tag: SynSYN20_02016
   organism_name: Synechococcus SYN20
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -28629,7 +28629,7 @@ rows:
   locus_tag: SynTAK9802_00067
   organism_name: Synechococcus TAK9802
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -28755,7 +28755,7 @@ rows:
   locus_tag: SynTAK9802_01503
   organism_name: Synechococcus TAK9802
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -28860,7 +28860,7 @@ rows:
   locus_tag: SynWH7803_0062
   organism_name: Synechococcus WH7803
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -28937,7 +28937,7 @@ rows:
   locus_tag: SynWH7803_1073
   organism_name: Synechococcus WH7803
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -29077,7 +29077,7 @@ rows:
   locus_tag: SynWH8103_00063
   organism_name: Synechococcus WH8103
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -29189,7 +29189,7 @@ rows:
   locus_tag: SynWH8103_01174
   organism_name: Synechococcus WH8103
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -29315,7 +29315,7 @@ rows:
   locus_tag: Syncc8109_0066
   organism_name: Synechococcus WH8109
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -29406,7 +29406,7 @@ rows:
   locus_tag: Syncc8109_1520
   organism_name: Synechococcus WH8109
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -29511,7 +29511,7 @@ rows:
   locus_tag: Syncc8109_RS03290
   organism_name: Synechococcus WH8109
   product: putative arsenate reductase
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: sigF2
@@ -29532,7 +29532,7 @@ rows:
   locus_tag: Syncc9605_0062
   organism_name: Synechococcus CC9605
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -29658,7 +29658,7 @@ rows:
   locus_tag: Syncc9605_1175
   organism_name: Synechococcus CC9605
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -29777,7 +29777,7 @@ rows:
   locus_tag: Syncc9605_2575
   organism_name: Synechococcus CC9605
   product: conserved hypothetical protein
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: rpoD5
@@ -29805,7 +29805,7 @@ rows:
   locus_tag: Syncc9902_0058
   organism_name: Synechococcus CC9902
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -29938,7 +29938,7 @@ rows:
   locus_tag: Syncc9902_1295
   organism_name: Synechococcus CC9902
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -30197,7 +30197,7 @@ rows:
   locus_tag: WH5701_08414
   organism_name: Synechococcus WH5701
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE
@@ -30428,7 +30428,7 @@ rows:
   locus_tag: WH7805_02067
   organism_name: Synechococcus WH7805
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: umuC
@@ -30540,7 +30540,7 @@ rows:
   locus_tag: WH7805_09124
   organism_name: Synechococcus WH7805
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaN
@@ -30750,14 +30750,14 @@ rows:
   locus_tag: amad1_05260
   organism_name: Alteromonas mediterranea AltDE1
   product: sigma-54 dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Signal transduction
   gene_name: fleR
   locus_tag: amad1_05270
   organism_name: Alteromonas mediterranea AltDE1
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: fliA
@@ -30771,7 +30771,7 @@ rows:
   locus_tag: amad1_05530
   organism_name: Alteromonas mediterranea AltDE1
   product: phage shock protein operon transcriptional activator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Amino acid metabolism
   gene_name: tyrR
@@ -30911,7 +30911,7 @@ rows:
   locus_tag: amad1_12010
   organism_name: Alteromonas mediterranea AltDE1
   product: sigma-54-dependent transcriptional regulator
-  score: 1.8609
+  score: 1.8608
 - annotation_quality: 3
   gene_category: Transcription
   gene_name: sigY
@@ -31107,7 +31107,7 @@ rows:
   locus_tag: sync_0062
   organism_name: Synechococcus CC9311
   product: DNA polymerase III, gamma and tau subunits
-  score: 6.1714
+  score: 6.1713
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: holA
@@ -31254,7 +31254,7 @@ rows:
   locus_tag: sync_1613
   organism_name: Synechococcus CC9311
   product: DNA primase
-  score: 4.3588
+  score: 4.3587
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: dnaE

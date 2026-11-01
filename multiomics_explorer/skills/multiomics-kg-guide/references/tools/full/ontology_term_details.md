@@ -148,7 +148,7 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
       "tc_class_id": "tcdb:3",
       "member_count": 97,
       "superfamily": "ArsA ATPase (ArsA) Superfamily",
-      "tcdb_substrate_count": 546,
+      "tcdb_substrate_count": 547,
       "direction": "unknown",
       "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters", "level": 1}],
       "children": [
@@ -360,7 +360,7 @@ ontology_term_details(term_ids=["tcdb:3.A.1"], link_kinds=["composition"])
       "tc_class_id": "tcdb:3",
       "member_count": 97,
       "superfamily": "ArsA ATPase (ArsA) Superfamily",
-      "tcdb_substrate_count": 546,
+      "tcdb_substrate_count": 547,
       "direction": "unknown",
       "parents": [{"id": "tcdb:3.A", "name": "P-P-bond-hydrolysis-driven transporters", "level": 1}],
       "children": [
@@ -562,7 +562,7 @@ discussed_by_publication(publication_dois=[...]) → ontology_term_details(term_
 
 - `member_count` (TCDB, MEROPS, InterPro) is the upstream database's family size, not a KG gene count.
 
-- TCDB rows carry `tcdb_substrate_count` (distinct substrates TCDB curates on the systems in the node's subtree; substrate edges leave `tc_system` nodes only, so a family's own range is the sum below it), `direction` (`uptake` / `export` / `unknown`, TCDB-stated and conservative: ABC uptake numbering, which also marks ABC subfamilies, or a system's own name; family-level and higher nodes read `unknown`; rule: `docs://ontologies/tcdb`), sparse `direction_basis` and, on `tc_system` nodes, `proteins` (TCDB's protein list: gene symbols, accessions, source organism). Use `tcdb_substrate_count` to see how broad a family call is before trusting a family walk: the ABC superfamily tcdb:3.A.1 reads 546. Many children are range-only (`gene_count = 0`): curated systems no KG gene is called to.
+- TCDB rows carry `tcdb_substrate_count` (distinct substrates TCDB curates on the systems in the node's subtree; substrate edges leave `tc_system` nodes only, so a family's own range is the sum below it), `direction` (`uptake` / `export` / `unknown`, TCDB-stated and conservative: ABC uptake numbering, which also marks ABC subfamilies, or a system's own name; family-level and higher nodes read `unknown`; rule: `docs://ontologies/tcdb`), sparse `direction_basis` and, on `tc_system` nodes, `proteins` (TCDB's protein list: gene symbols, accessions, source organism). Use `tcdb_substrate_count` to see how broad a family call is before trusting a family walk: the ABC superfamily tcdb:3.A.1 reads 547. Many children are range-only (`gene_count = 0`): curated systems no KG gene is called to.
 
 - A compact column that is missing on the node is absent, not null: GO rows carry only `direct_gene_count` from their compact extras, Pfam rows `short_name`, KEGG `reaction_count` / `metabolite_count` only on pathway terms (absent on KO / module rows). Do not treat an absent key as `0`.
 

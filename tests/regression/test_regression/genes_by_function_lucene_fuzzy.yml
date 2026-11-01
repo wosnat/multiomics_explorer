@@ -4032,7 +4032,7 @@ rows:
   locus_tag: Sputw3181_2127
   organism_name: Shewanella sp. W3-18-1
   product: replication initiation negative regulator SeqA
-  score: 4.1187
+  score: 4.1186
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: polA

@@ -10,9 +10,9 @@ by_ontology:
   truncated: true
 - ontology: tcdb
   returned: 5
-  score_max: 7.366277694702148
-  total_entries: 9725
-  total_matching: 527
+  score_max: 7.373953342437744
+  total_entries: 9762
+  total_matching: 551
   truncated: true
 case_id: search_ontology_multi_go_bp_tcdb_transport
 mode: search
@@ -65,7 +65,7 @@ results:
   name: Ion transport 2 domain-containing protein of 345 aas and 2 TMSs
   ontology_type: tcdb
   organism_count: 0
-  score: 5.9922
+  score: 6.0067
 - gene_count: 0
   id: tcdb:2.A.39.1.7
   is_informative: true
@@ -73,7 +73,7 @@ results:
   name: Putative transmembrane transport protein
   ontology_type: tcdb
   organism_count: 0
-  score: 7.3663
+  score: 7.374
 - gene_count: 0
   id: tcdb:2.A.55.3.4
   is_informative: true
@@ -81,7 +81,7 @@ results:
   name: Putative metal ion transport protein
   ontology_type: tcdb
   organism_count: 0
-  score: 7.0223
+  score: 7.0311
 - gene_count: 0
   id: tcdb:3.A.1.1.36
   is_informative: true
@@ -89,7 +89,7 @@ results:
   name: Putative transport system
   ontology_type: tcdb
   organism_count: 0
-  score: 6.6706
+  score: 6.67
 - gene_count: 0
   id: tcdb:9.B.14.2.5
   is_informative: true
@@ -98,13 +98,13 @@ results:
     C of 234 aas
   ontology_type: tcdb
   organism_count: 0
-  score: 5.2572
+  score: 5.2698
 returned: 10
 row_count: 10
-score_max: 7.366277694702148
-score_median: 3.3912983536720276
+score_max: 7.373953342437744
+score_median: 3.3975949883461
 skipped_ontologies: []
-total_entries: 13136
-total_matching: 859
+total_entries: 13173
+total_matching: 883
 truncated: true
 warnings: []

@@ -170,9 +170,9 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00009"], organism="Prochloro
   "not_matched": ["kegg.compound:C00009"],
   "tcdb_family_substrates_not_shown": {"genes": 4, "metabolites": 1, "rows": 4},
   "tcdb_family_substrates_skipped": [
-    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
-    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
-    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 547},
+    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 547},
+    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 547},
     ...
   ],
   "gene_count_total": 0,
@@ -257,9 +257,9 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"], organism="Prochloro
   "not_matched": ["kegg.compound:C00736"],
   "tcdb_family_substrates_not_shown": {"genes": 5, "metabolites": 1, "rows": 5},
   "tcdb_family_substrates_skipped": [
-    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
-    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
-    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 546},
+    {"locus_tag": "PMM0449", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 547},
+    {"locus_tag": "PMM0450", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 547},
+    {"locus_tag": "PMM0913", "tcdb_id": "tcdb:3.A.1", "tcdb_substrate_count": 547},
     ...
   ],
   "gene_count_total": 0,

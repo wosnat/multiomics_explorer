@@ -225,7 +225,7 @@ search_ontology(ontology=["tcdb"], level=2, organism="MED4", min_gene_count=5)
 ```example-response
 {
   "mode": "browse",
-  "total_entries": 9725,
+  "total_entries": 9762,
   "total_matching": 8,
   "...": "6 empty fields omitted",
   "returned": 5,
@@ -234,7 +234,7 @@ search_ontology(ontology=["tcdb"], level=2, organism="MED4", min_gene_count=5)
   "by_ontology": [
     {
       "ontology": "tcdb",
-      "total_entries": 9725,
+      "total_entries": 9762,
       "total_matching": 8,
       "score_max": null,
       "returned": 5,
@@ -426,10 +426,10 @@ search_ontology(search_text="transport", ontology=["go_bp", "tcdb"], limit=5)
 ```example-response
 {
   "mode": "search",
-  "total_entries": 13136,
-  "total_matching": 859,
-  "score_max": 7.366277694702148,
-  "score_median": 3.3912983536720276,
+  "total_entries": 13173,
+  "total_matching": 883,
+  "score_max": 7.373953342437744,
+  "score_median": 3.3975949883461,
   "returned": 10,
   "offset": 0,
   "truncated": true,
@@ -444,9 +444,9 @@ search_ontology(search_text="transport", ontology=["go_bp", "tcdb"], limit=5)
     },
     {
       "ontology": "tcdb",
-      "total_entries": 9725,
-      "total_matching": 527,
-      "score_max": 7.366277694702148,
+      "total_entries": 9762,
+      "total_matching": 551,
+      "score_max": 7.373953342437744,
       "returned": 5,
       "truncated": true
     }
@@ -497,9 +497,9 @@ search_ontology(search_text="nitrate", limit=2)
 ```example-response
 {
   "mode": "search",
-  "total_entries": 58147,
+  "total_entries": 58187,
   "total_matching": 208,
-  "score_max": 11.335722923278809,
+  "score_max": 11.387791633605957,
   "score_median": 3.41845965385437,
   "returned": 19,
   "offset": 0,
@@ -648,19 +648,19 @@ search_ontology(search_text="sucrose", ontology=["tcdb"])
 ```example-response
 {
   "mode": "search",
-  "total_entries": 9725,
+  "total_entries": 9762,
   "total_matching": 35,
-  "score_max": 9.35278034210205,
-  "score_median": 4.326177597045898,
+  "score_max": 9.411396026611328,
+  "score_median": 4.371308326721191,
   "returned": 5,
   "offset": 0,
   "truncated": true,
   "by_ontology": [
     {
       "ontology": "tcdb",
-      "total_entries": 9725,
+      "total_entries": 9762,
       "total_matching": 35,
-      "score_max": 9.35278034210205,
+      "score_max": 9.411396026611328,
       "returned": 5,
       "truncated": true
     }
@@ -671,7 +671,7 @@ search_ontology(search_text="sucrose", ontology=["tcdb"])
       "id": "tcdb:2.A.2.4.17",
       "name": "High affinity sucrose transporter of 617 aas and 12 TMSs, Sut1B.",
       "ontology_type": "tcdb",
-      "score": 9.35278034210205,
+      "score": 9.411396026611328,
       "level": 4,
       "is_informative": true,
       "gene_count": 0,
@@ -681,7 +681,7 @@ search_ontology(search_text="sucrose", ontology=["tcdb"])
       "id": "tcdb:3.A.1.1.8",
       "name": "Sucrose/maltose/trehalose porter (sucrose-inducible)",
       "ontology_type": "tcdb",
-      "score": 8.559282302856445,
+      "score": 8.61709213256836,
       "level": 4,
       "is_informative": true,
       "gene_count": 3,
@@ -691,7 +691,7 @@ search_ontology(search_text="sucrose", ontology=["tcdb"])
       "id": "tcdb:4.A.1.2.1",
       "name": "Sucrose porter IIBCScr (ScrA) of 456 aas and 10 or 11 TMSs.",
       "ontology_type": "tcdb",
-      "score": 8.534334182739258,
+      "score": 8.588693618774414,
       "level": 4,
       "is_informative": true,
       "gene_count": 0,
@@ -713,19 +713,19 @@ search_ontology(search_text="UrtA", ontology=["tcdb"], verbose=True, limit=2)
 ```example-response
 {
   "mode": "search",
-  "total_entries": 9725,
+  "total_entries": 9762,
   "total_matching": 2,
-  "score_max": 3.453925609588623,
-  "score_median": 3.2717318534851074,
+  "score_max": 3.4547557830810547,
+  "score_median": 3.2717013359069824,
   "returned": 2,
   "offset": 0,
   "truncated": false,
   "by_ontology": [
     {
       "ontology": "tcdb",
-      "total_entries": 9725,
+      "total_entries": 9762,
       "total_matching": 2,
-      "score_max": 3.453925609588623,
+      "score_max": 3.4547557830810547,
       "returned": 2,
       "truncated": false
     }
@@ -736,7 +736,7 @@ search_ontology(search_text="UrtA", ontology=["tcdb"], verbose=True, limit=2)
       "id": "tcdb:3.A.1.4.4",
       "name": "The high-affinity (<1 μM) urea porter",
       "ontology_type": "tcdb",
-      "score": 3.453925609588623,
+      "score": 3.4547557830810547,
       "level": 4,
       "is_informative": true,
       "gene_count": 462,
@@ -753,7 +753,7 @@ search_ontology(search_text="UrtA", ontology=["tcdb"], verbose=True, limit=2)
       "id": "tcdb:3.A.1.4.5",
       "name": "The high affinity urea/thiourea/hydroxyurea porter",
       "ontology_type": "tcdb",
-      "score": 3.2717318534851074,
+      "score": 3.2717013359069824,
       "level": 4,
       "is_informative": true,
       "gene_count": 462,
@@ -1026,19 +1026,19 @@ search_ontology(search_text="transport", ontology=["kegg"], informative_only=Tru
 ```example-response
 {
   "mode": "search",
-  "total_entries": 5107,
+  "total_entries": 5110,
   "total_matching": 331,
-  "score_max": 1.7493276596069336,
-  "score_median": 1.1619808673858643,
+  "score_max": 1.7499687671661377,
+  "score_median": 1.1626993417739868,
   "returned": 5,
   "offset": 0,
   "truncated": true,
   "by_ontology": [
     {
       "ontology": "kegg",
-      "total_entries": 5107,
+      "total_entries": 5110,
       "total_matching": 331,
-      "score_max": 1.7493276596069336,
+      "score_max": 1.7499687671661377,
       "returned": 5,
       "truncated": true
     }
@@ -1049,7 +1049,7 @@ search_ontology(search_text="transport", ontology=["kegg"], informative_only=Tru
       "id": "kegg.subcategory:09131",
       "name": "Membrane transport",
       "ontology_type": "kegg",
-      "score": 1.7493276596069336,
+      "score": 1.7499687671661377,
       "level": 1,
       "is_informative": true,
       "discussed_by_n_publications": 0,
@@ -1060,18 +1060,18 @@ search_ontology(search_text="transport", ontology=["kegg"], informative_only=Tru
       "id": "kegg.subcategory:09141",
       "name": "Transport and catabolism",
       "ontology_type": "kegg",
-      "score": 1.6134060621261597,
+      "score": 1.6140916347503662,
       "level": 1,
       "is_informative": true,
       "discussed_by_n_publications": 0,
-      "gene_count": 802,
+      "gene_count": 1196,
       "organism_count": 118
     },
     {
       "id": "kegg.orthology:K03322",
       "name": "mntH; manganese transport protein",
       "ontology_type": "kegg",
-      "score": 1.4970839023590088,
+      "score": 1.4977943897247314,
       "level": 3,
       "is_informative": true,
       "discussed_by_n_publications": 0,
@@ -1092,19 +1092,19 @@ search_ontology(search_text="calvin", ontology=["kegg"])
 ```example-response
 {
   "mode": "search",
-  "total_entries": 5107,
+  "total_entries": 5110,
   "total_matching": 1,
-  "score_max": 4.152606964111328,
-  "score_median": 4.152606964111328,
+  "score_max": 4.154165267944336,
+  "score_median": 4.154165267944336,
   "returned": 1,
   "offset": 0,
   "truncated": false,
   "by_ontology": [
     {
       "ontology": "kegg",
-      "total_entries": 5107,
+      "total_entries": 5110,
       "total_matching": 1,
-      "score_max": 4.152606964111328,
+      "score_max": 4.154165267944336,
       "returned": 1,
       "truncated": false
     }
@@ -1115,7 +1115,7 @@ search_ontology(search_text="calvin", ontology=["kegg"])
       "id": "kegg.pathway:ko00710",
       "name": "Carbon fixation by Calvin cycle",
       "ontology_type": "kegg",
-      "score": 4.152606964111328,
+      "score": 4.154165267944336,
       "level": 2,
       "is_informative": true,
       "discussed_by_n_publications": 27,

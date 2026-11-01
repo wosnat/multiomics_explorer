@@ -136,7 +136,7 @@ list_metabolites(metabolite_ids=["chebi:14654"])
 
 ```example-response
 {
-  "total_entries": 3251,
+  "total_entries": 3249,
   "total_matching": 1,
   "top_organisms": [
     {"organism_name": "Alteromonas macleodii 83-1", "count": 1},
@@ -214,12 +214,12 @@ list_metabolites(structure_kind=["generic"], summary=True)
 
 ```example-response
 {
-  "total_entries": 3251,
-  "total_matching": 641,
+  "total_entries": 3249,
+  "total_matching": 639,
   "top_organisms": [
     {"organism_name": "Pseudomonas putida KT2440", "count": 322},
-    {"organism_name": "Alteromonas macleodii EZ55", "count": 315},
-    {"organism_name": "Alteromonas macleodii MIT1002", "count": 312},
+    {"organism_name": "Alteromonas macleodii EZ55", "count": 313},
+    {"organism_name": "Alteromonas macleodii MIT1002", "count": 310},
     ...
   ],
   "top_metabolite_pathways": [
@@ -241,25 +241,25 @@ list_metabolites(structure_kind=["generic"], summary=True)
     ...
   ],
   "by_evidence_source": [
-    {"evidence_source": "metabolism", "count": 349},
+    {"evidence_source": "metabolism", "count": 347},
     {"evidence_source": "transport", "count": 298},
     {"evidence_source": "go_transport", "count": 82}
   ],
-  "xref_coverage": {"with_chebi": 554, "with_hmdb": 2, "with_mnxm": 639},
+  "xref_coverage": {"with_chebi": 554, "with_hmdb": 2, "with_mnxm": 637},
   "mass_stats": {"mass_min": null, "mass_median": null, "mass_max": null},
-  "by_measurement_coverage": {"by_paper_count": [{"paper_count": 0, "count": 641}], "by_compartment": []},
-  "by_structure_kind": [{"structure_kind": "generic", "count": 641}],
+  "by_measurement_coverage": {"by_paper_count": [{"paper_count": 0, "count": 639}], "by_compartment": []},
+  "by_structure_kind": [{"structure_kind": "generic", "count": 639}],
   "by_kegg_functional_category": [
     {"kegg_functional_category": "Lipids", "count": 19},
     {"kegg_functional_category": "Antibiotics", "count": 2},
-    {"kegg_functional_category": "not classified", "count": 620}
+    {"kegg_functional_category": "not classified", "count": 618}
   ],
   "by_kegg_brite_class": [
     {"kegg_brite_class": "Lipids: Fatty acyls", "count": 39},
     {"kegg_brite_class": "Lipids: Glycerophospholipids", "count": 24},
     {"kegg_brite_class": "Lipids: Glycerolipids", "count": 9},
     ...,
-    {"kegg_brite_class": "not classified", "count": 565}
+    {"kegg_brite_class": "not classified", "count": 563}
   ],
   "...": "5 empty fields omitted",
   "returned": 0,
@@ -278,7 +278,7 @@ list_metabolites(kegg_functional_categories=["Peptides"], limit=3)
 
 ```example-response
 {
-  "total_entries": 3251,
+  "total_entries": 3249,
   "total_matching": 59,
   "top_organisms": [
     {"organism_name": "Ruegeria pomeroyi DSS-3", "count": 48},
@@ -450,7 +450,7 @@ list_metabolites(kegg_brite_classes=["Lipids: Fatty acyls"], limit=3)
 
 ```example-response
 {
-  "total_entries": 3251,
+  "total_entries": 3249,
   "total_matching": 257,
   "top_organisms": [
     {"organism_name": "Ruegeria pomeroyi DSS-3", "count": 193},
@@ -467,7 +467,7 @@ list_metabolites(kegg_brite_classes=["Lipids: Fatty acyls"], limit=3)
     {
       "metabolite_pathway_id": "kegg.pathway:ko01120",
       "metabolite_pathway_name": "Microbial metabolism in diverse environments",
-      "count": 84
+      "count": 85
     },
     {
       "metabolite_pathway_id": "kegg.pathway:ko01212",
@@ -608,7 +608,7 @@ list_metabolites(metabolite_ids=["chebi:17234"])
 
 ```example-response
 {
-  "total_entries": 3251,
+  "total_entries": 3249,
   "total_matching": 1,
   "top_organisms": [
     {"organism_name": "Alteromonas macleodii 83-1", "count": 1},
@@ -680,7 +680,7 @@ list_metabolites(evidence_sources=["metabolomics"], summary=True)
 
 ```example-response
 {
-  "total_entries": 3251,
+  "total_entries": 3249,
   "total_matching": 135,
   "top_organisms": [
     {"organism_name": "Prochlorococcus MIT9313", "count": 134},

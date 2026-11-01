@@ -59,7 +59,7 @@ results:
   - coculture
   - darkness
   - light
-  catalyzed_metabolite_count: 1356
+  catalyzed_metabolite_count: 1354
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -130,7 +130,7 @@ results:
   - diel
   - light
   - viral
-  catalyzed_metabolite_count: 1039
+  catalyzed_metabolite_count: 1037
   clade: HLI
   cluster_types:
   - decay_pattern
@@ -214,12 +214,12 @@ top_annotation_capability:
   peptidase_gene_count: 50
   preferred_name: Prochlorococcus MED4
 top_metabolic_capability:
-- catalyzed_metabolite_count: 1356
+- catalyzed_metabolite_count: 1354
   go_transport_metabolite_count: 75
   organism_name: Alteromonas (MarRef v6)
   reaction_count: 1263
   transported_metabolite_count: 128
-- catalyzed_metabolite_count: 1039
+- catalyzed_metabolite_count: 1037
   go_transport_metabolite_count: 46
   organism_name: Prochlorococcus MED4
   reaction_count: 943

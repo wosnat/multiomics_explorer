@@ -72,7 +72,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/gene_response_profile/full` — ~5459 tok
 - `docs://tools/genes_by_boolean_metric/full` — ~5475 tok
 - `docs://tools/genes_by_categorical_metric/full` — ~5283 tok
-- `docs://tools/genes_by_function/full` — ~2756 tok
+- `docs://tools/genes_by_function/full` — ~2753 tok
 - `docs://tools/genes_by_homolog_group/full` — ~2338 tok
 - `docs://tools/genes_by_metabolite/full` — ~11107 tok
 - `docs://tools/genes_by_numeric_metric/full` — ~6342 tok
@@ -97,7 +97,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/resolve_gene/full` — ~1543 tok
 - `docs://tools/run_cypher/full` — ~945 tok
 - `docs://tools/search_homolog_groups/full` — ~2154 tok
-- `docs://tools/search_ontology/full` — ~10731 tok
+- `docs://tools/search_ontology/full` — ~10732 tok
 
 ## Analysis
 

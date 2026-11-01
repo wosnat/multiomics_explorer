@@ -1,7 +1,7 @@
 by_evidence_source:
-- count: 2287
+- count: 2285
   evidence_source: metabolism
-- count: 1311
+- count: 1313
   evidence_source: transport
 - count: 218
   evidence_source: go_transport
@@ -63,7 +63,7 @@ by_kegg_brite_class:
 - count: 1
   kegg_brite_class: 'Phytochemical compounds: Shikimate / acetate-malonate pathway
     derived compounds'
-- count: 2597
+- count: 2595
   kegg_brite_class: not classified
 by_kegg_functional_category:
 - count: 64
@@ -84,7 +84,7 @@ by_kegg_functional_category:
   kegg_functional_category: Hormones and transmitters
 - count: 14
   kegg_functional_category: Steroids
-- count: 2925
+- count: 2923
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment:
@@ -95,7 +95,7 @@ by_measurement_coverage:
   - compartment: whole_cell
     count: 135
   by_paper_count:
-  - count: 3116
+  - count: 3114
     paper_count: 0
   - count: 93
     paper_count: 1
@@ -106,7 +106,7 @@ by_measurement_coverage:
 by_structure_kind:
 - count: 2584
   structure_kind: defined
-- count: 641
+- count: 639
   structure_kind: generic
 - count: 26
   structure_kind: polymer
@@ -421,13 +421,13 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 1643
+- count: 1646
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 637
+- count: 644
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
-- count: 603
+- count: 606
   metabolite_pathway_id: kegg.pathway:ko01120
   metabolite_pathway_name: Microbial metabolism in diverse environments
 - count: 286
@@ -454,29 +454,29 @@ top_metabolite_pathways:
 top_organisms:
 - count: 1728
   organism_name: Pseudomonas putida KT2440
-- count: 1604
+- count: 1602
   organism_name: Ruegeria pomeroyi DSS-3
-- count: 1563
+- count: 1561
   organism_name: Alteromonas macleodii EZ55
-- count: 1489
+- count: 1486
   organism_name: Marinobacter (MarRef v6)
-- count: 1484
+- count: 1482
   organism_name: Alteromonas macleodii MIT1002
-- count: 1481
+- count: 1479
   organism_name: Shewanella sp. W3-18-1
-- count: 1474
+- count: 1472
   organism_name: Alteromonas (MarRef v6)
-- count: 1473
+- count: 1471
   organism_name: Alteromonas macleodii BGP6
-- count: 1473
+- count: 1471
   organism_name: Alteromonas macleodii 83-1
-- count: 1462
+- count: 1460
   organism_name: Alteromonas macleodii HOT1A3
-total_entries: 3251
-total_matching: 3251
+total_entries: 3249
+total_matching: 3249
 truncated: true
 warnings: []
 xref_coverage:
   with_chebi: 3114
   with_hmdb: 1481
-  with_mnxm: 3228
+  with_mnxm: 3226

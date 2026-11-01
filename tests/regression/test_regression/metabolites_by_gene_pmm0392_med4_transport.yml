@@ -516,8 +516,8 @@ top_metabolite_pathways:
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
-  pathway_metabolite_count: 637
-  pathway_reaction_count: 556
+  pathway_metabolite_count: 644
+  pathway_reaction_count: 558
 top_metabolite_pathways_truncated: true
 top_metabolites:
 - formula: null

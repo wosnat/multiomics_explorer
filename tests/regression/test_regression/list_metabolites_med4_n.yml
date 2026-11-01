@@ -1,7 +1,7 @@
 by_evidence_source:
-- count: 616
+- count: 614
   evidence_source: metabolism
-- count: 147
+- count: 148
   evidence_source: transport
 - count: 74
   evidence_source: metabolomics
@@ -26,7 +26,7 @@ by_kegg_brite_class:
   kegg_brite_class: 'Pesticides: Pesticides'
 - count: 1
   kegg_brite_class: 'Phytochemical compounds: Amino acid related compounds'
-- count: 565
+- count: 563
   kegg_brite_class: not classified
 by_kegg_functional_category:
 - count: 43
@@ -41,7 +41,7 @@ by_kegg_functional_category:
   kegg_functional_category: Antibiotics
 - count: 1
   kegg_functional_category: Carbohydrates
-- count: 520
+- count: 518
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment:
@@ -52,7 +52,7 @@ by_measurement_coverage:
   - compartment: whole_cell
     count: 74
   by_paper_count:
-  - count: 556
+  - count: 554
     paper_count: 0
   - count: 44
     paper_count: 1
@@ -61,7 +61,7 @@ by_measurement_coverage:
 by_structure_kind:
 - count: 518
   structure_kind: defined
-- count: 112
+- count: 110
   structure_kind: generic
 case_id: list_metabolites_med4_n
 mass_stats:
@@ -315,7 +315,7 @@ top_metabolite_pathways:
 - count: 440
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 170
+- count: 171
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
 - count: 155
@@ -343,28 +343,28 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko02010
   metabolite_pathway_name: ABC transporters
 top_organisms:
-- count: 630
-  organism_name: Prochlorococcus MED4
 - count: 628
+  organism_name: Prochlorococcus MED4
+- count: 626
   organism_name: Prochlorococcus EQPAC1
-- count: 618
+- count: 616
   organism_name: Prochlorococcus MIT9314
-- count: 615
+- count: 613
   organism_name: Prochlorococcus MIT9107
-- count: 615
+- count: 613
   organism_name: Prochlorococcus MIT9116
-- count: 615
+- count: 613
   organism_name: Prochlorococcus MIT9123
-- count: 606
-  organism_name: Prochlorococcus MIT9515
-- count: 605
-  organism_name: Prochlorococcus AS9601
 - count: 604
-  organism_name: Prochlorococcus SB
+  organism_name: Prochlorococcus MIT9515
 - count: 603
+  organism_name: Prochlorococcus AS9601
+- count: 602
+  organism_name: Prochlorococcus SB
+- count: 601
   organism_name: Prochlorococcus MIT9215
-total_entries: 3251
-total_matching: 630
+total_entries: 3249
+total_matching: 628
 truncated: true
 warnings:
 - 29 metabolites have no formula and can never match an element filter (often generic
@@ -373,4 +373,4 @@ warnings:
 xref_coverage:
   with_chebi: 598
   with_hmdb: 405
-  with_mnxm: 629
+  with_mnxm: 627

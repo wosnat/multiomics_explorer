@@ -2638,12 +2638,12 @@ class TestListMetabolites:
         keep_separate; → 1694 at the 2026-10-18T18:40Z GO-transport rebuild:
         2 of the 29 new GO-substrate nodes carry N)."""
         result = api.list_metabolites(elements=["N"], conn=conn)
-        assert result["total_matching"] == 1706  # → 1706 2026-10-28T05:04Z: Ford 2021 strains (KEGG metabolites only new strains reach) ← 1694 → 1663 2026-10-24T17:33Z: TCDB 3a removed 65 transport-only metabolites → 1673 2026-10-26T04:21Z: 10 N-bearing generic forms added (TCDB review)
+        assert result["total_matching"] == 1704  # → 1704 2026-11-01T08:35Z: KEGG/TCDB/ChEBI refresh ← 1706 2026-10-28T05:04Z: Ford 2021 strains (KEGG metabolites only new strains reach) ← 1694 → 1663 2026-10-24T17:33Z: TCDB 3a removed 65 transport-only metabolites → 1673 2026-10-26T04:21Z: 10 N-bearing generic forms added (TCDB review)
 
     def test_elements_n_and_p_filter(self, conn):
         """Multi-element AND filter (must contain both N and P)."""
         result = api.list_metabolites(elements=["N", "P"], conn=conn)
-        assert result["total_matching"] == 593  # → 593 2026-10-28T05:04Z: Ford 2021 strains ← 583 → 574 (2026-10-15 identity rebuild) → 576 (stereo-guard splits) → 574 (2026-10-24T17:33Z, TCDB 3a removed metabolites)
+        assert result["total_matching"] == 591  # → 591 2026-11-01T08:35Z: KEGG/TCDB/ChEBI refresh ← 593 2026-10-28T05:04Z: Ford 2021 strains ← 583 → 574 (2026-10-15 identity rebuild) → 576 (stereo-guard splits) → 574 (2026-10-24T17:33Z, TCDB 3a removed metabolites)
 
     def test_organism_plus_elements_filter(self, conn):
         """MED4 + N elements (the canonical N-source primitive): 992.
@@ -2661,7 +2661,7 @@ class TestListMetabolites:
             elements=["N"],
             conn=conn,
         )
-        assert result["total_matching"] == 630  # 1003 → 630 2026-10-24T17:33Z: organism transport arm now direct systems only (Organism_has_metabolite 88,579 → 52,648)
+        assert result["total_matching"] == 628  # → 628 2026-11-01T08:35Z: KEGG/TCDB/ChEBI refresh ← 630 ← 1003 → 630 2026-10-24T17:33Z: organism transport arm now direct systems only (Organism_has_metabolite 88,579 → 52,648)
 
     def test_pathway_id_filter(self, conn):
         """Nitrogen metabolism pathway (ko00910) has 18 metabolites."""
@@ -2704,7 +2704,7 @@ class TestListMetabolites:
         result = api.list_metabolites(
             evidence_sources=["transport"], conn=conn,
         )
-        assert result["total_matching"] == 1311  # → 1311 2026-10-28T05:04Z: Ford 2021 strains (TC systems only new-strain genes hit) ← 1382 → 1285 2026-10-24T17:33Z: 'transport' = substrate of a kept TCDB system (65 removed, 31 lost the tag) → 1282 2026-10-26T04:21Z: TCDB substrate filter
+        assert result["total_matching"] == 1313  # → 1313 2026-11-01T08:35Z: KEGG/TCDB/ChEBI refresh ← 1311 2026-10-28T05:04Z: Ford 2021 strains (TC systems only new-strain genes hit) ← 1382 → 1285 2026-10-24T17:33Z: 'transport' = substrate of a kept TCDB system (65 removed, 31 lost the tag) → 1282 2026-10-26T04:21Z: TCDB substrate filter
 
     def test_summary_mode_empty_results_envelope_populated(self, conn, kg_count):
         """summary=True returns no result rows but envelope is populated."""
@@ -4881,7 +4881,7 @@ class TestMetaboliteIdentitySurface:
             structure_kind=["generic", "polymer"], summary=True, conn=conn)
         # 650 → 675 2026-10-18T18:40Z: 25 of the 29 new GO-substrate nodes are generic.
         # 675 → 655 2026-10-24T17:33Z: TCDB 3a removed transport-only metabolites.
-        assert out["total_matching"] == 667  # → 667 2026-10-28T05:04Z: Ford 2021 strains ← 655 → 647 2026-10-26T04:21Z: TCDB review re-keys
+        assert out["total_matching"] == 665  # → 665 2026-11-01T08:35Z: KEGG/TCDB/ChEBI refresh ← 667 2026-10-28T05:04Z: Ford 2021 strains ← 655 → 647 2026-10-26T04:21Z: TCDB review re-keys
 
     def test_kegg_functional_category_peptides(self, conn):
         out = api.list_metabolites(
@@ -4917,23 +4917,23 @@ class TestMetaboliteIdentitySurface:
         out = api.list_metabolites(summary=True, conn=conn)
         # +29 GO-substrate nodes 2026-10-18T18:40Z (4 defined, 25 generic).
         assert out["by_kegg_functional_category"][-1] == {
-            "kegg_functional_category": "not classified", "count": 2925}  # 2026-10-28T05:04Z: Ford 2021 strains; 2026-10-24T17:33Z: TCDB 3a removals; 2026-10-26T04:21Z: TCDB review re-keys
+            "kegg_functional_category": "not classified", "count": 2923}  # 2026-11-01T08:35Z: KEGG/TCDB/ChEBI refresh; 2026-10-28T05:04Z: Ford 2021 strains; 2026-10-24T17:33Z: TCDB 3a removals; 2026-10-26T04:21Z: TCDB review re-keys
         assert out["by_kegg_brite_class"][-1] == {
-            "kegg_brite_class": "not classified", "count": 2597}
+            "kegg_brite_class": "not classified", "count": 2595}
         assert {b["structure_kind"]: b["count"]
                 for b in out["by_structure_kind"]} == {
-            "defined": 2584, "generic": 641, "polymer": 26}
+            "defined": 2584, "generic": 639, "polymer": 26}
 
     def test_transport_n_breakdown(self, conn):
         out = api.list_metabolites(
             evidence_sources=["transport"], elements=["N"], summary=True,
             conn=conn)
-        assert out["total_matching"] == 646  # → 646 2026-10-28T05:04Z: Ford 2021 strains ← 672 → 620 2026-10-24T17:33Z: TCDB 3a → 628 2026-10-26T04:21Z: generic forms added
+        assert out["total_matching"] == 647  # → 647 2026-11-01T08:35Z: KEGG/TCDB/ChEBI refresh ← 646 2026-10-28T05:04Z: Ford 2021 strains ← 672 → 620 2026-10-24T17:33Z: TCDB 3a → 628 2026-10-26T04:21Z: generic forms added
         assert {b["structure_kind"]: b["count"]
                 for b in out["by_structure_kind"]} == {
-            "defined": 584, "generic": 58, "polymer": 4}
+            "defined": 585, "generic": 58, "polymer": 4}
         assert out["by_kegg_functional_category"][-1] == {
-            "kegg_functional_category": "not classified", "count": 513}
+            "kegg_functional_category": "not classified", "count": 514}
 
     def test_unknown_brite_class_warns_and_matches_nothing(self, conn):
         out = api.list_metabolites(
@@ -5758,9 +5758,9 @@ class TestGoTransportPassThroughs:
         """Spec §7.6: organism filter unions go_transport_organism_names."""
         r = api.list_metabolites(
             organism_names=[_GOT_MED4], summary=True, conn=conn)
-        assert r["total_matching"] == 1089  # 1891 → 1092 2026-10-24T17:33Z: MED4 transport arm now direct systems only → 1089 2026-10-26T04:21Z: TCDB substrate filter
+        assert r["total_matching"] == 1087  # → 1087 2026-11-01T08:35Z: KEGG/TCDB/ChEBI refresh ← 1089 ← 1891 → 1092 2026-10-24T17:33Z: MED4 transport arm now direct systems only → 1089 2026-10-26T04:21Z: TCDB substrate filter
         top = {o["organism_name"]: o["count"] for o in r["top_organisms"]}
-        assert top[_GOT_MED4] == 1089
+        assert top[_GOT_MED4] == 1087
 
     def test_list_metabolites_go_transport_source(self, conn):
         r = api.list_metabolites(

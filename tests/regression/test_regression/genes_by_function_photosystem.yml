@@ -1030,7 +1030,7 @@ rows:
   locus_tag: BL107_13920
   organism_name: Synechococcus sp. BL107
   product: photosystem II PsbY-like protein
-  score: 5.3909
+  score: 5.3908
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbA
@@ -16907,7 +16907,7 @@ rows:
   locus_tag: EW15_1331
   organism_name: Prochlorococcus MIT0801
   product: photosystem II D1 protein carboxyl-terminal processing peptidase
-  score: 4.155
+  score: 4.1549
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoP
@@ -17201,7 +17201,7 @@ rows:
   locus_tag: H6G84_00175
   organism_name: Synechococcus elongatus PCC 7942
   product: c-type cytochrome
-  score: 3.2755
+  score: 3.2754
 - annotation_quality: 3
   gene_category: Energy production
   gene_name: H6G84_RS00200
@@ -18315,7 +18315,7 @@ rows:
   locus_tag: KR100_RS14880
   organism_name: Synechococcus KORDI-100
   product: photosystem II PsbY-like protein
-  score: 5.3909
+  score: 5.3908
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: psbY
@@ -26727,7 +26727,7 @@ rows:
   locus_tag: Pro0980
   organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
   product: possible photosystem II D1 repair protein FtsH3
-  score: 2.054
+  score: 2.0539
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: terC
@@ -29564,7 +29564,7 @@ rows:
   locus_tag: SYN9616_RS0102070
   organism_name: Synechococcus CC9616
   product: photosystem II PsbY-like protein
-  score: 5.3909
+  score: 5.3908
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoP
@@ -32066,7 +32066,7 @@ rows:
   locus_tag: SynA15127_01041
   organism_name: Synechococcus A15-127
   product: photosystem II PsbY-like protein
-  score: 5.3909
+  score: 5.3908
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: petJ
@@ -37158,7 +37158,7 @@ rows:
   locus_tag: SynBIOSE41_04165
   organism_name: Synechococcus BIOS-E4-1
   product: photosystem II PsbY-like protein
-  score: 5.3909
+  score: 5.3908
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: null
@@ -37803,7 +37803,7 @@ rows:
   locus_tag: SynBIOSU31_03219
   organism_name: Synechococcus BIOS-U3-1
   product: photosystem II PsbY-like protein
-  score: 5.3909
+  score: 5.3908
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: moaC
@@ -41036,7 +41036,7 @@ rows:
   locus_tag: SynMITS9220_02864
   organism_name: Synechococcus MITS9220
   product: photosystem II PsbY-like protein
-  score: 5.3909
+  score: 5.3908
 - annotation_quality: 3
   gene_category: Photosynthesis
   gene_name: cyanoQ
@@ -41344,7 +41344,7 @@ rows:
   locus_tag: SynMVIR181_01113
   organism_name: Synechococcus MVIR-18-1
   product: photosystem II PsbY-like protein
-  score: 5.3909
+  score: 5.3908
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: psbA
@@ -51029,7 +51029,7 @@ rows:
   locus_tag: Syncc9902_1004
   organism_name: Synechococcus CC9902
   product: photosystem II PsbY-like protein
-  score: 5.3909
+  score: 5.3908
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: isiA
@@ -53056,7 +53056,7 @@ rows:
   locus_tag: sync_2299
   organism_name: Synechococcus CC9311
   product: photosystem II PsbY-like protein
-  score: 5.3909
+  score: 5.3908
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: isiA

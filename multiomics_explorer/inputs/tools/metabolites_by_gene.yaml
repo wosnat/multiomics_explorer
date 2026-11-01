@@ -21,7 +21,7 @@ examples:
     # PMM0913 (salY) carries a usable TCDB call only on the ABC superfamily
     # tcdb:3.A.1. It points at no system, so the transport arm is empty, and
     # the family walk never starts from a node curated with over 200
-    # substrates (tcdb:3.A.1 has 546). `tcdb_family_substrates_skipped` names
+    # substrates (tcdb:3.A.1 has 547). `tcdb_family_substrates_skipped` names
     # the gene and node, and the warning says the call is superfamily-level
     # with the substrate unknown. Read it as "an ABC transporter of unknown
     # substrate", not as "no transporter".

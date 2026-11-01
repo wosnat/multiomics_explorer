@@ -136,7 +136,7 @@ results:
   superfamily: ArsA ATPase (ArsA) Superfamily
   tc_class_id: tcdb:3
   tcdb_id: 3.A.1
-  tcdb_substrate_count: 546
+  tcdb_substrate_count: 547
   term_id: tcdb:3.A.1
 - children:
   - '{''id'': ''interpro:IPR004708'', ''level'': 1, ''name'': ''Aspartate ammonia-lyase''}'

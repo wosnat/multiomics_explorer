@@ -56,7 +56,7 @@ with `level_kind` `tc_class` → `tc_subclass` → `tc_family` →
 `tc_subfamily` → `tc_system`. Substrate edges leave `tc_system` nodes
 only, so a family's substrate range is the union of its systems';
 `tcdb_substrate_count` holds that range at every level (the ABC
-superfamily `tcdb:3.A.1` reads 546). `gene_count` / `organism_count` are
+superfamily `tcdb:3.A.1` reads 547). `gene_count` / `organism_count` are
 subtree-inclusive and count gated edges only, so a class reports
 thousands of genes while its `direct_gene_count` is 0. Most nodes are
 range-only: systems TCDB curates (and their ancestors) with no KG gene

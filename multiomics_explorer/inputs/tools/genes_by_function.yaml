@@ -22,8 +22,8 @@ examples:
           {"category": "Energy production", "count": 464},
           ...
         ],
-        "score_max": 6.025513648986816,
-        "score_median": 4.0308990478515625,
+        "score_max": 6.0255126953125,
+        "score_median": 4.030897617340088,
         "returned": 5,
         "offset": 0,
         "truncated": true,
@@ -36,7 +36,7 @@ examples:
             "organism_name": "Synechococcus elongatus PCC 7942",
             "gene_category": "Unknown",
             "annotation_quality": 3,
-            "score": 6.025513648986816
+            "score": 6.0255126953125
           },
           {
             "locus_tag": "M744_01545",
@@ -45,7 +45,7 @@ examples:
             "organism_name": "Synechococcus elongatus UTEX 2973",
             "gene_category": "Unknown",
             "annotation_quality": 3,
-            "score": 6.025513648986816
+            "score": 6.0255126953125
           },
           {
             "locus_tag": "SYNPCC7002_A0269",
@@ -54,7 +54,7 @@ examples:
             "organism_name": "Synechococcus PCC 7002",
             "gene_category": "Unknown",
             "annotation_quality": 3,
-            "score": 6.025513648986816
+            "score": 6.0255126953125
           },
           ...
         ]
@@ -82,8 +82,8 @@ examples:
           {"category": "Coenzyme metabolism", "count": 385},
           ...
         ],
-        "score_max": 7.707810401916504,
-        "score_median": 4.2014923095703125,
+        "score_max": 7.7078094482421875,
+        "score_median": 4.20149040222168,
         "returned": 0,
         "offset": 0,
         "truncated": true,

@@ -1,5 +1,5 @@
 by_evidence_source:
-- count: 349
+- count: 347
   evidence_source: metabolism
 - count: 298
   evidence_source: transport
@@ -16,22 +16,22 @@ by_kegg_brite_class:
   kegg_brite_class: 'Lipids: Sphingolipids'
 - count: 1
   kegg_brite_class: 'Lipids: Sterol lipids'
-- count: 565
+- count: 563
   kegg_brite_class: not classified
 by_kegg_functional_category:
 - count: 19
   kegg_functional_category: Lipids
 - count: 2
   kegg_functional_category: Antibiotics
-- count: 620
+- count: 618
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment: []
   by_paper_count:
-  - count: 641
+  - count: 639
     paper_count: 0
 by_structure_kind:
-- count: 641
+- count: 639
   structure_kind: generic
 case_id: list_metabolites_structure_kind_generic
 mass_stats:
@@ -84,29 +84,29 @@ top_metabolite_pathways:
 top_organisms:
 - count: 322
   organism_name: Pseudomonas putida KT2440
-- count: 315
+- count: 313
   organism_name: Alteromonas macleodii EZ55
-- count: 312
+- count: 310
   organism_name: Alteromonas macleodii MIT1002
-- count: 311
+- count: 309
   organism_name: Alteromonas macleodii BGP6
-- count: 311
+- count: 309
   organism_name: Alteromonas macleodii 83-1
-- count: 309
+- count: 307
   organism_name: Alteromonas mediterranea AltDE1
-- count: 309
+- count: 307
   organism_name: Alteromonas macleodii HOT1A3
-- count: 308
+- count: 306
   organism_name: Alteromonas macleodii ATCC27126
-- count: 303
+- count: 301
   organism_name: Alteromonas macleodii AD45
-- count: 303
+- count: 301
   organism_name: Alteromonas mediterranea AltDE
-total_entries: 3251
-total_matching: 641
+total_entries: 3249
+total_matching: 639
 truncated: true
 warnings: []
 xref_coverage:
   with_chebi: 554
   with_hmdb: 2
-  with_mnxm: 639
+  with_mnxm: 637

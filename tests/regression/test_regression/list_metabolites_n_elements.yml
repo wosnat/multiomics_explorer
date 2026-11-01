@@ -1,7 +1,7 @@
 by_evidence_source:
-- count: 1262
+- count: 1260
   evidence_source: metabolism
-- count: 646
+- count: 647
   evidence_source: transport
 - count: 101
   evidence_source: metabolomics
@@ -50,7 +50,7 @@ by_kegg_brite_class:
   kegg_brite_class: 'Natural toxins: Marine biotoxins'
 - count: 1
   kegg_brite_class: 'Phytochemical compounds: Terpenoids'
-- count: 1421
+- count: 1419
   kegg_brite_class: not classified
 by_kegg_functional_category:
 - count: 59
@@ -69,7 +69,7 @@ by_kegg_functional_category:
   kegg_functional_category: Lipids
 - count: 2
   kegg_functional_category: Steroids
-- count: 1514
+- count: 1512
   kegg_functional_category: not classified
 by_measurement_coverage:
   by_compartment:
@@ -80,7 +80,7 @@ by_measurement_coverage:
   - compartment: whole_cell
     count: 101
   by_paper_count:
-  - count: 1605
+  - count: 1603
     paper_count: 0
   - count: 68
     paper_count: 1
@@ -91,7 +91,7 @@ by_measurement_coverage:
 by_structure_kind:
 - count: 1447
   structure_kind: defined
-- count: 254
+- count: 252
   structure_kind: generic
 - count: 5
   structure_kind: polymer
@@ -344,13 +344,13 @@ row_count: 5
 score_max: null
 score_median: null
 top_metabolite_pathways:
-- count: 911
+- count: 913
   metabolite_pathway_id: kegg.pathway:ko01100
   metabolite_pathway_name: Metabolic pathways
-- count: 337
+- count: 343
   metabolite_pathway_id: kegg.pathway:ko01110
   metabolite_pathway_name: Biosynthesis of secondary metabolites
-- count: 205
+- count: 207
   metabolite_pathway_id: kegg.pathway:ko01120
   metabolite_pathway_name: Microbial metabolism in diverse environments
 - count: 182
@@ -377,26 +377,26 @@ top_metabolite_pathways:
 top_organisms:
 - count: 1029
   organism_name: Pseudomonas putida KT2440
-- count: 974
+- count: 972
   organism_name: Ruegeria pomeroyi DSS-3
-- count: 903
+- count: 901
   organism_name: Shewanella sp. W3-18-1
-- count: 893
-  organism_name: Alteromonas mediterranea AltDE1
 - count: 891
+  organism_name: Alteromonas mediterranea AltDE1
+- count: 889
   organism_name: Alteromonas (MarRef v6)
-- count: 880
+- count: 878
   organism_name: Alteromonas mediterranea AltDE
-- count: 875
+- count: 873
   organism_name: Alteromonas macleodii EZ55
-- count: 874
+- count: 872
   organism_name: Alteromonas macleodii MIT1002
-- count: 871
+- count: 869
   organism_name: Alteromonas macleodii BGP6
-- count: 871
+- count: 869
   organism_name: Alteromonas macleodii ATCC27126
-total_entries: 3251
-total_matching: 1706
+total_entries: 3249
+total_matching: 1704
 truncated: true
 warnings:
 - 240 metabolites have no formula and can never match an element filter (often generic
@@ -405,4 +405,4 @@ warnings:
 xref_coverage:
   with_chebi: 1630
   with_hmdb: 881
-  with_mnxm: 1692
+  with_mnxm: 1690

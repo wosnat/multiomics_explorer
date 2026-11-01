@@ -1080,7 +1080,7 @@ rows:
   locus_tag: PMM1381
   organism_name: Prochlorococcus MED4
   product: putative SOS response associated peptidase
-  score: 3.4969
+  score: 3.4968
 - annotation_quality: 3
   gene_category: Regulatory functions
   gene_name: null
@@ -1304,7 +1304,7 @@ rows:
   locus_tag: PMM1697
   organism_name: Prochlorococcus MED4
   product: RNA polymerase sigma factor, type II
-  score: 1.1232
+  score: 1.1231
 - annotation_quality: 3
   gene_category: Replication and repair
   gene_name: uvrA

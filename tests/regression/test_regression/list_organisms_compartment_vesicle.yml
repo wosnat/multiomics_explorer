@@ -4,7 +4,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
-  catalyzed_metabolite_count: 1326
+  catalyzed_metabolite_count: 1324
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -45,7 +45,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
-  catalyzed_metabolite_count: 1307
+  catalyzed_metabolite_count: 1305
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -91,7 +91,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
-  catalyzed_metabolite_count: 1339
+  catalyzed_metabolite_count: 1337
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -128,7 +128,7 @@ rows:
 - background_factors:
   - axenic
   - darkness
-  catalyzed_metabolite_count: 1280
+  catalyzed_metabolite_count: 1278
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -167,7 +167,7 @@ rows:
   - coculture
   - darkness
   - light
-  catalyzed_metabolite_count: 1334
+  catalyzed_metabolite_count: 1332
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -217,7 +217,7 @@ rows:
   - darkness
   - diel
   - light
-  catalyzed_metabolite_count: 1352
+  catalyzed_metabolite_count: 1350
   clade: null
   cluster_types: []
   clustering_analysis_count: 0
@@ -269,7 +269,7 @@ rows:
   - diel
   - light
   - viral
-  catalyzed_metabolite_count: 1039
+  catalyzed_metabolite_count: 1037
   clade: HLI
   cluster_types:
   - decay_pattern
@@ -344,7 +344,7 @@ rows:
   - coculture
   - diel
   - light
-  catalyzed_metabolite_count: 1047
+  catalyzed_metabolite_count: 1045
   clade: HLII
   cluster_types:
   - genomic_island
@@ -396,7 +396,7 @@ rows:
 - background_factors:
   - axenic
   - light
-  catalyzed_metabolite_count: 1081
+  catalyzed_metabolite_count: 1079
   clade: LLIV
   cluster_types:
   - genomic_island

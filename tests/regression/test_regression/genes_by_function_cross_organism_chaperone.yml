@@ -735,7 +735,7 @@ rows:
   locus_tag: ALT831_03988
   organism_name: Alteromonas macleodii 83-1
   product: SCO family protein
-  score: 2.6623
+  score: 2.6622
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: comM
@@ -1022,7 +1022,7 @@ rows:
   locus_tag: ALTBGP6_03989
   organism_name: Alteromonas macleodii BGP6
   product: SCO family protein
-  score: 2.6623
+  score: 2.6622
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: comM
@@ -1309,7 +1309,7 @@ rows:
   locus_tag: AMBAS45_19425
   organism_name: Alteromonas macleodii AD45
   product: SCO family protein
-  score: 2.6623
+  score: 2.6622
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: comM
@@ -1589,7 +1589,7 @@ rows:
   locus_tag: AMBLS11_18595
   organism_name: Alteromonas macleodii BS11
   product: SCO family protein
-  score: 2.6623
+  score: 2.6622
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: comM
@@ -2842,7 +2842,7 @@ rows:
   locus_tag: Cyagr_0241
   organism_name: Cyanobium PCC6307
   product: conserved hypothetical protein
-  score: 2.6623
+  score: 2.6622
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: cobW
@@ -2968,7 +2968,7 @@ rows:
   locus_tag: Cyagr_1695
   organism_name: Cyanobium PCC6307
   product: conserved hypothetical protein
-  score: 2.6623
+  score: 2.6622
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: null
@@ -8505,7 +8505,7 @@ rows:
   locus_tag: H6G84_03925
   organism_name: Synechococcus elongatus PCC 7942
   product: molecular chaperone HtpG
-  score: 4.876
+  score: 4.8759
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: H6G84_RS03990
@@ -8582,7 +8582,7 @@ rows:
   locus_tag: H6G84_08010
   organism_name: Synechococcus elongatus PCC 7942
   product: DnaJ C-terminal domain-containing protein
-  score: 2.6623
+  score: 2.6622
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
@@ -9135,7 +9135,7 @@ rows:
   locus_tag: KR100_08980
   organism_name: Synechococcus KORDI-100
   product: molecular chaperone HtpG
-  score: 5.2492
+  score: 5.2491
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
@@ -9681,7 +9681,7 @@ rows:
   locus_tag: M744_03285
   organism_name: Synechococcus elongatus UTEX 2973
   product: DnaJ C-terminal domain-containing protein
-  score: 2.6623
+  score: 2.6622
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hypC
@@ -10101,7 +10101,7 @@ rows:
   locus_tag: M8001_16705
   organism_name: Pseudomonas putida KT2440
   product: SCO family protein
-  score: 2.6623
+  score: 2.6622
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpK
@@ -10199,7 +10199,7 @@ rows:
   locus_tag: M8001_22970
   organism_name: Pseudomonas putida KT2440
   product: flagellar basal body P-ring formation chaperone FlgA
-  score: 3.3151
+  score: 3.315
 - annotation_quality: 3
   gene_category: Cell motility
   gene_name: null
@@ -10857,7 +10857,7 @@ rows:
   locus_tag: MASE_19300
   organism_name: Alteromonas macleodii ATCC27126
   product: SCO family protein
-  score: 2.6623
+  score: 2.6622
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: comM
@@ -13958,7 +13958,7 @@ rows:
   locus_tag: RH83_RS07225
   organism_name: Prochlorococcus HNLC2
   product: chaperone protein GrpE
-  score: 3.3151
+  score: 3.315
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ1
@@ -14126,7 +14126,7 @@ rows:
   locus_tag: RH84_RS06450
   organism_name: Prochlorococcus HNLC1
   product: chaperone protein GrpE
-  score: 3.3151
+  score: 3.315
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: dnaJ1
@@ -15071,7 +15071,7 @@ rows:
   locus_tag: SY28_00505
   organism_name: Meiothermus ruber
   product: SCO family protein
-  score: 2.6623
+  score: 2.6622
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: ccmE
@@ -15274,7 +15274,7 @@ rows:
   locus_tag: SYN9616_RS0104645
   organism_name: Synechococcus CC9616
   product: molecular chaperone HtpG
-  score: 5.2492
+  score: 5.2491
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: hslO
@@ -15582,7 +15582,7 @@ rows:
   locus_tag: SYNPCC7002_A2161
   organism_name: Synechococcus PCC 7002
   product: DnaJ C-terminal domain-containing protein
-  score: 2.6623
+  score: 2.6622
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: clpB
@@ -16296,7 +16296,7 @@ rows:
   locus_tag: Syn8016DRAFT_0420
   organism_name: Synechococcus WH8016
   product: DnaJ type IV chaperone protein
-  score: 6.2045
+  score: 6.2044
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaJ3
@@ -16345,7 +16345,7 @@ rows:
   locus_tag: Syn8016DRAFT_1030
   organism_name: Synechococcus WH8016
   product: DnaJ type IV chaperone protein
-  score: 6.7318
+  score: 6.7317
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpB1
@@ -17381,7 +17381,7 @@ rows:
   locus_tag: SynA1560_01719
   organism_name: Synechococcus A15-60
   product: molecular chaperone HtpG
-  score: 5.2492
+  score: 5.2491
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
@@ -17829,7 +17829,7 @@ rows:
   locus_tag: SynA1825c_01699
   organism_name: Synechococcus A18-25c
   product: molecular chaperone HtpG
-  score: 5.2492
+  score: 5.2491
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
@@ -18431,7 +18431,7 @@ rows:
   locus_tag: SynBIOSE41_02279
   organism_name: Synechococcus BIOS-E4-1
   product: molecular chaperone HtpG
-  score: 5.2492
+  score: 5.2491
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: cobW
@@ -18634,7 +18634,7 @@ rows:
   locus_tag: SynBIOSU31_01570
   organism_name: Synechococcus BIOS-U3-1
   product: molecular chaperone HtpG
-  score: 5.2492
+  score: 5.2491
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
@@ -19887,7 +19887,7 @@ rows:
   locus_tag: SynMITS9220_01388
   organism_name: Synechococcus MITS9220
   product: molecular chaperone HtpG
-  score: 5.2492
+  score: 5.2491
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: dnaK2
@@ -20356,7 +20356,7 @@ rows:
   locus_tag: SynNOUM97013_01463
   organism_name: Synechococcus NOUM97013
   product: molecular chaperone HtpG
-  score: 5.2492
+  score: 5.2491
 - annotation_quality: 3
   gene_category: Coenzyme metabolism
   gene_name: cobW
@@ -24192,7 +24192,7 @@ rows:
   locus_tag: WH5701_09720
   organism_name: Synechococcus WH5701
   product: conserved hypothetical protein
-  score: 2.6623
+  score: 2.6622
 - annotation_quality: 3
   gene_category: Stress response and adaptation
   gene_name: clpC
@@ -24822,7 +24822,7 @@ rows:
   locus_tag: amad1_19890
   organism_name: Alteromonas mediterranea AltDE1
   product: SCO family protein
-  score: 2.6623
+  score: 2.6622
 - annotation_quality: 3
   gene_category: Post-translational modification
   gene_name: comM

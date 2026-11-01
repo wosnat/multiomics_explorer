@@ -245,15 +245,15 @@
   cypher: >
     MATCH (a:TcdbFamily {id: 'tcdb:3.A.1'}), (m:TcdbFamily {id: 'tcdb:2.A.1'})
     RETURN a.tcdb_substrate_count AS abc, m.tcdb_substrate_count AS mfs
-  expect: {abc: 546, mfs: 468}
+  expect: {abc: 547, mfs: 468}
   quoted:
-    - '546'
+    - '547'
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/transport.md
     - multiomics_explorer/inputs/ontologies/tcdb.yaml
     - multiomics_explorer/inputs/tools/metabolites_by_gene.yaml
     - multiomics_explorer/inputs/tools/ontology_term_details.yaml
-  note: "family-walk breadth cap (200): ABC tcdb:3.A.1 = 546 substrates, MFS tcdb:2.A.1 = 468"
+  note: "family-walk breadth cap (200): ABC tcdb:3.A.1 = 547 substrates, MFS tcdb:2.A.1 = 468"
 
 - id: tcdb_abc_med4_and_children
   cypher: >

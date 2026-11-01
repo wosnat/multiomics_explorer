@@ -1150,7 +1150,7 @@ class TcdbFamilySubstrateSkipped(BaseModel):
         description="The capped start node (e.g. 'tcdb:3.A.1', the ABC "
         "superfamily). Inspect its range via ontology_term_details.")
     tcdb_substrate_count: int = Field(
-        description="Substrates curated under the node (e.g. 546); above "
+        description="Substrates curated under the node (e.g. 547); above "
         "the 200-substrate walk cap.")
 
 
