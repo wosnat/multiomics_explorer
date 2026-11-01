@@ -86,4 +86,24 @@ Asks:
 
 ## Status
 
-Open. C1's explorer side is done; C1's doc alignment, C2, C3 and C4 are KG-side.
+KG side done in the working tree (2026-11-01, uncommitted); takes effect on the next rebuild.
+
+- **C1:** every KG doc reference now says `release_breaking` (5 files). `mcp_min_version`
+  `0.1.0a6` is still a release-cut step, after the explorer's alpha.6 tag.
+- **C2:** `### Breaking` is 9 one-line bullets (1.2 KB as extracted). The detail moved, unchanged,
+  to `### Breaking (details)`, which the extractor does not stamp (exact heading match). The
+  CHANGELOG header now states the ~8–10 bullet / ~2 KB rule. `### Highlights` is 5 bullets
+  (Cyanorak folded into the genomes bullet).
+- **C3:** 1,510 → 1,509; the partner highlight says 77 experiments (35 newly named); the
+  significant-edge line also gives the current build's 113,669. 116 was right for
+  `organism_type = 'genome_strain'`; your 118 adds the 2 `reference_proteome_match` organisms,
+  and the bullet now says so.
+- **C4:** `level_is_best_effort` removed from the 7 non-GO labels (only GO emits it). The other
+  11 are allowlisted in `test_schema_coverage.py::OPTIONAL_PROPS`, each with a reason, and a new
+  reverse check fails on any other declared-but-unset property. The label rule is unchanged.
+
+**Explorer check (2026-11-01):** reply and KG CHANGELOG reviewed. `extract_preflight_subsection`
+matches `### Breaking` exactly and stops at the next `###`, so only the 9 one-liners are stamped.
+Highlights (5) and Breaking read well; C3 figures now agree with the live graph. Remaining: verify
+after the rebuild that `kg_schema` lists the 72 newly declared properties and none of the dropped
+`level_is_best_effort` entries; `mcp_min_version` at the release cut.
