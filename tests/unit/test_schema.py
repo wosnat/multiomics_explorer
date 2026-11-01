@@ -1,7 +1,7 @@
 """P1: Tests for schema diffing, baseline round-trip, prompt formatting, and
 introspection scoping/determinism."""
 
-
+import json
 from unittest.mock import MagicMock
 
 from multiomics_explorer.kg.schema import (
@@ -307,13 +307,16 @@ class TestLoadSchemaFromNeo4jScoping:
         assert "LIMIT 10" in prop_calls[0]
 
 
-def _routing_conn(sample_props, all_keys, fill_values):
-    """Fake conn answering the three property queries by shape: the
-    10-row sample, the full-type key union, and the per-key fill."""
+def _routing_conn(sample_props, all_keys, fill_values, declared=None):
+    """Fake conn answering the property queries by shape: the Schema_info
+    declaration, the 10-row sample, the full-type key union, and the
+    per-key fill."""
     conn = MagicMock()
     conn.get_node_count.return_value = 1
 
     def execute(cypher, **params):
+        if "Schema_info" in cypher:
+            return [{"schema": json.dumps(declared)}] if declared else []
         if "nodeTypeProperties" in cypher:
             names = {int: "Long", float: "Double", str: "String"}
             return [
@@ -374,6 +377,76 @@ class TestSparseProperties:
         )
         fills = [c for c in conn.execute_query.call_args_list if "AS v" in c.args[0]]
         assert fills == []
+
+
+class TestDeclaredProperties:
+    """A type the KG declares in `Schema_info.schema_info` takes its keys and
+    types from the declaration; no full-graph scan runs for it."""
+
+    DECLARED = {
+        "changes expression of": {
+            "represented_as": "edge",
+            "label_as_edge": "changes_expression_of",
+            "properties": {"log2_fold_change": "float", "rank_up": "int",
+                           "treatment_type": "str[]"},
+        },
+        "gene": {"represented_as": "node",
+                 "properties": {"locus_tag": "str", "gene_count": "int"}},
+        "taxonomy": {"some": "metadata"},
+    }
+
+    def _scans(self, conn):
+        return [c for c in conn.execute_query.call_args_list
+                if any(m in c.args[0] for m in
+                       ("DISTINCT k", "AS v", "nodeTypeProperties"))]
+
+    def test_declared_relationship_needs_no_scan(self):
+        conn = _routing_conn(
+            sample_props=[{"log2_fold_change": 1.5}],
+            all_keys=[], fill_values={}, declared=self.DECLARED,
+        )
+        schema = load_schema_from_neo4j(
+            conn, relationship_types=["Changes_expression_of"],
+            section="relationships",
+        )
+        assert schema.relationships["Changes_expression_of"].properties == {
+            "log2_fold_change": "float", "rank_up": "int",
+            "treatment_type": "list",
+        }
+        assert self._scans(conn) == []
+
+    def test_declared_node_label_needs_no_scan(self):
+        conn = _routing_conn(
+            sample_props=[{"locus_tag": "PMM0001"}],
+            all_keys=[], fill_values={}, declared=self.DECLARED,
+        )
+        schema = load_schema_from_neo4j(conn, labels=["Gene"], section="nodes")
+        assert schema.nodes["Gene"].properties == {
+            "locus_tag": "string", "gene_count": "int",
+        }
+        assert self._scans(conn) == []
+
+    def test_sampled_key_missing_from_declaration_is_kept(self):
+        conn = _routing_conn(
+            sample_props=[{"locus_tag": "PMM0001", "legacy": 2}],
+            all_keys=[], fill_values={}, declared=self.DECLARED,
+        )
+        schema = load_schema_from_neo4j(conn, labels=["Gene"], section="nodes")
+        assert schema.nodes["Gene"].properties["legacy"] == "int"
+
+    def test_undeclared_label_falls_back_to_scan(self):
+        conn = _routing_conn(
+            sample_props=[{"locus_tag": "PMM0001"}],
+            all_keys=["locus_tag", "gene_name"],
+            fill_values={"gene_name": "dnaN"}, declared=self.DECLARED,
+        )
+        schema = load_schema_from_neo4j(
+            conn, labels=["NamedThing"], section="nodes",
+        )
+        assert "nodeTypeProperties" in " ".join(
+            c.args[0] for c in conn.execute_query.call_args_list
+        )
+        assert schema.nodes["NamedThing"].properties == {"locus_tag": "string"}
 
 
 class TestAbstractLabels:

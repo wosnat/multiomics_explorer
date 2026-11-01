@@ -1,5 +1,6 @@
 """Graph schema introspection from the live Neo4j instance."""
 
+import json
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -116,6 +117,13 @@ def _infer_type(value: Any) -> str:
 # `db.schema.nodeTypeProperties()` read (~5 s).
 _PROPERTIES_CACHE: dict[tuple, dict[str, str]] = {}
 _NODE_CATALOG_CACHE: dict[tuple, dict[str, dict[str, str]]] = {}
+_DECLARED_CACHE: dict[tuple, dict[str, dict[str, str]]] = {}
+
+# schema_config.yaml type spellings -> `_infer_type` names.
+_DECLARED_TYPES = {
+    "str": "string", "int": "int", "float": "float",
+    "bool": "boolean", "boolean": "boolean",
+}
 
 _PROCEDURE_TYPES = {
     "String": "string", "Long": "int", "Double": "float", "Boolean": "boolean",
@@ -137,6 +145,56 @@ def _procedure_type(types: list[str] | None) -> str:
         if t in _PROCEDURE_TYPES:
             return _PROCEDURE_TYPES[t]
     return "any"
+
+
+def _declared_type(t: Any) -> str:
+    t = str(t)
+    if t.endswith("[]") or t.startswith("list"):
+        return "list"
+    return _DECLARED_TYPES.get(t, "any")
+
+
+def _schema_label(key: str, entry: dict) -> str:
+    """BioCypher's Neo4j label / relationship type for a schema_config entry
+    (same rule as the KG's `tests/kg_validity/test_schema_coverage.py`)."""
+    label_as_edge = entry.get("label_as_edge")
+    if label_as_edge:
+        return label_as_edge[0].upper() + label_as_edge[1:]
+    return "".join(w[:1].upper() + w[1:] for w in key.replace("_", " ").split())
+
+
+def _declared_properties(conn: GraphConnection) -> dict[str, dict[str, str]]:
+    """label / relationship type -> {property: type} as the KG declares it in
+    `Schema_info.schema_info` (the JSON dump of its schema_config.yaml).
+
+    The KG build guarantees every live property is declared, post-import
+    ones included (`test_schema_coverage.py`), so a declared type needs no
+    graph scan. Abstract BioCypher parents (NamedThing, Entity, ...) and
+    Schema_info itself are not declared; an older KG without the node
+    yields ``{}``.
+    """
+    endpoint = _endpoint(conn)
+    if endpoint is not None and endpoint in _DECLARED_CACHE:
+        return _DECLARED_CACHE[endpoint]
+    declared: dict[str, dict[str, str]] = {}
+    try:
+        rows = conn.execute_query(
+            "MATCH (s:Schema_info) RETURN s.schema_info AS schema LIMIT 1"
+        )
+        raw = rows[0].get("schema") if rows else None
+        schema = json.loads(raw) if isinstance(raw, str) else (raw or {})
+    except (ValueError, TypeError, IndexError, AttributeError):
+        schema = {}
+    if isinstance(schema, dict):
+        for key, entry in schema.items():
+            if not isinstance(entry, dict) or "represented_as" not in entry:
+                continue
+            props = declared.setdefault(_schema_label(key, entry), {})
+            for name, t in (entry.get("properties") or {}).items():
+                props[name] = _declared_type(t)
+    if endpoint is not None:
+        _DECLARED_CACHE[endpoint] = declared
+    return declared
 
 
 def _node_catalog(conn: GraphConnection) -> dict[str, dict[str, str]]:
@@ -183,12 +241,14 @@ def _type_properties(conn: GraphConnection, kind: str, name: str) -> dict[str, s
     """Property name -> type for one node label (``kind='node'``) or
     relationship type (``kind='rel'``).
 
-    Types come from a deterministically ordered 10-row sample; the key set is
-    the union over *every* node / edge of the type, so a sparse property
+    The key set covers *every* node / edge of the type, so a sparse property
     (e.g. ``rank_up``, set only on significant-up expression edges) is listed
-    regardless of whether the sample hits it. Keys the sample missed take
-    their type from `db.schema.nodeTypeProperties()` (nodes) or from the
-    first carrier found (relationships; one batched query per type).
+    regardless of whether a sample hits it. A type the KG declares in
+    `Schema_info` takes its keys and types from the declaration, plus a
+    deterministically ordered 10-row sample as a drift guard. An undeclared
+    one (abstract parent labels, older KGs) falls back to scanning: keys the
+    sample missed come from `db.schema.nodeTypeProperties()` (nodes) or from
+    the first carrier found (relationships; one batched query per type).
     """
     endpoint = _endpoint(conn)
     cache_key = (*endpoint, kind, name) if endpoint is not None else None
@@ -210,7 +270,12 @@ def _type_properties(conn: GraphConnection, kind: str, name: str) -> dict[str, s
                 if k not in props or props[k] == "any":
                     props[k] = _infer_type(v)
 
-    if kind == "node":
+    declared = _declared_properties(conn).get(name)
+    if declared is not None:
+        for k, t in declared.items():
+            if t != "any" or k not in props:
+                props[k] = t
+    elif kind == "node":
         for k, t in sorted(_node_catalog(conn).get(name, {}).items()):
             if props.get(k, "any") == "any":
                 props[k] = t
@@ -254,8 +319,9 @@ def load_schema_from_neo4j(
     half entirely (no catalog call for it).
 
     Property keys are the union over every node / edge of the type
-    (``_type_properties``), so sparse properties are always listed; types come from a deterministically
-    ordered sample (``coalesce(n.id, elementId(n))`` for nodes,
+    (``_type_properties``: the KG's `Schema_info` declaration where it has
+    one, a graph scan otherwise), so sparse properties are always listed;
+    sampled types come from a deterministically ordered sample (``coalesce(n.id, elementId(n))`` for nodes,
     ``elementId(r)`` for relationships), stable across builds even for
     abstract labels that lack an ``id`` property. See ``_type_properties``.
     """
