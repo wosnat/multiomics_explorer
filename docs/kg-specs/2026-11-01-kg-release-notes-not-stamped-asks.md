@@ -43,6 +43,19 @@ notes URL) on the alpha-deploy `Schema_info` node from the tagged CHANGELOG sect
 re-check from the explorer side: `kg_release_info()` should show `kg.release_highlights` and
 `kg.breaking_changes`. (The explorer reads `release_breaking`; fixed explorer-side 2026-11-01.)
 
+## R2 — Tester guide points at the wrong explorer version (P2)
+
+`docs/kg_mcp_guide.md` (KG repo), checked after both releases shipped:
+- Lines 21 and 100 say "~37 tools"; explorer 0.1.0-alpha.6 serves 42.
+- The install command (`uvx --from git+https://github.com/wosnat/multiomics_explorer …`) pulls
+  explorer `main`, not a release.
+- Line 203 says to pin "`@kg-0.1.0-alpha.1`". That is a KG tag and does not exist in the explorer
+  repo; explorer tags are `v<version>`.
+
+Fix: install from the tag that matches the KG's `mcp_min_version`, e.g.
+`git+https://github.com/wosnat/multiomics_explorer@v0.1.0-alpha.6`, and say "42 tools" (or
+"~40") in both places.
+
 ## Status
 
-Open (KG side).
+Open (KG side): R1 (alpha.8 still unstamped as of the KG release), R2.
