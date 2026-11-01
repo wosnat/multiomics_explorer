@@ -14,7 +14,7 @@ Sizes: **S** ≤ half a day, no spec · **M** a day, one-page spec (Mode B) · *
 | # | Item | Size | Notes |
 |---|---|---|---|
 | 1.1 | Cut alpha.6 with `/release-explorer` (CHANGELOG `[Unreleased]` → dated section; polish the Breaking list). | S | was 2c.12 |
-| 1.2 | KG-side coordination for that cut: next official KG release sets `mcp_min_version` to the alpha.6 version and stamps `release_highlights` / `breaking_changes` (alpha.7 shipped with both null; live dev build still null). Draft both from the CHANGELOG once 1.1 is polished. | KG | §5 A1 |
+| 1.2 | KG-side coordination for that cut: next official KG release sets `mcp_min_version` to the alpha.6 version and stamps `release_highlights` / `release_breaking` (alpha.7 shipped with both null; live dev build still null). Asks C1–C4 in `docs/kg-specs/2026-11-01-kg-changelog-review-asks.md` (short Breaking section, figures, schema follow-ups). | KG | §5 A1 |
 | 1.3 | Decide whether 2b.6 consolidation rides this breaking release or becomes a separate alpha.7 (it was deferred from alpha.5 to avoid two breaking releases in a row — alpha.6 is already breaking). | — | decision |
 
 ## 2. Next — small, concrete
@@ -46,7 +46,7 @@ Empty.
 ## 5. KG asks pending (explorer → KG)
 
 **A — release coordination**
-- A1. On the next official KG cut: `mcp_min_version` = explorer alpha.6, and stamp `release_highlights` / `breaking_changes` (null on alpha.7). Drafts come from the alpha.6 CHANGELOG (item 1.2).
+- A1. On the next official KG cut: `mcp_min_version` = explorer alpha.6, and stamp `release_highlights` / `release_breaking` (null on alpha.7). Drafts come from the alpha.6 CHANGELOG (item 1.2).
 
 **D — from the Pro N-import coculture analysis 2026-10-06 (not filed KG-side)**
 - D3. Genome-context counts for transport substrates (KG half of 2c.9).
