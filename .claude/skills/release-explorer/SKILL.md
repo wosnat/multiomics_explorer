@@ -29,6 +29,25 @@ Do **not** use for:
   publish a wheel from the current HEAD.
 - PyPI publication — out of scope today; install path is git tag.
 
+## Release notes shape
+
+The cut `## [<version>]` section, in this order:
+
+1. **KG requirement** paragraph: the KG release it targets, linked to that
+   release's GitHub notes (`https://github.com/wosnat/multiomics_biocypher_kg/releases/tag/kg-<v>`),
+   and what fails against an older KG.
+2. `### Highlights`: about 5 plain-language bullets, "what can I now do",
+   no field lists. Then one line telling upgraders what to read in Breaking.
+3. `### Breaking` → `### Added` → `### Changed` → `### Fixed`: the details.
+   Each bullet opens with a bold one-line summary; detail follows.
+   `### Changed` ends with a **New data in KG `<v>`** bullet (strains,
+   papers, reference refreshes, linked to the KG notes) so users know why
+   counts moved.
+
+Outfacing rules: only changes since the previous explorer release; a fix
+to a feature that never shipped folds into that feature's entry; no rebuild
+logs, test counts, backlog ids or spec paths (those live in commit messages).
+
 ## Args
 
 | Arg | Default | Meaning |
@@ -62,7 +81,8 @@ onward.
 2. **CHANGELOG cut** — rename `## [Unreleased]` → `## [<version>] - YYYY-MM-DD`,
    open a fresh empty `## [Unreleased]` above. Idempotent: if
    `## [<version>]` already exists, no-op. **Pauses for polish** unless
-   `--resume` is set.
+   `--resume` is set. The polished section is the GitHub Release body, read
+   by users, so it follows **Release notes shape** below.
 3. **Commit + tag + push** — `chore(release): v<version>` commit (CHANGELOG
    + pyproject), annotated tag `v<version>`, `git push --follow-tags`.
    Each step idempotent.
