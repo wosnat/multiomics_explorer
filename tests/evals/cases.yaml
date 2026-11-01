@@ -988,9 +988,10 @@
     rankable: true
   expect:
     # 31 -> 42 (verified live 2026-08-29): KG-SYNC-006 paper batch added
-    # 11 rankable numeric DMs.
-    min_rows: 42
-    max_rows: 42
+    # 11 rankable numeric DMs. 42 -> 54 (verified live 2026-11-01):
+    # 2026-10 rebuilds (Ford 2021 strains + paper batch).
+    min_rows: 54
+    max_rows: 54
 
 - id: list_derived_metrics_rankable_false
   tool: list_derived_metrics
@@ -1001,9 +1002,10 @@
     # 34 -> 38 (verified live 2026-08-20): Lu 2026 DM rewiring replaced
     # 2 non-rankable numeric DMs with 6 non-rankable boolean per-strain
     # detection metrics (net +4). 38 -> 41 (verified live 2026-08-29):
-    # KG-SYNC-006 paper batch, +3 non-rankable DMs.
-    min_rows: 41
-    max_rows: 41
+    # KG-SYNC-006 paper batch, +3 non-rankable DMs. 41 -> 248 (verified
+    # live 2026-11-01): 2026-10 rebuilds (Ford 2021 strains + paper batch).
+    min_rows: 248
+    max_rows: 248
 
 - id: list_derived_metrics_has_p_value_empty
   tool: list_derived_metrics
