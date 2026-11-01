@@ -21,11 +21,10 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 
 ## [Unreleased]
 
-**KG requirement:** this release targets the KG builds of late October 2026
-(coculture partner list, TCDB cleanup, GO transport edges, metabolite
-identity, control timing). Run against an older KG, `list_experiments` and
-both DE tools fail on `coculture_partner`. The KG's `mcp_min_version` must
-be set to this version before the KG release.
+**KG requirement:** KG `0.1.0-alpha.8` (its `mcp_min_version` is `0.1.0a6`,
+this release). It adds the coculture partner list, the TCDB cleanup, GO
+transport edges, metabolite identity and control timing. Against an older KG,
+`list_experiments` and both DE tools fail on `coculture_partner`.
 
 ### Breaking
 - **`coculture_partner` is a list.** It names every organism sharing the culture, sorted, and is `[]` when axenic. It now includes partners that were the culture background rather than the treatment, so `list_experiments(coculture_partner="Alteromonas")` returns 53 experiments, not 5. Add `treatment_type=['coculture']` to keep only coculture-vs-axenic contrasts. Affects `list_experiments`, `differential_expression_by_gene` (verbose) and `differential_expression_by_ortholog`.
