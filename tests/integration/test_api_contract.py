@@ -1711,7 +1711,7 @@ class TestKGReleaseInfoLive:
     """Live-KG smoke for api/functions.kg_release_info."""
 
     def test_returns_ok_verdict_against_dev_kg(self, conn):
-        """The dev KG at localhost:7687 should always satisfy the
+        """The configured test KG (NEO4J_URI) should always satisfy the
         installed explorer's compatibility check. If this fails,
         EITHER:
           1. The dev KG floated past the explorer's installed version.
@@ -1754,7 +1754,7 @@ class TestKGReleaseInfoLive:
         Key is always present in kg{} (it's in _KG_IDENTITY_FIELDS); the value
         is None only on KGs built before the property existed (unknown).
         Not pinned to a specific role: the value depends on which build is
-        deployed at bolt://localhost:7687 (dev builds stamp 'local-dev'; the
+        deployed at the configured NEO4J_URI (dev builds stamp 'local-dev'; the
         alpha.7 release cut stamps 'staging') — the contract is verbatim
         passthrough of the live Schema_info value, never host/port inference.
         """
