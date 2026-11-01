@@ -32,7 +32,7 @@
 - `docs://tools/genes_by_ontology` — ~1738 tok
 - `docs://tools/genes_in_cluster` — ~760 tok
 - `docs://tools/kg_release_info` — ~671 tok
-- `docs://tools/kg_schema` — ~622 tok
+- `docs://tools/kg_schema` — ~620 tok
 - `docs://tools/list_clustering_analyses` — ~981 tok
 - `docs://tools/list_derived_metrics` — ~1559 tok
 - `docs://tools/list_experiments` — ~1837 tok
@@ -79,7 +79,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/genes_by_ontology/full` — ~12064 tok
 - `docs://tools/genes_in_cluster/full` — ~1979 tok
 - `docs://tools/kg_release_info/full` — ~2354 tok
-- `docs://tools/kg_schema/full` — ~2243 tok
+- `docs://tools/kg_schema/full` — ~2178 tok
 - `docs://tools/list_clustering_analyses/full` — ~2426 tok
 - `docs://tools/list_derived_metrics/full` — ~3510 tok
 - `docs://tools/list_experiments/full` — ~9415 tok

@@ -58,13 +58,10 @@ kg_schema(labels=['Gene'], section='nodes')
         "cazy_family_count": "int",
         "closest_ortholog_genera": "list",
         "closest_ortholog_group_size": "int",
-        "cluster_membership_count": "int",
-        "cluster_types": "list",
         "compartments_observed": "list",
         "contig": "string",
         "contributing_sources": "list",
         "coordinate_source": "string",
-        "discussed_in_publication_count": "int",
         "end": "int",
         "expression_edge_count": "int",
         "function_description": "string",
@@ -74,12 +71,7 @@ kg_schema(labels=['Gene'], section='nodes')
         "gene_summary": "string",
         "id": "string",
         "informative_annotation_types": "list",
-        "interpro_entry_count": "int",
         "locus_tag": "string",
-        "merops_classes": "list",
-        "merops_evidence_score_max": "float",
-        "merops_family_count": "int",
-        "ncbifam_family_count": "int",
         "numeric_metric_count": "int",
         "numeric_metric_types_observed": "list",
         "organism_name": "string",
@@ -93,12 +85,10 @@ kg_schema(labels=['Gene'], section='nodes')
         "sequence": "string",
         "sequence_source": "string",
         "signal_peptide": "string",
-        "signal_peptide_type": "string",
         "significant_down_count": "int",
         "significant_up_count": "int",
         "start": "int",
         "strand": "string",
-        "subcellular_localization": "string",
         "tcdb_assignment_count": "int",
         "transmembrane_regions": "list",
         "transported_metabolite_count": "int"
@@ -120,8 +110,8 @@ kg_schema(section='relationships', relationship_types=['Changes_expression_of'])
   "...": "3 empty fields omitted (nodes, not_found_labels, not_found_relationship_types)",
   "relationships": {
     "Changes_expression_of": {
-      "source_labels": ["Experiment", "InvestigativeProcess"],
-      "target_labels": ["BiologicalEntity", "Entity", "Gene", ...],
+      "source_labels": ["Experiment"],
+      "target_labels": ["Gene"],
       "properties": {
         "adjusted_p_value": "float",
         "expression_direction": "string",
@@ -155,8 +145,8 @@ kg_schema(section='relationships', relationship_types=['Molecular_function_trans
   "...": "3 empty fields omitted (nodes, not_found_labels, not_found_relationship_types)",
   "relationships": {
     "Molecular_function_transports_metabolite": {
-      "source_labels": ["BiologicalEntity", "BiologicalProcessOrActivity", "Entity", ...],
-      "target_labels": ["Entity", "Metabolite", "NamedThing"],
+      "source_labels": ["MolecularFunction"],
+      "target_labels": ["Metabolite"],
       "properties": {"go_chebi_ids": "list"},
       "description": "GO defines this molecular-function term as a transporter activity whose primary input (RO:0004009..."
     }
@@ -173,7 +163,9 @@ kg_schema(relationship_types=['Biological_process_transports_metabolite', ...]) 
 
 ## Common mistakes
 
-- Calling kg_schema() with no arguments dumps every node label and relationship type in the KG (~46 KB, ~12k tokens) — pass labels / relationship_types / section to scope the call to what you actually need before validating a run_cypher query.
+- Calling kg_schema() with no arguments dumps every node label and relationship type in the KG (~35 KB, ~9k tokens) — pass labels / relationship_types / section to scope the call to what you actually need before validating a run_cypher query.
+
+- BioCypher parent labels (NamedThing, Entity, BiologicalEntity, GeneOntology, ...) sit on many node types and are listed with no properties, and relationship source_labels / target_labels name only the concrete labels — MATCH on the concrete label (Gene, TcdbFamily, ...).
 
 - Schema does not include node counts — use run_cypher for counts (or kg_release_info for the headline gene / organism / experiment / paper counts)
 

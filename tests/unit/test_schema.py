@@ -307,7 +307,8 @@ class TestLoadSchemaFromNeo4jScoping:
         assert "LIMIT 10" in prop_calls[0]
 
 
-def _routing_conn(sample_props, all_keys, fill_values, declared=None):
+def _routing_conn(sample_props, all_keys, fill_values, declared=None,
+                  probe_labels=None, probe_keys=None):
     """Fake conn answering the property queries by shape: the Schema_info
     declaration, the 10-row sample, the full-type key union, and the
     per-key fill."""
@@ -315,8 +316,12 @@ def _routing_conn(sample_props, all_keys, fill_values, declared=None):
     conn.get_node_count.return_value = 1
 
     def execute(cypher, **params):
-        if "Schema_info" in cypher:
+        if "s.schema_info" in cypher:
             return [{"schema": json.dumps(declared)}] if declared else []
+        if "labels(n) AS labels" in cypher:
+            return [{"labels": probe_labels or []}]
+        if "keys(n) AS keys" in cypher:
+            return [{"keys": probe_keys or []}]
         if "nodeTypeProperties" in cypher:
             names = {int: "Long", float: "Double", str: "String"}
             return [
@@ -380,73 +385,102 @@ class TestSparseProperties:
 
 
 class TestDeclaredProperties:
-    """A type the KG declares in `Schema_info.schema_info` takes its keys and
-    types from the declaration; no full-graph scan runs for it."""
+    """A type the KG declares in `Schema_info.schema_info` takes its keys,
+    types and endpoints from the declaration; no scan or sample runs."""
 
     DECLARED = {
         "changes expression of": {
             "represented_as": "edge",
             "label_as_edge": "changes_expression_of",
+            "source": "experiment", "target": ["gene", "protein"],
             "properties": {"log2_fold_change": "float", "rank_up": "int",
                            "treatment_type": "str[]"},
         },
+        "experiment": {"represented_as": "node", "properties": {}},
         "gene": {"represented_as": "node",
                  "properties": {"locus_tag": "str", "gene_count": "int"}},
+        "protein": {"represented_as": "node", "properties": {}},
         "taxonomy": {"some": "metadata"},
     }
 
-    def _scans(self, conn):
-        return [c for c in conn.execute_query.call_args_list
+    def _graph_reads(self, conn):
+        return [c.args[0] for c in conn.execute_query.call_args_list
                 if any(m in c.args[0] for m in
-                       ("DISTINCT k", "AS v", "nodeTypeProperties"))]
+                       ("DISTINCT k", "AS v", "nodeTypeProperties",
+                        "properties(", "labels(a)"))]
 
     def test_declared_relationship_needs_no_scan(self):
         conn = _routing_conn(
-            sample_props=[{"log2_fold_change": 1.5}],
-            all_keys=[], fill_values={}, declared=self.DECLARED,
+            sample_props=[], all_keys=[], fill_values={},
+            declared=self.DECLARED, probe_keys=["id", "log2_fold_change"],
         )
         schema = load_schema_from_neo4j(
             conn, relationship_types=["Changes_expression_of"],
             section="relationships",
         )
-        assert schema.relationships["Changes_expression_of"].properties == {
-            "log2_fold_change": "float", "rank_up": "int",
+        rel = schema.relationships["Changes_expression_of"]
+        assert rel.properties == {
+            "id": "string", "log2_fold_change": "float", "rank_up": "int",
             "treatment_type": "list",
         }
-        assert self._scans(conn) == []
+        assert rel.source_labels == ["Experiment"]
+        assert rel.target_labels == ["Gene", "Protein"]
+        assert self._graph_reads(conn) == []
 
     def test_declared_node_label_needs_no_scan(self):
         conn = _routing_conn(
-            sample_props=[{"locus_tag": "PMM0001"}],
-            all_keys=[], fill_values={}, declared=self.DECLARED,
+            sample_props=[], all_keys=[], fill_values={},
+            declared=self.DECLARED, probe_keys=["id", "preferred_id", "locus_tag"],
         )
         schema = load_schema_from_neo4j(conn, labels=["Gene"], section="nodes")
         assert schema.nodes["Gene"].properties == {
+            "id": "string", "preferred_id": "string",
             "locus_tag": "string", "gene_count": "int",
         }
-        assert self._scans(conn) == []
+        assert self._graph_reads(conn) == []
 
-    def test_sampled_key_missing_from_declaration_is_kept(self):
+    def test_only_biocypher_keys_come_from_the_row(self):
+        """An undeclared property on the probed row is not listed: only the
+        BioCypher keys are read from it, so the result never depends on
+        which row comes back."""
         conn = _routing_conn(
-            sample_props=[{"locus_tag": "PMM0001", "legacy": 2}],
-            all_keys=[], fill_values={}, declared=self.DECLARED,
+            sample_props=[], all_keys=[], fill_values={},
+            declared=self.DECLARED, probe_keys=["id", "legacy"],
         )
         schema = load_schema_from_neo4j(conn, labels=["Gene"], section="nodes")
-        assert schema.nodes["Gene"].properties["legacy"] == "int"
+        assert "legacy" not in schema.nodes["Gene"].properties
+        assert schema.nodes["Gene"].properties["id"] == "string"
 
-    def test_undeclared_label_falls_back_to_scan(self):
+    def test_abstract_label_has_no_properties(self):
         conn = _routing_conn(
-            sample_props=[{"locus_tag": "PMM0001"}],
-            all_keys=["locus_tag", "gene_name"],
-            fill_values={"gene_name": "dnaN"}, declared=self.DECLARED,
+            sample_props=[{"locus_tag": "PMM0001"}], all_keys=[], fill_values={},
+            declared=self.DECLARED, probe_labels=["Gene", "NamedThing"],
         )
         schema = load_schema_from_neo4j(
             conn, labels=["NamedThing"], section="nodes",
         )
-        assert "nodeTypeProperties" in " ".join(
-            c.args[0] for c in conn.execute_query.call_args_list
+        assert schema.nodes["NamedThing"].properties == {}
+        assert self._graph_reads(conn) == []
+
+    def test_undeclared_concrete_label_is_sampled(self):
+        conn = _routing_conn(
+            sample_props=[{"version": "0.0.0-dev"}], all_keys=[], fill_values={},
+            declared=self.DECLARED, probe_labels=["Schema_info"],
         )
-        assert schema.nodes["NamedThing"].properties == {"locus_tag": "string"}
+        schema = load_schema_from_neo4j(
+            conn, labels=["Schema_info"], section="nodes",
+        )
+        assert schema.nodes["Schema_info"].properties == {"version": "string"}
+        reads = " ".join(self._graph_reads(conn))
+        assert "properties(" in reads and "nodeTypeProperties" not in reads
+
+    def test_counts_skipped_on_request(self):
+        conn = _routing_conn(
+            sample_props=[], all_keys=[], fill_values={}, declared=self.DECLARED,
+        )
+        load_schema_from_neo4j(conn, labels=["Gene"], section="nodes",
+                               with_counts=False)
+        conn.get_node_count.assert_not_called()
 
 
 class TestAbstractLabels:

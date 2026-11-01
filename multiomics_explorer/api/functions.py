@@ -1505,6 +1505,7 @@ def kg_schema(
         labels=valid_labels,
         relationship_types=valid_relationship_types,
         section=section,
+        with_counts=False,
     )
     result = schema.to_dict()
     descriptions = _edge_descriptions()

@@ -61,7 +61,7 @@ be set to this version before the KG release.
 ### Changed
 - **`summary=True` is smaller than a default page** on `resolve_gene`, `list_organisms`, `list_publications` and `list_experiments` (`list_organisms`: 51k → 6k chars). Long breakdowns there are capped at 10 with a `<key>_truncated` flag.
 - **`list_metabolites(organism_names=…, evidence_sources=…)`** now means "this organism reaches the metabolite by that route". It used to mean "reaches it by any route, and some organism has evidence S", which made every strain look alike under `transport` (MED4 + `transport` + N: 147 → 20 rows).
-- **`kg_schema`** reads property names and types from the schema the KG publishes, and relationship descriptions carry reading caveats.
+- **`kg_schema` is fast and smaller.** It reads properties, types and relationship endpoints from the schema the KG publishes instead of sampling the graph: a full dump takes about 1 s (was 10–18 s) and ~35 KB (was ~46 KB). `source_labels` / `target_labels` name concrete labels only (no BioCypher parents such as `NamedThing`), and those parent labels are listed with no properties. Relationship descriptions carry reading caveats.
 - **Docs are shorter.** Example responses show at most 3 rows (full tool pages 277k → 234k tokens), `docs://index` rows say when to read each page, and a review pass corrected stale counts and wording across all served docs.
 - **Results follow the KG data changes of this period.** The largest: expression significance follows each paper's own criterion (significant DE edges 102,557 → 113,725), and 75 genome strains and 11 papers were added. See the KG changelog.
 

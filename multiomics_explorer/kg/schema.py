@@ -117,7 +117,12 @@ def _infer_type(value: Any) -> str:
 # `db.schema.nodeTypeProperties()` read (~5 s).
 _PROPERTIES_CACHE: dict[tuple, dict[str, str]] = {}
 _NODE_CATALOG_CACHE: dict[tuple, dict[str, dict[str, str]]] = {}
-_DECLARED_CACHE: dict[tuple, dict[str, dict[str, str]]] = {}
+_DECLARED_CACHE: dict[tuple, dict[str, dict]] = {}
+
+# Set by BioCypher on every node / edge it writes, never declared in
+# schema_config.yaml; a declared type learns which ones it carries from one
+# row (they are dense, so any row answers).
+_BIOCYPHER_KEYS = ("id", "preferred_id", "source", "licence", "version")
 
 # schema_config.yaml type spellings -> `_infer_type` names.
 _DECLARED_TYPES = {
@@ -163,20 +168,22 @@ def _schema_label(key: str, entry: dict) -> str:
     return "".join(w[:1].upper() + w[1:] for w in key.replace("_", " ").split())
 
 
-def _declared_properties(conn: GraphConnection) -> dict[str, dict[str, str]]:
-    """label / relationship type -> {property: type} as the KG declares it in
-    `Schema_info.schema_info` (the JSON dump of its schema_config.yaml).
+def _declared_schema(conn: GraphConnection) -> dict[str, dict]:
+    """What the KG declares in `Schema_info.schema_info` (the JSON dump of
+    its schema_config.yaml): ``{"properties": {label_or_type: {prop: type}},
+    "endpoints": {rel_type: (source_labels, target_labels)}}``.
 
     The KG build guarantees every live property is declared, post-import
     ones included (`test_schema_coverage.py`), so a declared type needs no
-    graph scan. Abstract BioCypher parents (NamedThing, Entity, ...) and
-    Schema_info itself are not declared; an older KG without the node
-    yields ``{}``.
+    graph query at all. Abstract BioCypher parents (NamedThing, Entity, ...)
+    and Schema_info itself are not declared; an older KG without the node
+    yields empty maps.
     """
     endpoint = _endpoint(conn)
     if endpoint is not None and endpoint in _DECLARED_CACHE:
         return _DECLARED_CACHE[endpoint]
-    declared: dict[str, dict[str, str]] = {}
+    properties: dict[str, dict[str, str]] = {}
+    endpoints: dict[str, tuple[set[str], set[str]]] = {}
     try:
         rows = conn.execute_query(
             "MATCH (s:Schema_info) RETURN s.schema_info AS schema LIMIT 1"
@@ -185,16 +192,44 @@ def _declared_properties(conn: GraphConnection) -> dict[str, dict[str, str]]:
         schema = json.loads(raw) if isinstance(raw, str) else (raw or {})
     except (ValueError, TypeError, IndexError, AttributeError):
         schema = {}
-    if isinstance(schema, dict):
-        for key, entry in schema.items():
-            if not isinstance(entry, dict) or "represented_as" not in entry:
-                continue
-            props = declared.setdefault(_schema_label(key, entry), {})
-            for name, t in (entry.get("properties") or {}).items():
-                props[name] = _declared_type(t)
+    if not isinstance(schema, dict):
+        schema = {}
+    entries = {
+        key: entry for key, entry in schema.items()
+        if isinstance(entry, dict) and "represented_as" in entry
+    }
+    node_labels = {
+        key: _schema_label(key, entry) for key, entry in entries.items()
+        if entry.get("represented_as") == "node"
+    }
+
+    def _labels(ref: Any) -> set[str]:
+        refs = ref if isinstance(ref, list) else [ref]
+        return {node_labels.get(r) or _schema_label(str(r), {}) for r in refs if r}
+
+    for key, entry in entries.items():
+        label = _schema_label(key, entry)
+        props = properties.setdefault(label, {})
+        for name, t in (entry.get("properties") or {}).items():
+            props[name] = _declared_type(t)
+        if entry.get("represented_as") == "edge" and entry.get("source") and entry.get("target"):
+            src, tgt = endpoints.setdefault(label, (set(), set()))
+            src.update(_labels(entry["source"]))
+            tgt.update(_labels(entry["target"]))
+    declared = {
+        "properties": properties,
+        "endpoints": {
+            rt: (sorted(src), sorted(tgt)) for rt, (src, tgt) in endpoints.items()
+        },
+    }
     if endpoint is not None:
         _DECLARED_CACHE[endpoint] = declared
     return declared
+
+
+def _declared_properties(conn: GraphConnection) -> dict[str, dict[str, str]]:
+    """label / relationship type -> {property: type} from `_declared_schema`."""
+    return _declared_schema(conn)["properties"]
 
 
 def _node_catalog(conn: GraphConnection) -> dict[str, dict[str, str]]:
@@ -244,16 +279,43 @@ def _type_properties(conn: GraphConnection, kind: str, name: str) -> dict[str, s
     The key set covers *every* node / edge of the type, so a sparse property
     (e.g. ``rank_up``, set only on significant-up expression edges) is listed
     regardless of whether a sample hits it. A type the KG declares in
-    `Schema_info` takes its keys and types from the declaration, plus a
-    deterministically ordered 10-row sample as a drift guard. An undeclared
-    one (abstract parent labels, older KGs) falls back to scanning: keys the
-    sample missed come from `db.schema.nodeTypeProperties()` (nodes) or from
-    the first carrier found (relationships; one batched query per type).
+    `Schema_info` takes its keys and types from the declaration, plus the
+    BioCypher keys (``id``, ``preferred_id``, ...) one row carries. On a declaring KG an undeclared label is either an abstract
+    BioCypher parent (its nodes carry a declared label; no properties of its
+    own) or Schema_info itself (a 10-row sample). A KG without a declaration
+    falls back to scanning: keys the sample missed come from
+    `db.schema.nodeTypeProperties()` (nodes) or from the first carrier found
+    (relationships; one batched query per type).
     """
     endpoint = _endpoint(conn)
     cache_key = (*endpoint, kind, name) if endpoint is not None else None
     if cache_key is not None and cache_key in _PROPERTIES_CACHE:
         return dict(_PROPERTIES_CACHE[cache_key])
+
+    declared_all = _declared_properties(conn)
+    declared = declared_all.get(name)
+    if declared is not None:
+        match = f"MATCH (n:`{name}`)" if kind == "node" else f"MATCH ()-[n:`{name}`]->()"
+        probe = conn.execute_query(f"{match} RETURN keys(n) AS keys LIMIT 1")
+        keys = set((probe[0].get("keys") if probe else None) or [])
+        props = {k: "string" for k in _BIOCYPHER_KEYS if k in keys}
+        props.update(declared)
+        if cache_key is not None:
+            _PROPERTIES_CACHE[cache_key] = dict(props)
+        return props
+
+    if kind == "node" and declared_all:
+        # An undeclared label whose nodes carry a declared label is an
+        # abstract BioCypher parent (NamedThing, Entity, ...): no properties
+        # of its own. One node decides it; no scan.
+        probe = conn.execute_query(
+            f"MATCH (n:`{name}`) RETURN labels(n) AS labels LIMIT 1"
+        )
+        node_labels = (probe[0].get("labels") if probe else None) or []
+        if any(label in declared_all for label in node_labels if label != name):
+            if cache_key is not None:
+                _PROPERTIES_CACHE[cache_key] = {}
+            return {}
 
     if kind == "node":
         match, var, order = f"MATCH (n:`{name}`)", "n", "coalesce(n.id, elementId(n))"
@@ -270,11 +332,8 @@ def _type_properties(conn: GraphConnection, kind: str, name: str) -> dict[str, s
                 if k not in props or props[k] == "any":
                     props[k] = _infer_type(v)
 
-    declared = _declared_properties(conn).get(name)
-    if declared is not None:
-        for k, t in declared.items():
-            if t != "any" or k not in props:
-                props[k] = t
+    if declared_all:
+        pass  # declared KG: an undeclared concrete label (Schema_info) keeps its sample
     elif kind == "node":
         for k, t in sorted(_node_catalog(conn).get(name, {}).items()):
             if props.get(k, "any") == "any":
@@ -305,6 +364,7 @@ def load_schema_from_neo4j(
     labels: list[str] | None = None,
     relationship_types: list[str] | None = None,
     section: Literal["nodes", "relationships", "both"] = "both",
+    with_counts: bool = True,
 ) -> GraphSchema:
     """Introspect the graph schema from a live Neo4j instance.
 
@@ -316,7 +376,13 @@ def load_schema_from_neo4j(
     every label / relationship type in the graph — the caller is expected
     to have resolved unknown values before calling in (see
     ``api.functions.kg_schema``). ``section`` skips introspecting the other
-    half entirely (no catalog call for it).
+    half entirely (no catalog call for it). ``with_counts=False`` skips the
+    per-label node counts (``kg_schema`` does not return them).
+
+    On a KG that declares its schema in `Schema_info`, relationship
+    endpoints are the declared source / target labels (concrete labels
+    only, no BioCypher ancestors) and properties come from the declaration;
+    a full dump then costs a handful of cheap queries.
 
     Property keys are the union over every node / edge of the type
     (``_type_properties``: the KG's `Schema_info` declaration where it has
@@ -330,7 +396,7 @@ def load_schema_from_neo4j(
     if section in ("nodes", "both"):
         target_labels = labels if labels is not None else conn.get_labels()
         for label in target_labels:
-            count = conn.get_node_count(label)
+            count = conn.get_node_count(label) if with_counts else 0
             node_schema = NodeSchema(label=label, count=count)
 
             node_schema.properties = _type_properties(conn, "node", label)
@@ -338,11 +404,21 @@ def load_schema_from_neo4j(
             schema.nodes[label] = node_schema
 
     if section in ("relationships", "both"):
+        declared_endpoints = _declared_schema(conn)["endpoints"]
         target_rel_types = relationship_types if relationship_types is not None else conn.get_relationship_types()
         for rel_type in target_rel_types:
             rel_schema = RelationshipSchema(type=rel_type)
 
-            # Get source and target labels
+            declared_ends = declared_endpoints.get(rel_type)
+            if declared_ends is not None:
+                rel_schema.source_labels, rel_schema.target_labels = (
+                    list(declared_ends[0]), list(declared_ends[1]),
+                )
+                rel_schema.properties = _type_properties(conn, "rel", rel_type)
+                schema.relationships[rel_type] = rel_schema
+                continue
+
+            # Undeclared (older KG): source and target labels from the graph
             endpoints = conn.execute_query(
                 f"MATCH (a)-[r:`{rel_type}`]->(b) "
                 f"RETURN DISTINCT labels(a) AS src, labels(b) AS tgt LIMIT 10"

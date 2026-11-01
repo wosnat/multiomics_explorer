@@ -33,11 +33,11 @@ nodes, relationships, not_found_labels, not_found_relationship_types
 
 ## Common mistakes
 
-- Calling kg_schema() with no arguments dumps every node label and relationship type in the KG (~46 KB, ~12k tokens) — pass labels / relationship_types / section to scope the call to what you actually need before validating a run_cypher query.
+- Calling kg_schema() with no arguments dumps every node label and relationship type in the KG (~35 KB, ~9k tokens) — pass labels / relationship_types / section to scope the call to what you actually need before validating a run_cypher query.
+
+- BioCypher parent labels (NamedThing, Entity, BiologicalEntity, GeneOntology, ...) sit on many node types and are listed with no properties, and relationship source_labels / target_labels name only the concrete labels — MATCH on the concrete label (Gene, TcdbFamily, ...).
 
 - Schema does not include node counts — use run_cypher for counts (or kg_release_info for the headline gene / organism / experiment / paper counts)
-
-- This is the one tool whose result is not a list envelope: no total_matching / results, just {nodes, relationships} keyed by label / relationship type. Ontology memberships are relationships (Gene_has_tcdb_family, Gene_involved_in_biological_process, ...), never Gene properties.
 
 ## Chaining patterns
 

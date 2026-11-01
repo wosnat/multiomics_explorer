@@ -182,6 +182,7 @@ class TestKgSchema:
             labels=None,
             relationship_types=None,
             section="both",
+            with_counts=False,
         )
 
     def test_not_found_keys_default_empty(self, mock_conn):
@@ -212,6 +213,7 @@ class TestKgSchema:
             labels=["Gene"],
             relationship_types=None,
             section="both",
+            with_counts=False,
         )
 
     def test_relationship_types_filter_reports_not_found_and_passes_valid_only(self, mock_conn):
@@ -229,6 +231,7 @@ class TestKgSchema:
             labels=None,
             relationship_types=["Encodes"],
             section="both",
+            with_counts=False,
         )
 
     def test_section_passed_through(self, mock_conn):
@@ -244,6 +247,7 @@ class TestKgSchema:
             labels=None,
             relationship_types=None,
             section="nodes",
+            with_counts=False,
         )
 
 
