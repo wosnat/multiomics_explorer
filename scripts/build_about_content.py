@@ -28,7 +28,7 @@ Supported YAML keys (in ``multiomics_explorer/inputs/tools/{tool}.yaml``):
 
 | Key                       | Type                          | Renders as                                              |
 |---------------------------|-------------------------------|---------------------------------------------------------|
-| ``examples``              | list[{title, call, response, steps, illustrative, note}] | "Few-shot examples" section; ``illustrative: true`` marks the title "(illustrative — not a live response)", ``note`` renders italic under the call |
+| ``examples``              | list[{title, call, response, steps, illustrative, note, keep}] | "Few-shot examples" section; ``illustrative: true`` marks the title "(illustrative — not a live response)", ``note`` renders italic under the call; ``keep`` (not rendered) lists envelope keys `refresh_examples.py` shows whole |
 | ``verbose_fields``        | list[str]                     | Splits per-result table into compact + verbose          |
 | ``chaining``              | list[str]                     | "Chaining patterns" section                             |
 | ``mistakes``              | list (str or {wrong, right})  | "Common mistakes" section (bullets and/or wrong/right pairs) |
@@ -650,7 +650,7 @@ ILLUSTRATIVE_MARKER = " (illustrative — not a live response)"
 # Keys an `examples[]` entry may carry. `illustrative: true` = hand-written
 # response (title gets ILLUSTRATIVE_MARKER; live-refresh tooling skips it);
 # `note` = one italic line rendered under the call.
-EXAMPLE_KEYS = frozenset({"title", "call", "response", "steps", "illustrative", "note"})
+EXAMPLE_KEYS = frozenset({"title", "call", "response", "steps", "illustrative", "note", "keep"})
 
 
 def lint_example_keys(tool_name: str, input_data: dict) -> list[str]:

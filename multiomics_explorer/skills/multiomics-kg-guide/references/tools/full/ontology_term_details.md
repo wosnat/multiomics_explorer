@@ -76,6 +76,7 @@ total_matching, returned, offset, truncated, not_found, by_ontology, links_out_t
 | signalp_id | string \| None (optional) | SignalP type ID (sparse: signal_peptide_type) |
 | interpro_id | string \| None (optional) | Bare InterPro accession (sparse: interpro) |
 | interpro_type | string \| None (optional) | InterPro entry type, e.g. 'FAMILY', 'DOMAIN' (sparse: interpro) |
+| ncbifam_family_count | int \| None (optional) | NCBIfam families whose router link points at this TIGR role (sparse: tigr_role). A router, not gene evidence. |
 | ncbifam_id | string \| None (optional) | Bare NCBIfam accession (sparse: ncbifam) |
 | family_type | string \| None (optional) | NCBIfam family type, e.g. 'equivalog' (sparse: ncbifam) |
 | gene_symbol | string \| None (optional) | NCBIfam gene symbol (sparse: ncbifam) |
@@ -305,6 +306,7 @@ ontology_term_details(term_ids=["tigr.role:energy_metabolism"])
       "organism_count": 118,
       "direct_gene_count": 0,
       "code": "energy_metabolism",
+      "ncbifam_family_count": 289,
       "parents": [],
       "children": [
         {

@@ -240,12 +240,13 @@ examples:
   - title: Browse several ontologies at once — by_level is empty on multi-ontology calls
     call: search_ontology(ontology=["merops", "ncbifam"], level=0, limit=3)
     note: "Multi-ontology browse pages in lockstep (up to `limit` rows per ontology, rows grouped by ontology). `by_level` is only filled on a single-ontology browse — with two or more ontologies it comes back `[]` because levels mean different things per ontology; read `by_ontology[]` instead."
+    keep: [by_level]
     response: |
       {
         "mode": "browse",
         "total_entries": 5212,
         "total_matching": 5088,
-        "...": "7 empty fields omitted",
+        "...": "6 empty fields omitted",
         "returned": 6,
         "offset": 0,
         "truncated": true,
@@ -267,6 +268,7 @@ examples:
             "truncated": true
           }
         ],
+        "by_level": [],
         "results": [
           {
             "id": "ncbifam:TIGR00231",

@@ -269,7 +269,7 @@ metabolites_by_gene(locus_tags=["PMM0065"], organism="Prochlorococcus MED4", evi
 metabolites_by_gene(locus_tags=["PMM0970"], organism="Prochlorococcus MED4")
 ```
 
-*TCDB rows come first: urea through both direct urea systems (tcdb:3.A.1.4.4 and 3.A.1.4.5, one row each), thiourea and hydroxyurea through 3.A.1.4.5; the two GO rows (a molecular-function and a biological-process term, both naming urea, `go_term_depth=0`) follow. `by_evidence_source` carries `go_transport` alongside `transport`. A GO row is a term definition: read `go_evidence` and `go_sources` for how the gene came to carry the term.*
+*TCDB rows come first: urea through both direct urea systems (tcdb:3.A.1.4.4 and 3.A.1.4.5, one row each), thiourea and hydroxyurea through 3.A.1.4.5; the two GO rows (a molecular-function and a biological-process term, both naming urea, `go_term_depth=0`) follow as rows 5–6, past the rows shown below; `by_evidence_source` shows them as `go_transport` alongside `transport`, and `evidence_sources=['go_transport']` returns just those two. A GO row is a term definition: read `go_evidence` and `go_sources` for how the gene came to carry the term.*
 
 ```example-response
 {

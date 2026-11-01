@@ -425,3 +425,21 @@ def test_empty_live_is_ok_when_shown_documents_empty():
     assert rx.check_example(ex, Runner()).status == rx.STATUS_OK
     ex2 = rx.Example(tool="t", index=0, title="x", call="t()", response='{"returned": 3}')
     assert rx.check_example(ex2, Runner()).status == rx.STATUS_EMPTY
+
+
+def test_keep_exempts_keys_from_dict_cap_and_empty_fold():
+    live = {"params": {f"k{i}": i for i in range(10)},
+            "a": [], "b": None, "c": {}, "by_level": [], "results": []}
+    plain = rx.trim_response(live)
+    assert "..." in plain["params"] and "by_level" not in plain
+    kept = rx.trim_response(live, keep=("params", "by_level"))
+    assert kept["params"] == live["params"]
+    assert kept["by_level"] == []
+    assert "..." in kept  # the other empties still fold
+
+
+def test_load_examples_reads_keep(tmp_path):
+    p = tmp_path / "some_tool.yaml"
+    p.write_text("examples:\n  - title: t\n    call: some_tool()\n    keep: [enrichment_params]\n    response: |\n      {}\n")
+    (ex,) = rx.load_examples(p)
+    assert ex.keep == ("enrichment_params",)

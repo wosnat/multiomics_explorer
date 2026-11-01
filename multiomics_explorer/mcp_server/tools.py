@@ -3248,6 +3248,8 @@ def register_tools(mcp: FastMCP):
         interpro_id: str | None = Field(default=None, description="Bare InterPro accession (sparse: interpro)")
         interpro_type: str | None = Field(default=None,
             description="InterPro entry type, e.g. 'FAMILY', 'DOMAIN' (sparse: interpro)")
+        ncbifam_family_count: int | None = Field(default=None,
+            description="NCBIfam families whose router link points at this TIGR role (sparse: tigr_role). A router, not gene evidence.")
         ncbifam_id: str | None = Field(default=None, description="Bare NCBIfam accession (sparse: ncbifam)")
         family_type: str | None = Field(default=None,
             description="NCBIfam family type, e.g. 'equivalog' (sparse: ncbifam)")

@@ -14489,6 +14489,15 @@ class TestTcdbCleanupOntologyEnvelopes:
         desc = row.model_fields["metabolite_count"].description or ""
         assert "tcdb" not in desc.lower(), desc
 
+    def test_ontology_term_details_row_declares_every_compact_column(self, tool_fns):
+        """A `term_details_compact` column missing from the row model is
+        silently dropped over MCP (TIGR `ncbifam_family_count` was)."""
+        from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
+        row = _row_model(tool_fns, "ontology_term_details")
+        for key, cfg in ONTOLOGY_CONFIG.items():
+            for f in cfg.get("term_details_compact") or []:
+                assert f in row.model_fields, (key, f)
+
     @pytest.mark.asyncio
     async def test_ontology_term_details_roundtrip_tcdb_columns(self, tool_fns, mock_ctx):
         with patch(

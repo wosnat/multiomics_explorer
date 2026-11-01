@@ -92,6 +92,8 @@ class Example:
     illustrative: bool = False
     has_steps: bool = False
     path: Path | None = None
+    # Envelope keys the note is about: never dict-capped or empty-folded.
+    keep: tuple[str, ...] = ()
 
     @property
     def id(self) -> str:
@@ -127,6 +129,7 @@ def load_examples(path: Path) -> list[Example]:
             illustrative=bool(ex.get("illustrative", False)),
             has_steps="steps" in ex,
             path=path,
+            keep=tuple(str(k) for k in (ex.get("keep") or [])),
         ))
     return out
 
@@ -658,7 +661,9 @@ def _cap_mapping(d: dict, cfg: TrimConfig) -> dict:
     return out
 
 
-def trim_response(live: Any, cfg: TrimConfig = DEFAULT_TRIM) -> Any:
+def trim_response(
+    live: Any, cfg: TrimConfig = DEFAULT_TRIM, keep: tuple[str, ...] = (),
+) -> Any:
     """Deterministic trim of a live envelope for display (see :class:`TrimConfig`).
 
     * top-level scalars kept as-is (strings > ``max_string_len`` elided)
@@ -671,6 +676,8 @@ def trim_response(live: Any, cfg: TrimConfig = DEFAULT_TRIM) -> Any:
       behind one ``"...": "N null fields omitted (names…)"`` entry
     * non-results lists of wide dicts → ``max_wide_items`` exemplar entries
     * ≥ ``min_empty_to_elide`` empty top-level fields → one ``"..."`` entry
+    * ``keep`` (an example's ``keep:`` list) — envelope keys shown whole: never
+      dict-capped, never folded into the empty-fields entry
 
     Elisions are ``...`` list items and ``"..."`` keys only, so every real
     key stays a real field name and :func:`parse_shown_response` drops the
@@ -680,7 +687,10 @@ def trim_response(live: Any, cfg: TrimConfig = DEFAULT_TRIM) -> Any:
     """
     if not isinstance(live, dict):
         return _trim_value(live, cfg)
-    empties = [k for k, v in live.items() if _is_empty(v) and k not in KEEP_EMPTY_KEYS]
+    empties = [
+        k for k, v in live.items()
+        if _is_empty(v) and k not in KEEP_EMPTY_KEYS and k not in keep
+    ]
     elide_empties = len(empties) >= cfg.min_empty_to_elide
     out: dict[str, Any] = {}
     for k, v in live.items():
@@ -692,7 +702,8 @@ def trim_response(live: Any, cfg: TrimConfig = DEFAULT_TRIM) -> Any:
             rows = [_trim_value(x, cfg, in_list=True) for x in v[: cfg.max_rows]]
             out[k] = rows + [ELLIPSIS] if len(v) > cfg.max_rows else rows
         elif isinstance(v, dict):
-            out[k] = _cap_mapping(_trim_value(v, cfg), cfg)
+            trimmed = _trim_value(v, cfg)
+            out[k] = trimmed if k in keep else _cap_mapping(trimmed, cfg)
         else:
             out[k] = _trim_value(v, cfg)
     return out
@@ -731,11 +742,13 @@ def _dump(v: Any, indent: int) -> str:
     return "[\n" + ",\n".join(pad + it for it in items) + "\n" + close + "]"
 
 
-def format_response(live: Any, cfg: TrimConfig = DEFAULT_TRIM) -> str:
+def format_response(
+    live: Any, cfg: TrimConfig = DEFAULT_TRIM, keep: tuple[str, ...] = (),
+) -> str:
     """JSON-ish text of the trimmed envelope: two-space indent, short
     dicts/lists inline, ``...`` items rendered bare (parseable back by
     :func:`parse_shown_response`)."""
-    return _dump(trim_response(live, cfg), 0)
+    return _dump(trim_response(live, cfg, keep), 0)
 
 
 _EXAMPLES_KEY_RE = re.compile(r"^examples:\s*$", re.MULTILINE)
@@ -838,7 +851,7 @@ def run_write(paths: list[Path], runner: LiveRunner, cfg: TrimConfig = DEFAULT_T
                 print(f"[empty      ] {ex.id} — live result is empty (left untouched; fix the inputs)")
                 continue
             try:
-                text = replace_response_block(text, ex.index, format_response(live, cfg))
+                text = replace_response_block(text, ex.index, format_response(live, cfg, ex.keep))
             except ValueError as e:
                 print(f"[unwritable ] {ex.id} — {e}")
                 continue

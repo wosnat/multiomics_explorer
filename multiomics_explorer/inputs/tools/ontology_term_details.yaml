@@ -195,6 +195,7 @@ examples:
             "organism_count": 118,
             "direct_gene_count": 0,
             "code": "energy_metabolism",
+            "ncbifam_family_count": 289,
             "parents": [],
             "children": [
               {

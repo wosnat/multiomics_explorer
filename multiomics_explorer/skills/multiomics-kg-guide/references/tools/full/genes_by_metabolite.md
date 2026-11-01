@@ -228,7 +228,7 @@ genes_by_metabolite(metabolite_ids=["kegg.compound:C00086"], organism="Prochloro
 genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"], organism="Prochlorococcus MED4", summary=True)
 ```
 
-*TCDB names substrates generically, so Cysteine (stereo form unspecified) carries the transport edges and 0 reactions; KEGG reactions use L-Cysteine. In MED4 no gene points directly at a Cysteine system: `tcdb_family_substrates_not_shown` counts 5 genes the family walk would add. `stereo_relatives` lists L-Cysteine with its MED4 counts (exactly what this tool reports for it), `by_metabolite[*].stereo_relative_ids` marks the entry, and the stereo warning comes first in `warnings`. D-Cysteine is not hinted: it has no MED4 genes.*
+*TCDB names substrates generically, so Cysteine (stereo form unspecified) carries the transport edges and 0 reactions; KEGG reactions use L-Cysteine. In MED4 no gene points directly at a Cysteine system: `tcdb_family_substrates_not_shown` counts 5 genes the family walk would add. `stereo_relatives` lists L-Cysteine with its MED4 counts (exactly what this tool reports for it), and the stereo warning comes first in `warnings`. (`by_metabolite` is empty here — no direct rows — so there is no entry for `stereo_relative_ids` to mark.) D-Cysteine is not hinted: it has no MED4 genes.*
 
 ```example-response
 {

@@ -358,7 +358,7 @@ search_ontology(ontology=["merops", "ncbifam"], level=0, limit=3)
   "mode": "browse",
   "total_entries": 5212,
   "total_matching": 5088,
-  "...": "7 empty fields omitted",
+  "...": "6 empty fields omitted",
   "returned": 6,
   "offset": 0,
   "truncated": true,
@@ -380,6 +380,7 @@ search_ontology(ontology=["merops", "ncbifam"], level=0, limit=3)
       "truncated": true
     }
   ],
+  "by_level": [],
   "results": [
     {
       "id": "ncbifam:TIGR00231",

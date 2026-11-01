@@ -239,6 +239,7 @@ examples:
   - title: "Read enrichment_params — what was actually tested"
     call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="cyanorak_role", level=1, summary=True)
     note: "`enrichment_params` echoes every input plus the derived sizes: `term2gene_row_count` / `n_unique_terms` (the TERM2GENE actually fed to Fisher, after `informative_only` and the size filter), `n_clusters_input` / `n_clusters_tested` / `n_clusters_skipped` (with `clusters_skipped[]` naming the reason, e.g. `no_pathways_in_size_range`), `background_mode`, `filters_applied`, `trust_axes`. Diff this block between two runs before comparing p-values."
+    keep: [enrichment_params]
     response: |
       {
         "organism_name": "Prochlorococcus MED4",
@@ -333,7 +334,26 @@ examples:
           "term_ids": null,
           "tree": null,
           "informative_only": true,
-          "...": "+20 more"
+          "min_gene_set_size": 5,
+          "max_gene_set_size": 500,
+          "pvalue_cutoff": 0.05,
+          "include_nonsignificant": false,
+          "background_mode": "table_scope",
+          "experiment_ids": ["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"],
+          "direction": "both",
+          "significant_only": true,
+          "timepoint_filter": null,
+          "growth_phases": null,
+          "n_clusters_input": 2,
+          "n_clusters_tested": 2,
+          "n_clusters_skipped": 0,
+          "term2gene_row_count": 1487,
+          "n_unique_terms": 106,
+          "multitest_method": "fdr_bh",
+          "filters_applied": {},
+          "trust_axes": {"cyanorak_role": ["sources", "evidence"]},
+          "background_filtered": false,
+          "interpro_type": null
         },
         "trust_axes": {"cyanorak_role": ["sources", "evidence"]},
         "background_filtered": false,
