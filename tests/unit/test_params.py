@@ -109,7 +109,7 @@ def test_param_types_match_baseline():
     spec baseline commit 8b8f16d. Regression guard for the D3 shared-param
     refactor: sharing one description string across tools must never widen
     a required `str` to `str | None`, an `int` to `int | None`, etc."""
-    baseline = json.loads(_BASELINE_FIXTURE.read_text())
+    baseline = json.loads(_BASELINE_FIXTURE.read_text(encoding="utf-8"))
     assert baseline, "baseline fixture is empty — this test would pass vacuously"
     schemas = _all_tool_input_schemas()
     diffs = []

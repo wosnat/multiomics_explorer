@@ -148,7 +148,7 @@ def _collect_test_cases() -> list[tuple[str, dict]]:
     if not ABOUT_DIR.exists():
         return cases
     for path in sorted((ABOUT_DIR / "full").glob("*.md")):
-        content = path.read_text()
+        content = path.read_text(encoding="utf-8")
         examples = _parse_examples(content)
         for ex in examples:
             cases.append((path.stem, ex))

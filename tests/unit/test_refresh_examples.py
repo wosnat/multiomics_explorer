@@ -379,7 +379,7 @@ def test_load_examples_skip_reasons(tmp_path: Path):
               {}
           - title: no response
             call: t(a=1)
-        '''))
+        '''), encoding="utf-8")
     exs = rx.load_examples(p)
     assert [e.tool for e in exs] == ["mytool"] * 5
     assert [e.skip_reason for e in exs] == [
@@ -440,6 +440,6 @@ def test_keep_exempts_keys_from_dict_cap_and_empty_fold():
 
 def test_load_examples_reads_keep(tmp_path):
     p = tmp_path / "some_tool.yaml"
-    p.write_text("examples:\n  - title: t\n    call: some_tool()\n    keep: [enrichment_params]\n    response: |\n      {}\n")
+    p.write_text("examples:\n  - title: t\n    call: some_tool()\n    keep: [enrichment_params]\n    response: |\n      {}\n", encoding="utf-8")
     (ex,) = rx.load_examples(p)
     assert ex.keep == ("enrichment_params",)

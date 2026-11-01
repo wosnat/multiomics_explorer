@@ -160,7 +160,7 @@ def main():
     report = build_report(results)
 
     if args.output:
-        args.output.write_text(report)
+        args.output.write_text(report, encoding="utf-8")
         print(f"\nReport saved to {args.output}")
     else:
         print(f"\n{report}")

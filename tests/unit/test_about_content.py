@@ -184,7 +184,7 @@ def test_yaml_example_kwargs_valid(tool_schemas):
     tool_names = set(tool_schemas)
     failures = []
     for yf in sorted(_INPUTS_DIR.glob("*.yaml")):
-        data = yaml.safe_load(yf.read_text()) or {}
+        data = yaml.safe_load(yf.read_text(encoding="utf-8")) or {}
         texts: list[str] = []
         for ex in data.get("examples") or []:
             texts.append(str(ex.get("call") or ""))
@@ -209,7 +209,7 @@ def test_guide_and_analysis_kwargs_valid(tool_schemas):
     failures = []
     for doc_dir in (_GUIDE_DIR, _ANALYSIS_DIR):
         for md in sorted(doc_dir.glob("*.md")):
-            for name, kwargs in _iter_tool_calls(md.read_text(), tool_names):
+            for name, kwargs in _iter_tool_calls(md.read_text(encoding="utf-8"), tool_names):
                 params = set(
                     (tool_schemas[name]["parameters"].get("properties") or {})
                 ) | _NON_MCP_KWARGS
@@ -227,7 +227,7 @@ def test_every_tool_has_yaml_doc_and_claude_row(tool_schemas):
     tool_names = set(tool_schemas)
     yaml_stems = {p.stem for p in _INPUTS_DIR.glob("*.yaml")}
     doc_stems = {p.stem for p in _get_about_files()}
-    claude_rows = set(re.findall(r"^\| `([a-z_]+)` \|", _CLAUDE_MD.read_text(), re.M))
+    claude_rows = set(re.findall(r"^\| `([a-z_]+)` \|", _CLAUDE_MD.read_text(encoding="utf-8"), re.M))
 
     problems = []
     for t in sorted(tool_names):
@@ -258,7 +258,7 @@ def test_tool_count_claims_match_registry(tool_schemas):
 
     failures = []
     for f in list(_GUIDE_DIR.glob("*.md")) + [_SERVER_PY]:
-        text = f.read_text()
+        text = f.read_text(encoding="utf-8")
         for n in re.findall(r"(\d+)\s+tools\b", text):
             if int(n) not in valid_before_tools:
                 failures.append(
@@ -386,7 +386,7 @@ class TestAboutContentConsistency:
     def test_example_calls_reference_valid_tools(self, tool_schemas):
         """example-call blocks reference registered tool names."""
         for path in _get_about_files():
-            content = path.read_text()
+            content = path.read_text(encoding="utf-8")
             call_names = _extract_example_calls(content)
             for name in call_names:
                 assert name in tool_schemas, (
@@ -410,7 +410,7 @@ class TestAboutContentConsistency:
             if not schema or not schema.get("output_schema"):
                 continue
 
-            content = path.read_text()
+            content = path.read_text(encoding="utf-8")
             expected_keys = _extract_expected_keys(content)
             if not expected_keys:
                 continue
@@ -433,7 +433,7 @@ class TestAboutContentConsistency:
             if not schema:
                 continue
 
-            content = path.read_text()
+            content = path.read_text(encoding="utf-8")
             about_params = set(_extract_param_names_from_about(content))
             if not about_params:
                 continue
@@ -508,13 +508,13 @@ _BASELINE_PATH3B = _ROOT / "multiomics_explorer" / "config" / "schema_baseline.y
 def _ontology_yaml(key):
     path = _ONTOLOGY_INPUTS_DIR / f"{key}.yaml"
     assert path.exists(), f"missing {path}"
-    return _yaml3b.safe_load(path.read_text()) or {}
+    return _yaml3b.safe_load(path.read_text(encoding="utf-8")) or {}
 
 
 def _ontology_md(key):
     path = _ONTOLOGY_DOCS_DIR / f"{key}.md"
     assert path.exists(), f"missing {path}"
-    return path.read_text()
+    return path.read_text(encoding="utf-8")
 
 
 class TestOntologyReferenceInputs:
@@ -554,7 +554,7 @@ class TestOntologyReferenceDocs:
         assert (_ONTOLOGY_DOCS_DIR / f"{key}.md").exists()
 
     def test_index_exists_and_links_every_key(self):
-        index = (_ONTOLOGY_DOCS_DIR / "index.md").read_text()
+        index = (_ONTOLOGY_DOCS_DIR / "index.md").read_text(encoding="utf-8")
         for key in _ONTOLOGY_KEYS:
             assert key in index, f"index.md does not mention {key}"
 
@@ -601,7 +601,7 @@ class TestOntologyReferenceDocs:
     @pytest.mark.parametrize("key", _ONTOLOGY_KEYS)
     def test_md_names_baseline_node_props(self, key):
         """Schema-baseline node props for the label are rendered."""
-        baseline = _yaml3b.safe_load(_BASELINE_PATH3B.read_text())["schema"]
+        baseline = _yaml3b.safe_load(_BASELINE_PATH3B.read_text(encoding="utf-8"))["schema"]
         props = set(baseline["nodes"].get(_CFG3B[key]["label"], {})
                     .get("properties", {}))
         md = _ontology_md(key)
@@ -728,11 +728,11 @@ class TestOntologiesGeneratorStage:
                 assert summary.endswith(".") or summary.endswith("…"), summary
 
     def test_lint_covers_the_ontologies_dir(self):
-        src = (_ROOT / "scripts" / "build_about_content.py").read_text()
+        src = (_ROOT / "scripts" / "build_about_content.py").read_text(encoding="utf-8")
         assert 'skills_refs / "ontologies"' in src
 
     def test_cli_accepts_the_ontologies_stage(self):
-        src = (_ROOT / "scripts" / "build_about_content.py").read_text()
+        src = (_ROOT / "scripts" / "build_about_content.py").read_text(encoding="utf-8")
         assert "--ontologies" in src or '"ontologies"' in src
 
 
@@ -833,7 +833,7 @@ def test_yaml_example_keys_are_known():
 
     failures = []
     for yf in sorted(_INPUTS_DIR.glob("*.yaml")):
-        failures += lint_example_keys(yf.stem, _yaml3b.safe_load(yf.read_text()) or {})
+        failures += lint_example_keys(yf.stem, _yaml3b.safe_load(yf.read_text(encoding="utf-8")) or {})
     assert not failures, "\n".join(failures)
 
 
@@ -841,7 +841,7 @@ def test_node_prop_notes_cover_every_ontology_label_prop():
     """Every baseline prop on an ontology (or parent) label has a one-liner."""
     from scripts.build_about_content import _NODE_PROP_NOTES
 
-    baseline = _yaml3b.safe_load(_BASELINE_PATH3B.read_text())["schema"]["nodes"]
+    baseline = _yaml3b.safe_load(_BASELINE_PATH3B.read_text(encoding="utf-8"))["schema"]["nodes"]
     missing = []
     for key, cfg in _CFG3B.items():
         for label in [cfg["label"]] + ([cfg["parent_label"]] if cfg.get("parent_label") else []):
@@ -915,7 +915,7 @@ def test_yaml_example_responses_carry_an_envelope_key(tool_schemas):
     for yf in sorted(_INPUTS_DIR.glob("*.yaml")):
         if yf.stem in tool_schemas:
             failures += lint_example_responses(
-                yf.stem, _yaml3b.safe_load(yf.read_text()) or {}, tool_schemas[yf.stem])
+                yf.stem, _yaml3b.safe_load(yf.read_text(encoding="utf-8")) or {}, tool_schemas[yf.stem])
     assert not failures, "\n".join(failures)
 
 
@@ -932,7 +932,7 @@ def test_brief_page_structure_and_pointer(tool_schemas):
     from scripts.build_about_content import render_brief
 
     name = "resolve_gene"
-    input_data = _yaml3b.safe_load((_INPUTS_DIR / f"{name}.yaml").read_text())
+    input_data = _yaml3b.safe_load((_INPUTS_DIR / f"{name}.yaml").read_text(encoding="utf-8"))
     brief = render_brief(name, tool_schemas[name], input_data)
     for section in BRIEF_SECTIONS:
         assert section in brief, section
@@ -947,7 +947,7 @@ def test_brief_result_row_lists_compact_fields_only(tool_schemas):
     from scripts.build_about_content import extract_response_fields, render_brief
 
     for name in ("genes_in_cluster", "list_derived_metrics"):
-        input_data = _yaml3b.safe_load((_INPUTS_DIR / f"{name}.yaml").read_text())
+        input_data = _yaml3b.safe_load((_INPUTS_DIR / f"{name}.yaml").read_text(encoding="utf-8"))
         brief = render_brief(name, tool_schemas[name], input_data)
         m = _re.search(r"^Result row: `([^`]*)`", brief, _re.M)
         assert m, name
@@ -964,9 +964,9 @@ def test_full_render_unchanged(tool_schemas):
     from scripts.build_about_content import FULL_OUTPUT_DIR, render_about
 
     name = "resolve_gene"
-    input_data = _yaml3b.safe_load((_INPUTS_DIR / f"{name}.yaml").read_text())
+    input_data = _yaml3b.safe_load((_INPUTS_DIR / f"{name}.yaml").read_text(encoding="utf-8"))
     assert render_about(name, tool_schemas[name], input_data) == (
-        FULL_OUTPUT_DIR / f"{name}.md").read_text()
+        FULL_OUTPUT_DIR / f"{name}.md").read_text(encoding="utf-8")
 
 
 def test_every_tool_has_brief_and_full():

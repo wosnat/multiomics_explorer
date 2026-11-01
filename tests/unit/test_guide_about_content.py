@@ -43,7 +43,7 @@ def test_guide_md_lint_clean(md_path: Path):
 
 
 def test_conventions_within_budget_and_pointers_present():
-    text = (GUIDE_DIR / "conventions.md").read_text()
+    text = (GUIDE_DIR / "conventions.md").read_text(encoding="utf-8")
     assert len(text) <= 28000, f"conventions.md {len(text)} chars > 28k (~7k tok)"
     for moved, home in [
         ("Transport trust ladder", "docs://analysis/metabolites"),
@@ -55,17 +55,17 @@ def test_conventions_within_budget_and_pointers_present():
 
 
 def test_start_here_budget_and_recipes():
-    text = (GUIDE_DIR / "start_here.md").read_text()
+    text = (GUIDE_DIR / "start_here.md").read_text(encoding="utf-8")
     assert len(text) <= 16000, f"start_here.md {len(text)} chars > 16k (~4k tok)"
     assert "cross-feeding" in text.lower()
     assert "ontology_landscape" in text
 
 
 def test_expression_analysis_page():
-    text = (ANALYSIS_DIR / "expression.md").read_text()   # FileNotFoundError = RED
+    text = (ANALYSIS_DIR / "expression.md").read_text(encoding="utf-8")   # FileNotFoundError = RED
     for term in ("response_matrix", "gene_set_compare", "differential_expression_by_gene",
                  "table_scope", "docs://guide/python_api"):
         assert term in text
-    api = (GUIDE_DIR / "python_api.md").read_text()
+    api = (GUIDE_DIR / "python_api.md").read_text(encoding="utf-8")
     assert "## Cross-experiment summarization" not in api
     assert "docs://analysis/expression" in api

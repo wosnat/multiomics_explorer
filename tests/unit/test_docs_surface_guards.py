@@ -78,7 +78,7 @@ Full reference: `docs://tools/t/full`
 
 def test_brief_sections_accepts_a_complete_page(tmp_path):
     p = tmp_path / "t.md"
-    p.write_text(_GOOD_BRIEF)
+    p.write_text(_GOOD_BRIEF, encoding="utf-8")
     assert bac.lint_brief_sections([p]) == []
 
 
@@ -86,7 +86,7 @@ def test_brief_sections_accepts_the_chaining_overflow_marker(tmp_path):
     p = tmp_path / "t.md"
     p.write_text(_GOOD_BRIEF.replace(
         "## Chaining patterns\n\n- x\n",
-        "Chaining patterns: see `docs://tools/t/full`.\n"))
+        "Chaining patterns: see `docs://tools/t/full`.\n"), encoding="utf-8")
     assert bac.lint_brief_sections([p]) == []
 
 
@@ -98,14 +98,14 @@ def test_brief_sections_accepts_the_chaining_overflow_marker(tmp_path):
 ])
 def test_brief_sections_flags_a_missing_section(tmp_path, drop):
     p = tmp_path / "t.md"
-    p.write_text(_GOOD_BRIEF.replace(drop, ""))
+    p.write_text(_GOOD_BRIEF.replace(drop, ""), encoding="utf-8")
     out = bac.lint_brief_sections([p])
     assert len(out) == 1 and out[0].startswith("t:"), out
 
 
 def test_brief_sections_flags_a_missing_full_pointer(tmp_path):
     p = tmp_path / "t.md"
-    p.write_text(_GOOD_BRIEF.replace("`docs://tools/t/full`", "the full page"))
+    p.write_text(_GOOD_BRIEF.replace("`docs://tools/t/full`", "the full page"), encoding="utf-8")
     assert bac.lint_brief_sections([p])
 
 
@@ -119,13 +119,13 @@ def test_every_brief_page_carries_all_sections():
 
 def test_index_size_flags_an_oversized_index(tmp_path):
     p = tmp_path / "index.md"
-    p.write_text("x" * (bac.INDEX_MAX_CHARS + 1))
+    p.write_text("x" * (bac.INDEX_MAX_CHARS + 1), encoding="utf-8")
     assert bac.lint_index_size(p)
 
 
 def test_index_size_accepts_the_cap(tmp_path):
     p = tmp_path / "index.md"
-    p.write_text("x" * bac.INDEX_MAX_CHARS)
+    p.write_text("x" * bac.INDEX_MAX_CHARS, encoding="utf-8")
     assert bac.lint_index_size(p) == []
 
 
@@ -138,21 +138,21 @@ def test_served_index_within_cap():
 # ---------------------------------------------------------------------------
 
 def test_kg_claims_quoted_flags_a_file_missing_the_text(tmp_path):
-    (tmp_path / "a.md").write_text("About 71% of numeric\nedges are tested-absent.\n")
-    (tmp_path / "b.md").write_text("Nothing numeric here.\n")
+    (tmp_path / "a.md").write_text("About 71% of numeric\nedges are tested-absent.\n", encoding="utf-8")
+    (tmp_path / "b.md").write_text("Nothing numeric here.\n", encoding="utf-8")
     claims = [{"id": "c", "quoted": ["71% of numeric edges"], "used_in": ["a.md", "b.md"]}]
     out = bac.lint_kg_claims_quoted(claims, repo=tmp_path)
     assert len(out) == 1 and "b.md" in out[0], out
 
 
 def test_kg_claims_quoted_any_variant_matches(tmp_path):
-    (tmp_path / "a.md").write_text("on only 11 of 34 boolean DMs\n")
+    (tmp_path / "a.md").write_text("on only 11 of 34 boolean DMs\n", encoding="utf-8")
     claims = [{"id": "c", "quoted": ["11 of 34", "eleven"], "used_in": ["a.md"]}]
     assert bac.lint_kg_claims_quoted(claims, repo=tmp_path) == []
 
 
 def test_kg_claims_quoted_is_required(tmp_path):
-    (tmp_path / "a.md").write_text("x\n")
+    (tmp_path / "a.md").write_text("x\n", encoding="utf-8")
     out = bac.lint_kg_claims_quoted([{"id": "c", "used_in": ["a.md"]}], repo=tmp_path)
     assert out and "quoted" in out[0]
 
@@ -182,20 +182,20 @@ def scenario_b() -> None:
 
 def test_example_toc_accepts_accurate_pins(tmp_path):
     p = tmp_path / "x.py"
-    p.write_text(_TOC_SCRIPT.format(b=11))
+    p.write_text(_TOC_SCRIPT.format(b=11), encoding="utf-8")
     assert bac.lint_example_tocs([p]) == []
 
 
 def test_example_toc_flags_a_drifted_pin(tmp_path):
     p = tmp_path / "x.py"
-    p.write_text(_TOC_SCRIPT.format(b=40))
+    p.write_text(_TOC_SCRIPT.format(b=40), encoding="utf-8")
     out = bac.lint_example_tocs([p])
     assert len(out) == 1 and "scenario_b" in out[0], out
 
 
 def test_example_toc_flags_a_missing_scenario(tmp_path):
     p = tmp_path / "x.py"
-    p.write_text(_TOC_SCRIPT.format(b=11).replace("def scenario_b", "def scenario_c"))
+    p.write_text(_TOC_SCRIPT.format(b=11).replace("def scenario_b", "def scenario_c"), encoding="utf-8")
     out = bac.lint_example_tocs([p])
     assert len(out) == 1 and "scenario_b" in out[0], out
 
@@ -221,14 +221,14 @@ def test_verbose_param_points_at_the_full_page():
 
 def test_identifier_lint_flags_an_unknown_backtick_identifier(tmp_path, tool_schemas):
     p = tmp_path / "x.md"
-    p.write_text("Read `zzq_not_a_real_field` on every row; `locus_tags` is fine.\n")
+    p.write_text("Read `zzq_not_a_real_field` on every row; `locus_tags` is fine.\n", encoding="utf-8")
     out = bac.lint_outfacing_identifiers(tool_schemas, paths=[p])
     assert len(out) == 1 and "zzq_not_a_real_field" in out[0], out
 
 
 def test_identifier_lint_flags_an_unknown_tool_kwarg(tmp_path, tool_schemas):
     p = tmp_path / "x.md"
-    p.write_text("Call resolve_gene(identifier='dnaN', zzq_bogus=1) first.\n")
+    p.write_text("Call resolve_gene(identifier='dnaN', zzq_bogus=1) first.\n", encoding="utf-8")
     out = bac.lint_outfacing_identifiers(tool_schemas, paths=[p])
     assert len(out) == 1 and "resolve_gene(zzq_bogus=" in out[0], out
 
@@ -238,7 +238,7 @@ def test_identifier_lint_ignores_wrong_side_of_a_mistake(tmp_path, tool_schemas)
     p.write_text(
         "mistakes:\n"
         "  - wrong: \"resolve_gene(zzq_bogus=1)  # `zzq_not_a_param` is no param\"\n"
-        "    right: resolve_gene(identifier='dnaN')\n"
+        "    right: resolve_gene(identifier='dnaN')\n", encoding="utf-8"
     )
     assert bac.lint_outfacing_identifiers(tool_schemas, paths=[p]) == []
 
@@ -252,7 +252,7 @@ def test_identifier_lint_skips_yaml_examples(tmp_path, tool_schemas):
         "    response: |\n"
         "      {\"zzq_not_a_real_field\": 1}  `zzq_other_thing`\n"
         "mistakes:\n"
-        "  - \"`zzq_after_examples` is unknown\"\n"
+        "  - \"`zzq_after_examples` is unknown\"\n", encoding="utf-8"
     )
     out = bac.lint_outfacing_identifiers(tool_schemas, paths=[p])
     assert len(out) == 1 and "zzq_after_examples" in out[0], out
@@ -260,7 +260,7 @@ def test_identifier_lint_skips_yaml_examples(tmp_path, tool_schemas):
 
 def test_identifier_lint_ignores_tool_definitions(tmp_path, tool_schemas):
     p = tmp_path / "tools.py"
-    p.write_text("async def resolve_gene(\n    zzq_internal: int = 1,\n):\n    pass\n")
+    p.write_text("async def resolve_gene(\n    zzq_internal: int = 1,\n):\n    pass\n", encoding="utf-8")
     assert bac.lint_outfacing_identifiers(tool_schemas, paths=[p]) == []
 
 
@@ -292,7 +292,7 @@ def test_hand_authored_docs_name_real_identifiers(tool_schemas):
 ])
 def test_flat_lint_flags_a_hierarchical_ontology(tmp_path, text):
     p = tmp_path / "x.md"
-    p.write_text(text + "\n")
+    p.write_text(text + "\n", encoding="utf-8")
     assert bac.lint_hierarchy_flat_claims([p]), text
 
 
@@ -305,15 +305,15 @@ def test_flat_lint_flags_a_hierarchical_ontology(tmp_path, text):
 ])
 def test_flat_lint_accepts_flat_ontologies_and_other_flats(tmp_path, text):
     p = tmp_path / "x.md"
-    p.write_text(text + "\n")
+    p.write_text(text + "\n", encoding="utf-8")
     assert bac.lint_hierarchy_flat_claims([p]) == [], text
 
 
 def test_flat_lint_reads_an_ontology_yaml_as_its_own_key(tmp_path):
     hier = tmp_path / "cazy.yaml"
-    hier.write_text("hierarchy: |\n  Flat: every family is level 0.\n")
+    hier.write_text("hierarchy: |\n  Flat: every family is level 0.\n", encoding="utf-8")
     flat = tmp_path / "ncbifam.yaml"
-    flat.write_text("hierarchy: |\n  Flat: every family is level 0.\n")
+    flat.write_text("hierarchy: |\n  Flat: every family is level 0.\n", encoding="utf-8")
     assert bac.lint_hierarchy_flat_claims([hier])
     assert bac.lint_hierarchy_flat_claims([flat]) == []
 

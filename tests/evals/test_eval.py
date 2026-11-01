@@ -59,7 +59,7 @@ from multiomics_explorer.kg.queries_lib import (
 # ---------------------------------------------------------------------------
 
 CASES_PATH = Path(__file__).parent / "cases.yaml"
-CASES = yaml.safe_load(CASES_PATH.read_text())
+CASES = yaml.safe_load(CASES_PATH.read_text(encoding="utf-8"))
 CASE_IDS = [c["id"] for c in CASES]
 
 # ---------------------------------------------------------------------------

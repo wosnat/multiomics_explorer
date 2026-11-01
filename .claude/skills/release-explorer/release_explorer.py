@@ -73,7 +73,7 @@ def run(cmd, *, capture: bool = False, check: bool = True, dry: bool = False, cw
 
 
 def read_pyproject_version() -> str:
-    text = PYPROJECT.read_text()
+    text = PYPROJECT.read_text(encoding="utf-8")
     m = re.search(r'^version\s*=\s*"([^"]+)"', text, re.MULTILINE)
     if not m:
         fail("Could not find a `version = \"...\"` line in pyproject.toml")
@@ -222,7 +222,7 @@ def phase_2_changelog_cut(args, ctx: dict) -> None:
     if not CHANGELOG.exists():
         fail(f"{CHANGELOG} not found. Bootstrap it (Keep-a-Changelog format) first.")
 
-    text = CHANGELOG.read_text()
+    text = CHANGELOG.read_text(encoding="utf-8")
     version_marker = f"## [{args.version}]"
 
     if version_marker in text:
@@ -256,7 +256,7 @@ def phase_2_changelog_cut(args, ctx: dict) -> None:
         log(f"would cut [Unreleased] -> [{args.version}] - {today}", "dry")
         return
 
-    CHANGELOG.write_text(new_text)
+    CHANGELOG.write_text(new_text, encoding="utf-8")
     log(f"cut [Unreleased] -> [{args.version}] - {today}", "ok")
 
     if not args.resume:
@@ -437,11 +437,11 @@ def phase_5_publish(args, ctx: dict) -> None:
         print(json.dumps(metadata, indent=2))
     else:
         DIST_DIR.mkdir(exist_ok=True)
-        metadata_path.write_text(json.dumps(metadata, indent=2) + "\n")
+        metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
         log(f"wrote {metadata_path.relative_to(REPO_ROOT)}", "ok")
 
     # Extract CHANGELOG section
-    text = CHANGELOG.read_text() if CHANGELOG.exists() else ""
+    text = CHANGELOG.read_text(encoding="utf-8") if CHANGELOG.exists() else ""
     section_re = re.compile(
         rf"^## \[{re.escape(ctx['version'])}\][^\n]*\n(.*?)(?=^## \[|\Z)",
         re.MULTILINE | re.DOTALL,
@@ -461,7 +461,7 @@ def phase_5_publish(args, ctx: dict) -> None:
         print(notes[:600] + ("\n... [truncated]" if len(notes) > 600 else ""))
         print("---")
     else:
-        notes_fragment.write_text(notes)
+        notes_fragment.write_text(notes, encoding="utf-8")
         log(f"wrote {notes_fragment.name}", "ok")
 
     # gh release create

@@ -26,7 +26,7 @@ SHORTHAND = re.compile(r"\b(?:PR|slice)\s?\d[ab]?\b(?![.\d])")
 @pytest.mark.parametrize("path", FILES, ids=lambda p: str(p.relative_to(ROOT)))
 def test_no_internal_shorthand(path: Path):
     bad = []
-    for i, line in enumerate(path.read_text().splitlines(), 1):
+    for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
         code = line.split("#", 1)[0] if path.suffix == ".py" else line
         if SHORTHAND.search(code):
             bad.append(f"{path.name}:{i}: {line.strip()[:100]}")

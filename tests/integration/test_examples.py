@@ -1,6 +1,7 @@
 """Smoke tests for examples/*.py — run each scenario against the live KG."""
 from __future__ import annotations
 
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -10,6 +11,10 @@ import pytest
 pytestmark = pytest.mark.kg
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+
+# Examples print non-ASCII (e.g. arrows); force UTF-8 stdio so piped output
+# doesn't fall back to the Windows console codepage.
+_UTF8_ENV = {**os.environ, "PYTHONUTF8": "1"}
 
 # --- pathway_enrichment.py ---
 
@@ -37,7 +42,7 @@ def test_scenario_runs_cleanly(scenario, expected):
     if scenario == "custom":
         cmd += ["--locus-tags", "PMM0001,PMM0002,PMM0003"]
     result = subprocess.run(
-        cmd, cwd=REPO_ROOT, capture_output=True, text=True, timeout=300
+        cmd, cwd=REPO_ROOT, capture_output=True, encoding="utf-8", env=_UTF8_ENV, timeout=300
     )
     assert result.returncode == 0, (
         f"scenario {scenario} failed: stderr={result.stderr}"
@@ -68,7 +73,7 @@ def test_metabolites_scenario_runs_cleanly(scenario):
     """Each metabolites.py scenario exits 0 and produces some output on the live KG."""
     cmd = [sys.executable, str(METABOLITES_SCRIPT), "--scenario", scenario]
     result = subprocess.run(
-        cmd, cwd=REPO_ROOT, capture_output=True, text=True, timeout=180
+        cmd, cwd=REPO_ROOT, capture_output=True, encoding="utf-8", env=_UTF8_ENV, timeout=180
     )
     assert result.returncode == 0, (
         f"metabolites scenario {scenario} failed: stderr={result.stderr}"
@@ -102,7 +107,7 @@ def test_annotation_evidence_scenario_runs_cleanly(scenario, expected):
     exists to demonstrate, on the live KG."""
     cmd = [sys.executable, str(ANNOTATION_EVIDENCE_SCRIPT), "--scenario", scenario]
     result = subprocess.run(
-        cmd, cwd=REPO_ROOT, capture_output=True, text=True, timeout=300
+        cmd, cwd=REPO_ROOT, capture_output=True, encoding="utf-8", env=_UTF8_ENV, timeout=300
     )
     assert result.returncode == 0, (
         f"annotation_evidence scenario {scenario} failed: stderr={result.stderr}"
@@ -141,7 +146,7 @@ def test_ontology_terms_scenario_runs_cleanly(scenario, expected):
     assert ONTOLOGY_TERMS_SCRIPT.exists(), ONTOLOGY_TERMS_SCRIPT
     cmd = [sys.executable, str(ONTOLOGY_TERMS_SCRIPT), "--scenario", scenario]
     result = subprocess.run(
-        cmd, cwd=REPO_ROOT, capture_output=True, text=True, timeout=300
+        cmd, cwd=REPO_ROOT, capture_output=True, encoding="utf-8", env=_UTF8_ENV, timeout=300
     )
     assert result.returncode == 0, (
         f"ontology_terms scenario {scenario} failed: stderr={result.stderr}"
@@ -176,7 +181,7 @@ def test_annotation_evidence_slice4_scenario_runs_cleanly(scenario, expected):
     exists to demonstrate, on the live KG."""
     cmd = [sys.executable, str(ANNOTATION_EVIDENCE_SCRIPT), "--scenario", scenario]
     result = subprocess.run(
-        cmd, cwd=REPO_ROOT, capture_output=True, text=True, timeout=300
+        cmd, cwd=REPO_ROOT, capture_output=True, encoding="utf-8", env=_UTF8_ENV, timeout=300
     )
     assert result.returncode == 0, (
         f"annotation_evidence scenario {scenario} failed: stderr={result.stderr}"

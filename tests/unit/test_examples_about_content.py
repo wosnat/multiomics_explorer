@@ -42,5 +42,5 @@ def test_examples_lint_clean(path: Path):
 
 def test_examples_have_scenario_toc():
     for name in ("pathway_enrichment", "metabolites", "ontology_terms", "annotation_evidence"):
-        text = (EXAMPLES_DIR / f"{name}.py").read_text()
+        text = (EXAMPLES_DIR / f"{name}.py").read_text(encoding="utf-8")
         assert "# CONTENTS" in text[:2000], name

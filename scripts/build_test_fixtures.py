@@ -47,7 +47,7 @@ for organism_dir in sorted(KG_CACHE.iterdir()):
 
 
 def load_annotations(path: Path) -> dict:
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -320,10 +320,10 @@ if __name__ == "__main__":
     # Write __init__.py if it doesn't exist
     init_file = FIXTURES_DIR / "__init__.py"
     if not init_file.exists():
-        init_file.write_text("")
+        init_file.write_text("", encoding="utf-8")
 
     output = generate_output()
-    OUTPUT_FILE.write_text(output)
+    OUTPUT_FILE.write_text(output, encoding="utf-8")
 
     print(f"Generated {OUTPUT_FILE}")
     print(f"  {len(SELECTED_GENES)} genes selected")

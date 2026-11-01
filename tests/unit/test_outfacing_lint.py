@@ -31,7 +31,7 @@ def test_lint_function_exists(lint_mod):
 
 def test_lint_catches_iso_date(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("Released on 2026-05-06.\n")
+    md.write_text("Released on 2026-05-06.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 1
     assert vs[0][1] == 1
@@ -39,28 +39,28 @@ def test_lint_catches_iso_date(lint_mod, tmp_path):
 
 def test_lint_catches_today_count(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("149 metabolites today have evidence.\n")
+    md.write_text("149 metabolites today have evidence.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 1
 
 
 def test_lint_catches_section_marker(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("See §10 for tested-absent semantics.\n")
+    md.write_text("See §10 for tested-absent semantics.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 1
 
 
 def test_lint_catches_phase_tag(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("Renamed from `search` in Phase 2.\n")
+    md.write_text("Renamed from `search` in Phase 2.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 1
 
 
 def test_lint_catches_audit_word(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("audit §4.3.3 primary headline.\n")
+    md.write_text("audit §4.3.3 primary headline.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert len(vs) >= 1
 
@@ -68,28 +68,28 @@ def test_lint_catches_audit_word(lint_mod, tmp_path):
 def test_lint_catches_capitalized_audit(lint_mod, tmp_path):
     """'Audit Part 3a P0' in examples/metabolites.py slipped the lowercase-only pattern."""
     md = tmp_path / "t.md"
-    md.write_text("Build-derived note (Audit Part 3a P0).\n")
+    md.write_text("Build-derived note (Audit Part 3a P0).\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert len(vs) >= 1
 
 
 def test_lint_catches_kg_ticket(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("Pending KG-MET-002 backfill.\n")
+    md.write_text("Pending KG-MET-002 backfill.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 1
 
 
 def test_lint_catches_mode_tag(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("Built using the Mode-B template.\n")
+    md.write_text("Built using the Mode-B template.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 1
 
 
 def test_lint_catches_cluster_tag(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("Cluster A surface landed last week.\n")
+    md.write_text("Cluster A surface landed last week.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 1
 
@@ -100,7 +100,8 @@ def test_lint_ignores_biological_d_tags(lint_mod, tmp_path):
     md.write_text(
         "Photosystem II D1 protein.\n"
         "D3 sentinel-stripped timepoints.\n"
-        "F-class proteins recovered.\n"
+        "F-class proteins recovered.\n",
+        encoding="utf-8",
     )
     vs = lint_mod.lint_about_content([md])
     assert vs == []
@@ -108,7 +109,7 @@ def test_lint_ignores_biological_d_tags(lint_mod, tmp_path):
 
 def test_lint_catches_parent_section(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("See parent §13.6 for not_found shape.\n")
+    md.write_text("See parent §13.6 for not_found shape.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert len(vs) >= 1
 
@@ -120,7 +121,8 @@ def test_lint_catches_retired_catalysis_arm_names(lint_mod, tmp_path):
         "Reads Gene.metabolite_count for the rollup.\n"
         "OrganismTaxon.metabolite_count ranks organisms.\n"
         "Metabolite.gene_count routes to genes_by_metabolite.\n"
-        "Chain via results[].gene_count > 0.\n"
+        "Chain via results[].gene_count > 0.\n",
+        encoding="utf-8",
     )
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 4
@@ -131,7 +133,8 @@ def test_lint_catches_retired_tcdb_trust_vocabulary(lint_mod, tmp_path):
     md = tmp_path / "t.md"
     md.write_text(
         "See section g (precision-tier) for the split.\n"
-        "Warn on family_inferred dominance of transport rows.\n"
+        "Warn on family_inferred dominance of transport rows.\n",
+        encoding="utf-8",
     )
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 2
@@ -144,7 +147,8 @@ def test_lint_catches_retired_name_lineage(lint_mod, tmp_path):
     md.write_text(
         "The corrected successor of the removed transporter_count.\n"
         "A replacement for the retired metabolite_count column.\n"
-        "The successor family sits one level below its parent.\n"
+        "The successor family sits one level below its parent.\n",
+        encoding="utf-8",
     )
     vs = lint_mod.lint_about_content([md])
     assert [v[1] for v in vs] == [1, 2]
@@ -156,7 +160,8 @@ def test_lint_ignores_legitimate_count_names(lint_mod, tmp_path):
     md.write_text(
         "Ontology-node gene_count means genes annotated to the term.\n"
         "Per-row metabolite_count counts measured metabolites.\n"
-        "catalyzed_metabolite_count and catalyst_gene_count are the arms.\n"
+        "catalyzed_metabolite_count and catalyst_gene_count are the arms.\n",
+        encoding="utf-8",
     )
     vs = lint_mod.lint_about_content([md])
     assert vs == []
@@ -164,28 +169,28 @@ def test_lint_ignores_legitimate_count_names(lint_mod, tmp_path):
 
 def test_lint_carveout_aq_marker(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("[AQ] redefined 2026-05-01: annotation_state encoding.\n")
+    md.write_text("[AQ] redefined 2026-05-01: annotation_state encoding.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert vs == []
 
 
 def test_lint_carveout_enr_marker(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("[ENR] informative_only=True default flip 2026-05-04.\n")
+    md.write_text("[ENR] informative_only=True default flip 2026-05-04.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert vs == []
 
 
 def test_lint_clean_line_passes(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("Returns gene-level summary across treatments.\n")
+    md.write_text("Returns gene-level summary across treatments.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert vs == []
 
 
 def test_lint_reports_file_line_and_token(lint_mod, tmp_path):
     md = tmp_path / "tool.md"
-    md.write_text("ok\nbad: see parent §10\nok again\n")
+    md.write_text("ok\nbad: see parent §10\nok again\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 1
     path, line_no, line, token = vs[0]
@@ -196,7 +201,7 @@ def test_lint_reports_file_line_and_token(lint_mod, tmp_path):
 
 def test_run_lint_exit_zero_on_clean_input(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("Plain prose with no violations.\n")
+    md.write_text("Plain prose with no violations.\n", encoding="utf-8")
     buf = io.StringIO()
     rc = lint_mod.run_lint([md], stream=buf)
     assert rc == 0
@@ -204,7 +209,7 @@ def test_run_lint_exit_zero_on_clean_input(lint_mod, tmp_path):
 
 def test_run_lint_exit_nonzero_on_violation(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("This has 149 today.\n")
+    md.write_text("This has 149 today.\n", encoding="utf-8")
     buf = io.StringIO()
     rc = lint_mod.run_lint([md], stream=buf)
     assert rc != 0
@@ -219,7 +224,7 @@ def test_run_lint_exit_nonzero_on_violation(lint_mod, tmp_path):
 
 def _write_py(tmp_path: Path, body: str) -> Path:
     f = tmp_path / "sample.py"
-    f.write_text(body)
+    f.write_text(body, encoding="utf-8")
     return f
 
 
@@ -339,7 +344,8 @@ def test_dangling_ref_flags_a_missing_section(lint_mod, tmp_path):
         "\n"
         "picking the one edge whose trust columns populate an ancestor row (see\n"
         '"One edge per (gene, term)" below). Ontologies without a rank_prop are\n'
-        "either flat or carry no score at all.\n"
+        "either flat or carry no score at all.\n",
+        encoding="utf-8",
     )
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 1
@@ -360,7 +366,8 @@ def test_dangling_ref_resolves_against_a_heading_in_the_same_file(
         "\n"
         "## One edge per (gene, term)\n"
         "\n"
-        "Highest rank_prop wins.\n"
+        "Highest rank_prop wins.\n",
+        encoding="utf-8",
     )
     assert lint_mod.lint_about_content([md]) == []
 
@@ -373,7 +380,8 @@ def test_dangling_ref_tolerates_numbering_and_qualifiers(lint_mod, tmp_path):
         "\n"
         'Term size is the background-scoped size. See "Gotchas" below.\n'
         "\n"
-        "## 12. Gotchas\n"
+        "## 12. Gotchas\n",
+        encoding="utf-8",
     )
     assert lint_mod.lint_about_content([md]) == []
 
@@ -384,7 +392,8 @@ def test_dangling_ref_ignores_docs_cross_links(lint_mod, tmp_path):
     md.write_text(
         "# Annotation trust\n"
         "\n"
-        "See docs://analysis/annotation_evidence below for the full ladder.\n"
+        "See docs://analysis/annotation_evidence below for the full ladder.\n",
+        encoding="utf-8",
     )
     assert lint_mod.lint_about_content([md]) == []
 
@@ -396,7 +405,8 @@ def test_dangling_ref_ignores_quoted_values(lint_mod, tmp_path):
         "# Annotation trust\n"
         "\n"
         'Rows default to "most_specific" above; see "most_specific" below.\n'
-        'Tier sits at or above 2; the table above lists "curated" first.\n'
+        'Tier sits at or above 2; the table above lists "curated" first.\n',
+        encoding="utf-8",
     )
     assert lint_mod.lint_about_content([md]) == []
 
@@ -406,7 +416,8 @@ def test_lint_catches_field_descriptions(lint_mod, tmp_path):
     md.write_text(
         "Docs and Field descriptions may list stale values.\n"
         "One Field description per parameter.\n"
-        "Parameter descriptions may list stale values.\n"
+        "Parameter descriptions may list stale values.\n",
+        encoding="utf-8",
     )
     vs = lint_mod.lint_about_content([md])
     assert [v[1] for v in vs] == [1, 2]
@@ -417,14 +428,14 @@ def test_lint_catches_field_descriptions(lint_mod, tmp_path):
 def test_lint_catches_release_note_previously(lint_mod, tmp_path):
     """'previously 0 rows' in a served mistakes entry: the reader has no 'previously'."""
     md = tmp_path / "t.md"
-    md.write_text("bare KEGG id — previously 0 rows, `C00064` in not_found\n")
+    md.write_text("bare KEGG id — previously 0 rows, `C00064` in not_found\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert len(vs) >= 1
 
 
 def test_lint_catches_release_note_are_now_resolved(lint_mod, tmp_path):
     md = tmp_path / "t.md"
-    md.write_text("Bare metabolite IDs are now resolved via cross-references.\n")
+    md.write_text("Bare metabolite IDs are now resolved via cross-references.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert len(vs) >= 1
 
@@ -432,7 +443,7 @@ def test_lint_catches_release_note_are_now_resolved(lint_mod, tmp_path):
 def test_lint_ignores_present_tense_type_note(lint_mod, tmp_path):
     """'`ontology` is now `str | list[str]`' is a type description, not release framing."""
     md = tmp_path / "t.md"
-    md.write_text("`ontology` is now `str | list[str] | None`.\n")
+    md.write_text("`ontology` is now `str | list[str] | None`.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert vs == []
 
@@ -443,7 +454,8 @@ def test_lint_skips_example_response_fences(lint_mod, tmp_path):
     md.write_text(
         "Prose line.\n```example-response\n"
         '{"description": "previously described"}\n```\n'
-        "Released on 2026-05-06.\n"
+        "Released on 2026-05-06.\n",
+        encoding="utf-8",
     )
     vs = lint_mod.lint_about_content([md])
     assert [v[1] for v in vs] == [5]
@@ -459,11 +471,11 @@ def test_lint_catches_both_arms_on_three_arm_chemistry_pages(lint_mod, tmp_path)
         sub = tmp_path / name.removesuffix(".md")
         sub.mkdir()
         md = sub / name
-        md.write_text(line + "metabolite_count: reached via either arm.\n")
+        md.write_text(line + "metabolite_count: reached via either arm.\n", encoding="utf-8")
         vs = lint_mod.lint_about_content([md])
         assert [v[3] for v in vs] == ["both arms", "either arm"], name
     other = tmp_path / "assays_by_metabolite.md"
-    other.write_text("Default None = both arms merged.\n")
+    other.write_text("Default None = both arms merged.\n", encoding="utf-8")
     assert lint_mod.lint_about_content([other]) == []
 
 
@@ -480,7 +492,7 @@ def test_lint_catches_two_entry_evidence_source_on_three_arm_pages(
             "by_evidence_source: Frequency over `evidence_source` values "
             "present in the slice (≤2 entries).\n"
             "by_substrate_depth: transport rows only (≤2 entries; metabolism "
-            "rows are excluded).\n")
+            "rows are excluded).\n", encoding="utf-8")
         vs = lint_mod.lint_about_content([md])
         assert [v[1] for v in vs] == [1], name
 
@@ -493,7 +505,7 @@ def test_lint_catches_tcdb_evidence_score_axis(lint_mod, tmp_path):
     md = tmp_path / "t.md"
     md.write_text(
         "- **trust_axes** (object): e.g. {'tcdb': ['sources','evidence','evidence_score','tier']}.\n"
-        '"trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]}\n'
+        '"trust_axes": {"tcdb": ["sources", "evidence", "evidence_score", "tier"]}\n', encoding="utf-8"
     )
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 2
@@ -503,7 +515,7 @@ def test_lint_ignores_correct_tcdb_trust_axes(lint_mod, tmp_path):
     md = tmp_path / "t.md"
     md.write_text(
         "e.g. {'tcdb': ['sources','evidence','tier']} (TCDB has no evidence_score).\n"
-        "{'merops': ['evidence_score'], 'tcdb': ['tier']}\n"
+        "{'merops': ['evidence_score'], 'tcdb': ['tier']}\n", encoding="utf-8"
     )
     assert lint_mod.lint_about_content([md]) == []
 
@@ -515,12 +527,12 @@ def test_lint_catches_tcdb_rank_prop(lint_mod, tmp_path):
     md = tmp_path / "t.md"
     md.write_text(
         "TCDB rows rank by `rank_prop` identity.\n"
-        "chosen by `rank_prop` — call kind then identity for TCDB\n"
+        "chosen by `rank_prop` — call kind then identity for TCDB\n", encoding="utf-8"
     )
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 2
     clean = tmp_path / "c.md"
-    clean.write_text("MEROPS ranks by `rank_prop` = confidence_score.\n")
+    clean.write_text("MEROPS ranks by `rank_prop` = confidence_score.\n", encoding="utf-8")
     assert lint_mod.lint_about_content([clean]) == []
 
 
@@ -528,7 +540,7 @@ def test_lint_catches_tcdb_id_name_fallback(lint_mod, tmp_path):
     md = tmp_path / "t.md"
     md.write_text(
         "for tc_subfamily / tc_system it falls back to the `tcdb_id` value.\n"
-        "The display name is the nearest named ancestor's name.\n")
+        "The display name is the nearest named ancestor's name.\n", encoding="utf-8")
     vs = lint_mod.lint_about_content([md])
     assert len(vs) == 1
     assert vs[0][1] == 1

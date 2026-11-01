@@ -51,7 +51,7 @@ def test_two_state_helper_maps_positive_and_negative():
 
 @pytest.mark.parametrize("path", SCAN_FILES, ids=lambda p: p.name)
 def test_no_stale_literal_on_two_state_property(path: Path):
-    src = path.read_text()
+    src = path.read_text(encoding="utf-8")
     bad: list[str] = []
     for pat in (CYPHER_CMP, PY_CMP, PARAM_COERCE):
         for m in pat.finditer(src):
@@ -69,7 +69,7 @@ def test_no_true_false_string_near_two_state_property(path: Path):
     are genuinely 'true'-valued and are not two-state properties."""
     names = re.compile(rf"\b({PROPS})\b")
     bad = []
-    for i, line in enumerate(path.read_text().splitlines(), 1):
+    for i, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
         if STALE.search(line) and names.search(line):
             bad.append(f"{path.name}:{i}: {line.strip()[:120]}")
     assert not bad, "'true'/'false' next to a two-state property:\n" + "\n".join(bad)

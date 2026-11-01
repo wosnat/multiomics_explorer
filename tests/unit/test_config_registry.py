@@ -26,7 +26,7 @@ _BASELINE_PATH = (
 
 @pytest.fixture(scope="module")
 def baseline():
-    with _BASELINE_PATH.open() as fh:
+    with _BASELINE_PATH.open(encoding="utf-8") as fh:
         return yaml.safe_load(fh)["schema"]
 
 

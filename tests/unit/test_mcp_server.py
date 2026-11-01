@@ -264,7 +264,7 @@ class TestOntologyDocResources:
 def test_docs_index_registered_and_fresh():
     uris = _all_resource_uris()
     assert "docs://index" in uris
-    index_text = (_SKILLS_DIR / "index.md").read_text()
+    index_text = (_SKILLS_DIR / "index.md").read_text(encoding="utf-8")
     for uri in uris:
         if uri.startswith("docs://") and uri != "docs://index":
             assert uri in index_text, f"{uri} missing from docs://index"

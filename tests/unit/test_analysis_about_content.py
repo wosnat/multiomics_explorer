@@ -122,7 +122,7 @@ class TestAnalysisAboutContent:
     @pytest.mark.parametrize("path", _get_about_files(), ids=lambda p: p.stem)
     def test_param_table_names_valid(self, path):
         """Parameter names in tables match some analysis function signature."""
-        content = path.read_text()
+        content = path.read_text(encoding="utf-8")
         table_params = _extract_param_table_names(content)
         if not table_params:
             pytest.skip("no parameter table found")
@@ -143,7 +143,7 @@ class TestAnalysisAboutContent:
     @pytest.mark.parametrize("path", _get_about_files(), ids=lambda p: p.stem)
     def test_imports_resolve(self, path):
         """Import paths in code examples are importable."""
-        content = path.read_text()
+        content = path.read_text(encoding="utf-8")
         blocks = _extract_python_blocks(content)
         if not blocks:
             pytest.skip("no python code blocks")
@@ -166,7 +166,7 @@ class TestAnalysisAboutContent:
     @pytest.mark.parametrize("path", _get_about_files(), ids=lambda p: p.stem)
     def test_function_calls_use_valid_kwargs(self, path):
         """Function calls in code examples use valid keyword arguments."""
-        content = path.read_text()
+        content = path.read_text(encoding="utf-8")
         blocks = _extract_python_blocks(content)
         if not blocks:
             pytest.skip("no python code blocks")
@@ -207,7 +207,7 @@ class TestAnalysisAboutContent:
     @pytest.mark.parametrize("path", _get_about_files(), ids=lambda p: p.stem)
     def test_function_names_in_examples_exist(self, path):
         """Function names called in examples exist as analysis or API functions."""
-        content = path.read_text()
+        content = path.read_text(encoding="utf-8")
         blocks = _extract_python_blocks(content)
         if not blocks:
             pytest.skip("no python code blocks")
@@ -274,7 +274,7 @@ def _analysis_public_functions() -> list[tuple[str, Path, int, int]]:
     for py_file in sorted(_ANALYSIS_PKG_DIR.glob("*.py")):
         if py_file.name == "__init__.py":
             continue
-        tree = ast.parse(py_file.read_text())
+        tree = ast.parse(py_file.read_text(encoding="utf-8"))
         for node in tree.body:
             if isinstance(node, target_types):
                 if not node.name.startswith("_"):

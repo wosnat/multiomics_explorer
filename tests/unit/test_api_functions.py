@@ -13999,7 +13999,7 @@ _API_FILE = Path(inspect.getsourcefile(api)).resolve()
 
 def _api_public_function_names() -> list[str]:
     """Top-level public functions in api/functions.py via AST walk."""
-    tree = ast.parse(_API_FILE.read_text())
+    tree = ast.parse(_API_FILE.read_text(encoding="utf-8"))
     names = []
     for node in tree.body:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
@@ -14010,7 +14010,7 @@ def _api_public_function_names() -> list[str]:
 
 def _api_function_line_range(name: str) -> tuple[int, int]:
     """Line range of `name` in api/functions.py (1-indexed, inclusive)."""
-    tree = ast.parse(_API_FILE.read_text())
+    tree = ast.parse(_API_FILE.read_text(encoding="utf-8"))
     for node in tree.body:
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
             if node.name == name:
