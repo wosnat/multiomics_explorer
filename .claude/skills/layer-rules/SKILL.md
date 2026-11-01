@@ -76,6 +76,10 @@ fills the `response:` block from the live KG; `--check` reports drift
 (`tests/integration/test_about_examples.py::test_example_response_values_match_live`
 fails on it). Mark an example `illustrative: true` (+ `note:`) only when its
 point cannot be reproduced live (a `warn` verdict, a tool bug).
+Responses are capped (3 rows / 3 list entries / 6 dict keys, empty
+fields folded); when the note is about an envelope key the cap would
+hide, list it under `keep: [key, ...]` on the example. A note must only
+point at what the shown response contains.
 
 **Prose may not restate machine-known facts.** Vocabulary values
 (`treatment_type`, `background_factors`, `compartment`, …) are quoted at most
