@@ -66,6 +66,7 @@ be set to this version before the KG release.
 - **Results follow the KG data changes of this period.** The largest: expression significance follows each paper's own criterion (significant DE edges 102,557 → 113,725), and 75 genome strains and 11 papers were added. See the KG changelog.
 
 ### Fixed
+- **`kg_release_info` never showed a release's breaking changes.** The KG stamps them as `Schema_info.release_breaking`; the explorer read `breaking_changes`. `kg.breaking_changes` now carries them.
 - **`kg_schema` omitted sparse properties** (e.g. `rank_up` / `rank_down` on expression edges) when its sample missed them.
 - **Paging could repeat and skip rows** on `metabolites_by_gene`, `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`, `assays_by_metabolite` and `list_experiments` (e.g. `metabolites_by_gene(['PMM0331'])`: 229 rows paged, 44 never returned). Sort orders are now unique.
 - **`gene_neighbors` could run Neo4j out of memory.** `window` is capped at 100, and very large detail requests are rejected with a "split into batches" error.

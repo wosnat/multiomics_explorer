@@ -14205,6 +14205,19 @@ class TestKGReleaseInfo:
         assert report["kg"]["release_highlights"] == "- Publication discusses-edges\n- +8 organisms"
         assert report["kg"]["breaking_changes"] == "- annotation_quality redefined to 0..3"
 
+    def test_release_breaking_is_surfaced_as_breaking_changes(self):
+        """`/release-kg` stamps `release_breaking`; kg{} exposes it as
+        `breaking_changes` and the summary points at it."""
+        from multiomics_explorer.api.functions import kg_release_info
+        si = self._ok_schema_info(release_breaking="- coculture_partner is a list")
+        conn = self._make_conn(si, self._ok_labels(), self._ok_rel_types())
+
+        report = kg_release_info(conn=conn)
+
+        assert report["kg"]["breaking_changes"] == "- coculture_partner is a list"
+        assert "release_breaking" not in report["kg"]
+        assert "kg.breaking_changes" in report["summary"]
+
     def test_dev_build_leaves_change_list_fields_null_and_summary_clean(self):
         """A KG built without the fields (dev build) -> None, summary unchanged."""
         from multiomics_explorer.api.functions import kg_release_info

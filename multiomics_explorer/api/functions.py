@@ -12640,6 +12640,12 @@ def kg_release_info(*, conn: GraphConnection | None = None) -> dict:
     row = rows[0] if rows else {"schema_info": None, "labels": [], "rel_types": []}
 
     schema_info = row.get("schema_info")
+    if schema_info is not None and not schema_info.get("breaking_changes"):
+        # `/release-kg` stamps the CHANGELOG `### Breaking` section as
+        # `release_breaking`; surfaced under the public `breaking_changes`.
+        schema_info = {
+            **schema_info, "breaking_changes": schema_info.get("release_breaking"),
+        }
     labels = set(row.get("labels") or [])
     rel_types = set(row.get("rel_types") or [])
 
