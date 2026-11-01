@@ -13,6 +13,12 @@ renders the GitHub Release notes from that section. The changelog is the
 source of truth; the GitHub Release is a rendering of one section. See
 `.claude/skills/release-explorer/SKILL.md`.
 
+**Entries are for users.** Each release section opens with the KG it
+targets (linked to the KG release notes) and `### Highlights` (~5 bullets),
+then `### Breaking` / `### Added` / `### Changed` / `### Fixed` as details.
+Log only what changes for users since the last release; rebuild absorbs,
+test counts and internal ids belong in commit messages.
+
 **Cross-repo contract:** the KG declares its minimum-compatible explorer
 version via `Schema_info.mcp_min_version`. When a release here changes the
 contract (new MCP tools, breaking arg shape, return-shape changes), bump
@@ -21,10 +27,27 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 
 ## [Unreleased]
 
-**KG requirement:** KG `0.1.0-alpha.8` (its `mcp_min_version` is `0.1.0a6`,
-this release). It adds the coculture partner list, the TCDB cleanup, GO
+### Added
+
+### Changed
+
+### Fixed
+
+## [0.1.0-alpha.6] - 2026-11-01
+
+**KG requirement:** KG `0.1.0-alpha.8` ([release notes](https://github.com/wosnat/multiomics_biocypher_kg/releases/tag/kg-0.1.0-alpha.8); its
+`mcp_min_version` is `0.1.0a6`, this release). It adds the coculture partner list, the TCDB cleanup, GO
 transport edges, metabolite identity and control timing. Against an older KG,
 `list_experiments` and both DE tools fail on `coculture_partner`.
+
+### Highlights
+- **Transport, three ways.** `genes_by_metabolite` / `metabolites_by_gene` answer "which genes move compound X" through TCDB, KEGG and a new GO transport route, showing where the routes agree. TCDB reads the way TCDB curates it: each gene shows the specific system it best matches, with that system's own substrates.
+- **Metabolites by any id.** KEGG, ChEBI, MetaNetX, HMDB or InChIKey, including retired ids; new compound classes and stereo-form hints.
+- **Experiment design you can filter on.** Every coculture partner and its role, and whether a DE contrast's control was sampled at the same time as the treatment.
+- **New data from KG `0.1.0-alpha.8`:** 75 genome strains and 11 papers.
+- **Smaller, faster answers.** `summary=True` stays small on the list tools, `kg_schema` returns in about a second, and the docs are shorter.
+
+Upgrading from alpha.5: read **Breaking** first (`coculture_partner` is a list; TCDB fields changed; Python keyword aliases removed).
 
 ### Breaking
 - **`coculture_partner` is a list.** It names every organism sharing the culture, sorted, and is `[]` when axenic. It now includes partners that were the culture background rather than the treatment, so `list_experiments(coculture_partner="Alteromonas")` returns 53 experiments, not 5. Add `treatment_type=['coculture']` to keep only coculture-vs-axenic contrasts. Affects `list_experiments`, `differential_expression_by_gene` (verbose) and `differential_expression_by_ortholog`.
@@ -40,9 +63,10 @@ transport edges, metabolite identity and control timing. Against an older KG,
 ### Added
 - **GO transport route on `genes_by_metabolite` / `metabolites_by_gene`.** A third evidence source, `go_transport`, on by default: genes annotated to a GO term defined as moving the compound (e.g. siderophore transport). These are term definitions, not gene-level substrate calls. Filters `go_namespace` and `go_evidence`; opt-in `go_include_ancestors`. Route agreement: envelope `by_evidence_source_combination` and per-gene / per-metabolite `multi_source_*` counts. `gene_overview` and `list_organisms` gain `go_transport_metabolite_count`; `gene_overview.evidence_sources` can include `go_transport`.
 - **TCDB reads as TCDB curates it.**
+  - **Best-hit calls are new.** Besides the eggNOG and tier-truncated diamond calls, each transporter gene now records the specific TCDB systems its protein best matches (`tcdb_call='diamond_best_hit'`), so you can tell the cyanate from the nitrate ABC system on the gene itself. Ontology rows carry `tcdb_call` (and `tcdb_calls` for all the kinds behind a row), verbose rows add the alignment (`tcdb_best_hit_rank`, `tcdb_bitscore`, `tcdb_bitscore_ratio`, `tcdb_scov`), transport rows add `tcdb_identity`, and `gene_overview` adds `tcdb_best_hit_identity`. `genes_by_function` finds a gene by its best-hit system's name or substrate ("urea porter", "cyanate").
   - Unnamed subfamilies / systems show a readable `display_name` everywhere a TCDB name appears ("The General Secretory Pathway (Sec) Family — subfamily 3.A.5.7"), not a bare TCID.
   - `TcdbFamily.proteins` (e.g. `UrtA (R); UrtB (M)`) is searchable and shown on `ontology_term_details` / verbose `search_ontology`.
-  - Term columns `tcdb_substrate_count`, `direction`, `direction_basis`; `gene_overview.tcdb_best_hit_identity`; `tcdb_call` filter and `by_tcdb_call` envelope on the ontology tools.
+  - Term columns `tcdb_substrate_count`, `direction`, `direction_basis`; `tcdb_call` filter and `by_tcdb_call` envelope on the ontology tools.
   - Opt-ins: `include_tcdb_family_substrates` adds rows from a gene's family call to its systems' substrates (skipped above 200 substrates, reported in `tcdb_family_substrates_skipped`; `tcdb_family_substrates_not_shown` says what the default leaves out). `include_weak_tcdb_hits` adds below-threshold hits to `gene_ontology_terms` / `genes_by_ontology`.
   - `kg_release_info` lists the targets TCDB and GO drop by curation (`tcdb_substrate_excluded_targets`, `go_transport_excluded_targets`); `genes_by_metabolite` warns when a requested compound is one of them.
 - **Metabolite identity.**
@@ -62,10 +86,14 @@ transport edges, metabolite identity and control timing. Against an older KG,
 - **`list_metabolites(organism_names=…, evidence_sources=…)`** now means "this organism reaches the metabolite by that route". It used to mean "reaches it by any route, and some organism has evidence S", which made every strain look alike under `transport` (MED4 + `transport` + N: 147 → 20 rows).
 - **`kg_schema` is fast and smaller.** It reads properties, types and relationship endpoints from the schema the KG publishes instead of sampling the graph: a full dump takes about 1 s (was 10–18 s) and ~35 KB (was ~46 KB). `source_labels` / `target_labels` name concrete labels only (no BioCypher parents such as `NamedThing`), and those parent labels are listed with no properties. Relationship descriptions carry reading caveats.
 - **Docs are shorter.** Example responses show at most 3 rows (full tool pages 277k → 234k tokens), `docs://index` rows say when to read each page, and a review pass corrected stale counts and wording across all served docs.
-- **Results follow the KG data changes of this period.** The largest: expression significance follows each paper's own criterion (significant DE edges 102,557 → 113,725), and 75 genome strains and 11 papers were added. See the KG changelog.
+- **New data in KG `0.1.0-alpha.8`** (details in the [KG release notes](https://github.com/wosnat/multiomics_biocypher_kg/releases/tag/kg-0.1.0-alpha.8)), so many counts differ from alpha.5:
+  - 75 genome strains: 74 *Prochlorococcus* / *Synechococcus* / *Cyanobium* genomes from the Ford 2021 substrate-binding-protein survey, plus *Alteromonas macleodii* 83-1.
+  - 11 papers, including the first knockout and gene-essentiality studies, *Alteromonas* TonB-dependent transporters and *Ruegeria pomeroyi* with a diatom partner.
+  - Expression significance follows each paper's own criterion (significant DE edges ~102.6K → ~113.7K), and fold changes on six papers are corrected.
+  - KEGG and TCDB refreshed (2026-11-01), InterPro 110.0, GO 2026-07-26; 182 KEGG pathways irrelevant to bacteria are dropped, so enrichment backgrounds shrink.
 
 ### Fixed
-- **`kg_release_info` never showed a release's breaking changes.** The KG stamps them as `Schema_info.release_breaking`; the explorer read `breaking_changes`. `kg.breaking_changes` now carries them.
+- **`kg_release_info` never showed a release's breaking changes.** The KG stamps them as `Schema_info.release_breaking`; the explorer read `breaking_changes`. `kg.breaking_changes` now carries them. KG `0.1.0-alpha.8` does not stamp its release notes yet (a KG-side fix), so both fields read null against it.
 - **`ontology_term_details` dropped `ncbifam_family_count` on TIGR roles over MCP** (the Python API returned it). It is now a row field.
 - **`kg_schema` omitted sparse properties** (e.g. `rank_up` / `rank_down` on expression edges) when its sample missed them.
 - **Paging could repeat and skip rows** on `metabolites_by_gene`, `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`, `assays_by_metabolite` and `list_experiments` (e.g. `metabolites_by_gene(['PMM0331'])`: 229 rows paged, 44 never returned). Sort orders are now unique.
