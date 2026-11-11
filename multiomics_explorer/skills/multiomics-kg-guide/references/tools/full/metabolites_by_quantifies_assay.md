@@ -15,7 +15,7 @@ docs://tools/metabolites_by_quantifies_assay; summary=True first.
 |---|---|---|---|
 | assay_ids | list[string] | — | MetaboliteAssay IDs to drill into (full prefixed). Discover via `list_metabolite_assays(value_kind='numeric')`. E.g. ['metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration']. `not_found.assay_ids` lists IDs absent from the KG. |
 | organism | string \| None | None | Organism: case-insensitive substring match on the organism name ('MED4'); a genus word matches every strain. See list_organisms. |
-| metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolites. |
+| metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolite_ids. |
 | exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
 | experiment_ids | list[string] \| None | None | Filter to assays from these experiments. |
 | publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |

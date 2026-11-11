@@ -19,7 +19,6 @@ Empty.
 
 | # | Item | Size | Origin |
 |---|---|---|---|
-| 2d.3 | Restructure `analysis/metabolites.md` (~770 lines): fold §g into `analysis/transport.md` (phnD / Pst examples, breadth cap, scale repeat); split ID forms / stereo / structure_kind / KEGG categories to their own page; reorder tested-absent section; drop hard-coded counts. Glutamine reading path ~24k → ~12k tok. | M | docs-review 2026-10-31 (was 2d.3 + 2d.4) |
 | 2b.6 | **Consolidation** (breaking; timing parked as 1.3). Merge `metabolites_by_quantifies_assay` + `metabolites_by_flags_assay` → `metabolites_by_assay`; merge or front the three `genes_by_*_metric`; `SKILL.md` for the skill tree and collapse CLAUDE.md's tool table; delete the research repo's duplicate python guide + fix its dangling `docs://analysis/to_dataframe` link. | L | llm-review 2026-08-29 |
 | 2.8 | Organism resolver word-match leaks: "Alteromonas mediterranea AltDE" / `AltDE` matches `AltDE1` and the builders leak AltDE1 genes; genus node `Alteromonas` matches all strains. Resolver gates on `gene_count > 0`, so treatment taxa are safe. | M | slice-2 ledger + GO transport 2026-10-23 (was 2.8 + 2c.18) |
 | 3.21 | Eval pass on the annotation-trust surface in `multiomics_research` (protease vs dead-homolog, urea transporter ranking, InterPro superfamily ORA on a dark-survival cluster) — only agent-driven runs show whether routing / warnings / `docs://` pages lead to the right tool. Roadmap "stress test" step. | M | was 1.3 |

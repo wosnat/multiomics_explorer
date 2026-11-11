@@ -126,7 +126,7 @@ PublicationDoisParam = Annotated[list[str] | None, Field(description=_PUBLICATIO
 
 PublicationDoisRequiredParam = Annotated[list[str], Field(description=_PUBLICATION_DOIS_DESC)]
 
-_METABOLITE_IDS_DESC = "Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolites."
+_METABOLITE_IDS_DESC = "Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolite_ids."
 
 MetaboliteIdsParam = Annotated[list[str] | None, Field(description=_METABOLITE_IDS_DESC)]
 

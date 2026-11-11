@@ -114,7 +114,7 @@ on what's being filtered:
   overlap with `metabolite_ids`; empty list is a no-op. Present on all
   seven chemistry / metabolomics tools, typically used to strip currency
   cofactors (ATP, NADH, water). Accepts the same alias forms as
-  `metabolite_ids` — `docs://analysis/metabolites`.
+  `metabolite_ids` — `docs://analysis/metabolite_ids`.
 - **Controlled-vocabulary filters** match whole values — see "Live
   vocabularies" below.
 
@@ -371,7 +371,7 @@ exclusions in `excluded_assays`).
 - **Stereo forms are separate nodes** (Cysteine ≠ L-Cysteine): read
   `stereo_relatives`, or pass `include_stereo_forms=True`.
 
-Detail: `docs://analysis/metabolites`.
+Detail: `docs://analysis/metabolite_ids`.
 
 ## Ontology term / ortholog-group ID forms
 

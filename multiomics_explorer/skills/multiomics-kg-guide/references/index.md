@@ -2,14 +2,14 @@
 
 ## Guides
 
-- `docs://guide/concepts` — ~6596 tok — Read when an entity in a tool output is unfamiliar: what each node and edge means…
-- `docs://guide/conventions` — ~7030 tok — Read when a cross-tool behaviour surprises you: envelopes, filters, not_found vs not_matched, paging.
+- `docs://guide/concepts` — ~6591 tok — Read when an entity in a tool output is unfamiliar: what each node and edge means…
+- `docs://guide/conventions` — ~7032 tok — Read when a cross-tool behaviour surprises you: envelopes, filters, not_found vs…
 - `docs://guide/python_api` — ~4167 tok — Read before scripting: Python vs MCP, imports, the three return shapes, DataFrame conversion.
 - `docs://guide/start_here` — ~4019 tok — Read first: the tool families, a question-shape decision tree, and when to call summary=True.
 
 ## Tools (brief)
 
-- `docs://tools/assays_by_metabolite` — ~1365 tok
+- `docs://tools/assays_by_metabolite` — ~1366 tok
 - `docs://tools/cluster_enrichment` — ~1864 tok
 - `docs://tools/differential_expression_by_gene` — ~1179 tok
 - `docs://tools/differential_expression_by_ortholog` — ~1190 tok
@@ -37,13 +37,13 @@
 - `docs://tools/list_derived_metrics` — ~1559 tok
 - `docs://tools/list_experiments` — ~1837 tok
 - `docs://tools/list_filter_values` — ~1640 tok
-- `docs://tools/list_metabolite_assays` — ~1355 tok
-- `docs://tools/list_metabolites` — ~1989 tok
+- `docs://tools/list_metabolite_assays` — ~1356 tok
+- `docs://tools/list_metabolites` — ~1991 tok
 - `docs://tools/list_organisms` — ~1201 tok
 - `docs://tools/list_publications` — ~1143 tok
-- `docs://tools/metabolites_by_flags_assay` — ~1438 tok
+- `docs://tools/metabolites_by_flags_assay` — ~1439 tok
 - `docs://tools/metabolites_by_gene` — ~1855 tok
-- `docs://tools/metabolites_by_quantifies_assay` — ~1892 tok
+- `docs://tools/metabolites_by_quantifies_assay` — ~1893 tok
 - `docs://tools/ontology_landscape` — ~1346 tok
 - `docs://tools/ontology_term_details` — ~1116 tok
 - `docs://tools/pathway_enrichment` — ~1734 tok
@@ -84,13 +84,13 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/list_derived_metrics/full` — ~3510 tok
 - `docs://tools/list_experiments/full` — ~9415 tok
 - `docs://tools/list_filter_values/full` — ~7212 tok
-- `docs://tools/list_metabolite_assays/full` — ~3658 tok
-- `docs://tools/list_metabolites/full` — ~12586 tok
+- `docs://tools/list_metabolite_assays/full` — ~3659 tok
+- `docs://tools/list_metabolites/full` — ~12588 tok
 - `docs://tools/list_organisms/full` — ~11949 tok
 - `docs://tools/list_publications/full` — ~7988 tok
-- `docs://tools/metabolites_by_flags_assay/full` — ~4420 tok
+- `docs://tools/metabolites_by_flags_assay/full` — ~4421 tok
 - `docs://tools/metabolites_by_gene/full` — ~12143 tok
-- `docs://tools/metabolites_by_quantifies_assay/full` — ~6093 tok
+- `docs://tools/metabolites_by_quantifies_assay/full` — ~6094 tok
 - `docs://tools/ontology_landscape/full` — ~7407 tok
 - `docs://tools/ontology_term_details/full` — ~7575 tok
 - `docs://tools/pathway_enrichment/full` — ~9547 tok
@@ -101,12 +101,13 @@ Append /full for the complete page — all worked examples + full response forma
 
 ## Analysis
 
-- `docs://analysis/annotation_evidence` — ~7612 tok — Read before trusting, filtering or ranking gene→term annotations: evidence ladder, tiers, gates.
-- `docs://analysis/derived_metrics` — ~2771 tok — Read for non-DE gene evidence (rhythmicity, amplitudes, classes): discover DMs, then drill down.
-- `docs://analysis/enrichment` — ~7732 tok — Read before pathway_enrichment / cluster_enrichment: building blocks, backgrounds, levels, pitfalls.
+- `docs://analysis/annotation_evidence` — ~7612 tok — Read before trusting, filtering or ranking gene→term annotations: evidence ladder, tiers…
+- `docs://analysis/derived_metrics` — ~2771 tok — Read for non-DE gene evidence (rhythmicity, amplitudes, classes): discover DMs, then drill…
+- `docs://analysis/enrichment` — ~7732 tok — Read before pathway_enrichment / cluster_enrichment: building blocks, backgrounds, levels…
 - `docs://analysis/expression` — ~2504 tok — Read for DE questions: the DE tool family, plus response_matrix / gene_set_compare summaries.
-- `docs://analysis/metabolites` — ~14644 tok — Read before any metabolite question: which pipeline answers it, then the drill.
-- `docs://analysis/transport` — ~4326 tok — What transports compound X in organism Y, or what does gene Z move? The KG answers from three routes.
+- `docs://analysis/metabolite_ids` — ~4447 tok — Read when an id didn't resolve, an answer splits across stereo forms, or a row is a compound…
+- `docs://analysis/metabolites` — ~9157 tok — Read before any metabolite question: which pipeline answers it, then the drill.
+- `docs://analysis/transport` — ~4629 tok — What transports compound X in organism Y, or what does gene Z move? The KG answers from…
 
 ## Ontologies
 
@@ -118,7 +119,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://ontologies/go_bp` — ~2259 tok
 - `docs://ontologies/go_cc` — ~1774 tok
 - `docs://ontologies/go_mf` — ~2108 tok
-- `docs://ontologies/index` — ~1235 tok — One page per supported ontology — what it is, how genes get annotated, identifier form, hierarchy, the…
+- `docs://ontologies/index` — ~1235 tok — One page per supported ontology — what it is, how genes get annotated, identifier form…
 - `docs://ontologies/interpro` — ~2434 tok
 - `docs://ontologies/kegg` — ~2325 tok
 - `docs://ontologies/merops` — ~2673 tok
@@ -131,8 +132,8 @@ Append /full for the complete page — all worked examples + full response forma
 
 ## Examples
 
-- `docs://examples/annotation_evidence.py` — ~3434 tok — Runnable: MEROPS call_class, the TCDB gate, InterPro enrichment, trust-filtered TCDB, rollups.
-- `docs://examples/metabolites.py` — ~9671 tok — Runnable: metabolite discovery, compound↔gene, cross-feeding, N-source DE, TCDB, metabolomics.
+- `docs://examples/annotation_evidence.py` — ~3434 tok — Runnable: MEROPS call_class, the TCDB gate, InterPro enrichment, trust-filtered TCDB…
+- `docs://examples/metabolites.py` — ~9671 tok — Runnable: metabolite discovery, compound↔gene, cross-feeding, N-source DE, TCDB…
 - `docs://examples/ontology_terms.py` — ~2300 tok — Runnable: browse terms, one search across ontologies, a term-details batch, a bridge walk.
-- `docs://examples/pathway_enrichment.py` — ~3249 tok — Runnable: enrichment from a landscape scout, DE, clusters, ortholog groups and custom gene lists.
+- `docs://examples/pathway_enrichment.py` — ~3249 tok — Runnable: enrichment from a landscape scout, DE, clusters, ortholog groups and custom gene…
 

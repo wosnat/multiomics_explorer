@@ -24,7 +24,7 @@ docs://tools/list_metabolite_assays; summary=True first.
 | publication_dois | list[string] \| None | None | Restrict to these publication DOIs. |
 | experiment_ids | list[string] \| None | None | Experiment node id(s). |
 | assay_ids | list[string] \| None | None | MetaboliteAssay id(s). `not_found.assay_ids` lists unknowns. |
-| metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolites. |
+| metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolite_ids. |
 | exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
 | rankable | bool \| None | None | True → assays supporting rank/percentile/bucket on metabolites_by_quantifies_assay's rankable-gated filters. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |

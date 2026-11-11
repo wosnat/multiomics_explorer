@@ -82,8 +82,9 @@ mcp = FastMCP(
         "docs://tools/{tool} is a ~1k-tok brief — append /full "
         "only when you need every worked example; docs://guide/conventions "
         "(~7k) for cross-tool semantics; "
-        "docs://analysis/{enrichment,metabolites,annotation_evidence,"
-        "expression,derived_metrics,transport} for methodology."
+        "docs://analysis/{enrichment,metabolites,metabolite_ids,"
+        "annotation_evidence,expression,derived_metrics,transport} for "
+        "methodology."
     ),
     lifespan=lifespan,
 )

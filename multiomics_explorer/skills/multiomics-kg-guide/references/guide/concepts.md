@@ -176,8 +176,7 @@ and `vesicle` simultaneously — distinct rows. Filter via
   drill in via `genes_by_metabolite` / `metabolites_by_gene`. Every
   `metabolite_ids` parameter accepts any id form, bare or prefixed
   (`C00064`, `CHEBI:17234`, `HMDB…`, `MNXM…`, an InChIKey), and retired
-  ids resolve to the current node — see `docs://analysis/metabolites`
-  "Metabolite ID forms".
+  ids resolve to the current node — see `docs://analysis/metabolite_ids`.
 
   KEGG `Reaction` nodes sit *between* Gene and Metabolite on the
   metabolism arm — `Gene → Reaction → Metabolite` — but are

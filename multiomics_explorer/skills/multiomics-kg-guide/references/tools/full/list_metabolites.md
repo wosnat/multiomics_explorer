@@ -14,7 +14,7 @@ docs://tools/list_metabolites; summary=True first.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string \| None | None | Free-text search (Lucene) over metabolite name, formula and identifiers (KEGG / ChEBI / MNX / HMDB ids, InChIKey). A formula hit is a token match — for composition use `elements`. E.g. 'glucose', 'phosphate AND amino'. |
-| metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolites. |
+| metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolite_ids. |
 | exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
 | kegg_compound_ids | list[string] \| None | None | KEGG compound ids, bare or prefixed (e.g. ['C00031']). Matches any of the metabolite's identifiers, including secondary and retired ones, so a merged compound's old KEGG id still finds it. |
 | chebi_ids | list[string] \| None | None | ChEBI ids, bare digits or 'CHEBI:' form (e.g. ['4167', 'CHEBI:15422']). Matches any of the metabolite's identifiers, including secondary and retired ones. |
@@ -790,7 +790,7 @@ list_metabolites (per-row `transporter_gene_count > 0`) → genes_by_metabolite(
 list_metabolites (per-row `stereo_relatives`) → genes_by_metabolite(metabolite_ids=[generic id], organism=..., include_stereo_forms=True) — transport on the generic form plus catalysis on the specific form, per organism
 list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)
 differential_expression_by_gene → metabolites_by_gene(metabolite_elements=['N']) → list_metabolites for chemistry context
-list_metabolites (per-row `kegg_brite_classes`, top level only) → run_cypher over `MetaboliteClass` for the deeper KEGG compound classes (docs://analysis/metabolites)
+list_metabolites (per-row `kegg_brite_classes`, top level only) → run_cypher over `MetaboliteClass` for the deeper KEGG compound classes (docs://analysis/metabolite_ids)
 list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(metabolite_ids=[...]) — reverse lookup of all measurement evidence (numeric + boolean) for the measured compounds (cross-organism by default).
 list_metabolites(evidence_sources=['go_transport'], organism_names=[...]) → genes_by_metabolite(metabolite_ids=[...], organism=..., evidence_sources=['go_transport']) for the genes carrying the GO term
 ```
@@ -864,7 +864,7 @@ organic acid with no category. The headings are functional (amines sit under
 Peptides). Use them to describe or group results, never to exclude; for enrichment
 use the classified metabolites as background; for composition use `elements`. The
 envelope's trailing `"not classified"` entry counts the unlisted metabolites; it is
-not a filter value. Details: docs://analysis/metabolites.
+not a filter value. Details: docs://analysis/metabolite_ids.
 
 ```
 

@@ -1,6 +1,8 @@
 # Working with metabolites
 
-Read before any metabolite question: which pipeline answers it, then the drill. The KG models metabolites via three distinct source pipelines (metabolism, transport, metabolomics), each answering a different question class; transport evidence has two routes, TCDB `transport` and GO `go_transport` (`docs://analysis/transport`). **Read the disambiguation table first; pick the right row before drilling.**
+Read before any metabolite question: which pipeline answers it, then the drill. The KG models metabolites via three distinct source pipelines (metabolism, transport, metabolomics), each answering a different question class; transport evidence has two routes, TCDB `transport` and GO `go_transport`. **Find the question in the decision tree, check its row in the source table, then drill.**
+
+Companion pages: `docs://analysis/transport` (reading TCDB and GO transport rows, empty answers, route agreement) and `docs://analysis/metabolite_ids` (id forms, stereo forms, compound classes).
 
 Runnable companion: `docs://examples/metabolites.py` (7 scenarios).
 
@@ -9,274 +11,49 @@ Runnable companion: `docs://examples/metabolites.py` (7 scenarios).
 > `list_metabolites`, `list_metabolite_assays`, or `kg_release_info` for current
 > figures.
 
+## Quick decision tree
+
+```
+User asks about a metabolite or chemistry
+├─ "Can / does gene X act on metabolite M?"
+│   ├─ "produce / catalyse" → Track A1 b1/c1 (metabolism arm)
+│   └─ "transport" → Track A2 b2/c2 (transport arm) + docs://analysis/transport (direct vs family rows)
+├─ "Which genes act on M?" → genes_by_metabolite (read evidence_source split)
+├─ "M shows transport only / 0 catalysts" → read stereo_relatives; genes_by_metabolite(include_stereo_forms=True) for transport ↔ catalysis joins (docs://analysis/metabolite_ids)
+├─ "Which metabolites does gene X act on?" → metabolites_by_gene
+├─ "Id lands in not_found / resolved to another id" → docs://analysis/metabolite_ids
+├─ "Find metabolite by name → metabolite_id" → list_metabolites(search_text="...")  ← name-search hook; precedes any compound-anchored chain
+├─ "Find metabolites by element / pathway / mass" → list_metabolites
+├─ "Which metabolites are lipids / sugars / vitamins?" → list_metabolites(kegg_functional_categories=… / kegg_brite_classes=…) — partial, see docs://analysis/metabolite_ids
+├─ "Which genes transport siderophores / vitamins (a chemical role)?" → genes_by_metabolite(metabolite_ids=['chebi.role:…']); run_cypher only for which TCDB systems carry a role (Track A f — Chemical roles)
+├─ "GO vs TCDB transport, which routes agree, empty transport answer" → docs://analysis/transport
+├─ "Cross-feeding between organisms" → Track A d — Cross-feeding bridge
+├─ "N-source / chemistry-filtered DE" → Track A e — N-source / nutrient-class workflow
+├─ "Genes that transport substrate X" → Track A2 b2 (metabolite-anchored; see also Track A f — Ontology bridges)
+├─ "Genes annotated to TCDB family / KEGG term" → genes_by_ontology
+├─ "What metabolomics assays exist for treatment / paper / organism?" → list_metabolite_assays  (Track B discovery)
+├─ "Was metabolite M measured? At what level?" → assays_by_metabolite (cross-organism reverse lookup)
+├─ "Top-N / detected-only metabolites in this numeric assay?" → metabolites_by_quantifies_assay
+├─ "Which metabolites were flagged present/absent in this paper's S2 table?" → metabolites_by_flags_assay
+└─ "value = 0 / not_detected / flag_value = false rows" → keep them: Track B "Tested-absent vs unmeasured"
+```
+
 ## Source disambiguation
 
 | `evidence_source` | Path in KG | Question it answers | Native tools | Key caveats |
 |---|---|---|---|---|
 | `metabolism` | `Gene → Reaction → Metabolite` (KEGG-derived) | "Which metabolites is this gene's reaction involved in?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['metabolism']`) | KO inference may be putative; `Reaction_has_metabolite` is undirected — upstream KEGG direction is unreliable, so the convention is permanent: use "involved in" framing, never "produces"/"consumes"; promiscuous enzymes inflate counts |
 | `transport` | `Gene → TcdbFamily (tc_system) → Metabolite` (TCDB-derived; a gene's `transport` tag also counts systems curated only with chemical roles, e.g. 'drug') | "Which metabolites does this gene transport, through a TCDB system it is directly assigned to?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['transport']`) | Default rows need a `direct` system call; genes TCDB placed only at family or subfamily level need `include_tcdb_family_substrates=True` (family rows, a recall expansion); TCDB curation can be narrow (Pst → triphosphate only); direction is node-level (`tcdb_direction`), not per gene |
-| `go_transport` | `Gene → GO term → Metabolite / ChemicalRole` (GO term's primary input) | "Does a GO term this gene carries define it as moving the compound?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['go_transport']`); `list_metabolites(evidence_sources=['go_transport'])` (~220 metabolites) | A term definition, not a gene fact; molecular-function and biological-process terms mean different things; kept apart from TCDB (`organism_count`, `transporter_gene_count`, `catalyst_gene_count` ignore it); GO rows carry `go_term_id`, `go_namespace`, `go_evidence`, `go_term_depth`, `target_kind`. How to read it: `docs://analysis/transport` |
-| `metabolomics` | `MetaboliteAssay → Metabolite` (mass-spec) | "Which metabolites were measured under this condition?" | `list_metabolite_assays` (discovery), `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay` (per-arm drill-down), `assays_by_metabolite` (reverse lookup) — see Track B | No gene anchor; `Assay_quantifies` (concentration/intensity) ≠ `Assay_flags` (qualitative detection); compartment matters (`whole_cell` / `extracellular` / `vesicle`); ~135 of ~3.25k metabolites measured (~96% are annotation-only); 3 papers, 14 assays (12 numeric + 2 boolean), 12 experiments; replicate / normalisation conventions vary by paper |
+| `go_transport` | `Gene → GO term → Metabolite / ChemicalRole` (GO term's primary input) | "Does a GO term this gene carries define it as moving the compound?" | `genes_by_metabolite`, `metabolites_by_gene` (with `evidence_sources=['go_transport']`); `list_metabolites(evidence_sources=['go_transport'])` | A term definition, not a gene fact; molecular-function and biological-process terms mean different things; kept apart from TCDB (`organism_count`, `transporter_gene_count`, `catalyst_gene_count` ignore it); GO rows carry `go_term_id`, `go_namespace`, `go_evidence`, `go_term_depth`, `target_kind`. How to read it: `docs://analysis/transport` |
+| `metabolomics` | `MetaboliteAssay → Metabolite` (mass-spec) | "Which metabolites were measured under this condition?" | `list_metabolite_assays` (discovery), `metabolites_by_quantifies_assay` / `metabolites_by_flags_assay` (per-arm drill-down), `assays_by_metabolite` (reverse lookup) — see Track B | No gene anchor; `Assay_quantifies` (concentration/intensity) ≠ `Assay_flags` (qualitative detection); compartment matters (`whole_cell` / `extracellular` / `vesicle`); a targeted panel — only a small fraction of KG metabolites is measured at all; replicate / normalisation conventions vary by paper |
 
-The `metabolism`, `transport` and `go_transport` rows share tools — the `evidence_source` field on result rows is the discriminator, and `tcdb_route ∈ {direct, family}`, `tcdb_identity` and `tcdb_calls` further qualify transport rows (see "Direct vs family substrates" under Track A2). The `metabolomics` row has dedicated tools — see Track B.
+The `metabolism`, `transport` and `go_transport` rows share tools — the `evidence_source` field on result rows is the discriminator, and `tcdb_route ∈ {direct, family}`, `tcdb_identity` and `tcdb_calls` further qualify transport rows (see `docs://analysis/transport`). The `metabolomics` row has dedicated tools — see Track B.
 
 The `Metabolite.evidence_sources` list field on each Metabolite node already indicates which routes contribute (e.g., `['metabolism', 'transport', 'go_transport', 'metabolomics']`); read this to route quickly. It is metabolite-level: `transport` means some TCDB system lists the compound, not that any given organism reaches it. For one organism's reach by a route, pass both filters: `list_metabolites(organism_names=[...], evidence_sources=['transport'])` keeps only compounds the listed organism's own genes reach by that route.
 
-**Metabolite ID forms.** Canonical `Metabolite.id` carries a namespace prefix: `kegg.compound:C00064`
-(KEGG-keyed, the large majority) or `chebi:17234` (ChEBI-only, mostly TCDB substrates). Each
-node also lists every identifier it answers to in `all_identifiers` — lower-case-prefixed
-CURIEs for KEGG, ChEBI (primary and secondary), MetaNetX, HMDB and InChIKey
-(`kegg.compound:C00244`, `chebi:14654`, `mnx:MNXM732398`, `hmdb:HMDB0000122`,
-`inchikey:GRYLNZFGIOXLOG-UHFFFAOYSA-N`). Every entry sits on exactly one node.
-
-Every `metabolite_ids` / `exclude_metabolite_ids` parameter on the seven chemistry /
-metabolomics tools (`list_metabolites`, `genes_by_metabolite`, `metabolites_by_gene`,
-`list_metabolite_assays`, `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`,
-`assays_by_metabolite`) resolves its inputs before the query runs:
-
-1. **Normalise the form.** `C00064` / `kegg.compound:c00064` → `kegg.compound:C00064`;
-   `CHEBI:17234` / bare `17234` → `chebi:17234`; `MNXM732398` → `mnx:MNXM732398`;
-   `HMDB02878` → `hmdb:HMDB0002878` (digits padded to 7); a bare InChIKey →
-   `inchikey:<KEY>`.
-2. **Look it up** as a node id first, then in every node's `all_identifiers`. This is how
-   **retired ids** resolve: ids of nodes an earlier KG build merged or re-keyed now sit in
-   the surviving node's `all_identifiers` (`chebi:14654` → nitrate `kegg.compound:C00244`;
-   `kegg.compound:C01327`, hydrogen chloride, → chloride `kegg.compound:C00698`).
-3. **Report.** Every input that isn't already the canonical id is listed in
-   `resolved_aliases` (`{input: [canonical, ...]}`, empty when none), so a case fix, a
-   prefix fix and a retired-id hop are all visible. Exclude-wins-on-overlap is evaluated on
-   the canonical ids, so mixed forms across `metabolite_ids` and `exclude_metabolite_ids`
-   still overlap correctly.
-
-Three kinds of input do not resolve to a metabolite:
-
-- **A removed compound** (stays verbatim in `not_found`) whose paper measurements were moved to a different compound — e.g.
-  `kegg.compound:C00525` (D-tryptophan), whose rows now sit on L-tryptophan
-  `kegg.compound:C00078`. A `warnings` entry names the new id. It is not resolved, because the
-  two are different compounds; pass the new id yourself if the paper's stereo call is not the
-  point.
-- **A chemical-role id** — `chebi:10004` or `chebi.role:33229` ('vitamin (role)'). Roles
-  (vitamin, siderophore, antibiotic, …) are `ChemicalRole` nodes, not metabolites.
-  `genes_by_metabolite` and `metabolites_by_gene` resolve them (`chebi:10004` →
-  `chebi.role:33229` in `resolved_aliases`) and return TCDB / GO role rows
-  (`target_kind='chemical_role'`); a role with no edges in the organism lands in
-  `not_matched`. `list_metabolites` and the four metabolomics tools keep the id verbatim in
-  `not_found` with a `warnings` entry naming the role. See "Chemical roles" under Track A f.
-- **Anything else unknown** (stays in `not_found`) — a name such as `glutamate` (resolve names with
-  `list_metabolites(search_text=...)` first), or an id the KG never carried.
-
-`list_metabolites`' xref filters (`kegg_compound_ids`, `chebi_ids`, `hmdb_ids`, `mnxm_ids`)
-normalise each value the same way and match it against `all_identifiers`, so secondary and
-retired ids match too. They are filters, not resolution: they report nothing in
-`resolved_aliases`.
-
-**Molecule vs class (`structure_kind`).** `list_metabolites` rows carry `structure_kind`:
-`defined` (one molecule), `generic` (a class such as 'Amino acid' or 'Acyl-CoA') or `polymer`
-(DNA, glycogen). Generic and polymer nodes have no `mass` and carry generic formulas with a
-placeholder (`C2H4NO2*` for 'Amino acid'), whose element set still feeds the `elements`
-filter. Filter `structure_kind=['defined']` when a question is about specific molecules.
+**Ids, stereo forms and compound classes** live on their own page, `docs://analysis/metabolite_ids`: any id form resolves (`resolved_aliases`), a compound's stereo forms are separate nodes whose counts never combine (Cysteine vs L-Cysteine), and `structure_kind` / KEGG compound categories tell classes from molecules. Read it when an id lands in `not_found`, a `stereo_relatives` hint or "Stereo forms hold more rows" warning appears, or a row is a class such as 'Amino acid'.
 
 **One row schema across the three arms.** `genes_by_metabolite` and `metabolites_by_gene` rows from all three arms share one schema. Fields that belong to another arm are `None`: `tcdb_*` on KEGG and GO rows; `reaction_*`, `ec_numbers` and `mass_balance` on TCDB and GO rows; `go_*` on KEGG and TCDB rows. Every row carries `evidence_source` and `metabolite_structure_kind` (`defined` / `generic` / `polymer`; null on role targets). Null optional fields (`gene_name`; formula / mass / chebi on role rows) can be left out of a row entirely, so read them with `row.get(...)`. Branch on `evidence_source`.
-
-## Stereo forms: generic vs specific nodes
-
-**The rule: a compound's stereo forms are separate metabolite nodes, and no count or row ever
-combines across them.** "Cysteine" (`kegg.compound:C00736`, stereo form unspecified),
-"L-Cysteine" (`kegg.compound:C00097`) and "D-Cysteine" (`kegg.compound:C00793`) are three
-nodes, each with its own `catalyst_gene_count`, `transporter_gene_count` and gene rows.
-
-**Why the split matters.** The three evidence sources name compounds differently, so they land
-on different nodes of the same family:
-
-| Source | Names compounds… | So its evidence sits on… | Example |
-|---|---|---|---|
-| TCDB substrate lists (`transport`) | generically ("cysteine", "alanine") | the **unspecified** node | Cysteine `C00736`: transporter genes only, **0** catalyst genes |
-| KEGG reactions (`metabolism`) | as the specific form | the **specific** node | L-Cysteine `C00097`: the catalysts (and some transport) |
-| Measured compounds whose paper gave no form (`metabolomics`) | placed on the most-catalysed form (`stereo_assignment='dominant_form_assumed'`) | usually the **specific L-form** | 'Alanine' measurements sit on L-Alanine `C00041`, while most alanine transport sits on Alanine `C01401` |
-
-A question that joins transport to catalysis ("is the cysteine this transporter imports also
-used by an enzyme here?") therefore needs both nodes. Stay on one and you silently get half the
-answer: in MED4, `genes_by_metabolite` on Cysteine returns transport rows only (0 reactions),
-while L-Cysteine carries the reactions. A `0` on one form is not a `0` for the compound.
-
-**Relations.** The KG links forms with two edges, and the tools name what the relative is to the
-metabolite it's attached to:
-
-- `specific_form`: the relative is a stereo-specified form of this generic node
-  (Cysteine → L-Cysteine, D-Cysteine).
-- `unspecified_form`: the relative is the generic node of this specific form
-  (L-Cysteine → Cysteine).
-- `enantiomer`: the mirror-image form (L-Cysteine ↔ D-Cysteine). Only `list_metabolites` lists
-  enantiomers. They are different compounds with different enzymes, so the gene tools never hint
-  at them or add them.
-
-A generic node's `specific_form` relatives can include a **D-form**: Alanine `C01401` has both
-L-Alanine `C00041` and D-Alanine `C00133` as specific forms. Relatives are named, never
-filtered. You decide which one fits the question.
-
-**How to read it in each tool.**
-
-- **`list_metabolites`**: per-row `stereo_relatives` (absent when the node has none), with
-  `metabolite_id`, `name`, `relation` and the relative's own KG-wide `catalyst_gene_count` /
-  `transporter_gene_count`. This is the first look: a generic row with `catalyst_gene_count = 0`
-  whose `specific_form` relative has hundreds of catalysts is the split, not missing biology.
-- **`genes_by_metabolite`**: envelope `stereo_relatives`, keyed by input metabolite id. Each
-  entry carries `metabolite_id`, `name`, `relation` (`specific_form` / `unspecified_form`
-  only) and **organism-scoped** `reaction_count` / `transporter_count` / `gene_count`, under
-  the same filters as your call. These are exactly what `genes_by_metabolite` would report in
-  `by_metabolite` for that relative. Only relatives with genes in this organism are listed, and
-  relatives you passed in `metabolite_ids` or `exclude_metabolite_ids` are never hinted. The
-  matching `by_metabolite` entry carries `stereo_relative_ids`, and the first `warnings` entry
-  ("Stereo forms hold more rows: …") names the relatives with their counts. The hint fires
-  whenever a relative has rows, even when the input has rows of its own.
-- **`metabolites_by_gene`**: the same envelope `stereo_relatives`, keyed by every metabolite in
-  your result that has a stereo relative, and per-row `stereo_relative_ids`. The relative's
-  counts cover the **whole organism**, not just your input genes: the question it answers is
-  "where else does this compound have genes here".
-
-**When to cross the split: `genes_by_metabolite(include_stereo_forms=True)`.** This adds each
-input's generic ↔ specific relatives to the query. The added rows and `by_metabolite` entries
-carry `via_stereo_form_of` (the input id they came from), and the envelope's
-`stereo_forms_added` maps each input to every relative it queried, including relatives with no
-rows in this organism (those add nothing and never land in `not_matched`). No hint fires,
-because the relatives are already in the result. Use it for:
-
-- transport ↔ catalysis joins (generic transport, specific catalysis);
-- "every gene that touches cysteine, in any form" screens.
-
-Don't use it for:
-
-- **exact-form questions** ("which genes act on L-cysteine specifically"): query the one id;
-- **D-amino-acid biology** (peptidoglycan D-Ala, racemases): the expansion from a generic
-  node can pull in the L-form *and* the D-form, so check the `via_stereo_form_of` rows by
-  `metabolite_name` and drop the form that doesn't belong.
-
-Enantiomers are never added, and the expansion is one hop. D-Alanine does not reach L-Alanine
-through Alanine.
-
-**MED4 worked example (cysteine).**
-
-```python
-from multiomics_explorer import genes_by_metabolite
-
-r = genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"],   # Cysteine (generic)
-                        organism="Prochlorococcus MED4", summary=True)
-# No direct rows: no MED4 gene has a TCDB system curated with Cysteine, and it has
-#   0 reactions (KEGG uses L-Cysteine). Cysteine lands in not_matched.
-# r["stereo_relatives"]["kegg.compound:C00736"]: L-Cysteine kegg.compound:C00097,
-#   relation 'specific_form', with its own reaction / gene counts.
-#   D-Cysteine is not listed: it has no MED4 genes.
-# r["warnings"][0] starts "Stereo forms hold more rows: Cysteine (...) → L-Cysteine (...)";
-# another warning says 5 genes reach Cysteine only through a family call
-#   (tcdb_family_substrates_not_shown).
-
-r = genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"],
-                        organism="Prochlorococcus MED4",
-                        include_tcdb_family_substrates=True)
-# 5 family rows: mcyH, mdlB, hetA, sodX on tcdb:3.A.1.106, glcH on tcdb:2.A.2
-#   (tcdb_route='family' — candidates, not system calls).
-
-r = genes_by_metabolite(metabolite_ids=["kegg.compound:C00736"],
-                        organism="Prochlorococcus MED4", include_stereo_forms=True)
-# r["stereo_forms_added"] == {"kegg.compound:C00736":
-#     ["kegg.compound:C00097", "kegg.compound:C00793"]}   # L- and D-Cysteine queried;
-#   D-Cysteine has no MED4 rows, so it adds nothing (and is not in not_matched).
-# L-Cysteine's metabolism rows now appear, each with via_stereo_form_of="kegg.compound:C00736";
-# r["by_metabolite"] has an L-Cysteine entry tagged the same way.
-```
-
-The gene-anchored route is the same split seen from the other side. `metabolites_by_gene` on
-MED4's cysteine transporter candidates (e.g. PMM0065 mcyH, family `tcdb:3.A.1.106`) with
-`include_tcdb_family_substrates=True` returns a Cysteine family row plus a `stereo_relatives`
-entry pointing at L-Cysteine. Chain it into `genes_by_metabolite(metabolite_ids=
-["kegg.compound:C00736"], organism=..., include_tcdb_family_substrates=True,
-include_stereo_forms=True)` to get the transporter candidates and the L-cysteine enzymes in
-one result.
-
-**What is and isn't linked.** A link exists when ChEBI places the specific form under the
-generic one with the same formula and charge (plus a short curated list), so common generic
-substrates are covered: 'glucose' `chebi:17234` → D-Glucose `kegg.compound:C00031`, mannose →
-D-Mannose, isoleucine → L-Isoleucine, fructose → D-Fructose. Two kinds are deliberately **not**
-linked:
-- **class terms** such as 'amino acid' `chebi:33709`, glucoside or galactoside, whose members are
-  different compounds, not stereo forms;
-- **ring vs open-chain forms** such as keto-D-fructose `kegg.compound:C10906` vs D-Fructose.
-
-So a missing hint means "no stereo form in the KG", not "no related compound". For a class term
-or an open-chain form, search by name (`list_metabolites(search_text="fructose")` lists every
-node) and pass the form you want to `genes_by_metabolite` yourself.
-
-An id that names a stereo form the KG has no node for (e.g. D-pipecolic acid `chebi:41582`) stays
-in `not_found` with a warning naming the stereo-unspecified node it was removed from.
-
-## KEGG compound categories: what they are and aren't
-
-`list_metabolites` carries two KEGG classification fields — `kegg_functional_categories` and
-`kegg_brite_classes` — as row fields, filters and envelope rollups
-(`by_kegg_functional_category`, `by_kegg_brite_class`). Both are useful for describing a result
-list and both are **partial**. Read this before using either to include, exclude or count.
-
-1. **Source and method.** `kegg_functional_categories` holds the 9 top-level groups of KEGG BRITE
-   hierarchy **br08001 "Compounds with biological roles"** (values:
-   `list_filter_values('kegg_functional_category')`). br08001 is a hand-curated KEGG list:
-   curators place selected **representative** compounds under functional headings. It is not an
-   exhaustive or rule-based chemical classification. A compound is in a category only if KEGG
-   listed it there; the KG copies KEGG's assignments and never infers a category.
-2. **Coverage is low.** Only 335 of 3,243 metabolites (~10%) carry a category. Common central
-   metabolites the KG catalyses are often unclassified: 1,974 metabolites with catalyst genes
-   have no category — fumarate, ethanol, L-carnitine and D-ribulose 5-phosphate among them.
-3. **Absence means "KEGG didn't list it", not "not in this category".** Fumarate is an organic
-   acid and carries no category. The envelope's trailing `"not classified"` entry counts these
-   metabolites so the gap stays visible. Never read a missing category as a negative.
-   `"not classified"` is an envelope label only — the filter does not accept it.
-4. **Functional, not structural headings.** Amino acids *and* amines (putrescine, dopamine) sit
-   under Peptides; myo-inositol under Carbohydrates; retinol under Vitamins and cofactors. A
-   compound can sit in more than one category (dopamine is also under Hormones and transmitters).
-5. **Consequences for analysis.**
-   - Use categories to *describe or group* a result list, not to *exclude* compounds.
-   - For enrichment or "over-represented category" claims, the background is the classified
-     metabolites only (those with at least one value in the field you test), never all
-     metabolites — an unclassified compound is not a non-member.
-   - For composition questions (N-containing, P-containing), use the `elements` filter instead.
-6. **The second field, `kegg_brite_classes`**, holds KEGG's 7 other compound BRITE trees, as
-   `"Tree: Class"` strings (values: `list_filter_values('kegg_brite_class')`):
-   - Lipids br08002 (LIPID MAPS-style classes);
-   - Phytochemical compounds br08003;
-   - Glycosides br08021;
-   - Pesticides br08007;
-   - Natural toxins br08009;
-   - Endocrine disrupting compounds br08006;
-   - Bioactive peptides br08005.
-
-   These are the same kind of hand-curated, representative-compound lists. Some are chemical
-   (lipid and phytochemical classes, glycosides); others group compounds by use or effect
-   (pesticides, toxins, endocrine disruptors). The tree prefix keeps same-named classes apart
-   (`Pesticides: Pesticides` vs `Endocrine disrupting compounds: Pesticides and herbicides`).
-   Coverage:
-   - 652 of 3,243 metabolites (~20%) have a class;
-   - with both fields, 884 (~27%) have something;
-   - 687 of the 2,221 metabolites with catalyst genes have something.
-
-   Only the top level of each tree is on the row. Deeper classes (e.g. the lipid subclass
-   'Fatty Acids and Conjugates') are `run_cypher`-only, through the `MetaboliteClass` hierarchy
-   (`tree_code`, `level` 0 = top class):
-
-   ```cypher
-   MATCH (cls:MetaboliteClass {tree_code: 'br08002'})
-   WHERE cls.name CONTAINS 'Fatty Acids and Conjugates'
-   MATCH (sub:MetaboliteClass)-[:Metabolite_class_is_a_metabolite_class*0..]->(cls)
-   MATCH (m:Metabolite)-[:Metabolite_in_metabolite_class]->(sub)
-   RETURN cls.id AS class_id, m.id AS metabolite_id, m.name AS name,
-          collect(DISTINCT sub.name) AS via_classes
-   ORDER BY name
-   LIMIT 50
-   ```
-
-   Points 3 and 5 apply unchanged.
-7. **Two fields, two questions.** `kegg_functional_categories` answers "what is it for, in
-   KEGG's functional grouping"; `kegg_brite_classes` answers "what kind of compound is it, or
-   what is it used as". They overlap: butanoic acid is Lipids + Organic acids functionally, and
-   `Lipids: Fatty acyls` + `Phytochemical compounds: Fatty acids related compounds` in BRITE.
 
 ## When to surface caveats inline
 
@@ -284,7 +61,7 @@ Always restate the row's caveats when the answer touches it. The LLM should neve
 
 - "This gene produces X" — only "this gene catalyses a reaction involving X". This is the permanent convention: upstream KEGG annotation direction is unreliable, so the KG intentionally stays undirected.
 - "This gene transports X" from a family row — a `tcdb_route='family'` row means the gene's TCDB family or subfamily has some system curated with X; the annotation can't pin the system. Say "this gene belongs to a TCDB family that includes a system moving X, so X is candidate-only". Quote `tcdb_identity` and `tcdb_calls` when you rank candidates; even a direct row is a homology call, not a measured activity.
-- "No gene in this organism acts on X" from a `0` on one stereo form — a generic node (Cysteine) has 0 reactions by construction and the catalysts sit on the specific form (L-Cysteine). Read `stereo_relatives` first (see "Stereo forms: generic vs specific nodes").
+- "No gene in this organism acts on X" from a `0` on one stereo form — a generic node (Cysteine) has 0 reactions by construction and the catalysts sit on the specific form (L-Cysteine). Read `stereo_relatives` first (`docs://analysis/metabolite_ids`).
 - "Metabolite X was not produced under condition Y" based on metabolomics absence — say "X was not detected in the targeted panel under condition Y" (targeted ≠ comprehensive).
 
 ---
@@ -405,27 +182,9 @@ result = metabolites_by_gene(
 # result["by_gene"][0]: tcdb_direct_rows, tcdb_family_rows, tcdb_assignment_count (2).
 ```
 
-### g — Direct vs family substrates
+### Direct vs family rows
 
-TCDB curates substrates on **systems** (5-part TC numbers such as `tcdb:3.A.1.4.4`, level kind `tc_system`) and nowhere else. Every gene → TCDB edge carries a `tcdb_gate`: `direct` feeds transport rows and the transport counts, `annotated` feeds the TCDB annotation and family-walk starts, `below_gate` feeds nothing (gate definitions: `docs://ontologies/tcdb`).
-
-**Direct rows (default).** One row per gene × system × metabolite, from `direct` edges only. Distinct Metabolite targets across a gene's direct rows equal `gene_overview.transported_metabolite_count`, and distinct genes across a metabolite's direct rows, summed over organisms, equal `list_metabolites.transporter_gene_count`. Rank within the route by `tcdb_identity` (percent identity of the representative DIAMOND edge; null on eggNOG-only calls), then by `tcdb_calls` (eggNOG plus a DIAMOND kind is independent agreement; `diamond_best_hit` and `diamond_tier` come from one DIAMOND run).
-
-**Family rows (`include_tcdb_family_substrates=True`).** A fallback for genes TCDB could not place in a system. The walk starts from the gene's deepest `annotated` family or subfamily call, goes down to every system below it, and adds one `tcdb_route='family'` row per (gene, attached node, metabolite), with `tcdb_substrate_system_count` = how many of those systems carry the metabolite. The switch only adds rows. It never walks above a direct system the gene already has (that would add only the sibling systems' substrates), never starts from a class or subclass, and never starts from a node curated with more than 200 substrates (ABC `tcdb:3.A.1`, MFS `tcdb:2.A.1`): those genes are listed in `tcdb_family_substrates_skipped` (substrate unknown; `metabolites_by_gene` also warns, `genes_by_metabolite` does not).
-
-- **Motivating case: phosphate in MED4.** `genes_by_metabolite(['kegg.compound:C00009'], organism='MED4')` (orthophosphate) returns no transport rows. phnD (PMM0673), the phosphonate-binding protein, has only an eggNOG call on subfamily `tcdb:3.A.1.9` (PhnT) plus a weak hit on the ABC superfamily. The envelope's `tcdb_family_substrates_not_shown` reads `{genes: 4, metabolites: 1, rows: 4}` (phnC, phnD, phnE, PMM0717) and the warning says to pass `include_tcdb_family_substrates=True`; with it, phnD reaches orthophosphate, phosphonic acid, phosphite, phosphinate and Fe³⁺ through `tcdb:3.A.1.9`.
-- **Curation caveat: Pst.** MED4 pstA/B/C/S have direct calls onto `tcdb:3.A.1.7.6` ("High affinity phosphate-specific transporter, PstABCS"), which TCDB curates with **triphosphate only**. They therefore drop out of the orthophosphate answer, and because they have a direct system, no family walk brings them back. When a substrate answer looks too narrow, read the system names in `tcdb_family_name` and `top_tcdb_families`.
-- **A real transporter can sit in family rows only.** MED4 gltS (PMM0628) has an eggNOG call on the glutamate:Na+ symporter family `tcdb:2.A.27` and only weak DIAMOND hits, so it has no direct rows; the walk reaches glutamate through the family.
-- **Catch-all substrates.** TCDB curates some generic substrates ("Peptide", "Protein"); they pass through as curated and can top family-row counts. Treat them as "some substrate".
-- **Family rows are a recall expansion.** They say the gene's family moves the compound somewhere, not that the gene does. Most of their noise is eggNOG family calls on genes that are not transporters at all (cell-division, chaperone and protease genes among them). The KG has no per-gene transporter call yet, so do not count family rows as transport capability.
-
-**Choose by question shape:**
-
-- **Default (direct rows)** — conservative. Use for cross-organism inference and whenever over-claiming a substrate would mislead.
-- **`include_tcdb_family_substrates=True`** — broad screen ("which transporters could plausibly act on these N substrates?"), or when the direct answer is empty and `tcdb_family_substrates_not_shown` is non-zero. Report family rows as candidates.
-- **Pivot** for a single transporter family: `genes_by_ontology(ontology="tcdb", term_ids=[...])`. (For substrate-anchored questions prefer the metabolite-anchored route above.)
-
-Scale in MED4: 203 genes carry a gate-passing TCDB call, 56 reach a substrate directly, and 98 have a gate-passing call but no direct edge (their transport arm is empty by default).
+Default transport rows come only from TCDB systems a gene is directly assigned to. Genes TCDB placed only at family or subfamily level have no rows unless you pass `include_tcdb_family_substrates=True`, which adds `tcdb_route='family'` candidate rows. Read `tcdb_family_substrates_not_shown` before calling the transport arm empty. Row semantics, the phnD and Pst examples, the 200-substrate breadth cap, catch-all substrates and what an empty answer means: `docs://analysis/transport`.
 
 ---
 
@@ -558,9 +317,36 @@ The same KEGG pathway map (e.g. `kegg.pathway:ko00910` Nitrogen metabolism) can 
 
 ---
 
-## Tested-absent vs unmeasured
+## Track B — Metabolomics measurement
 
-> **Top-level invariant for the metabolomics layer.** Propagated across the 4 metabolomics tools (`list_metabolite_assays`, `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`, `assays_by_metabolite`). Read this once; it determines how every row of every drill-down output is interpreted.
+Four native tools cover the measurement layer (no `run_cypher` needed):
+
+- **`list_metabolite_assays`** — discovery surface. Inspect `value_kind` (numeric/boolean → routes drill-down), `rankable` (gates `metric_bucket` / `min_percentile` / `max_percentile` / `max_rank` on the numeric drill-down), `compartment`, and per-row `detection_status_counts` (numeric assays) before drilling.
+- **`metabolites_by_quantifies_assay`** — numeric-arm drill-down. One row per (metabolite × assay-edge) with `value`, `detection_status`, `timepoint*` and rankable-gated `metric_bucket` / `metric_percentile` / `rank_by_metric`. `by_detection_status` is the primary headline.
+- **`metabolites_by_flags_assay`** — boolean-arm drill-down. Edge filter `flag_value` (`True` = presence flagged, `False` = tested-absent — real biology, most boolean rows).
+- **`assays_by_metabolite`** — polymorphic reverse lookup. Cross-organism by default. Numeric rows carry `value` / `detection_status` / `timepoint*`; boolean rows carry `flag_value` / `n_positive`. Cross-arm fields explicit `None` (union-shape padding).
+
+### Caveats — always restate when surfacing measurement results
+
+- **No gene anchor.** A metabolite measurement says nothing about which gene produced/consumed it.
+- **`Assay_quantifies` vs `Assay_flags`.** Quantifies = concentration/intensity (with `value`, `value_sd`, `n_replicates`, `metric_percentile`, `rank_by_metric`); Flags = qualitative detection (with `flag_value`, `n_positive`, `n_replicates`). Their downstream interpretation differs — split per DM convention into two drill-down tools.
+- **Compartment matters.** `whole_cell` measures pool; `extracellular` measures excretion / uptake / spent media; `vesicle` measures cargo packaged into extracellular vesicles. Filter via the `compartment=` kwarg on every Track-B tool.
+- **Targeted panel ≠ full metabolome.** Absence in measurement ≠ absence in cell. Only a small fraction of KG metabolites has any measurement; `list_metabolites(summary=True)` `by_measurement_coverage` gives the live split, `list_metabolite_assays(summary=True)` the assays and papers.
+- **Stereo form may be the KG's call, not the paper's.** Every measurement row carries
+  `stereo_assignment`: `as_reported` (the paper named the form, or the compound has no stereo
+  variant) or `dominant_form_assumed` (the paper gave no form — e.g. 'Alanine' — and the KG
+  placed the row on one form of the stereo family, usually the one with the most catalysing
+  genes, here L-alanine `kegg.compound:C00041`). The drill-downs add `by_stereo_assignment` to the envelope and a
+  `warnings` entry when assumed rows are present; pass `stereo_assignment=['as_reported']` to
+  keep only the paper's own calls. Say "measured as alanine (L-form assumed)" when quoting an
+  assumed row. Transport for the same compound usually sits on the generic node (Alanine
+  `kegg.compound:C01401`): see `docs://analysis/metabolite_ids`.
+- **Replicate / normalisation conventions vary by paper.** Read `value_sd` and `n_replicates` on the edge, plus `field_description` on the parent assay (canonical provenance read — `verbose=True` surfaces it). The `value` itself is processed per the paper's pipeline.
+- **Tested-absent vs unmeasured.** See "Tested-absent vs unmeasured" below — the top-level invariant. Tested-absent rows (`value=0` / `detection_status='not_detected'` / `flag_value=false`) are biology, not noise; default-filtering them strips the majority of the layer.
+
+### Tested-absent vs unmeasured
+
+> **Top-level invariant for the metabolomics layer**, shared by the 4 metabolomics tools (`list_metabolite_assays`, `metabolites_by_quantifies_assay`, `metabolites_by_flags_assay`, `assays_by_metabolite`). It determines how every row of every drill-down output is read.
 
 In metabolomics, **two row states must not be conflated**:
 
@@ -570,69 +356,19 @@ In metabolomics, **two row states must not be conflated**:
 | **Tested-absent** | `value = 0`, `n_non_zero = 0`, `detection_status = 'not_detected'` | `flag_value = false` | Metabolite *assayed and not found*. **Real biological data — keep in `results`, count toward `total_matching` and envelope rollups.** |
 | **Unmeasured** | no row in result; `metabolite_id` in `not_found` / `not_matched` | no row in result | Metabolite *not in this assay's scope*. **No information — do not infer absence.** |
 
-Tested-absent rows answer the biological question "is X actually absent under condition Y." Discarding them silently misreads the question. Unmeasured rows carry zero information either way and must not be conflated with absence.
+Tested-absent rows answer the biological question "is X actually absent under condition Y". Discarding them silently misreads the question. Unmeasured rows carry zero information either way.
 
-On the numeric arm (`metabolites_by_quantifies_assay` and the quantifies rows of `assays_by_metabolite`), a tested-absent row's `metric_bucket` / `metric_percentile` / `rank_by_metric` are always null — a raw-zero value can otherwise tie into a high bucket purely because most of the assay's edges are zero — and the rank-gated filters (`metric_bucket`, `min_percentile` / `max_percentile`, `max_rank`) never select `not_detected` rows for the same reason.
+**Tested-absent is the majority, not the exception.** Most numeric edges are `not_detected` and most boolean flags are `false`; read `by_detection_status` (`list_metabolite_assays`, `metabolites_by_quantifies_assay`) or `by_value` (`metabolites_by_flags_assay`) for the live split before drilling. Default-filtering tested-absent rows would discard most of the measured biology.
 
-### Cross-tool implications
+On the numeric arm (`metabolites_by_quantifies_assay` and the quantifies rows of `assays_by_metabolite`), a tested-absent row's `metric_bucket` / `metric_percentile` / `rank_by_metric` are always null — a raw-zero value could otherwise tie into a high bucket because most of the assay's edges are zero — and the rank-gated filters (`metric_bucket`, `min_percentile` / `max_percentile`, `max_rank`) never select `not_detected` rows.
 
 | Surface | Behavior |
 |---|---|
 | `total_matching` | Counts measured rows = present + tested-absent. Excludes unmeasured (no row exists to count). |
-| `results` (default) | Includes tested-absent rows by default. |
-| Envelope rollups (`by_detection_status`, `by_value`, `by_flag_value`, `by_assay`, `by_compartment`, `by_organism`, `by_metric`) | Include tested-absent rows. Lets callers see how much of `total_matching` is biological absence. |
-| Edge-level filters (`min_value > 0`, `detection_status` list excluding `not_detected`, `flag_value=True`) | Caller-surfaced; never silently default-on. Each one drops tested-absent rows when set. |
-| `assays_by_metabolite` `not_found` / `not_matched` buckets | **Unmeasured-only**. Tested-absent rows go in `results`, not these buckets. |
-
-### Empirical scale
-
-`detection_status` (`detected / sporadic / not_detected`) is the primary headline summary for the metabolomics layer. The breakdown shows tested-absent dominates:
-
-- **Numeric arm (12 assays):** 70.7% of `Assay_quantifies` edges are `not_detected` (1046 of 1480 rows). Tested-absent is the majority signal, not an exception.
-- **Boolean arm (2 assays, 186 rows total):** 68.8% have `flag_value = false` (128 of 186 rows).
-- **PEP (`kegg.compound:C00074`):** 14 of 20 measurements (70%) are tested-absent across the 10 assays that measure it (12 `not_detected` quantifies-edges + 2 `flag_value=false` boolean-edges).
-
-Default-filtering tested-absent rows would discard the majority of measured biology under this KG state.
-
-### Tool-specific framing
-
-- **`list_metabolite_assays`** (discovery / pre-flight): envelope `by_detection_status` rollup over numeric assays; per-row `detection_status_counts` on numeric rows. Use this surface to gauge tested-absent share before drilling.
-- **`metabolites_by_quantifies_assay`** (numeric drill-down): `by_detection_status` is the primary headline. Edge-level `min_value > 0` and `detection_status` filters surfaced as caller choices, never default-on.
-- **`metabolites_by_flags_assay`** (boolean drill-down): `by_flag_value` mirror; `flag_value=False` is the explicit way to ask for tested-absent rows.
-- **`assays_by_metabolite`** (reverse lookup): `not_found` / `not_matched` buckets are unmeasured-only — the metabolite was never in the KG's metabolomics scope. Tested-absent rows for IN-scope metabolites are in `results`.
-
-### Cross-references
-
-- Tool-level YAML mistakes (each carries the wrong/right pair): `inputs/tools/list_metabolite_assays.yaml`, plus the 3 drill-down YAMLs.
-
----
-
-## Track B — Metabolomics measurement
-
-Four native tools cover the measurement layer (no `run_cypher` needed):
-
-- **`list_metabolite_assays`** — discovery surface. Inspect `value_kind` (numeric/boolean → routes drill-down), `rankable` (gates `metric_bucket` / `min_percentile` / `max_percentile` / `max_rank` on the numeric drill-down), `compartment`, and per-row `detection_status_counts` (numeric assays) before drilling.
-- **`metabolites_by_quantifies_assay`** — numeric-arm drill-down. One row per (metabolite × assay-edge) with `value`, `detection_status`, `timepoint*` and rankable-gated `metric_bucket` / `metric_percentile` / `rank_by_metric`. `by_detection_status` is the primary headline.
-- **`metabolites_by_flags_assay`** — boolean-arm drill-down. Edge filter `flag_value` (`True` = presence flagged, `False` = tested-absent — real biology, 68.8% of boolean rows in the live KG).
-- **`assays_by_metabolite`** — polymorphic reverse lookup. Cross-organism by default. Numeric rows carry `value` / `detection_status` / `timepoint*`; boolean rows carry `flag_value` / `n_positive`. Cross-arm fields explicit `None` (union-shape padding).
-
-### Caveats — always restate when surfacing measurement results
-
-- **No gene anchor.** A metabolite measurement says nothing about which gene produced/consumed it.
-- **`Assay_quantifies` vs `Assay_flags`.** Quantifies = concentration/intensity (with `value`, `value_sd`, `n_replicates`, `metric_percentile`, `rank_by_metric`); Flags = qualitative detection (with `flag_value`, `n_positive`, `n_replicates`). Their downstream interpretation differs — split per DM convention into two drill-down tools.
-- **Compartment matters.** `whole_cell` measures pool; `extracellular` measures excretion / uptake / spent media; `vesicle` measures cargo packaged into extracellular vesicles. Filter via the `compartment=` kwarg on every Track-B tool.
-- **Targeted panel ≠ full metabolome.** Absence in measurement ≠ absence in cell. The current KG covers ~135 distinct metabolites across 14 assays in 3 papers — out of ~3.25k metabolites total, so ~96% have no measurement coverage.
-- **Stereo form may be the KG's call, not the paper's.** Every measurement row carries
-  `stereo_assignment`: `as_reported` (the paper named the form, or the compound has no stereo
-  variant) or `dominant_form_assumed` (the paper gave no form — e.g. 'Alanine' — and the KG
-  placed the row on one form of the stereo family, usually the one with the most catalysing
-  genes, here L-alanine `kegg.compound:C00041`). The drill-downs add `by_stereo_assignment` to the envelope and a
-  `warnings` entry when assumed rows are present; pass `stereo_assignment=['as_reported']` to
-  keep only the paper's own calls. Say "measured as alanine (L-form assumed)" when quoting an
-  assumed row. Transport for the same compound usually sits on the generic node (Alanine
-  `kegg.compound:C01401`): see "Stereo forms: generic vs specific nodes".
-- **Replicate / normalisation conventions vary by paper.** Read `value_sd` and `n_replicates` on the edge, plus `field_description` on the parent assay (canonical provenance read — `verbose=True` surfaces it). The `value` itself is processed per the paper's pipeline.
-- **Tested-absent vs unmeasured.** See "Tested-absent vs unmeasured" above — the top-level invariant. Tested-absent rows (`value=0` / `detection_status='not_detected'` / `flag_value=false`) are biology, not noise; default-filtering them strips the majority of the layer.
+| `results` (default) | Includes tested-absent rows. |
+| Envelope rollups (`by_detection_status`, `by_value`, `by_flag_value`, `by_assay`, `by_compartment`, `by_organism`, `by_metric`) | Include tested-absent rows, so you can see how much of `total_matching` is biological absence. |
+| Edge-level filters (`min_value > 0`, `detection_status` list excluding `not_detected`, `flag_value=True`) | Caller's choice, never on by default. Each one drops tested-absent rows when set; `flag_value=False` asks for them explicitly. |
+| `assays_by_metabolite` `not_found` / `not_matched` | **Unmeasured only.** Tested-absent rows for in-scope metabolites are in `results`. |
 
 ### Discovery
 
@@ -646,21 +382,10 @@ assays = list_metabolite_assays(summary=True)
 
 # 2. Narrow by treatment / paper / organism.
 p_assays = list_metabolite_assays(treatment_type=["phosphorus"], rankable=True)
-# Today returns 2 numeric assays from 10.1128/msystems.01261-22 against MIT9301.
-# Dropping rankable=True returns 4 (those 2 + 2 boolean assays, which are
-# non-rankable and surface in excluded_assays if you pass rankable-gated
-# filters with mixed input).
+# Dropping rankable=True also returns the boolean assays, which are
+# non-rankable and land in excluded_assays if you pass rankable-gated
+# filters with mixed input.
 ```
-
-Current KG state:
-
-| Paper | Assays | Compartments | Value kinds | Note |
-|---|---|---|---|---|
-| `10.1128/msystems.01261-22` (Kujawinski 2023) | 8 | whole_cell, extracellular | numeric (6) + boolean (2) | P-stress on MIT9301; KEGG-tagged + paper-level S2 flag table |
-| `10.1073/pnas.2213271120` (Capovilla 2023, chitin paper) | 2 | whole_cell | numeric | MIT9303/MIT9313, carbon (chitosan addition) |
-| `10.1111/1462-2920.15834` (vesicle paper) | 4 | whole_cell, vesicle | numeric | MIT9312 / MIT9313, growth_phase + compartment treatment |
-
-Treatments observed: `phosphorus`, `growth_phase`, `carbon`, `compartment`. Compartments: `whole_cell` (9), `extracellular` (3), `vesicle` (2). Organisms: MIT9313 (5), MIT9301 (4), MIT9312 (2), MIT0801 (2), MIT9303 (1).
 
 ### Assay → metabolite drill-down
 
@@ -686,7 +411,7 @@ top_decile = metabolites_by_quantifies_assay(
 # Boolean arm — pick assay_ids from list_metabolite_assays(value_kind='boolean').
 flags = metabolites_by_flags_assay(
     assay_ids=["metabolite_assay:msystems.01261-22:presence_flags_table_s2:presence_flag_intracellular"],
-    flag_value=False,                     # tested-absent slice (real biology — 68.8% of boolean rows)
+    flag_value=False,                     # tested-absent slice (real biology — most boolean rows)
     limit=20,
 )
 # Each row: metabolite_id, name, flag_value, n_positive, n_replicates,
@@ -734,7 +459,7 @@ mvals = metabolites_by_quantifies_assay(
 )
 
 # 2. Expression evidence — which P-acting genes responded under N starvation
-#    (or P-stress). Follow the chemistry-filtered DE pattern below
+#    (or P-stress). Follow the chemistry-filtered DE pattern in Track A e
 #    (metabolites_by_gene metabolite_elements=['P'] → differential_expression_by_gene).
 
 # 3. Surface both with their caveats; do not conflate "metabolite changed" with
@@ -742,30 +467,3 @@ mvals = metabolites_by_quantifies_assay(
 ```
 
 Time-point alignment between metabolomics and expression assays still varies by paper — confirm experiment `id` matches before joining (the current KG has no nitrogen-stress metabolomics experiments, so the canonical N-DE workflow can't be mirrored on the metabolite side; phosphorus and carbon are the available stress-treatment cross-omics pairings).
-
----
-
-## Quick decision tree
-
-```
-User asks about a metabolite or chemistry
-├─ "Can / does gene X act on metabolite M?"
-│   ├─ "produce / catalyse" → Track A1 b1/c1 (metabolism arm)
-│   └─ "transport" → Track A2 b2/c2 (transport arm) + g (substrate resolution / depth)
-├─ "Which genes act on M?" → genes_by_metabolite (read evidence_source split)
-├─ "M shows transport only / 0 catalysts" → read stereo_relatives; genes_by_metabolite(include_stereo_forms=True) for transport ↔ catalysis joins (Stereo forms section)
-├─ "Which metabolites does gene X act on?" → metabolites_by_gene
-├─ "Find metabolite by name → metabolite_id" → list_metabolites(search_text="...")  ← name-search hook; precedes any compound-anchored chain
-├─ "Find metabolites by element / pathway / mass" → list_metabolites
-├─ "Which metabolites are lipids / sugars / vitamins?" → list_metabolites(kegg_functional_categories=… / kegg_brite_classes=…) — partial, see KEGG compound categories
-├─ "Which genes transport siderophores / vitamins (a chemical role)?" → genes_by_metabolite(metabolite_ids=['chebi.role:…']); run_cypher only for which TCDB systems carry a role (Track A f)
-├─ "GO vs TCDB transport, which routes agree, empty transport answer" → docs://analysis/transport
-├─ "Cross-feeding between organisms" → Track A d — Cross-feeding bridge
-├─ "N-source / chemistry-filtered DE" → Track A e — N-source / nutrient-class workflow
-├─ "Genes that transport substrate X" → Track A2 b2 (metabolite-anchored; see also Track A f — Ontology bridges)
-├─ "Genes annotated to TCDB family / KEGG term" → genes_by_ontology
-├─ "What metabolomics assays exist for treatment / paper / organism?" → list_metabolite_assays  (Track B discovery)
-├─ "Was metabolite M measured? At what level?" → assays_by_metabolite (cross-organism reverse lookup)
-├─ "Top-N / detected-only metabolites in this numeric assay?" → metabolites_by_quantifies_assay
-└─ "Which metabolites were flagged present/absent in this paper's S2 table?" → metabolites_by_flags_assay
-```

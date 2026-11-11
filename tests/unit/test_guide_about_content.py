@@ -47,7 +47,7 @@ def test_conventions_within_budget_and_pointers_present():
     assert len(text) <= 28000, f"conventions.md {len(text)} chars > 28k (~7k tok)"
     for moved, home in [
         ("Transport trust ladder", "docs://analysis/metabolites"),
-        ("Metabolite ID forms", "docs://analysis/metabolites"),
+        ("Metabolite ID forms", "docs://analysis/metabolite_ids"),
         ("Annotation-trust surface", "docs://analysis/annotation_evidence"),
     ]:
         assert home in text, f"pointer to {home} missing"

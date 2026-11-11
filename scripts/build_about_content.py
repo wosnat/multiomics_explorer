@@ -1527,6 +1527,8 @@ READ_WHEN_OVERRIDES: dict[str, str] = {
         "Read before pathway_enrichment / cluster_enrichment: building blocks, backgrounds, levels, pitfalls.",
     "docs://analysis/derived_metrics":
         "Read for non-DE gene evidence (rhythmicity, amplitudes, classes): discover DMs, then drill down.",
+    "docs://analysis/metabolite_ids":
+        "Read when an id didn't resolve, an answer splits across stereo forms, or a row is a compound class.",
     "docs://analysis/expression":
         "Read for DE questions: the DE tool family, plus response_matrix / gene_set_compare summaries.",
     "docs://examples/annotation_evidence.py":

@@ -634,7 +634,7 @@ chaining:
   - "list_metabolites (per-row `stereo_relatives`) → genes_by_metabolite(metabolite_ids=[generic id], organism=..., include_stereo_forms=True) — transport on the generic form plus catalysis on the specific form, per organism"
   - "list_metabolites (per-row pathway_ids) → genes_by_ontology(ontology='kegg', term_ids=[pathway_id], organism=...)"
   - "differential_expression_by_gene → metabolites_by_gene(metabolite_elements=['N']) → list_metabolites for chemistry context"
-  - "list_metabolites (per-row `kegg_brite_classes`, top level only) → run_cypher over `MetaboliteClass` for the deeper KEGG compound classes (docs://analysis/metabolites)"
+  - "list_metabolites (per-row `kegg_brite_classes`, top level only) → run_cypher over `MetaboliteClass` for the deeper KEGG compound classes (docs://analysis/metabolite_ids)"
   - "list_metabolites (per-row `measured_assay_count > 0`) → assays_by_metabolite(metabolite_ids=[...]) — reverse lookup of all measurement evidence (numeric + boolean) for the measured compounds (cross-organism by default)."
   - "list_metabolites(evidence_sources=['go_transport'], organism_names=[...]) → genes_by_metabolite(metabolite_ids=[...], organism=..., evidence_sources=['go_transport']) for the genes carrying the GO term"
 
@@ -679,7 +679,7 @@ mistakes:
       Peptides). Use them to describe or group results, never to exclude; for enrichment
       use the classified metabolites as background; for composition use `elements`. The
       envelope's trailing `"not classified"` entry counts the unlisted metabolites; it is
-      not a filter value. Details: docs://analysis/metabolites.
+      not a filter value. Details: docs://analysis/metabolite_ids.
   - "`structure_kind` separates single molecules (`defined`) from classes and polymers (`generic` / `polymer`, e.g. 'Amino acid', 'Acyl-CoA', glycogen). Generic and polymer nodes have no `mass` and carry generic formulas with a placeholder ('Amino acid' is `C2H4NO2*`), whose atoms still feed the `elements` filter — add `structure_kind=['defined']` when a question is about specific molecules."
   - "evidence_sources='metabolomics' selects metabolites measured by a MetaboliteAssay. Drill in via list_metabolite_assays(metabolite_ids=[...]) or assays_by_metabolite to inspect the measurement evidence."
   - "Same metabolite measured in both whole_cell and extracellular returns one row with `measured_compartments=['extracellular','whole_cell']` (sorted), not two rows — Metabolite is compartment-agnostic."
