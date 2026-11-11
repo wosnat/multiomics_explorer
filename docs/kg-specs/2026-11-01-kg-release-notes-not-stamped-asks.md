@@ -58,4 +58,4 @@ Fix: install from the tag that matches the KG's `mcp_min_version`, e.g.
 
 ## Status
 
-R1 closed: KG `251f9e43` forwards the three variables in all compose files, and alpha.8 was re-stamped (same `built_at`). Verified from the explorer on 17687: `kg_release_info` reads `ok` (17/17), the summary points at both fields, and the MCP layer returns highlights (1,792 chars), `breaking_changes` (1,158 chars) and `release_notes_url`. R2 open.
+R1 closed: KG `251f9e43` forwards the three variables in all compose files, and alpha.8 was re-stamped (same `built_at`). Verified from the explorer on 17687: `kg_release_info` reads `ok` (17/17), the summary points at both fields, and the MCP layer returns highlights (1,792 chars), `breaking_changes` (1,158 chars) and `release_notes_url`. R2 closed: the KG repo's `docs/kg_mcp_guide.md` now says 42 tools and pins `@v0.1.0-alpha.6` (checked 2026-11-11).
