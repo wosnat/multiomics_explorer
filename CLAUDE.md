@@ -150,8 +150,13 @@ Source of truth:
 After edits, regenerate (writes directly to the skills tree):
 
 ```bash
-uv run python scripts/build_about_content.py
+uv run python scripts/build_about_content.py --live-vocab   # KG reachable
 ```
+
+The committed ontology pages embed a `ControlledVocabulary` snapshot, so
+always pass `--live-vocab` with a KG up. A plain build (no flag, or no KG)
+strips the snapshot from every `references/ontologies/*.md` — a spurious
+diff, not a fix.
 
 **Per-ontology reference docs are generated too** — never edit
 `multiomics_explorer/skills/multiomics-kg-guide/references/ontologies/*.md`
@@ -162,7 +167,8 @@ truth: the hand-authored `multiomics_explorer/inputs/ontologies/{key}.yaml`
 `typical_questions[]`, `see_also[]`) merged at build time with the
 `ONTOLOGY_CONFIG` row (label, gene_rel, hierarchy rels, trust axes, facet,
 compact/verbose columns, bridges), `config/schema_baseline.yaml` node props,
-and — when a KG is reachable — `ControlledVocabulary` values (falls back to a
+and — with `--live-vocab` and a reachable KG — a snapshot of
+`ControlledVocabulary` values (without it, pages fall back to a
 `list_filter_values` pointer; no Neo4j needed to build). The default build
 runs this stage; `--ontologies` runs it alone; `--lint` covers the dir.
 

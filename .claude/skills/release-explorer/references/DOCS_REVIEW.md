@@ -41,7 +41,8 @@ Findings go to the session scratchpad as `docs_review_<date>.md` grouped by
 surface and severity. Then:
 
 - P1/P2 with a mechanical fix → fix now (YAML / tools.py / analysis md),
-  regenerate (`build_about_content.py`), rerun the lints, commit
+  regenerate (`build_about_content.py --live-vocab` — without the flag the
+  ontology pages lose their vocab snapshot), rerun the lints, commit
   `docs(review): …`.
 - Anything not fixed → `docs/backlog.md` (one line, size, origin
   `docs-review <date>`).
