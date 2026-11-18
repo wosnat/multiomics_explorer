@@ -28,9 +28,11 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 ## [Unreleased]
 
 ### Added
+- **`genes_by_homolog_group` reports `by_clade`**: for each genus and clade, how many organisms carry the input groups (`organism_count`) and how many the KG holds (`organisms_in_clade`), with `gene_count`. One call per group shows its spread across ecotypes (e.g. an hli group in 18 of 19 HLII genomes) without joining `list_organisms` or parsing strain names.
 - **`docs://analysis/metabolite_ids`**: metabolite id forms and resolution, stereo forms (Cysteine vs L-Cysteine) and compound classes (`structure_kind`, KEGG compound categories), split out of `docs://analysis/metabolites`. Read it when an id lands in `not_found`, a `stereo_relatives` hint appears, or a row is a class.
 
 ### Changed
+- **`differential_expression_by_gene` returns `product` without `verbose=True`**, like the other tools that return gene rows. Code that read `row["product"]` on a compact call no longer raises KeyError.
 - **`docs://analysis/metabolites` is shorter** (~14.6k → ~9.2k tokens): the decision tree comes first, TCDB direct-vs-family detail lives in `docs://analysis/transport`, tested-absent sits with the metabolomics section, and hard-coded KG counts point at the tool that reports them.
 
 ### Fixed

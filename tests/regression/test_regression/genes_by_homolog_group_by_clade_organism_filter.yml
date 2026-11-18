@@ -1,0 +1,32 @@
+by_clade:
+- clade: HLI
+  gene_count: 3
+  genus: Prochlorococcus
+  organism_count: 1
+  organisms_in_clade: 4
+by_organism:
+- count: 3
+  organism_name: Prochlorococcus MED4
+case_id: genes_by_homolog_group_by_clade_organism_filter
+genes_per_group_max: 3
+genes_per_group_median: 3
+not_found_groups: []
+not_found_organisms: []
+not_matched_groups: []
+not_matched_organisms: []
+offset: 0
+resolved_aliases: {}
+results: []
+returned: 0
+row_count: 0
+top_categories:
+- category: Stress response and adaptation
+  count: 3
+top_groups:
+- count: 3
+  group_id: cyanorak:CK_00002025
+total_categories: 1
+total_genes: 3
+total_matching: 3
+truncated: true
+warnings: []

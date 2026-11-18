@@ -1,0 +1,152 @@
+by_clade:
+- clade: HLI
+  gene_count: 7
+  genus: Prochlorococcus
+  organism_count: 3
+  organisms_in_clade: 4
+- clade: HLII
+  gene_count: 29
+  genus: Prochlorococcus
+  organism_count: 18
+  organisms_in_clade: 19
+- clade: HLIII
+  gene_count: 1
+  genus: Prochlorococcus
+  organism_count: 1
+  organisms_in_clade: 1
+- clade: HLIV
+  gene_count: 4
+  genus: Prochlorococcus
+  organism_count: 1
+  organisms_in_clade: 1
+- clade: LLI
+  gene_count: 21
+  genus: Prochlorococcus
+  organism_count: 4
+  organisms_in_clade: 4
+- clade: LLII
+  gene_count: 8
+  genus: Prochlorococcus
+  organism_count: 8
+  organisms_in_clade: 8
+- clade: LLIII
+  gene_count: 2
+  genus: Prochlorococcus
+  organism_count: 2
+  organisms_in_clade: 2
+- clade: LLIV
+  gene_count: 6
+  genus: Prochlorococcus
+  organism_count: 6
+  organisms_in_clade: 6
+by_organism:
+- count: 8
+  organism_name: Prochlorococcus MIT0801
+- count: 5
+  organism_name: Prochlorococcus MIT9311
+- count: 5
+  organism_name: Prochlorococcus MIT9312
+- count: 5
+  organism_name: Prochlorococcus NATL1A
+- count: 5
+  organism_name: Prochlorococcus NATL2A
+- count: 4
+  organism_name: Prochlorococcus HNLC1
+- count: 3
+  organism_name: Prochlorococcus EQPAC1
+- count: 3
+  organism_name: Prochlorococcus MED4
+- count: 3
+  organism_name: Prochlorococcus PAC1
+- count: 2
+  organism_name: Prochlorococcus AS9601
+- count: 2
+  organism_name: Prochlorococcus MIT9302
+- count: 2
+  organism_name: Prochlorococcus MIT9314
+- count: 1
+  organism_name: Prochlorococcus GP2
+- count: 1
+  organism_name: Prochlorococcus HNLC2
+- count: 1
+  organism_name: Prochlorococcus LG
+- count: 1
+  organism_name: Prochlorococcus MIT0601
+- count: 1
+  organism_name: Prochlorococcus MIT0602
+- count: 1
+  organism_name: Prochlorococcus MIT0603
+- count: 1
+  organism_name: Prochlorococcus MIT0604
+- count: 1
+  organism_name: Prochlorococcus MIT0701
+- count: 1
+  organism_name: Prochlorococcus MIT0702
+- count: 1
+  organism_name: Prochlorococcus MIT0703
+- count: 1
+  organism_name: Prochlorococcus MIT1327
+- count: 1
+  organism_name: Prochlorococcus MIT9107
+- count: 1
+  organism_name: Prochlorococcus MIT9116
+- count: 1
+  organism_name: Prochlorococcus MIT9123
+- count: 1
+  organism_name: Prochlorococcus MIT9201
+- count: 1
+  organism_name: Prochlorococcus MIT9202
+- count: 1
+  organism_name: Prochlorococcus MIT9211
+- count: 1
+  organism_name: Prochlorococcus MIT9215
+- count: 1
+  organism_name: Prochlorococcus MIT9301
+- count: 1
+  organism_name: Prochlorococcus MIT9303
+- count: 1
+  organism_name: Prochlorococcus MIT9313
+- count: 1
+  organism_name: Prochlorococcus MIT9321
+- count: 1
+  organism_name: Prochlorococcus MIT9322
+- count: 1
+  organism_name: Prochlorococcus MIT9401
+- count: 1
+  organism_name: Prochlorococcus MIT9515
+- count: 1
+  organism_name: Prochlorococcus SB
+- count: 1
+  organism_name: Prochlorococcus SS2
+- count: 1
+  organism_name: Prochlorococcus SS35
+- count: 1
+  organism_name: Prochlorococcus SS51
+- count: 1
+  organism_name: Prochlorococcus SS52
+- count: 1
+  organism_name: Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+case_id: genes_by_homolog_group_by_clade
+genes_per_group_max: 78
+genes_per_group_median: 78
+not_found_groups:
+- cyanorak:CK_99999999
+not_found_organisms: []
+not_matched_groups: []
+not_matched_organisms: []
+offset: 0
+resolved_aliases: {}
+results: []
+returned: 0
+row_count: 0
+top_categories:
+- category: Stress response and adaptation
+  count: 78
+top_groups:
+- count: 78
+  group_id: cyanorak:CK_00002025
+total_categories: 1
+total_genes: 78
+total_matching: 78
+truncated: true
+warnings: []

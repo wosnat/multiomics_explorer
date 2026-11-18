@@ -89,6 +89,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_search_homolog_groups,
     build_search_homolog_groups_summary,
     build_genes_by_homolog_group,
+    build_genes_by_homolog_group_by_clade,
     build_genes_by_homolog_group_diagnostics,
     build_genes_by_homolog_group_summary,
     build_search_ontology,
@@ -3590,7 +3591,7 @@ def genes_by_homolog_group(
 
     Returns dict with keys: total_matching, total_genes,
     total_categories, genes_per_group_max, genes_per_group_median,
-    by_organism, top_categories, top_groups,
+    by_organism, by_clade, top_categories, top_groups,
     not_found_groups, not_matched_groups,
     not_found_organisms, not_matched_organisms, resolved_aliases,
     warnings (advisory, [] when clean), returned, truncated, results.
@@ -3598,6 +3599,13 @@ def genes_by_homolog_group(
     organism_name, gene_category, group_id.
     Per result (verbose): adds gene_summary, function_description,
     consensus_product, source.
+
+    by_clade: one entry per (genus, clade) among matched genes, with
+    genus, clade, organism_count, organisms_in_clade, gene_count; sorted
+    by genus then clade, nulls last; [] when nothing matched. Counts are
+    a union across the input groups; call once per group for per-group
+    breadth. organisms_in_clade counts every KG organism in that genus
+    and clade, and ignores the organisms filter.
 
     group_ids: Accepts the canonical prefixed form (`cyanorak:CK_00000364`,
         `eggnog:COG0592@2`) or a bare accession (`CK_00000364`,
@@ -3663,6 +3671,27 @@ def genes_by_homolog_group(
     else:
         envelope["not_found_organisms"] = []
         envelope["not_matched_organisms"] = []
+
+    # by_clade query — runs on summary and detail calls alike. Sorted in
+    # Python (genus, clade; nulls last) for a deterministic order.
+    clade_cypher, clade_params = build_genes_by_homolog_group_by_clade(
+        group_ids=group_ids, organisms=organisms,
+    )
+    by_clade = [
+        {
+            "genus": r["genus"],
+            "clade": r["clade"],
+            "organism_count": r["organism_count"],
+            "organisms_in_clade": r["organisms_in_clade"],
+            "gene_count": r["gene_count"],
+        }
+        for r in conn.execute_query(clade_cypher, **clade_params)
+    ]
+    by_clade.sort(key=lambda e: (
+        e["genus"] is None, e["genus"] or "",
+        e["clade"] is None, e["clade"] or "",
+    ))
+    envelope["by_clade"] = by_clade
 
     # Detail query — skip when limit=0
     if limit == 0:
@@ -4872,6 +4901,13 @@ def differential_expression_by_gene(
         by_table_scope, rows_by_growth_phase, top_categories, experiments,
         returned, truncated, not_found, no_expression, filtered_out,
         warnings, not_found_experiments, not_matched_experiments, results.
+        Per result (compact): locus_tag, gene_name, product, experiment_id,
+        treatment_type, timepoint, timepoint_hours, timepoint_order,
+        log2fc, padj, rank, rank_up, rank_down, expression_status,
+        growth_phase, control_timing. Per result (verbose): adds
+        experiment_name, treatment, gene_category, omics_type,
+        coculture_partner, table_scope, table_scope_detail,
+        background_factors.
         not_found_experiments/not_matched_experiments are populated only
         when experiment_ids is provided (empty lists otherwise).
         no_expression: gene has NO Changes_expression_of edge at all in the

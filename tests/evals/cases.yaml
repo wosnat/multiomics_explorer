@@ -1353,6 +1353,34 @@
     min_rows: 1
     columns: [locus_tag, gene_name, product, organism_name, gene_category, group_id, gene_summary, function_description, consensus_product, source]
 
+# `dispatch: api` pins the by_clade envelope (spec docs/tool-specs/small-items-2d1-2d2.md).
+- id: genes_by_homolog_group_by_clade
+  tool: genes_by_homolog_group
+  dispatch: api
+  desc: |
+    hli group CK_00002025 plus a not-found id, summary call. Pins by_clade:
+    8 Prochlorococcus (genus, clade) rows, gene_count summing to
+    total_matching, organisms_in_clade as the KG-wide denominator
+    (HLII 18/19).
+  params:
+    group_ids: ["cyanorak:CK_00002025", "cyanorak:CK_99999999"]
+    summary: true
+  expect:
+    min_rows: 0
+
+- id: genes_by_homolog_group_by_clade_organism_filter
+  tool: genes_by_homolog_group
+  dispatch: api
+  desc: |
+    Same group filtered to MED4: one HLI row, organism_count 1 against
+    organisms_in_clade 4 (the filter narrows numerators only).
+  params:
+    group_ids: ["cyanorak:CK_00002025"]
+    organisms: ["MED4"]
+    summary: true
+  expect:
+    min_rows: 0
+
 # ---------------------------------------------------------------------------
 # differential_expression_by_gene
 # ---------------------------------------------------------------------------

@@ -4572,6 +4572,11 @@ def register_tools(mcp: FastMCP):
         gene_name: str | None = Field(
             description="Gene name (e.g. 'amtB'). Null if unannotated.",
         )
+        product: str | None = Field(
+            default=None,
+            description="Gene product description"
+            " (e.g. 'Ammonium transporter'). Null if the gene has no product.",
+        )
         experiment_id: str = Field(
             description="Experiment ID (e.g. '10.1101/2025.11.24.690089_...')",
         )
@@ -4639,11 +4644,6 @@ def register_tools(mcp: FastMCP):
             "Timepoint-level condition — not gene-specific.",
         )
         # Verbose (present when verbose=True)
-        product: str | None = Field(
-            default=None,
-            description="Gene product description"
-            " (e.g. 'Ammonium transporter')",
-        )
         experiment_name: str | None = Field(
             default=None,
             description="Human-readable experiment name",
@@ -5120,6 +5120,18 @@ def register_tools(mcp: FastMCP):
             description="Organism name (e.g. 'Prochlorococcus MED4')")
         count: int = Field(description="Member genes from this organism")
 
+    class HomologGroupCladeBreakdown(BaseModel):
+        genus: str | None = Field(
+            description="Organism genus (e.g. 'Prochlorococcus'). Null when the KG has no genus.")
+        clade: str | None = Field(
+            description="Ecotype clade (e.g. 'HLII'). Labels repeat across genera ('III', '5.2'), so read it with genus. Null when the KG has no clade (e.g. Alteromonas).")
+        organism_count: int = Field(
+            description="Organisms in this genus + clade with ≥1 matched gene, union across input groups (e.g. 18)")
+        organisms_in_clade: int = Field(
+            description="All KG organisms with genes in this genus + clade — the denominator; ignores the organisms filter (e.g. 19)")
+        gene_count: int = Field(
+            description="Matched gene×group rows in this genus + clade (e.g. 30)")
+
     class HomologGroupCategoryBreakdown(BaseModel):
         category: str = Field(
             description="Gene category (e.g. 'Photosynthesis')")
@@ -5148,6 +5160,8 @@ def register_tools(mcp: FastMCP):
             description="Top 5 gene categories by member count, sorted by count desc")
         top_groups: list[HomologGroupGroupBreakdown] = Field(
             description="Top 5 groups by member count, sorted by count desc")
+        by_clade: list[HomologGroupCladeBreakdown] = Field(default_factory=list,
+            description="Breadth per (genus, clade): organism_count of organisms_in_clade carry a member, sorted by genus then clade. Counts are a union over all input groups; call once per group for per-group breadth. Empty when nothing matched.")
         not_found_groups: list[str] = Field(default_factory=list,
             description="Input group_ids not found in KG")
         not_matched_groups: list[str] = Field(default_factory=list,
@@ -5188,7 +5202,7 @@ def register_tools(mcp: FastMCP):
 
         Use to enumerate a group's members; for a gene's own groups use `gene_homologs`, for expression across organisms `differential_expression_by_ortholog`.
         Filters: group_ids, organisms.
-        Returns: by_organism, top_categories, top_groups, genes-per-group stats, and a not_found / not_matched pair for each of groups and organisms; one row = (locus_tag, group_id).
+        Returns: by_organism, by_clade, top_categories, top_groups, genes-per-group stats, and a not_found / not_matched pair for each of groups and organisms; one row = (locus_tag, group_id).
         docs://tools/genes_by_homolog_group; summary=True first.
         """
         await ctx.info(f"genes_by_homolog_group group_ids={group_ids} organisms={organisms}")
@@ -5201,6 +5215,7 @@ def register_tools(mcp: FastMCP):
             by_organism = [HomologGroupOrganismBreakdown(**b) for b in data["by_organism"]]
             top_categories = [HomologGroupCategoryBreakdown(**b) for b in data["top_categories"]]
             top_groups = [HomologGroupGroupBreakdown(**b) for b in data["top_groups"]]
+            by_clade = [HomologGroupCladeBreakdown(**b) for b in data.get("by_clade", [])]
             results = [GenesByHomologGroupResult(**r) for r in data["results"]]
             response = GenesByHomologGroupResponse(
                 total_matching=data["total_matching"],
@@ -5211,6 +5226,7 @@ def register_tools(mcp: FastMCP):
                 by_organism=by_organism,
                 top_categories=top_categories,
                 top_groups=top_groups,
+                by_clade=by_clade,
                 not_found_groups=data["not_found_groups"],
                 not_matched_groups=data["not_matched_groups"],
                 not_found_organisms=data["not_found_organisms"],

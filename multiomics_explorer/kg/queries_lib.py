@@ -6605,13 +6605,13 @@ def build_differential_expression_by_gene(
 ) -> tuple[str, dict]:
     """Build detail Cypher for differential_expression_by_gene.
 
-    RETURN keys (compact — 15): locus_tag, gene_name,
+    RETURN keys (compact — 16): locus_tag, gene_name, product,
     experiment_id, treatment_type, timepoint, timepoint_hours, timepoint_order,
     log2fc, padj, rank, rank_up, rank_down, expression_status, growth_phase,
     control_timing.
-    RETURN keys (verbose): adds product, experiment_name, treatment,
+    RETURN keys (verbose): adds experiment_name, treatment,
     gene_category, omics_type, coculture_partner, table_scope,
-    table_scope_detail.
+    table_scope_detail, background_factors.
     """
     conditions, params = _differential_expression_where(
         organism=organism, locus_tags=locus_tags,
@@ -6622,7 +6622,6 @@ def build_differential_expression_by_gene(
     where_block = "WHERE " + " AND ".join(conditions) + "\n" if conditions else ""
 
     verbose_cols = (
-        ",\n       g.product AS product"
         ",\n       e.name AS experiment_name"
         ",\n       e.treatment AS treatment"
         ",\n       g.gene_category AS gene_category"
@@ -6650,6 +6649,7 @@ def build_differential_expression_by_gene(
         f"{where_block}"
         "RETURN g.locus_tag AS locus_tag,\n"
         "       g.gene_name AS gene_name,\n"
+        "       g.product AS product,\n"
         "       e.id AS experiment_id,\n"
         "       e.treatment_type AS treatment_type,\n"
         "       r.time_point AS timepoint,\n"
@@ -6858,6 +6858,48 @@ def build_genes_by_homolog_group_summary(
         "RETURN total_matching, total_genes, total_categories,\n"
         "       not_found_groups, not_matched_groups,\n"
         "       by_organism, by_category_raw, by_group_raw"
+    )
+    return cypher, params
+
+
+def build_genes_by_homolog_group_by_clade(
+    *,
+    group_ids: list[str],
+    organisms: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Build the by_clade envelope rollup for genes_by_homolog_group.
+
+    One row per (genus, clade) among matched genes, union across all
+    input groups. ``organisms`` narrows the numerators only; the
+    denominator (``organisms_in_clade``) counts every KG organism with
+    ``gene_count > 0`` in that genus + clade. Zero rows when nothing
+    matched.
+
+    RETURN keys: genus, clade, organism_count, organisms_in_clade,
+    gene_count. Ordered by genus, then clade.
+    """
+    params: dict = {"group_ids": group_ids, "organisms": organisms}
+
+    # The KG's Neo4j rejects `CALL (x) { }`, so the subquery imports via WITH.
+    cypher = (
+        "UNWIND $group_ids AS gid\n"
+        "MATCH (og:OrthologGroup {id: gid})<-[:Gene_in_ortholog_group]-(g:Gene)\n"
+        "      -[:Gene_belongs_to_organism]->(o:OrganismTaxon)\n"
+        "WHERE ($organisms IS NULL OR ANY(org_input IN $organisms\n"
+        "       WHERE ALL(word IN split(toLower(org_input), ' ')\n"
+        "             WHERE toLower(g.organism_name) CONTAINS word)))\n"
+        "WITH o.genus AS genus, o.clade AS clade,\n"
+        "     count(DISTINCT o) AS organism_count, count(g) AS gene_count\n"
+        "CALL {\n"
+        "  WITH genus, clade\n"
+        "  MATCH (t:OrganismTaxon)\n"
+        "  WHERE t.gene_count > 0\n"
+        "    AND ((genus IS NULL AND t.genus IS NULL) OR t.genus = genus)\n"
+        "    AND ((clade IS NULL AND t.clade IS NULL) OR t.clade = clade)\n"
+        "  RETURN count(t) AS organisms_in_clade\n"
+        "}\n"
+        "RETURN genus, clade, organism_count, organisms_in_clade, gene_count\n"
+        "ORDER BY genus, clade"
     )
     return cypher, params
 

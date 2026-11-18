@@ -26,7 +26,7 @@
 - `docs://tools/genes_by_boolean_metric` — ~1389 tok
 - `docs://tools/genes_by_categorical_metric` — ~1446 tok
 - `docs://tools/genes_by_function` — ~1042 tok
-- `docs://tools/genes_by_homolog_group` — ~653 tok
+- `docs://tools/genes_by_homolog_group` — ~722 tok
 - `docs://tools/genes_by_metabolite` — ~1700 tok
 - `docs://tools/genes_by_numeric_metric` — ~1652 tok
 - `docs://tools/genes_by_ontology` — ~1738 tok
@@ -58,7 +58,7 @@ Append /full for the complete page — all worked examples + full response forma
 
 - `docs://tools/assays_by_metabolite/full` — ~5371 tok
 - `docs://tools/cluster_enrichment/full` — ~4457 tok
-- `docs://tools/differential_expression_by_gene/full` — ~6425 tok
+- `docs://tools/differential_expression_by_gene/full` — ~6434 tok
 - `docs://tools/differential_expression_by_ortholog/full` — ~3041 tok
 - `docs://tools/discussed_by_publication/full` — ~3344 tok
 - `docs://tools/gene_aa_sequence/full` — ~2386 tok
@@ -73,7 +73,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/genes_by_boolean_metric/full` — ~5475 tok
 - `docs://tools/genes_by_categorical_metric/full` — ~5283 tok
 - `docs://tools/genes_by_function/full` — ~2753 tok
-- `docs://tools/genes_by_homolog_group/full` — ~2338 tok
+- `docs://tools/genes_by_homolog_group/full` — ~2539 tok
 - `docs://tools/genes_by_metabolite/full` — ~11107 tok
 - `docs://tools/genes_by_numeric_metric/full` — ~6342 tok
 - `docs://tools/genes_by_ontology/full` — ~12064 tok

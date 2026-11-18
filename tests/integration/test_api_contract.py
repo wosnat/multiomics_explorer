@@ -769,7 +769,7 @@ class TestGenesByHomologGroupContract:
         expected_keys = {
             "total_matching", "total_genes", "total_categories",
             "genes_per_group_max", "genes_per_group_median",
-            "by_organism", "top_categories", "top_groups",
+            "by_organism", "by_clade", "top_categories", "top_groups",
             "not_found_groups", "not_matched_groups",
             "not_found_organisms", "not_matched_organisms",
             "returned", "truncated", "offset", "results",

@@ -6,7 +6,7 @@ Group IDs to their member genes per organism — one row per gene × group.
 
 Use to enumerate a group's members; for a gene's own groups use `gene_homologs`, for expression across organisms `differential_expression_by_ortholog`.
 Filters: group_ids, organisms.
-Returns: by_organism, top_categories, top_groups, genes-per-group stats, and a not_found / not_matched pair for each of groups and organisms; one row = (locus_tag, group_id).
+Returns: by_organism, by_clade, top_categories, top_groups, genes-per-group stats, and a not_found / not_matched pair for each of groups and organisms; one row = (locus_tag, group_id).
 docs://tools/genes_by_homolog_group; summary=True first.
 
 ## Parameters
@@ -25,7 +25,7 @@ docs://tools/genes_by_homolog_group; summary=True first.
 ### Envelope
 
 ```expected-keys
-total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, resolved_aliases, warnings, returned, truncated, results
+total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, by_clade, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, resolved_aliases, warnings, returned, truncated, results
 ```
 
 - **total_matching** (int): Gene×group rows matching filters (e.g. 33)
@@ -37,6 +37,7 @@ total_matching, total_genes, total_categories, offset, genes_per_group_max, gene
 - **by_organism** (list[HomologGroupOrganismBreakdown]): Member counts per organism, sorted by count desc (all)
 - **top_categories** (list[HomologGroupCategoryBreakdown]): Top 5 gene categories by member count, sorted by count desc
 - **top_groups** (list[HomologGroupGroupBreakdown]): Top 5 groups by member count, sorted by count desc
+- **by_clade** (list[HomologGroupCladeBreakdown]): Breadth per (genus, clade): organism_count of organisms_in_clade carry a member, sorted by genus then clade. Counts are a union over all input groups; call once per group for per-group breadth. Empty when nothing matched.
 - **not_found_groups** (list[string]): Input group_ids not found in KG
 - **not_matched_groups** (list[string]): Groups that exist but have 0 member genes after organism filter
 - **not_found_organisms** (list[string]): Organism filter values matching zero Gene nodes in KG
@@ -178,6 +179,7 @@ search_homolog_groups → genes_by_homolog_group
 genes_by_homolog_group → gene_overview
 genes_by_homolog_group → differential_expression_by_gene
 gene_homologs → genes_by_homolog_group
+genes_by_homolog_group(group_ids=[one_id]) → read `by_clade` for that group's breadth across ecotypes: `organism_count` of `organisms_in_clade` per (genus, clade). Call once per group_id — with several group_ids the counts are a union over the batch.
 ```
 
 ## Common mistakes
@@ -208,13 +210,15 @@ response['total_matching']  # use total, not len
 
 - `organisms` entries are word-matched against preferred_name + name_synonyms, so a genus word (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous.
 
+- For ecotype (HL / LL) breadth read `by_clade` (or `clade` on list_organisms), never parse strain names. Entries are keyed by (genus, clade) because clade labels repeat across genera ('III', '5.2'); `clade` is null for organisms without one.
+
 ## Package import equivalent
 
 ```python
 from multiomics_explorer import genes_by_homolog_group
 
 result = genes_by_homolog_group(group_ids=...)
-# returns dict with keys: total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, resolved_aliases, warnings, returned, truncated, results
+# returns dict with keys: total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, by_clade, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, resolved_aliases, warnings, returned, truncated, results
 ```
 
 Use package import for bulk data extraction in scripts.

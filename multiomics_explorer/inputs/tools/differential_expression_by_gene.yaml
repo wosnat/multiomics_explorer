@@ -235,7 +235,6 @@ examples:
               → get the significant expression rows
 
 verbose_fields:
-  - product
   - experiment_name
   - treatment
   - gene_category

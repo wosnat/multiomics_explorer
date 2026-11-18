@@ -15,8 +15,7 @@ Empty.
 
 | # | Item | Size | Origin |
 |---|---|---|---|
-| 2d.1 | `differential_expression_by_gene`: return `product` on compact rows (verbose-only today, so analysis code KeyErrors; most gene tools return it compact). Additive. | S | spock ntca_urea 2026-11-03 |
-| 2d.2 | `genes_by_homolog_group`: `by_clade` envelope rollup from `OrganismTaxon.clade` (set on 98/123 organisms; null → `unassigned`), so HL/LL/Syn breadth needs no `list_organisms` join. Docs: use `clade`, never parse strain names. | S | spock hli_light_stress 2026-11-16 |
+| 2d.8 | Group-id batches aren't de-duplicated: `['cyanorak:CK_00002025', 'CK_00002025']` counts the group twice in `genes_by_homolog_group` `total_matching`, `top_groups` and `by_clade` (the bare id is coerced, then both run). De-duplicate after alias coercion; check the other id-coercing tools for the same. | S | 2d.2 code review 2026-11-18 |
 
 ## 3. Larger — needs a spec / design
 

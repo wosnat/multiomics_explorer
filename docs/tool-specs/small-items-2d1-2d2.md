@@ -81,7 +81,8 @@ WITH o.genus AS genus, o.clade AS clade,
 CALL {
   WITH genus, clade
   MATCH (t:OrganismTaxon)
-  WHERE t.gene_count > 0 AND t.genus = genus
+  WHERE t.gene_count > 0
+    AND ((genus IS NULL AND t.genus IS NULL) OR t.genus = genus)
     AND ((clade IS NULL AND t.clade IS NULL) OR t.clade = clade)
   RETURN count(t) AS organisms_in_clade
 }
@@ -89,7 +90,10 @@ RETURN genus, clade, organism_count, organisms_in_clade, gene_count
 ORDER BY genus, clade
 ```
 
-(The KG's Neo4j rejects `CALL (x) { }`, so the subquery imports with `WITH`.)
+(The KG's Neo4j rejects `CALL (x) { }`, so the subquery imports with `WITH`. The genus match
+is null-safe like the clade match. This was a build-time fix: with a plain `t.genus = genus`, a
+null-genus organism that has genes would get denominator 0. The only null-genus taxon today,
+Phage, has 0 genes.)
 
 Checks run:
 - `cyanorak:CK_00002025` (PMM1404's hli group, 78 members / 43 organisms): 8 Prochlorococcus
@@ -108,7 +112,9 @@ Checks run:
   response model has `by_clade: list[HomologGroupCladeBreakdown]`.
 - Regression: `--force-regen` the DE-by-gene goldens (new compact column) and the
   `genes_by_homolog_group` goldens (new envelope key), with a classified diff.
-- Edge cases: existing scenarios for both tools cover the input axes. `by_clade` must be `[]` on
-  the not-found / not-matched scenarios (the invariant oracle checks it).
+- Edge cases: existing scenarios for both tools cover the input axes. The invariant oracle has no
+  per-tool envelope checks, so `by_clade == []` on a not-found group is covered by unit tests and
+  a unit check against the live KG. A `dispatch: api` regression case
+  (`genes_by_homolog_group_by_clade*`) pins the envelope on a real group.
 - Examples: `refresh_examples.py --write --tool differential_expression_by_gene` and
   `--tool genes_by_homolog_group`.

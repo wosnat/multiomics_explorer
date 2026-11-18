@@ -57,6 +57,7 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_function,
     build_genes_by_function_summary,
     build_genes_by_homolog_group,
+    build_genes_by_homolog_group_by_clade,
     build_genes_by_homolog_group_diagnostics,
     build_genes_by_homolog_group_summary,
     build_genes_by_ontology_validate,
@@ -383,6 +384,7 @@ _BUILDERS: list[tuple[str, ...]] = [
     # --- genes by homolog group ---
     ("genes_by_homolog_group_summary", build_genes_by_homolog_group_summary, {"group_ids": _GROUPS}),
     ("genes_by_homolog_group_diagnostics", build_genes_by_homolog_group_diagnostics, {"group_ids": _GROUPS}),
+    ("genes_by_homolog_group_by_clade", build_genes_by_homolog_group_by_clade, {"group_ids": _GROUPS}),
     ("genes_by_homolog_group", build_genes_by_homolog_group, {"group_ids": _GROUPS}),
     # --- differential expression by gene ---
     ("de_by_gene_summary_global", build_differential_expression_by_gene_summary_global, {}),

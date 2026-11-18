@@ -66,6 +66,7 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 |---|---|---|
 | locus_tag | string | Gene locus tag (e.g. 'ACZ81_01830') |
 | gene_name | string \| None | Gene name (e.g. 'amtB'). Null if unannotated. |
+| product | string \| None (optional) | Gene product description (e.g. 'Ammonium transporter'). Null if the gene has no product. |
 | experiment_id | string | Experiment ID (e.g. '10.1101/2025.11.24.690089_...') |
 | treatment_type | list[string] | Treatment types from experiment (e.g. ['nitrogen']) |
 | timepoint | string \| None | Timepoint label (e.g. 'days 60+89'). Null when edge has no label. |
@@ -84,7 +85,6 @@ organism_name, matching_genes, total_matching, rows_by_status, median_abs_log2fc
 
 | Field | Type | Description |
 |---|---|---|
-| product | string \| None (optional) | Gene product description (e.g. 'Ammonium transporter') |
 | experiment_name | string \| None (optional) | Human-readable experiment name |
 | treatment | string \| None (optional) | Treatment details (e.g. 'PRO99-lowN nutrient starvation') |
 | gene_category | string \| None (optional) | Gene functional category (e.g. 'Inorganic ion transport') |

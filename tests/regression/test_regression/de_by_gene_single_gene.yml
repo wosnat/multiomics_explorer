@@ -9,6 +9,7 @@ rows:
   locus_tag: PMM0001
   log2fc: -2.8863
   padj: 0.0311
+  product: DNA polymerase III, beta subunit
   rank: 581
   rank_down: 277
   rank_up: null
@@ -25,6 +26,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 2.23
   padj: 0.0
+  product: DNA polymerase III, beta subunit
   rank: 75
   rank_down: null
   rank_up: 50
@@ -41,6 +43,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 1.885
   padj: 0.0
+  product: DNA polymerase III, beta subunit
   rank: 459
   rank_down: null
   rank_up: 184
@@ -57,6 +60,7 @@ rows:
   locus_tag: PMM0001
   log2fc: -1.2476
   padj: 0.0005
+  product: DNA polymerase III, beta subunit
   rank: 583
   rank_down: 222
   rank_up: null
@@ -73,6 +77,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 1.1985
   padj: 1.0
+  product: DNA polymerase III, beta subunit
   rank: 362
   rank_down: null
   rank_up: null
@@ -89,6 +94,7 @@ rows:
   locus_tag: PMM0001
   log2fc: -1.1726
   padj: 0.1017
+  product: DNA polymerase III, beta subunit
   rank: 81
   rank_down: null
   rank_up: null
@@ -105,6 +111,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 1.1294
   padj: 0.0
+  product: DNA polymerase III, beta subunit
   rank: 544
   rank_down: null
   rank_up: 313
@@ -121,6 +128,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 1.1005
   padj: 0.0007
+  product: DNA polymerase III, beta subunit
   rank: 213
   rank_down: null
   rank_up: 84
@@ -137,6 +145,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 1.0312
   padj: 0.0
+  product: DNA polymerase III, beta subunit
   rank: 562
   rank_down: null
   rank_up: 296
@@ -153,6 +162,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 1.008
   padj: 1.0
+  product: DNA polymerase III, beta subunit
   rank: 462
   rank_down: null
   rank_up: null
@@ -169,6 +179,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.89
   padj: 0.54
+  product: DNA polymerase III, beta subunit
   rank: 467
   rank_down: null
   rank_up: null
@@ -185,6 +196,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.87
   padj: 0.49
+  product: DNA polymerase III, beta subunit
   rank: 493
   rank_down: null
   rank_up: null
@@ -201,6 +213,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.8628
   padj: 1.0
+  product: DNA polymerase III, beta subunit
   rank: 468
   rank_down: null
   rank_up: null
@@ -217,6 +230,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.8456
   padj: 0.0002
+  product: DNA polymerase III, beta subunit
   rank: 605
   rank_down: null
   rank_up: 318
@@ -233,6 +247,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.7135
   padj: 0.036
+  product: DNA polymerase III, beta subunit
   rank: 211
   rank_down: null
   rank_up: 70
@@ -249,6 +264,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.7087
   padj: 0.2466
+  product: DNA polymerase III, beta subunit
   rank: 248
   rank_down: null
   rank_up: null
@@ -265,6 +281,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.6172
   padj: 0.028
+  product: DNA polymerase III, beta subunit
   rank: 574
   rank_down: null
   rank_up: 225
@@ -281,6 +298,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.5893
   padj: 0.0135
+  product: DNA polymerase III, beta subunit
   rank: 549
   rank_down: null
   rank_up: 234
@@ -297,6 +315,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.5614
   padj: 0.0484
+  product: DNA polymerase III, beta subunit
   rank: 570
   rank_down: null
   rank_up: 208
@@ -313,6 +332,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.5111
   padj: 1.0
+  product: DNA polymerase III, beta subunit
   rank: 722
   rank_down: null
   rank_up: null
@@ -329,6 +349,7 @@ rows:
   locus_tag: PMM0001
   log2fc: -0.5071
   padj: 0.1863
+  product: DNA polymerase III, beta subunit
   rank: 172
   rank_down: null
   rank_up: null
@@ -345,6 +366,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.3774
   padj: 0.191
+  product: DNA polymerase III, beta subunit
   rank: 717
   rank_down: null
   rank_up: null
@@ -361,6 +383,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.3637
   padj: 0.7829
+  product: DNA polymerase III, beta subunit
   rank: 1190
   rank_down: null
   rank_up: null
@@ -377,6 +400,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.334
   padj: 1.0
+  product: DNA polymerase III, beta subunit
   rank: 694
   rank_down: null
   rank_up: null
@@ -393,6 +417,7 @@ rows:
   locus_tag: PMM0001
   log2fc: -0.2314
   padj: 0.2832
+  product: DNA polymerase III, beta subunit
   rank: 132
   rank_down: null
   rank_up: null
@@ -409,6 +434,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.2121
   padj: 1.0
+  product: DNA polymerase III, beta subunit
   rank: 936
   rank_down: null
   rank_up: null
@@ -425,6 +451,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.1577
   padj: 1.0
+  product: DNA polymerase III, beta subunit
   rank: 1299
   rank_down: null
   rank_up: null
@@ -441,6 +468,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.1564
   padj: 1.0
+  product: DNA polymerase III, beta subunit
   rank: 1275
   rank_down: null
   rank_up: null
@@ -457,6 +485,7 @@ rows:
   locus_tag: PMM0001
   log2fc: -0.1452
   padj: 0.7754
+  product: DNA polymerase III, beta subunit
   rank: 1578
   rank_down: null
   rank_up: null
@@ -473,6 +502,7 @@ rows:
   locus_tag: PMM0001
   log2fc: -0.1271
   padj: 0.8007
+  product: DNA polymerase III, beta subunit
   rank: 1630
   rank_down: null
   rank_up: null
@@ -489,6 +519,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.121
   padj: 0.4309
+  product: DNA polymerase III, beta subunit
   rank: 236
   rank_down: null
   rank_up: null
@@ -505,6 +536,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.1087
   padj: 0.6459
+  product: DNA polymerase III, beta subunit
   rank: 1316
   rank_down: null
   rank_up: null
@@ -521,6 +553,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.1035
   padj: 0.665
+  product: DNA polymerase III, beta subunit
   rank: 1323
   rank_down: null
   rank_up: null
@@ -537,6 +570,7 @@ rows:
   locus_tag: PMM0001
   log2fc: 0.0821
   padj: 1.0
+  product: DNA polymerase III, beta subunit
   rank: 1624
   rank_down: null
   rank_up: null
@@ -553,6 +587,7 @@ rows:
   locus_tag: PMM0001
   log2fc: -0.0794
   padj: 0.8653
+  product: DNA polymerase III, beta subunit
   rank: 1670
   rank_down: null
   rank_up: null
@@ -569,6 +604,7 @@ rows:
   locus_tag: PMM0001
   log2fc: -0.0714
   padj: 0.9335
+  product: DNA polymerase III, beta subunit
   rank: 1616
   rank_down: null
   rank_up: null
@@ -585,6 +621,7 @@ rows:
   locus_tag: PMM0001
   log2fc: -0.0161
   padj: 0.9762
+  product: DNA polymerase III, beta subunit
   rank: 1823
   rank_down: null
   rank_up: null

@@ -6,7 +6,7 @@ Group IDs to their member genes per organism — one row per gene × group.
 
 Use to enumerate a group's members; for a gene's own groups use `gene_homologs`, for expression across organisms `differential_expression_by_ortholog`.
 Filters: group_ids, organisms.
-Returns: by_organism, top_categories, top_groups, genes-per-group stats, and a not_found / not_matched pair for each of groups and organisms; one row = (locus_tag, group_id).
+Returns: by_organism, by_clade, top_categories, top_groups, genes-per-group stats, and a not_found / not_matched pair for each of groups and organisms; one row = (locus_tag, group_id).
 docs://tools/genes_by_homolog_group; summary=True first.
 
 ## Parameters
@@ -31,7 +31,7 @@ genes_by_homolog_group(group_ids=["cyanorak:CK_00000570"])
 ## Response sketch
 
 ```expected-keys
-total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, resolved_aliases, warnings, returned, truncated, results
+total_matching, total_genes, total_categories, offset, genes_per_group_max, genes_per_group_median, by_organism, top_categories, top_groups, by_clade, not_found_groups, not_matched_groups, not_found_organisms, not_matched_organisms, resolved_aliases, warnings, returned, truncated, results
 ```
 
 Result row: `locus_tag, gene_name, product, organism_name, gene_category, group_id`
@@ -50,5 +50,6 @@ Result row: `locus_tag, gene_name, product, organism_name, gene_category, group_
 - genes_by_homolog_group → gene_overview
 - genes_by_homolog_group → differential_expression_by_gene
 - gene_homologs → genes_by_homolog_group
+- genes_by_homolog_group(group_ids=[one_id]) → read `by_clade` for that group's breadth across ecotypes: `organism_count` of `organisms_in_clade` per (genus, clade). Call once per group_id — with several group_ids the counts are a union over the batch.
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/genes_by_homolog_group/full`

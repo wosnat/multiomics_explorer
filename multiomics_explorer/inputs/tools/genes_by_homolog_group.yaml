@@ -102,6 +102,7 @@ chaining:
   - "genes_by_homolog_group → gene_overview"
   - "genes_by_homolog_group → differential_expression_by_gene"
   - "gene_homologs → genes_by_homolog_group"
+  - "genes_by_homolog_group(group_ids=[one_id]) → read `by_clade` for that group's breadth across ecotypes: `organism_count` of `organisms_in_clade` per (genus, clade). Call once per group_id — with several group_ids the counts are a union over the batch."
 
 mistakes:
   - "Bare group ids ('CK_00000570', 'COG0592@2') are accepted and coerced to canonical — check `resolved_aliases` for the mapping; prefer the prefixed form ('cyanorak:CK_00000570') to skip coercion."
@@ -113,3 +114,4 @@ mistakes:
   - wrong: "len(results)  # actual count"
     right: "response['total_matching']  # use total, not len"
   - "`organisms` entries are word-matched against preferred_name + name_synonyms, so a genus word (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous."
+  - "For ecotype (HL / LL) breadth read `by_clade` (or `clade` on list_organisms), never parse strain names. Entries are keyed by (genus, clade) because clade labels repeat across genera ('III', '5.2'); `clade` is null for organisms without one."
