@@ -54,6 +54,7 @@ from multiomics_explorer.mcp_server.params import (  # noqa: E402
     OrganismFromTagsSingleParam,
     OrganismParam,
     OrganismRequiredParam,
+    OrganismScopeParam,
     OrganismSingleParam,
     OrganismsParam,
     PublicationDoisParam,
@@ -3379,6 +3380,8 @@ def register_tools(mcp: FastMCP):
 
     class GenesByOntologyResult(SparseRow):
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM0001')")
+        organism_name: str | None = Field(default=None,
+            description="Organism of this gene (e.g. 'Prochlorococcus MED4'). On every row; rows sort by organism_name, term_id, locus_tag.")
         gene_name: str | None = Field(default=None,
             description="Gene name (e.g. 'dnaN')")
         product: str | None = Field(default=None,
@@ -3507,20 +3510,35 @@ def register_tools(mcp: FastMCP):
     class OntologyTermBreakdown(BaseModel):
         term_id: str = Field(description="Term ID (e.g. 'go:0050896')")
         term_name: str = Field(description="Term name (e.g. 'response to stimulus')")
-        count: int = Field(description="Distinct gene count (e.g. 152)")
+        count: int = Field(description="Distinct gene count, summed across organisms (e.g. 152)")
+        organism_count: int = Field(default=1,
+            description="Organisms with at least one gene under this term (e.g. 2)")
         is_informative: bool = Field(
             description="True iff term is not flagged is_uninformative")
 
+    class GboOrganismBreakdown(BaseModel):
+        organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
+        gene_count: int = Field(description="Distinct genes of this organism in the result (e.g. 2)")
+        term_count: int = Field(description="Distinct terms reached by this organism's genes (e.g. 1)")
+        row_count: int = Field(description="(gene × term) rows for this organism; sums to total_matching")
+
     class GenesByOntologyResponse(BaseModel):
         ontology: str = Field(description="Echo of input ontology (e.g. 'go_bp')")
-        organism_name: str = Field(description="Single organism for all results")
+        organism_name: str | None = Field(default=None,
+            description="The organism when exactly one is in scope (a string, or a list that resolves to one organism); None when several or all organisms are in scope")
+        by_organism: list[GboOrganismBreakdown] = Field(default_factory=list,
+            description="Per-organism counts for organisms with at least one row, sorted gene_count desc then name")
+        organisms_without_genes: list[str] = Field(default_factory=list,
+            description="Organisms in scope with no matching row, sorted by name (presence answer: these genomes lack the term). Can be long when organism is omitted.")
+        not_found_organisms: list[str] = Field(default_factory=list,
+            description="organism list entries that matched no organism. Always [] for a single string or None.")
         total_matching: int = Field(description="(gene × term) row count matching all filters")
         total_genes: int = Field(description="Distinct genes across results")
         total_terms: int = Field(description="Distinct terms emitted")
         total_categories: int = Field(description="Distinct gene_category values")
-        genes_per_term_min: int = Field(description="Fewest genes in any surviving term")
-        genes_per_term_median: float = Field(description="Median genes per term")
-        genes_per_term_max: int = Field(description="Most genes in any surviving term")
+        genes_per_term_min: int = Field(description="Fewest genes in any surviving (term, organism) gene set")
+        genes_per_term_median: float = Field(description="Median genes per (term, organism) gene set")
+        genes_per_term_max: int = Field(description="Most genes in any surviving (term, organism) gene set")
         terms_per_gene_min: int = Field(description="Fewest terms for any gene")
         terms_per_gene_median: float = Field(description="Median terms per gene")
         terms_per_gene_max: int = Field(description="Most terms for any gene")
@@ -3541,7 +3559,7 @@ def register_tools(mcp: FastMCP):
         filtered_out: list[str] = Field(default_factory=list,
             description="Input term_ids valid but outside [min, max]_gene_set_size")
         size_filtered_terms: int = Field(default=0,
-            description="Terms passing every other filter but outside min/max_gene_set_size, dropped. >0 adds a warning while either bound is still the default; to enumerate all pass min_gene_set_size=1 and a large max_gene_set_size (e.g. 100000; Python also accepts None).")
+            description="(Term, organism) gene sets passing every other filter but outside min/max_gene_set_size, dropped. >0 adds a warning while either bound is still the default; to enumerate all pass min_gene_set_size=1 and a large max_gene_set_size (e.g. 100000; Python also accepts None).")
         size_filtered_genes: int = Field(default=0,
             description="Genes found only in size-dropped terms (missing from total_genes).")
         resolved_aliases: dict[str, list[str]] = Field(default_factory=dict,
@@ -3597,7 +3615,7 @@ def register_tools(mcp: FastMCP):
         ontology: Annotated[OntologyKey, Field(
             description="Ontology for these term_ids / this level.",
         )],
-        organism: OrganismRequiredParam,
+        organism: OrganismScopeParam = None,
         tree: Annotated[str | None, Field(
             description="BRITE tree name filter (e.g. 'transporters'). Only valid when "
                         "ontology='brite'. See docs://guide/conventions for the BRITE-tree "
@@ -3616,14 +3634,15 @@ def register_tools(mcp: FastMCP):
                         "coerced to canonical (see `resolved_aliases`).",
         )] = None,
         min_gene_set_size: Annotated[int, Field(
-            description="Exclude terms with fewer organism-scoped genes than this. "
-                        "Matches `ontology_landscape`'s organism-scoped convention.",
+            description="Exclude (term, organism) gene sets with fewer genes than this "
+                        "(per genome, as `ontology_landscape`). Default 5 applies to a single "
+                        "organism only; with a list or all organisms the default means no bound.",
             ge=0,
         )] = api.GENE_SET_SIZE_MIN_DEFAULT,
         max_gene_set_size: Annotated[int, Field(
-            description="Exclude terms with more organism-scoped genes than this. "
-                        "Matches `ontology_landscape`'s organism-scoped convention. "
-                        "Pass a large value (e.g. 100000) to disable.",
+            description="Exclude (term, organism) gene sets with more genes than this "
+                        "(per genome). Default 500 applies to a single organism only; with "
+                        "a list or all organisms the default means no bound. 100000 disables.",
             ge=1,
         )] = api.GENE_SET_SIZE_MAX_DEFAULT,
         informative_only: InformativeOnlyParam = False,
@@ -3648,11 +3667,11 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 50,
         offset: OffsetParam = 0,
     ) -> GenesByOntologyResponse:
-        """Gene × term pairs for ontology terms in ONE organism (term_ids expand down the hierarchy, level rolls up, both = scoped rollup).
+        """Gene × term pairs for ontology terms in one, several or all organisms (term_ids expand down, level rolls up, both = scoped rollup).
 
         Use to build TERM2GENE or list a term's genes; for a gene's own annotations use `gene_ontology_terms`, for substrate-anchored TCDB / EC `genes_by_metabolite`.
         Filters: ontology, organism, term_ids, level, tree, min/max_gene_set_size, informative_only, trust filters.
-        Returns: by_category, by_level, top_terms, trust rollups, not_found, wrong_ontology, wrong_level; one row = (locus_tag, term_id, evidence).
+        Returns: by_organism, organisms_without_genes, by_level, top_terms, trust rollups; one row = (locus_tag, organism_name, term_id, evidence).
         docs://tools/genes_by_ontology; summary=True first.
         """
         await ctx.info(
@@ -3690,7 +3709,8 @@ def register_tools(mcp: FastMCP):
                     min_gene_set_size, max_gene_set_size):
                 await ctx.warning(
                     f"genes_by_ontology: {data['size_filtered_terms']} "
-                    f"terms outside min/max_gene_set_size were dropped "
+                    f"(term, organism) gene sets outside min/max_gene_set_size "
+                    f"were dropped "
                     f"(see response.size_filtered_terms)"
                 )
             return GenesByOntologyResponse(**data)

@@ -2,11 +2,11 @@
 
 ## What it does
 
-Gene × term pairs for ontology terms in ONE organism (term_ids expand down the hierarchy, level rolls up, both = scoped rollup).
+Gene × term pairs for ontology terms in one, several or all organisms (term_ids expand down, level rolls up, both = scoped rollup).
 
 Use to build TERM2GENE or list a term's genes; for a gene's own annotations use `gene_ontology_terms`, for substrate-anchored TCDB / EC `genes_by_metabolite`.
 Filters: ontology, organism, term_ids, level, tree, min/max_gene_set_size, informative_only, trust filters.
-Returns: by_category, by_level, top_terms, trust rollups, not_found, wrong_ontology, wrong_level; one row = (locus_tag, term_id, evidence).
+Returns: by_organism, organisms_without_genes, by_level, top_terms, trust rollups; one row = (locus_tag, organism_name, term_id, evidence).
 docs://tools/genes_by_ontology; summary=True first.
 
 ## Parameters
@@ -14,12 +14,12 @@ docs://tools/genes_by_ontology; summary=True first.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') | — | Ontology for these term_ids / this level. |
-| organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
+| organism | string \| list[string] \| None | None | One organism, a list (each entry word-matched and may expand to several strains), or omit for all organisms. A single string must resolve to ONE organism. See list_organisms. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level to roll UP to (0 = broadest). At least one of `level` or `term_ids` must be provided. See docs://guide/conventions. |
 | term_ids | list[string] \| None | None | Ontology term IDs (from search_ontology). Without `level`: expand DOWN from each input term. With `level`: scope rollup to these level-N terms. Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced to canonical (see `resolved_aliases`). |
-| min_gene_set_size | int | 5 | Exclude terms with fewer organism-scoped genes than this. Matches `ontology_landscape`'s organism-scoped convention. |
-| max_gene_set_size | int | 500 | Exclude terms with more organism-scoped genes than this. Matches `ontology_landscape`'s organism-scoped convention. Pass a large value (e.g. 100000) to disable. |
+| min_gene_set_size | int | 5 | Exclude (term, organism) gene sets with fewer genes than this (per genome, as `ontology_landscape`). Default 5 applies to a single organism only; with a list or all organisms the default means no bound. |
+| max_gene_set_size | int | 500 | Exclude (term, organism) gene sets with more genes than this (per genome). Default 500 applies to a single organism only; with a list or all organisms the default means no bound. 100000 disables. |
 | informative_only | bool | False | True drops terms the KG flags uninformative (roots, catch-alls). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
@@ -41,18 +41,21 @@ docs://tools/genes_by_ontology; summary=True first.
 ### Envelope
 
 ```expected-keys
-ontology, organism_name, total_matching, total_genes, total_terms, total_categories, genes_per_term_min, genes_per_term_median, genes_per_term_max, terms_per_gene_min, terms_per_gene_median, terms_per_gene_max, by_category, by_level, top_terms, n_best_effort_terms, not_found, wrong_ontology, wrong_level, filtered_out, size_filtered_terms, size_filtered_genes, resolved_aliases, returned, offset, truncated, trust_axes, warnings, filters_applied, skipped_ontologies, by_evidence, by_tier, by_sources, by_call_class, by_tcdb_call, evidence_score_stats, results
+ontology, organism_name, by_organism, organisms_without_genes, not_found_organisms, total_matching, total_genes, total_terms, total_categories, genes_per_term_min, genes_per_term_median, genes_per_term_max, terms_per_gene_min, terms_per_gene_median, terms_per_gene_max, by_category, by_level, top_terms, n_best_effort_terms, not_found, wrong_ontology, wrong_level, filtered_out, size_filtered_terms, size_filtered_genes, resolved_aliases, returned, offset, truncated, trust_axes, warnings, filters_applied, skipped_ontologies, by_evidence, by_tier, by_sources, by_call_class, by_tcdb_call, evidence_score_stats, results
 ```
 
 - **ontology** (string): Echo of input ontology (e.g. 'go_bp')
-- **organism_name** (string): Single organism for all results
+- **organism_name** (string | None): The organism when exactly one is in scope (a string, or a list that resolves to one organism); None when several or all organisms are in scope
+- **by_organism** (list[GboOrganismBreakdown]): Per-organism counts for organisms with at least one row, sorted gene_count desc then name
+- **organisms_without_genes** (list[string]): Organisms in scope with no matching row, sorted by name (presence answer: these genomes lack the term). Can be long when organism is omitted.
+- **not_found_organisms** (list[string]): organism list entries that matched no organism. Always [] for a single string or None.
 - **total_matching** (int): (gene × term) row count matching all filters
 - **total_genes** (int): Distinct genes across results
 - **total_terms** (int): Distinct terms emitted
 - **total_categories** (int): Distinct gene_category values
-- **genes_per_term_min** (int): Fewest genes in any surviving term
-- **genes_per_term_median** (float): Median genes per term
-- **genes_per_term_max** (int): Most genes in any surviving term
+- **genes_per_term_min** (int): Fewest genes in any surviving (term, organism) gene set
+- **genes_per_term_median** (float): Median genes per (term, organism) gene set
+- **genes_per_term_max** (int): Most genes in any surviving (term, organism) gene set
 - **terms_per_gene_min** (int): Fewest terms for any gene
 - **terms_per_gene_median** (float): Median terms per gene
 - **terms_per_gene_max** (int): Most terms for any gene
@@ -64,7 +67,7 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 - **wrong_ontology** (list[string]): Input term_ids present but in a different ontology label
 - **wrong_level** (list[string]): Input term_ids in the ontology but at wrong level (only when level + term_ids both set)
 - **filtered_out** (list[string]): Input term_ids valid but outside [min, max]_gene_set_size
-- **size_filtered_terms** (int): Terms passing every other filter but outside min/max_gene_set_size, dropped. >0 adds a warning while either bound is still the default; to enumerate all pass min_gene_set_size=1 and a large max_gene_set_size (e.g. 100000; Python also accepts None).
+- **size_filtered_terms** (int): (Term, organism) gene sets passing every other filter but outside min/max_gene_set_size, dropped. >0 adds a warning while either bound is still the default; to enumerate all pass min_gene_set_size=1 and a large max_gene_set_size (e.g. 100000; Python also accepts None).
 - **size_filtered_genes** (int): Genes found only in size-dropped terms (missing from total_genes).
 - **resolved_aliases** (object): Bare term_ids (e.g. 'ko00910', 'GO:0006979') coerced to canonical CURIEs, {input: [canonical]}. Empty when none were coerced.
 - **returned** (int): Rows in this response
@@ -87,6 +90,7 @@ ontology, organism_name, total_matching, total_genes, total_terms, total_categor
 | Field | Type | Description |
 |---|---|---|
 | locus_tag | string | Gene locus tag (e.g. 'PMM0001') |
+| organism_name | string \| None (optional) | Organism of this gene (e.g. 'Prochlorococcus MED4'). On every row; rows sort by organism_name, term_id, locus_tag. |
 | gene_name | string \| None (optional) | Gene name (e.g. 'dnaN') |
 | product | string \| None (optional) | Gene product (e.g. 'DNA polymerase III, beta subunit') |
 | gene_category | string \| None (optional) | Functional category (e.g. 'Replication and repair') |
@@ -147,6 +151,8 @@ genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
 {
   "ontology": "go_bp",
   "organism_name": "Prochlorococcus MED4",
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 30, "term_count": 1, "row_count": 30}],
+  "...": "13 empty fields omitted",
   "total_matching": 30,
   "total_genes": 30,
   "total_terms": 1,
@@ -164,10 +170,17 @@ genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
     ...
   ],
   "by_level": [{"level": 6, "n_terms": 1, "n_genes": 30, "row_count": 30}],
-  "top_terms": [{"term_id": "go:0006260", "term_name": "DNA replication", "count": 30, "is_informative": true}],
+  "top_terms": [
+    {
+      "term_id": "go:0006260",
+      "term_name": "DNA replication",
+      "count": 30,
+      "organism_count": 1,
+      "is_informative": true
+    }
+  ],
   "n_best_effort_terms": 1,
   "not_found": [],
-  "...": "11 empty fields omitted",
   "size_filtered_terms": 0,
   "size_filtered_genes": 0,
   "returned": 30,
@@ -185,6 +198,7 @@ genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
   "results": [
     {
       "locus_tag": "PMM0001",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": "dnaN",
       "product": "DNA polymerase III, beta subunit",
       "gene_category": "Replication and repair",
@@ -196,6 +210,7 @@ genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
     },
     {
       "locus_tag": "PMM0077",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": "rarA",
       "product": "recombination factor",
       "gene_category": "Replication and repair",
@@ -207,6 +222,7 @@ genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
     },
     {
       "locus_tag": "PMM0129",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": "holB",
       "product": "DNA polymerase III, delta^ subunit",
       "gene_category": "Replication and repair",
@@ -231,6 +247,8 @@ genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
 {
   "ontology": "cyanorak_role",
   "organism_name": "Prochlorococcus MED4",
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1438, "term_count": 69, "row_count": 1761}],
+  "...": "12 empty fields omitted",
   "total_matching": 1761,
   "total_genes": 1438,
   "total_terms": 69,
@@ -253,25 +271,27 @@ genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
       "term_id": "cyanorak.role:R.2",
       "term_name": "Other > Conserved hypothetical proteins",
       "count": 340,
+      "organism_count": 1,
       "is_informative": false
     },
     {
       "term_id": "cyanorak.role:D.1",
       "term_name": "Cellular processes > Adaptation/acclimation to atypical conditions and detoxification",
       "count": 213,
+      "organism_count": 1,
       "is_informative": true
     },
     {
       "term_id": "cyanorak.role:B.10",
       "term_name": "Biosynthesis of cofactors, prosthetic groups, and carriers > Vitamins",
       "count": 63,
+      "organism_count": 1,
       "is_informative": true
     },
     ...
   ],
   "n_best_effort_terms": 0,
   "not_found": [],
-  "...": "10 empty fields omitted",
   "size_filtered_terms": 41,
   "size_filtered_genes": 53,
   "returned": 50,
@@ -285,6 +305,7 @@ genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
   "results": [
     {
       "locus_tag": "PMM0107",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": "aroK",
       "product": "shikimate kinase",
       "gene_category": "Amino acid metabolism",
@@ -296,6 +317,7 @@ genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
     },
     {
       "locus_tag": "PMM0164",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": "trpB",
       "product": "tryptophan synthase, beta subunit",
       "gene_category": "Amino acid metabolism",
@@ -307,6 +329,7 @@ genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1)
     },
     {
       "locus_tag": "PMM0224",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": "aroC",
       "product": "chorismate synthase",
       "gene_category": "Amino acid metabolism",
@@ -333,19 +356,79 @@ genes_by_ontology(ontology="cyanorak_role", organism="MED4", level=1, term_ids=[
 genes_by_ontology(ontology="go_bp", organism="MED4", level=1, summary=True)
 ```
 
-### Example 5: BRITE tree-scoped rollup (transporters at category level)
+### Example 5: Which strains carry a family — presence and copy number across organisms
+
+```example-call
+genes_by_ontology(ontology="interpro", term_ids=["interpro:IPR063966"], interpro_type="FAMILY", organism=None, summary=True)
+```
+
+*`organism=None` scans every organism with genes. `by_organism` lists the strains that carry HliA-D with their copy number (`gene_count`); `organisms_without_genes` names the strains that have none, here the heterotrophs. The size bounds are off because more than one organism is in scope, so strains with fewer than 5 copies are kept. `genes_per_term_min` / `max` are copy numbers per genome.*
+
+```example-response
+{
+  "ontology": "interpro",
+  "...": "12 empty fields omitted",
+  "by_organism": [
+    {"organism_name": "Synechococcus CC9311", "gene_count": 11, "term_count": 1, "row_count": 11},
+    {"organism_name": "Synechococcus BIOS-E4-1", "gene_count": 9, "term_count": 1, "row_count": 9},
+    {"organism_name": "Synechococcus WH5701", "gene_count": 9, "term_count": 1, "row_count": 9},
+    ...
+  ],
+  "organisms_without_genes": ["Alteromonas (MarRef v6)", "Alteromonas macleodii 83-1", "Alteromonas macleodii AD45", ...],
+  "total_matching": 500,
+  "total_genes": 500,
+  "total_terms": 1,
+  "total_categories": 3,
+  "genes_per_term_min": 3,
+  "genes_per_term_median": 5.0,
+  "genes_per_term_max": 11,
+  "terms_per_gene_min": 1,
+  "terms_per_gene_median": 1.0,
+  "terms_per_gene_max": 1,
+  "by_category": [
+    {"category": "Stress response and adaptation", "count": 467},
+    {"category": "Unknown", "count": 31},
+    {"category": "Coenzyme metabolism", "count": 2}
+  ],
+  "by_level": [{"level": 0, "n_terms": 1, "n_genes": 500, "row_count": 500}],
+  "top_terms": [
+    {
+      "term_id": "interpro:IPR063966",
+      "term_name": "High light-inducible protein HliA-D-like",
+      "count": 500,
+      "organism_count": 102,
+      "is_informative": true
+    }
+  ],
+  "n_best_effort_terms": 0,
+  "not_found": [],
+  "size_filtered_terms": 0,
+  "size_filtered_genes": 0,
+  "returned": 0,
+  "offset": 0,
+  "truncated": true,
+  "trust_axes": {"interpro": ["sources", "evidence"]},
+  "filters_applied": {"interpro_type": "FAMILY"},
+  "by_evidence": [{"count": 500, "evidence": "signature"}],
+  "by_sources": [{"count": 500, "source": "interproscan"}],
+  "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
+  "results": []
+}
+```
+
+### Example 6: BRITE tree-scoped rollup (transporters at category level)
 
 ```example-call
 genes_by_ontology(ontology="brite", organism="MED4", level=1, tree="transporters")
 ```
 
-### Example 6: Inspect all terms (override size filter)
+### Example 7: Inspect all terms (override size filter)
 
 ```example-call
 genes_by_ontology(ontology="go_bp", organism="MED4", level=1, min_gene_set_size=0, max_gene_set_size=100000)
 ```
 
-### Example 7: TCDB term → gene drill-down (with descendant expansion)
+### Example 8: TCDB term → gene drill-down (with descendant expansion)
 
 ```example-call
 genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:2.A", "tcdb:2.A.1"])
@@ -353,13 +436,13 @@ genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:2.A", "tcdb:
 
 *Each term expands DOWN through its families, subfamilies and systems before binding to genes, over gated edges only (`tcdb_gate` direct or annotated), so a term's gene set matches its `gene_count`. The default size filter applies to the expanded set: the subclass tcdb:2.A (Porters) keeps its MED4 genes, while MFS tcdb:2.A.1 has fewer than `min_gene_set_size=5` gated MED4 genes and lands in `filtered_out` with 0 rows — pass `min_gene_set_size=1` to see it. Rows carry `tcdb_call` / `tcdb_gate` / `tcdb_calls`; envelope `by_tcdb_call` counts them.*
 
-### Example 8: CAZy class roll-up — genes by glycoside hydrolase / glycosyltransferase class
+### Example 9: CAZy class roll-up — genes by glycoside hydrolase / glycosyltransferase class
 
 ```example-call
 genes_by_ontology(ontology="cazy", organism="MED4", level=0)
 ```
 
-### Example 9: PSORTb outer-membrane proteins with confidence score
+### Example 10: PSORTb outer-membrane proteins with confidence score
 
 ```example-call
 genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMembrane"], organism="MED4")
@@ -369,6 +452,8 @@ genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMe
 {
   "ontology": "subcellular_localization",
   "organism_name": "Prochlorococcus MED4",
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 11, "term_count": 1, "row_count": 11}],
+  "...": "15 empty fields omitted",
   "total_matching": 11,
   "total_genes": 11,
   "total_terms": 1,
@@ -386,10 +471,17 @@ genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMe
     ...
   ],
   "by_level": [{"level": 0, "n_terms": 1, "n_genes": 11, "row_count": 11}],
-  "top_terms": [{"term_id": "psortb_OuterMembrane", "term_name": "Outer membrane", "count": 11, "is_informative": true}],
+  "top_terms": [
+    {
+      "term_id": "psortb_OuterMembrane",
+      "term_name": "Outer membrane",
+      "count": 11,
+      "organism_count": 1,
+      "is_informative": true
+    }
+  ],
   "n_best_effort_terms": 0,
   "not_found": [],
-  "...": "13 empty fields omitted",
   "size_filtered_terms": 0,
   "size_filtered_genes": 0,
   "returned": 11,
@@ -400,6 +492,7 @@ genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMe
   "results": [
     {
       "locus_tag": "PMM0063",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": "ycf66",
       "product": "uncharacterized conserved hypothetical protein Ycf66",
       "gene_category": "Transcription",
@@ -410,6 +503,7 @@ genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMe
     },
     {
       "locus_tag": "PMM0097",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": "tolC",
       "product": "TolC-like outer membrane efflux protein, RND family",
       "gene_category": "Stress response and adaptation",
@@ -420,6 +514,7 @@ genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMe
     },
     {
       "locus_tag": "PMM0151",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": "scpA",
       "product": "scpA/B family protein",
       "gene_category": "Cellular processes",
@@ -433,7 +528,7 @@ genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMe
 }
 ```
 
-### Example 10: SignalP lipoproteins with cleavage info
+### Example 11: SignalP lipoproteins with cleavage info
 
 ```example-call
 genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_LIPO"], organism="MED4")
@@ -443,6 +538,8 @@ genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_LIPO"], org
 {
   "ontology": "signal_peptide_type",
   "organism_name": "Prochlorococcus MED4",
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 15, "term_count": 1, "row_count": 15}],
+  "...": "15 empty fields omitted",
   "total_matching": 15,
   "total_genes": 15,
   "total_terms": 1,
@@ -465,12 +562,12 @@ genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_LIPO"], org
       "term_id": "signalp_LIPO",
       "term_name": "Lipoprotein signal peptide (Sec/SPII)",
       "count": 15,
+      "organism_count": 1,
       "is_informative": true
     }
   ],
   "n_best_effort_terms": 0,
   "not_found": [],
-  "...": "13 empty fields omitted",
   "size_filtered_terms": 0,
   "size_filtered_genes": 0,
   "returned": 15,
@@ -481,6 +578,7 @@ genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_LIPO"], org
   "results": [
     {
       "locus_tag": "PMM0296",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": "ycf48",
       "product": "photosystem II stability/assembly factor",
       "gene_category": "Photosynthesis",
@@ -491,6 +589,7 @@ genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_LIPO"], org
     },
     {
       "locus_tag": "PMM0437",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": null,
       "product": "conserved hypothetical protein",
       "gene_category": "Unknown",
@@ -501,6 +600,7 @@ genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_LIPO"], org
     },
     {
       "locus_tag": "PMM0513",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": "lepB",
       "product": "signal peptidase I",
       "gene_category": "Post-translational modification",
@@ -514,7 +614,7 @@ genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_LIPO"], org
 }
 ```
 
-### Example 11: InterPro homologous-superfamily census (interpro_type facet)
+### Example 12: InterPro homologous-superfamily census (interpro_type facet)
 
 ```example-call
 genes_by_ontology(ontology="interpro", organism="MED4", term_ids=["interpro:IPR027417"])
@@ -524,6 +624,8 @@ genes_by_ontology(ontology="interpro", organism="MED4", term_ids=["interpro:IPR0
 {
   "ontology": "interpro",
   "organism_name": "Prochlorococcus MED4",
+  "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 119, "term_count": 1, "row_count": 119}],
+  "...": "13 empty fields omitted",
   "total_matching": 119,
   "total_genes": 119,
   "total_terms": 1,
@@ -546,12 +648,12 @@ genes_by_ontology(ontology="interpro", organism="MED4", term_ids=["interpro:IPR0
       "term_id": "interpro:IPR027417",
       "term_name": "P-loop containing nucleoside triphosphate hydrolase",
       "count": 119,
+      "organism_count": 1,
       "is_informative": true
     }
   ],
   "n_best_effort_terms": 0,
   "not_found": [],
-  "...": "11 empty fields omitted",
   "size_filtered_terms": 0,
   "size_filtered_genes": 0,
   "returned": 50,
@@ -564,6 +666,7 @@ genes_by_ontology(ontology="interpro", organism="MED4", term_ids=["interpro:IPR0
   "results": [
     {
       "locus_tag": "PMM0010",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": "ftsY",
       "product": "signal recognition particle-docking protein FtsY",
       "gene_category": "Post-translational modification",
@@ -576,6 +679,7 @@ genes_by_ontology(ontology="interpro", organism="MED4", term_ids=["interpro:IPR0
     },
     {
       "locus_tag": "PMM0019",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": "rsgA",
       "product": "ribosome biogenesis GTPase / thiamine phosphate phosphatase",
       "gene_category": "Coenzyme metabolism",
@@ -588,6 +692,7 @@ genes_by_ontology(ontology="interpro", organism="MED4", term_ids=["interpro:IPR0
     },
     {
       "locus_tag": "PMM0049",
+      "organism_name": "Prochlorococcus MED4",
       "gene_name": "coaE",
       "product": "dephospho-CoA kinase",
       "gene_category": "Coenzyme metabolism",
@@ -603,7 +708,7 @@ genes_by_ontology(ontology="interpro", organism="MED4", term_ids=["interpro:IPR0
 }
 ```
 
-### Example 12: MEROPS peptidase-only clan census (call_class filter)
+### Example 13: MEROPS peptidase-only clan census (call_class filter)
 
 ```example-call
 genes_by_ontology(ontology="merops", organism="MIT1002", level=0, call_class=["peptidase"])
@@ -613,6 +718,8 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0, call_class=["p
 {
   "ontology": "merops",
   "organism_name": "Alteromonas macleodii MIT1002",
+  "by_organism": [{"organism_name": "Alteromonas macleodii MIT1002", "gene_count": 72, "term_count": 7, "row_count": 72}],
+  "...": "9 empty fields omitted",
   "total_matching": 72,
   "total_genes": 72,
   "total_terms": 7,
@@ -631,14 +738,13 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0, call_class=["p
   ],
   "by_level": [{"level": 0, "n_terms": 7, "n_genes": 72, "row_count": 72}],
   "top_terms": [
-    {"term_id": "merops.clan:SC", "term_name": "SC", "count": 22, "is_informative": true},
-    {"term_id": "merops.clan:MA", "term_name": "MA", "count": 18, "is_informative": true},
-    {"term_id": "merops.clan:MH", "term_name": "MH", "count": 8, "is_informative": true},
+    {"term_id": "merops.clan:SC", "term_name": "SC", "count": 22, "organism_count": 1, "is_informative": true},
+    {"term_id": "merops.clan:MA", "term_name": "MA", "count": 18, "organism_count": 1, "is_informative": true},
+    {"term_id": "merops.clan:MH", "term_name": "MH", "count": 8, "organism_count": 1, "is_informative": true},
     ...
   ],
   "n_best_effort_terms": 0,
   "not_found": [],
-  "...": "7 empty fields omitted",
   "size_filtered_terms": 20,
   "size_filtered_genes": 46,
   "returned": 50,
@@ -655,6 +761,7 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0, call_class=["p
   "results": [
     {
       "locus_tag": "MIT1002_00401",
+      "organism_name": "Alteromonas macleodii MIT1002",
       "gene_name": "dcp",
       "product": "M3 family metallopeptidase",
       "gene_category": "Amino acid metabolism",
@@ -667,6 +774,7 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0, call_class=["p
     },
     {
       "locus_tag": "MIT1002_00745",
+      "organism_name": "Alteromonas macleodii MIT1002",
       "gene_name": null,
       "product": "dipeptidyl-peptidase 3 family protein",
       "gene_category": "Unknown",
@@ -679,6 +787,7 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0, call_class=["p
     },
     {
       "locus_tag": "MIT1002_00890",
+      "organism_name": "Alteromonas macleodii MIT1002",
       "gene_name": "pepN",
       "product": "M1 family metallopeptidase",
       "gene_category": "Amino acid metabolism",
@@ -694,7 +803,7 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0, call_class=["p
 }
 ```
 
-### Example 13: MEROPS clan census without call_class (warns)
+### Example 14: MEROPS clan census without call_class (warns)
 
 ```example-call
 genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
@@ -704,6 +813,8 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
 {
   "ontology": "merops",
   "organism_name": "Alteromonas macleodii MIT1002",
+  "by_organism": [{"organism_name": "Alteromonas macleodii MIT1002", "gene_count": 112, "term_count": 10, "row_count": 112}],
+  "...": "10 empty fields omitted",
   "total_matching": 112,
   "total_genes": 112,
   "total_terms": 10,
@@ -722,14 +833,13 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
   ],
   "by_level": [{"level": 0, "n_terms": 10, "n_genes": 112, "row_count": 112}],
   "top_terms": [
-    {"term_id": "merops.clan:SC", "term_name": "SC", "count": 31, "is_informative": true},
-    {"term_id": "merops.clan:MA", "term_name": "MA", "count": 18, "is_informative": true},
-    {"term_id": "merops.clan:PC", "term_name": "PC", "count": 13, "is_informative": true},
+    {"term_id": "merops.clan:SC", "term_name": "SC", "count": 31, "organism_count": 1, "is_informative": true},
+    {"term_id": "merops.clan:MA", "term_name": "MA", "count": 18, "organism_count": 1, "is_informative": true},
+    {"term_id": "merops.clan:PC", "term_name": "PC", "count": 13, "organism_count": 1, "is_informative": true},
     ...
   ],
   "n_best_effort_terms": 0,
   "not_found": [],
-  "...": "8 empty fields omitted",
   "size_filtered_terms": 17,
   "size_filtered_genes": 38,
   "returned": 50,
@@ -748,6 +858,7 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
   "results": [
     {
       "locus_tag": "MIT1002_00401",
+      "organism_name": "Alteromonas macleodii MIT1002",
       "gene_name": "dcp",
       "product": "M3 family metallopeptidase",
       "gene_category": "Amino acid metabolism",
@@ -760,6 +871,7 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
     },
     {
       "locus_tag": "MIT1002_00745",
+      "organism_name": "Alteromonas macleodii MIT1002",
       "gene_name": null,
       "product": "dipeptidyl-peptidase 3 family protein",
       "gene_category": "Unknown",
@@ -772,6 +884,7 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
     },
     {
       "locus_tag": "MIT1002_00890",
+      "organism_name": "Alteromonas macleodii MIT1002",
       "gene_name": "pepN",
       "product": "M1 family metallopeptidase",
       "gene_category": "Amino acid metabolism",
@@ -787,7 +900,7 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
 }
 ```
 
-### Example 14: TCDB trust detail — sources / tier / DIAMOND statistics (verbose)
+### Example 15: TCDB trust detail — sources / tier / DIAMOND statistics (verbose)
 
 ```example-call
 genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1.4"], min_gene_set_size=1, verbose=True)
@@ -795,7 +908,7 @@ genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1.4"], m
 
 *The urea / amino-acid subfamily tcdb:3.A.1.4 in MED4: the urtABCDE genes. Each row reports one edge by precedence (best hit, then tier, then eggNOG; then identity): `tcdb_call`, `tcdb_gate`, `sources`, `tier` and, on DIAMOND rows, `identity` / `qcov` (percent), `evalue`, `tcdb_scov`, `tcdb_best_hit_rank`, `tcdb_bitscore`, `tcdb_bitscore_ratio`. `tcdb_calls` lists every call kind on the gene's lineage through the term. TCDB carries no evidence score.*
 
-### Example 15: Trust filters on TCDB — DIAMOND calls only (evidence + tcdb_call)
+### Example 16: Trust filters on TCDB — DIAMOND calls only (evidence + tcdb_call)
 
 ```example-call
 genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], evidence=["homology"], tcdb_call=["diamond_best_hit", "diamond_tier"])
@@ -803,7 +916,7 @@ genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], evi
 
 *TCDB's trust axes are `sources`, `evidence` and `tier`, plus the `tcdb_call` filter; `min_evidence_score` raises on tcdb. `evidence=['homology']` and `tcdb_call` both drop the eggNOG rows here. Default TCDB rows are gated, so their tier is 1, 2 or null (eggNOG): `max_tier=2` changes nothing unless `include_weak_tcdb_hits=True`. `max_tier=1` keeps tier-1 calls plus the tier-null eggNOG rows, so pair it with `evidence=['homology']`; on tcdb:3.A.1 in MED4 that leaves 4 genes, below the default `min_gene_set_size=5`, so also pass `min_gene_set_size=1`. `include_weak_tcdb_hits=True` adds the below-gate DIAMOND edges instead.*
 
-### Example 16: Filter out uninformative terms (term-side filter, opt-in)
+### Example 17: Filter out uninformative terms (term-side filter, opt-in)
 
 ```example-call
 genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=True, min_gene_set_size=1)
@@ -811,7 +924,7 @@ genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=Tr
 
 *`informative_only=True` excludes terms flagged `is_uninformative='true'` (GO roots, catch-all Cyanorak / TIGR / COG roles, KEGG KOs named 'uncharacterized protein' — for KEGG also the global / overview pathway maps such as `kegg.pathway:ko01100`). Term-side only — never narrows the gene set. Every detail row carries `is_informative: bool`. MED4 KEGG level 3: 1124 → 1094 rows. `min_gene_set_size=1` is needed here because most KOs carry a single MED4 gene and the default size filter (5) would drop them all.*
 
-### Example 17: From level-survey to pathway defs
+### Example 18: From level-survey to pathway defs
 
 ```
 Step 1: ontology_landscape(organism="MED4")
@@ -830,6 +943,7 @@ Step 3: pathway_enrichment(ontology="cyanorak_role", organism="MED4", level=1, e
 Term-anchored: term / level → (gene × term) pairs, hierarchy expanded DOWN. The gene-anchored reverse (locus_tags → their terms, leaf or rollup) is `gene_ontology_terms`.
 ontology_landscape → genes_by_ontology(level=N)
 search_ontology → genes_by_ontology(term_ids=[...])
+search_ontology → genes_by_ontology(term_ids=[...], organism=None, summary=True) → `by_organism` / `organisms_without_genes` for which strains carry the term
 genes_by_ontology → pathway_enrichment
 genes_by_ontology → gene_overview
 genes_by_ontology(ontology='tcdb' | 'ec', term_ids=[...]) → genes_by_metabolite (substrate-anchored pivot — see docs://analysis/metabolites)
@@ -842,7 +956,7 @@ genes_by_ontology(ontology='merops', call_class=['peptidase']) → pathway_enric
 
 - Term-anchored (term → genes). For 'which terms does this gene carry?' use `gene_ontology_terms(locus_tags=[...])` — same ontology surface, opposite anchor.
 
-- Default `min_gene_set_size=5` / `max_gene_set_size=500` suit enrichment and drop small and huge terms, which can hide most of a gene set (e.g. BRITE `tree='transporters'`, `level=2` in MED4). To enumerate every gene pass `min_gene_set_size=1` and a large `max_gene_set_size` (e.g. 100000 over MCP; `None` from Python). The envelope reports what was dropped: `size_filtered_terms` (terms outside the size bounds), `size_filtered_genes` (genes found only in those terms), and a `warnings` entry while either bound is still the default (passing both bounds explicitly keeps the counts but drops the warning). `filtered_out` lists only input `term_ids`, so in `level` mode these fields are the only signal.
+- With one organism, the default `min_gene_set_size=5` / `max_gene_set_size=500` suit enrichment and drop small and huge terms, which can hide most of a gene set (e.g. BRITE `tree='transporters'`, `level=2` in MED4). To enumerate every gene pass `min_gene_set_size=1` and a large `max_gene_set_size` (e.g. 100000 over MCP; `None` from Python). The envelope reports what was dropped: `size_filtered_terms` (terms outside the size bounds), `size_filtered_genes` (genes found only in those terms), and a `warnings` entry while either bound is still the default (passing both bounds explicitly keeps the counts but drops the warning). `filtered_out` lists only input `term_ids`, so in `level` mode these fields are the only signal.
 
 - Substrate-anchored TCDB questions ('which genes transport sucrose?') chain via `genes_by_metabolite`, NOT `genes_by_ontology`. Use `genes_by_ontology(ontology='tcdb', term_ids=[...])` for *family*-level questions ('which genes are in voltage-gated ion channels?'). The metabolite-anchored route includes every TC system curated with the substrate (plus the opt-in family walk); the family-anchored route here is anchored on one TC id and misses cross-family substrate hits.
 
@@ -850,13 +964,23 @@ genes_by_ontology(ontology='merops', call_class=['peptidase']) → pathway_enric
 
 - Results are `(gene × term)` pairs, not distinct genes — use `total_genes` for the gene count. `total_matching` is the row count.
 
-- Gene-set-size filter is organism-scoped via descendants — count of distinct genes annotated to the term or any descendant for `$organism`. Matches `ontology_landscape`'s convention.
+- Gene-set-size bounds count per (term, organism): the distinct genes one genome has on the term or any descendant, never the cross-organism total. Matches `ontology_landscape`'s convention.
+
+- Across organisms (a list or `organism=None`) the size bounds are off unless you pass them, because a per-genome minimum of 5 would drop single- and few-copy families from a presence answer. For enrichment-style gene sets across organisms pass explicit bounds (e.g. `min_gene_set_size=5, max_gene_set_size=500`); they apply to each genome's gene set, so a term can be kept in one strain and dropped in another (`size_filtered_terms` counts the dropped (term, organism) sets).
 
 - For GO (a DAG), level slicing is a best-effort approximation — `level_is_best_effort` flags rows where the min-path to root was ambiguous. Check `ontology_landscape`'s `best_effort_share` per level.
 
 - `level_is_best_effort` is a sparse column — absent when not GO / not best-effort. In pandas, call `df['level_is_best_effort'].fillna(False)` before boolean filtering.
 
-- `organism` is required and single-valued. For cross-organism browsing, loop the tool or use `gene_ontology_terms`.
+- A list entry is word-matched and can expand to many strains: `organism=['Prochlorococcus']` covers every Prochlorococcus genome, not one. Entries that match nothing land in `not_found_organisms` instead of raising. Check `by_organism` for the strains you actually got.
+
+```mistake
+genes_by_ontology(ontology='kegg', organism='Alteromonas', level=1)  # a single string matching several strains raises ValueError
+```
+
+```correction
+genes_by_ontology(ontology='kegg', organism=['Alteromonas'], level=1)  # a list takes every match; or name one strain, e.g. organism='EZ55'
+```
 
 - Pfam is a 2-level ontology: `level=1` → Pfam domains (leaf), `level=0` → PfamClan (parent). Both kinds of IDs are accepted under `ontology='pfam'`.
 
@@ -925,8 +1049,8 @@ response.total_genes  # distinct genes across all matches
 ```python
 from multiomics_explorer import genes_by_ontology
 
-result = genes_by_ontology(ontology=..., organism=...)
-# returns dict with keys: ontology, organism_name, total_matching, total_genes, total_terms, total_categories, genes_per_term_min, genes_per_term_median, genes_per_term_max, terms_per_gene_min, terms_per_gene_median, terms_per_gene_max, by_category, by_level, top_terms, n_best_effort_terms, not_found, wrong_ontology, wrong_level, filtered_out, size_filtered_terms, size_filtered_genes, resolved_aliases, returned, offset, truncated, trust_axes, warnings, filters_applied, skipped_ontologies, by_evidence, by_tier, by_sources, by_call_class, by_tcdb_call, evidence_score_stats, evidence_score_signals, results
+result = genes_by_ontology(ontology=...)
+# returns dict with keys: ontology, organism_name, by_organism, organisms_without_genes, not_found_organisms, total_matching, total_genes, total_terms, total_categories, genes_per_term_min, genes_per_term_median, genes_per_term_max, terms_per_gene_min, terms_per_gene_median, terms_per_gene_max, by_category, by_level, top_terms, n_best_effort_terms, not_found, wrong_ontology, wrong_level, filtered_out, size_filtered_terms, size_filtered_genes, resolved_aliases, returned, offset, truncated, trust_axes, warnings, filters_applied, skipped_ontologies, by_evidence, by_tier, by_sources, by_call_class, by_tcdb_call, evidence_score_stats, evidence_score_signals, results
 ```
 
 Use package import for bulk data extraction in scripts.

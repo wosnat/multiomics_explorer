@@ -17425,3 +17425,23 @@ class TestGbo2d4DetailC6:
     def test_empty_page_raises(self):
         with pytest.raises(ValueError):
             self._build(buckets=[])
+
+
+class TestGbo2d4PfamGuardPrecedence:
+    """Pfam term_ids mode: the label guard is parenthesized on every organism
+    scope, so a trust filter binds on Pfam inputs too (it used to read
+    `t:Pfam OR t:PfamClan AND <trust>`, skipping the filter for a Pfam term)."""
+
+    @pytest.mark.parametrize("organisms", [
+        "Prochlorococcus MED4", ["Prochlorococcus MED4"], None,
+    ])
+    def test_guard_parenthesized_before_trust(self, organisms):
+        from multiomics_explorer.kg.queries_lib import (
+            _genes_by_ontology_match_stage,
+        )
+        cypher, _ = _genes_by_ontology_match_stage(
+            ontology="pfam", level=None, term_ids=["pfam:PF00005"],
+            organisms=organisms, evidence=["curated"],
+        )
+        assert "WHERE (t:Pfam OR t:PfamClan)" in cypher
+        assert "WHERE t:Pfam OR t:PfamClan" not in cypher

@@ -2,11 +2,11 @@
 
 ## What it does
 
-Gene × term pairs for ontology terms in ONE organism (term_ids expand down the hierarchy, level rolls up, both = scoped rollup).
+Gene × term pairs for ontology terms in one, several or all organisms (term_ids expand down, level rolls up, both = scoped rollup).
 
 Use to build TERM2GENE or list a term's genes; for a gene's own annotations use `gene_ontology_terms`, for substrate-anchored TCDB / EC `genes_by_metabolite`.
 Filters: ontology, organism, term_ids, level, tree, min/max_gene_set_size, informative_only, trust filters.
-Returns: by_category, by_level, top_terms, trust rollups, not_found, wrong_ontology, wrong_level; one row = (locus_tag, term_id, evidence).
+Returns: by_organism, organisms_without_genes, by_level, top_terms, trust rollups; one row = (locus_tag, organism_name, term_id, evidence).
 docs://tools/genes_by_ontology; summary=True first.
 
 ## Parameters
@@ -14,12 +14,12 @@ docs://tools/genes_by_ontology; summary=True first.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') | — | Ontology for these term_ids / this level. |
-| organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
+| organism | string \| list[string] \| None | None | One organism, a list (each entry word-matched and may expand to several strains), or omit for all organisms. A single string must resolve to ONE organism. See list_organisms. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level to roll UP to (0 = broadest). At least one of `level` or `term_ids` must be provided. See docs://guide/conventions. |
 | term_ids | list[string] \| None | None | Ontology term IDs (from search_ontology). Without `level`: expand DOWN from each input term. With `level`: scope rollup to these level-N terms. Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced to canonical (see `resolved_aliases`). |
-| min_gene_set_size | int | 5 | Exclude terms with fewer organism-scoped genes than this. Matches `ontology_landscape`'s organism-scoped convention. |
-| max_gene_set_size | int | 500 | Exclude terms with more organism-scoped genes than this. Matches `ontology_landscape`'s organism-scoped convention. Pass a large value (e.g. 100000) to disable. |
+| min_gene_set_size | int | 5 | Exclude (term, organism) gene sets with fewer genes than this (per genome, as `ontology_landscape`). Default 5 applies to a single organism only; with a list or all organisms the default means no bound. |
+| max_gene_set_size | int | 500 | Exclude (term, organism) gene sets with more genes than this (per genome). Default 500 applies to a single organism only; with a list or all organisms the default means no bound. 100000 disables. |
 | informative_only | bool | False | True drops terms the KG flags uninformative (roots, catch-alls). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
@@ -47,10 +47,10 @@ genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
 ## Response sketch
 
 ```expected-keys
-ontology, organism_name, total_matching, total_genes, total_terms, total_categories, genes_per_term_min, genes_per_term_median, genes_per_term_max, terms_per_gene_min, terms_per_gene_median, terms_per_gene_max, by_category, by_level, top_terms, n_best_effort_terms, not_found, wrong_ontology, wrong_level, filtered_out, size_filtered_terms, size_filtered_genes, resolved_aliases, returned, offset, truncated, trust_axes, warnings, filters_applied, skipped_ontologies, by_evidence, by_tier, by_sources, by_call_class, by_tcdb_call, evidence_score_stats, results
+ontology, organism_name, by_organism, organisms_without_genes, not_found_organisms, total_matching, total_genes, total_terms, total_categories, genes_per_term_min, genes_per_term_median, genes_per_term_max, terms_per_gene_min, terms_per_gene_median, terms_per_gene_max, by_category, by_level, top_terms, n_best_effort_terms, not_found, wrong_ontology, wrong_level, filtered_out, size_filtered_terms, size_filtered_genes, resolved_aliases, returned, offset, truncated, trust_axes, warnings, filters_applied, skipped_ontologies, by_evidence, by_tier, by_sources, by_call_class, by_tcdb_call, evidence_score_stats, results
 ```
 
-Result row: `locus_tag, gene_name, product, gene_category, term_id, term_name, level, is_informative, tree, tree_code, evidence, call_class, …`
+Result row: `locus_tag, organism_name, gene_name, product, gene_category, term_id, term_name, level, is_informative, tree, tree_code, evidence, …`
 
 ## Common mistakes
 
@@ -61,6 +61,7 @@ Result row: `locus_tag, gene_name, product, gene_category, term_id, term_name, l
 - Term-anchored: term / level → (gene × term) pairs, hierarchy expanded DOWN. The gene-anchored reverse (locus_tags → their terms, leaf or rollup) is `gene_ontology_terms`.
 - ontology_landscape → genes_by_ontology(level=N)
 - search_ontology → genes_by_ontology(term_ids=[...])
+- search_ontology → genes_by_ontology(term_ids=[...], organism=None, summary=True) → `by_organism` / `organisms_without_genes` for which strains carry the term
 - genes_by_ontology → pathway_enrichment
 - genes_by_ontology → gene_overview
 - genes_by_ontology(ontology='tcdb' | 'ec', term_ids=[...]) → genes_by_metabolite (substrate-anchored pivot — see docs://analysis/metabolites)

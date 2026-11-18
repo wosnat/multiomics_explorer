@@ -9,6 +9,8 @@ examples:
       {
         "ontology": "go_bp",
         "organism_name": "Prochlorococcus MED4",
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 30, "term_count": 1, "row_count": 30}],
+        "...": "13 empty fields omitted",
         "total_matching": 30,
         "total_genes": 30,
         "total_terms": 1,
@@ -26,10 +28,17 @@ examples:
           ...
         ],
         "by_level": [{"level": 6, "n_terms": 1, "n_genes": 30, "row_count": 30}],
-        "top_terms": [{"term_id": "go:0006260", "term_name": "DNA replication", "count": 30, "is_informative": true}],
+        "top_terms": [
+          {
+            "term_id": "go:0006260",
+            "term_name": "DNA replication",
+            "count": 30,
+            "organism_count": 1,
+            "is_informative": true
+          }
+        ],
         "n_best_effort_terms": 1,
         "not_found": [],
-        "...": "11 empty fields omitted",
         "size_filtered_terms": 0,
         "size_filtered_genes": 0,
         "returned": 30,
@@ -47,6 +56,7 @@ examples:
         "results": [
           {
             "locus_tag": "PMM0001",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": "dnaN",
             "product": "DNA polymerase III, beta subunit",
             "gene_category": "Replication and repair",
@@ -58,6 +68,7 @@ examples:
           },
           {
             "locus_tag": "PMM0077",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": "rarA",
             "product": "recombination factor",
             "gene_category": "Replication and repair",
@@ -69,6 +80,7 @@ examples:
           },
           {
             "locus_tag": "PMM0129",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": "holB",
             "product": "DNA polymerase III, delta^ subunit",
             "gene_category": "Replication and repair",
@@ -88,6 +100,8 @@ examples:
       {
         "ontology": "cyanorak_role",
         "organism_name": "Prochlorococcus MED4",
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 1438, "term_count": 69, "row_count": 1761}],
+        "...": "12 empty fields omitted",
         "total_matching": 1761,
         "total_genes": 1438,
         "total_terms": 69,
@@ -110,25 +124,27 @@ examples:
             "term_id": "cyanorak.role:R.2",
             "term_name": "Other > Conserved hypothetical proteins",
             "count": 340,
+            "organism_count": 1,
             "is_informative": false
           },
           {
             "term_id": "cyanorak.role:D.1",
             "term_name": "Cellular processes > Adaptation/acclimation to atypical conditions and detoxification",
             "count": 213,
+            "organism_count": 1,
             "is_informative": true
           },
           {
             "term_id": "cyanorak.role:B.10",
             "term_name": "Biosynthesis of cofactors, prosthetic groups, and carriers > Vitamins",
             "count": 63,
+            "organism_count": 1,
             "is_informative": true
           },
           ...
         ],
         "n_best_effort_terms": 0,
         "not_found": [],
-        "...": "10 empty fields omitted",
         "size_filtered_terms": 41,
         "size_filtered_genes": 53,
         "returned": 50,
@@ -142,6 +158,7 @@ examples:
         "results": [
           {
             "locus_tag": "PMM0107",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": "aroK",
             "product": "shikimate kinase",
             "gene_category": "Amino acid metabolism",
@@ -153,6 +170,7 @@ examples:
           },
           {
             "locus_tag": "PMM0164",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": "trpB",
             "product": "tryptophan synthase, beta subunit",
             "gene_category": "Amino acid metabolism",
@@ -164,6 +182,7 @@ examples:
           },
           {
             "locus_tag": "PMM0224",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": "aroC",
             "product": "chorismate synthase",
             "gene_category": "Amino acid metabolism",
@@ -182,6 +201,61 @@ examples:
 
   - title: Summary-only (envelope, no rows)
     call: genes_by_ontology(ontology="go_bp", organism="MED4", level=1, summary=True)
+
+  - title: Which strains carry a family — presence and copy number across organisms
+    call: genes_by_ontology(ontology="interpro", term_ids=["interpro:IPR063966"], interpro_type="FAMILY", organism=None, summary=True)
+    note: "`organism=None` scans every organism with genes. `by_organism` lists the strains that carry HliA-D with their copy number (`gene_count`); `organisms_without_genes` names the strains that have none, here the heterotrophs. The size bounds are off because more than one organism is in scope, so strains with fewer than 5 copies are kept. `genes_per_term_min` / `max` are copy numbers per genome."
+    keep: [by_organism, organisms_without_genes]
+    response: |
+      {
+        "ontology": "interpro",
+        "...": "12 empty fields omitted",
+        "by_organism": [
+          {"organism_name": "Synechococcus CC9311", "gene_count": 11, "term_count": 1, "row_count": 11},
+          {"organism_name": "Synechococcus BIOS-E4-1", "gene_count": 9, "term_count": 1, "row_count": 9},
+          {"organism_name": "Synechococcus WH5701", "gene_count": 9, "term_count": 1, "row_count": 9},
+          ...
+        ],
+        "organisms_without_genes": ["Alteromonas (MarRef v6)", "Alteromonas macleodii 83-1", "Alteromonas macleodii AD45", ...],
+        "total_matching": 500,
+        "total_genes": 500,
+        "total_terms": 1,
+        "total_categories": 3,
+        "genes_per_term_min": 3,
+        "genes_per_term_median": 5.0,
+        "genes_per_term_max": 11,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 1,
+        "by_category": [
+          {"category": "Stress response and adaptation", "count": 467},
+          {"category": "Unknown", "count": 31},
+          {"category": "Coenzyme metabolism", "count": 2}
+        ],
+        "by_level": [{"level": 0, "n_terms": 1, "n_genes": 500, "row_count": 500}],
+        "top_terms": [
+          {
+            "term_id": "interpro:IPR063966",
+            "term_name": "High light-inducible protein HliA-D-like",
+            "count": 500,
+            "organism_count": 102,
+            "is_informative": true
+          }
+        ],
+        "n_best_effort_terms": 0,
+        "not_found": [],
+        "size_filtered_terms": 0,
+        "size_filtered_genes": 0,
+        "returned": 0,
+        "offset": 0,
+        "truncated": true,
+        "trust_axes": {"interpro": ["sources", "evidence"]},
+        "filters_applied": {"interpro_type": "FAMILY"},
+        "by_evidence": [{"count": 500, "evidence": "signature"}],
+        "by_sources": [{"count": 500, "source": "interproscan"}],
+        "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
+        "results": []
+      }
 
   - title: BRITE tree-scoped rollup (transporters at category level)
     call: genes_by_ontology(ontology="brite", organism="MED4", level=1, tree="transporters")
@@ -202,6 +276,8 @@ examples:
       {
         "ontology": "subcellular_localization",
         "organism_name": "Prochlorococcus MED4",
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 11, "term_count": 1, "row_count": 11}],
+        "...": "15 empty fields omitted",
         "total_matching": 11,
         "total_genes": 11,
         "total_terms": 1,
@@ -219,10 +295,17 @@ examples:
           ...
         ],
         "by_level": [{"level": 0, "n_terms": 1, "n_genes": 11, "row_count": 11}],
-        "top_terms": [{"term_id": "psortb_OuterMembrane", "term_name": "Outer membrane", "count": 11, "is_informative": true}],
+        "top_terms": [
+          {
+            "term_id": "psortb_OuterMembrane",
+            "term_name": "Outer membrane",
+            "count": 11,
+            "organism_count": 1,
+            "is_informative": true
+          }
+        ],
         "n_best_effort_terms": 0,
         "not_found": [],
-        "...": "13 empty fields omitted",
         "size_filtered_terms": 0,
         "size_filtered_genes": 0,
         "returned": 11,
@@ -233,6 +316,7 @@ examples:
         "results": [
           {
             "locus_tag": "PMM0063",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": "ycf66",
             "product": "uncharacterized conserved hypothetical protein Ycf66",
             "gene_category": "Transcription",
@@ -243,6 +327,7 @@ examples:
           },
           {
             "locus_tag": "PMM0097",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": "tolC",
             "product": "TolC-like outer membrane efflux protein, RND family",
             "gene_category": "Stress response and adaptation",
@@ -253,6 +338,7 @@ examples:
           },
           {
             "locus_tag": "PMM0151",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": "scpA",
             "product": "scpA/B family protein",
             "gene_category": "Cellular processes",
@@ -271,6 +357,8 @@ examples:
       {
         "ontology": "signal_peptide_type",
         "organism_name": "Prochlorococcus MED4",
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 15, "term_count": 1, "row_count": 15}],
+        "...": "15 empty fields omitted",
         "total_matching": 15,
         "total_genes": 15,
         "total_terms": 1,
@@ -293,12 +381,12 @@ examples:
             "term_id": "signalp_LIPO",
             "term_name": "Lipoprotein signal peptide (Sec/SPII)",
             "count": 15,
+            "organism_count": 1,
             "is_informative": true
           }
         ],
         "n_best_effort_terms": 0,
         "not_found": [],
-        "...": "13 empty fields omitted",
         "size_filtered_terms": 0,
         "size_filtered_genes": 0,
         "returned": 15,
@@ -309,6 +397,7 @@ examples:
         "results": [
           {
             "locus_tag": "PMM0296",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": "ycf48",
             "product": "photosystem II stability/assembly factor",
             "gene_category": "Photosynthesis",
@@ -319,6 +408,7 @@ examples:
           },
           {
             "locus_tag": "PMM0437",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": null,
             "product": "conserved hypothetical protein",
             "gene_category": "Unknown",
@@ -329,6 +419,7 @@ examples:
           },
           {
             "locus_tag": "PMM0513",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": "lepB",
             "product": "signal peptidase I",
             "gene_category": "Post-translational modification",
@@ -347,6 +438,8 @@ examples:
       {
         "ontology": "interpro",
         "organism_name": "Prochlorococcus MED4",
+        "by_organism": [{"organism_name": "Prochlorococcus MED4", "gene_count": 119, "term_count": 1, "row_count": 119}],
+        "...": "13 empty fields omitted",
         "total_matching": 119,
         "total_genes": 119,
         "total_terms": 1,
@@ -369,12 +462,12 @@ examples:
             "term_id": "interpro:IPR027417",
             "term_name": "P-loop containing nucleoside triphosphate hydrolase",
             "count": 119,
+            "organism_count": 1,
             "is_informative": true
           }
         ],
         "n_best_effort_terms": 0,
         "not_found": [],
-        "...": "11 empty fields omitted",
         "size_filtered_terms": 0,
         "size_filtered_genes": 0,
         "returned": 50,
@@ -387,6 +480,7 @@ examples:
         "results": [
           {
             "locus_tag": "PMM0010",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": "ftsY",
             "product": "signal recognition particle-docking protein FtsY",
             "gene_category": "Post-translational modification",
@@ -399,6 +493,7 @@ examples:
           },
           {
             "locus_tag": "PMM0019",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": "rsgA",
             "product": "ribosome biogenesis GTPase / thiamine phosphate phosphatase",
             "gene_category": "Coenzyme metabolism",
@@ -411,6 +506,7 @@ examples:
           },
           {
             "locus_tag": "PMM0049",
+            "organism_name": "Prochlorococcus MED4",
             "gene_name": "coaE",
             "product": "dephospho-CoA kinase",
             "gene_category": "Coenzyme metabolism",
@@ -431,6 +527,8 @@ examples:
       {
         "ontology": "merops",
         "organism_name": "Alteromonas macleodii MIT1002",
+        "by_organism": [{"organism_name": "Alteromonas macleodii MIT1002", "gene_count": 72, "term_count": 7, "row_count": 72}],
+        "...": "9 empty fields omitted",
         "total_matching": 72,
         "total_genes": 72,
         "total_terms": 7,
@@ -449,14 +547,13 @@ examples:
         ],
         "by_level": [{"level": 0, "n_terms": 7, "n_genes": 72, "row_count": 72}],
         "top_terms": [
-          {"term_id": "merops.clan:SC", "term_name": "SC", "count": 22, "is_informative": true},
-          {"term_id": "merops.clan:MA", "term_name": "MA", "count": 18, "is_informative": true},
-          {"term_id": "merops.clan:MH", "term_name": "MH", "count": 8, "is_informative": true},
+          {"term_id": "merops.clan:SC", "term_name": "SC", "count": 22, "organism_count": 1, "is_informative": true},
+          {"term_id": "merops.clan:MA", "term_name": "MA", "count": 18, "organism_count": 1, "is_informative": true},
+          {"term_id": "merops.clan:MH", "term_name": "MH", "count": 8, "organism_count": 1, "is_informative": true},
           ...
         ],
         "n_best_effort_terms": 0,
         "not_found": [],
-        "...": "7 empty fields omitted",
         "size_filtered_terms": 20,
         "size_filtered_genes": 46,
         "returned": 50,
@@ -473,6 +570,7 @@ examples:
         "results": [
           {
             "locus_tag": "MIT1002_00401",
+            "organism_name": "Alteromonas macleodii MIT1002",
             "gene_name": "dcp",
             "product": "M3 family metallopeptidase",
             "gene_category": "Amino acid metabolism",
@@ -485,6 +583,7 @@ examples:
           },
           {
             "locus_tag": "MIT1002_00745",
+            "organism_name": "Alteromonas macleodii MIT1002",
             "gene_name": null,
             "product": "dipeptidyl-peptidase 3 family protein",
             "gene_category": "Unknown",
@@ -497,6 +596,7 @@ examples:
           },
           {
             "locus_tag": "MIT1002_00890",
+            "organism_name": "Alteromonas macleodii MIT1002",
             "gene_name": "pepN",
             "product": "M1 family metallopeptidase",
             "gene_category": "Amino acid metabolism",
@@ -517,6 +617,8 @@ examples:
       {
         "ontology": "merops",
         "organism_name": "Alteromonas macleodii MIT1002",
+        "by_organism": [{"organism_name": "Alteromonas macleodii MIT1002", "gene_count": 112, "term_count": 10, "row_count": 112}],
+        "...": "10 empty fields omitted",
         "total_matching": 112,
         "total_genes": 112,
         "total_terms": 10,
@@ -535,14 +637,13 @@ examples:
         ],
         "by_level": [{"level": 0, "n_terms": 10, "n_genes": 112, "row_count": 112}],
         "top_terms": [
-          {"term_id": "merops.clan:SC", "term_name": "SC", "count": 31, "is_informative": true},
-          {"term_id": "merops.clan:MA", "term_name": "MA", "count": 18, "is_informative": true},
-          {"term_id": "merops.clan:PC", "term_name": "PC", "count": 13, "is_informative": true},
+          {"term_id": "merops.clan:SC", "term_name": "SC", "count": 31, "organism_count": 1, "is_informative": true},
+          {"term_id": "merops.clan:MA", "term_name": "MA", "count": 18, "organism_count": 1, "is_informative": true},
+          {"term_id": "merops.clan:PC", "term_name": "PC", "count": 13, "organism_count": 1, "is_informative": true},
           ...
         ],
         "n_best_effort_terms": 0,
         "not_found": [],
-        "...": "8 empty fields omitted",
         "size_filtered_terms": 17,
         "size_filtered_genes": 38,
         "returned": 50,
@@ -561,6 +662,7 @@ examples:
         "results": [
           {
             "locus_tag": "MIT1002_00401",
+            "organism_name": "Alteromonas macleodii MIT1002",
             "gene_name": "dcp",
             "product": "M3 family metallopeptidase",
             "gene_category": "Amino acid metabolism",
@@ -573,6 +675,7 @@ examples:
           },
           {
             "locus_tag": "MIT1002_00745",
+            "organism_name": "Alteromonas macleodii MIT1002",
             "gene_name": null,
             "product": "dipeptidyl-peptidase 3 family protein",
             "gene_category": "Unknown",
@@ -585,6 +688,7 @@ examples:
           },
           {
             "locus_tag": "MIT1002_00890",
+            "organism_name": "Alteromonas macleodii MIT1002",
             "gene_name": "pepN",
             "product": "M1 family metallopeptidase",
             "gene_category": "Amino acid metabolism",
@@ -655,6 +759,7 @@ chaining:
   - "Term-anchored: term / level → (gene × term) pairs, hierarchy expanded DOWN. The gene-anchored reverse (locus_tags → their terms, leaf or rollup) is `gene_ontology_terms`."
   - "ontology_landscape → genes_by_ontology(level=N)"
   - "search_ontology → genes_by_ontology(term_ids=[...])"
+  - "search_ontology → genes_by_ontology(term_ids=[...], organism=None, summary=True) → `by_organism` / `organisms_without_genes` for which strains carry the term"
   - "genes_by_ontology → pathway_enrichment"
   - "genes_by_ontology → gene_overview"
   - "genes_by_ontology(ontology='tcdb' | 'ec', term_ids=[...]) → genes_by_metabolite (substrate-anchored pivot — see docs://analysis/metabolites)"
@@ -665,14 +770,17 @@ chaining:
 
 mistakes:
   - "Term-anchored (term → genes). For 'which terms does this gene carry?' use `gene_ontology_terms(locus_tags=[...])` — same ontology surface, opposite anchor."
-  - "Default `min_gene_set_size=5` / `max_gene_set_size=500` suit enrichment and drop small and huge terms, which can hide most of a gene set (e.g. BRITE `tree='transporters'`, `level=2` in MED4). To enumerate every gene pass `min_gene_set_size=1` and a large `max_gene_set_size` (e.g. 100000 over MCP; `None` from Python). The envelope reports what was dropped: `size_filtered_terms` (terms outside the size bounds), `size_filtered_genes` (genes found only in those terms), and a `warnings` entry while either bound is still the default (passing both bounds explicitly keeps the counts but drops the warning). `filtered_out` lists only input `term_ids`, so in `level` mode these fields are the only signal."
+  - "With one organism, the default `min_gene_set_size=5` / `max_gene_set_size=500` suit enrichment and drop small and huge terms, which can hide most of a gene set (e.g. BRITE `tree='transporters'`, `level=2` in MED4). To enumerate every gene pass `min_gene_set_size=1` and a large `max_gene_set_size` (e.g. 100000 over MCP; `None` from Python). The envelope reports what was dropped: `size_filtered_terms` (terms outside the size bounds), `size_filtered_genes` (genes found only in those terms), and a `warnings` entry while either bound is still the default (passing both bounds explicitly keeps the counts but drops the warning). `filtered_out` lists only input `term_ids`, so in `level` mode these fields are the only signal."
   - "Substrate-anchored TCDB questions ('which genes transport sucrose?') chain via `genes_by_metabolite`, NOT `genes_by_ontology`. Use `genes_by_ontology(ontology='tcdb', term_ids=[...])` for *family*-level questions ('which genes are in voltage-gated ion channels?'). The metabolite-anchored route includes every TC system curated with the substrate (plus the opt-in family walk); the family-anchored route here is anchored on one TC id and misses cross-family substrate hits."
   - "At least one of `level` or `term_ids` must be set — calling without either is an error."
   - "Results are `(gene × term)` pairs, not distinct genes — use `total_genes` for the gene count. `total_matching` is the row count."
-  - "Gene-set-size filter is organism-scoped via descendants — count of distinct genes annotated to the term or any descendant for `$organism`. Matches `ontology_landscape`'s convention."
+  - "Gene-set-size bounds count per (term, organism): the distinct genes one genome has on the term or any descendant, never the cross-organism total. Matches `ontology_landscape`'s convention."
+  - "Across organisms (a list or `organism=None`) the size bounds are off unless you pass them, because a per-genome minimum of 5 would drop single- and few-copy families from a presence answer. For enrichment-style gene sets across organisms pass explicit bounds (e.g. `min_gene_set_size=5, max_gene_set_size=500`); they apply to each genome's gene set, so a term can be kept in one strain and dropped in another (`size_filtered_terms` counts the dropped (term, organism) sets)."
   - "For GO (a DAG), level slicing is a best-effort approximation — `level_is_best_effort` flags rows where the min-path to root was ambiguous. Check `ontology_landscape`'s `best_effort_share` per level."
   - "`level_is_best_effort` is a sparse column — absent when not GO / not best-effort. In pandas, call `df['level_is_best_effort'].fillna(False)` before boolean filtering."
-  - "`organism` is required and single-valued. For cross-organism browsing, loop the tool or use `gene_ontology_terms`."
+  - "A list entry is word-matched and can expand to many strains: `organism=['Prochlorococcus']` covers every Prochlorococcus genome, not one. Entries that match nothing land in `not_found_organisms` instead of raising. Check `by_organism` for the strains you actually got."
+  - wrong: "genes_by_ontology(ontology='kegg', organism='Alteromonas', level=1)  # a single string matching several strains raises ValueError"
+    right: "genes_by_ontology(ontology='kegg', organism=['Alteromonas'], level=1)  # a list takes every match; or name one strain, e.g. organism='EZ55'"
   - "Pfam is a 2-level ontology: `level=1` → Pfam domains (leaf), `level=0` → PfamClan (parent). Both kinds of IDs are accepted under `ontology='pfam'`."
   - "KEGG: gene edges only hit the KO leaf (`level=3`). Passing `level=0/1/2` rolls up to category/subcategory/pathway via `is_a`."
   - "BRITE: gene edges hit the KO leaf (`level=3`, same as KEGG). Passing `level=0/1/2` rolls up through BRITE tree hierarchy. Each BRITE tree is a separate functional classification — use `tree` to scope to a specific tree (e.g. `tree='transporters'`). Without `tree`, results mix all BRITE trees. Use `list_filter_values('brite_tree')` to discover available trees."

@@ -209,10 +209,12 @@ def genes_by_ontology_scenarios():
                  term_ids=_2D4_HLI_TERMS, interpro_type="FAMILY",
                  offset=fx.OFFSET_PAST_END)),
         Scenario(
-            # presence answer across every strain (the 2d.4 origin)
-            "all_organisms_hli_presence_summary",
+            # presence answer across every strain (the 2d.4 origin); a small
+            # detail page, not summary=True: the harness reads empty results
+            # as an empty match (summary coverage: test_gbo_cross_organism_live)
+            "all_organisms_hli_presence_page",
             dict(ontology="interpro", term_ids=_2D4_HLI_TERMS,
-                 interpro_type="FAMILY", summary=True)),
+                 interpro_type="FAMILY", limit=5)),
     ]
 
 

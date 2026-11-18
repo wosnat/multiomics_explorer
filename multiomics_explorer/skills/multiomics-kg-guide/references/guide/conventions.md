@@ -135,12 +135,13 @@ values as `list_filter_values` spells them: `treatment_type` /
 
 ### Single-organism vs cross-organism
 
-Four organism-scope shapes; every scalar `organism=` uses the same
+Five organism-scope shapes; every scalar `organism=` uses the same
 resolver ("Organism naming" below). **Required
-scalar `organism=`** (omitting raises, list raises) — needs one gene
-universe (TERM2GENE mapping, background, single-organism chemistry join):
-`genes_by_ontology`, `ontology_landscape`, `pathway_enrichment`,
-`cluster_enrichment`, `genes_by_metabolite`. **Optional, single
+scalar `organism=`** (omitting raises, list raises) — one gene
+universe (background, chemistry join): `ontology_landscape`,
+`pathway_enrichment`, `cluster_enrichment`, `genes_by_metabolite`.
+**One, a list or all** — `genes_by_ontology` (size bounds per
+genome). **Optional, single
 organism enforced** — inferred from input IDs, raises if they span
 organisms: `differential_expression_by_gene`, `gene_response_profile`,
 `genes_in_cluster`, `metabolites_by_gene`. **Optional, mixed batches
@@ -156,7 +157,7 @@ in `not_found`); a handful of tools take no organism parameter at all
 `gene_aa_sequence`, `gene_neighbors`; plus `search_homolog_groups`,
 `discussed_by_publication`; gene rows still carry `organism`).
 
-The pattern: tools needing an organism-scoped index (TERM2GENE,
+The pattern: tools needing an organism-scoped index (enrichment
 backgrounds, chemistry joins) are single-organism; summaries and
 comparisons are cross-organism. See
 "Organism naming" below for `coculture_partner=`. Per-row routing signals

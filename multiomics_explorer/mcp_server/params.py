@@ -81,6 +81,12 @@ OrganismFromTagsSingleParam = Annotated[str | None, Field(
     min_length=1,
 )]
 
+# genes_by_ontology: one organism, a list, or every organism (cross-organism
+# TERM2GENE; a single string still must resolve to one organism).
+OrganismScopeParam = Annotated[str | list[str] | None, Field(
+    description="One organism, a list (each entry word-matched and may expand to several strains), or omit for all organisms. A single string must resolve to ONE organism. See list_organisms.",
+)]
+
 OrganismContainsParam = Annotated[str | None, Field(
     description="Organism: case-insensitive substring match on the organism name ('MED4'); a genus word matches every strain. See list_organisms.",
 )]

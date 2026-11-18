@@ -3,7 +3,7 @@
 ## Guides
 
 - `docs://guide/concepts` — ~6591 tok — Read when an entity in a tool output is unfamiliar: what each node and edge means…
-- `docs://guide/conventions` — ~7043 tok — Read when a cross-tool behaviour surprises you: envelopes, filters, not_found vs…
+- `docs://guide/conventions` — ~7046 tok — Read when a cross-tool behaviour surprises you: envelopes, filters, not_found vs…
 - `docs://guide/python_api` — ~4167 tok — Read before scripting: Python vs MCP, imports, the three return shapes, DataFrame conversion.
 - `docs://guide/start_here` — ~4019 tok — Read first: the tool families, a question-shape decision tree, and when to call summary=True.
 
@@ -29,7 +29,7 @@
 - `docs://tools/genes_by_homolog_group` — ~722 tok
 - `docs://tools/genes_by_metabolite` — ~1700 tok
 - `docs://tools/genes_by_numeric_metric` — ~1652 tok
-- `docs://tools/genes_by_ontology` — ~1738 tok
+- `docs://tools/genes_by_ontology` — ~1831 tok
 - `docs://tools/genes_in_cluster` — ~760 tok
 - `docs://tools/kg_release_info` — ~671 tok
 - `docs://tools/kg_schema` — ~620 tok
@@ -76,7 +76,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/genes_by_homolog_group/full` — ~2539 tok
 - `docs://tools/genes_by_metabolite/full` — ~11107 tok
 - `docs://tools/genes_by_numeric_metric/full` — ~6342 tok
-- `docs://tools/genes_by_ontology/full` — ~12064 tok
+- `docs://tools/genes_by_ontology/full` — ~13778 tok
 - `docs://tools/genes_in_cluster/full` — ~1979 tok
 - `docs://tools/kg_release_info/full` — ~2354 tok
 - `docs://tools/kg_schema/full` — ~2178 tok

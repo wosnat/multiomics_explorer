@@ -4015,10 +4015,128 @@ def _size_warning_due(min_gene_set_size, max_gene_set_size) -> bool:
             or _is_default_size(max_gene_set_size))
 
 
+# Full fetches (limit=None) run the detail query in chunks of contiguous
+# buckets summing to at most this many rows; a larger bucket goes alone.
+_GBO_DETAIL_CHUNK_ROWS = 20_000
+
+
+def _gbo_page_buckets(
+    buckets: list[dict], offset: int, limit: int,
+) -> tuple[list[dict], int]:
+    """Buckets overlapping rows [offset, offset + limit) of the match.
+
+    ``buckets`` are ordered (organism_name, term_id) with ``n_genes`` each;
+    the detail rows follow the same order, so cumulative ``n_genes`` maps a
+    row window onto buckets. Returns (page buckets, inner offset into the
+    first of them). Empty when the window starts past the end.
+    """
+    out: list[dict] = []
+    pos = 0
+    first_lo: int | None = None
+    for b in buckets:
+        lo, hi = pos, pos + b["n_genes"]
+        pos = hi
+        if hi <= offset:
+            continue
+        if lo >= offset + limit:
+            break
+        if first_lo is None:
+            first_lo = lo
+        out.append(b)
+    return out, (offset - first_lo if first_lo is not None else 0)
+
+
+def _gbo_full_fetch_chunks(
+    buckets: list[dict], offset: int,
+) -> list[tuple[list[dict], int]]:
+    """limit=None: every bucket from ``offset`` on, in chunks of contiguous
+    buckets summing to <= _GBO_DETAIL_CHUNK_ROWS rows (a larger bucket goes
+    alone). Returns [(chunk buckets, inner offset)]; only the first chunk can
+    carry a non-zero inner offset."""
+    chunks: list[tuple[list[dict], int]] = []
+    cur: list[dict] = []
+    cur_rows = 0
+    cur_inner = 0
+    pos = 0
+    for b in buckets:
+        lo, hi = pos, pos + b["n_genes"]
+        pos = hi
+        if hi <= offset:
+            continue
+        inner = max(offset - lo, 0)
+        n = b["n_genes"] - inner
+        if cur and cur_rows + n > _GBO_DETAIL_CHUNK_ROWS:
+            chunks.append((cur, cur_inner))
+            cur, cur_rows = [], 0
+        if not cur:
+            cur_inner = inner
+        cur.append(b)
+        cur_rows += n
+    if cur:
+        chunks.append((cur, cur_inner))
+    return chunks
+
+
+def _gbo_resolve_organism_scope(
+    organism: "str | list[str] | None", conn: "GraphConnection",
+) -> tuple["str | list[str] | None", list[str]]:
+    """Resolve genes_by_ontology's organism scope.
+
+    Returns (scope, not_found_organisms). ``scope`` is the canonical name for
+    a str, a sorted de-duplicated list of canonical names for a list (may be
+    empty when nothing matched), or None for every organism.
+    """
+    if organism is None:
+        return None, []
+    if isinstance(organism, str):
+        try:
+            resolved = _validate_organism_inputs(
+                organism=organism, locus_tags=None, experiment_ids=None,
+                conn=conn,
+            )
+        except ValueError as exc:
+            if "matches multiple organisms" in str(exc):
+                raise ValueError(
+                    f"{exc}. To query several organisms at once, pass a "
+                    f"list (e.g. organism=['{organism}'])."
+                ) from exc
+            raise
+        return resolved, []
+    entries = list(organism)
+    if not entries:
+        raise ValueError("organism list must not be empty.")
+    scope: set[str] = set()
+    not_found: list[str] = []
+    for entry in entries:
+        cypher, params = build_resolve_organism_for_organism(organism=entry)
+        rows = conn.execute_query(cypher, **params)
+        orgs = rows[0].get("organisms", []) if rows else []
+        if orgs:
+            scope.update(orgs)
+        elif entry not in not_found:
+            not_found.append(entry)
+    return sorted(scope), not_found
+
+
+def _gbo_organisms_with_genes(conn: "GraphConnection") -> list[str]:
+    """Every organism with genes — the universe behind organism=None."""
+    rows = conn.execute_query(
+        "MATCH (o:OrganismTaxon) WHERE coalesce(o.gene_count, 0) > 0 "
+        "RETURN collect(DISTINCT o.preferred_name) AS organisms"
+    )
+    names: set[str] = set()
+    for r in rows or []:
+        if r.get("organisms"):
+            names.update(r["organisms"])
+        elif r.get("organism_name"):
+            names.add(r["organism_name"])
+    return sorted(names)
+
+
 @listify_bare_str
 def genes_by_ontology(
     ontology: str,
-    organism: str,
+    organism: str | list[str] | None = None,
     level: int | None = None,
     term_ids: list[str] | None = None,
     min_gene_set_size: int = GENE_SET_SIZE_MIN_DEFAULT,
@@ -4045,6 +4163,27 @@ def genes_by_ontology(
     Mode 1 (term_ids only): expand DOWN, row term_id = input term.
     Mode 2 (level only): roll UP, row term_id = level-N ancestor.
     Mode 3 (level + term_ids): Mode 2 scoped to provided level-N terms.
+
+    ``organism`` sets which genomes are searched:
+
+    - a ``str``: one organism. It must match exactly one organism; a name
+      that matches several raises ``ValueError`` (pass a list instead).
+    - a ``list[str]``: these organisms. Each entry is word-matched and may
+      expand to several strains (``"Prochlorococcus"`` matches every
+      Prochlorococcus genome); the matches are unioned and de-duplicated.
+      Entries that match nothing are listed in ``not_found_organisms``. An
+      empty list raises ``ValueError``.
+    - ``None`` (default): every organism with genes.
+
+    Gene sets are counted per (term, organism): ``min_gene_set_size`` /
+    ``max_gene_set_size`` bound a term's gene set inside one genome. Left at
+    their defaults, the bounds are 5 / 500 for a single ``str`` organism and
+    off (1 / None) for a list or None, so a term with a few genes per strain
+    is not dropped from a presence answer. Explicit values always apply.
+
+    Rows carry ``organism_name`` and are ordered by
+    (``organism_name``, ``term_id``, ``locus_tag``); ``offset`` / ``limit``
+    page over that order, and ``limit=None`` returns every row.
 
     Trust filters bind on the gene->term edge before the hierarchy walk, so
     they shape the gene set itself and not just the rows you read. They all
@@ -4084,10 +4223,21 @@ def genes_by_ontology(
     which has no composite score), ``filters_applied``,
     ``skipped_ontologies`` and ``warnings``.
 
+    Organism keys: ``organism_name`` (the organism when exactly one is in
+    scope, else None); ``by_organism`` (``organism_name``, ``gene_count``,
+    ``term_count``, ``row_count`` per organism with at least one row,
+    largest ``gene_count`` first; ``row_count`` sums to
+    ``total_matching``); ``organisms_without_genes`` (organisms in scope
+    with no row, sorted); ``not_found_organisms`` (list entries that
+    matched no organism). ``top_terms`` entries carry ``organism_count``
+    and a ``count`` summed across organisms; ``total_terms`` and
+    ``by_level.n_terms`` count distinct terms; ``genes_per_term_*`` are
+    over per-(term, organism) gene sets.
+
     ``size_filtered_terms`` / ``size_filtered_genes`` (always present, int)
     report what the ``min_gene_set_size`` / ``max_gene_set_size`` bounds
-    dropped: terms that pass every other filter but fall outside the size
-    window, and distinct genes lost from ``total_genes`` because they sit
+    dropped: (term, organism) gene sets that pass every other filter but
+    fall outside the size window, and distinct genes lost from ``total_genes`` because they sit
     only in those terms. Both are 0 when nothing is dropped or when the size
     filters are no-ops (``min_gene_set_size <= 1`` and
     ``max_gene_set_size=None``). A warning fires when terms were dropped
@@ -4115,10 +4265,24 @@ def genes_by_ontology(
         raise ValueError(
             "At least one of `level` or `term_ids` must be provided."
         )
-    if min_gene_set_size < 0:
+    # Cross-organism scope (list / None): size bounds still at their default
+    # markers resolve to "no bound"; one organism (str) keeps 5 / 500.
+    # Explicit values always apply, per (term, organism).
+    single_scope = isinstance(organism, str)
+    if organism is not None and not single_scope and not list(organism):
+        raise ValueError("organism list must not be empty.")
+    eff_min = min_gene_set_size
+    eff_max = max_gene_set_size
+    if not single_scope:
+        if _is_default_size(eff_min):
+            eff_min = 1
+        if _is_default_size(eff_max):
+            eff_max = None
+    if eff_min < 0:
         raise ValueError("min_gene_set_size must be >= 0.")
-    if max_gene_set_size is not None and max_gene_set_size < min_gene_set_size:
+    if eff_max is not None and eff_max < eff_min:
         raise ValueError("max_gene_set_size must be >= min_gene_set_size.")
+    bounds_active = eff_min > 1 or eff_max is not None
     if summary:
         limit = 0
 
@@ -4132,10 +4296,15 @@ def genes_by_ontology(
     # nodes, never by this file. A missing node degrades to a pivot read.
     trust_warnings = _validate_categorical_values(conn, ontology, trust_filters)
 
-    # Resolve organism to canonical name (fuzzy → exact)
-    organism = _validate_organism_inputs(
-        organism=organism, locus_tags=None, experiment_ids=None, conn=conn,
-    )
+    # Resolve the organism scope: canonical str, resolved list, or None.
+    scope, not_found_organisms = _gbo_resolve_organism_scope(organism, conn)
+    if single_scope:
+        organism_name = scope
+    elif scope is not None and len(scope) == 1:
+        organism_name = scope[0]
+    else:
+        organism_name = None
+    scope_empty = scope is not None and not single_scope and not scope
 
     # --- Query V: validate term_ids (only when provided) ---
     not_found: list[str] = []
@@ -4156,63 +4325,50 @@ def genes_by_ontology(
                 wrong_level.append(r["tid"])
         ok_term_ids = [r["tid"] for r in v_rows if r["status"] == "ok"]
 
-    # Short-circuit when all term_ids invalid: skip queries A/B/D, fall through
-    # to envelope assembly with empty aggregates. _stats and Counter both handle
-    # empty inputs gracefully; `if limit == 0:` below skips Query D.
+    # Short-circuit when all term_ids are invalid or no organism resolved:
+    # skip queries A/B/C/D and assemble an empty envelope. _stats and Counter
+    # handle empty inputs; `if limit == 0:` below skips Query D.
     effective_term_ids = ok_term_ids if term_ids else None
     size_filtered_terms = 0
     size_filtered_genes = 0
-    if term_ids and not effective_term_ids:
+    scope_kwargs = dict(
+        ontology=ontology, organism=scope,
+        level=level, term_ids=effective_term_ids,
+        informative_only=informative_only,
+        include_weak_tcdb_hits=include_weak_tcdb_hits,
+        **trust_filters,
+    )
+    if (term_ids and not effective_term_ids) or scope_empty:
         per_term: list[dict] = []
         per_gene: list[dict] = []
         limit = 0  # forces detail to be skipped without re-checking summary flag
     else:
-        # --- Query A: per-term aggregate ---
+        # --- Query A: one bucket per (organism, term) ---
         pt_cypher, pt_params = build_genes_by_ontology_per_term(
-            ontology=ontology, organism=organism,
-            level=level, term_ids=effective_term_ids,
-            min_gene_set_size=min_gene_set_size,
-            max_gene_set_size=max_gene_set_size,
-            informative_only=informative_only,
-            include_weak_tcdb_hits=include_weak_tcdb_hits,
-            **trust_filters,
+            min_gene_set_size=eff_min, max_gene_set_size=eff_max,
+            **scope_kwargs,
         )
         per_term = conn.execute_query(pt_cypher, **pt_params)
 
         # --- Query B: per-gene aggregate ---
         pg_cypher, pg_params = build_genes_by_ontology_per_gene(
-            ontology=ontology, organism=organism,
-            level=level, term_ids=effective_term_ids,
-            min_gene_set_size=min_gene_set_size,
-            max_gene_set_size=max_gene_set_size,
-            informative_only=informative_only,
-            include_weak_tcdb_hits=include_weak_tcdb_hits,
-            **trust_filters,
+            min_gene_set_size=eff_min, max_gene_set_size=eff_max,
+            **scope_kwargs,
         )
         per_gene = conn.execute_query(pg_cypher, **pg_params)
 
         # --- Queries A'/B': size-filter diagnostic (only when active) ---
         # Re-run A and B with the size filters disabled; the difference is
         # what the size bounds silently dropped.
-        if min_gene_set_size > 1 or max_gene_set_size is not None:
+        if bounds_active:
             upt_cypher, upt_params = build_genes_by_ontology_per_term(
-                ontology=ontology, organism=organism,
-                level=level, term_ids=effective_term_ids,
-                min_gene_set_size=0,
-                max_gene_set_size=None,
-                informative_only=informative_only,
-                include_weak_tcdb_hits=include_weak_tcdb_hits,
-                **trust_filters,
+                min_gene_set_size=0, max_gene_set_size=None,
+                **scope_kwargs,
             )
             unfiltered_per_term = conn.execute_query(upt_cypher, **upt_params)
             upg_cypher, upg_params = build_genes_by_ontology_per_gene(
-                ontology=ontology, organism=organism,
-                level=level, term_ids=effective_term_ids,
-                min_gene_set_size=0,
-                max_gene_set_size=None,
-                informative_only=informative_only,
-                include_weak_tcdb_hits=include_weak_tcdb_hits,
-                **trust_filters,
+                min_gene_set_size=0, max_gene_set_size=None,
+                **scope_kwargs,
             )
             unfiltered_per_gene = conn.execute_query(upg_cypher, **upg_params)
             size_filtered_terms = max(
@@ -4220,24 +4376,51 @@ def genes_by_ontology(
             size_filtered_genes = max(
                 len(unfiltered_per_gene) - len(per_gene), 0)
 
+    # One organism: tolerate rows without organism_name.
+    if single_scope:
+        for r in per_term:
+            r.setdefault("organism_name", scope)
+        for r in per_gene:
+            r.setdefault("organism_name", scope)
+    # Bucket order is the detail row order; the page planner walks it.
+    per_term = sorted(
+        per_term, key=lambda r: (r["organism_name"] or "", r["term_id"]))
+
     size_warnings: list[str] = []
     if size_filtered_terms > 0 and _size_warning_due(
             min_gene_set_size, max_gene_set_size):
         size_warnings.append(
             f"{size_filtered_terms} terms ({size_filtered_genes} genes not "
             f"otherwise covered) fell outside "
-            f"min_gene_set_size={min_gene_set_size} / "
-            f"max_gene_set_size={max_gene_set_size} and were dropped. "
+            f"min_gene_set_size={int(eff_min)} / "
+            f"max_gene_set_size={None if eff_max is None else int(eff_max)} "
+            "and were dropped. "
             "The defaults suit enrichment; to enumerate every gene pass "
             "min_gene_set_size=1 and a large max_gene_set_size "
             "(e.g. 100000 via MCP; None from Python)."
         )
 
     # --- Compose envelope ---
+    # per_term rows are (organism, term) buckets; per-term fields sum the
+    # buckets of each term.
     total_matching = sum(r["n_genes"] for r in per_term)
     total_genes = len(per_gene)
-    total_terms = len(per_term)
-    n_best_effort_terms = sum(1 for r in per_term if r["best_effort"])
+
+    terms: dict[str, dict] = {}
+    for r in per_term:
+        e = terms.get(r["term_id"])
+        if e is None:
+            terms[r["term_id"]] = {
+                "term_id": r["term_id"], "term_name": r["term_name"],
+                "level": r["level"], "best_effort": r["best_effort"],
+                "is_informative": r["is_informative"],
+                "count": r["n_genes"], "organism_count": 1,
+            }
+        else:
+            e["count"] += r["n_genes"]
+            e["organism_count"] += 1
+    total_terms = len(terms)
+    n_best_effort_terms = sum(1 for e in terms.values() if e["best_effort"])
 
     # by_category from per_gene
     cat_counter = Counter(r["gene_category"] for r in per_gene)
@@ -4247,16 +4430,17 @@ def genes_by_ontology(
     ]
     total_categories = len(cat_counter)
 
-    # by_level from per_term (for n_terms, row_count) + per_gene (for n_genes)
+    # by_level: distinct terms (n_terms) and rows (row_count) from the
+    # buckets, genes (n_genes) from per_gene.
     level_terms: dict[int, dict] = {}
-    for r in per_term:
-        lvl = r["level"]
+    for t_entry in terms.values():
+        lvl = t_entry["level"]
         e = level_terms.setdefault(
             lvl,
             {"level": lvl, "n_terms": 0, "n_genes": 0, "row_count": 0},
         )
         e["n_terms"] += 1
-        e["row_count"] += r["n_genes"]
+        e["row_count"] += t_entry["count"]
     # n_genes per level from per_gene.levels_hit
     for r in per_gene:
         for lvl in r["levels_hit"]:
@@ -4267,17 +4451,18 @@ def genes_by_ontology(
                 level_terms[lvl]["n_genes"] += 1  # count once per gene per level
     by_level = sorted(level_terms.values(), key=lambda e: e["level"])
 
-    # top_terms: top 5 by n_genes desc, tie-break term_id asc
+    # top_terms: top 5 by rows summed across organisms desc, tie term_id asc
     top_terms_sorted = sorted(
-        per_term, key=lambda r: (-r["n_genes"], r["term_id"])
+        terms.values(), key=lambda e: (-e["count"], e["term_id"])
     )[:5]
     top_terms = [
-        {"term_id": r["term_id"], "term_name": r["term_name"],
-         "count": r["n_genes"], "is_informative": r["is_informative"]}
-        for r in top_terms_sorted
+        {"term_id": e["term_id"], "term_name": e["term_name"],
+         "count": e["count"], "organism_count": e["organism_count"],
+         "is_informative": e["is_informative"]}
+        for e in top_terms_sorted
     ]
 
-    # Distributions
+    # Distributions: genes per (term, organism) gene set
     genes_per_term_vals = [r["n_genes"] for r in per_term]
     terms_per_gene_vals = [r["n_terms"] for r in per_gene]
 
@@ -4289,17 +4474,47 @@ def genes_by_ontology(
     g_min, g_med, g_max = _stats(genes_per_term_vals)
     t_min, t_med, t_max = _stats(terms_per_gene_vals)
 
-    # filtered_out: ok term_ids not present in per_term output (Modes 1 & 3)
+    # filtered_out: ok term_ids with no surviving bucket in any organism
     filtered_out: list[str] = []
     if effective_term_ids:
-        emitted_term_ids = {r["term_id"] for r in per_term}
         filtered_out = [
-            tid for tid in effective_term_ids if tid not in emitted_term_ids
+            tid for tid in effective_term_ids if tid not in terms
         ]
+
+    # by_organism: organisms with >= 1 row
+    org_entries: dict[str, dict] = {}
+    for r in per_term:
+        e = org_entries.setdefault(
+            r["organism_name"],
+            {"organism_name": r["organism_name"], "gene_count": 0,
+             "term_count": 0, "row_count": 0},
+        )
+        e["term_count"] += 1
+        e["row_count"] += r["n_genes"]
+    for r in per_gene:
+        e = org_entries.get(r.get("organism_name"))
+        if e is not None:
+            e["gene_count"] += 1
+    by_organism = sorted(
+        org_entries.values(),
+        key=lambda e: (-e["gene_count"], e["organism_name"] or ""),
+    )
+
+    # organisms_without_genes: organisms in scope with no row
+    if scope_empty:
+        in_scope: list[str] = []
+    elif scope is None:
+        in_scope = _gbo_organisms_with_genes(conn)
+    elif single_scope:
+        in_scope = [scope]
+    else:
+        in_scope = list(scope)
+    organisms_without_genes = sorted(
+        o for o in set(in_scope) if o not in org_entries)
 
     envelope = {
         "ontology": ontology,
-        "organism_name": organism,
+        "organism_name": organism_name,
         "total_matching": total_matching,
         "total_genes": total_genes,
         "total_terms": total_terms,
@@ -4313,6 +4528,9 @@ def genes_by_ontology(
         "by_category": by_category,
         "by_level": by_level,
         "top_terms": top_terms,
+        "by_organism": by_organism,
+        "organisms_without_genes": organisms_without_genes,
+        "not_found_organisms": not_found_organisms,
         "n_best_effort_terms": n_best_effort_terms,
         "not_found": not_found,
         "wrong_ontology": wrong_ontology,
@@ -4332,19 +4550,20 @@ def genes_by_ontology(
     # there in summary mode too. The detail query below already IS the full
     # match when it is unpaginated; on a paged or summary call the rollups
     # come from Cypher count() aggregations — never a second row scan.
+    # With size bounds active the rollups read only the surviving buckets.
     aggregate_done = False
     scored = _any_scored([ontology])
     if ontology_row_columns(ontology, verbose=False, force_trust_axes=True) and (
         per_term and not (limit is None and offset == 0)
     ):
         agg_cypher, agg_params = build_genes_by_ontology_trust_rollups(
-            ontology=ontology, organism=organism,
-            level=level, term_ids=effective_term_ids,
-            min_gene_set_size=min_gene_set_size,
-            max_gene_set_size=max_gene_set_size,
-            informative_only=informative_only,
-            include_weak_tcdb_hits=include_weak_tcdb_hits,
-            **trust_filters,
+            min_gene_set_size=eff_min, max_gene_set_size=eff_max,
+            buckets=(
+                [{"organism_name": r["organism_name"],
+                  "term_id": r["term_id"]} for r in per_term]
+                if bounds_active else None
+            ),
+            **scope_kwargs,
         )
         agg_rows = conn.execute_query(agg_cypher, **agg_params)
         agg_row = agg_rows[0] if agg_rows else None
@@ -4375,17 +4594,28 @@ def genes_by_ontology(
         envelope["results"] = []
         return envelope
 
-    det_cypher, det_params = build_genes_by_ontology_detail(
-        ontology=ontology, organism=organism,
-        level=level, term_ids=effective_term_ids,
-        min_gene_set_size=min_gene_set_size,
-        max_gene_set_size=max_gene_set_size,
-        verbose=verbose, limit=limit, offset=offset,
-        informative_only=informative_only,
-        include_weak_tcdb_hits=include_weak_tcdb_hits,
-        **trust_filters,
-    )
-    results = conn.execute_query(det_cypher, **det_params)
+    # Page planner: each detail query reads only the buckets overlapping
+    # its row window, plus an inner offset into the first of them. A full
+    # fetch (limit=None) runs in chunks of at most _GBO_DETAIL_CHUNK_ROWS.
+    if limit is None:
+        pages = _gbo_full_fetch_chunks(per_term, offset)
+    else:
+        page, inner_offset = _gbo_page_buckets(per_term, offset, limit)
+        pages = [(page, inner_offset)] if page else []
+
+    results: list[dict] = []
+    for page, inner_offset in pages:
+        det_cypher, det_params = build_genes_by_ontology_detail(
+            ontology=ontology,
+            buckets=[{"organism_name": b["organism_name"],
+                      "term_id": b["term_id"]} for b in page],
+            level=level,
+            verbose=verbose, limit=limit, offset=inner_offset,
+            informative_only=informative_only,
+            include_weak_tcdb_hits=include_weak_tcdb_hits,
+            **trust_filters,
+        )
+        results.extend(conn.execute_query(det_cypher, **det_params))
 
     # Rollups and warnings read the raw rows: the compact strip below hides
     # the verbose axes from the caller, but the distribution still belongs

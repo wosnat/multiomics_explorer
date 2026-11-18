@@ -35,6 +35,7 @@ _SHARED = {
         "OrganismParam", "OrganismSingleParam",
         "OrganismRequiredParam", "OrganismContainsParam",
         "OrganismFromTagsParam", "OrganismFromTagsSingleParam",
+        "OrganismScopeParam",
     ],
     "limit": ["LimitParam", "LimitOptionalParam"],
     "offset": ["OffsetParam"],
@@ -59,12 +60,13 @@ def test_shared_params_have_one_description_each():
     for pname, tnames in _SHARED.items():
         descs = {params.__dict__[t].__metadata__[0].description for t in tnames}
         if pname == "organism":
-            # five matching contracts; OrganismSingleParam and
+            # six matching contracts; OrganismSingleParam and
             # OrganismRequiredParam share the single-organism text;
             # OrganismFromTagsParam (mixed batches) and
             # OrganismFromTagsSingleParam (one inferred organism) are the
-            # locus-tag tools' optional check.
-            assert len(descs) == 5, f"{pname}: expected 5 contract texts, got: {descs}"
+            # locus-tag tools' optional check; OrganismScopeParam is
+            # genes_by_ontology's one / list / all scope.
+            assert len(descs) == 6, f"{pname}: expected 6 contract texts, got: {descs}"
         elif pname == "metabolite_ids":
             # two contracts: chemical roles warn everywhere except
             # genes_by_metabolite / metabolites_by_gene, where they are a

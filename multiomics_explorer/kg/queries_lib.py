@@ -831,7 +831,6 @@ def _best_edge_rebind_cypher(
     cfg = _ontology_cfg(ontology)
     label = cfg["label"]
     gene_rel = cfg["gene_rel"]
-    rank_key = _best_edge_rank_key(cfg)
     gate = cfg.get("gate")
 
     bridge = cfg.get("bridge")
@@ -847,47 +846,15 @@ def _best_edge_rebind_cypher(
     depth = "*0..1" if cfg.get("parent_label") else "*0.."
     walk_pattern = f"-[:{rel_union}{depth}]->(t)"
 
-    row_props = _ontology_row_edge_props(
-        ontology, verbose, force_trust_axes=force_trust_axes,
+    edge_map, sort_list = _best_edge_map_and_sort(
+        ontology, verbose, rel_var="r2", leaf_var="l2",
+        force_trust_axes=force_trust_axes, include_weak=include_weak,
     )
-    entries = [f"{prop}: r2.{prop}" for prop in row_props]
-    sort_keys: list[str] = []
-    if gate and include_weak:
-        entries.append(
-            f"gate_rank: CASE WHEN {_gate_pass_predicate(gate, 'r2')}"
-            " THEN 1 ELSE 0 END"
-        )
-        sort_keys.append("gate_rank")
-    if isinstance(rank_key, dict):
-        then = _safe_identifier(rank_key["then"], "rank_order property")
-        entries.append(f"call_rank: {_rank_order_case(rank_key, 'r2')}")
-        entries.append(f"then_rank: coalesce(r2.{then}, -1.0)")
-        sort_keys.extend(["call_rank", "then_rank"])
-    elif rank_key != "attachment_level":
-        if rank_key not in row_props:
-            entries.append(f"{rank_key}: r2.{rank_key}")
-        sort_keys.append(rank_key)
-    # Secondary key (backlog 2.1): equal primary scores pick the deepest
-    # attachment (higher `level` = more specific), so a rollup row never
-    # reports a `superseded` ancestor edge over a most-specific descendant
-    # with the same score. Levels are always in the map.
-    entries.append("attachment_level: l2.level")
-    sort_keys.append("attachment_level")
-    # Final tie-break (KG ask A6, 2026-10-28): edges still tied fell back to
-    # storage order, which changes per import, so `sources` flipped between
-    # builds. Leaf id, then sources, both ascending.
-    entries.append("attachment_id: l2.id")
-    entries.append(
-        "sources_key: apoc.text.join(coalesce(r2.sources, []), ',')"
-    )
-    sort_keys.extend(["^attachment_id", "^sources_key"])
-    edge_map = "{" + ", ".join(entries) + "}"
     edge_where = _and_join(
         "" if include_weak or not gate else _gate_pass_predicate(gate, "r2"),
         trust_frag,
     )
     trust_where = f"            WHERE {edge_where}\n" if edge_where else ""
-    sort_list = "[" + ", ".join(f"'{k}'" for k in sort_keys) + "]"
 
     return (
         f"{distinct_head}\n"
@@ -896,6 +863,65 @@ def _best_edge_rebind_cypher(
         f"            | {edge_map}] AS edges\n"
         f"WITH t, g, head(apoc.coll.sortMulti(edges, {sort_list})) AS r\n"
     )
+
+
+def _best_edge_map_and_sort(
+    ontology: str,
+    verbose: bool,
+    *,
+    rel_var: str,
+    leaf_var: str,
+    force_trust_axes: bool = False,
+    include_weak: bool = False,
+) -> tuple[str, str]:
+    """(edge map, sortMulti key list) for the one-edge-per-(gene, term) pick.
+
+    Shared by the re-walk rebind (`_best_edge_rebind_cypher`, `r2` / `l2`)
+    and the head-edge rollup (2d.4 C5, `r` / `leaf`), so both rank edges
+    with exactly the same map entries and keys.
+    """
+    cfg = _ontology_cfg(ontology)
+    rank_key = _best_edge_rank_key(cfg)
+    gate = cfg.get("gate")
+    r = rel_var
+
+    row_props = _ontology_row_edge_props(
+        ontology, verbose, force_trust_axes=force_trust_axes,
+    )
+    entries = [f"{prop}: {r}.{prop}" for prop in row_props]
+    sort_keys: list[str] = []
+    if gate and include_weak:
+        entries.append(
+            f"gate_rank: CASE WHEN {_gate_pass_predicate(gate, r)}"
+            " THEN 1 ELSE 0 END"
+        )
+        sort_keys.append("gate_rank")
+    if isinstance(rank_key, dict):
+        then = _safe_identifier(rank_key["then"], "rank_order property")
+        entries.append(f"call_rank: {_rank_order_case(rank_key, r)}")
+        entries.append(f"then_rank: coalesce({r}.{then}, -1.0)")
+        sort_keys.extend(["call_rank", "then_rank"])
+    elif rank_key != "attachment_level":
+        if rank_key not in row_props:
+            entries.append(f"{rank_key}: {r}.{rank_key}")
+        sort_keys.append(rank_key)
+    # Secondary key (backlog 2.1): equal primary scores pick the deepest
+    # attachment (higher `level` = more specific), so a rollup row never
+    # reports a `superseded` ancestor edge over a most-specific descendant
+    # with the same score. Levels are always in the map.
+    entries.append(f"attachment_level: {leaf_var}.level")
+    sort_keys.append("attachment_level")
+    # Final tie-break (KG ask A6, 2026-10-28): edges still tied fell back to
+    # storage order, which changes per import, so `sources` flipped between
+    # builds. Leaf id, then sources, both ascending.
+    entries.append(f"attachment_id: {leaf_var}.id")
+    entries.append(
+        f"sources_key: apoc.text.join(coalesce({r}.sources, []), ',')"
+    )
+    sort_keys.extend(["^attachment_id", "^sources_key"])
+    edge_map = "{" + ", ".join(entries) + "}"
+    sort_list = "[" + ", ".join(f"'{k}'" for k in sort_keys) + "]"
+    return edge_map, sort_list
 
 
 def build_vocab_values(*, applies_to: str, prop: str) -> tuple[str, dict]:
@@ -4597,12 +4623,15 @@ def build_genes_by_ontology_validate(
     }
 
 
+_GBO_SINGLE_ORG_GENE = "(g:Gene {organism_name: $org})"
+
+
 def _genes_by_ontology_match_stage(
     *,
     ontology: str,
     level: int | None,
     term_ids: list[str] | None,
-    organism: str,
+    organisms: str | list[str] | None,
     tree: str | None = None,
     informative_only: bool = False,
     sources: list[str] | None = None,
@@ -4613,12 +4642,28 @@ def _genes_by_ontology_match_stage(
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
     include_weak_tcdb_hits: bool = False,
+    collapse: bool = True,
+    carry_edges: bool = False,
 ) -> tuple[str, dict]:
     """Shared MATCH + size-filter-WITH for detail/per_term/per_gene builders.
 
-    Returns the Cypher fragment through `WITH t, collect(DISTINCT g) AS term_genes`
-    with the $min_gene_set_size / $max_gene_set_size filter applied,
-    plus the common params dict (org, term_ids/level as applicable).
+    Returns the Cypher fragment through
+    `WITH t, g.organism_name AS org, collect(DISTINCT g) AS term_genes`
+    (one bucket per (term, organism), 2d.4 C2) with the
+    $min_gene_set_size / $max_gene_set_size filter applied, plus the common
+    params dict (org / orgs, term_ids / level as applicable).
+
+    Organism scope (2d.4 C1): a `str` keeps the single-organism property map
+    `(g:Gene {organism_name: $org})`; a `list` matches `(g:Gene)` and
+    and-joins `g.organism_name IN $orgs` into the gene→leaf WHERE (next to
+    the trust and gate predicates, ahead of the walk); `None` matches every
+    organism with no predicate.
+
+    `collapse=False` stops after the head (and the informative filter): no
+    gene collect and no size filter, so the caller reads the head's
+    `(t, g, r, leaf)` bindings directly (2d.4 C5 rollups / C6 detail).
+    `carry_edges=True` carries `r, leaf` through the informative filter's
+    WITH for such a caller.
 
     When `informative_only=True`, an extra term-level filter
     `AND coalesce(t.is_uninformative, '') <> 'true'` is applied BEFORE the
@@ -4645,12 +4690,24 @@ def _genes_by_ontology_match_stage(
         ontology, sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
     )
+    params: dict = {}
+    single_org = isinstance(organisms, str)
+    if single_org:
+        gene_node = _GBO_SINGLE_ORG_GENE
+        org_pred = ""
+        params["org"] = organisms
+    else:
+        gene_node = "(g:Gene)"
+        org_pred = ""
+        if organisms is not None:
+            org_pred = "g.organism_name IN $orgs"
+            params["orgs"] = list(organisms)
+    # Organism scope, gate, then trust: one conjunction on the gene→leaf edge.
     trust_frag = _and_join(
+        org_pred,
         ontology_gate_clause(ontology, include_weak=include_weak_tcdb_hits),
         trust_frag,
     )
-
-    params: dict = {"org": organism}
     params.update(trust_params)
 
     if level is None:
@@ -4678,8 +4735,12 @@ def _genes_by_ontology_match_stage(
                 "WITH input_tid, coalesce(tp, tc) AS t\n"
                 "OPTIONAL MATCH (t)<-[:Pfam_in_pfam_clan*0..1]-(leaf:Pfam)\n"
                 "WITH t, coalesce(leaf, t) AS leaf\n"
-                "MATCH (g:Gene {organism_name: $org})-[r:Gene_has_pfam]->(leaf)\n"
-                "WHERE t:Pfam OR t:PfamClan"
+                f"MATCH {gene_node}-[r:Gene_has_pfam]->(leaf)\n"
+                # Parenthesized so the appended facet / trust / organism
+                # `AND` predicates bind on both labels. Unparenthesized, AND
+                # bound tighter than OR and a Pfam (non-clan) input skipped
+                # the trust filter.
+                + "WHERE (t:Pfam OR t:PfamClan)"
                 + facet_and
                 + (f" AND {trust_frag}" if trust_frag else "")
                 + "\n"
@@ -4697,7 +4758,7 @@ def _genes_by_ontology_match_stage(
                     f"MATCH (t:{leaf} {{id: input_tid}})\n"
                     f"{facet_where}"
                     f"{walk}\n"
-                    f"MATCH (g:Gene {{organism_name: $org}})"
+                    f"MATCH {gene_node}"
                     f"-[r:{frag['gene_rel']}]->(leaf)\n"
                     f"{trust_where}"
                 )
@@ -4707,7 +4768,7 @@ def _genes_by_ontology_match_stage(
                     "UNWIND $term_ids AS input_tid\n"
                     f"MATCH (t:{leaf} {{id: input_tid}})\n"
                     f"{facet_where}"
-                    f"MATCH (g:Gene {{organism_name: $org}})"
+                    f"MATCH {gene_node}"
                     f"-[r:{frag['gene_rel']}]->(t)\n"
                     f"{trust_where}"
                 )
@@ -4715,7 +4776,7 @@ def _genes_by_ontology_match_stage(
         # Mode 2/3 — walk UP, filter on level (and optionally term_ids).
         params["level"] = level
         frag = _hierarchy_walk(ontology, direction="up")
-        bind = frag["bind_up"]
+        bind = frag["bind_up"].replace(_GBO_SINGLE_ORG_GENE, gene_node)
         walk = frag["walk_up"]
         # Pfam's walk_up already carries a `WHERE t:Pfam OR t:PfamClan` guard
         # — merge the level filter in via AND instead of opening a new WHERE.
@@ -4750,7 +4811,7 @@ def _genes_by_ontology_match_stage(
     # weak-only term is sized on its weak gene count.
     gate = _ontology_cfg(ontology).get("gate")
     weak_sizing = bool(gate) and include_weak_tcdb_hits
-    carry = ", r" if weak_sizing else ""
+    carry = ", r, leaf" if carry_edges else (", r" if weak_sizing else "")
     informative_filter = (
         f"WITH t, g{carry} WHERE coalesce(t.is_uninformative, '') <> 'true'\n"
         if informative_only else ""
@@ -4761,22 +4822,24 @@ def _genes_by_ontology_match_stage(
     # Collect DISTINCT g (not records) so multi-edge ontologies don't
     # inflate term-size counts — r is re-bound via OPTIONAL MATCH in
     # the detail builder when needed.
+    if not collapse:
+        return f"{cypher_head}\n{informative_filter}".rstrip("\n"), params
     if weak_sizing:
         gated = _gate_pass_predicate(gate, "r")
         size_filter = (
-            "WITH t, collect(DISTINCT g) AS term_genes,\n"
+            "WITH t, g.organism_name AS org, collect(DISTINCT g) AS term_genes,\n"
             f"     collect(DISTINCT CASE WHEN {gated} THEN g END)"
             " AS gated_genes\n"
-            "WITH t, term_genes, CASE WHEN size(gated_genes) > 0"
+            "WITH t, org, term_genes, CASE WHEN size(gated_genes) > 0"
             " THEN size(gated_genes) ELSE size(term_genes) END AS set_size\n"
             "WHERE set_size >= $min_gene_set_size\n"
             "  AND ($max_gene_set_size IS NULL OR "
             "set_size <= $max_gene_set_size)\n"
-            "WITH t, term_genes"
+            "WITH t, org, term_genes"
         )
     else:
         size_filter = (
-            "WITH t, collect(DISTINCT g) AS term_genes\n"
+            "WITH t, g.organism_name AS org, collect(DISTINCT g) AS term_genes\n"
             "WHERE size(term_genes) >= $min_gene_set_size\n"
             "  AND ($max_gene_set_size IS NULL OR "
             "size(term_genes) <= $max_gene_set_size)"
@@ -4787,11 +4850,8 @@ def _genes_by_ontology_match_stage(
 def build_genes_by_ontology_detail(
     *,
     ontology: str,
-    organism: str,
+    buckets: list[dict],
     level: int | None = None,
-    term_ids: list[str] | None = None,
-    min_gene_set_size: int = 5,
-    max_gene_set_size: int | None = 500,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -4806,56 +4866,66 @@ def build_genes_by_ontology_detail(
     interpro_type: str | None = None,
     include_weak_tcdb_hits: bool = False,
 ) -> tuple[str, dict]:
-    """Build (gene × term) detail query. Dispatches on (level, term_ids).
+    """Build the (gene × term) detail query for one page of buckets (2d.4 C6).
 
-    `organism` is required (single-organism contract).
+    `buckets` is the page's slice of Query A (`build_genes_by_ontology_per_term`)
+    rows: `[{organism_name, term_id}, ...]`, already sized there, so this query
+    takes no size bounds and collects no gene lists. The head runs in the
+    caller's mode with `term_ids` := the page's distinct terms and organism
+    scope := the page's distinct organisms (`$orgs`):
 
-    Mode 1: term_ids only — walk DOWN.
-    Mode 2: level only — walk UP, filter on level.
-    Mode 3: level + term_ids — walk UP, filter on level AND input_tids.
+    Mode 1: `level=None` — walk DOWN from the page's terms.
+    Mode 3: `level` given — walk UP, filter on level AND the page's terms
+    (level-only callers run as Mode 3 for the page).
+
+    `WITH DISTINCT t, g` then keeps only the page's exact
+    `"<organism>|<term_id>"` pairs (`$bucket_keys`), dropping the
+    cross-product pairs the org × term narrowing admits. `offset` / `limit`
+    are the inner page bounds within those buckets.
 
     Trust filters (`sources` / `evidence` / `max_tier` / `min_evidence_score` /
-    `call_class`) bind on the gene→leaf relationship `r` BEFORE the walk and
-    the size collapse, so per-term gene-set sizes reflect the filtered edges
-    (spec §7.1). Facets (`tree`, `interpro_type`) bind on `t` after the walk.
-    On a hierarchical ontology the trust columns come from the gene's best
-    edge under `t` via the one-edge-per-(gene, term) rebind (spec §7.2).
+    `call_class` / `tcdb_call`) bind on the gene→leaf relationship `r`.
+    Facets (`tree`, `interpro_type`) bind on `t`. On a hierarchical ontology
+    the trust columns come from the gene's best edge under `t` via the
+    one-edge-per-(gene, term) rebind (spec §7.2).
 
-    RETURN keys (compact): locus_tag, gene_name, product, gene_category,
-    term_id, term_name, level, tree, tree_code, is_informative, plus the
-    ontology's compact trust columns — `evidence`, and `interpro_type` /
-    `call_class` where owned.
+    RETURN keys (compact): locus_tag, organism_name, gene_name, product,
+    gene_category, term_id, term_name, level, tree, tree_code,
+    is_informative, plus the ontology's compact trust columns — `evidence`,
+    and `interpro_type` / `call_class` where owned.
     RETURN keys (verbose): adds function_description, level_is_best_effort
     and the ontology's native detail. See
     `ontology_row_columns(ontology, verbose)` for the exact owned set; the
     api layer strips everything else.
+    ORDER BY organism_name, term_id, locus_tag (a total order across
+    organisms).
 
     The remaining trust axes (`sources`, `evidence_score`, `tier`) are
     projected in BOTH modes (`force_trust_axes`) so the envelope rollups and
     the tier-null warning have rows to read; the api layer strips them back
     off compact rows.
     """
-    # Validation stays in the builder (helper would also need it, but the
-    # detail-builder tests expect `match="level.*term_ids"`).
-    if level is None and not term_ids:
+    if not buckets:
         raise ValueError(
-            "At least one of `level` or `term_ids` must be provided."
+            "buckets must be a non-empty list of {organism_name, term_id}."
         )
-    if max_gene_set_size is not None and max_gene_set_size < min_gene_set_size:
-        raise ValueError(
-            "max_gene_set_size must be >= min_gene_set_size."
-        )
+    page_orgs = list(dict.fromkeys(b["organism_name"] for b in buckets))
+    page_terms = list(dict.fromkeys(b["term_id"] for b in buckets))
+    bucket_keys = list(dict.fromkeys(
+        f"{b['organism_name']}|{b['term_id']}" for b in buckets
+    ))
 
     head, params = _genes_by_ontology_match_stage(
-        ontology=ontology, level=level, term_ids=term_ids, organism=organism,
+        ontology=ontology, level=level, term_ids=page_terms,
+        organisms=page_orgs,
         tree=tree, informative_only=informative_only,
         sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
         interpro_type=interpro_type,
         include_weak_tcdb_hits=include_weak_tcdb_hits,
+        collapse=False,
     )
-    params["min_gene_set_size"] = min_gene_set_size
-    params["max_gene_set_size"] = max_gene_set_size
+    params["bucket_keys"] = bucket_keys
 
     # Row return
     verbose_cols = (
@@ -4868,14 +4938,15 @@ def build_genes_by_ontology_detail(
         include_weak=include_weak_tcdb_hits,
     )
     return_block = (
-        "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
+        "RETURN g.locus_tag AS locus_tag, g.organism_name AS organism_name,\n"
+        "       g.gene_name AS gene_name,\n"
         "       g.product AS product, g.gene_category AS gene_category,\n"
         f"       t.id AS term_id, {_term_name_cypher(ONTOLOGY_CONFIG[ontology])} AS term_name,"
         " t.level AS level,\n"
         "       t.tree AS tree, t.tree_code AS tree_code,\n"
         "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative"
         f"{verbose_cols}{edge_prop_cols}\n"
-        "ORDER BY t.id, g.locus_tag"
+        "ORDER BY organism_name, term_id, locus_tag"
     )
 
     # Pagination
@@ -4887,6 +4958,13 @@ def build_genes_by_ontology_detail(
     if limit is not None:
         limit_clause = "\nLIMIT $limit"
         params["limit"] = limit
+
+    # One row per (gene, term) of the page's buckets.
+    bucket_head = (
+        "WITH DISTINCT t, g\n"
+        "WHERE g.organism_name IN $orgs"
+        " AND g.organism_name + '|' + t.id IN $bucket_keys"
+    )
 
     # Re-bind `r` for the (gene, term) pair. Emitted only when the ontology
     # owns row columns in this mode — skipping it avoids multi-edge fan-out.
@@ -4903,23 +4981,24 @@ def build_genes_by_ontology_detail(
             rel_var="r2",
         )
         edge_rebind = _best_edge_rebind_cypher(
-            ontology, verbose, trust_frag=rebind_trust, force_trust_axes=True,
+            ontology, verbose, trust_frag=rebind_trust,
+            distinct_head=bucket_head, force_trust_axes=True,
             include_weak=include_weak_tcdb_hits,
         )
     elif ontology_row_columns(ontology, verbose, force_trust_axes=True):
-        edge_rebind = f"OPTIONAL MATCH (g)-[r:{cfg['gene_rel']}]->(t)\n"
+        edge_rebind = (
+            f"{bucket_head}\n"
+            f"OPTIONAL MATCH (g)-[r:{cfg['gene_rel']}]->(t)\n"
+        )
     else:
-        edge_rebind = ""
+        edge_rebind = f"{bucket_head}\n"
 
     cypher = (
         f"{head}\n"
-        f"UNWIND term_genes AS g\n"
         f"{edge_rebind}"
         f"{return_block}{skip_clause}{limit_clause}"
     )
     return cypher, params
-
-
 
 
 # --- ontology_term_details (spec §7.5, design §6) -----------------------------
@@ -5134,7 +5213,7 @@ def build_ontology_term_details(
 def build_genes_by_ontology_trust_rollups(
     *,
     ontology: str,
-    organism: str,
+    organism: str | list[str] | None,
     level: int | None = None,
     term_ids: list[str] | None = None,
     min_gene_set_size: int = 5,
@@ -5149,14 +5228,31 @@ def build_genes_by_ontology_trust_rollups(
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
     include_weak_tcdb_hits: bool = False,
+    buckets: list[dict] | None = None,
 ) -> tuple[str, dict]:
     """Aggregate-only full-match trust projection for genes_by_ontology.
 
-    Same MATCH stage, filters and one-edge-per-(gene, term) rebind as
+    Same MATCH stage, filters and one-edge-per-(gene, term) pick as
     `build_genes_by_ontology_detail`, but the tail is a single aggregation
     over the (gene, term) edges — no per-row id / locus_tag, no pagination —
     so the envelope rollups describe the whole match without a second row
     scan (spec §13 i).
+
+    `organism` is a str, a list (`$orgs`) or None (all organisms); see
+    `_genes_by_ontology_match_stage`.
+
+    Hierarchical (best-edge) ontologies (2d.4 C5) read the edges the head
+    already bound: `WITH DISTINCT t, g, r, leaf`, then one edge map per
+    (gene, term) with exactly the rebind's entries and rank keys (`r` /
+    `leaf` in place of `r2` / `l2`), so no gene list is collected and no
+    hierarchy is re-walked. Size bounds act through `buckets` (Query A's
+    surviving `[{organism_name, term_id}]`), passed as the `$bucket_set` map
+    `{"<org>|<term_id>": true}`, only when the bounds are active
+    (`min_gene_set_size > 1` or `max_gene_set_size` set). Bounds active with
+    `buckets=None` falls back to the head's own size collapse and the
+    re-walk rebind (correct, but slow and memory-heavy across organisms).
+    Flat ontologies keep the head's size collapse and their direct
+    `OPTIONAL MATCH`.
 
     Rollups follow the api's row-derived shapes: `by_evidence`
     [{evidence, count}], `by_tier` [{tier, count}] with a string `'null'`
@@ -5179,38 +5275,64 @@ def build_genes_by_ontology_trust_rollups(
             "max_gene_set_size must be >= min_gene_set_size."
         )
 
-    head, params = _genes_by_ontology_match_stage(
-        ontology=ontology, level=level, term_ids=term_ids, organism=organism,
-        tree=tree, informative_only=informative_only,
-        sources=sources, evidence=evidence, max_tier=max_tier,
-        min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
-        interpro_type=interpro_type,
-        include_weak_tcdb_hits=include_weak_tcdb_hits,
-    )
-    params["min_gene_set_size"] = min_gene_set_size
-    params["max_gene_set_size"] = max_gene_set_size
-
     cfg = ONTOLOGY_CONFIG[ontology]
     trust = cfg.get("trust") or {}
     compact_edge = cfg.get("compact_edge") or {}
     has_edge_cols = bool(
         ontology_row_columns(ontology, False, force_trust_axes=True)
     )
+    bounds_active = min_gene_set_size > 1 or max_gene_set_size is not None
+    best_edge = _uses_best_edge_rebind(ontology, False, force_trust_axes=True)
+    head_edges = best_edge and (buckets is not None or not bounds_active)
 
-    if _uses_best_edge_rebind(ontology, False, force_trust_axes=True):
-        rebind_trust, _ = build_trust_filter_clause(
-            ontology, sources=sources, evidence=evidence, max_tier=max_tier,
-            min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
-            rel_var="r2",
+    head, params = _genes_by_ontology_match_stage(
+        ontology=ontology, level=level, term_ids=term_ids, organisms=organism,
+        tree=tree, informative_only=informative_only,
+        sources=sources, evidence=evidence, max_tier=max_tier,
+        min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
+        interpro_type=interpro_type,
+        include_weak_tcdb_hits=include_weak_tcdb_hits,
+        collapse=not head_edges, carry_edges=head_edges,
+    )
+
+    if head_edges:
+        # C5: the head already filtered r by trust / gate / organism, so its
+        # (g, r, leaf) bindings are exactly the edges the re-walk rebind
+        # would enumerate for (t, g).
+        edge_map, sort_list = _best_edge_map_and_sort(
+            ontology, False, rel_var="r", leaf_var="leaf",
+            force_trust_axes=True, include_weak=include_weak_tcdb_hits,
         )
-        edge_rebind = _best_edge_rebind_cypher(
-            ontology, False, trust_frag=rebind_trust, force_trust_axes=True,
-            include_weak=include_weak_tcdb_hits,
+        bucket_where = ""
+        if bounds_active:
+            bucket_where = "WHERE $bucket_set[g.organism_name + '|' + t.id]\n"
+            params["bucket_set"] = {
+                f"{b['organism_name']}|{b['term_id']}": True for b in buckets
+            }
+        edge_rebind = (
+            "WITH DISTINCT t, g, r, leaf\n"
+            f"{bucket_where}"
+            f"WITH t, g, collect({edge_map}) AS edges\n"
+            f"WITH t, g, head(apoc.coll.sortMulti(edges, {sort_list})) AS r\n"
         )
-    elif has_edge_cols:
-        edge_rebind = f"OPTIONAL MATCH (g)-[r:{cfg['gene_rel']}]->(t)\n"
     else:
-        edge_rebind = ""
+        params["min_gene_set_size"] = min_gene_set_size
+        params["max_gene_set_size"] = max_gene_set_size
+        if best_edge:
+            rebind_trust, _ = build_trust_filter_clause(
+                ontology, sources=sources, evidence=evidence, max_tier=max_tier,
+                min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
+                rel_var="r2",
+            )
+            rebind = _best_edge_rebind_cypher(
+                ontology, False, trust_frag=rebind_trust, force_trust_axes=True,
+                include_weak=include_weak_tcdb_hits,
+            )
+        elif has_edge_cols:
+            rebind = f"OPTIONAL MATCH (g)-[r:{cfg['gene_rel']}]->(t)\n"
+        else:
+            rebind = ""
+        edge_rebind = f"UNWIND term_genes AS g\n{rebind}"
 
     def _freq(values: str, key: str) -> str:
         return (
@@ -5293,7 +5415,6 @@ def build_genes_by_ontology_trust_rollups(
 
     cypher = (
         f"{head}\n"
-        "UNWIND term_genes AS g\n"
         f"{edge_rebind}"
         "WITH " + ",\n     ".join(agg_parts) + "\n"
         "RETURN " + ",\n       ".join(ret_parts)
@@ -5304,7 +5425,7 @@ def build_genes_by_ontology_trust_rollups(
 def build_genes_by_ontology_per_term(
     *,
     ontology: str,
-    organism: str,
+    organism: str | list[str] | None,
     level: int | None = None,
     term_ids: list[str] | None = None,
     min_gene_set_size: int = 5,
@@ -5320,24 +5441,27 @@ def build_genes_by_ontology_per_term(
     interpro_type: str | None = None,
     include_weak_tcdb_hits: bool = False,
 ) -> tuple[str, dict]:
-    """Per-term aggregate. One row per surviving term.
+    """Per-bucket aggregate (Query A). One row per surviving (organism, term).
 
-    `organism` is required (single-organism contract). Feeds summary fields
-    such as `top_terms`, `by_level.n_terms`, `by_level.row_count`,
-    `n_best_effort_terms`, and `filtered_out` detection.
+    `organism` is a str, a list (`$orgs`) or None (all organisms); see
+    `_genes_by_ontology_match_stage`. Size bounds apply per bucket (2d.4 C2).
+    Feeds summary fields such as `top_terms`, `by_level.n_terms`,
+    `by_level.row_count`, `n_best_effort_terms`, `filtered_out` detection —
+    the api sums buckets per term — and the detail page planner.
 
     Mode 1: term_ids only — walk DOWN.
     Mode 2: level only — walk UP, filter on level.
     Mode 3: level + term_ids — walk UP, filter on level AND input_tids.
 
     Trust filters and facets thread through `_genes_by_ontology_match_stage`,
-    so the per-term sizes here match the detail rows for the same filters.
+    so the per-bucket sizes here match the detail rows for the same filters.
 
-    RETURN keys: term_id, term_name, level, tree, tree_code, best_effort,
-    n_genes, cat_freqs, is_informative.
+    RETURN keys: organism_name, term_id, term_name, level, tree, tree_code,
+    best_effort, n_genes, cat_freqs, is_informative.
+    ORDER BY organism_name, term_id.
     """
     head, params = _genes_by_ontology_match_stage(
-        ontology=ontology, level=level, term_ids=term_ids, organism=organism,
+        ontology=ontology, level=level, term_ids=term_ids, organisms=organism,
         tree=tree, informative_only=informative_only,
         sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
@@ -5349,9 +5473,10 @@ def build_genes_by_ontology_per_term(
 
     tail = (
         "UNWIND term_genes AS g\n"
-        "WITH t, collect({lt: g.locus_tag, "
+        "WITH t, org, collect({lt: g.locus_tag, "
         "cat: coalesce(g.gene_category, 'Unknown')}) AS gene_rows\n"
-        f"RETURN t.id AS term_id, {_term_name_cypher(ONTOLOGY_CONFIG[ontology])} AS term_name,"
+        "RETURN org AS organism_name,\n"
+        f"       t.id AS term_id, {_term_name_cypher(ONTOLOGY_CONFIG[ontology])} AS term_name,"
         " t.level AS level,\n"
         "       t.tree AS tree, t.tree_code AS tree_code,\n"
         "       t.level_is_best_effort IS NOT NULL AS best_effort,\n"
@@ -5359,7 +5484,7 @@ def build_genes_by_ontology_per_term(
         "       apoc.coll.frequencies("
         "[r IN gene_rows | r.cat]) AS cat_freqs,\n"
         "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
-        "ORDER BY t.id"
+        "ORDER BY organism_name, term_id"
     )
     return f"{head}\n{tail}", params
 
@@ -5367,7 +5492,7 @@ def build_genes_by_ontology_per_term(
 def build_genes_by_ontology_per_gene(
     *,
     ontology: str,
-    organism: str,
+    organism: str | list[str] | None,
     level: int | None = None,
     term_ids: list[str] | None = None,
     min_gene_set_size: int = 5,
@@ -5385,9 +5510,13 @@ def build_genes_by_ontology_per_gene(
 ) -> tuple[str, dict]:
     """Per-gene aggregate. One row per surviving gene.
 
-    RETURN keys: locus_tag, gene_category, n_terms, levels_hit.
-    `levels_hit` is the distinct set of term levels each gene was reached
-    via — used by L2 to compute by_level.n_genes via set-union.
+    RETURN keys: locus_tag, organism_name, gene_category, n_terms,
+    levels_hit. `levels_hit` is the distinct set of term levels each gene was
+    reached via — used by L2 to compute by_level.n_genes via set-union;
+    `organism_name` feeds `by_organism.gene_count` (2d.4 C4).
+
+    `organism` is a str, a list (`$orgs`) or None (all organisms); see
+    `_genes_by_ontology_match_stage`.
 
     Per-gene rows do not carry per-term flags; `informative_only` threads
     through the helper so only informative terms count toward each gene's
@@ -5396,7 +5525,7 @@ def build_genes_by_ontology_per_gene(
     edges that survive them.
     """
     head, params = _genes_by_ontology_match_stage(
-        ontology=ontology, level=level, term_ids=term_ids, organism=organism,
+        ontology=ontology, level=level, term_ids=term_ids, organisms=organism,
         tree=tree, informative_only=informative_only,
         sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
@@ -5410,6 +5539,7 @@ def build_genes_by_ontology_per_gene(
         "WITH g, collect(DISTINCT t.id) AS gene_terms, "
         "collect(DISTINCT t.level) AS gene_levels\n"
         "RETURN g.locus_tag AS locus_tag,\n"
+        "       g.organism_name AS organism_name,\n"
         "       coalesce(g.gene_category, 'Unknown') AS gene_category,\n"
         "       size(gene_terms) AS n_terms,\n"
         "       gene_levels AS levels_hit\n"

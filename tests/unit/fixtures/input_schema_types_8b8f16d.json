@@ -2707,9 +2707,22 @@
    }
   },
   "organism": {
-   "required": true,
+   "required": false,
    "type_sig": {
-    "type": "string"
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "items": {
+       "type": "string"
+      },
+      "type": "array"
+     },
+     {
+      "type": "null"
+     }
+    ]
    }
   },
   "sources": {

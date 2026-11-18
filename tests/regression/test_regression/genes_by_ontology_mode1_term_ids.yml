@@ -20,6 +20,11 @@ by_level:
   n_genes: 30
   n_terms: 1
   row_count: 30
+by_organism:
+- gene_count: 30
+  organism_name: Prochlorococcus MED4
+  row_count: 30
+  term_count: 1
 by_sources:
 - count: 18
   source: cyanorak
@@ -46,9 +51,11 @@ genes_per_term_median: 30.0
 genes_per_term_min: 30
 n_best_effort_terms: 1
 not_found: []
+not_found_organisms: []
 offset: 0
 ontology: go_bp
 organism_name: Prochlorococcus MED4
+organisms_without_genes: []
 resolved_aliases: {}
 results:
 - evidence: curated
@@ -57,6 +64,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0001
+  organism_name: Prochlorococcus MED4
   product: DNA polymerase III, beta subunit
   term_id: go:0006260
   term_name: DNA replication
@@ -66,6 +74,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0077
+  organism_name: Prochlorococcus MED4
   product: recombination factor
   term_id: go:0006260
   term_name: DNA replication
@@ -75,6 +84,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0129
+  organism_name: Prochlorococcus MED4
   product: DNA polymerase III, delta^ subunit
   term_id: go:0006260
   term_name: DNA replication
@@ -84,6 +94,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0200
+  organism_name: Prochlorococcus MED4
   product: ribonuclease HI
   term_id: go:0006260
   term_name: DNA replication
@@ -93,6 +104,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0436
+  organism_name: Prochlorococcus MED4
   product: DNA topoisomerase I, omega subunit
   term_id: go:0006260
   term_name: DNA replication
@@ -102,6 +114,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0497
+  organism_name: Prochlorococcus MED4
   product: primosomal protein N^
   term_id: go:0006260
   term_name: DNA replication
@@ -111,6 +124,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0502
+  organism_name: Prochlorococcus MED4
   product: possible single-stranded DNA-binding protein
   term_id: go:0006260
   term_name: DNA replication
@@ -120,6 +134,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0565
+  organism_name: Prochlorococcus MED4
   product: chromosomal replication initiator protein
   term_id: go:0006260
   term_name: DNA replication
@@ -129,6 +144,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0621
+  organism_name: Prochlorococcus MED4
   product: exonuclease family protein
   term_id: go:0006260
   term_name: DNA replication
@@ -138,6 +154,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0661
+  organism_name: Prochlorococcus MED4
   product: ribonucleoside-diphosphate reductase
   term_id: go:0006260
   term_name: DNA replication
@@ -147,6 +164,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0729
+  organism_name: Prochlorococcus MED4
   product: ATP-dependent DNA ligase
   term_id: go:0006260
   term_name: DNA replication
@@ -156,6 +174,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0897
+  organism_name: Prochlorococcus MED4
   product: chaperone protein DnaK
   term_id: go:0006260
   term_name: DNA replication
@@ -165,6 +184,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0936
+  organism_name: Prochlorococcus MED4
   product: DNA polymerase V, subunit D
   term_id: go:0006260
   term_name: DNA replication
@@ -174,6 +194,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0937
+  organism_name: Prochlorococcus MED4
   product: DNA polymerase V, subunit C
   term_id: go:0006260
   term_name: DNA replication
@@ -183,6 +204,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0939
+  organism_name: Prochlorococcus MED4
   product: DNA primase
   term_id: go:0006260
   term_name: DNA replication
@@ -192,6 +214,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0942
+  organism_name: Prochlorococcus MED4
   product: holliday junction ATP-dependent DNA helicase RuvA
   term_id: go:0006260
   term_name: DNA replication
@@ -201,6 +224,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM0945
+  organism_name: Prochlorococcus MED4
   product: DNA polymerase III, alpha subunit
   term_id: go:0006260
   term_name: DNA replication
@@ -210,6 +234,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM1054
+  organism_name: Prochlorococcus MED4
   product: crossover junction endodeoxyribonuclease RuvC
   term_id: go:0006260
   term_name: DNA replication
@@ -219,6 +244,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM1063
+  organism_name: Prochlorococcus MED4
   product: DNA gyrase, A subunit
   term_id: go:0006260
   term_name: DNA replication
@@ -228,6 +254,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM1140
+  organism_name: Prochlorococcus MED4
   product: DNA polymerase I
   term_id: go:0006260
   term_name: DNA replication
@@ -237,6 +264,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM1262
+  organism_name: Prochlorococcus MED4
   product: SOS-response transcriptional repressor
   term_id: go:0006260
   term_name: DNA replication
@@ -246,6 +274,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM1432
+  organism_name: Prochlorococcus MED4
   product: chaperone protein DnaK
   term_id: go:0006260
   term_name: DNA replication
@@ -255,6 +284,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM1573
+  organism_name: Prochlorococcus MED4
   product: DNA replication and repair protein recF
   term_id: go:0006260
   term_name: DNA replication
@@ -264,6 +294,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM1615
+  organism_name: Prochlorococcus MED4
   product: holliday junction ATP-dependent DNA helicase RuvB
   term_id: go:0006260
   term_name: DNA replication
@@ -273,6 +304,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM1623
+  organism_name: Prochlorococcus MED4
   product: single-stranded DNA-binding protein
   term_id: go:0006260
   term_name: DNA replication
@@ -282,6 +314,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM1634
+  organism_name: Prochlorococcus MED4
   product: DNA gyrase, B subunit
   term_id: go:0006260
   term_name: DNA replication
@@ -291,6 +324,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM1647
+  organism_name: Prochlorococcus MED4
   product: DNA polymerase III, delta subunit
   term_id: go:0006260
   term_name: DNA replication
@@ -300,6 +334,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM1658
+  organism_name: Prochlorococcus MED4
   product: DNA polymerase III, gamma and tau subunits
   term_id: go:0006260
   term_name: DNA replication
@@ -309,6 +344,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM1674
+  organism_name: Prochlorococcus MED4
   product: replicative DNA helicase
   term_id: go:0006260
   term_name: DNA replication
@@ -318,6 +354,7 @@ results:
   is_informative: true
   level: 6
   locus_tag: PMM1679
+  organism_name: Prochlorococcus MED4
   product: ATP-dependent DNA ligase
   term_id: go:0006260
   term_name: DNA replication
@@ -332,6 +369,7 @@ terms_per_gene_min: 1
 top_terms:
 - count: 30
   is_informative: true
+  organism_count: 1
   term_id: go:0006260
   term_name: DNA replication
 total_categories: 6
