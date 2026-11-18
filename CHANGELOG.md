@@ -37,6 +37,7 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 
 ### Fixed
 - **A group id passed twice is counted once.** `genes_by_homolog_group` and `differential_expression_by_ortholog` doubled their counts when a batch held the same group twice, bare and prefixed (`CK_00000570` and `cyanorak:CK_00000570`) or repeated. Ids are now de-duplicated after coercion; `resolved_aliases` still lists the bare form.
+- **A repeated id or filter value no longer doubles results anywhere.** Passing the same locus tag, cluster id or experiment id twice (`["PMM0315", "PMM0315"]`) doubled rows and totals on `gene_overview`, `gene_details`, `gene_homologs`, `gene_clusters_by_gene`, `gene_derived_metrics`, `gene_neighbors` and `genes_in_cluster`. Every list parameter now drops repeats, keeping first-seen order.
 
 ## [0.1.0-alpha.6] - 2026-11-01
 
