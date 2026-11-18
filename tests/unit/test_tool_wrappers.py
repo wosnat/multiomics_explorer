@@ -15082,3 +15082,229 @@ def test_enrichment_background_describes_annotated_mode(tool_fns, tool_name):
     """backlog 3.12: the background param names the annotated mode."""
     desc = _param_description(tool_fns, tool_name, "background")
     assert "'annotated'" in desc, desc
+
+
+# ---------------------------------------------------------------------------
+# 2d.7a — relax single-organism gates on the locus-tag tools (RED).
+# Spec: docs/tool-specs/2d7-single-organism-gates.md. `organism` optional on
+# the 4 wrappers; `by_organism` envelope models on 3 (GO-terms
+# {organism_name, gene_count}; clusters / metrics {organism_name, count});
+# verbose `organism_name` row field on clusters / metrics rows.
+# ---------------------------------------------------------------------------
+
+import inspect as _inspect_2d7
+import typing as _typing_2d7
+
+_2D7_MED4 = "Prochlorococcus MED4"
+_2D7_MIT9313 = "Prochlorococcus MIT9313"
+
+_2D7_GOT_RETURN = {
+    "total_matching": 2, "total_genes": 2, "total_terms": 2,
+    "by_ontology": [{"ontology_type": "go_bp", "term_count": 2, "gene_count": 2}],
+    "by_term": [],
+    "terms_per_gene_min": 1, "terms_per_gene_max": 1,
+    "terms_per_gene_median": 1.0,
+    "returned": 2, "offset": 0, "truncated": False,
+    "not_found": [], "no_terms": [],
+    "by_organism": [
+        {"organism_name": _2D7_MED4, "gene_count": 1},
+        {"organism_name": _2D7_MIT9313, "gene_count": 1},
+    ],
+    "results": [
+        {"locus_tag": "PMM0001", "term_id": "go:1", "term_name": "a",
+         "level": 3, "is_informative": True},
+        {"locus_tag": "PMT0419", "term_id": "go:2", "term_name": "b",
+         "level": 3, "is_informative": True},
+    ],
+}
+
+_2D7_GCBG_RETURN = {
+    "total_matching": 2, "total_clusters": 2,
+    "genes_with_clusters": 2, "genes_without_clusters": 0,
+    "not_found": [], "not_matched": [],
+    "by_cluster_type": [], "by_treatment_type": [],
+    "by_background_factors": [], "by_analysis": [],
+    "by_organism": [
+        {"organism_name": _2D7_MED4, "count": 1},
+        {"organism_name": _2D7_MIT9313, "count": 1},
+    ],
+    "returned": 2, "offset": 0, "truncated": False,
+    "results": [
+        {"locus_tag": lt, "gene_name": None, "cluster_id": f"c:{lt}",
+         "cluster_name": "c", "cluster_type": "stress_response",
+         "membership_score": None, "analysis_id": "ca:1",
+         "analysis_name": "a", "treatment_type": [],
+         "background_factors": [], "organism_name": org}
+        for lt, org in (("PMM0370", _2D7_MED4), ("PMT0856", _2D7_MIT9313))
+    ],
+}
+
+_2D7_GDM_RETURN = {
+    "total_matching": 2, "total_derived_metrics": 2,
+    "genes_with_metrics": 2, "genes_without_metrics": 0,
+    "not_found": [], "not_matched": [],
+    "by_value_kind": [], "by_metric_type": [], "by_metric": [],
+    "by_compartment": [], "by_treatment_type": [],
+    "by_background_factors": [], "by_publication": [],
+    "by_organism": [
+        {"organism_name": _2D7_MED4, "count": 1},
+        {"organism_name": _2D7_MIT9313, "count": 1},
+    ],
+    "returned": 2, "offset": 0, "truncated": False,
+    "results": [
+        {"locus_tag": lt, "gene_name": None, "derived_metric_id": f"dm:{lt}",
+         "value_kind": "numeric", "name": "m", "value": 1.0,
+         "rankable": False, "has_p_value": False, "rank_by_metric": None,
+         "metric_percentile": None, "metric_bucket": None,
+         "organism_name": org}
+        for lt, org in (("PMM0001", _2D7_MED4), ("PMT0419", _2D7_MIT9313))
+    ],
+}
+
+_2D7_TOOLS = [
+    "gene_ontology_terms", "gene_clusters_by_gene",
+    "gene_derived_metrics", "metabolites_by_gene",
+]
+
+
+def _2d7_response_model(tool_fns, tool):
+    return _typing_2d7.get_type_hints(tool_fns[tool])["return"]
+
+
+def _2d7_list_item_model(model, field):
+    ann = model.model_fields[field].annotation
+    (item,) = _typing_2d7.get_args(ann)
+    return item
+
+
+class Test2d7OrganismOptionalWrappers:
+
+    @pytest.mark.parametrize("tool", _2D7_TOOLS)
+    def test_organism_param_defaults_to_none(self, tool_fns, tool):
+        param = _inspect_2d7.signature(tool_fns[tool]).parameters["organism"]
+        assert param.default is None
+
+    @pytest.mark.parametrize("tool", _2D7_TOOLS)
+    def test_organism_annotation_allows_none(self, tool_fns, tool):
+        hints = _typing_2d7.get_type_hints(tool_fns[tool], include_extras=True)
+        base = _typing_2d7.get_args(hints["organism"])[0] \
+            if _typing_2d7.get_origin(hints["organism"]) is _typing_2d7.Annotated \
+            else hints["organism"]
+        # unwrap nested Annotated (metabolites_by_gene wraps a param alias)
+        while _typing_2d7.get_origin(base) is _typing_2d7.Annotated:
+            base = _typing_2d7.get_args(base)[0]
+        assert type(None) in _typing_2d7.get_args(base), base
+
+    @pytest.mark.asyncio
+    async def test_gene_ontology_terms_without_organism_forwards_none(
+        self, tool_fns, mock_ctx,
+    ):
+        with patch("multiomics_explorer.api.functions.gene_ontology_terms",
+                   return_value=_2D7_GOT_RETURN) as mock_api:
+            await tool_fns["gene_ontology_terms"](
+                mock_ctx, locus_tags=["PMM0001", "PMT0419"])
+        assert mock_api.call_args.kwargs["organism"] is None
+
+    @pytest.mark.asyncio
+    async def test_metabolites_by_gene_without_organism_forwards_none(
+        self, tool_fns, mock_ctx,
+    ):
+        with patch("multiomics_explorer.api.functions.metabolites_by_gene",
+                   side_effect=ValueError("stop")) as mock_api:
+            with pytest.raises(ToolError):
+                await tool_fns["metabolites_by_gene"](
+                    mock_ctx, locus_tags=["PMM0963"])
+        call = mock_api.call_args
+        org = call.kwargs.get("organism", call.args[1] if len(call.args) > 1 else None)
+        assert org is None
+
+    @pytest.mark.asyncio
+    async def test_metabolites_by_gene_mixed_batch_is_tool_error(
+        self, tool_fns, mock_ctx,
+    ):
+        msg = ("locus_tags span multiple organisms: Prochlorococcus MED4, "
+               "Prochlorococcus MIT9313 — call once per organism")
+        with patch("multiomics_explorer.api.functions.metabolites_by_gene",
+                   side_effect=ValueError(msg)):
+            with pytest.raises(ToolError, match="span multiple organisms"):
+                await tool_fns["metabolites_by_gene"](
+                    mock_ctx, locus_tags=["PMM0963", "PMT0419"])
+
+
+class Test2d7ByOrganismWrappers:
+
+    def test_gene_ontology_terms_by_organism_model(self, tool_fns):
+        resp = _2d7_response_model(tool_fns, "gene_ontology_terms")
+        assert "by_organism" in resp.model_fields
+        assert resp.model_fields["by_organism"].description
+        item = _2d7_list_item_model(resp, "by_organism")
+        assert set(item.model_fields) == {"organism_name", "gene_count"}
+
+    @pytest.mark.parametrize("tool", ["gene_clusters_by_gene",
+                                      "gene_derived_metrics"])
+    def test_row_tools_by_organism_model(self, tool_fns, tool):
+        resp = _2d7_response_model(tool_fns, tool)
+        assert "by_organism" in resp.model_fields
+        assert resp.model_fields["by_organism"].description
+        item = _2d7_list_item_model(resp, "by_organism")
+        assert set(item.model_fields) == {"organism_name", "count"}
+
+    @pytest.mark.parametrize("tool", ["gene_clusters_by_gene",
+                                      "gene_derived_metrics"])
+    def test_row_tools_verbose_organism_name_field(self, tool_fns, tool):
+        resp = _2d7_response_model(tool_fns, tool)
+        row = _2d7_list_item_model(resp, "results")
+        assert "organism_name" in row.model_fields
+        f = row.model_fields["organism_name"]
+        assert not f.is_required()   # verbose-only
+        assert f.description
+
+    @pytest.mark.asyncio
+    async def test_gene_ontology_terms_by_organism_forwarded(
+        self, tool_fns, mock_ctx,
+    ):
+        with patch("multiomics_explorer.api.functions.gene_ontology_terms",
+                   return_value=_2D7_GOT_RETURN):
+            result = await tool_fns["gene_ontology_terms"](
+                mock_ctx, locus_tags=["PMM0001", "PMT0419"])
+        assert [(b.organism_name, b.gene_count) for b in result.by_organism] == [
+            (_2D7_MED4, 1), (_2D7_MIT9313, 1)]
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("tool,api_return", [
+        ("gene_clusters_by_gene", _2D7_GCBG_RETURN),
+        ("gene_derived_metrics", _2D7_GDM_RETURN),
+    ])
+    async def test_row_tools_by_organism_and_row_organism_forwarded(
+        self, tool_fns, mock_ctx, tool, api_return,
+    ):
+        with patch(f"multiomics_explorer.api.functions.{tool}",
+                   return_value=api_return):
+            result = await tool_fns[tool](
+                mock_ctx, locus_tags=[r["locus_tag"] for r in api_return["results"]],
+                verbose=True)
+        assert [(b.organism_name, b.count) for b in result.by_organism] == [
+            (_2D7_MED4, 1), (_2D7_MIT9313, 1)]
+        assert [r.organism_name for r in result.results] == [
+            _2D7_MED4, _2D7_MIT9313]
+        dumped = result.results[0].model_dump()
+        assert dumped["organism_name"] == _2D7_MED4
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("tool,api_return", [
+        ("gene_clusters_by_gene", _2D7_GCBG_RETURN),
+        ("gene_derived_metrics", _2D7_GDM_RETURN),
+    ])
+    async def test_row_tools_compact_row_omits_organism_name(
+        self, tool_fns, mock_ctx, tool, api_return,
+    ):
+        """Compact rows (no organism_name from the api) do not gain a null
+        organism_name on the wire (SparseRow)."""
+        compact = {**api_return, "results": [
+            {k: v for k, v in r.items() if k != "organism_name"}
+            for r in api_return["results"]]}
+        with patch(f"multiomics_explorer.api.functions.{tool}",
+                   return_value=compact):
+            result = await tool_fns[tool](
+                mock_ctx, locus_tags=[r["locus_tag"] for r in compact["results"]])
+        assert "organism_name" not in result.results[0].model_dump()

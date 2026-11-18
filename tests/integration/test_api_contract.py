@@ -364,6 +364,7 @@ class TestGeneOntologyTermsContract:
             "terms_per_gene_median",
             "returned", "truncated", "offset", "not_found", "no_terms",
             "results",
+            "by_organism",  # 2d.7a
         }
         assert expected_keys <= set(result.keys())
         assert result["total_matching"] >= 1
@@ -934,6 +935,7 @@ class TestGeneClustersByGeneContract:
             "by_cluster_type", "by_treatment_type",
             "by_background_factors", "by_analysis",
             "returned", "offset", "truncated", "results",
+            "by_organism",  # 2d.7a
         }
         assert expected_keys <= set(result.keys())
 
@@ -1101,6 +1103,7 @@ class TestGeneDerivedMetricsContract:
         "by_compartment", "by_treatment_type",
         "by_background_factors", "by_publication", "warnings",
         "returned", "offset", "truncated", "results",
+        "by_organism",  # 2d.7a
     }
 
     EXPECTED_COMPACT_RESULT_KEYS = {
@@ -1116,6 +1119,7 @@ class TestGeneDerivedMetricsContract:
         "compartment", "treatment_type", "background_factors",
         "publication_doi", "treatment", "light_condition",
         "experimental_context",
+        "organism_name",  # 2d.7a
         # p_value: deferred — not in raw rows today
     }
 

@@ -2045,6 +2045,8 @@ class TestGeneOntologyTerms:
             "by_tcdb_call",
             "evidence_score_stats", "filters_applied", "skipped_ontologies",
             "warnings",
+            # 2d.7a: per-organism gene counts (mixed batches allowed).
+            "by_organism",
         }
         assert set(result.keys()) == expected_keys
 
@@ -5089,14 +5091,13 @@ class TestGeneClustersByGene:
     }
 
     def test_returns_envelope(self, mock_conn):
-        mock_conn.execute_query.side_effect = [
-            # organism validation
-            [{"organisms": ["Prochlorococcus MED4"]}],
+        mock_conn.execute_query.side_effect = _2d7_resolver_tolerant([
+            # organism validation (2d.7a: skipped without organism)
             # summary
             [self._SUMMARY_RESULT],
             # detail
             [self._DETAIL_ROW],
-        ]
+        ])
         result = api.gene_clusters_by_gene(
             locus_tags=["PMM0370"], conn=mock_conn)
         assert result["total_matching"] == 2
@@ -5105,20 +5106,20 @@ class TestGeneClustersByGene:
         assert len(result["results"]) == 1
 
     def test_by_analysis_in_envelope(self, mock_conn):
-        mock_conn.execute_query.side_effect = [
-            [{"organisms": ["Prochlorococcus MED4"]}],
+        mock_conn.execute_query.side_effect = _2d7_resolver_tolerant([
+            # organism validation (2d.7a: skipped without organism)
             [self._SUMMARY_RESULT],
-        ]
+        ])
         result = api.gene_clusters_by_gene(
             locus_tags=["PMM0370"], summary=True, conn=mock_conn)
         assert "by_analysis" in result
         assert result["by_analysis"][0]["analysis_id"] == "ca:tolonen2006:med4:nitrogen"
 
     def test_analysis_ids_parameter(self, mock_conn):
-        mock_conn.execute_query.side_effect = [
-            [{"organisms": ["Prochlorococcus MED4"]}],
+        mock_conn.execute_query.side_effect = _2d7_resolver_tolerant([
+            # organism validation (2d.7a: skipped without organism)
             [self._SUMMARY_RESULT],
-        ]
+        ])
         result = api.gene_clusters_by_gene(
             locus_tags=["PMM0370"],
             analysis_ids=["ca:tolonen2006:med4:nitrogen"],
@@ -5130,10 +5131,10 @@ class TestGeneClustersByGene:
             api.gene_clusters_by_gene(locus_tags=[], conn=mock_conn)
 
     def test_summary_mode(self, mock_conn):
-        mock_conn.execute_query.side_effect = [
-            [{"organisms": ["Prochlorococcus MED4"]}],
+        mock_conn.execute_query.side_effect = _2d7_resolver_tolerant([
+            # organism validation (2d.7a: skipped without organism)
             [self._SUMMARY_RESULT],
-        ]
+        ])
         result = api.gene_clusters_by_gene(
             locus_tags=["PMM0370"], summary=True, conn=mock_conn)
         assert result["returned"] == 0
@@ -5145,11 +5146,11 @@ class TestGeneClustersByGene:
             "not_found": ["FAKE001"],
             "genes_without_clusters": 0,
         }
-        mock_conn.execute_query.side_effect = [
-            [{"organisms": ["Prochlorococcus MED4"]}],
+        mock_conn.execute_query.side_effect = _2d7_resolver_tolerant([
+            # organism validation (2d.7a: skipped without organism)
             [summary_with_nf],
             [],  # case-mismatch lookup over not_found
-        ]
+        ])
         result = api.gene_clusters_by_gene(
             locus_tags=["PMM0370", "FAKE001"], summary=True, conn=mock_conn)
         assert "FAKE001" in result["not_found"]
@@ -24565,3 +24566,507 @@ class TestEnrichmentAnnotatedBackground:
     def test_validation_message_names_annotated(self, kind):
         with pytest.raises(ValueError, match="'annotated'"):
             self._call(kind, level=1, background="genome")
+
+
+# ---------------------------------------------------------------------------
+# 2d.7a — relax single-organism gates on the locus-tag tools (RED).
+# Spec: docs/tool-specs/2d7-single-organism-gates.md ("Rules shared by all
+# four", "Per tool", "Degenerate inputs"). The REAL `_validate_organism_inputs`
+# runs here (not monkeypatched): the dispatcher below answers its two
+# resolver queries by cypher shape, so "organism given + foreign tag" is the
+# real rule-2 raise, and a mixed batch without organism proves the
+# single-organism check is skipped (the locus resolver would otherwise
+# report two organisms and raise "span multiple organisms").
+#
+# Mock contract for the implementer:
+#   * gene_ontology_terms: each found gene's organism is carried as
+#     `organism_name` on BOTH the existence-check rows and the summary's
+#     `gene_term_counts` entries (either source works).
+#   * gene_clusters_by_gene / gene_derived_metrics: the summary row carries
+#     `by_organism` as APOC frequencies `[{item, count}]` (sibling by_*
+#     shape), renamed api-side to `{organism_name, count}`.
+# ---------------------------------------------------------------------------
+
+import inspect as _inspect_2d7
+
+_2D7_MED4 = "Prochlorococcus MED4"
+_2D7_MIT9313 = "Prochlorococcus MIT9313"
+_2D7_ORG_OF = {
+    "PMM0001": _2D7_MED4, "PMM0002": _2D7_MED4, "PMM0003": _2D7_MED4,
+    "PMM0370": _2D7_MED4, "PMM1714": _2D7_MED4, "PMM0963": _2D7_MED4,
+    "PMT0419": _2D7_MIT9313, "PMT0856": _2D7_MIT9313,
+}
+_2D7_ORG_RESOLVER_MARK = "MATCH (o:OrganismTaxon)"
+_2D7_LOCUS_RESOLVER_MARK = "RETURN collect(DISTINCT g.organism_name) AS organisms"
+
+
+def _2d7_dispatch(*, organism_hits=None, handlers=()):
+    """`side_effect` answering by cypher shape. `organism_hits` = what the
+    organism-word resolver returns; the locus-tag resolver answers from
+    `_2D7_ORG_OF`. `handlers` = [(mark, fn(params) -> rows)] checked in
+    order; anything else returns []."""
+    calls: list[tuple[str, dict]] = []
+
+    def _exec(cypher, *args, **params):
+        calls.append((cypher, params))
+        if _2D7_ORG_RESOLVER_MARK in cypher:
+            return [{"organisms": list(organism_hits or [])}]
+        if _2D7_LOCUS_RESOLVER_MARK in cypher:
+            orgs = sorted({_2D7_ORG_OF[lt] for lt in params.get("locus_tags", [])
+                           if lt in _2D7_ORG_OF})
+            return [{"organisms": orgs}]
+        for mark, fn in handlers:
+            if mark in cypher:
+                return fn(params)
+        return []
+
+    _exec.calls = calls
+    return _exec
+
+
+def _2d7_api_fn(name):
+    return getattr(api, name)
+
+
+_2D7_TOOLS = [
+    "gene_ontology_terms", "gene_clusters_by_gene",
+    "gene_derived_metrics", "metabolites_by_gene",
+]
+_2D7_MIXED_TOOLS = [
+    "gene_ontology_terms", "gene_clusters_by_gene", "gene_derived_metrics",
+]
+
+
+class Test2d7DegenerateInputs:
+    """Degenerate-input matrix (spec table), all four tools."""
+
+    @pytest.mark.parametrize("tool", _2D7_TOOLS)
+    @pytest.mark.parametrize("empty", [[], None], ids=["empty_list", "none"])
+    def test_empty_locus_tags_raise_before_any_query(self, tool, empty):
+        conn = MagicMock()
+        conn.execute_query.side_effect = _2d7_dispatch(
+            organism_hits=[_2D7_MED4])
+        with pytest.raises(ValueError, match="locus_tags must not be empty"):
+            _2d7_api_fn(tool)(locus_tags=empty, organism="MED4", conn=conn)
+        assert conn.execute_query.call_count == 0
+
+    @pytest.mark.parametrize("tool", _2D7_TOOLS)
+    @pytest.mark.parametrize("empty", [[], None], ids=["empty_list", "none"])
+    def test_empty_locus_tags_raise_without_organism(self, tool, empty):
+        conn = MagicMock()
+        conn.execute_query.side_effect = _2d7_dispatch()
+        with pytest.raises(ValueError, match="locus_tags must not be empty"):
+            _2d7_api_fn(tool)(locus_tags=empty, conn=conn)
+        assert conn.execute_query.call_count == 0
+
+    @pytest.mark.parametrize("tool", _2D7_TOOLS)
+    def test_organism_defaults_to_none(self, tool):
+        fn = _inspect_2d7.unwrap(_2d7_api_fn(tool))
+        params = _inspect_2d7.signature(fn).parameters
+        assert "organism" in params
+        assert params["organism"].default is None
+
+    @pytest.mark.parametrize("tool", _2D7_TOOLS)
+    def test_locus_tags_still_required(self, tool):
+        """No locus_tags and no organism -> TypeError from the signature."""
+        with pytest.raises(TypeError):
+            _2d7_api_fn(tool)(conn=MagicMock())
+
+    @pytest.mark.parametrize("tool", _2D7_TOOLS)
+    @pytest.mark.parametrize("foreign", [["PMT0419"], ["PMM0001", "PMT0419"]],
+                             ids=["only_foreign", "mixed"])
+    def test_organism_given_foreign_tag_raises(self, tool, foreign):
+        """Rule 2: organism + a tag from another organism -> ValueError,
+        replacing the GO `no_terms` / metabolites `not_found` misreports."""
+        conn = MagicMock()
+        conn.execute_query.side_effect = _2d7_dispatch(
+            organism_hits=[_2D7_MED4])
+        with pytest.raises(ValueError, match="MIT9313"):
+            _2d7_api_fn(tool)(locus_tags=foreign, organism="MED4", conn=conn)
+
+
+# --- gene_ontology_terms -----------------------------------------------------
+
+def _2d7_got_handlers(terms_by_tag):
+    """Existence check + per-ontology summary + detail answered from
+    `terms_by_tag` = {locus_tag: [term_id, ...]} (unknown tags absent)."""
+    def _exist(params):
+        return [
+            {"lt": lt, "found": lt in _2D7_ORG_OF,
+             "organism_name": _2D7_ORG_OF.get(lt)}
+            for lt in params["locus_tags"]
+        ]
+
+    def _summary(params):
+        tags = [lt for lt in params["locus_tags"] if terms_by_tag.get(lt)]
+        if not tags:
+            return [{"gene_count": 0, "term_count": 0, "by_term": [],
+                     "gene_term_counts": []}]
+        by_term: dict[str, int] = {}
+        for lt in tags:
+            for t in terms_by_tag[lt]:
+                by_term[t] = by_term.get(t, 0) + 1
+        return [{
+            "gene_count": len(tags),
+            "term_count": sum(len(terms_by_tag[lt]) for lt in tags),
+            "by_term": [{"term_id": t, "term_name": t, "level": 3, "count": n}
+                        for t, n in by_term.items()],
+            "gene_term_counts": [
+                {"locus_tag": lt, "term_count": len(terms_by_tag[lt]),
+                 "organism_name": _2D7_ORG_OF[lt]}
+                for lt in tags
+            ],
+        }]
+
+    def _detail(params):
+        return [
+            {"locus_tag": lt, "term_id": t, "term_name": t, "level": 3,
+             "is_informative": True}
+            for lt in params["locus_tags"] for t in terms_by_tag.get(lt, [])
+        ]
+
+    return [
+        ("g IS NOT NULL AS found", _exist),
+        ("gene_term_counts", _summary),
+        ("ORDER BY g.locus_tag, t.id", _detail),
+    ]
+
+
+class TestGeneOntologyTermsOrganismOptional:
+    """2d.7a gene_ontology_terms: organism optional, mixed batches allowed,
+    `by_organism: [{organism_name, gene_count}]` (genes with >=1 row)."""
+
+    _TERMS = {
+        "PMM0001": ["go:1", "go:2"],
+        "PMM0002": [],            # found, no terms -> no_terms, not counted
+        "PMM0003": ["go:1"],
+        "PMT0419": ["go:3"],
+    }
+
+    def _run(self, tags, organism_hits=None, **kw):
+        conn = MagicMock()
+        conn.execute_query.side_effect = _2d7_dispatch(
+            organism_hits=organism_hits,
+            handlers=_2d7_got_handlers(self._TERMS))
+        out = api.gene_ontology_terms(locus_tags=tags, ontology="go_bp",
+                                      conn=conn, **kw)
+        return out, conn
+
+    def test_mixed_batch_without_organism_works(self):
+        tags = ["PMM0001", "PMM0002", "PMM0003", "PMT0419"]
+        out, _ = self._run(tags)
+        assert {r["locus_tag"] for r in out["results"]} == {
+            "PMM0001", "PMM0003", "PMT0419"}
+        assert out["total_genes"] == 3
+        assert out["no_terms"] == ["PMM0002"]
+        assert out["not_found"] == []
+
+    def test_mixed_batch_by_organism(self):
+        tags = ["PMT0419", "PMM0001", "PMM0002", "PMM0003"]
+        out, _ = self._run(tags)
+        assert out["by_organism"] == [
+            {"organism_name": _2D7_MED4, "gene_count": 2},
+            {"organism_name": _2D7_MIT9313, "gene_count": 1},
+        ]
+        assert sum(b["gene_count"] for b in out["by_organism"]) == out["total_genes"]
+
+    def test_by_organism_ties_sorted_by_name(self):
+        out, _ = self._run(["PMT0419", "PMM0003"])
+        assert out["by_organism"] == [
+            {"organism_name": _2D7_MED4, "gene_count": 1},
+            {"organism_name": _2D7_MIT9313, "gene_count": 1},
+        ]
+
+    def test_by_organism_in_summary_mode(self):
+        out, _ = self._run(["PMM0001", "PMT0419"], summary=True)
+        assert out["results"] == []
+        assert out["by_organism"] == [
+            {"organism_name": _2D7_MED4, "gene_count": 1},
+            {"organism_name": _2D7_MIT9313, "gene_count": 1},
+        ]
+
+    def test_single_organism_by_organism(self):
+        out, _ = self._run(["PMM0001", "PMM0003"], organism="MED4",
+                           organism_hits=[_2D7_MED4])
+        assert out["by_organism"] == [
+            {"organism_name": _2D7_MED4, "gene_count": 2}]
+
+    def test_all_unknown_tags_without_organism(self):
+        tags = ["NOPE", ""]
+        out, conn = self._run(tags)
+        assert out["not_found"] == tags
+        assert out["total_matching"] == 0
+        assert out["total_genes"] == 0
+        assert out["results"] == []
+        assert out["no_terms"] == []
+        assert out["by_organism"] == []
+
+    def test_some_unknown_without_organism(self):
+        out, _ = self._run(["PMM0001", "NOPE"])
+        assert out["not_found"] == ["NOPE"]
+        assert {r["locus_tag"] for r in out["results"]} == {"PMM0001"}
+        assert out["by_organism"] == [
+            {"organism_name": _2D7_MED4, "gene_count": 1}]
+
+    def test_organism_omitted_passes_none_to_builders(self, monkeypatch):
+        seen: list[tuple[str, object]] = []
+        real_d, real_s = api.build_gene_ontology_terms, api.build_gene_ontology_terms_summary
+
+        def spy_d(**kw):
+            seen.append(("detail", kw["organism_name"]))
+            return real_d(**kw)
+
+        def spy_s(**kw):
+            seen.append(("summary", kw["organism_name"]))
+            return real_s(**kw)
+
+        monkeypatch.setattr(api, "build_gene_ontology_terms", spy_d)
+        monkeypatch.setattr(api, "build_gene_ontology_terms_summary", spy_s)
+        self._run(["PMM0001", "PMT0419"])
+        assert {k for k, _ in seen} == {"detail", "summary"}
+        assert all(v is None for _, v in seen), seen
+
+    def test_organism_given_passes_resolved_name_to_builders(self, monkeypatch):
+        seen: list[object] = []
+        real_d, real_s = api.build_gene_ontology_terms, api.build_gene_ontology_terms_summary
+
+        def spy_d(**kw):
+            seen.append(kw["organism_name"])
+            return real_d(**kw)
+
+        def spy_s(**kw):
+            seen.append(kw["organism_name"])
+            return real_s(**kw)
+
+        monkeypatch.setattr(api, "build_gene_ontology_terms", spy_d)
+        monkeypatch.setattr(api, "build_gene_ontology_terms_summary", spy_s)
+        self._run(["PMM0001"], organism="MED4", organism_hits=[_2D7_MED4])
+        assert seen and all(v == _2D7_MED4 for v in seen), seen
+
+    def test_built_queries_carry_org_param(self):
+        """`$org` is always present in params (None when unscoped)."""
+        _, conn = self._run(["PMM0001", "PMT0419"])
+        built = [p for c, p in conn.execute_query.side_effect.calls
+                 if "gene_term_counts" in c or "ORDER BY g.locus_tag, t.id" in c]
+        assert built
+        assert all("org" in p and p["org"] is None for p in built)
+
+    def test_foreign_tag_no_longer_in_no_terms(self):
+        """Today PMT0419 under organism='MED4' lands in no_terms (misreport).
+        Now: ValueError naming MIT9313."""
+        conn = MagicMock()
+        conn.execute_query.side_effect = _2d7_dispatch(
+            organism_hits=[_2D7_MED4],
+            handlers=_2d7_got_handlers(self._TERMS))
+        with pytest.raises(ValueError, match="MIT9313"):
+            api.gene_ontology_terms(["PMM0001", "PMT0419"], "MED4",
+                                    ontology="go_bp", conn=conn)
+
+    def test_positional_organism_still_works(self):
+        conn = MagicMock()
+        conn.execute_query.side_effect = _2d7_dispatch(
+            organism_hits=[_2D7_MED4],
+            handlers=_2d7_got_handlers(self._TERMS))
+        out = api.gene_ontology_terms(["PMM0001"], "MED4", ontology="go_bp",
+                                      conn=conn)
+        assert {r["locus_tag"] for r in out["results"]} == {"PMM0001"}
+
+
+# --- gene_clusters_by_gene / gene_derived_metrics ----------------------------
+
+def _2d7_gcbg_summary(not_found=(), by_organism=(), total=0):
+    return {
+        "total_matching": total, "total_clusters": 1 if total else 0,
+        "genes_with_clusters": 0, "genes_without_clusters": 0,
+        "not_found": list(not_found), "not_matched": [],
+        "by_cluster_type": [], "by_treatment_type": [],
+        "by_background_factors": [], "by_analysis": [],
+        "by_organism": [{"item": o, "count": n} for o, n in by_organism],
+    }
+
+
+def _2d7_gdm_summary(not_found=(), by_organism=(), total=0):
+    return {
+        "total_matching": total, "total_derived_metrics": 1 if total else 0,
+        "genes_with_metrics": 0, "genes_without_metrics": 0,
+        "not_found": list(not_found), "not_matched": [],
+        "by_value_kind": [], "by_metric_type": [], "by_metric": [],
+        "by_compartment": [], "by_treatment_type": [],
+        "by_background_factors": [], "by_publication": [],
+        "by_organism": [{"item": o, "count": n} for o, n in by_organism],
+    }
+
+
+_2D7_ROWTOOLS = {
+    # tool: (summary mark, summary factory, detail mark, detail row factory)
+    "gene_clusters_by_gene": (
+        "total_clusters", _2d7_gcbg_summary, "AS cluster_id",
+        lambda lt: {"locus_tag": lt, "gene_name": None, "cluster_id": f"c:{lt}",
+                    "cluster_name": "c", "cluster_type": "stress_response",
+                    "membership_score": None, "analysis_id": "ca:1",
+                    "analysis_name": "a", "treatment_type": [],
+                    "background_factors": []},
+    ),
+    "gene_derived_metrics": (
+        "total_derived_metrics", _2d7_gdm_summary, "AS derived_metric_id",
+        lambda lt: {"locus_tag": lt, "gene_name": None,
+                    "derived_metric_id": f"dm:{lt}", "value_kind": "numeric",
+                    "name": "m", "value": 1.0, "rankable": False,
+                    "has_p_value": False, "rank_by_metric": None,
+                    "metric_percentile": None, "metric_bucket": None},
+    ),
+}
+
+
+class TestGeneRowToolsOrganismOptional:
+    """2d.7a gene_clusters_by_gene / gene_derived_metrics: without organism
+    the single-organism check is skipped; `by_organism: [{organism_name,
+    count}]` (rows per organism), count desc then name."""
+
+    def _run(self, tool, tags, *, summary_kw, organism_hits=None,
+             detail_tags=None, **kw):
+        s_mark, s_fac, d_mark, d_row = _2D7_ROWTOOLS[tool]
+        handlers = [
+            (s_mark, lambda p: [s_fac(**summary_kw)]),
+            (d_mark, lambda p: [d_row(lt) for lt in (detail_tags or [])]),
+        ]
+        conn = MagicMock()
+        conn.execute_query.side_effect = _2d7_dispatch(
+            organism_hits=organism_hits, handlers=handlers)
+        return _2d7_api_fn(tool)(locus_tags=tags, conn=conn, **kw), conn
+
+    @pytest.mark.parametrize("tool", sorted(_2D7_ROWTOOLS))
+    def test_mixed_batch_without_organism_works(self, tool):
+        tags = ["PMM0370", "PMT0856"]
+        out, _ = self._run(
+            tool, tags, detail_tags=["PMM0370", "PMM0370", "PMT0856"],
+            summary_kw=dict(total=3, by_organism=[(_2D7_MED4, 2),
+                                                  (_2D7_MIT9313, 1)]))
+        assert {r["locus_tag"] for r in out["results"]} == set(tags)
+        assert out["by_organism"] == [
+            {"organism_name": _2D7_MED4, "count": 2},
+            {"organism_name": _2D7_MIT9313, "count": 1},
+        ]
+
+    @pytest.mark.parametrize("tool", sorted(_2D7_ROWTOOLS))
+    def test_mixed_batch_does_not_raise_span_multiple(self, tool):
+        """The locus resolver would answer two organisms; the call must not
+        consult it (or must not raise on it) without `organism`."""
+        out, _ = self._run(
+            tool, ["PMM0370", "PMT0856"], summary=True,
+            summary_kw=dict(total=2, by_organism=[(_2D7_MED4, 1),
+                                                  (_2D7_MIT9313, 1)]))
+        assert out["results"] == []
+        assert len(out["by_organism"]) == 2
+
+    @pytest.mark.parametrize("tool", sorted(_2D7_ROWTOOLS))
+    def test_by_organism_sorted_count_desc_then_name(self, tool):
+        out, _ = self._run(
+            tool, ["PMM0370", "PMT0856"], summary=True,
+            summary_kw=dict(total=6, by_organism=[(_2D7_MIT9313, 1),
+                                                  ("Z org", 4),
+                                                  (_2D7_MED4, 1)]))
+        assert out["by_organism"] == [
+            {"organism_name": "Z org", "count": 4},
+            {"organism_name": _2D7_MED4, "count": 1},
+            {"organism_name": _2D7_MIT9313, "count": 1},
+        ]
+
+    @pytest.mark.parametrize("tool", sorted(_2D7_ROWTOOLS))
+    def test_all_unknown_tags_without_organism(self, tool):
+        """Today: ValueError 'at least one of organism, locus_tags, or
+        experiment_ids is required' (a bug). Now: empty envelope."""
+        tags = ["NOPE", ""]
+        out, _ = self._run(tool, tags,
+                           summary_kw=dict(not_found=tags, total=0))
+        assert out["not_found"] == tags
+        assert out["total_matching"] == 0
+        assert out["results"] == []
+        assert out["by_organism"] == []
+
+    @pytest.mark.parametrize("tool", sorted(_2D7_ROWTOOLS))
+    def test_organism_given_single_organism_still_works(self, tool):
+        out, _ = self._run(
+            tool, ["PMM0370"], organism="MED4", organism_hits=[_2D7_MED4],
+            detail_tags=["PMM0370"],
+            summary_kw=dict(total=1, by_organism=[(_2D7_MED4, 1)]))
+        assert out["by_organism"] == [{"organism_name": _2D7_MED4, "count": 1}]
+
+    @pytest.mark.parametrize("tool", sorted(_2D7_ROWTOOLS))
+    def test_organism_given_mixed_batch_raises(self, tool):
+        """With `organism`, the check still runs (rule 2)."""
+        with pytest.raises(ValueError):
+            self._run(tool, ["PMM0370", "PMT0856"], organism="MED4",
+                      organism_hits=[_2D7_MED4],
+                      summary_kw=dict(total=0))
+
+
+# --- metabolites_by_gene -----------------------------------------------------
+
+class TestMetabolitesByGeneOrganismOptional:
+    """2d.7a metabolites_by_gene: organism inferred from the tags; mixed
+    batches still raise (organism-scoped counts / stereo hint)."""
+
+    @staticmethod
+    def _conn(organism_hits=None, found=None):
+        conn = MagicMock()
+        conn.execute_query.side_effect = _2d7_dispatch(
+            organism_hits=organism_hits,
+            handlers=[("collect(DISTINCT g.locus_tag) AS found",
+                       lambda p: [{"found": list(found or [])}])])
+        return conn
+
+    def test_mixed_batch_without_organism_raises(self):
+        conn = self._conn()
+        with pytest.raises(ValueError, match="span multiple organisms"):
+            api.metabolites_by_gene(locus_tags=["PMM0963", "PMT0419"],
+                                    conn=conn)
+
+    def test_organism_omitted_resolved_from_tags(self):
+        conn = self._conn(found=["PMM0963"])
+        out = api.metabolites_by_gene(locus_tags=["PMM0963"], conn=conn)
+        org_params = [p["organism"] for _, p in
+                      conn.execute_query.side_effect.calls if "organism" in p]
+        assert org_params, "no organism-scoped query ran"
+        assert all(o == _2D7_MED4 for o in org_params), org_params
+        assert out["not_found"]["locus_tags"] == []
+
+    def test_all_unknown_tags_without_organism(self):
+        tags = ["NOPE", ""]
+        conn = self._conn()
+        out = api.metabolites_by_gene(locus_tags=tags, conn=conn)
+        assert out["not_found"]["locus_tags"] == tags
+        assert out["total_matching"] == 0
+        assert out["results"] == []
+
+    def test_foreign_tag_no_longer_in_not_found(self):
+        """Today PMT0419 under organism='MED4' lands in
+        not_found.locus_tags (misreport). Now: ValueError naming MIT9313."""
+        conn = self._conn(organism_hits=[_2D7_MED4], found=["PMM0963"])
+        with pytest.raises(ValueError, match="MIT9313"):
+            api.metabolites_by_gene(["PMM0963", "PMT0419"], "MED4", conn=conn)
+
+    def test_zero_match_organism_word_keeps_empty_envelope(self):
+        """The zero-match organism word path stays (not_found.organism)."""
+        conn = self._conn(organism_hits=[])
+        out = api.metabolites_by_gene(["PMM0963"], "Bogus organism", conn=conn)
+        assert out["not_found"]["organism"] == "Bogus organism"
+        assert out["total_matching"] == 0
+
+
+def _2d7_resolver_tolerant(responses):
+    """`side_effect` for fixed-order lists that must not care whether the
+    organism resolvers run (2d.7a: gene_clusters_by_gene skips the
+    single-organism check without `organism`). Resolver queries answer MED4;
+    every other query consumes `responses` in order."""
+    queue = list(responses)
+
+    def _exec(cypher, *args, **params):
+        if (_2D7_ORG_RESOLVER_MARK in cypher
+                or _2D7_LOCUS_RESOLVER_MARK in cypher):
+            return [{"organisms": [_2D7_MED4]}]
+        if not queue:
+            raise StopIteration
+        return queue.pop(0)
+
+    return _exec

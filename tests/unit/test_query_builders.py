@@ -2195,11 +2195,12 @@ class TestBuildGeneOntologyTermsLevelTree:
             )
 
     def test_organism_scoped_match(self):
-        """MATCH uses organism_name: $org and locus_tag IN $locus_tags."""
+        """MATCH uses the $org guard and locus_tag IN $locus_tags (2d.7a:
+        `{organism_name: $org}` became `($org IS NULL OR g.organism_name = $org)`)."""
         cypher, params = build_gene_ontology_terms(
             locus_tags=["PMM0001"], ontology="go_bp", organism_name="Test Org",
         )
-        assert "organism_name: $org" in cypher
+        assert "($org IS NULL OR g.organism_name = $org)" in cypher
         assert "locus_tag IN $locus_tags" in cypher
         assert params["org"] == "Test Org"
 
@@ -16654,3 +16655,246 @@ class TestBuildGeneOverviewTcdbRoleSubstrates:
         seg = _rp_has_chemistry_tcdb_segment(cypher)
         assert _RP_TCDB_ROLE_RELS in seg, seg
         assert _RP_MET_OR_ROLE_RE.search(seg), seg
+
+
+
+# ---------------------------------------------------------------------------
+# 2d.7a — relax single-organism gates on locus-tag tools (RED).
+# Spec: docs/tool-specs/2d7-single-organism-gates.md ("Per tool" +
+# "Degenerate inputs" Cypher guards). `MATCH (g:Gene {organism_name: $org})`
+# becomes `MATCH (g:Gene)` + `AND ($org IS NULL OR g.organism_name = $org)` on
+# the existing `WHERE g.locus_tag IN $locus_tags`, in both GO-terms builders,
+# every branch. `$org` always present in params (None when unscoped).
+# ---------------------------------------------------------------------------
+
+from multiomics_explorer.kg import queries_lib as _ql2d7
+
+_2D7_ORG = "Prochlorococcus MED4"
+
+# (ontology, mode, extra kwargs). Covers every bind branch of both builders:
+# bridge (brite), flat (cog_category, subcellular_localization), pfam
+# (cross-label parent), hierarchical (go_bp, kegg, cyanorak_role), the
+# facet ontologies (brite `tree`, interpro `interpro_type`), the gated /
+# rank_order ontology (tcdb, with and without the weak switch) and a trust
+# filter on the bind WHERE (`trust_and` is spliced after the locus-tag
+# predicate).
+_2D7_BRANCHES = [
+    ("go_bp", "leaf", {}),
+    ("go_bp", "rollup", {"level": 2}),
+    ("go_bp", "leaf", {"evidence": ["curated"]}),
+    ("go_bp", "rollup", {"level": 2, "evidence": ["curated"]}),
+    ("kegg", "leaf", {}),
+    ("kegg", "rollup", {"level": 1}),
+    ("cyanorak_role", "leaf", {}),
+    ("cyanorak_role", "rollup", {"level": 1}),
+    ("cog_category", "leaf", {}),
+    ("cog_category", "rollup", {"level": 0}),
+    ("subcellular_localization", "leaf", {}),
+    ("subcellular_localization", "rollup", {"level": 0}),
+    ("pfam", "leaf", {}),
+    ("pfam", "rollup", {"level": 0}),
+    ("brite", "leaf", {}),
+    ("brite", "leaf", {"tree": "transporters"}),
+    ("brite", "rollup", {"level": 1}),
+    ("brite", "rollup", {"level": 1, "tree": "transporters"}),
+    ("interpro", "leaf", {"interpro_type": "DOMAIN"}),
+    ("interpro", "rollup", {"level": 0, "interpro_type": "DOMAIN"}),
+    ("tcdb", "leaf", {}),
+    ("tcdb", "rollup", {"level": 2}),
+    ("tcdb", "leaf", {"include_weak_tcdb_hits": True}),
+    ("tcdb", "rollup", {"level": 2, "include_weak_tcdb_hits": True}),
+    ("tcdb", "leaf", {"max_tier": 2}),
+    ("tcdb", "rollup", {"level": 2, "max_tier": 2}),
+]
+
+
+def _2d7_ids():
+    out = []
+    for o, m, kw in _2D7_BRANCHES:
+        extra = sorted(k for k in kw if k != "level")
+        out.append("-".join([o, m, *extra]))
+    return out
+
+
+def _2d7_build(which, ontology, mode, extra, organism_name, verbose=False):
+    if which == "detail":
+        return _ql2d7.build_gene_ontology_terms(
+            locus_tags=["PMM0001", "PMT0419"], ontology=ontology,
+            organism_name=organism_name, mode=mode, verbose=verbose, **extra,
+        )
+    return _ql2d7.build_gene_ontology_terms_summary(
+        locus_tags=["PMM0001", "PMT0419"], ontology=ontology,
+        organism_name=organism_name, mode=mode, **extra,
+    )
+
+
+# The gene MATCH line, then the WHERE line that must open with the locus-tag
+# predicate and carry the parenthesised org guard on the SAME clause.
+_2D7_GENE_MATCH_RE = re.compile(
+    r"MATCH \(g:Gene\)[^\n]*\nWHERE g\.locus_tag IN \$locus_tags([^\n]*)"
+)
+_2D7_ORG_GUARD = "($org IS NULL OR g.organism_name = $org)"
+
+
+class TestBuildGeneOntologyTermsOrganismOptional:
+    """2d.7a: GO-terms builders run with or without an organism scope."""
+
+    @pytest.mark.parametrize("which", ["detail", "summary"])
+    @pytest.mark.parametrize("organism_name", [None, _2D7_ORG])
+    @pytest.mark.parametrize("ontology,mode,extra", _2D7_BRANCHES, ids=_2d7_ids())
+    def test_no_inline_organism_map(self, which, organism_name, ontology, mode, extra):
+        cypher, _ = _2d7_build(which, ontology, mode, extra, organism_name)
+        assert "{organism_name: $org}" not in cypher, cypher
+        assert "MATCH (g:Gene {" not in cypher, cypher
+
+    @pytest.mark.parametrize("which", ["detail", "summary"])
+    @pytest.mark.parametrize("organism_name", [None, _2D7_ORG])
+    @pytest.mark.parametrize("ontology,mode,extra", _2D7_BRANCHES, ids=_2d7_ids())
+    def test_every_gene_match_bound_by_tags_and_org_guard(
+        self, which, organism_name, ontology, mode, extra,
+    ):
+        cypher, _ = _2d7_build(which, ontology, mode, extra, organism_name)
+        n_gene_matches = cypher.count("MATCH (g:Gene")
+        assert n_gene_matches >= 1, cypher
+        clauses = _2D7_GENE_MATCH_RE.findall(cypher)
+        # Every `MATCH (g:Gene` is bare `(g:Gene)` and is immediately followed
+        # by a WHERE opening with the locus-tag predicate ...
+        assert len(clauses) == n_gene_matches, cypher
+        # ... whose same clause carries the parenthesised org guard (parens
+        # matter: an unparenthesised OR would swallow the trust AND-chain).
+        for rest in clauses:
+            assert _2D7_ORG_GUARD in rest, cypher
+
+    @pytest.mark.parametrize("which", ["detail", "summary"])
+    @pytest.mark.parametrize("ontology,mode,extra", _2D7_BRANCHES, ids=_2d7_ids())
+    def test_org_guard_follows_locus_tag_predicate(self, which, ontology, mode, extra):
+        """`g.locus_tag IN $locus_tags` stays the FIRST predicate, so a null
+        `$org` can never widen the query beyond the tag list."""
+        cypher, _ = _2d7_build(which, ontology, mode, extra, None)
+        guarded = [ln for ln in cypher.splitlines() if _2D7_ORG_GUARD in ln]
+        assert guarded, cypher
+        for line in guarded:
+            assert line.startswith(
+                "WHERE g.locus_tag IN $locus_tags AND " + _2D7_ORG_GUARD
+            ), line
+
+    @pytest.mark.parametrize("which", ["detail", "summary"])
+    @pytest.mark.parametrize("ontology,mode,extra", _2D7_BRANCHES, ids=_2d7_ids())
+    def test_org_param_none_when_unscoped(self, which, ontology, mode, extra):
+        _, params = _2d7_build(which, ontology, mode, extra, None)
+        assert "org" in params
+        assert params["org"] is None
+        assert params["locus_tags"] == ["PMM0001", "PMT0419"]
+
+    @pytest.mark.parametrize("which", ["detail", "summary"])
+    @pytest.mark.parametrize("ontology,mode,extra", _2D7_BRANCHES, ids=_2d7_ids())
+    def test_org_param_set_when_scoped(self, which, ontology, mode, extra):
+        _, params = _2d7_build(which, ontology, mode, extra, _2D7_ORG)
+        assert params["org"] == _2D7_ORG
+
+    @pytest.mark.parametrize("ontology,mode,extra", _2D7_BRANCHES, ids=_2d7_ids())
+    def test_detail_verbose_branch_also_guarded(self, ontology, mode, extra):
+        """Verbose rollup takes the best-edge rebind on hierarchical
+        ontologies — the rebind must not add an unguarded gene MATCH."""
+        cypher, _ = _2d7_build("detail", ontology, mode, extra, None, verbose=True)
+        assert "{organism_name: $org}" not in cypher
+        n = cypher.count("MATCH (g:Gene")
+        assert n >= 1
+        assert len(_2D7_GENE_MATCH_RE.findall(cypher)) == n, cypher
+        assert "g.organism_name AS organism_name" in cypher
+
+
+class TestGeneOntologyTermsGeneMatchGuard:
+    """Generic guard (spec "Degenerate inputs"): in both GO-terms builders,
+    every gene MATCH carries `g.locus_tag IN $locus_tags` — over EVERY
+    registered ontology, both modes, both scopes."""
+
+    @staticmethod
+    def _cases():
+        out = []
+        for ont in _ql2d7.ONTOLOGY_CONFIG:
+            facet = {"interpro_type": "DOMAIN"} if ont == "interpro" else {}
+            out.append((ont, "leaf", facet))
+            out.append((ont, "rollup", {"level": 1, **facet}))
+        return out
+
+    @pytest.mark.parametrize("which", ["detail", "summary"])
+    @pytest.mark.parametrize("organism_name", [None, _2D7_ORG])
+    def test_gene_match_count_equals_locus_tag_predicate_count(
+        self, which, organism_name,
+    ):
+        for ont, mode, extra in self._cases():
+            for verbose in ([False, True] if which == "detail" else [False]):
+                cypher, params = _2d7_build(
+                    which, ont, mode, extra, organism_name, verbose=verbose,
+                )
+                n_match = cypher.count("MATCH (g:Gene")
+                n_pred = cypher.count("g.locus_tag IN $locus_tags")
+                assert n_match >= 1, (ont, mode)
+                assert n_match == n_pred, (ont, mode, verbose, cypher)
+                assert _2D7_ORG_GUARD in cypher, (ont, mode, verbose)
+                assert "{organism_name: $org}" not in cypher, (ont, mode)
+                assert "org" in params and params["org"] == organism_name
+
+
+class TestBuildGeneClustersByGeneOrganismColumn:
+    """2d.7a: verbose row column `organism_name` + `by_organism` summary."""
+
+    def test_verbose_adds_organism_name(self):
+        cypher, _ = _ql2d7.build_gene_clusters_by_gene(
+            locus_tags=["PMM0370"], verbose=True,
+        )
+        assert "g.organism_name AS organism_name" in cypher
+
+    def test_compact_has_no_organism_name(self):
+        cypher, _ = _ql2d7.build_gene_clusters_by_gene(
+            locus_tags=["PMM0370"], verbose=False,
+        )
+        assert "AS organism_name" not in cypher
+
+    def test_summary_returns_by_organism(self):
+        """by_organism (rows per organism) comes from the summary query, so
+        summary=True carries it; APOC frequencies over g.organism_name like
+        the sibling by_* rollups (`[{item, count}]`, renamed api-side)."""
+        cypher, _ = _ql2d7.build_gene_clusters_by_gene_summary(
+            locus_tags=["PMM0370", "PMT0856"],
+        )
+        assert "AS by_organism" in cypher
+        assert "g.organism_name" in cypher
+
+    def test_no_organism_filter_added(self):
+        cypher, params = _ql2d7.build_gene_clusters_by_gene(
+            locus_tags=["PMM0370"], verbose=True,
+        )
+        assert "$org" not in cypher
+        assert "org" not in params
+
+
+class TestBuildGeneDerivedMetricsOrganismColumn:
+    """2d.7a: verbose row column `organism_name` + `by_organism` summary."""
+
+    def test_verbose_adds_organism_name(self):
+        cypher, _ = _ql2d7.build_gene_derived_metrics(
+            locus_tags=["PMM1714"], verbose=True,
+        )
+        assert "g.organism_name AS organism_name" in cypher
+
+    def test_compact_has_no_organism_name(self):
+        cypher, _ = _ql2d7.build_gene_derived_metrics(
+            locus_tags=["PMM1714"], verbose=False,
+        )
+        assert "AS organism_name" not in cypher
+
+    def test_summary_returns_by_organism(self):
+        cypher, _ = _ql2d7.build_gene_derived_metrics_summary(
+            locus_tags=["PMM1714", "PMT0419"],
+        )
+        assert "AS by_organism" in cypher
+        assert "g.organism_name" in cypher
+
+    def test_no_organism_filter_added(self):
+        cypher, params = _ql2d7.build_gene_derived_metrics(
+            locus_tags=["PMM1714"], verbose=True,
+        )
+        assert "$org" not in cypher
+        assert "org" not in params

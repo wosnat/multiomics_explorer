@@ -28,6 +28,19 @@ _ABC_ONLY_WALK_START_LOCUS = "PMM0449"        # only walk start = tcdb:3.A.1 (ca
 _BELOW_GATE_ONLY_LOCUS = "PMM0024"            # thiL: one below_gate tier-3 edge
 _WEAK_ON_TOP_LOCUS = "PMM0125"                # ecfA1: 8 annotated + 4 below_gate edges
 
+# 2d.7a single-organism gates (docs/tool-specs/2d7-single-organism-gates.md).
+# Locus tags are KG-unique, so a mixed-organism batch without `organism` is a
+# plain union of per-gene rows on gene_ontology_terms / gene_clusters_by_gene
+# / gene_derived_metrics, and a ToolError on metabolites_by_gene. Pinned on
+# the release KG alpha.9 (2026-11-18):
+#   MATCH (g:Gene {locus_tag:$lt}) RETURN g.organism_name
+#   PMM0001, PMM0370 -> Prochlorococcus MED4; PMT0419, PMT0856 -> MIT9313.
+#   PMM0001 / PMT0419 carry GO terms + DM rows; PMM0370 (5) / PMT0856 (3)
+#   carry Gene_in_gene_cluster edges (PMT0419 has none).
+_2D7_MIXED_ORG_BATCH = ["PMM0001", "PMT0419"]
+_2D7_MIXED_ORG_CLUSTER_BATCH = ["PMM0370", "PMT0856"]
+_2D7_ALL_UNKNOWN = [fx.UNKNOWN_LOCUS, ""]
+
 
 @dataclass
 class Scenario:
@@ -319,6 +332,29 @@ def gene_ontology_terms_scenarios():
             "merops_call_class_zero_rows",
             dict(locus_tags=["PMM0001"], organism=fx.CONTROL_ORGANISM,
                  ontology=["merops"], call_class=["peptidase"])),
+        # --- 2d.7a single-organism gates ---
+        Scenario(
+            "mixed_organism_batch_no_organism",
+            dict(locus_tags=_2D7_MIXED_ORG_BATCH),
+            input_ids=_2D7_MIXED_ORG_BATCH),
+        Scenario(
+            "all_unknown_no_organism",
+            dict(locus_tags=_2D7_ALL_UNKNOWN),
+            input_ids=_2D7_ALL_UNKNOWN),
+        Scenario(
+            "empty_locus_tags_no_organism",
+            dict(locus_tags=[]),
+            expects_error=ToolError),
+        Scenario(
+            # rule 2: organism given + a tag from another organism raises.
+            "organism_with_foreign_tag",
+            dict(locus_tags=_2D7_MIXED_ORG_BATCH, organism=fx.CONTROL_ORGANISM),
+            expects_error=ToolError),
+        Scenario(
+            "mixed_organism_batch_no_organism_rollup",
+            dict(locus_tags=_2D7_MIXED_ORG_BATCH, ontology="cyanorak_role",
+                 mode="rollup", level=1),
+            input_ids=_2D7_MIXED_ORG_BATCH),
     ]
 
 
@@ -408,6 +444,24 @@ def gene_derived_metrics_scenarios():
             "offset_past_end",
             dict(locus_tags=["PMM0001"], organism=fx.CONTROL_ORGANISM,
                  offset=fx.OFFSET_PAST_END)),
+        # --- 2d.7a single-organism gates ---
+        Scenario(
+            "mixed_organism_batch_no_organism",
+            dict(locus_tags=_2D7_MIXED_ORG_BATCH),
+            input_ids=_2D7_MIXED_ORG_BATCH),
+        Scenario(
+            "all_unknown_no_organism",
+            dict(locus_tags=_2D7_ALL_UNKNOWN),
+            input_ids=_2D7_ALL_UNKNOWN),
+        Scenario(
+            "empty_locus_tags_no_organism",
+            dict(locus_tags=[]),
+            expects_error=ToolError),
+        Scenario(
+            # rule 2: organism given + a tag from another organism raises.
+            "organism_with_foreign_tag",
+            dict(locus_tags=_2D7_MIXED_ORG_BATCH, organism=fx.CONTROL_ORGANISM),
+            expects_error=ToolError),
     ]
 
 
@@ -435,6 +489,24 @@ def gene_clusters_by_gene_scenarios():
             dict(locus_tags=[_DECAY_ANALYSIS_GENE], organism=fx.CONTROL_ORGANISM,
                  analysis_ids=[_DECAY_ANALYSIS_ID]),
             input_ids=[_DECAY_ANALYSIS_GENE]),
+        # --- 2d.7a single-organism gates ---
+        Scenario(
+            "mixed_organism_batch_no_organism",
+            dict(locus_tags=_2D7_MIXED_ORG_CLUSTER_BATCH),
+            input_ids=_2D7_MIXED_ORG_CLUSTER_BATCH),
+        Scenario(
+            "all_unknown_no_organism",
+            dict(locus_tags=_2D7_ALL_UNKNOWN),
+            input_ids=_2D7_ALL_UNKNOWN),
+        Scenario(
+            "empty_locus_tags_no_organism",
+            dict(locus_tags=[]),
+            expects_error=ToolError),
+        Scenario(
+            # rule 2: organism given + a tag from another organism raises.
+            "organism_with_foreign_tag",
+            dict(locus_tags=_2D7_MIXED_ORG_CLUSTER_BATCH, organism=fx.CONTROL_ORGANISM),
+            expects_error=ToolError),
     ]
 
 
@@ -1333,6 +1405,31 @@ def metabolites_by_gene_scenarios():
             "bare_metabolite_id_filter",
             dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,
                  metabolite_ids=[_BARE_UREA_ID])),
+        # --- 2d.7a single-organism gates (structured not_found -> no
+        # input_ids) ---
+        Scenario(
+            # organism-scoped counts + stereo hint: mixed batches still raise.
+            "mixed_organism_batch_no_organism",
+            dict(locus_tags=_2D7_MIXED_ORG_BATCH),
+            expects_error=ToolError),
+        Scenario(
+            "single_organism_no_organism",
+            dict(locus_tags=["PMM0963"])),
+        Scenario(
+            "all_unknown_no_organism",
+            dict(locus_tags=_2D7_ALL_UNKNOWN)),
+        Scenario(
+            "empty_locus_tags",
+            dict(locus_tags=[], organism=fx.CONTROL_ORGANISM),
+            expects_error=ToolError),
+        Scenario(
+            "empty_locus_tags_no_organism",
+            dict(locus_tags=[]),
+            expects_error=ToolError),
+        Scenario(
+            "organism_with_foreign_tag",
+            dict(locus_tags=_2D7_MIXED_ORG_BATCH, organism=fx.CONTROL_ORGANISM),
+            expects_error=ToolError),
     ]
 
 
