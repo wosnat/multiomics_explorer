@@ -24598,6 +24598,7 @@ _2D7_ORG_OF = {
 }
 _2D7_ORG_RESOLVER_MARK = "MATCH (o:OrganismTaxon)"
 _2D7_LOCUS_RESOLVER_MARK = "RETURN collect(DISTINCT g.organism_name) AS organisms"
+_2D7_EXISTENCE_MARK = "g IS NOT NULL AS found"
 
 
 def _2d7_dispatch(*, organism_hits=None, handlers=()):
@@ -24618,6 +24619,12 @@ def _2d7_dispatch(*, organism_hits=None, handlers=()):
         for mark, fn in handlers:
             if mark in cypher:
                 return fn(params)
+        if _2D7_EXISTENCE_MARK in cypher:
+            # Default answer for build_gene_existence_check (tests may
+            # override via `handlers`): organism from `_2D7_ORG_OF`.
+            return [{"lt": lt, "found": lt in _2D7_ORG_OF,
+                     "organism_name": _2D7_ORG_OF.get(lt)}
+                    for lt in params.get("locus_tags", [])]
         return []
 
     _exec.calls = calls

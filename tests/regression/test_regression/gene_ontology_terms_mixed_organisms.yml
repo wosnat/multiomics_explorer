@@ -1,0 +1,72 @@
+by_call_class: []
+by_evidence:
+- count: 1
+  evidence: curated
+- count: 1
+  evidence: family_inferred
+by_ontology:
+- gene_count: 2
+  ontology_type: go_bp
+  term_count: 2
+by_organism:
+- gene_count: 1
+  organism_name: Prochlorococcus MED4
+- gene_count: 1
+  organism_name: Prochlorococcus MIT9313
+by_sources:
+- count: 1
+  source: uniprot
+- count: 1
+  source: interproscan
+by_tcdb_call: []
+by_term:
+- count: 1
+  level: 7
+  ontology_type: go_bp
+  term_id: go:0006271
+  term_name: DNA strand elongation involved in DNA replication
+- count: 1
+  level: 6
+  ontology_type: go_bp
+  term_id: go:0009772
+  term_name: photosynthetic electron transport in photosystem II
+by_tier: []
+case_id: gene_ontology_terms_mixed_organisms
+evidence_score_stats:
+  max: 0.667
+  median: 0.5
+  min: 0.333
+  n_null: 0
+filters_applied: {}
+no_terms: []
+not_found: []
+offset: 0
+results:
+- evidence: curated
+  is_informative: true
+  level: 7
+  locus_tag: PMM0001
+  term_id: go:0006271
+  term_name: DNA strand elongation involved in DNA replication
+- evidence: family_inferred
+  is_informative: true
+  level: 6
+  locus_tag: PMT0419
+  term_id: go:0009772
+  term_name: photosynthetic electron transport in photosystem II
+returned: 2
+row_count: 2
+skipped_ontologies: []
+terms_per_gene_max: 1
+terms_per_gene_median: 1.0
+terms_per_gene_min: 1
+total_genes: 2
+total_matching: 2
+total_terms: 2
+truncated: false
+trust_axes:
+  go_bp:
+  - sources
+  - evidence
+  - evidence_score
+warnings: []

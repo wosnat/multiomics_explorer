@@ -533,7 +533,7 @@ mistakes:
   - "Default mode='leaf' returns only leaf (most specific) terms — ancestor terms like 'metabolic process' are excluded because they are implied by the more specific child terms"
   - "`summary=True` gives term and gene counts only: the trust rollups (`by_evidence`, `by_tier`, `by_sources`, `by_call_class`, `by_tcdb_call`, `evidence_score_stats`) come back empty. For them pass `summary=False` with `limit=1`."
 
-  - "organism is required — single-valued. Locus tags must belong to the specified organism."
+  - "`organism` is optional: pass it only to scope or as a check. A tag from another organism then raises `ValueError`. Mixed-organism batches are fine without it; read `by_organism` for genes per organism."
   - "ontology=None returns ALL ontology types — use ontology filter when you only need one type"
   - "mode='rollup' requires `level` (and optionally `ontology`). It walks UP the hierarchy from leaf annotations to the requested level, returning rolled-up (gene x ancestor-term) pairs."
   - "to check if a gene is connected to a broad term (e.g. 'DNA repair'), use genes_by_ontology(term_ids=[...], ontology=..., organism=...) which expands down the hierarchy — gene_ontology_terms only returns the leaf annotations"

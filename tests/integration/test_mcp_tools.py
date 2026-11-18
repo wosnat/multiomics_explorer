@@ -2126,11 +2126,23 @@ class TestGeneDerivedMetrics:
 
     @pytest.mark.asyncio
     async def test_organism_conflict_raises(self, tool_fns, conn):
+        # 2d.7a: a mixed batch alone is allowed; organism given + a tag
+        # from another organism is the conflict that raises.
         from fastmcp.exceptions import ToolError
         ctx = _ctx_with_conn(conn)
-        with pytest.raises(ToolError):
+        with pytest.raises(ToolError, match="PMN2A_2128"):
             await tool_fns["gene_derived_metrics"](
-                ctx, locus_tags=["PMM1714", "PMN2A_2128"])  # MED4 + NATL2A
+                ctx, locus_tags=["PMM1714", "PMN2A_2128"],  # MED4 + NATL2A
+                organism="MED4")
+
+    @pytest.mark.asyncio
+    async def test_mixed_organism_batch_reports_by_organism(self, tool_fns, conn):
+        ctx = _ctx_with_conn(conn)
+        response = await tool_fns["gene_derived_metrics"](
+            ctx, locus_tags=["PMM1714", "PMN2A_2128"])  # MED4 + NATL2A
+        orgs = {b.organism_name: b.count for b in response.by_organism}
+        assert set(orgs) == {"Prochlorococcus MED4", "Prochlorococcus NATL2A"}
+        assert sum(orgs.values()) == response.total_matching
 
     @pytest.mark.asyncio
     async def test_truncation(self, tool_fns, conn, kg_count):

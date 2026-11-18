@@ -1,0 +1,288 @@
+by_analysis:
+- analysis_id: clustering_analysis:j.cell.2022.12.006:med4_genomic_islands
+  count: 1
+- analysis_id: clustering_analysis:gb-2010-11-5-r54:decay_clusters
+  count: 1
+- analysis_id: clustering_analysis:journal.pone.0005135:med4_diel_clusters
+  count: 1
+- analysis_id: clustering_analysis:msb4100087:med4_kmeans_nstarvation
+  count: 1
+- analysis_id: clustering_analysis:ismej.2011.49:med4_iron_response_clusters
+  count: 1
+- analysis_id: clustering_analysis:j.cell.2022.12.006:mit9313_genomic_islands
+  count: 1
+- analysis_id: clustering_analysis:msb4100087:mit9313_kmeans_nstarvation
+  count: 1
+- analysis_id: clustering_analysis:ismej.2011.49:mit9313_iron_response_clusters
+  count: 1
+by_background_factors:
+- background_factor: axenic
+  count: 6
+- background_factor: light
+  count: 5
+- background_factor: chemical
+  count: 1
+- background_factor: diel
+  count: 1
+by_cluster_type:
+- cluster_type: time_course
+  count: 4
+- cluster_type: genomic_island
+  count: 2
+- cluster_type: decay_pattern
+  count: 1
+- cluster_type: diel
+  count: 1
+by_organism:
+- count: 5
+  organism_name: Prochlorococcus MED4
+- count: 3
+  organism_name: Prochlorococcus MIT9313
+by_treatment_type:
+- count: 2
+  treatment_type: genomic_analysis
+- count: 2
+  treatment_type: nitrogen
+- count: 2
+  treatment_type: iron
+- count: 1
+  treatment_type: rna_decay
+- count: 1
+  treatment_type: diel
+case_id: gene_clusters_by_gene_mixed_organisms
+genes_with_clusters: 2
+genes_without_clusters: 0
+not_found: []
+not_matched: []
+offset: 0
+results:
+- analysis_id: clustering_analysis:gb-2010-11-5-r54:decay_clusters
+  analysis_name: MED4 mRNA decay-pattern clusters (Steglich 2010)
+  background_factors:
+  - axenic
+  - chemical
+  - light
+  cluster_expression_dynamics: null
+  cluster_functional_description: null
+  cluster_id: cluster:gb-2010-11-5-r54:decay_clusters:1
+  cluster_method: Soft clustering (Mfuzz, m=2, 12 clusters) of rifampicin decay time-course
+    profiles
+  cluster_name: Cluster 1
+  cluster_temporal_pattern: null
+  cluster_type: decay_pattern
+  experimental_context: 12 clusters with distinct decay profiles (20-139 members;
+    1,102 of 2,043 features clustered). Cluster 6 = shortest half-lives; cluster 11
+    = highly expressed genes with long half-lives; clusters 2 and 4 enriched in tRNA/rRNA/ncRNA
+    features. Per-cluster narrative descriptions not extracted yet — functional_description
+    is null initially.
+  gene_name: cynA
+  light_condition: continuous cool white light
+  locus_tag: PMM0370
+  member_count: 113
+  membership_score: null
+  organism_name: Prochlorococcus MED4
+  p_value: null
+  treatment: Rifampicin transcription arrest, 0-60 min mRNA decay time course
+  treatment_type:
+  - rna_decay
+- analysis_id: clustering_analysis:ismej.2011.49:med4_iron_response_clusters
+  analysis_name: MED4 iron-response hierarchical clusters (Thompson 2011 Fig 3)
+  background_factors:
+  - axenic
+  - light
+  cluster_expression_dynamics: late sustained
+  cluster_functional_description: Enriched for iron stress response genes including
+    bcp, sigA/rpoD, crp, hli, iraI, idiA, isiB, and several small RNAs, indicating
+    a coordinated iron stress regulon.
+  cluster_id: cluster:ismej.2011.49:med4_iron_response_clusters:19
+  cluster_method: Hierarchical clustering (paper Figure 3)
+  cluster_name: Prochlorococcus MED4 cluster 19 (63 genes)
+  cluster_temporal_pattern: Genes are upregulated during iron starvation starting
+    early and remain elevated until iron rescue, where expression decreases.
+  cluster_type: time_course
+  experimental_context: Prochlorococcus MED4 in PRO99 (trace-metal clean) at 21C under
+    continuous light at 27 umol photons m-2 s-1; clusters group genes by temporal
+    expression profile across the full -Fe/+Fe time course
+  gene_name: cynA
+  light_condition: continuous light
+  locus_tag: PMM0370
+  member_count: 59
+  membership_score: null
+  organism_name: Prochlorococcus MED4
+  p_value: null
+  treatment: Iron starvation (-Fe) and rescue (+Fe added at 49h) time course; samples
+    at 0/12/24/48h plus rescue R
+  treatment_type:
+  - iron
+- analysis_id: clustering_analysis:j.cell.2022.12.006:med4_genomic_islands
+  analysis_name: MED4 predicted genomic islands (Hackl 2023)
+  background_factors: []
+  cluster_expression_dynamics: null
+  cluster_functional_description: null
+  cluster_id: cluster:j.cell.2022.12.006:med4_genomic_islands:MED4_1_323821_368220
+  cluster_method: Tycheposon-pipeline genomic island prediction (Hackl 2023 Table
+    S2)
+  cluster_name: Cluster MED4_1_323821_368220
+  cluster_temporal_pattern: null
+  cluster_type: genomic_island
+  experimental_context: Predicted variable-region genomic islands transferred onto
+    the deployed assembly by coordinate containment (gene fully inside the mmc2 interval;
+    assembly frame verified against mmc1, delta <= 236 bp). island_id encodes contig
+    + start + end. Islands are predicted variable regions within one genome — NOT
+    a pangenome core/flexible label. No per-island narrative exists; functional_description
+    stays null.
+  gene_name: cynA
+  light_condition: ''
+  locus_tag: PMM0370
+  member_count: 76
+  membership_score: null
+  organism_name: Prochlorococcus MED4
+  p_value: null
+  treatment: Genomic island prediction from genome sequence (no experimental treatment)
+  treatment_type:
+  - genomic_analysis
+- analysis_id: clustering_analysis:journal.pone.0005135:med4_diel_clusters
+  analysis_name: MED4 diel cycling expression clusters
+  background_factors:
+  - axenic
+  - diel
+  cluster_expression_dynamics: peaks mid-day
+  cluster_functional_description: Enriched for cytochrome b6/f (3/7 genes, p=0.0059)
+    and photosystem II genes (8/22 genes, p=3.70E-08).
+  cluster_id: cluster:journal.pone.0005135:med4_diel_clusters:3
+  cluster_method: Soft clustering (Mfuzz, c=16, m=1.25)
+  cluster_name: Prochlorococcus cluster 3 (cytochrome b6/f and photosystem II)
+  cluster_temporal_pattern: Genes peak in expression near 12.5 hours after onset of
+    dark with 24h periodicity.
+  cluster_type: diel
+  experimental_context: Axenic Prochlorococcus MED4 in Sargasso Seawater-based Pro99
+    medium (10 mM HEPES pH 7.5) at 24C; 14:10 L:D cycle with gradual dawn/dusk transitions;
+    max PAR ~232 umol quanta m-2 s-1; custom Affymetrix MD4-9313 GeneChip; 50 timepoints
+    at 2h intervals over 48h; duplicate cultures sampled alternately; RMA-normalized;
+    Fourier analysis (FDR<0.10) for periodicity; soft clustering via Mfuzz (c=16,
+    m=1.25)
+  gene_name: cynA
+  light_condition: 14:10 light:dark cycle
+  locus_tag: PMM0370
+  member_count: 23
+  membership_score: 0.6415
+  organism_name: Prochlorococcus MED4
+  p_value: null
+  treatment: 'Simulated diel light-dark cycle (14h light : 10h dark) over 48 hours'
+  treatment_type:
+  - diel
+- analysis_id: clustering_analysis:msb4100087:med4_kmeans_nstarvation
+  analysis_name: MED4 K-means N-starvation clusters
+  background_factors:
+  - axenic
+  - light
+  cluster_expression_dynamics: early transient
+  cluster_functional_description: Contains nitrogen transport genes such as urtA and
+    cynA. Enriched for transport and binding category.
+  cluster_id: cluster:msb4100087:med4_kmeans_nstarvation:1
+  cluster_method: K-means (K=9)
+  cluster_name: Prochlorococcus MED4 cluster 1 (5 genes)
+  cluster_temporal_pattern: Most rapidly and highly upregulated genes in MED4 during
+    nitrogen starvation, with expression first appearing within 6 hours and peaking
+    early in the time course.
+  cluster_type: time_course
+  experimental_context: Custom Affymetrix microarray MD4-9313; MED4 cells in Pro99
+    medium at 22C under continuous light (50 umol quanta m-2 s-1); sampled at 0, 3,
+    6, 12, 24, 48h post N-deprivation
+  gene_name: cynA
+  light_condition: continuous light
+  locus_tag: PMM0370
+  member_count: 5
+  membership_score: null
+  organism_name: Prochlorococcus MED4
+  p_value: null
+  treatment: N-starvation time course (0, 3, 6, 12, 24, 48h)
+  treatment_type:
+  - nitrogen
+- analysis_id: clustering_analysis:ismej.2011.49:mit9313_iron_response_clusters
+  analysis_name: MIT9313 iron-response hierarchical clusters (Thompson 2011 Fig 3)
+  background_factors:
+  - axenic
+  - light
+  cluster_expression_dynamics: null
+  cluster_functional_description: Contains genes including glyQ, piuC, idiA, pcbB,
+    and isiB, involved in iron transport and stress response.
+  cluster_id: cluster:ismej.2011.49:mit9313_iron_response_clusters:4
+  cluster_method: Hierarchical clustering (paper Figure 3)
+  cluster_name: MIT9313 cluster 4 (24 genes)
+  cluster_temporal_pattern: null
+  cluster_type: time_course
+  experimental_context: Prochlorococcus MIT9313 in PRO99 (trace-metal clean) at 25C
+    under continuous light at 20 umol photons m-2 s-1; clusters group genes by temporal
+    expression profile across the full -Fe/+Fe time course
+  gene_name: mscL
+  light_condition: continuous light
+  locus_tag: PMT0856
+  member_count: 24
+  membership_score: null
+  organism_name: Prochlorococcus MIT9313
+  p_value: null
+  treatment: Iron starvation (-Fe) and rescue (+Fe added at 54h) time course; samples
+    at 0/16/28/53h plus rescue R
+  treatment_type:
+  - iron
+- analysis_id: clustering_analysis:j.cell.2022.12.006:mit9313_genomic_islands
+  analysis_name: MIT9313 predicted genomic islands (Hackl 2023)
+  background_factors: []
+  cluster_expression_dynamics: null
+  cluster_functional_description: null
+  cluster_id: cluster:j.cell.2022.12.006:mit9313_genomic_islands:MIT9313_1_904788_1131090
+  cluster_method: Tycheposon-pipeline genomic island prediction (Hackl 2023 Table
+    S2)
+  cluster_name: Cluster MIT9313_1_904788_1131090
+  cluster_temporal_pattern: null
+  cluster_type: genomic_island
+  experimental_context: Predicted variable-region genomic islands transferred onto
+    the deployed assembly by coordinate containment (gene fully inside the mmc2 interval;
+    assembly frame verified against mmc1, delta <= 236 bp). island_id encodes contig
+    + start + end. Islands are predicted variable regions within one genome — NOT
+    a pangenome core/flexible label. No per-island narrative exists; functional_description
+    stays null.
+  gene_name: mscL
+  light_condition: ''
+  locus_tag: PMT0856
+  member_count: 277
+  membership_score: null
+  organism_name: Prochlorococcus MIT9313
+  p_value: null
+  treatment: Genomic island prediction from genome sequence (no experimental treatment)
+  treatment_type:
+  - genomic_analysis
+- analysis_id: clustering_analysis:msb4100087:mit9313_kmeans_nstarvation
+  analysis_name: MIT9313 K-means N-starvation clusters
+  background_factors:
+  - axenic
+  - light
+  cluster_expression_dynamics: gradual repression
+  cluster_functional_description: Enriched for photosynthesis and respiration genes
+    including photosystem I and II components and the phycoerythrin gene cpeB.
+  cluster_id: cluster:msb4100087:mit9313_kmeans_nstarvation:6
+  cluster_method: K-means (K=7)
+  cluster_name: MIT9313 cluster 6 (photosynthesis and respiration)
+  cluster_temporal_pattern: Downregulated cluster with gradual repression during nitrogen
+    starvation, with mild repression at late time points.
+  cluster_type: time_course
+  experimental_context: Custom Affymetrix microarray MD4-9313; MIT9313 cells in Pro99
+    medium at 22C under continuous light (10 umol quanta m-2 s-1); sampled at 0, 3,
+    6, 12, 24, 48h post N-deprivation
+  gene_name: mscL
+  light_condition: continuous light
+  locus_tag: PMT0856
+  member_count: 81
+  membership_score: null
+  organism_name: Prochlorococcus MIT9313
+  p_value: null
+  treatment: N-starvation time course (0, 3, 6, 12, 24, 48h)
+  treatment_type:
+  - nitrogen
+returned: 8
+row_count: 8
+total_clusters: 8
+total_matching: 8
+truncated: false
+warnings: []

@@ -13,8 +13,8 @@ docs://tools/metabolites_by_gene; summary=True for 50+ genes.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| locus_tags | list[string] | — | Gene locus tags to drill into (case-sensitive). E.g. ['PMM0963', 'PMM0964', 'PMM0965'] for urease α/β/γ subunits. `not_found.locus_tags` lists tags that don't resolve to any Gene in the requested organism; `not_matched` lists tags that DO resolve but have no chemistry path (no reaction, TCDB or GO transport row). |
-| organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
+| locus_tags | list[string] | — | Gene locus tags to drill into (case-sensitive). E.g. ['PMM0963', 'PMM0964', 'PMM0965'] for urease α/β/γ subunits. `not_found.locus_tags` lists tags that don't resolve to any Gene (every tag when `organism` matches nothing); `not_matched` lists tags that DO resolve but have no chemistry path (no reaction, TCDB or GO transport row). |
+| organism | string \| None | None | Organism, optional: inferred from locus_tags, which must share one organism (a mixed batch raises). When given it must resolve to ONE organism ('MED4'); a tag from another organism raises. |
 | metabolite_elements | list[string] \| None | None | Keep rows whose metabolite contains ALL these element symbols (presence, e.g. ['N'], ['N', 'P']); formula-less metabolites never match (see no_formula_excluded). Applies to all three arms. `not_found.metabolite_elements` lists symbols that don't exist on any KG metabolite. |
 | metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds warn. `chebi.role:` ids reach TCDB / GO role edges. docs://analysis/transport. |
 | exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
@@ -517,7 +517,7 @@ metabolites_by_gene → go_transport rows with target_kind='chemical_role' → g
 
 - `top_metabolite_pathways` here means *KEGG pathways the gene set's chemistry reaches* (via `Reaction_in_kegg_pathway` + `Metabolite_in_pathway`). These are NOT the same as gene-KO-mediated pathway annotations (where pathway membership is asserted by the gene's KO assignment) — those live in `genes_by_ontology(ontology='kegg', term_ids=[...], organism=...)`. For metabolic pathway analysis with a hypothesis test, use `pathway_enrichment` instead.
 
-- `not_found.locus_tags` vs `not_matched`. `not_found.locus_tags` = locus_tags that don't resolve to any Gene in the requested organism (typo, wrong organism, gene removed in KG rebuild). `not_matched` = tags that resolve to a Gene but return no row under the active filters: no reaction, no direct TCDB system (family-only and superfamily-only genes land here; see the warning), and no GO transport term. Many housekeeping genes fall here. Pivot via `gene_overview(locus_tags=not_matched)`.
+- `not_found.locus_tags` vs `not_matched`. `not_found.locus_tags` = locus_tags that don't resolve to any Gene (typo, gene removed in KG rebuild); a tag from another organism raises instead. `not_matched` = tags that resolve to a Gene but return no row under the active filters: no reaction, no direct TCDB system (family-only and superfamily-only genes land here; see the warning), and no GO transport term. Many housekeeping genes fall here. Pivot via `gene_overview(locus_tags=not_matched)`.
 
 - A multi-source pair is corroborated, not proven. `by_evidence_source_combination`, `by_gene[].multi_source_metabolite_count` and `top_metabolites[].multi_source_gene_count` count the (gene, metabolite) pairs that two or more routes name, but the routes share homology (InterPro2GO and eggNOG vs the TCDB calls), so agreement raises confidence without being independent confirmation. A single-source pair is not wrong.
 
@@ -529,7 +529,9 @@ metabolites_by_gene → go_transport rows with target_kind='chemical_role' → g
 
 - Gene-anchored (locus_tags → metabolites). The metabolite-anchored mirror is `genes_by_metabolite` (metabolite → genes); both share the same row class, discriminators and per-arm filter scope.
 
-- Single organism per call. There is no `organisms` list. For cross-organism / cross-feeding work, call `metabolites_by_gene` once on the focal organism, take `top_metabolites`, then route to `genes_by_metabolite(metabolite_ids=[...], organism=partner)` (or `list_metabolites(metabolite_ids=[...], organism_names=[partner])` for presence-only).
+- `organism` is optional and inferred from `locus_tags`: pass it only to scope or as a check. A tag from another organism then raises `ValueError`.
+
+- One call per organism. A batch mixing organisms raises `ValueError`, because the organism-wide counts and the stereo hint are per organism. There is no `organisms` list. For cross-organism / cross-feeding work, call `metabolites_by_gene` once on the focal organism, take `top_metabolites`, then route to `genes_by_metabolite(metabolite_ids=[...], organism=partner)` (or `list_metabolites(metabolite_ids=[...], organism_names=[partner])` for presence-only).
 
 - `'metabolomics'` is not accepted in `evidence_sources` here (allowed: `metabolism`, `transport`, `go_transport`). Measurements have no gene anchor; for measurement evidence use `list_metabolite_assays` / `assays_by_metabolite`.
 
@@ -562,7 +564,7 @@ IDs in any form (bare, prefixed, ChEBI / HMDB / MNX / InChIKey, retired) resolve
 ```python
 from multiomics_explorer import metabolites_by_gene
 
-result = metabolites_by_gene(locus_tags=..., organism=...)
+result = metabolites_by_gene(locus_tags=...)
 # returns dict with keys: total_matching, returned, offset, truncated, warnings, stereo_relatives, resolved_aliases, not_found, not_matched, by_gene, by_evidence_source, by_evidence_source_combination, by_tcdb_route, tcdb_family_substrates_not_shown, tcdb_family_substrates_skipped, rows_by_go_term_depth, by_element, by_element_truncated, top_metabolites, top_reactions, top_tcdb_families, top_gene_categories, top_metabolite_pathways, top_metabolite_pathways_truncated, no_formula_excluded, no_formula_excluded_metabolites, gene_count_total, reaction_count_total, transporter_count_total, metabolite_count_total, results
 ```
 

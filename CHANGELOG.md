@@ -32,6 +32,7 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 - **`docs://analysis/metabolite_ids`**: metabolite id forms and resolution, stereo forms (Cysteine vs L-Cysteine) and compound classes (`structure_kind`, KEGG compound categories), split out of `docs://analysis/metabolites`. Read it when an id lands in `not_found`, a `stereo_relatives` hint appears, or a row is a class.
 
 ### Changed
+- **`organism` is optional on the locus-tag tools.** `gene_ontology_terms`, `gene_clusters_by_gene` and `gene_derived_metrics` accept genes from several organisms in one call and report `by_organism`; `metabolites_by_gene` infers its one organism from the tags. When `organism` is given, a tag from another organism now raises `ValueError` naming it, where `gene_ontology_terms` listed it in `no_terms` and `metabolites_by_gene` in `not_found` (both wrong: the gene exists, in another organism). `metabolites_by_gene(locus_tags=[])` now raises like the other three instead of returning an empty result.
 - **`differential_expression_by_gene` returns `product` without `verbose=True`**, like the other tools that return gene rows. Code that read `row["product"]` on a compact call no longer raises KeyError.
 - **`docs://analysis/metabolites` is shorter** (~14.6k → ~9.2k tokens): the decision tree comes first, TCDB direct-vs-family detail lives in `docs://analysis/transport`, tested-absent sits with the metabolomics section, and hard-coded KG counts point at the tool that reports them.
 

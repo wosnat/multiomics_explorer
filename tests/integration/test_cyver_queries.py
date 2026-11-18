@@ -519,6 +519,17 @@ for _ont_key in ONTOLOGY_CONFIG:
             {"ontology": _ont_key, "locus_tags": _LOCUS,
              "organism_name": "Prochlorococcus MED4"},
         ),
+        # 2d.7a: organism omitted -> `$org IS NULL` branch.
+        (
+            f"gene_ontology_terms_summary_noorg_{_ont_key}",
+            build_gene_ontology_terms_summary,
+            {"ontology": _ont_key, "locus_tags": _LOCUS, "organism_name": None},
+        ),
+        (
+            f"gene_ontology_terms_noorg_{_ont_key}",
+            build_gene_ontology_terms,
+            {"ontology": _ont_key, "locus_tags": _LOCUS, "organism_name": None},
+        ),
         (
             f"ontology_landscape_{_ont_key}",
             build_ontology_landscape,

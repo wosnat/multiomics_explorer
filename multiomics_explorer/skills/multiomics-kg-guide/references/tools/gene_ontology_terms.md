@@ -2,11 +2,11 @@
 
 ## What it does
 
-Reverse lookup: locus_tags to their ontology annotations in ONE organism, most-specific leaves (default) or rolled up to a level.
+Reverse lookup: locus_tags to their ontology annotations, most-specific leaves (default) or rolled up to a level.
 
 Use for what a gene carries; for which genes carry a term use `genes_by_ontology`, to find term IDs `search_ontology`.
 Filters: locus_tags, organism, ontology, mode, level, tree, informative_only, include_weak_tcdb_hits, trust filters.
-Returns: by_ontology, by_term, terms-per-gene stats, trust rollups (not with summary=True), skipped_ontologies, not_found, no_terms; one row = (locus_tag, term_id, evidence).
+Returns: by_ontology, by_term, by_organism, terms-per-gene stats, trust rollups (not with summary=True), skipped_ontologies, not_found, no_terms; one row = (locus_tag, term_id, evidence).
 docs://tools/gene_ontology_terms; summary=True first.
 
 ## Parameters
@@ -14,7 +14,7 @@ docs://tools/gene_ontology_terms; summary=True first.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags to look up. E.g. ['PMM0001', 'PMM0845']. |
-| organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
+| organism | string \| None | None | Organism, optional: omit to take tags from any organisms (batches may mix). When given it must resolve to ONE organism ('MED4') and every tag must belong to it; a tag from another organism raises. |
 | ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') \| list[string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops')] \| None | None | Filter to one ontology, or a list of ontologies (trust filters/facets shape all-or-skip-or-raise per docs://guide/conventions). None returns all. |
 | mode | string ('leaf', 'rollup') | leaf | 'leaf' returns most-specific annotations (default). 'rollup' walks up to ancestors at the given level. |
 | level | int \| None | None | Hierarchy level (0 = broadest). In leaf mode: filter to leaves at this level. In rollup mode: required — target ancestor level. See docs://guide/conventions. |
@@ -46,7 +46,7 @@ gene_ontology_terms(locus_tags=["PMM0001"], organism="MED4", ontology="go_bp")
 ## Response sketch
 
 ```expected-keys
-total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_min, terms_per_gene_max, terms_per_gene_median, returned, offset, truncated, not_found, no_terms, trust_axes, by_evidence, by_tier, by_sources, by_call_class, by_tcdb_call, evidence_score_stats, filters_applied, skipped_ontologies, warnings, results
+total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_min, terms_per_gene_max, terms_per_gene_median, returned, offset, truncated, not_found, no_terms, by_organism, trust_axes, by_evidence, by_tier, by_sources, by_call_class, by_tcdb_call, evidence_score_stats, filters_applied, skipped_ontologies, warnings, results
 ```
 
 Result row: `locus_tag, term_id, term_name, level, is_informative, ontology_type, tree, tree_code, evidence, call_class, tcdb_call, tcdb_gate, …`

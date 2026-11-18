@@ -1,0 +1,989 @@
+by_background_factors:
+- background_factor: axenic
+  count: 23
+- background_factor: light
+  count: 17
+- background_factor: chemical
+  count: 4
+by_compartment:
+- compartment: whole_cell
+  count: 20
+- compartment: vesicle
+  count: 3
+by_metric:
+- count: 1
+  derived_metric_id: derived_metric:1471-2180-14-11:med4_expression_level:pangenome_membership
+  metric_type: pangenome_membership
+  name: MED4 core vs flexible genome assignment (Wang 2014)
+  value_kind: categorical
+- count: 1
+  derived_metric_id: derived_metric:1471-2180-14-11:med4_expression_level:expression_level_class
+  metric_type: expression_level_class
+  name: MED4 RPKM expression-level class (Wang 2014)
+  value_kind: categorical
+- count: 1
+  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
+  metric_type: predicted_subcellular_localization
+  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
+  value_kind: categorical
+- count: 1
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:has_primary_tss
+  metric_type: has_primary_tss
+  name: Has mapped primary TSS (gTSS)
+  value_kind: boolean
+- count: 1
+  derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:expressed_above_background
+  metric_type: expressed_above_background
+  name: Expressed above background at t0
+  value_kind: boolean
+- count: 1
+  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  metric_type: vesicle_proteome_member
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  value_kind: boolean
+- count: 1
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:internal_tss_count
+  metric_type: internal_tss_count
+  name: Internal TSS count
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:antisense_tss_count
+  metric_type: antisense_tss_count
+  name: Antisense TSS count
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:expression_at_t0_log2
+  metric_type: expression_at_t0_log2
+  name: Expression at t0 (log2)
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:rna_decay_time_min
+  metric_type: rna_decay_time_min
+  name: mRNA decay time (min per twofold decrease)
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:rna_half_life_min
+  metric_type: rna_half_life_min
+  name: mRNA half-life (min)
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  metric_type: damping_ratio
+  name: Transcript:protein amplitude ratio
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:diel_amplitude_protein_log2
+  metric_type: diel_amplitude_protein_log2
+  name: Protein amplitude (log2)
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:diel_amplitude_transcript_log2
+  metric_type: diel_amplitude_transcript_log2
+  name: Transcript amplitude (log2)
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:protein_transcript_lag_h
+  metric_type: protein_transcript_lag_h
+  name: Protein-transcript lag (h)
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:peak_time_protein_h
+  metric_type: peak_time_protein_h
+  name: Time of peak protein abundance (h)
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:peak_time_transcript_h
+  metric_type: peak_time_transcript_h
+  name: Time of peak transcript abundance (h)
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:mascot_identification_probability
+  metric_type: mascot_identification_probability
+  name: MED4 vesicle protein Mascot identification probability (Biller 2014 Table
+    S2)
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:tss_distance_to_cds
+  metric_type: tss_distance_to_cds
+  name: TSS distance to CDS (5^UTR length)
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:minus10_element_score
+  metric_type: minus10_element_score
+  name: -10 element score (best gTSS)
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:internal_tss_count
+  metric_type: internal_tss_count
+  name: Internal TSS count
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:antisense_tss_count
+  metric_type: antisense_tss_count
+  name: Antisense TSS count
+  value_kind: numeric
+- count: 1
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:has_primary_tss
+  metric_type: has_primary_tss
+  name: Has mapped primary TSS (gTSS)
+  value_kind: boolean
+by_metric_type:
+- count: 2
+  metric_type: has_primary_tss
+- count: 2
+  metric_type: internal_tss_count
+- count: 2
+  metric_type: antisense_tss_count
+- count: 1
+  metric_type: pangenome_membership
+- count: 1
+  metric_type: expression_level_class
+- count: 1
+  metric_type: predicted_subcellular_localization
+- count: 1
+  metric_type: expressed_above_background
+- count: 1
+  metric_type: vesicle_proteome_member
+- count: 1
+  metric_type: expression_at_t0_log2
+- count: 1
+  metric_type: rna_decay_time_min
+- count: 1
+  metric_type: rna_half_life_min
+- count: 1
+  metric_type: damping_ratio
+- count: 1
+  metric_type: diel_amplitude_protein_log2
+- count: 1
+  metric_type: diel_amplitude_transcript_log2
+- count: 1
+  metric_type: protein_transcript_lag_h
+- count: 1
+  metric_type: peak_time_protein_h
+- count: 1
+  metric_type: peak_time_transcript_h
+- count: 1
+  metric_type: mascot_identification_probability
+- count: 1
+  metric_type: tss_distance_to_cds
+- count: 1
+  metric_type: minus10_element_score
+by_organism:
+- count: 18
+  organism_name: Prochlorococcus MED4
+- count: 5
+  organism_name: Prochlorococcus MIT9313
+by_publication:
+- count: 8
+  publication_doi: 10.1038/ismej.2014.57
+- count: 6
+  publication_doi: 10.1371/journal.pone.0043432
+- count: 4
+  publication_doi: 10.1186/gb-2010-11-5-r54
+- count: 3
+  publication_doi: 10.1126/science.1243457
+- count: 2
+  publication_doi: 10.1186/1471-2180-14-11
+by_treatment_type:
+- count: 8
+  treatment_type: tss_mapping
+- count: 6
+  treatment_type: diel
+- count: 4
+  treatment_type: rna_decay
+- count: 3
+  treatment_type: compartment
+- count: 2
+  treatment_type: growth_phase
+by_value_kind:
+- count: 16
+  value_kind: numeric
+- count: 4
+  value_kind: boolean
+- count: 3
+  value_kind: categorical
+case_id: gene_derived_metrics_mixed_organisms
+genes_with_metrics: 2
+genes_without_metrics: 0
+not_found: []
+not_matched: []
+offset: 0
+results:
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - chemical
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:expressed_above_background
+  experimental_context: Axenic Prochlorococcus MED4 in Sargasso-seawater-based Pro99
+    at 21C under 30 umol quanta m-2 s-1 continuous cool white light (growth rate 0.325
+    per day); triplicate cultures split into seven subcultures; rifampicin dissolved
+    in Pro99 (no organic solvent) to 150 ug/ml final; decay followed on high-density
+    Affymetrix MD4-9313 microarrays; per-gene half-life and decay rate fitted from
+    the 0-60 min series
+  field_description: The paper^s expression-threshold call at t0. false = below background
+    — the paper excluded these genes from its global half-life statistics and clustering,
+    and their decay fits are unreliable. Use as a reliability filter on rna_half_life_min
+    / rna_decay_time_min.
+  gene_name: null
+  has_p_value: false
+  light_condition: continuous cool white light
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  metric_type: expressed_above_background
+  name: Expressed above background at t0
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1186/gb-2010-11-5-r54
+  rank_by_metric: null
+  rankable: false
+  treatment: Rifampicin transcription arrest (150 ug/ml); transcript decay sampled
+    at 0, 2.5, 5, 10, 20, 40, 60 min
+  treatment_type:
+  - rna_decay
+  unit: ''
+  value: flagged
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:has_primary_tss
+  experimental_context: MED4 monoculture at 22C in AMP1 medium under 10-30 umol quanta
+    m-2 s-1 continuous cool white light, harvested in exponential phase; TSS positions
+    mapped by 454 + Solexa differential RNA-seq with tiling-array support (control
+    + pooled-stress hybridizations used only to call expressed segments). Derived
+    per-gene scalars are ROUTING signals reduced from the multi-TSS-per-gene map —
+    they do not capture transcript boundaries, UTR lengths, operon structure or the
+    ncRNA catalogue (the paper^s actual contribution; no schema slot yet).
+  field_description: At least one primary/genic TSS (gTSS) mapped for this gene. false
+    = gene appears in the TSS map only via antisense/internal sites. Routing signal
+    reduced from the Voigt 2014 TSS map — NOT a complete promoter annotation.
+  gene_name: null
+  has_p_value: false
+  light_condition: continuous cool white light
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  metric_type: has_primary_tss
+  name: Has mapped primary TSS (gTSS)
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2014.57
+  rank_by_metric: null
+  rankable: false
+  treatment: Genome-wide transcriptional start site mapping in exponential growth
+  treatment_type:
+  - tss_mapping
+  unit: ''
+  value: not_flagged
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  experimental_context: 20 L axenic MED4 culture; vesicles isolated by tangential
+    flow filtration + OptiPrep gradient; SDS-PAGE band, trypsin digest, LTQ LC-MS/MS,
+    Mascot search; PSORTb subcellular-localization prediction. Table S2 lists the
+    proteins identified at >=97% Mascot identification probability with at least one
+    exclusive unique peptide.
+  field_description: 'Boolean flag: protein identified in MED4 vesicle proteome by
+    LC-MS/MS (Mascot >=97% identification probability with >=1 exclusive unique peptide).'
+  gene_name: null
+  has_p_value: false
+  light_condition: continuous light
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  metric_type: vesicle_proteome_member
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1126/science.1243457
+  rank_by_metric: null
+  rankable: false
+  treatment: Vesicle fraction (extracellular)
+  treatment_type:
+  - compartment
+  unit: ''
+  value: flagged
+  value_kind: boolean
+- allowed_categories:
+  - --
+  - HEG
+  - LEG
+  - MEG
+  - NEG
+  - VEG
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:1471-2180-14-11:med4_expression_level:expression_level_class
+  experimental_context: RNA-seq across 10 samples from MED4 grown in Pro99 and AMP
+    media at exponential and log-phase; RPKM quartiles used to classify genes by expression
+    level; 21C under continuous light at 28 umol quanta m-2 s-1
+  field_description: 'Per-gene expression-level class assigned from RPKM quartiles
+    aggregated across 10 RNA-seq samples (MED4 in Pro99 and AMP media, exponential
+    and log-phase; 21C, continuous light at 28 umol quanta m-2 s-1). Class meanings
+    reported in Wang 2014: VEG = very highly expressed (top RPKM quartile across conditions);
+    HEG = highly expressed, enriched for COG "C" energy production and conversion,
+    "J" translation and ribosomal structure, and "O" protein modification, folding
+    and turnover (Figure 4c) and showing significantly lower nonsynonymous substitution
+    rate (Ka) than MEG or LEG (P<0.001, Figure 3a); MEG = moderately expressed, significantly
+    enriched for essential genes with homologs in the Database of Essential Genes
+    (DEG-hit rate, P<0.001, Figure 4b); LEG = lowly expressed, slightly enriched for
+    COG "R" general function (P=0.023); NEG = not expressed, under-represented in
+    the core genome (1.5% core vs 6.6% flexible, P<0.001, Figure 3c); -- = unclassified
+    (RPKM did not fit any quartile bin).'
+  gene_name: null
+  has_p_value: false
+  light_condition: continuous light
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  metric_type: expression_level_class
+  name: MED4 RPKM expression-level class (Wang 2014)
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1186/1471-2180-14-11
+  rank_by_metric: null
+  rankable: false
+  treatment: Multiple growth conditions (Pro99 and AMP media, exponential and log-phase)
+  treatment_type:
+  - growth_phase
+  unit: ''
+  value: MEG
+  value_kind: categorical
+- allowed_categories:
+  - Core
+  - Flexible
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:1471-2180-14-11:med4_expression_level:pangenome_membership
+  experimental_context: RNA-seq across 10 samples from MED4 grown in Pro99 and AMP
+    media at exponential and log-phase; RPKM quartiles used to classify genes by expression
+    level; 21C under continuous light at 28 umol quanta m-2 s-1
+  field_description: 'Pangenome membership for each MED4 CDS gene. Core = present
+    across sequenced Prochlorococcus genomes (Prochlorococcus core gene set); Flexible
+    = strain-specific or variably present across Prochlorococcus genomes (flexible/accessory
+    gene set). Wang 2014 reports that the core genome contains significantly fewer
+    NEG and VEG genes than the flexible genome (NEG: 1.5% < 6.6%; VEG: 49.6% < 64.6%;
+    both P<0.001, Figure 3c), indicating that conserved core genes cluster around
+    moderate expression while flexible genes are enriched at the high and low extremes.'
+  gene_name: null
+  has_p_value: false
+  light_condition: continuous light
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  metric_type: pangenome_membership
+  name: MED4 core vs flexible genome assignment (Wang 2014)
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1186/1471-2180-14-11
+  rank_by_metric: null
+  rankable: false
+  treatment: Multiple growth conditions (Pro99 and AMP media, exponential and log-phase)
+  treatment_type:
+  - growth_phase
+  unit: ''
+  value: Core
+  value_kind: categorical
+- allowed_categories:
+  - Cytoplasmic
+  - Cytoplasmic Membrane
+  - Extracellular
+  - Outer Membrane
+  - Periplasmic
+  - Unknown
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
+  experimental_context: 20 L axenic MED4 culture; vesicles isolated by tangential
+    flow filtration + OptiPrep gradient; SDS-PAGE band, trypsin digest, LTQ LC-MS/MS,
+    Mascot search; PSORTb subcellular-localization prediction. Table S2 lists the
+    proteins identified at >=97% Mascot identification probability with at least one
+    exclusive unique peptide.
+  field_description: PSORTb-predicted subcellular localization for proteins in the
+    MED4 vesicle proteome.
+  gene_name: null
+  has_p_value: false
+  light_condition: continuous light
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  metric_type: predicted_subcellular_localization
+  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1126/science.1243457
+  rank_by_metric: null
+  rankable: false
+  treatment: Vesicle fraction (extracellular)
+  treatment_type:
+  - compartment
+  unit: ''
+  value: Cytoplasmic Membrane
+  value_kind: categorical
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - chemical
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:expression_at_t0_log2
+  experimental_context: Axenic Prochlorococcus MED4 in Sargasso-seawater-based Pro99
+    at 21C under 30 umol quanta m-2 s-1 continuous cool white light (growth rate 0.325
+    per day); triplicate cultures split into seven subcultures; rifampicin dissolved
+    in Pro99 (no organic solvent) to 150 ug/ml final; decay followed on high-density
+    Affymetrix MD4-9313 microarrays; per-gene half-life and decay rate fitted from
+    the 0-60 min series
+  field_description: log2 microarray expression level at 0 min (before rifampicin
+    addition) — the steady-state abundance baseline the decay fit starts from.
+  gene_name: null
+  has_p_value: false
+  light_condition: continuous cool white light
+  locus_tag: PMM1714
+  metric_bucket: mid
+  metric_percentile: 58.8906
+  metric_type: expression_at_t0_log2
+  name: Expression at t0 (log2)
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1186/gb-2010-11-5-r54
+  rank_by_metric: 794
+  rankable: true
+  treatment: Rifampicin transcription arrest (150 ug/ml); transcript decay sampled
+    at 0, 2.5, 5, 10, 20, 40, 60 min
+  treatment_type:
+  - rna_decay
+  unit: log2
+  value: 6.1576
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - chemical
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:rna_decay_time_min
+  experimental_context: Axenic Prochlorococcus MED4 in Sargasso-seawater-based Pro99
+    at 21C under 30 umol quanta m-2 s-1 continuous cool white light (growth rate 0.325
+    per day); triplicate cultures split into seven subcultures; rifampicin dissolved
+    in Pro99 (no organic solvent) to 150 ug/ml final; decay followed on high-density
+    Affymetrix MD4-9313 microarrays; per-gene half-life and decay rate fitted from
+    the 0-60 min series
+  field_description: Two-phase-fit mRNA decay time in minutes per twofold decrease,
+    measured relative to the timepoint of maximal expression (the paper idiosyncratically
+    calls this ^decay rate^; it is a TIME, not a rate constant). Higher = MORE stable
+    — same direction as rna_half_life_min, which it complements (different fitting
+    approach; median 2.6 min for expressed genes). Standard error and error-interval
+    bounds per gene in source columns decay_time_se_min / decay_time_lower / decay_time_upper
+    (kept in the CSV, not wired as metrics).
+  gene_name: null
+  has_p_value: false
+  light_condition: continuous cool white light
+  locus_tag: PMM1714
+  metric_bucket: mid
+  metric_percentile: 56.2986
+  metric_type: rna_decay_time_min
+  name: mRNA decay time (min per twofold decrease)
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1186/gb-2010-11-5-r54
+  rank_by_metric: 844
+  rankable: true
+  treatment: Rifampicin transcription arrest (150 ug/ml); transcript decay sampled
+    at 0, 2.5, 5, 10, 20, 40, 60 min
+  treatment_type:
+  - rna_decay
+  unit: min
+  value: 3.8237
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - chemical
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:rna_half_life_min
+  experimental_context: Axenic Prochlorococcus MED4 in Sargasso-seawater-based Pro99
+    at 21C under 30 umol quanta m-2 s-1 continuous cool white light (growth rate 0.325
+    per day); triplicate cultures split into seven subcultures; rifampicin dissolved
+    in Pro99 (no organic solvent) to 150 ug/ml final; decay followed on high-density
+    Affymetrix MD4-9313 microarrays; per-gene half-life and decay rate fitted from
+    the 0-60 min series
+  field_description: 'Fitted mRNA half-life in minutes after rifampicin transcription
+    arrest (median 2.4 min for expressed genes; 3.4 min over the whole table). Higher
+    = more stable transcript. Caveat: fits for genes below the expression threshold
+    (expressed_above_background = false) are unreliable, and half-lives of very highly
+    expressed genes are saturation-inflated (paper: psbA 40 min by array vs 18 min
+    by qPCR). Standard error per gene in source column half_life_se_min (kept in the
+    CSV, not wired as a metric).'
+  gene_name: null
+  has_p_value: false
+  light_condition: continuous cool white light
+  locus_tag: PMM1714
+  metric_bucket: mid
+  metric_percentile: 69.3105
+  metric_type: rna_half_life_min
+  name: mRNA half-life (min)
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1186/gb-2010-11-5-r54
+  rank_by_metric: 593
+  rankable: true
+  treatment: Rifampicin transcription arrest (150 ug/ml); transcript decay sampled
+    at 0, 2.5, 5, 10, 20, 40, 60 min
+  treatment_type:
+  - rna_decay
+  unit: min
+  value: 4.9606
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:antisense_tss_count
+  experimental_context: MED4 monoculture at 22C in AMP1 medium under 10-30 umol quanta
+    m-2 s-1 continuous cool white light, harvested in exponential phase; TSS positions
+    mapped by 454 + Solexa differential RNA-seq with tiling-array support (control
+    + pooled-stress hybridizations used only to call expressed segments). Derived
+    per-gene scalars are ROUTING signals reduced from the multi-TSS-per-gene map —
+    they do not capture transcript boundaries, UTR lengths, operon structure or the
+    ncRNA catalogue (the paper^s actual contribution; no schema slot yet).
+  field_description: Number of mapped antisense TSS rows (aTSS + array-only aArray)
+    at this gene^s locus. 0 = gene is in the TSS map but with no antisense site. Routing
+    signal (^does this gene have mapped antisense transcription?^) — NOT a complete
+    antisense-transcript annotation (the paper^s asRNA/ncRNA catalogue is not wired).
+  gene_name: null
+  has_p_value: false
+  light_condition: continuous cool white light
+  locus_tag: PMM1714
+  metric_bucket: top_decile
+  metric_percentile: 94.7789
+  metric_type: antisense_tss_count
+  name: Antisense TSS count
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2014.57
+  rank_by_metric: 86
+  rankable: true
+  treatment: Genome-wide transcriptional start site mapping in exponential growth
+  treatment_type:
+  - tss_mapping
+  unit: count
+  value: 4.0
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:internal_tss_count
+  experimental_context: MED4 monoculture at 22C in AMP1 medium under 10-30 umol quanta
+    m-2 s-1 continuous cool white light, harvested in exponential phase; TSS positions
+    mapped by 454 + Solexa differential RNA-seq with tiling-array support (control
+    + pooled-stress hybridizations used only to call expressed segments). Derived
+    per-gene scalars are ROUTING signals reduced from the multi-TSS-per-gene map —
+    they do not capture transcript boundaries, UTR lengths, operon structure or the
+    ncRNA catalogue (the paper^s actual contribution; no schema slot yet).
+  field_description: Number of mapped internal TSS (iTSS) rows inside this gene^s
+    CDS. Routing signal reduced from the Voigt 2014 TSS map.
+  gene_name: null
+  has_p_value: false
+  light_condition: continuous cool white light
+  locus_tag: PMM1714
+  metric_bucket: low
+  metric_percentile: 6.1425
+  metric_type: internal_tss_count
+  name: Internal TSS count
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1038/ismej.2014.57
+  rank_by_metric: 1529
+  rankable: true
+  treatment: Genome-wide transcriptional start site mapping in exponential growth
+  treatment_type:
+  - tss_mapping
+  unit: count
+  value: 0.0
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:damping_ratio
+  experimental_context: Derived per-gene metrics (phase, amplitude, lag, damping)
+    from paired mRNA (RNA-seq) and protein (LC-MS 14N/15N SILAC) time courses sampled
+    every 2h over 26h for 312 significantly cycling genes
+  field_description: Ratio of transcript log2-amplitude to protein log2-amplitude.
+    Higher = stronger damping of transcript oscillations at the protein level (post-transcriptional
+    buffering).
+  gene_name: null
+  has_p_value: false
+  light_condition: 14:10 light:dark cycle
+  locus_tag: PMM1714
+  metric_bucket: low
+  metric_percentile: 8.3601
+  metric_type: damping_ratio
+  name: Transcript:protein amplitude ratio
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1371/journal.pone.0043432
+  rank_by_metric: 286
+  rankable: true
+  treatment: Light-dark synchronized diel cycle (14:10)
+  treatment_type:
+  - diel
+  unit: ''
+  value: 1.3
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:diel_amplitude_protein_log2
+  experimental_context: Derived per-gene metrics (phase, amplitude, lag, damping)
+    from paired mRNA (RNA-seq) and protein (LC-MS 14N/15N SILAC) time courses sampled
+    every 2h over 26h for 312 significantly cycling genes
+  field_description: log2 peak-to-trough amplitude of protein abundance across the
+    diel cycle. Higher = stronger protein oscillation.
+  gene_name: null
+  has_p_value: false
+  light_condition: 14:10 light:dark cycle
+  locus_tag: PMM1714
+  metric_bucket: top_quartile
+  metric_percentile: 76.2058
+  metric_type: diel_amplitude_protein_log2
+  name: Protein amplitude (log2)
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1371/journal.pone.0043432
+  rank_by_metric: 75
+  rankable: true
+  treatment: Light-dark synchronized diel cycle (14:10)
+  treatment_type:
+  - diel
+  unit: log2
+  value: 0.52
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:diel_amplitude_transcript_log2
+  experimental_context: Derived per-gene metrics (phase, amplitude, lag, damping)
+    from paired mRNA (RNA-seq) and protein (LC-MS 14N/15N SILAC) time courses sampled
+    every 2h over 26h for 312 significantly cycling genes
+  field_description: log2 peak-to-trough amplitude of transcript abundance across
+    the diel cycle. Higher = stronger mRNA oscillation.
+  gene_name: null
+  has_p_value: false
+  light_condition: 14:10 light:dark cycle
+  locus_tag: PMM1714
+  metric_bucket: low
+  metric_percentile: 8.6817
+  metric_type: diel_amplitude_transcript_log2
+  name: Transcript amplitude (log2)
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1371/journal.pone.0043432
+  rank_by_metric: 285
+  rankable: true
+  treatment: Light-dark synchronized diel cycle (14:10)
+  treatment_type:
+  - diel
+  unit: log2
+  value: 0.66
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:peak_time_protein_h
+  experimental_context: Derived per-gene metrics (phase, amplitude, lag, damping)
+    from paired mRNA (RNA-seq) and protein (LC-MS 14N/15N SILAC) time courses sampled
+    every 2h over 26h for 312 significantly cycling genes
+  field_description: Clock-hour at which protein abundance peaks across the 14:10
+    diel cycle (0-24h). Phase metric (circular), not a magnitude — not rankable.
+  gene_name: null
+  has_p_value: false
+  light_condition: 14:10 light:dark cycle
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  metric_type: peak_time_protein_h
+  name: Time of peak protein abundance (h)
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1371/journal.pone.0043432
+  rank_by_metric: null
+  rankable: false
+  treatment: Light-dark synchronized diel cycle (14:10)
+  treatment_type:
+  - diel
+  unit: hours
+  value: 12.4
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:peak_time_transcript_h
+  experimental_context: Derived per-gene metrics (phase, amplitude, lag, damping)
+    from paired mRNA (RNA-seq) and protein (LC-MS 14N/15N SILAC) time courses sampled
+    every 2h over 26h for 312 significantly cycling genes
+  field_description: Clock-hour at which mRNA abundance peaks across the 14:10 diel
+    cycle (0-24h). Phase metric (circular), not a magnitude — not rankable.
+  gene_name: null
+  has_p_value: false
+  light_condition: 14:10 light:dark cycle
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  metric_type: peak_time_transcript_h
+  name: Time of peak transcript abundance (h)
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1371/journal.pone.0043432
+  rank_by_metric: null
+  rankable: false
+  treatment: Light-dark synchronized diel cycle (14:10)
+  treatment_type:
+  - diel
+  unit: hours
+  value: 21.0
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  compartment: whole_cell
+  derived_metric_id: derived_metric:journal.pone.0043432:table_s2_waldbauer_diel_metrics:protein_transcript_lag_h
+  experimental_context: Derived per-gene metrics (phase, amplitude, lag, damping)
+    from paired mRNA (RNA-seq) and protein (LC-MS 14N/15N SILAC) time courses sampled
+    every 2h over 26h for 312 significantly cycling genes
+  field_description: Lag between transcript peak and protein peak (protein_peak -
+    transcript_peak, mod 24h). Higher = greater post-transcriptional / translational
+    delay.
+  gene_name: null
+  has_p_value: false
+  light_condition: 14:10 light:dark cycle
+  locus_tag: PMM1714
+  metric_bucket: top_quartile
+  metric_percentile: 80.7074
+  metric_type: protein_transcript_lag_h
+  name: Protein-transcript lag (h)
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1371/journal.pone.0043432
+  rank_by_metric: 61
+  rankable: true
+  treatment: Light-dark synchronized diel cycle (14:10)
+  treatment_type:
+  - diel
+  unit: hours
+  value: 15.7
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:mascot_identification_probability
+  experimental_context: 20 L axenic MED4 culture; vesicles isolated by tangential
+    flow filtration + OptiPrep gradient; SDS-PAGE band, trypsin digest, LTQ LC-MS/MS,
+    Mascot search; PSORTb subcellular-localization prediction. Table S2 lists the
+    proteins identified at >=97% Mascot identification probability with at least one
+    exclusive unique peptide.
+  field_description: Mascot peptide-identification probability (%) for the protein
+    in the MED4 vesicle proteome; quality score, not abundance. Cutoff was 97%.
+  gene_name: null
+  has_p_value: false
+  light_condition: continuous light
+  locus_tag: PMM1714
+  metric_bucket: null
+  metric_percentile: null
+  metric_type: mascot_identification_probability
+  name: MED4 vesicle protein Mascot identification probability (Biller 2014 Table
+    S2)
+  organism_name: Prochlorococcus MED4
+  publication_doi: 10.1126/science.1243457
+  rank_by_metric: null
+  rankable: false
+  treatment: Vesicle fraction (extracellular)
+  treatment_type:
+  - compartment
+  unit: percent
+  value: 99.9
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:has_primary_tss
+  experimental_context: MIT9313 monoculture at 22C in AMP1 medium under 10-30 umol
+    quanta m-2 s-1 continuous cool white light, harvested in exponential phase; TSS
+    positions mapped by 454 + Solexa differential RNA-seq with tiling-array support
+    (control + pooled-stress hybridizations used only to call expressed segments).
+    Derived per-gene scalars are ROUTING signals reduced from the multi-TSS-per-gene
+    map — they do not capture transcript boundaries, UTR lengths, operon structure
+    or the ncRNA catalogue (the paper^s actual contribution; no schema slot yet).
+  field_description: At least one primary/genic TSS (gTSS) mapped for this gene. false
+    = gene appears in the TSS map only via antisense/internal sites. Routing signal
+    reduced from the Voigt 2014 TSS map — NOT a complete promoter annotation.
+  gene_name: psbA
+  has_p_value: false
+  light_condition: continuous cool white light
+  locus_tag: PMT0419
+  metric_bucket: null
+  metric_percentile: null
+  metric_type: has_primary_tss
+  name: Has mapped primary TSS (gTSS)
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2014.57
+  rank_by_metric: null
+  rankable: false
+  treatment: Genome-wide transcriptional start site mapping in exponential growth
+  treatment_type:
+  - tss_mapping
+  unit: ''
+  value: flagged
+  value_kind: boolean
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:antisense_tss_count
+  experimental_context: MIT9313 monoculture at 22C in AMP1 medium under 10-30 umol
+    quanta m-2 s-1 continuous cool white light, harvested in exponential phase; TSS
+    positions mapped by 454 + Solexa differential RNA-seq with tiling-array support
+    (control + pooled-stress hybridizations used only to call expressed segments).
+    Derived per-gene scalars are ROUTING signals reduced from the multi-TSS-per-gene
+    map — they do not capture transcript boundaries, UTR lengths, operon structure
+    or the ncRNA catalogue (the paper^s actual contribution; no schema slot yet).
+  field_description: Number of mapped antisense TSS rows (aTSS + array-only aArray)
+    at this gene^s locus. 0 = gene is in the TSS map but with no antisense site. Routing
+    signal — NOT a complete antisense-transcript annotation.
+  gene_name: psbA
+  has_p_value: false
+  light_condition: continuous cool white light
+  locus_tag: PMT0419
+  metric_bucket: top_quartile
+  metric_percentile: 85.8746
+  metric_type: antisense_tss_count
+  name: Antisense TSS count
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2014.57
+  rank_by_metric: 303
+  rankable: true
+  treatment: Genome-wide transcriptional start site mapping in exponential growth
+  treatment_type:
+  - tss_mapping
+  unit: count
+  value: 3.0
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:internal_tss_count
+  experimental_context: MIT9313 monoculture at 22C in AMP1 medium under 10-30 umol
+    quanta m-2 s-1 continuous cool white light, harvested in exponential phase; TSS
+    positions mapped by 454 + Solexa differential RNA-seq with tiling-array support
+    (control + pooled-stress hybridizations used only to call expressed segments).
+    Derived per-gene scalars are ROUTING signals reduced from the multi-TSS-per-gene
+    map — they do not capture transcript boundaries, UTR lengths, operon structure
+    or the ncRNA catalogue (the paper^s actual contribution; no schema slot yet).
+  field_description: Number of mapped internal TSS (iTSS) rows inside this gene^s
+    CDS. Routing signal reduced from the Voigt 2014 TSS map.
+  gene_name: psbA
+  has_p_value: false
+  light_condition: continuous cool white light
+  locus_tag: PMT0419
+  metric_bucket: mid
+  metric_percentile: 33.0215
+  metric_type: internal_tss_count
+  name: Internal TSS count
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2014.57
+  rank_by_metric: 1433
+  rankable: true
+  treatment: Genome-wide transcriptional start site mapping in exponential growth
+  treatment_type:
+  - tss_mapping
+  unit: count
+  value: 0.0
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:minus10_element_score
+  experimental_context: MIT9313 monoculture at 22C in AMP1 medium under 10-30 umol
+    quanta m-2 s-1 continuous cool white light, harvested in exponential phase; TSS
+    positions mapped by 454 + Solexa differential RNA-seq with tiling-array support
+    (control + pooled-stress hybridizations used only to call expressed segments).
+    Derived per-gene scalars are ROUTING signals reduced from the multi-TSS-per-gene
+    map — they do not capture transcript boundaries, UTR lengths, operon structure
+    or the ncRNA catalogue (the paper^s actual contribution; no schema slot yet).
+  field_description: Maximum -10 promoter element motif score across the gene^s primary
+    (gTSS) sites. Present only for genes with a gTSS. Higher = stronger canonical
+    -10 box.
+  gene_name: psbA
+  has_p_value: false
+  light_condition: continuous cool white light
+  locus_tag: PMT0419
+  metric_bucket: mid
+  metric_percentile: 74.7082
+  metric_type: minus10_element_score
+  name: -10 element score (best gTSS)
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2014.57
+  rank_by_metric: 261
+  rankable: true
+  treatment: Genome-wide transcriptional start site mapping in exponential growth
+  treatment_type:
+  - tss_mapping
+  unit: ''
+  value: 4.985
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
+  compartment: whole_cell
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:tss_distance_to_cds
+  experimental_context: MIT9313 monoculture at 22C in AMP1 medium under 10-30 umol
+    quanta m-2 s-1 continuous cool white light, harvested in exponential phase; TSS
+    positions mapped by 454 + Solexa differential RNA-seq with tiling-array support
+    (control + pooled-stress hybridizations used only to call expressed segments).
+    Derived per-gene scalars are ROUTING signals reduced from the multi-TSS-per-gene
+    map — they do not capture transcript boundaries, UTR lengths, operon structure
+    or the ncRNA catalogue (the paper^s actual contribution; no schema slot yet).
+  field_description: Distance from the gene^s dominant primary TSS (strongest gTSS
+    by normalized Solexa read value; fallback raw Solexa / 454 reads) to the CDS start
+    = 5^UTR length in nt. 0 = leaderless. Present only for genes with a gTSS carrying
+    a mapped distance.
+  gene_name: psbA
+  has_p_value: false
+  light_condition: continuous cool white light
+  locus_tag: PMT0419
+  metric_bucket: low
+  metric_percentile: 7.0769
+  metric_type: tss_distance_to_cds
+  name: TSS distance to CDS (5^UTR length)
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1038/ismej.2014.57
+  rank_by_metric: 907
+  rankable: true
+  treatment: Genome-wide transcriptional start site mapping in exponential growth
+  treatment_type:
+  - tss_mapping
+  unit: nt
+  value: 7.0
+  value_kind: numeric
+returned: 23
+row_count: 23
+total_derived_metrics: 23
+total_matching: 23
+truncated: false
+warnings: []

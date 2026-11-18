@@ -1351,9 +1351,12 @@ def metabolites_by_gene_scenarios():
         Scenario(
             "gene_no_chemistry",
             dict(locus_tags=[fx.GENE_NO_DE], organism=fx.CONTROL_ORGANISM)),
+        # 2d.7a: the tag must belong to the organism (a MED4 tag under
+        # RSP50 now raises; that case is the `organism_with_foreign_tag`
+        # scenario). BSR22_05140 is an RSP50 gene.
         Scenario(
             "genome_only_organism",
-            dict(locus_tags=["PMM0001"], organism=fx.GENOME_ONLY_ORGANISM)),
+            dict(locus_tags=["BSR22_05140"], organism=fx.GENOME_ONLY_ORGANISM)),
         Scenario(
             "offset_past_end",
             dict(locus_tags=["PMM0963"], organism=fx.CONTROL_ORGANISM,

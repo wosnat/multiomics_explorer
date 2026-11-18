@@ -2,19 +2,19 @@
 
 ## What it does
 
-DerivedMetric annotations for a gene batch in ONE organism (inferred when omitted) — one row per gene × DM with a polymorphic value.
+DerivedMetric annotations for a gene batch (organisms may mix) — one row per gene × DM with a polymorphic value.
 
 Use for a gene's whole DM profile; for edge-level filtering pivot to the `genes_by_{numeric,boolean,categorical}_metric` trio.
 Filters: locus_tags, organism, metric_types, value_kind, derived_metric_ids, plus the compartment / publication / condition filters.
-Returns: by_value_kind, by_metric_type, by_metric, genes_with_metrics, not_found, not_matched; one row = (locus_tag, derived_metric_id, value).
+Returns: by_value_kind, by_metric_type, by_metric, by_organism, genes_with_metrics, not_found, not_matched; one row = (locus_tag, derived_metric_id, value).
 docs://tools/gene_derived_metrics; summary=True first.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| locus_tags | list[string] | — | Gene locus tags to look up (e.g. ['PMM1714', 'PMM0001']). Required, non-empty. Single organism enforced — locus_tags must all resolve to the same organism (or pair with `organism` to disambiguate). |
-| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
+| locus_tags | list[string] | — | Gene locus tags to look up (e.g. ['PMM1714', 'PMM0001']). Required, non-empty. May span organisms. |
+| organism | string \| None | None | Organism, optional: omit to take tags from any organisms (batches may mix). When given it must resolve to ONE organism ('MED4') and every tag must belong to it; a tag from another organism raises. |
 | metric_types | list[string] \| None | None | Filter by metric_type tags (e.g. 'diel_amplitude_protein_log2'). Same metric_type may appear across publications — pair with publication_dois or use derived_metric_ids to pin one specific DM. |
 | value_kind | string ('numeric', 'boolean', 'categorical') \| None | None | Restrict to one DM kind. Each kind has a different `value` column type — 'numeric' → float, 'boolean' → 'flagged'/'not_flagged', 'categorical' → category string. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
@@ -40,7 +40,7 @@ gene_derived_metrics(locus_tags=["PMM1714"])
 ## Response sketch
 
 ```expected-keys
-total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics, not_found, not_matched, by_value_kind, by_metric_type, by_metric, by_compartment, by_treatment_type, by_background_factors, by_publication, returned, offset, truncated, warnings, results
+total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics, not_found, not_matched, by_value_kind, by_metric_type, by_metric, by_compartment, by_treatment_type, by_background_factors, by_publication, by_organism, returned, offset, truncated, warnings, results
 ```
 
 Result row: `locus_tag, gene_name, derived_metric_id, value_kind, name, value, rankable, has_p_value, rank_by_metric, metric_percentile, metric_bucket, adjusted_p_value, …`

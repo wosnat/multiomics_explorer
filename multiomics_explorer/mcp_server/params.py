@@ -67,6 +67,20 @@ OrganismSingleParam = Annotated[str | None, Field(description=_ORGANISM_SINGLE_D
 
 OrganismRequiredParam = Annotated[str, Field(description=_ORGANISM_SINGLE_DESC)]
 
+# Locus-tag tools: `organism` is an optional scope / consistency check.
+# Mixed-batch tools (gene_ontology_terms, gene_clusters_by_gene,
+# gene_derived_metrics): omitted = no organism scope.
+OrganismFromTagsParam = Annotated[str | None, Field(
+    description="Organism, optional: omit to take tags from any organisms (batches may mix). When given it must resolve to ONE organism ('MED4') and every tag must belong to it; a tag from another organism raises.",
+    min_length=1,
+)]
+
+# metabolites_by_gene: one organism per call, inferred when omitted.
+OrganismFromTagsSingleParam = Annotated[str | None, Field(
+    description="Organism, optional: inferred from locus_tags, which must share one organism (a mixed batch raises). When given it must resolve to ONE organism ('MED4'); a tag from another organism raises.",
+    min_length=1,
+)]
+
 OrganismContainsParam = Annotated[str | None, Field(
     description="Organism: case-insensitive substring match on the organism name ('MED4'); a genus word matches every strain. See list_organisms.",
 )]

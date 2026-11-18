@@ -203,6 +203,17 @@ def _rename_freq(freq_list: list[dict], key_name: str) -> list[dict]:
     )
 
 
+def _by_organism_counts(raw_summary: dict) -> list[dict]:
+    """APOC ``by_organism`` ``[{item, count}]`` → ``[{organism_name, count}]``,
+    count desc then name. ``[]`` when the summary row has no rollup."""
+    return sorted(
+        ({"organism_name": f["item"], "count": f["count"]}
+         for f in raw_summary.get("by_organism") or []
+         if f.get("item") is not None),
+        key=lambda x: (-x["count"], x["organism_name"]),
+    )
+
+
 def _rename_measurement_coverage(raw: dict | None) -> dict:
     """Rename apoc.coll.frequencies output for `by_measurement_coverage`.
 
@@ -4412,7 +4423,7 @@ def genes_by_ontology(
 @listify_bare_str
 def gene_ontology_terms(
     locus_tags: list[str],
-    organism: str,
+    organism: str | None = None,
     ontology: str | list[str] | None = None,
     mode: str = "leaf",
     level: int | None = None,
@@ -4434,6 +4445,15 @@ def gene_ontology_terms(
     conn: GraphConnection | None = None,
 ) -> dict:
     """Get ontology annotations for genes. One row per gene × term.
+
+    ``organism`` is optional. Omitted, the call is not scoped to an
+    organism: a batch may mix genes from several organisms, and each gene
+    answers for itself. Given, every known locus_tag must belong to it, and
+    a tag from another organism raises ValueError naming the tag and its
+    organism (omit ``organism`` to query across organisms). Unknown tags go
+    to ``not_found`` either way. Envelope ``by_organism`` (list of
+    ``{organism_name, gene_count}``, gene_count desc then name) counts the
+    genes with at least one row per organism; ``[]`` when nothing matched.
 
     ``ontology`` takes one key, a list of keys, or None for every registered
     ontology. With several ontologies in play a trust filter that all of
@@ -4464,7 +4484,7 @@ def gene_ontology_terms(
     any other ontology changes nothing.
 
     Returns dict with keys: total_matching, total_genes, total_terms,
-    by_ontology, by_term, terms_per_gene_min, terms_per_gene_max,
+    by_ontology, by_term, by_organism, terms_per_gene_min, terms_per_gene_max,
     terms_per_gene_median, returned, truncated, not_found, no_terms,
     results, plus trust_axes, by_evidence, by_tier, by_sources,
     by_call_class, by_tcdb_call (always present; empty unless TCDB is queried),
@@ -4476,8 +4496,10 @@ def gene_ontology_terms(
     All-ontology queries add: ontology_type.
     BRITE results include sparse tree/tree_code fields.
 
-    Raises ValueError if an ontology name is unknown, if an ontology cannot
-    carry a filter you set, or if locus_tags is empty.
+    Raises ValueError if locus_tags is empty or None (checked first), if an
+    ontology name is unknown, if an ontology cannot carry a filter you set,
+    if ``organism`` matches no organism or several, or if a locus_tag
+    belongs to an organism other than ``organism``.
     """
     if not locus_tags:
         raise ValueError("locus_tags must not be empty.")
@@ -4516,16 +4538,24 @@ def gene_ontology_terms(
             conn, ont, per_ontology_filters.get(ont, {}),
         )
 
-    # Resolve organism
-    organism_name = _validate_organism_inputs(
-        organism=organism, locus_tags=None, experiment_ids=None, conn=conn,
-    )
+    # Resolve organism (optional). Given: every known tag must belong to it.
+    # Omitted: builders run unscoped ($org = None); the tag list bounds them.
+    organism_name: str | None = None
+    if organism:
+        organism_name = _validate_locus_tags_in_organism(
+            organism, locus_tags, conn,
+            hint="Omit organism to query across organisms.",
+        )
 
     # Step 1: gene existence check
     exist_cypher, exist_params = build_gene_existence_check(locus_tags=locus_tags)
     exist_rows = conn.execute_query(exist_cypher, **exist_params)
     not_found = [r["lt"] for r in exist_rows if not r["found"]]
     found_tags = [r["lt"] for r in exist_rows if r["found"]]
+    organism_of_tag = {
+        r["lt"]: r.get("organism_name") or organism_name
+        for r in exist_rows if r["found"]
+    }
 
     # Determine which ontologies to query (skipped ones already dropped)
     ontologies = list(targets)
@@ -4640,6 +4670,16 @@ def gene_ontology_terms(
                         if gene_term_counts.get(lt, 0) > 0]
     total_genes = len(genes_with_terms)
     total_terms = len({bt["term_id"] for bt in all_by_term})
+    genes_per_organism: dict[str, int] = {}
+    for lt in genes_with_terms:
+        org = organism_of_tag.get(lt)
+        if org:
+            genes_per_organism[org] = genes_per_organism.get(org, 0) + 1
+    by_organism = [
+        {"organism_name": org, "gene_count": n}
+        for org, n in sorted(genes_per_organism.items(),
+                             key=lambda kv: (-kv[1], kv[0]))
+    ]
 
     # Per-gene distribution (only genes with terms)
     counts = [gene_term_counts[lt] for lt in genes_with_terms]
@@ -4658,6 +4698,7 @@ def gene_ontology_terms(
         "total_terms": total_terms,
         "by_ontology": by_ontology,
         "by_term": all_by_term,
+        "by_organism": by_organism,
         "terms_per_gene_min": terms_per_gene_min,
         "terms_per_gene_max": terms_per_gene_max,
         "terms_per_gene_median": terms_per_gene_median,
@@ -4813,7 +4854,8 @@ def _validate_organism_inputs(
         cypher, params = build_resolve_organism_for_locus_tags(
             locus_tags=locus_tags
         )
-        orgs = conn.execute_query(cypher, **params)[0]["organisms"]
+        rows = conn.execute_query(cypher, **params)
+        orgs = rows[0]["organisms"] if rows else []
         if len(orgs) > 1:
             names = ", ".join(sorted(orgs))
             raise ValueError(
@@ -4865,6 +4907,76 @@ def _validate_organism_inputs(
                 )
 
     return first
+
+
+def _validate_locus_tags_in_organism(
+    organism: str,
+    locus_tags: list[str],
+    conn: "GraphConnection",
+    *,
+    hint: str,
+) -> str:
+    """Resolve `organism` and check every known locus_tag belongs to it.
+
+    Wraps `_validate_organism_inputs(organism, locus_tags, None, conn)`.
+    When a locus_tag mismatch is raised, the error is re-raised naming the
+    foreign tags and their organisms (from the gene existence check), ending
+    with `hint`. Organism-word errors (no match / ambiguous) propagate as-is.
+    Unknown tags never raise here; callers report them in `not_found`.
+
+    Returns the resolved organism_name.
+    """
+    try:
+        return _validate_organism_inputs(organism, locus_tags, None, conn)
+    except ValueError as e:
+        if "locus_tags" not in str(e):
+            raise
+        organism_name = _validate_organism_inputs(organism, None, None, conn)
+        exist_cypher, exist_params = build_gene_existence_check(
+            locus_tags=locus_tags)
+        foreign = [
+            (r["lt"], r["organism_name"])
+            for r in conn.execute_query(exist_cypher, **exist_params)
+            if r.get("found") and r.get("organism_name")
+            and r["organism_name"] != organism_name
+        ]
+        if not foreign:
+            raise
+        raise ValueError(
+            _foreign_locus_tags_message(organism_name, foreign, hint)
+        ) from e
+
+
+def _foreign_locus_tags_message(
+    organism_name: str, foreign: list[tuple[str, str]], hint: str,
+) -> str:
+    named = ", ".join(f"{lt} ({org})" for lt, org in foreign)
+    return f"locus_tags not in organism '{organism_name}': {named}. {hint}"
+
+
+def _raise_if_foreign_locus_tags(
+    organism_name: str,
+    locus_tags: list[str],
+    conn: "GraphConnection",
+    *,
+    hint: str,
+) -> None:
+    """Raise ValueError when a known locus_tag belongs to another organism.
+
+    One gene existence check over the tag list (locus-tag index); unknown
+    tags never raise. The message names each foreign tag and its organism.
+    """
+    exist_cypher, exist_params = build_gene_existence_check(
+        locus_tags=locus_tags)
+    foreign = [
+        (r["lt"], r["organism_name"])
+        for r in conn.execute_query(exist_cypher, **exist_params)
+        if r.get("found") and r.get("organism_name")
+        and r["organism_name"] != organism_name
+    ]
+    if foreign:
+        raise ValueError(
+            _foreign_locus_tags_message(organism_name, foreign, hint))
 
 
 @listify_bare_str
@@ -5928,13 +6040,21 @@ def gene_clusters_by_gene(
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
-    """Gene-centric cluster lookup. Single organism enforced.
+    """Gene-centric cluster lookup. One row per gene × cluster membership.
+
+    `organism` is optional. Omitted, a batch may mix genes from several
+    organisms; each gene answers for itself. Given, every known locus_tag
+    must belong to it, and a tag from another organism raises ValueError.
+    Unknown tags go to `not_found` either way.
 
     Returns dict with keys: total_matching, total_clusters,
     genes_with_clusters, genes_without_clusters,
     not_found, not_matched,
     by_cluster_type, by_treatment_type, by_background_factors, by_analysis,
-    warnings, returned, offset, truncated, results.
+    by_organism, warnings, returned, offset, truncated, results.
+
+    by_organism: list of `{organism_name, count}` (rows per organism,
+    count desc then name); `[]` when nothing matched.
 
     warnings: a closed-vocabulary filter value (cluster_type /
     treatment_type / background_factors) not in the live vocabulary, plus
@@ -5947,12 +6067,14 @@ def gene_clusters_by_gene(
     Per result (verbose): adds cluster_method, member_count,
     cluster_functional_description, cluster_expression_dynamics,
     cluster_temporal_pattern, treatment, light_condition,
-    experimental_context, p_value.
+    experimental_context, p_value, organism_name.
 
     summary=True: results=[], summary fields only.
 
     Raises:
-        ValueError: if locus_tags is empty or spans multiple organisms.
+        ValueError: if locus_tags is empty or None (checked first), if
+            `organism` matches no organism or several, or if a locus_tag
+            belongs to an organism other than `organism`.
     """
     if not locus_tags:
         raise ValueError("locus_tags must not be empty.")
@@ -5961,11 +6083,13 @@ def gene_clusters_by_gene(
 
     conn = _default_conn(conn)
 
-    # Single-organism enforcement
-    _validate_organism_inputs(
-        organism=organism, locus_tags=locus_tags,
-        experiment_ids=None, conn=conn,
-    )
+    # Organism is optional: given, every known tag must belong to it;
+    # omitted, a mixed batch is a plain union of per-gene rows.
+    if organism:
+        _validate_locus_tags_in_organism(
+            organism, locus_tags, conn,
+            hint="Omit organism to query across organisms.",
+        )
 
     warnings = _closed_vocab_warnings(
         conn, cluster_type=cluster_type, treatment_type=treatment_type,
@@ -6000,6 +6124,7 @@ def gene_clusters_by_gene(
             raw_summary["by_background_factors"], "background_factor"),
         "by_analysis": _rename_freq(
             raw_summary["by_analysis"], "analysis_id"),
+        "by_organism": _by_organism_counts(raw_summary),
         "warnings": warnings + _case_mismatch_warnings(conn, raw_summary["not_found"]),
     }
 
@@ -6041,13 +6166,21 @@ def gene_derived_metrics(
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
-    """Gene-centric DerivedMetric lookup. Single organism enforced.
+    """Gene-centric DerivedMetric lookup. One row per gene × metric.
+
+    `organism` is optional. Omitted, a batch may mix genes from several
+    organisms; each gene answers for itself. Given, every known locus_tag
+    must belong to it, and a tag from another organism raises ValueError.
+    Unknown tags go to `not_found` either way.
 
     Returns dict with keys: total_matching, total_derived_metrics,
     genes_with_metrics, genes_without_metrics, not_found, not_matched,
     by_value_kind, by_metric_type, by_metric, by_compartment,
-    by_treatment_type, by_background_factors, by_publication, warnings,
-    returned, offset, truncated, results.
+    by_treatment_type, by_background_factors, by_publication, by_organism,
+    warnings, returned, offset, truncated, results.
+
+    by_organism: list of `{organism_name, count}` (rows per organism,
+    count desc then name); `[]` when nothing matched.
 
     warnings: a closed-vocabulary filter value (compartment /
     treatment_type / background_factors) not in the live vocabulary, plus
@@ -6063,16 +6196,17 @@ def gene_derived_metrics(
     current KG): locus_tag, gene_name, derived_metric_id, value_kind, name,
     value, rankable, has_p_value, rank_by_metric, metric_percentile,
     metric_bucket, adjusted_p_value (None), significant (None).
-    Per result (verbose adds, 12 Pydantic; 11 emitted): metric_type,
+    Per result (verbose adds, 13 Pydantic; 12 emitted): metric_type,
     field_description, unit, allowed_categories, compartment,
     treatment_type, background_factors, publication_doi, treatment,
-    light_condition, experimental_context, p_value (None).
+    light_condition, experimental_context, organism_name, p_value (None).
 
     summary=True: results=[], summary fields only.
 
     Raises:
-        ValueError: locus_tags empty, or spans multiple organisms,
-                    or organism arg conflicts with inferred organism.
+        ValueError: if locus_tags is empty or None (checked first), if
+            `organism` matches no organism or several, or if a locus_tag
+            belongs to an organism other than `organism`.
     """
     if not locus_tags:
         raise ValueError("locus_tags must not be empty.")
@@ -6081,11 +6215,13 @@ def gene_derived_metrics(
 
     conn = _default_conn(conn)
 
-    # Single-organism enforcement
-    _validate_organism_inputs(
-        organism=organism, locus_tags=locus_tags,
-        experiment_ids=None, conn=conn,
-    )
+    # Organism is optional: given, every known tag must belong to it;
+    # omitted, a mixed batch is a plain union of per-gene rows.
+    if organism:
+        _validate_locus_tags_in_organism(
+            organism, locus_tags, conn,
+            hint="Omit organism to query across organisms.",
+        )
 
     warnings = _closed_vocab_warnings(
         conn, compartment=compartment, treatment_type=treatment_type,
@@ -6165,6 +6301,7 @@ def gene_derived_metrics(
             raw_summary["by_background_factors"], "background_factor"),
         "by_publication": _rename_freq(
             raw_summary["by_publication"], "publication_doi"),
+        "by_organism": _by_organism_counts(raw_summary),
         "warnings": warnings + _case_mismatch_warnings(conn, raw_summary["not_found"]),
     }
 
@@ -10315,7 +10452,7 @@ def _mbg_sort_key(row: dict, locus_index: dict[str, int]) -> tuple:
 @listify_bare_str
 def metabolites_by_gene(
     locus_tags: list[str],
-    organism: str,
+    organism: str | None = None,
     *,
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
@@ -10336,6 +10473,15 @@ def metabolites_by_gene(
     conn: GraphConnection | None = None,
 ) -> dict:
     """Find metabolites the input gene set's chemistry reaches in one organism.
+
+    `organism` is optional. Omitted, it is inferred from the known
+    locus_tags; tags from more than one organism raise ValueError (the
+    organism-wide counts and the stereo hint need one organism, so call
+    once per organism). Given, every known locus_tag must belong to it, and
+    a tag from another organism raises ValueError naming the tag and its
+    organism. Unknown tags go to `not_found.locus_tags` either way; when
+    every tag is unknown and `organism` is omitted, the call returns the
+    empty envelope (every tag in `not_found.locus_tags`, totals 0).
 
     Three evidence arms (joined api-side, not via Cypher UNION), each row
     labelled by `evidence_source`, never blended:
@@ -10543,10 +10689,14 @@ def metabolites_by_gene(
     dropped for lacking a formula) and `no_formula_excluded_metabolites`
     (int, distinct metabolites behind those rows), and a warning fires
     when the count is > 0. Both keys are absent when `metabolite_elements`
-    is unset or the organism does not resolve (empty envelope).
+    is unset or the call returns the empty envelope (organism does not
+    resolve, or every tag is unknown with `organism` omitted).
 
     Raises:
-        ValueError: if `evidence_sources` contains values outside
+        ValueError: if `locus_tags` is empty or None (checked first, before
+            any other validation). If `locus_tags` span more than one
+            organism with `organism` omitted, or a locus_tag belongs to an
+            organism other than `organism`. If `evidence_sources` contains values outside
             ``("metabolism", "transport", "go_transport")``. Mirrors
             `genes_by_metabolite`
             — gene-anchored tools reject ``"metabolomics"``. Also on
@@ -10555,6 +10705,10 @@ def metabolites_by_gene(
             matching zero organisms does not raise — it returns an empty
             envelope with `not_found.organism` set.
     """
+    # 0. Empty gene list raises before anything else (no query runs).
+    if not locus_tags:
+        raise ValueError("locus_tags must not be empty.")
+
     # 1. Defense-in-depth validators (before any Cypher executes).
     if evidence_sources is not None:
         invalid = [
@@ -10599,26 +10753,11 @@ def metabolites_by_gene(
     )
     alias_warnings = list(alias_warnings) + go_filter_warnings
 
-    # 1c. Pre-validate & resolve organism to its canonical preferred_name.
-    # The existence probe below (step 6) requires an EXACT match on
-    # `Gene.organism_name` — passing the raw fuzzy word through (e.g.
-    # 'MED4') would never match, listing every found gene as not_found.
-    # Ambiguous words propagate the ValueError (mirrors
-    # `differential_expression_by_gene` / `genes_by_metabolite`); a word
-    # matching zero organisms short-circuits to an empty envelope with
-    # `not_found.organism` set — the metabolite-side probes still run
-    # since they don't depend on organism.
-    try:
-        organism_resolved = _validate_organism_inputs(organism, None, None, conn)
-    except ValueError as e:
-        if "no organism matching" not in str(e):
-            raise
-        not_found_locus = list(locus_tags) if locus_tags else []
+    def _empty_envelope(not_found_organism: str | None) -> dict:
+        # Every requested tag reported as not_found; the metabolite-side
+        # probes still run since they don't depend on organism.
         _probes = _chemistry_input_probes(
             conn, metabolite_ids, metabolite_pathway_ids, metabolite_elements)
-        not_found_metab = _probes["not_found_metabolite_ids"]
-        not_found_paths = _probes["not_found_pathway_ids"]
-        not_found_elements = _probes["not_found_elements"]
         empty = {
             "total_matching": 0,
             "returned": 0,
@@ -10628,11 +10767,11 @@ def metabolites_by_gene(
                 conn, gene_categories=gene_categories),
             "resolved_aliases": resolved_aliases,
             "not_found": {
-                "locus_tags": not_found_locus,
-                "organism": organism,
-                "metabolite_ids": not_found_metab,
-                "metabolite_pathway_ids": not_found_paths,
-                "metabolite_elements": not_found_elements,
+                "locus_tags": list(locus_tags),
+                "organism": not_found_organism,
+                "metabolite_ids": _probes["not_found_metabolite_ids"],
+                "metabolite_pathway_ids": _probes["not_found_pathway_ids"],
+                "metabolite_elements": _probes["not_found_elements"],
             },
             "not_matched": [],
             "by_gene": [],
@@ -10659,7 +10798,42 @@ def metabolites_by_gene(
         if go_active:
             empty["rows_by_go_term_depth"] = []
         return empty
-    organism = organism_resolved
+
+    # 1c. Resolve the organism to its canonical preferred_name.
+    # The existence probe below (step 6) requires an EXACT match on
+    # `Gene.organism_name` — passing the raw fuzzy word through (e.g.
+    # 'MED4') would never match, listing every found gene as not_found.
+    organism_given = bool(organism)
+    if organism:
+        # Given: ambiguous words propagate the ValueError (mirrors
+        # `differential_expression_by_gene` / `genes_by_metabolite`), and a
+        # known tag from another organism raises naming it. A word matching
+        # zero organisms short-circuits to an empty envelope with
+        # `not_found.organism` set.
+        try:
+            organism_resolved = _validate_organism_inputs(
+                organism, None, None, conn)
+        except ValueError as e:
+            if "no organism matching" not in str(e):
+                raise
+            return _empty_envelope(organism)
+        organism = organism_resolved
+    else:
+        # Omitted: inferred from the known tags. The organism-wide counts
+        # and the stereo hint have no single meaning across organisms, so a
+        # mixed batch raises; all-unknown tags return the empty envelope.
+        res_cypher, res_params = build_resolve_organism_for_locus_tags(
+            locus_tags=locus_tags)
+        res_rows = conn.execute_query(res_cypher, **res_params)
+        tag_orgs = sorted(res_rows[0]["organisms"]) if res_rows else []
+        if len(tag_orgs) > 1:
+            raise ValueError(
+                f"locus_tags span multiple organisms: {', '.join(tag_orgs)}"
+                " — call once per organism"
+            )
+        if not tag_orgs:
+            return _empty_envelope(None)
+        organism = tag_orgs[0]
 
     # 3. Always run summary builder (envelope rollups even when summary=True).
     sum_cypher, sum_params = build_metabolites_by_gene_summary(
@@ -10847,18 +11021,21 @@ def metabolites_by_gene(
                 row["stereo_relative_ids"] = [r["metabolite_id"] for r in rels]
 
     # 6. Compute not_found.locus_tags via existence probe (always run).
-    if locus_tags:
-        rows = conn.execute_query(
-            "MATCH (g:Gene {organism_name: $organism}) "
-            "WHERE g.locus_tag IN $locus_tags "
-            "RETURN collect(DISTINCT g.locus_tag) AS found",
-            organism=organism, locus_tags=locus_tags,
-        )
-        found_locus = set(rows[0]["found"]) if rows else set()
-        not_found_locus = [lt for lt in locus_tags if lt not in found_locus]
-    else:
-        found_locus = set()
-        not_found_locus = []
+    rows = conn.execute_query(
+        "MATCH (g:Gene {organism_name: $organism}) "
+        "WHERE g.locus_tag IN $locus_tags "
+        "RETURN collect(DISTINCT g.locus_tag) AS found",
+        organism=organism, locus_tags=locus_tags,
+    )
+    found_locus = set(rows[0]["found"]) if rows else set()
+    not_found_locus = [lt for lt in locus_tags if lt not in found_locus]
+    # 6b. organism given: a tag missing from it but present in another
+    # organism is a caller error, not a not_found (rule 2). Checked here,
+    # after the organism-scoped queries, so it costs a query only when
+    # some tag was not found; no path returns before this point.
+    if organism_given and not_found_locus:
+        _raise_if_foreign_locus_tags(
+            organism, not_found_locus, conn, hint="Call once per organism.")
 
     # 7-9. Compute not_found.metabolite_pathway_ids / not_found.metabolite_elements
     # / not_found.metabolite_ids via the shared existence probes (also used

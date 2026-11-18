@@ -3,7 +3,7 @@
 ## Guides
 
 - `docs://guide/concepts` — ~6591 tok — Read when an entity in a tool output is unfamiliar: what each node and edge means…
-- `docs://guide/conventions` — ~7032 tok — Read when a cross-tool behaviour surprises you: envelopes, filters, not_found vs…
+- `docs://guide/conventions` — ~7043 tok — Read when a cross-tool behaviour surprises you: envelopes, filters, not_found vs…
 - `docs://guide/python_api` — ~4167 tok — Read before scripting: Python vs MCP, imports, the three return shapes, DataFrame conversion.
 - `docs://guide/start_here` — ~4019 tok — Read first: the tool families, a question-shape decision tree, and when to call summary=True.
 
@@ -15,12 +15,12 @@
 - `docs://tools/differential_expression_by_ortholog` — ~1190 tok
 - `docs://tools/discussed_by_publication` — ~787 tok
 - `docs://tools/gene_aa_sequence` — ~604 tok
-- `docs://tools/gene_clusters_by_gene` — ~949 tok
-- `docs://tools/gene_derived_metrics` — ~1192 tok
+- `docs://tools/gene_clusters_by_gene` — ~992 tok
+- `docs://tools/gene_derived_metrics` — ~1174 tok
 - `docs://tools/gene_details` — ~763 tok
 - `docs://tools/gene_homologs` — ~679 tok
 - `docs://tools/gene_neighbors` — ~790 tok
-- `docs://tools/gene_ontology_terms` — ~1776 tok
+- `docs://tools/gene_ontology_terms` — ~1786 tok
 - `docs://tools/gene_overview` — ~1530 tok
 - `docs://tools/gene_response_profile` — ~1004 tok
 - `docs://tools/genes_by_boolean_metric` — ~1389 tok
@@ -42,7 +42,7 @@
 - `docs://tools/list_organisms` — ~1201 tok
 - `docs://tools/list_publications` — ~1143 tok
 - `docs://tools/metabolites_by_flags_assay` — ~1439 tok
-- `docs://tools/metabolites_by_gene` — ~1855 tok
+- `docs://tools/metabolites_by_gene` — ~1865 tok
 - `docs://tools/metabolites_by_quantifies_assay` — ~1893 tok
 - `docs://tools/ontology_landscape` — ~1346 tok
 - `docs://tools/ontology_term_details` — ~1116 tok
@@ -62,12 +62,12 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/differential_expression_by_ortholog/full` — ~3041 tok
 - `docs://tools/discussed_by_publication/full` — ~3344 tok
 - `docs://tools/gene_aa_sequence/full` — ~2386 tok
-- `docs://tools/gene_clusters_by_gene/full` — ~2231 tok
-- `docs://tools/gene_derived_metrics/full` — ~2988 tok
+- `docs://tools/gene_clusters_by_gene/full` — ~2334 tok
+- `docs://tools/gene_derived_metrics/full` — ~3056 tok
 - `docs://tools/gene_details/full` — ~2258 tok
 - `docs://tools/gene_homologs/full` — ~2068 tok
 - `docs://tools/gene_neighbors/full` — ~3354 tok
-- `docs://tools/gene_ontology_terms/full` — ~9332 tok
+- `docs://tools/gene_ontology_terms/full` — ~9404 tok
 - `docs://tools/gene_overview/full` — ~9834 tok
 - `docs://tools/gene_response_profile/full` — ~5459 tok
 - `docs://tools/genes_by_boolean_metric/full` — ~5475 tok
@@ -89,7 +89,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/list_organisms/full` — ~11949 tok
 - `docs://tools/list_publications/full` — ~7988 tok
 - `docs://tools/metabolites_by_flags_assay/full` — ~4421 tok
-- `docs://tools/metabolites_by_gene/full` — ~12143 tok
+- `docs://tools/metabolites_by_gene/full` — ~12215 tok
 - `docs://tools/metabolites_by_quantifies_assay/full` — ~6094 tok
 - `docs://tools/ontology_landscape/full` — ~7407 tok
 - `docs://tools/ontology_term_details/full` — ~7575 tok
@@ -102,7 +102,7 @@ Append /full for the complete page — all worked examples + full response forma
 ## Analysis
 
 - `docs://analysis/annotation_evidence` — ~7612 tok — Read before trusting, filtering or ranking gene→term annotations: evidence ladder, tiers…
-- `docs://analysis/derived_metrics` — ~2771 tok — Read for non-DE gene evidence (rhythmicity, amplitudes, classes): discover DMs, then drill…
+- `docs://analysis/derived_metrics` — ~2778 tok — Read for non-DE gene evidence (rhythmicity, amplitudes, classes): discover DMs, then drill…
 - `docs://analysis/enrichment` — ~7732 tok — Read before pathway_enrichment / cluster_enrichment: building blocks, backgrounds, levels…
 - `docs://analysis/expression` — ~2504 tok — Read for DE questions: the DE tool family, plus response_matrix / gene_set_compare summaries.
 - `docs://analysis/metabolite_ids` — ~4447 tok — Read when an id didn't resolve, an answer splits across stereo forms, or a row is a compound…

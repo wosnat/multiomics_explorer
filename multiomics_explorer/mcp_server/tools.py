@@ -50,6 +50,8 @@ from multiomics_explorer.mcp_server.params import (  # noqa: E402
     OmicsTypeParam,
     OntologyKey,
     OrganismContainsParam,
+    OrganismFromTagsParam,
+    OrganismFromTagsSingleParam,
     OrganismParam,
     OrganismRequiredParam,
     OrganismSingleParam,
@@ -3810,6 +3812,10 @@ def register_tools(mcp: FastMCP):
         ontology_type: str = Field(description="Ontology type (e.g. 'go_bp')")
         count: int = Field(description="Genes annotated to this term (e.g. 4)")
 
+    class GeneOntologyOrganismBreakdown(BaseModel):
+        organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
+        gene_count: int = Field(description="Input genes from this organism with at least one row (e.g. 3)")
+
     class GeneOntologyTermsResponse(BaseModel):
         total_matching: int = Field(description="Total gene × term annotation rows")
         total_genes: int = Field(description="Distinct genes with at least one term")
@@ -3824,6 +3830,8 @@ def register_tools(mcp: FastMCP):
         truncated: bool = Field(description="True if total_matching > returned")
         not_found: list[str] = Field(default_factory=list, description="Input locus_tags not in KG")
         no_terms: list[str] = Field(default_factory=list, description="Input locus_tags in KG but with no terms for queried ontology")
+        by_organism: list[GeneOntologyOrganismBreakdown] = Field(default_factory=list,
+            description="Genes with at least one row, per organism; sorted by gene_count desc, then name")
         # Trust surface envelope + multi-ontology skip/raise matrix.
         trust_axes: dict[str, list[str]] = Field(default_factory=dict,
             description="Trust axes carried per queried ontology.")
@@ -3872,7 +3880,7 @@ def register_tools(mcp: FastMCP):
             description="Gene locus tags to look up. "
             "E.g. ['PMM0001', 'PMM0845'].",
         )],
-        organism: OrganismRequiredParam,
+        organism: OrganismFromTagsParam = None,
         ontology: Annotated[
             list[OntologyKey] | OntologyKey | None,
             Field(description="Filter to one ontology, or a list of ontologies "
@@ -3923,11 +3931,11 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 50,
         offset: OffsetParam = 0,
     ) -> GeneOntologyTermsResponse:
-        """Reverse lookup: locus_tags to their ontology annotations in ONE organism, most-specific leaves (default) or rolled up to a level.
+        """Reverse lookup: locus_tags to their ontology annotations, most-specific leaves (default) or rolled up to a level.
 
         Use for what a gene carries; for which genes carry a term use `genes_by_ontology`, to find term IDs `search_ontology`.
         Filters: locus_tags, organism, ontology, mode, level, tree, informative_only, include_weak_tcdb_hits, trust filters.
-        Returns: by_ontology, by_term, terms-per-gene stats, trust rollups (not with summary=True), skipped_ontologies, not_found, no_terms; one row = (locus_tag, term_id, evidence).
+        Returns: by_ontology, by_term, by_organism, terms-per-gene stats, trust rollups (not with summary=True), skipped_ontologies, not_found, no_terms; one row = (locus_tag, term_id, evidence).
         docs://tools/gene_ontology_terms; summary=True first.
         """
         await ctx.info(
@@ -3950,8 +3958,11 @@ def register_tools(mcp: FastMCP):
             results = [OntologyTermRow(**r) for r in data["results"]]
             by_ontology = [OntologyTypeBreakdown(**b) for b in data["by_ontology"]]
             by_term = [TermBreakdown(**b) for b in data["by_term"]]
+            by_organism = [GeneOntologyOrganismBreakdown(**b)
+                           for b in data.get("by_organism", [])]
             return GeneOntologyTermsResponse(
-                **{**data, "results": results, "by_ontology": by_ontology, "by_term": by_term},
+                **{**data, "results": results, "by_ontology": by_ontology,
+                   "by_term": by_term, "by_organism": by_organism},
             )
         except ValueError as e:
             await ctx.warning(f"gene_ontology_terms error: {e}")
@@ -5952,6 +5963,10 @@ def register_tools(mcp: FastMCP):
         publication_doi: str = Field(description="Parent publication DOI.")
         count: int = Field(description="Rows from this publication.")
 
+    class GeneDmOrganismBreakdown(BaseModel):
+        organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4').")
+        count: int = Field(description="Gene × DM rows from this organism.")
+
     class GeneDerivedMetricsResult(SparseRow):
         # ── compact (always populated by api/) ──────────────────────────
         locus_tag: str = Field(description="Gene locus tag (e.g. 'PMM1714').")
@@ -6046,6 +6061,10 @@ def register_tools(mcp: FastMCP):
             default=None,
             description="Raw p-value. Populated only when parent DM "
                         "has_p_value=True (none in current KG). Verbose only.")
+        organism_name: str | None = Field(
+            default=None,
+            description="Organism of the gene (e.g. 'Prochlorococcus MED4'). "
+                        "Verbose only.")
 
     class GeneDerivedMetricsResponse(BaseModel):
         total_matching: int = Field(
@@ -6083,6 +6102,9 @@ def register_tools(mcp: FastMCP):
             description="Rows per background factor (flattened).")
         by_publication: list[GeneDmPublicationBreakdown] = Field(
             description="Rows per parent publication.")
+        by_organism: list[GeneDmOrganismBreakdown] = Field(
+            default_factory=list,
+            description="Rows per organism, sorted by count desc, then name.")
         returned: int = Field(description="Length of results list.")
         offset: int = Field(default=0, description="Pagination offset used.")
         truncated: bool = Field(
@@ -6479,6 +6501,12 @@ def register_tools(mcp: FastMCP):
             description="Full experimental context description")
         p_value: float | None = Field(default=None,
             description="Assignment p-value (null for most methods)")
+        organism_name: str | None = Field(default=None,
+            description="Organism of the gene (e.g. 'Prochlorococcus MED4'). Verbose only.")
+
+    class GeneClustersByGeneOrganismBreakdown(BaseModel):
+        organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4')")
+        count: int = Field(description="Gene × cluster rows from this organism")
 
     class GeneClustersByGeneResponse(BaseModel):
         total_matching: int = Field(
@@ -6501,6 +6529,9 @@ def register_tools(mcp: FastMCP):
             description="Rows per background factor")
         by_analysis: list["GeneClusterAnalysisBreakdown"] = Field(
             description="Rows per clustering analysis")
+        by_organism: list["GeneClustersByGeneOrganismBreakdown"] = Field(
+            default_factory=list,
+            description="Rows per organism, sorted by count desc, then name")
         returned: int = Field(description="Results in this response")
         offset: int = Field(default=0, description="Offset into result set")
         truncated: bool = Field(
@@ -6519,7 +6550,7 @@ def register_tools(mcp: FastMCP):
         locus_tags: Annotated[list[str], Field(
             description="Gene locus tags (e.g. ['PMM0370', 'PMM0920']).",
         )],
-        organism: OrganismSingleParam = None,
+        organism: OrganismFromTagsParam = None,
         cluster_type: Annotated[str | None, Field(
             description="Filter by cluster type. Live vocabulary: "
                         "list_filter_values(filter_type='cluster_type'). Offline examples: "
@@ -6536,11 +6567,11 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 25,
         offset: OffsetParam = 0,
     ) -> GeneClustersByGeneResponse:
-        """Cluster memberships for a gene batch in ONE organism (inferred when omitted) — one row per gene × cluster with its analysis context.
+        """Cluster memberships for a gene batch (organisms may mix) — one row per gene × cluster with its analysis context.
 
         Use for which modules a gene sits in; for a cluster's full roster use `genes_in_cluster`, to discover analyses `list_clustering_analyses`.
         Filters: locus_tags, organism, cluster_type, analysis_ids, plus the publication / condition filters.
-        Returns: genes_with_clusters, genes_without_clusters, by_cluster_type, by_analysis, not_found, not_matched; one row = (locus_tag, cluster_id, analysis_id).
+        Returns: genes_with_clusters, genes_without_clusters, by_cluster_type, by_analysis, by_organism, not_found, not_matched; one row = (locus_tag, cluster_id, analysis_id).
         docs://tools/gene_clusters_by_gene; summary=True first.
         """
         await ctx.info(f"gene_clusters_by_gene locus_tags={locus_tags} "
@@ -6564,6 +6595,8 @@ def register_tools(mcp: FastMCP):
                                      for b in data["by_background_factors"]]
             by_analysis = [GeneClusterAnalysisBreakdown(**b)
                            for b in data["by_analysis"]]
+            by_organism = [GeneClustersByGeneOrganismBreakdown(**b)
+                           for b in data.get("by_organism", [])]
             results = [GeneClustersByGeneResult(**r) for r in data["results"]]
             response = GeneClustersByGeneResponse(
                 total_matching=data["total_matching"],
@@ -6576,6 +6609,7 @@ def register_tools(mcp: FastMCP):
                 by_treatment_type=by_treatment_type,
                 by_background_factors=by_background_factors,
                 by_analysis=by_analysis,
+                by_organism=by_organism,
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
@@ -6603,11 +6637,10 @@ def register_tools(mcp: FastMCP):
         ctx: Context,
         locus_tags: Annotated[list[str], Field(
             description="Gene locus tags to look up (e.g. ['PMM1714', "
-                        "'PMM0001']). Required, non-empty. Single organism "
-                        "enforced — locus_tags must all resolve to the same "
-                        "organism (or pair with `organism` to disambiguate).",
+                        "'PMM0001']). Required, non-empty. May span "
+                        "organisms.",
         )],
-        organism: OrganismSingleParam = None,
+        organism: OrganismFromTagsParam = None,
         metric_types: Annotated[list[str] | None, Field(
             description="Filter by metric_type tags (e.g. "
                         "'diel_amplitude_protein_log2'). Same metric_type may "
@@ -6635,11 +6668,11 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 5,
         offset: OffsetParam = 0,
     ) -> GeneDerivedMetricsResponse:
-        """DerivedMetric annotations for a gene batch in ONE organism (inferred when omitted) — one row per gene × DM with a polymorphic value.
+        """DerivedMetric annotations for a gene batch (organisms may mix) — one row per gene × DM with a polymorphic value.
 
         Use for a gene's whole DM profile; for edge-level filtering pivot to the `genes_by_{numeric,boolean,categorical}_metric` trio.
         Filters: locus_tags, organism, metric_types, value_kind, derived_metric_ids, plus the compartment / publication / condition filters.
-        Returns: by_value_kind, by_metric_type, by_metric, genes_with_metrics, not_found, not_matched; one row = (locus_tag, derived_metric_id, value).
+        Returns: by_value_kind, by_metric_type, by_metric, by_organism, genes_with_metrics, not_found, not_matched; one row = (locus_tag, derived_metric_id, value).
         docs://tools/gene_derived_metrics; summary=True first.
         """
         await ctx.info(f"gene_derived_metrics locus_tags={locus_tags} "
@@ -6671,6 +6704,8 @@ def register_tools(mcp: FastMCP):
                                      for b in data["by_background_factors"]]
             by_publication = [GeneDmPublicationBreakdown(**b)
                               for b in data["by_publication"]]
+            by_organism = [GeneDmOrganismBreakdown(**b)
+                           for b in data.get("by_organism", [])]
             results = [GeneDerivedMetricsResult(**r) for r in data["results"]]
             response = GeneDerivedMetricsResponse(
                 total_matching=data["total_matching"],
@@ -6686,6 +6721,7 @@ def register_tools(mcp: FastMCP):
                 by_treatment_type=by_treatment_type,
                 by_background_factors=by_background_factors,
                 by_publication=by_publication,
+                by_organism=by_organism,
                 returned=data["returned"],
                 offset=data.get("offset", 0),
                 truncated=data["truncated"],
@@ -8877,12 +8913,13 @@ def register_tools(mcp: FastMCP):
             description="Gene locus tags to drill into (case-sensitive). "
             "E.g. ['PMM0963', 'PMM0964', 'PMM0965'] for urease α/β/γ "
             "subunits. `not_found.locus_tags` lists tags that don't "
-            "resolve to any Gene in the requested organism; "
+            "resolve to any Gene (every tag when `organism` matches "
+            "nothing); "
             "`not_matched` lists tags that DO resolve but have no "
             "chemistry path (no reaction, TCDB or GO transport row).",
             min_length=1,
         )],
-        organism: Annotated[OrganismRequiredParam, Field(min_length=1)],
+        organism: OrganismFromTagsSingleParam = None,
         metabolite_elements: Annotated[list[str] | None, Field(
             description="Keep rows whose metabolite contains ALL these "
             "element symbols (presence, e.g. ['N'], ['N', 'P']); "

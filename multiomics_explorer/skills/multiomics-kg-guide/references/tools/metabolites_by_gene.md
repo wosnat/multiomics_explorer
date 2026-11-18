@@ -13,8 +13,8 @@ docs://tools/metabolites_by_gene; summary=True for 50+ genes.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| locus_tags | list[string] | — | Gene locus tags to drill into (case-sensitive). E.g. ['PMM0963', 'PMM0964', 'PMM0965'] for urease α/β/γ subunits. `not_found.locus_tags` lists tags that don't resolve to any Gene in the requested organism; `not_matched` lists tags that DO resolve but have no chemistry path (no reaction, TCDB or GO transport row). |
-| organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
+| locus_tags | list[string] | — | Gene locus tags to drill into (case-sensitive). E.g. ['PMM0963', 'PMM0964', 'PMM0965'] for urease α/β/γ subunits. `not_found.locus_tags` lists tags that don't resolve to any Gene (every tag when `organism` matches nothing); `not_matched` lists tags that DO resolve but have no chemistry path (no reaction, TCDB or GO transport row). |
+| organism | string \| None | None | Organism, optional: inferred from locus_tags, which must share one organism (a mixed batch raises). When given it must resolve to ONE organism ('MED4'); a tag from another organism raises. |
 | metabolite_elements | list[string] \| None | None | Keep rows whose metabolite contains ALL these element symbols (presence, e.g. ['N'], ['N', 'P']); formula-less metabolites never match (see no_formula_excluded). Applies to all three arms. `not_found.metabolite_elements` lists symbols that don't exist on any KG metabolite. |
 | metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds warn. `chebi.role:` ids reach TCDB / GO role edges. docs://analysis/transport. |
 | exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |

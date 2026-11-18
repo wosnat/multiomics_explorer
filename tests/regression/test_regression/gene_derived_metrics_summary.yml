@@ -80,6 +80,8 @@ rows:
   - '{''count'': 2, ''item'': ''protein_transcript_lag_h''}'
   - '{''count'': 2, ''item'': ''rna_decay_time_min''}'
   - '{''count'': 2, ''item'': ''rna_half_life_min''}'
+  by_organism:
+  - '{''count'': 35, ''item'': ''Prochlorococcus MED4''}'
   by_publication:
   - '{''count'': 12, ''item'': ''10.1371/journal.pone.0043432''}'
   - '{''count'': 3, ''item'': ''10.1126/science.1243457''}'

@@ -5517,7 +5517,7 @@ def build_gene_ontology_terms_summary(
     *,
     locus_tags: list[str],
     ontology: str,
-    organism_name: str,
+    organism_name: str | None = None,
     mode: str = "leaf",
     level: int | None = None,
     tree: str | None = None,
@@ -5547,6 +5547,10 @@ def build_gene_ontology_terms_summary(
     RETURN keys: gene_count, term_count, by_term, gene_term_counts.
     gene_term_counts is [{locus_tag, term_count}] — has per-gene identity
     so api/ can merge across ontologies for cross-ontology stats.
+
+    `organism_name` is optional: None = no organism scope (the
+    `locus_tags` list bounds the query); a name adds
+    `g.organism_name = $org`. `$org` is always set in params.
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
@@ -5578,10 +5582,10 @@ def build_gene_ontology_terms_summary(
             bridge_edge = bridge["edge"]
             bridge_node = bridge["node_label"]
             bind = (
-                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"MATCH (g:Gene)"
                 f"-[r:{gene_rel}]->(ko:{bridge_node})"
                 f"-[:{bridge_edge}]->(leaf:{label})\n"
-                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
+                f"WHERE g.locus_tag IN $locus_tags AND ($org IS NULL OR g.organism_name = $org){trust_and}\n"
             )
             rel_union = "|".join(cfg["hierarchy_rels"])
             walk = (
@@ -5591,16 +5595,16 @@ def build_gene_ontology_terms_summary(
         elif not cfg["hierarchy_rels"]:
             # flat: leaf = term, walk is identity
             bind = (
-                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"MATCH (g:Gene)"
                 f"-[r:{gene_rel}]->(t:{label})\n"
-                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
+                f"WHERE g.locus_tag IN $locus_tags AND ($org IS NULL OR g.organism_name = $org){trust_and}\n"
             )
             walk = "WITH g, t\nWHERE t.level = $level\n"
         elif ontology == "pfam":
             bind = (
-                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"MATCH (g:Gene)"
                 f"-[r:{gene_rel}]->(leaf:Pfam)\n"
-                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
+                f"WHERE g.locus_tag IN $locus_tags AND ($org IS NULL OR g.organism_name = $org){trust_and}\n"
             )
             walk = (
                 "MATCH (leaf)-[:Pfam_in_pfam_clan*0..1]->(t)\n"
@@ -5609,9 +5613,9 @@ def build_gene_ontology_terms_summary(
         else:
             rel_union = "|".join(cfg["hierarchy_rels"])
             bind = (
-                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"MATCH (g:Gene)"
                 f"-[r:{gene_rel}]->(leaf:{label})\n"
-                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
+                f"WHERE g.locus_tag IN $locus_tags AND ($org IS NULL OR g.organism_name = $org){trust_and}\n"
             )
             walk = (
                 f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
@@ -5654,15 +5658,15 @@ def build_gene_ontology_terms_summary(
 
         if bridge:
             match_line = (
-                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"MATCH (g:Gene)"
                 f"-[r:{gene_rel}]->(:{bridge['node_label']})"
                 f"-[:{bridge['edge']}]->(t:{label})\n"
-                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
+                f"WHERE g.locus_tag IN $locus_tags AND ($org IS NULL OR g.organism_name = $org){trust_and}\n"
             )
         else:
             match_line = (
-                f"MATCH (g:Gene {{organism_name: $org}})-[r:{gene_rel}]->(t:{label})\n"
-                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
+                f"MATCH (g:Gene)-[r:{gene_rel}]->(t:{label})\n"
+                f"WHERE g.locus_tag IN $locus_tags AND ($org IS NULL OR g.organism_name = $org){trust_and}\n"
             )
 
         # Convert leaf_filter "WHERE NOT EXISTS ..." to "AND NOT EXISTS ..."
@@ -5711,7 +5715,7 @@ def build_gene_ontology_terms(
     *,
     locus_tags: list[str],
     ontology: str,
-    organism_name: str,
+    organism_name: str | None = None,
     mode: str = "leaf",
     level: int | None = None,
     tree: str | None = None,
@@ -5744,6 +5748,10 @@ def build_gene_ontology_terms(
     `tcdb_call`, `tcdb_gate` and `tcdb_calls` (lineage call kinds).
     `include_weak_tcdb_hits=True` only adds below-gate rows (no-op for other
     ontologies).
+
+    `organism_name` is optional: None = no organism scope (the
+    `locus_tags` list bounds the query); a name adds
+    `g.organism_name = $org`. `$org` is always set in params.
 
     RETURN keys (compact): locus_tag, term_id, term_name, level, tree,
     tree_code, is_informative, plus the ontology's compact trust columns —
@@ -5809,10 +5817,10 @@ def build_gene_ontology_terms(
             bridge_edge = bridge["edge"]
             bridge_node = bridge["node_label"]
             bind = (
-                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"MATCH (g:Gene)"
                 f"-[r:{gene_rel}]->(ko:{bridge_node})"
                 f"-[:{bridge_edge}]->(leaf:{label})\n"
-                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
+                f"WHERE g.locus_tag IN $locus_tags AND ($org IS NULL OR g.organism_name = $org){trust_and}\n"
             )
             rel_union = "|".join(cfg["hierarchy_rels"])
             walk = (
@@ -5822,16 +5830,16 @@ def build_gene_ontology_terms(
         elif not cfg["hierarchy_rels"]:
             # flat: leaf = term
             bind = (
-                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"MATCH (g:Gene)"
                 f"-[r:{gene_rel}]->(t:{label})\n"
-                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
+                f"WHERE g.locus_tag IN $locus_tags AND ($org IS NULL OR g.organism_name = $org){trust_and}\n"
             )
             walk = "WITH g, t, r\nWHERE t.level = $level\n"
         elif ontology == "pfam":
             bind = (
-                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"MATCH (g:Gene)"
                 f"-[r:{gene_rel}]->(leaf:Pfam)\n"
-                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
+                f"WHERE g.locus_tag IN $locus_tags AND ($org IS NULL OR g.organism_name = $org){trust_and}\n"
             )
             walk = (
                 "MATCH (leaf)-[:Pfam_in_pfam_clan*0..1]->(t)\n"
@@ -5840,9 +5848,9 @@ def build_gene_ontology_terms(
         else:
             rel_union = "|".join(cfg["hierarchy_rels"])
             bind = (
-                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"MATCH (g:Gene)"
                 f"-[r:{gene_rel}]->(leaf:{label})\n"
-                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
+                f"WHERE g.locus_tag IN $locus_tags AND ($org IS NULL OR g.organism_name = $org){trust_and}\n"
             )
             walk = (
                 f"MATCH (leaf)-[:{rel_union}*0..]->(t:{label})\n"
@@ -5898,15 +5906,15 @@ def build_gene_ontology_terms(
 
         if bridge:
             match_line = (
-                f"MATCH (g:Gene {{organism_name: $org}})"
+                f"MATCH (g:Gene)"
                 f"-[r:{gene_rel}]->(:{bridge['node_label']})"
                 f"-[:{bridge['edge']}]->(t:{label})\n"
-                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
+                f"WHERE g.locus_tag IN $locus_tags AND ($org IS NULL OR g.organism_name = $org){trust_and}\n"
             )
         else:
             match_line = (
-                f"MATCH (g:Gene {{organism_name: $org}})-[r:{gene_rel}]->(t:{label})\n"
-                f"WHERE g.locus_tag IN $locus_tags{trust_and}\n"
+                f"MATCH (g:Gene)-[r:{gene_rel}]->(t:{label})\n"
+                f"WHERE g.locus_tag IN $locus_tags AND ($org IS NULL OR g.organism_name = $org){trust_and}\n"
             )
 
         # Convert leaf_filter "WHERE NOT EXISTS ..." to "AND NOT EXISTS ..."
@@ -5947,12 +5955,12 @@ def build_gene_existence_check(
 ) -> tuple[str, dict]:
     """Build query to check which locus_tags exist in the KG.
 
-    RETURN keys: lt, found.
+    RETURN keys: lt, found, organism_name (null when not found).
     """
     cypher = (
         "UNWIND $locus_tags AS lt\n"
         "OPTIONAL MATCH (g:Gene {locus_tag: lt})\n"
-        "RETURN lt, g IS NOT NULL AS found"
+        "RETURN lt, g IS NOT NULL AS found, g.organism_name AS organism_name"
     )
     return cypher, {"locus_tags": locus_tags}
 
@@ -8048,7 +8056,7 @@ def build_gene_clusters_by_gene_summary(
     genes_with_clusters, genes_without_clusters,
     not_found, not_matched,
     by_cluster_type, by_treatment_type, by_background_factors,
-    by_analysis.
+    by_analysis, by_organism (row counts per g.organism_name).
     """
     params: dict = {"locus_tags": locus_tags}
 
@@ -8091,7 +8099,7 @@ def build_gene_clusters_by_gene_summary(
         "     collect(CASE WHEN gc IS NOT NULL THEN\n"
         "       {lt: lt, cid: gc.id, ct: ca.cluster_type,\n"
         "        tt: ca.treatment_type, bfs: ca.background_factors,\n"
-        "        aid: ca.id, aname: ca.name} END) AS rows\n"
+        "        aid: ca.id, aname: ca.name, org: g.organism_name} END) AS rows\n"
         "WITH [x IN nf_raw WHERE x IS NOT NULL] AS not_found,\n"
         "     [x IN nm_raw WHERE x IS NOT NULL] AS not_matched,\n"
         "     rows\n"
@@ -8106,12 +8114,13 @@ def build_gene_clusters_by_gene_summary(
         "       apoc.coll.flatten([r IN rows | coalesce(r.tt, [])])) AS by_treatment_type,\n"
         "     apoc.coll.frequencies(\n"
         "       apoc.coll.flatten([r IN rows | coalesce(r.bfs, [])])) AS by_background_factors,\n"
-        "     apoc.coll.frequencies([r IN rows | r.aid]) AS by_analysis\n"
+        "     apoc.coll.frequencies([r IN rows | r.aid]) AS by_analysis,\n"
+        "     apoc.coll.frequencies([r IN rows | r.org]) AS by_organism\n"
         "RETURN total_matching, total_clusters,\n"
         "       genes_with_clusters, genes_without_clusters,\n"
         "       not_found, not_matched,\n"
         "       by_cluster_type, by_treatment_type, by_background_factors,\n"
-        "       by_analysis"
+        "       by_analysis, by_organism"
     )
     return cypher, params
 
@@ -8135,7 +8144,7 @@ def build_gene_clusters_by_gene(
     RETURN keys (compact): locus_tag, gene_name, cluster_id, cluster_name,
     cluster_type, membership_score, analysis_id, analysis_name,
     treatment_type, background_factors.
-    RETURN keys (verbose): adds cluster_method, member_count,
+    RETURN keys (verbose): adds organism_name, cluster_method, member_count,
     cluster_functional_description, cluster_expression_dynamics,
     cluster_temporal_pattern, treatment, light_condition,
     experimental_context, p_value.
@@ -8172,6 +8181,7 @@ def build_gene_clusters_by_gene(
     verbose_cols = ""
     if verbose:
         verbose_cols = (
+            ",\n       g.organism_name AS organism_name"
             ",\n       ca.cluster_method AS cluster_method"
             ",\n       gc.member_count AS member_count"
             ",\n       gc.functional_description AS cluster_functional_description"
@@ -8992,7 +9002,8 @@ def build_gene_derived_metrics_summary(
     RETURN keys: total_matching, total_derived_metrics, genes_with_metrics,
     genes_without_metrics, not_found, not_matched, by_value_kind,
     by_metric_type, by_metric, by_compartment, by_treatment_type,
-    by_background_factors, by_publication.
+    by_background_factors, by_publication, by_organism (row counts per
+    g.organism_name).
     """
     params: dict = {"locus_tags": locus_tags}
 
@@ -9048,7 +9059,8 @@ def build_gene_derived_metrics_summary(
         "       {lt: lt, dm_id: dm.id, name: dm.name,\n"
         "        mt: dm.metric_type, vk: dm.value_kind,\n"
         "        comp: dm.compartment, doi: dm.publication_doi,\n"
-        "        tt: dm.treatment_type, bfs: dm.background_factors} END) AS rows\n"
+        "        tt: dm.treatment_type, bfs: dm.background_factors,\n"
+        "        org: g.organism_name} END) AS rows\n"
         "WITH input_tags,\n"
         "     [x IN nf_raw WHERE x IS NOT NULL] AS not_found,\n"
         "     [x IN nm_raw WHERE x IS NOT NULL] AS not_matched,\n"
@@ -9072,7 +9084,8 @@ def build_gene_derived_metrics_summary(
         "         apoc.coll.flatten([r IN rows | coalesce(r.tt, [])])) AS by_treatment_type,\n"
         "       apoc.coll.frequencies(\n"
         "         apoc.coll.flatten([r IN rows | coalesce(r.bfs, [])])) AS by_background_factors,\n"
-        "       apoc.coll.frequencies([r IN rows | r.doi]) AS by_publication"
+        "       apoc.coll.frequencies([r IN rows | r.doi]) AS by_publication,\n"
+        "       apoc.coll.frequencies([r IN rows | r.org]) AS by_organism"
     )
     return cypher, params
 
@@ -9110,7 +9123,7 @@ def build_gene_derived_metrics(
     (`CASE WHEN dm.has_p_value = 'p_value' THEN r.<col> ELSE null END`)
     when a has_p_value='p_value' DM lands.
 
-    RETURN keys (verbose, 11 added today): metric_type,
+    RETURN keys (verbose, 12 added today): organism_name, metric_type,
     field_description, unit, allowed_categories, compartment,
     treatment_type, background_factors, publication_doi, treatment,
     light_condition, experimental_context. p_value (raw, edge-side)
@@ -9154,6 +9167,7 @@ def build_gene_derived_metrics(
     verbose_cols = ""
     if verbose:
         verbose_cols = (
+            ",\n       g.organism_name AS organism_name"
             ",\n       dm.metric_type AS metric_type"
             ",\n       dm.field_description AS field_description"
             ",\n       dm.unit AS unit"

@@ -2,19 +2,19 @@
 
 ## What it does
 
-DerivedMetric annotations for a gene batch in ONE organism (inferred when omitted) — one row per gene × DM with a polymorphic value.
+DerivedMetric annotations for a gene batch (organisms may mix) — one row per gene × DM with a polymorphic value.
 
 Use for a gene's whole DM profile; for edge-level filtering pivot to the `genes_by_{numeric,boolean,categorical}_metric` trio.
 Filters: locus_tags, organism, metric_types, value_kind, derived_metric_ids, plus the compartment / publication / condition filters.
-Returns: by_value_kind, by_metric_type, by_metric, genes_with_metrics, not_found, not_matched; one row = (locus_tag, derived_metric_id, value).
+Returns: by_value_kind, by_metric_type, by_metric, by_organism, genes_with_metrics, not_found, not_matched; one row = (locus_tag, derived_metric_id, value).
 docs://tools/gene_derived_metrics; summary=True first.
 
 ## Parameters
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| locus_tags | list[string] | — | Gene locus tags to look up (e.g. ['PMM1714', 'PMM0001']). Required, non-empty. Single organism enforced — locus_tags must all resolve to the same organism (or pair with `organism` to disambiguate). |
-| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
+| locus_tags | list[string] | — | Gene locus tags to look up (e.g. ['PMM1714', 'PMM0001']). Required, non-empty. May span organisms. |
+| organism | string \| None | None | Organism, optional: omit to take tags from any organisms (batches may mix). When given it must resolve to ONE organism ('MED4') and every tag must belong to it; a tag from another organism raises. |
 | metric_types | list[string] \| None | None | Filter by metric_type tags (e.g. 'diel_amplitude_protein_log2'). Same metric_type may appear across publications — pair with publication_dois or use derived_metric_ids to pin one specific DM. |
 | value_kind | string ('numeric', 'boolean', 'categorical') \| None | None | Restrict to one DM kind. Each kind has a different `value` column type — 'numeric' → float, 'boolean' → 'flagged'/'not_flagged', 'categorical' → category string. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
@@ -34,7 +34,7 @@ docs://tools/gene_derived_metrics; summary=True first.
 ### Envelope
 
 ```expected-keys
-total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics, not_found, not_matched, by_value_kind, by_metric_type, by_metric, by_compartment, by_treatment_type, by_background_factors, by_publication, returned, offset, truncated, warnings, results
+total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics, not_found, not_matched, by_value_kind, by_metric_type, by_metric, by_compartment, by_treatment_type, by_background_factors, by_publication, by_organism, returned, offset, truncated, warnings, results
 ```
 
 - **total_matching** (int): Gene × DM rows matching all filters.
@@ -50,6 +50,7 @@ total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics
 - **by_treatment_type** (list[GeneDmTreatmentBreakdown]): Rows per treatment_type (flattened).
 - **by_background_factors** (list[GeneDmBackgroundFactorBreakdown]): Rows per background factor (flattened).
 - **by_publication** (list[GeneDmPublicationBreakdown]): Rows per parent publication.
+- **by_organism** (list[GeneDmOrganismBreakdown]): Rows per organism, sorted by count desc, then name.
 - **returned** (int): Length of results list.
 - **offset** (int): Pagination offset used.
 - **truncated** (bool): True when total_matching > offset + returned.
@@ -89,6 +90,7 @@ total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics
 | light_condition | string \| None (optional) | Light regime. Verbose only. |
 | experimental_context | string \| None (optional) | Longer experimental setup description. Verbose only. |
 | p_value | float \| None (optional) | Raw p-value. Populated only when parent DM has_p_value=True (none in current KG). Verbose only. |
+| organism_name | string \| None (optional) | Organism of the gene (e.g. 'Prochlorococcus MED4'). Verbose only. |
 
 ## Few-shot examples
 
@@ -147,7 +149,7 @@ resolve_gene → gene_derived_metrics(locus_tags)
 
 - `not_matched` ≠ no DM signal at all. `not_matched` lists genes that exist in the KG but have zero DM rows AFTER the applied filters. A gene with only boolean DM signal called with `value_kind='numeric'` lands in `not_matched`. Inspect `gene_overview`'s per-row `derived_metric_count` / `derived_metric_value_kinds` (verbose adds per-kind counts) for unfiltered availability.
 
-- Single organism enforced. Mixing locus_tags from MED4 and NATL2A raises `ValueError`. Call once per organism.
+- `organism` is optional: pass it only to scope or as a check. A tag from another organism then raises `ValueError`. Mixed-organism batches (e.g. MED4 and NATL2A tags) are fine without it; read `by_organism` for rows per organism.
 
 ```mistake
 gene_derived_metrics(locus_tags=["PMM1714"], min_value=1.0)
@@ -173,7 +175,7 @@ locus_tags must be non-empty (raises ValueError).
 from multiomics_explorer import gene_derived_metrics
 
 result = gene_derived_metrics(locus_tags=...)
-# returns dict with keys: total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics, not_found, not_matched, by_value_kind, by_metric_type, by_metric, by_compartment, by_treatment_type, by_background_factors, by_publication, returned, offset, truncated, warnings, results
+# returns dict with keys: total_matching, total_derived_metrics, genes_with_metrics, genes_without_metrics, not_found, not_matched, by_value_kind, by_metric_type, by_metric, by_compartment, by_treatment_type, by_background_factors, by_publication, by_organism, returned, offset, truncated, warnings, results
 ```
 
 Use package import for bulk data extraction in scripts.

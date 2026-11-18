@@ -135,29 +135,30 @@ values as `list_filter_values` spells them: `treatment_type` /
 
 ### Single-organism vs cross-organism
 
-Three shapes of organism scope exist; all scalar `organism=` values go
-through the same resolver (see "Organism naming" below). **Required
+Four organism-scope shapes; every scalar `organism=` uses the same
+resolver ("Organism naming" below). **Required
 scalar `organism=`** (omitting raises, list raises) — needs one gene
 universe (TERM2GENE mapping, background, single-organism chemistry join):
-`genes_by_ontology`, `gene_ontology_terms`, `ontology_landscape`,
-`pathway_enrichment`, `cluster_enrichment`, `genes_by_metabolite`,
-`metabolites_by_gene`. **Optional scalar `organism=`, single organism
-enforced** — inferred from input IDs when omitted, raises if they span
-more than one organism: `differential_expression_by_gene`,
-`gene_response_profile`, `gene_derived_metrics`, `gene_clusters_by_gene`,
-`genes_in_cluster`. **Cross-organism** — rows from any organism;
+`genes_by_ontology`, `ontology_landscape`, `pathway_enrichment`,
+`cluster_enrichment`, `genes_by_metabolite`. **Optional, single
+organism enforced** — inferred from input IDs, raises if they span
+organisms: `differential_expression_by_gene`, `gene_response_profile`,
+`genes_in_cluster`, `metabolites_by_gene`. **Optional, mixed batches
+allowed** (per-gene rows, `by_organism` in the envelope):
+`gene_ontology_terms`, `gene_derived_metrics`, `gene_clusters_by_gene`.
+On both optional shapes a given `organism=` is a check: a foreign locus
+tag raises. **Cross-organism** — rows from any organism;
 `organism=` / `organisms=[...]` is an optional narrowing filter on the
 remaining discovery / drill-down tools; list `organism_names=[...]` is
 **only** on `list_organisms` and `list_metabolites` (unknown names land
 in `not_found`); a handful of tools take no organism parameter at all
 (gene-batch: `gene_overview`, `gene_details`, `gene_homologs`,
 `gene_aa_sequence`, `gene_neighbors`; plus `search_homolog_groups`,
-`discussed_by_publication`) (gene rows still carry per-row
-`organism`).
+`discussed_by_publication`; gene rows still carry `organism`).
 
-The pattern: anything needing a precomputed organism-scoped index
-(ontology terms, backgrounds, chemistry joins) is single-organism;
-anything summarizing or comparing across organisms is cross-organism. See
+The pattern: tools needing an organism-scoped index (TERM2GENE,
+backgrounds, chemistry joins) are single-organism; summaries and
+comparisons are cross-organism. See
 "Organism naming" below for `coculture_partner=`. Per-row routing signals
 on discovery tools (`expression_edge_count`, `catalyst_gene_count`,
 `evidence_sources`, `rankable`, ...) tell you which drill-downs are

@@ -1391,9 +1391,16 @@
    }
   },
   "organism": {
-   "required": true,
+   "required": false,
    "type_sig": {
-    "type": "string"
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
    }
   },
   "sources": {
@@ -4618,9 +4625,16 @@
    }
   },
   "organism": {
-   "required": true,
+   "required": false,
    "type_sig": {
-    "type": "string"
+    "anyOf": [
+     {
+      "type": "string"
+     },
+     {
+      "type": "null"
+     }
+    ]
    }
   },
   "summary": {

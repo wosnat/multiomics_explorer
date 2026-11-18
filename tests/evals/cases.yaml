@@ -1061,6 +1061,56 @@
     min_rows: 0
     columns: []
 
+# 2d.7a (spec docs/tool-specs/2d7-single-organism-gates.md): `organism`
+# omitted on the locus-tag tools. `dispatch: api` pins rows + by_organism.
+- id: gene_ontology_terms_mixed_organisms
+  tool: gene_ontology_terms
+  dispatch: api
+  desc: |
+    PMM0001 (MED4) + PMT0419 (MIT9313), go_bp leaf, no organism. Rows for
+    both genes; by_organism has one entry per organism.
+  params:
+    locus_tags: ["PMM0001", "PMT0419"]
+    ontology: go_bp
+  expect:
+    min_rows: 2
+
+- id: gene_clusters_by_gene_mixed_organisms
+  tool: gene_clusters_by_gene
+  dispatch: api
+  desc: |
+    PMM0370 (MED4) + PMT0856 (MIT9313), no organism. Rows from both
+    organisms' clusterings; by_organism counts rows per organism.
+  params:
+    locus_tags: ["PMM0370", "PMT0856"]
+    verbose: true
+  expect:
+    min_rows: 2
+
+- id: gene_derived_metrics_mixed_organisms
+  tool: gene_derived_metrics
+  dispatch: api
+  desc: |
+    PMM1714 (MED4) + PMT0419 (MIT9313), no organism. by_organism counts
+    rows per organism; verbose rows carry organism_name.
+  params:
+    locus_tags: ["PMM1714", "PMT0419"]
+    verbose: true
+  expect:
+    min_rows: 2
+
+- id: metabolites_by_gene_organism_inferred
+  tool: metabolites_by_gene
+  dispatch: api
+  desc: |
+    PMM0001 + PMM0315 with organism omitted: resolved to MED4 from the
+    tags; the envelope matches an explicit organism='MED4' call (14 rows).
+  params:
+    locus_tags: ["PMM0001", "PMM0315"]
+    summary: true
+  expect:
+    min_rows: 0
+
 # ---------------------------------------------------------------------------
 # genes_by_numeric_metric
 # ---------------------------------------------------------------------------

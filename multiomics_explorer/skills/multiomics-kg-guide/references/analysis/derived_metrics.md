@@ -48,7 +48,7 @@ Key properties on a `DerivedMetric` node:
 | Tool | Role |
 |---|---|
 | `list_derived_metrics` | Entry point — discover DM nodes; read `derived_metric_id`, `value_kind`, `rankable`, `has_p_value`, `allowed_categories` before any drill-down |
-| `gene_derived_metrics` | Gene-centric batch lookup — one row per gene × DM, polymorphic `value` column; single organism |
+| `gene_derived_metrics` | Gene-centric batch lookup — one row per gene × DM, polymorphic `value` column; mixed-organism batches allowed (`by_organism`) |
 | `genes_by_numeric_metric` | Drill-down on numeric DMs — value threshold (always), bucket / percentile / rank (rankable-gated), p-value (has_p_value-gated) |
 | `genes_by_boolean_metric` | Drill-down on boolean DMs — `flag_value` filter (`True` / `False` / `None`) |
 | `genes_by_categorical_metric` | Drill-down on categorical DMs — `categories` filter |

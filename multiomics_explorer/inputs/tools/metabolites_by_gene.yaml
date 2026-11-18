@@ -478,8 +478,8 @@ mistakes:
     hypothesis test, use `pathway_enrichment` instead.
   - >-
     `not_found.locus_tags` vs `not_matched`. `not_found.locus_tags` =
-    locus_tags that don't resolve to any Gene in the requested organism
-    (typo, wrong organism, gene removed in KG rebuild). `not_matched` = tags
+    locus_tags that don't resolve to any Gene (typo, gene removed in KG
+    rebuild); a tag from another organism raises instead. `not_matched` = tags
     that resolve to a Gene but return no row under the active filters: no
     reaction, no direct TCDB system (family-only and superfamily-only genes
     land here; see the warning), and no GO transport term. Many housekeeping
@@ -511,9 +511,14 @@ mistakes:
     mirror is `genes_by_metabolite` (metabolite → genes); both share the
     same row class, discriminators and per-arm filter scope.
   - >-
-    Single organism per call. There is no `organisms` list. For
-    cross-organism / cross-feeding work, call `metabolites_by_gene` once on
-    the focal organism, take `top_metabolites`, then route to
+    `organism` is optional and inferred from `locus_tags`: pass it only to
+    scope or as a check. A tag from another organism then raises
+    `ValueError`.
+  - >-
+    One call per organism. A batch mixing organisms raises `ValueError`,
+    because the organism-wide counts and the stereo hint are per organism.
+    There is no `organisms` list. For cross-organism / cross-feeding work,
+    call `metabolites_by_gene` once on the focal organism, take `top_metabolites`, then route to
     `genes_by_metabolite(metabolite_ids=[...], organism=partner)` (or
     `list_metabolites(metabolite_ids=[...], organism_names=[partner])` for
     presence-only).

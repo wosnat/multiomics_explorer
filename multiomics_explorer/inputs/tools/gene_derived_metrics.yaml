@@ -29,6 +29,7 @@ examples:
               → top-decile damped genes; intersect with DE top hits
 
 verbose_fields:
+  - organism_name
   - metric_type
   - field_description
   - unit
@@ -66,8 +67,10 @@ mistakes:
     `derived_metric_count` / `derived_metric_value_kinds` (verbose adds
     per-kind counts) for unfiltered availability.
   - >-
-    Single organism enforced. Mixing locus_tags from MED4 and NATL2A
-    raises `ValueError`. Call once per organism.
+    `organism` is optional: pass it only to scope or as a check. A tag
+    from another organism then raises `ValueError`. Mixed-organism batches
+    (e.g. MED4 and NATL2A tags) are fine without it; read `by_organism`
+    for rows per organism.
   - wrong: gene_derived_metrics(locus_tags=["PMM1714"], min_value=1.0)
     right: First call gene_derived_metrics(locus_tags=["PMM1714"]); then
       pivot to genes_by_numeric_metric(derived_metric_ids=[...], min_value=1.0)

@@ -1,0 +1,243 @@
+by_element:
+- element: O
+  metabolite_count: 8
+- element: H
+  metabolite_count: 7
+- element: C
+  metabolite_count: 6
+- element: P
+  metabolite_count: 6
+- element: N
+  metabolite_count: 4
+by_evidence_source:
+- count: 12
+  evidence_source: metabolism
+- count: 2
+  evidence_source: transport
+by_evidence_source_combination:
+- evidence_sources:
+  - metabolism
+  pair_count: 6
+- evidence_sources:
+  - transport
+  pair_count: 2
+by_gene:
+- gene_name: dnaN
+  go_transport_rows: 0
+  locus_tag: PMM0001
+  metabolism_rows: 12
+  metabolite_count: 6
+  multi_source_metabolite_count: 0
+  product: DNA polymerase III, beta subunit
+  reaction_count: 4
+  rows: 12
+  tcdb_assignment_count: 0
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 0
+  transporter_count: 0
+- gene_name: psbB
+  go_transport_rows: 0
+  locus_tag: PMM0315
+  metabolism_rows: 0
+  metabolite_count: 2
+  multi_source_metabolite_count: 0
+  product: photosystem II chlorophyll-binding protein CP47
+  reaction_count: 0
+  rows: 2
+  tcdb_assignment_count: 1
+  tcdb_direct_rows: 2
+  tcdb_family_rows: 0
+  transporter_count: 1
+by_tcdb_route:
+- count: 2
+  tcdb_route: direct
+case_id: metabolites_by_gene_organism_inferred
+gene_count_total: 2
+metabolite_count_total: 8
+not_found:
+  locus_tags: []
+  metabolite_elements: []
+  metabolite_ids: []
+  metabolite_pathway_ids: []
+  organism: null
+not_matched: []
+offset: 0
+reaction_count_total: 4
+resolved_aliases: {}
+results: []
+returned: 0
+row_count: 0
+rows_by_go_term_depth: []
+stereo_relatives: {}
+tcdb_family_substrates_not_shown:
+  genes: 0
+  metabolites: 0
+  rows: 0
+tcdb_family_substrates_skipped: []
+top_gene_categories:
+- category: Photosynthesis
+  gene_count: 1
+- category: Replication and repair
+  gene_count: 1
+top_metabolite_pathways:
+- gene_count: 2
+  metabolite_pathway_id: kegg.pathway:ko01100
+  metabolite_pathway_name: Metabolic pathways
+  pathway_metabolite_count: 1646
+  pathway_reaction_count: 1759
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00910
+  metabolite_pathway_name: Nitrogen metabolism
+  pathway_metabolite_count: 18
+  pathway_reaction_count: 24
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00630
+  metabolite_pathway_name: Glyoxylate and dicarboxylate metabolism
+  pathway_metabolite_count: 53
+  pathway_reaction_count: 56
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00240
+  metabolite_pathway_name: Pyrimidine metabolism
+  pathway_metabolite_count: 57
+  pathway_reaction_count: 73
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko01232
+  metabolite_pathway_name: Nucleotide metabolism
+  pathway_metabolite_count: 57
+  pathway_reaction_count: 102
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00230
+  metabolite_pathway_name: Purine metabolism
+  pathway_metabolite_count: 81
+  pathway_reaction_count: 104
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko01110
+  metabolite_pathway_name: Biosynthesis of secondary metabolites
+  pathway_metabolite_count: 644
+  pathway_reaction_count: 558
+top_metabolites:
+- formula: O2
+  gene_count: 1
+  go_transport_rows: 0
+  metabolism_rows: 0
+  metabolite_id: kegg.compound:C00007
+  multi_source_gene_count: 0
+  name: Oxygen
+  reaction_count: 0
+  tcdb_direct_rows: 1
+  tcdb_family_rows: 0
+  transporter_count: 1
+- formula: HO7P2
+  gene_count: 1
+  go_transport_rows: 0
+  metabolism_rows: 4
+  metabolite_id: kegg.compound:C00013
+  multi_source_gene_count: 0
+  name: Diphosphate
+  reaction_count: 4
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 0
+  transporter_count: 0
+- formula: C15H25O13P2*3
+  gene_count: 1
+  go_transport_rows: 0
+  metabolism_rows: 4
+  metabolite_id: kegg.compound:C00039
+  multi_source_gene_count: 0
+  name: DNA
+  reaction_count: 4
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 0
+  transporter_count: 0
+- formula: C10H12N5O12P3
+  gene_count: 1
+  go_transport_rows: 0
+  metabolism_rows: 1
+  metabolite_id: kegg.compound:C00131
+  multi_source_gene_count: 0
+  name: dATP
+  reaction_count: 1
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 0
+  transporter_count: 0
+- formula: C10H12N5O13P3
+  gene_count: 1
+  go_transport_rows: 0
+  metabolism_rows: 1
+  metabolite_id: kegg.compound:C00286
+  multi_source_gene_count: 0
+  name: dGTP
+  reaction_count: 1
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 0
+  transporter_count: 0
+- formula: C9H12N3O13P3
+  gene_count: 1
+  go_transport_rows: 0
+  metabolism_rows: 1
+  metabolite_id: kegg.compound:C00458
+  multi_source_gene_count: 0
+  name: dCTP
+  reaction_count: 1
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 0
+  transporter_count: 0
+- formula: C10H13N2O14P3
+  gene_count: 1
+  go_transport_rows: 0
+  metabolism_rows: 1
+  metabolite_id: kegg.compound:C00459
+  multi_source_gene_count: 0
+  name: dTTP
+  reaction_count: 1
+  tcdb_direct_rows: 0
+  tcdb_family_rows: 0
+  transporter_count: 0
+- formula: C13H16O2
+  gene_count: 1
+  go_transport_rows: 0
+  metabolism_rows: 0
+  metabolite_id: kegg.compound:C02061
+  multi_source_gene_count: 0
+  name: Plastoquinone
+  reaction_count: 0
+  tcdb_direct_rows: 1
+  tcdb_family_rows: 0
+  transporter_count: 1
+top_reactions:
+- ec_numbers: []
+  gene_count: 1
+  metabolite_count: 3
+  name: deoxyadenosine 5^-triphosphate:DNA deoxynucleotidyltransferase (DNA-directed);
+    dATP + DNA <=> Diphosphate + DNA
+  reaction_id: kegg.reaction:R00375
+- ec_numbers: []
+  gene_count: 1
+  metabolite_count: 3
+  name: deoxyguanosine 5^-triphosphate:DNA deoxynucleotidyltransferase (DNA-directed);
+    dGTP + DNA <=> Diphosphate + DNA
+  reaction_id: kegg.reaction:R00376
+- ec_numbers: []
+  gene_count: 1
+  metabolite_count: 3
+  name: deoxycytidine triphosphate:DNA deoxynucleotidyltransferase (DNA-directed);
+    dCTP + DNA <=> Diphosphate + DNA
+  reaction_id: kegg.reaction:R00377
+- ec_numbers: []
+  gene_count: 1
+  metabolite_count: 3
+  name: deoxythymidine triphosphate:DNA deoxynucleotidyltransferase (DNA-directed);
+    dTTP + DNA <=> Diphosphate + DNA
+  reaction_id: kegg.reaction:R00378
+top_tcdb_families:
+- direction: unknown
+  gene_count: 1
+  level_kind: tc_system
+  metabolite_count: 2
+  tcdb_family_id: tcdb:3.E.2.2.3
+  tcdb_family_name: Multicomponent Photosystem II of A. thaliana.
+  tcdb_route: direct
+total_matching: 14
+transporter_count_total: 1
+truncated: true
+warnings: []
