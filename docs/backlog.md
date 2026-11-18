@@ -15,7 +15,7 @@ Empty.
 
 | # | Item | Size | Origin |
 |---|---|---|---|
-| 2d.8 | Group-id batches aren't de-duplicated: `['cyanorak:CK_00002025', 'CK_00002025']` counts the group twice in `genes_by_homolog_group` `total_matching`, `top_groups` and `by_clade` (the bare id is coerced, then both run). De-duplicate after alias coercion; check the other id-coercing tools for the same. | S | 2d.2 code review 2026-11-18 |
+| 2d.9 | Exact-duplicate `locus_tags` / `cluster_ids` double-count: builders `UNWIND` the list with no de-dup, so `[X, X]` doubles rows and totals on `gene_overview`, `gene_details`, `gene_homologs`, `gene_clusters_by_gene`, `gene_derived_metrics`, `gene_neighbors`, `genes_in_cluster` (live, release KG: PMM0315 1→2, 4→8, 11→22). `differential_expression_by_gene`, `gene_ontology_terms`, `metabolites_by_gene` are safe (`IN` / own de-dup). Fix: first-seen de-dup of ID-list params at the api entry (helper next to `listify_bare_str`); check `experiment_ids` UNWIND paths too. | S | 2d.8 code review 2026-11-18 |
 
 ## 3. Larger — needs a spec / design
 

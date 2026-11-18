@@ -1125,8 +1125,12 @@ def _coerce_ids(
     passes through unchanged (every pattern's prefix group is optional, so
     a canonical ID round-trips to itself and is never reported as coerced).
 
-    Returns `(canonical ids in input order, {input: [canonical]} for the
-    ones that changed)`. The alias-map shape — a list per input — mirrors
+    Returns `(canonical ids in first-seen input order with duplicates
+    removed, {input: [canonical]} for the ones that changed)`. Duplicates
+    are dropped after coercion, so `['cyanorak:CK_00000570',
+    'CK_00000570']` reaches the query once and counts are not doubled.
+
+    The alias-map shape — a list per input — mirrors
     `_canonicalize_metabolite_ids`'s `resolved_aliases` for cross-tool
     consistency, even though every match here is 1:1 (no collision is
     possible: unlike a metabolite xref, a bare term/group accession cannot
@@ -1137,6 +1141,7 @@ def _coerce_ids(
     if not ids:
         return ids, {}
     canonical: list[str] = []
+    seen: set[str] = set()
     resolved: dict[str, list[str]] = {}
     for raw in ids:
         canonical_form = raw
@@ -1152,7 +1157,9 @@ def _coerce_ids(
                     accession = accession.upper()
                 canonical_form = template.format(accession)
                 break
-        canonical.append(canonical_form)
+        if canonical_form not in seen:
+            seen.add(canonical_form)
+            canonical.append(canonical_form)
         if canonical_form != raw:
             resolved[raw] = [canonical_form]
     return canonical, resolved

@@ -18870,6 +18870,85 @@ class TestCoerceIds:
         assert ids == ["kegg.pathway:ko00910", "kegg.pathway:ko00195", "bogus"]
         assert aliases == {"ko00910": ["kegg.pathway:ko00910"]}
 
+    # -- de-duplication after coercion (backlog 2d.8) -------------------
+    def test_bare_and_canonical_of_same_id_collapse(self):
+        ids, aliases = self._fn()(
+            ["cyanorak:CK_00002025", "CK_00002025"], self._group_rules(),
+        )
+        assert ids == ["cyanorak:CK_00002025"]
+        assert aliases == {"CK_00002025": ["cyanorak:CK_00002025"]}
+
+    def test_exact_duplicates_collapse(self):
+        ids, aliases = self._fn()(
+            ["eggnog:COG0592@2", "eggnog:COG0592@2"], self._group_rules(),
+        )
+        assert ids == ["eggnog:COG0592@2"]
+        assert aliases == {}
+
+    def test_dedup_keeps_first_seen_order(self):
+        ids, _ = self._fn()(
+            ["PF00004", "go:0006979", "pfam:PF00004", "0006979", "K00001"],
+            self._term_rules(),
+        )
+        assert ids == ["pfam:PF00004", "go:0006979", "kegg.orthology:K00001"]
+
+    def test_non_matching_duplicates_collapse(self):
+        ids, _ = self._fn()(["bogus", "bogus"], self._term_rules())
+        assert ids == ["bogus"]
+
+
+class TestDuplicateGroupIdsNotDoubleCounted:
+    """Duplicate group ids (bare + canonical, or repeated) reach every
+    builder once, so counts are not doubled (backlog 2d.8)."""
+
+    GID = "cyanorak:CK_00002025"
+    DUPES = ["cyanorak:CK_00002025", "CK_00002025", "cyanorak:CK_00002025"]
+
+    def _group_id_args(self, conn):
+        return [c.kwargs["group_ids"] for c in conn.execute_query.call_args_list
+                if "group_ids" in c.kwargs]
+
+    def test_genes_by_homolog_group_every_query_gets_deduped_ids(self, mock_conn):
+        mock_conn.execute_query.side_effect = [
+            [{"total_matching": 2, "total_genes": 2, "total_categories": 1,
+              "by_organism": [{"item": "Prochlorococcus MED4", "count": 2}],
+              "by_category_raw": [{"item": "Photosynthesis", "count": 2}],
+              "by_group_raw": [{"item": self.GID, "count": 2}],
+              "not_found_groups": [], "not_matched_groups": []}],  # summary
+            [],  # by_clade
+            [{"locus_tag": "PMM1404", "gene_name": "hli",
+              "product": "high light inducible protein",
+              "organism_name": "Prochlorococcus MED4",
+              "gene_category": "Photosynthesis", "group_id": self.GID}],  # detail
+        ]
+        result = api.genes_by_homolog_group(self.DUPES, conn=mock_conn)
+        assert mock_conn.execute_query.call_count == 3
+        assert self._group_id_args(mock_conn) == [[self.GID]] * 3
+        assert result["resolved_aliases"] == {"CK_00002025": [self.GID]}
+        assert result["not_found_groups"] == []
+
+    def test_differential_expression_by_ortholog_every_query_gets_deduped_ids(
+        self, mock_conn,
+    ):
+        mock_conn.execute_query.side_effect = [
+            [{"not_found": []}],  # Q1a group check
+            [{"total_matching": 10, "matching_genes": 3, "matching_groups": 1,
+              "experiment_count": 2, "by_organism": [], "rows_by_status": [],
+              "rows_by_treatment_type": [], "rows_by_background_factors": [],
+              "by_table_scope": [], "sig_log2fcs": [1.5, 2.0],
+              "matched_group_ids": [self.GID]}],  # Q1b summary
+            [{"top_groups": []}],  # Q2
+            [{"top_experiments": []}],  # Q3
+            [],  # Q4 results
+            [],  # Q5 membership
+        ]
+        api.differential_expression_by_ortholog(
+            group_ids=self.DUPES, conn=mock_conn,
+        )
+        assert mock_conn.execute_query.call_count == 6
+        args = self._group_id_args(mock_conn)
+        assert args, "expected queries carrying group_ids"
+        assert all(a == [self.GID] for a in args), args
 
 class TestCaseMismatchWarnings:
     """`_case_mismatch_warnings(conn, not_found)` — one extra lookup, no

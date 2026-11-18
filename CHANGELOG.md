@@ -36,6 +36,7 @@ ahead of the KG release. See KG plan §2.3 for the coordination dance.
 - **`docs://analysis/metabolites` is shorter** (~14.6k → ~9.2k tokens): the decision tree comes first, TCDB direct-vs-family detail lives in `docs://analysis/transport`, tested-absent sits with the metabolomics section, and hard-coded KG counts point at the tool that reports them.
 
 ### Fixed
+- **A group id passed twice is counted once.** `genes_by_homolog_group` and `differential_expression_by_ortholog` doubled their counts when a batch held the same group twice, bare and prefixed (`CK_00000570` and `cyanorak:CK_00000570`) or repeated. Ids are now de-duplicated after coercion; `resolved_aliases` still lists the bare form.
 
 ## [0.1.0-alpha.6] - 2026-11-01
 
