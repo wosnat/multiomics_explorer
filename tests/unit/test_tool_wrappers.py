@@ -15308,3 +15308,221 @@ class Test2d7ByOrganismWrappers:
             result = await tool_fns[tool](
                 mock_ctx, locus_tags=[r["locus_tag"] for r in compact["results"]])
         assert "organism_name" not in result.results[0].model_dump()
+
+
+# ---------------------------------------------------------------------------
+# 2d.4 — genes_by_ontology across organisms (RED).
+# Spec: docs/tool-specs/2d4-genes-by-ontology-cross-organism.md. `organism`
+# accepts str / list[str] / None (default); envelope gains by_organism /
+# organisms_without_genes / not_found_organisms and top_terms[].organism_count;
+# organism_name is None across organisms; every row carries organism_name.
+# ---------------------------------------------------------------------------
+
+import typing as _typing_2d4
+
+from pydantic import TypeAdapter as _TypeAdapter_2d4
+
+_2D4_MED4 = "Prochlorococcus MED4"
+_2D4_EZ55 = "Alteromonas macleodii EZ55"
+
+
+def _2d4_gbo_return(**over):
+    base = {
+        "ontology": "interpro", "organism_name": None,
+        "total_matching": 3, "total_genes": 3, "total_terms": 1,
+        "total_categories": 1,
+        "genes_per_term_min": 1, "genes_per_term_median": 1.5,
+        "genes_per_term_max": 2,
+        "terms_per_gene_min": 1, "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 1,
+        "by_category": [{"category": "Stress", "count": 3}],
+        "by_level": [{"level": 0, "n_terms": 1, "n_genes": 3, "row_count": 3}],
+        "top_terms": [{"term_id": "interpro:IPR063966", "term_name": "HliA-D",
+                       "count": 3, "organism_count": 2,
+                       "is_informative": True}],
+        "n_best_effort_terms": 0,
+        "not_found": [], "wrong_ontology": [], "wrong_level": [],
+        "filtered_out": [],
+        "by_organism": [
+            {"organism_name": _2D4_MED4, "gene_count": 2, "term_count": 1,
+             "row_count": 2},
+            {"organism_name": _2D4_EZ55, "gene_count": 1, "term_count": 1,
+             "row_count": 1},
+        ],
+        "organisms_without_genes": ["Prochlorococcus MIT9313"],
+        "not_found_organisms": ["nope"],
+        "returned": 3, "offset": 0, "truncated": False,
+        "results": [
+            {"locus_tag": lt, "organism_name": org, "gene_name": None,
+             "product": None, "gene_category": "Stress",
+             "term_id": "interpro:IPR063966", "term_name": "HliA-D",
+             "level": 0, "is_informative": True}
+            for lt, org in (("PMM0001", _2D4_MED4), ("PMM0002", _2D4_MED4),
+                            ("EZ55_0001", _2D4_EZ55))
+        ],
+    }
+    base.update(over)
+    return base
+
+
+def _2d4_gbo_response_model(tool_fns):
+    return _typing_2d4.get_type_hints(tool_fns["genes_by_ontology"])["return"]
+
+
+def _2d4_list_item(model, field):
+    ann = model.model_fields[field].annotation
+    (item,) = _typing_2d4.get_args(ann)
+    return item
+
+
+def _2d4_organism_adapter(tool_fns):
+    hints = _typing_2d4.get_type_hints(tool_fns["genes_by_ontology"],
+                                       include_extras=True)
+    return _TypeAdapter_2d4(hints["organism"])
+
+
+class Test2d4GboOrganismParamWrapper:
+
+    def test_organism_defaults_to_none(self, tool_fns):
+        import inspect
+        param = inspect.signature(
+            tool_fns["genes_by_ontology"]).parameters["organism"]
+        assert param.default is None
+
+    @pytest.mark.parametrize("value", [
+        _2D4_MED4, [_2D4_MED4, "Alteromonas"], None,
+    ], ids=["str", "list", "none"])
+    def test_organism_accepts_str_list_none(self, tool_fns, value):
+        adapter = _2d4_organism_adapter(tool_fns)
+        assert adapter.validate_python(value) == value
+
+    def test_organism_description_names_the_list_and_all_forms(self, tool_fns):
+        hints = _typing_2d4.get_type_hints(tool_fns["genes_by_ontology"],
+                                           include_extras=True)
+        desc = " ".join(
+            getattr(m, "description", "") or ""
+            for m in getattr(hints["organism"], "__metadata__", ()))
+        low = desc.lower()
+        assert "list" in low, desc
+        assert "all organisms" in low, desc
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("value", [
+        [_2D4_MED4, "Alteromonas"], _2D4_MED4,
+    ], ids=["list", "str"])
+    async def test_organism_forwarded_to_api(self, tool_fns, mock_ctx, value):
+        with patch("multiomics_explorer.api.functions.genes_by_ontology",
+                   return_value=_2d4_gbo_return()) as mock_api:
+            await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="interpro", organism=value,
+                term_ids=["interpro:IPR063966"], interpro_type="FAMILY")
+        assert mock_api.call_args.kwargs["organism"] == value
+
+    @pytest.mark.asyncio
+    async def test_omitted_organism_forwards_none(self, tool_fns, mock_ctx):
+        with patch("multiomics_explorer.api.functions.genes_by_ontology",
+                   return_value=_2d4_gbo_return()) as mock_api:
+            await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="interpro",
+                term_ids=["interpro:IPR063966"], interpro_type="FAMILY",
+                summary=True)
+        assert mock_api.call_args.kwargs["organism"] is None
+
+    @pytest.mark.asyncio
+    async def test_empty_list_value_error_is_tool_error(self, tool_fns, mock_ctx):
+        with patch("multiomics_explorer.api.functions.genes_by_ontology",
+                   side_effect=ValueError("organism list must not be empty.")):
+            with pytest.raises(ToolError, match="must not be empty"):
+                await tool_fns["genes_by_ontology"](
+                    mock_ctx, ontology="kegg", organism=[], level=1)
+
+    @pytest.mark.asyncio
+    async def test_size_bound_markers_forwarded_untouched(self, tool_fns, mock_ctx):
+        """The api resolves the markers per scope; the wrapper must pass
+        them through as markers (not plain ints)."""
+        from multiomics_explorer.api import functions as _api
+        with patch("multiomics_explorer.api.functions.genes_by_ontology",
+                   return_value=_2d4_gbo_return()) as mock_api:
+            await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="kegg", organism=[_2D4_MED4], level=1)
+        kw = mock_api.call_args.kwargs
+        assert _api._is_default_size(kw["min_gene_set_size"])
+        assert _api._is_default_size(kw["max_gene_set_size"])
+
+
+class Test2d4GboEnvelopeWrapper:
+
+    def test_organism_name_is_optional(self, tool_fns):
+        resp = _2d4_gbo_response_model(tool_fns)
+        ann = resp.model_fields["organism_name"].annotation
+        assert type(None) in _typing_2d4.get_args(ann), ann
+
+    def test_by_organism_model(self, tool_fns):
+        resp = _2d4_gbo_response_model(tool_fns)
+        assert "by_organism" in resp.model_fields
+        assert resp.model_fields["by_organism"].description
+        item = _2d4_list_item(resp, "by_organism")
+        assert set(item.model_fields) == {
+            "organism_name", "gene_count", "term_count", "row_count"}
+
+    @pytest.mark.parametrize("field", [
+        "organisms_without_genes", "not_found_organisms"])
+    def test_organism_list_fields(self, tool_fns, field):
+        resp = _2d4_gbo_response_model(tool_fns)
+        assert field in resp.model_fields
+        f = resp.model_fields[field]
+        assert f.description
+        assert f.annotation == list[str]
+
+    def test_top_terms_carry_organism_count(self, tool_fns):
+        resp = _2d4_gbo_response_model(tool_fns)
+        item = _2d4_list_item(resp, "top_terms")
+        assert "organism_count" in item.model_fields
+        assert item.model_fields["organism_count"].description
+
+    def test_row_model_has_organism_name(self, tool_fns):
+        resp = _2d4_gbo_response_model(tool_fns)
+        row = _2d4_list_item(resp, "results")
+        assert "organism_name" in row.model_fields
+        assert row.model_fields["organism_name"].description
+        names = list(row.model_fields)
+        assert names.index("organism_name") == names.index("locus_tag") + 1
+
+    @pytest.mark.asyncio
+    async def test_cross_organism_envelope_forwarded(self, tool_fns, mock_ctx):
+        with patch("multiomics_explorer.api.functions.genes_by_ontology",
+                   return_value=_2d4_gbo_return()):
+            result = await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="interpro", organism=[_2D4_MED4, "EZ55"],
+                term_ids=["interpro:IPR063966"], interpro_type="FAMILY")
+        assert result.organism_name is None
+        assert [(b.organism_name, b.gene_count, b.term_count, b.row_count)
+                for b in result.by_organism] == [
+            (_2D4_MED4, 2, 1, 2), (_2D4_EZ55, 1, 1, 1)]
+        assert result.organisms_without_genes == ["Prochlorococcus MIT9313"]
+        assert result.not_found_organisms == ["nope"]
+        assert result.top_terms[0].organism_count == 2
+        assert [r.organism_name for r in result.results] == [
+            _2D4_MED4, _2D4_MED4, _2D4_EZ55]
+        dumped = result.model_dump()
+        assert dumped["results"][2]["organism_name"] == _2D4_EZ55
+
+    @pytest.mark.asyncio
+    async def test_single_organism_envelope_still_validates(
+            self, tool_fns, mock_ctx):
+        single = _2d4_gbo_return(
+            organism_name=_2D4_MED4,
+            by_organism=[{"organism_name": _2D4_MED4, "gene_count": 2,
+                          "term_count": 1, "row_count": 2}],
+            organisms_without_genes=[], not_found_organisms=[])
+        with patch("multiomics_explorer.api.functions.genes_by_ontology",
+                   return_value=single):
+            result = await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="interpro", organism=_2D4_MED4,
+                term_ids=["interpro:IPR063966"], interpro_type="FAMILY")
+        assert result.organism_name == _2D4_MED4
+        assert result.not_found_organisms == []
+
+    def test_docstring_drops_one_organism(self, tool_fns):
+        doc = tool_fns["genes_by_ontology"].__doc__ or ""
+        assert "ONE organism" not in doc

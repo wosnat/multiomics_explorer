@@ -80,6 +80,26 @@ from multiomics_explorer.kg.queries_lib import (
 from multiomics_explorer.kg.queries_lib import _hierarchy_walk
 
 
+# 2d.4 (docs/tool-specs/2d4-genes-by-ontology-cross-organism.md, C6): the
+# detail builder is driven by the page's buckets — `buckets=[{organism_name,
+# term_id}]` replaces `organism` / `term_ids`, and it takes no size bounds
+# (Query A already sized the buckets). Pre-2d.4 call sites keep their
+# kwargs and go through this adapter.
+_DETAIL_PLACEHOLDER_TERM = "term:placeholder"
+
+
+def _detail_kw(**kw):
+    org = kw.pop("organism", "Prochlorococcus MED4")
+    term_ids = kw.pop("term_ids", None)
+    kw.pop("min_gene_set_size", None)
+    kw.pop("max_gene_set_size", None)
+    kw["buckets"] = [
+        {"organism_name": org, "term_id": tid}
+        for tid in (term_ids or [_DETAIL_PLACEHOLDER_TERM])
+    ]
+    return kw
+
+
 class TestHierarchyWalk:
     def test_go_bp_up(self):
         frag = _hierarchy_walk("go_bp", direction="up")
@@ -1630,26 +1650,29 @@ class TestBuildGenesByOntologyDetail:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, params = build_genes_by_ontology_detail(
+        cypher, params = build_genes_by_ontology_detail(**_detail_kw(
             ontology="go_bp",
             organism="Prochlorococcus MED4",
             term_ids=["go:0006260"],
             level=None,
             min_gene_set_size=5,
             max_gene_set_size=500,
-        )
+        ))
         assert params["term_ids"] == ["go:0006260"]
-        assert params["org"] == "Prochlorococcus MED4"
-        assert params["min_gene_set_size"] == 5
-        assert params["max_gene_set_size"] == 500
+        # 2d.4 C6: organism scope = the page's organisms ($orgs), no size
+        # bounds (Query A already sized the buckets).
+        assert params["orgs"] == ["Prochlorococcus MED4"]
+        assert "org" not in params
+        assert "min_gene_set_size" not in params
+        assert "max_gene_set_size" not in params
         # Mode 1: walk DOWN from each input term
         assert "UNWIND $term_ids AS input_tid" in cypher
         assert "(t:BiologicalProcess {id: input_tid})" in cypher
         assert "<-[:" in cypher  # walk direction
         assert "(leaf:BiologicalProcess)" in cypher
-        # Size filter
-        assert "size(term_genes) >= $min_gene_set_size" in cypher
-        assert "size(term_genes) <= $max_gene_set_size" in cypher
+        # No size filter in the bucket-driven detail query
+        assert "$min_gene_set_size" not in cypher
+        assert "$max_gene_set_size" not in cypher
         # Row return
         assert "g.locus_tag AS locus_tag" in cypher
         assert "t.id AS term_id" in cypher
@@ -1662,18 +1685,21 @@ class TestBuildGenesByOntologyDetail:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, params = build_genes_by_ontology_detail(
+        cypher, params = build_genes_by_ontology_detail(**_detail_kw(
             ontology="go_bp",
             organism="Prochlorococcus MED4",
             level=1,
             term_ids=None,
             min_gene_set_size=5,
             max_gene_set_size=500,
-        )
+        ))
         assert params["level"] == 1
-        assert "$term_ids" not in cypher  # no term_ids clause
+        # 2d.4 C6: level-only mode runs as Mode 3 for the page (level + the
+        # page's distinct term_ids).
+        assert "t.id IN $term_ids" in cypher
+        assert params["term_ids"] == [_DETAIL_PLACEHOLDER_TERM]
         # Mode 2: bind gene → leaf, walk leaf → ancestor
-        assert "(g:Gene {organism_name: $org})-[r:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)" in cypher
+        assert "(g:Gene)-[r:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)" in cypher
         assert "(leaf)-[:" in cypher
         assert "]->(t:BiologicalProcess)" in cypher
         assert "WHERE t.level = $level" in cypher
@@ -1682,14 +1708,14 @@ class TestBuildGenesByOntologyDetail:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="cyanorak_role",
             organism="Prochlorococcus MED4",
             level=1,
             term_ids=["cyanorak.role:A.1"],
             min_gene_set_size=5,
             max_gene_set_size=500,
-        )
+        ))
         # Mode 3: same as Mode 2 but with term_ids scope
         assert "WHERE t.level = $level AND t.id IN $term_ids" in cypher
 
@@ -1697,7 +1723,7 @@ class TestBuildGenesByOntologyDetail:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="go_bp",
             organism="Prochlorococcus MED4",
             level=1,
@@ -1705,7 +1731,7 @@ class TestBuildGenesByOntologyDetail:
             min_gene_set_size=5,
             max_gene_set_size=500,
             verbose=True,
-        )
+        ))
         assert "g.function_description AS function_description" in cypher
         assert "t.level_is_best_effort IS NOT NULL AS level_is_best_effort" in cypher
 
@@ -1713,7 +1739,7 @@ class TestBuildGenesByOntologyDetail:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, params = build_genes_by_ontology_detail(
+        cypher, params = build_genes_by_ontology_detail(**_detail_kw(
             ontology="go_bp",
             organism="Prochlorococcus MED4",
             level=1,
@@ -1722,7 +1748,7 @@ class TestBuildGenesByOntologyDetail:
             max_gene_set_size=500,
             limit=100,
             offset=50,
-        )
+        ))
         assert "SKIP $offset" in cypher
         assert "LIMIT $limit" in cypher
         assert params["limit"] == 100
@@ -1732,45 +1758,44 @@ class TestBuildGenesByOntologyDetail:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="go_bp",
             organism="Prochlorococcus MED4",
             level=1,
             term_ids=None,
             min_gene_set_size=5,
             max_gene_set_size=500,
-        )
-        assert "ORDER BY t.id, g.locus_tag" in cypher
+        ))
+        # 2d.4: total order across organisms (locus tags are KG-unique).
+        assert "ORDER BY organism_name, term_id, locus_tag" in cypher
 
     def test_no_mode_raises(self):
+        """2d.4 C6: the page's buckets ARE the mode input; an empty page is
+        a caller error (the api never runs Query D without buckets)."""
         import pytest
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        with pytest.raises(ValueError, match="level.*term_ids"):
+        with pytest.raises(ValueError):
             build_genes_by_ontology_detail(
-                ontology="go_bp",
-                organism="MED4",
-                level=None,
-                term_ids=None,
-                min_gene_set_size=5,
-                max_gene_set_size=500,
+                ontology="go_bp", level=None, buckets=[],
             )
 
     def test_flat_ontology_mode2(self):
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="cog_category",
             organism="Prochlorococcus MED4",
             level=0,
             term_ids=None,
             min_gene_set_size=5,
             max_gene_set_size=500,
-        )
-        # Flat: t = leaf; no walk between leaf and t
-        assert "(g:Gene {organism_name: $org})-[r:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
+        ))
+        # Flat: t = leaf; no walk between leaf and t (2d.4 C6: (g:Gene)
+        # scoped by the page's $orgs, not the single-organism property map)
+        assert "(g:Gene)-[r:Gene_in_cog_category]->(t:CogFunctionalCategory)" in cypher
         # No explicit leaf→t walk
         assert "(leaf)-[:" not in cypher
 
@@ -1778,10 +1803,10 @@ class TestBuildGenesByOntologyDetail:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="brite", organism="Test Org",
             level=1, min_gene_set_size=5, max_gene_set_size=500,
-        )
+        ))
         assert "t.tree AS tree" in cypher
         assert "t.tree_code AS tree_code" in cypher
 
@@ -1789,11 +1814,11 @@ class TestBuildGenesByOntologyDetail:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, params = build_genes_by_ontology_detail(
+        cypher, params = build_genes_by_ontology_detail(**_detail_kw(
             ontology="brite", organism="Test Org",
             level=1, min_gene_set_size=5, max_gene_set_size=500,
             tree="transporters",
-        )
+        ))
         assert "t.tree = $tree" in cypher
         assert params["tree"] == "transporters"
 
@@ -1802,11 +1827,11 @@ class TestBuildGenesByOntologyDetail:
             build_genes_by_ontology_detail,
         )
         with pytest.raises(ValueError, match="tree filter is only valid"):
-            build_genes_by_ontology_detail(
+            build_genes_by_ontology_detail(**_detail_kw(
                 ontology="go_bp", organism="Test Org",
                 level=2, min_gene_set_size=5, max_gene_set_size=500,
                 tree="x",
-            )
+            ))
 
 
 class TestBuildGenesByOntologyPerTerm:
@@ -1832,7 +1857,8 @@ class TestBuildGenesByOntologyPerTerm:
         assert "size(gene_rows) AS n_genes" in cypher
         assert "apoc.coll.frequencies" in cypher
         assert "AS cat_freqs" in cypher
-        assert "ORDER BY t.id" in cypher
+        # 2d.4 C3: one row per (organism, term) bucket
+        assert "ORDER BY organism_name, term_id" in cypher
         # Pagination NOT applied to summary queries
         assert "SKIP" not in cypher
         assert "LIMIT" not in cypher
@@ -2353,14 +2379,14 @@ class TestBuildGenesByOntologyTcdbCazy:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="tcdb",
             organism="Prochlorococcus MED4",
             term_ids=["tcdb:1.A.1"],
             level=None,
             min_gene_set_size=5,
             max_gene_set_size=500,
-        )
+        ))
         # Mode 1: walk DOWN from input term
         assert "(t:TcdbFamily {id: input_tid})" in cypher
         assert "(leaf:TcdbFamily)" in cypher
@@ -2371,17 +2397,18 @@ class TestBuildGenesByOntologyTcdbCazy:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="cazy",
             organism="Prochlorococcus MED4",
             level=0,
             term_ids=None,
             min_gene_set_size=5,
             max_gene_set_size=500,
-        )
-        # Mode 2: gene → leaf, walk leaf → ancestor
+        ))
+        # Mode 2: gene → leaf, walk leaf → ancestor (2d.4 C6: (g:Gene)
+        # scoped by the page's $orgs)
         assert (
-            "(g:Gene {organism_name: $org})-[r:Gene_has_cazy_family]->(leaf:CazyFamily)"
+            "(g:Gene)-[r:Gene_has_cazy_family]->(leaf:CazyFamily)"
             in cypher
         )
         assert "(leaf)-[:" in cypher
@@ -2393,22 +2420,22 @@ class TestBuildGenesByOntologyTcdbCazy:
             build_genes_by_ontology_detail,
         )
         with pytest.raises(ValueError, match="tree filter is only valid"):
-            build_genes_by_ontology_detail(
+            build_genes_by_ontology_detail(**_detail_kw(
                 ontology="tcdb", organism="Test Org",
                 level=1, min_gene_set_size=5, max_gene_set_size=500,
                 tree="transporters",
-            )
+            ))
 
     def test_detail_cazy_tree_filter_raises(self):
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
         with pytest.raises(ValueError, match="tree filter is only valid"):
-            build_genes_by_ontology_detail(
+            build_genes_by_ontology_detail(**_detail_kw(
                 ontology="cazy", organism="Test Org",
                 level=0, min_gene_set_size=5, max_gene_set_size=500,
                 tree="transporters",
-            )
+            ))
 
     def test_per_term_tcdb(self):
         from multiomics_explorer.kg.queries_lib import (
@@ -8917,7 +8944,7 @@ class TestBuildGenesByOntologyF1Surface:
             _genes_by_ontology_match_stage,
         )
         cypher, _ = _genes_by_ontology_match_stage(
-            ontology="go_bp", organism="Test Org",
+            ontology="go_bp", organisms="Test Org",
             level=1, term_ids=None,
         )
         assert "coalesce(t.is_uninformative, '') <> 'true'" not in cypher
@@ -8931,7 +8958,7 @@ class TestBuildGenesByOntologyF1Surface:
             _genes_by_ontology_match_stage,
         )
         cypher, _ = _genes_by_ontology_match_stage(
-            ontology="go_bp", organism="Test Org",
+            ontology="go_bp", organisms="Test Org",
             level=1, term_ids=None, informative_only=True,
         )
         assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher
@@ -8943,7 +8970,7 @@ class TestBuildGenesByOntologyF1Surface:
             _genes_by_ontology_match_stage,
         )
         cypher, _ = _genes_by_ontology_match_stage(
-            ontology="go_bp", organism="Test Org",
+            ontology="go_bp", organisms="Test Org",
             level=1, term_ids=None, informative_only=True,
         )
         idx_filter = cypher.find("coalesce(t.is_uninformative, '') <> 'true'")
@@ -8956,10 +8983,10 @@ class TestBuildGenesByOntologyF1Surface:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="go_bp", organism="Test Org",
             level=1, min_gene_set_size=5, max_gene_set_size=500,
-        )
+        ))
         assert "is_informative" in cypher
         assert "coalesce(t.is_uninformative, '') <> 'true'" in cypher
 
@@ -8967,10 +8994,10 @@ class TestBuildGenesByOntologyF1Surface:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="go_bp", organism="Test Org",
             level=1, min_gene_set_size=5, max_gene_set_size=500,
-        )
+        ))
         # Only the RETURN-side coalesce appears once; no WHERE-side filter.
         assert cypher.count("coalesce(t.is_uninformative, '') <> 'true'") == 1
 
@@ -8978,11 +9005,11 @@ class TestBuildGenesByOntologyF1Surface:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="go_bp", organism="Test Org",
             level=1, min_gene_set_size=5, max_gene_set_size=500,
             informative_only=True,
-        )
+        ))
         # Now we expect ≥2 — once in WHERE filter, once in RETURN coalesce.
         assert cypher.count("coalesce(t.is_uninformative, '') <> 'true'") >= 2
 
@@ -10883,7 +10910,7 @@ class TestMatchStageRelBinding:
         cypher, _ = _genes_by_ontology_match_stage(
             ontology="subcellular_localization",
             level=None, term_ids=["psortb_OuterMembrane"],
-            organism="MED4",
+            organisms="MED4",
         )
         assert "[r:Gene_has_subcellular_localization]" in cypher
 
@@ -10893,7 +10920,7 @@ class TestMatchStageRelBinding:
         cypher, _ = _genes_by_ontology_match_stage(
             ontology="tcdb",
             level=None, term_ids=["tcdb:1.A.1"],
-            organism="MED4",
+            organisms="MED4",
         )
         assert "[r:Gene_has_tcdb_family]" in cypher
 
@@ -10903,7 +10930,7 @@ class TestMatchStageRelBinding:
         cypher, _ = _genes_by_ontology_match_stage(
             ontology="signal_peptide_type",
             level=0, term_ids=None,
-            organism="MED4",
+            organisms="MED4",
         )
         assert "[r:Gene_has_signal_peptide_type]" in cypher
 
@@ -10914,7 +10941,7 @@ class TestMatchStageRelBinding:
         cypher, _ = _genes_by_ontology_match_stage(
             ontology="tcdb",
             level=None, term_ids=["tcdb:1.A.1"],
-            organism="MED4",
+            organisms="MED4",
         )
         assert "collect(DISTINCT g) AS term_genes" in cypher
         # Guard the broken {g, r} shape doesn't return
@@ -10951,12 +10978,12 @@ class TestGenesByOntologyDetailEdgeProps:
 
     def test_subcellular_localization_emits_localization_score_in_verbose(self):
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="subcellular_localization",
             organism="MED4",
             term_ids=["psortb_OuterMembrane"],
             verbose=True,
-        )
+        ))
         assert "r.score AS localization_score" in cypher
         # No foreign-ontology padding
         assert "null AS signal_peptide_probability" not in cypher
@@ -10964,21 +10991,21 @@ class TestGenesByOntologyDetailEdgeProps:
 
     def test_subcellular_localization_compact_omits_localization_score(self):
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="subcellular_localization",
             organism="MED4",
             term_ids=["psortb_OuterMembrane"],
-        )
+        ))
         assert "AS localization_score" not in cypher
 
     def test_signal_peptide_type_emits_three_signalp_cols_in_verbose(self):
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="signal_peptide_type",
             organism="MED4",
             term_ids=["signalp_LIPO"],
             verbose=True,
-        )
+        ))
         assert "r.probability AS signal_peptide_probability" in cypher
         assert "r.cleavage_site AS signal_peptide_cleavage_site" in cypher
         assert "r.cleavage_probability AS signal_peptide_cleavage_probability" in cypher
@@ -10986,23 +11013,23 @@ class TestGenesByOntologyDetailEdgeProps:
 
     def test_signal_peptide_type_compact_omits_signalp_cols(self):
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="signal_peptide_type",
             organism="MED4",
             term_ids=["signalp_LIPO"],
-        )
+        ))
         assert "AS signal_peptide_probability" not in cypher
 
     def test_pfam_emits_no_foreign_columns(self):
         """Non-owner ontology — the four PSORTb / SignalP columns are simply
         not part of a Pfam row."""
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="pfam",
             organism="MED4",
             term_ids=["pfam:PF00001"],
             verbose=True,
-        )
+        ))
         assert "localization_score" not in cypher
         assert "signal_peptide_probability" not in cypher
         assert "signal_peptide_cleavage_site" not in cypher
@@ -11012,39 +11039,41 @@ class TestGenesByOntologyDetailEdgeProps:
         assert "AS evidence_score" in cypher
 
     def test_detail_unwinds_bare_g(self):
-        """Detail builder uses UNWIND term_genes AS g — re-bind r happens
-        via OPTIONAL MATCH only when needed."""
+        """2d.4 C6: the detail query no longer collects / unwinds a per-term
+        gene list (quadratic memory) — it reads `WITH DISTINCT t, g` filtered
+        to the page's buckets. Re-bind r still happens per (g, t)."""
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="tcdb",
             organism="MED4",
             term_ids=["tcdb:1.A.1"],
-        )
-        assert "UNWIND term_genes AS g" in cypher
-        assert "UNWIND term_genes AS pair" not in cypher
+        ))
+        assert "UNWIND term_genes" not in cypher
+        assert "collect(DISTINCT g)" not in cypher
+        assert "WITH DISTINCT t, g" in cypher
 
     def test_detail_owner_ontology_optional_match_rebinds_r(self):
         """PSORTb is flat — the detail builder re-binds `r` for the (g, t)
         pair with a direct OPTIONAL MATCH (no hierarchy, so no best-edge
         list comprehension)."""
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="subcellular_localization",
             organism="MED4",
             term_ids=["psortb_OuterMembrane"],
             verbose=True,
-        )
+        ))
         assert "OPTIONAL MATCH (g)-[r:Gene_has_subcellular_localization]->(t)" in cypher
         assert "r.score AS localization_score" in cypher
 
     def test_detail_ontology_with_no_owned_columns_skips_the_rebind(self):
         """PSORTb compact owns no row columns, so `r` is never projected."""
         from multiomics_explorer.kg.queries_lib import build_genes_by_ontology_detail
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="subcellular_localization",
             organism="MED4",
             term_ids=["psortb_OuterMembrane"],
-        )
+        ))
         assert "OPTIONAL MATCH (g)-[r:" not in cypher
         assert "localization_score" not in cypher
 
@@ -11744,7 +11773,7 @@ class TestTrustPredicatePlacement:
         )
         return _genes_by_ontology_match_stage(
             ontology="merops", level=0, term_ids=None,
-            organism="Alteromonas macleodii MIT1002", **kwargs,
+            organisms="Alteromonas macleodii MIT1002", **kwargs,
         )
 
     def test_call_class_predicate_precedes_hierarchy_walk(self):
@@ -11784,7 +11813,7 @@ class TestTrustPredicatePlacement:
         )
         cypher, _ = _genes_by_ontology_match_stage(
             ontology="tcdb", level=None, term_ids=["tcdb:3.A.1"],
-            organism="Prochlorococcus MED4", max_tier=2,
+            organisms="Prochlorococcus MED4", max_tier=2,
         )
         pred = cypher.index("r.tier <= $max_tier")
         collapse = cypher.index("collect(DISTINCT g) AS term_genes")
@@ -11798,10 +11827,13 @@ class TestTrustPredicatePlacement:
     def test_all_three_gbo_builders_thread_trust_filters(self, builder_name):
         import multiomics_explorer.kg.queries_lib as ql
         builder = getattr(ql, builder_name)
-        cypher, params = builder(
+        kw = dict(
             ontology="merops", organism="Alteromonas macleodii MIT1002",
             level=0, call_class=["peptidase"],
         )
+        if builder_name == "build_genes_by_ontology_detail":
+            kw = _detail_kw(**kw)  # 2d.4 C6 bucket-driven signature
+        cypher, params = builder(**kw)
         assert "r.call_class IN $call_class" in cypher
         assert params["call_class"] == ["peptidase"]
 
@@ -11851,10 +11883,10 @@ class TestTrustPredicatePlacement:
             build_genes_by_ontology_detail,
         )
         with pytest.raises(ValueError, match="call_class"):
-            build_genes_by_ontology_detail(
+            build_genes_by_ontology_detail(**_detail_kw(
                 ontology="tcdb", organism="Prochlorococcus MED4",
                 level=1, call_class=["peptidase"],
-            )
+            ))
 
 
 class TestOneEdgePerGeneTermRebind:
@@ -11868,9 +11900,9 @@ class TestOneEdgePerGeneTermRebind:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="merops", organism="Alteromonas macleodii MIT1002", level=0,
-        )
+        ))
         assert "apoc.coll.sortMulti(" in cypher
         assert "'confidence_score'" in cypher
 
@@ -11882,9 +11914,9 @@ class TestOneEdgePerGeneTermRebind:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="go_bp", organism="Prochlorococcus MED4", level=3,
-        )
+        ))
         assert "attachment_id: l2.id" in cypher
         assert "'attachment_level', '^attachment_id', '^sources_key']" in cypher
 
@@ -11892,18 +11924,18 @@ class TestOneEdgePerGeneTermRebind:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="go_bp", organism="Prochlorococcus MED4", level=3,
-        )
+        ))
         assert "apoc.coll.sortMulti(" in cypher
 
     def test_flat_ontology_keeps_the_direct_optional_match(self):
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="cog_category", organism="Prochlorococcus MED4", level=0,
-        )
+        ))
         assert "OPTIONAL MATCH (g)-[r:Gene_in_cog_category]->(t)" in cypher
         assert "apoc.coll.sortMulti(" not in cypher
 
@@ -11912,20 +11944,20 @@ class TestOneEdgePerGeneTermRebind:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="tcdb", organism="Prochlorococcus MED4", level=2,
-        )
+        ))
         assert "WITH DISTINCT t, g" in cypher
 
     def test_psortb_has_no_rebind_and_no_trust_columns_in_compact(self):
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="subcellular_localization",
             organism="Prochlorococcus MED4",
             term_ids=["psortb_OuterMembrane"],
-        )
+        ))
         assert "apoc.coll.sortMulti(" not in cypher
         assert "AS localization_score" not in cypher
 
@@ -11942,9 +11974,9 @@ class TestOntologyRowColumnsInCypher:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="tcdb", organism="Prochlorococcus MED4", level=2,
-        )
+        ))
         for col in ("evidence", "sources", "tier", "tcdb_call", "tcdb_gate"):
             assert f"AS {col}" in cypher, col
         assert "AS evidence_score" not in cypher
@@ -11967,10 +11999,10 @@ class TestOntologyRowColumnsInCypher:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="tcdb", organism="Prochlorococcus MED4", level=2,
             verbose=True,
-        )
+        ))
         for col in ("evidence", "sources", "tier", "tcdb_call", "tcdb_gate",
                     "identity", "qcov", "evalue", "tcdb_scov",
                     "tcdb_best_hit_rank", "tcdb_bitscore",
@@ -11983,28 +12015,28 @@ class TestOntologyRowColumnsInCypher:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="merops", organism="Alteromonas macleodii MIT1002", level=0,
-        )
+        ))
         assert "AS call_class" in cypher
 
     def test_interpro_compact_projects_interpro_type_from_the_term(self):
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="interpro", organism="Prochlorococcus MED4", level=0,
-        )
+        ))
         assert "t.interpro_type AS interpro_type" in cypher
 
     def test_no_foreign_ontology_null_padding(self):
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="tcdb", organism="Prochlorococcus MED4", level=2,
             verbose=True,
-        )
+        ))
         assert "null AS localization_score" not in cypher
         assert "null AS signal_peptide_probability" not in cypher
         assert "null AS call_class" not in cypher
@@ -12087,25 +12119,15 @@ class TestFacetGeneralization:
     # Byte-identical BRITE goldens captured before the facet generalization
     # (2026-08-27, worktree slice3a-annotation-trust). `tree` output must not
     # move when the facet mechanism is introduced.
+    # 2d.4 (C2/C3) regrouped the size collapse and the RETURN per
+    # (organism, term) bucket; the facet-bearing head (MATCH .. WHERE) is
+    # what this golden guards and it stays byte-identical.
     BRITE_PER_TERM_GOLDEN = (
         "MATCH (g:Gene {organism_name: $org})-[r:Gene_has_kegg_ko]->(ko:KeggTerm)"
         "-[:Kegg_term_in_brite_category]->(leaf:BriteCategory)\n"
         "MATCH (leaf)-[:Brite_category_is_a_brite_category*0..]->(t:BriteCategory)\n"
         "WHERE t.level = $level AND t.tree = $tree\n"
         "\n"
-        "WITH t, collect(DISTINCT g) AS term_genes\n"
-        "WHERE size(term_genes) >= $min_gene_set_size\n"
-        "  AND ($max_gene_set_size IS NULL OR size(term_genes) <= $max_gene_set_size)\n"
-        "UNWIND term_genes AS g\n"
-        "WITH t, collect({lt: g.locus_tag, cat: coalesce(g.gene_category, 'Unknown')})"
-        " AS gene_rows\n"
-        "RETURN t.id AS term_id, t.name AS term_name, t.level AS level,\n"
-        "       t.tree AS tree, t.tree_code AS tree_code,\n"
-        "       t.level_is_best_effort IS NOT NULL AS best_effort,\n"
-        "       size(gene_rows) AS n_genes,\n"
-        "       apoc.coll.frequencies([r IN gene_rows | r.cat]) AS cat_freqs,\n"
-        "       coalesce(t.is_uninformative, '') <> 'true' AS is_informative\n"
-        "ORDER BY t.id"
     )
 
     def test_brite_per_term_cypher_is_byte_identical(self):
@@ -12115,7 +12137,10 @@ class TestFacetGeneralization:
         cypher, params = build_genes_by_ontology_per_term(
             ontology="brite", organism="MED4", level=1, tree="transporters",
         )
-        assert cypher == self.BRITE_PER_TERM_GOLDEN
+        assert cypher.startswith(self.BRITE_PER_TERM_GOLDEN), cypher
+        assert ("WITH t, g.organism_name AS org, collect(DISTINCT g) AS term_genes"
+                in cypher)
+        assert "ORDER BY organism_name, term_id" in cypher
         assert params["tree"] == "transporters"
 
     def test_brite_landscape_still_filters_on_tree(self):
@@ -12131,18 +12156,18 @@ class TestFacetGeneralization:
             build_genes_by_ontology_detail,
         )
         with pytest.raises(ValueError, match="tree"):
-            build_genes_by_ontology_detail(
+            build_genes_by_ontology_detail(**_detail_kw(
                 ontology="kegg", organism="MED4", level=1, tree="transporters",
-            )
+            ))
 
     def test_interpro_type_binds_on_the_term(self):
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, params = build_genes_by_ontology_detail(
+        cypher, params = build_genes_by_ontology_detail(**_detail_kw(
             ontology="interpro", organism="Prochlorococcus MED4", level=0,
             interpro_type="HOMOLOGOUS_SUPERFAMILY",
-        )
+        ))
         assert "t.interpro_type = $interpro_type" in cypher
         assert params["interpro_type"] == "HOMOLOGOUS_SUPERFAMILY"
 
@@ -12152,7 +12177,7 @@ class TestFacetGeneralization:
         )
         cypher, _ = _genes_by_ontology_match_stage(
             ontology="interpro", level=0, term_ids=None,
-            organism="Prochlorococcus MED4", interpro_type="FAMILY",
+            organisms="Prochlorococcus MED4", interpro_type="FAMILY",
         )
         walk = cypher.index("Interpro_entry_is_a_interpro_entry")
         facet = cypher.index("t.interpro_type = $interpro_type")
@@ -12163,10 +12188,10 @@ class TestFacetGeneralization:
             build_genes_by_ontology_detail,
         )
         with pytest.raises(ValueError, match="interpro_type"):
-            build_genes_by_ontology_detail(
+            build_genes_by_ontology_detail(**_detail_kw(
                 ontology="tcdb", organism="MED4", level=1,
                 interpro_type="FAMILY",
-            )
+            ))
 
     def test_interpro_type_applies_in_term_ids_mode(self):
         """Mode 1 (walk DOWN) must honour the facet too — enrichment forces
@@ -12174,10 +12199,10 @@ class TestFacetGeneralization:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, params = build_genes_by_ontology_detail(
+        cypher, params = build_genes_by_ontology_detail(**_detail_kw(
             ontology="interpro", organism="Prochlorococcus MED4",
             term_ids=["interpro:IPR027417"], interpro_type="DOMAIN",
-        )
+        ))
         assert "t.interpro_type = $interpro_type" in cypher
         assert params["interpro_type"] == "DOMAIN"
 
@@ -12188,7 +12213,7 @@ class TestFacetGeneralization:
         cypher, _ = _genes_by_ontology_match_stage(
             ontology="interpro", level=None,
             term_ids=["interpro:IPR027417"],
-            organism="Prochlorococcus MED4", interpro_type="FAMILY",
+            organisms="Prochlorococcus MED4", interpro_type="FAMILY",
         )
         facet = cypher.index("t.interpro_type = $interpro_type")
         walk = cypher.index("Interpro_entry_is_a_interpro_entry")
@@ -12209,10 +12234,10 @@ class TestFacetGeneralization:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, params = build_genes_by_ontology_detail(
+        cypher, params = build_genes_by_ontology_detail(**_detail_kw(
             ontology="interpro", organism="Prochlorococcus MED4",
             term_ids=["interpro:IPR027417"],
-        )
+        ))
         assert "interpro_type = $" not in cypher
         assert "interpro_type" not in params
 
@@ -12416,11 +12441,12 @@ class TestNewOntologyCypherNames:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, params = build_genes_by_ontology_detail(
+        cypher, params = build_genes_by_ontology_detail(**_detail_kw(
             ontology=ontology, organism="Prochlorococcus MED4", level=0,
-        )
+        ))
         assert ONTOLOGY_CONFIG[ontology]["gene_rel"] in cypher
-        assert params["org"] == "Prochlorococcus MED4"
+        # 2d.4 C6: organism scope = the page's organisms
+        assert params["orgs"] == ["Prochlorococcus MED4"]
 
 
 class TestGeneOverviewMeropsNcbifamColumns:
@@ -13078,9 +13104,14 @@ class TestBuildGenesByOntologyTrustRollups:
         assert "r.tier IS NULL" in cypher
 
     def test_size_filters_are_parameters(self):
-        _, params = self._build(min_gene_set_size=5, max_gene_set_size=500)
-        assert params["min_gene_set_size"] == 5
-        assert params["max_gene_set_size"] == 500
+        """2d.4 C5: on a best-edge-rebind ontology the size bounds act
+        through `$bucket_set` (Query A's surviving buckets), not a re-sized
+        collect."""
+        cypher, params = self._build(
+            min_gene_set_size=5, max_gene_set_size=500,
+            buckets=[{"organism_name": _ORG3B, "term_id": "tcdb:3.A.1"}])
+        assert "$bucket_set" in cypher
+        assert params["bucket_set"] == {f"{_ORG3B}|tcdb:3.A.1": True}
 
     def test_organism_is_a_parameter(self):
         cypher, params = self._build()
@@ -15059,6 +15090,14 @@ _TC_CALL_ORDER = ["diamond_best_hit", "diamond_tier", "eggnog"]
 def _tc_builder(name):
     fn = getattr(_qltc, name, None)
     assert fn is not None, f"queries_lib.{name} is missing (TCDB cleanup)"
+    if name == "build_genes_by_ontology_detail":
+        # 2d.4 C6: bucket-driven signature; adapt the shared _gbo_kw kwargs.
+        import functools
+
+        @functools.wraps(fn)
+        def _detail(**kw):
+            return fn(**_detail_kw(**kw))
+        return _detail
     return fn
 
 
@@ -15266,15 +15305,15 @@ class TestTcdbGateOnOntologyTraversals:
         assert "tcdb_calls" not in cypher
 
     def test_genes_by_ontology_walk_down_mode_is_gated(self):
-        cypher, params = _qltc.build_genes_by_ontology_detail(
-            ontology="tcdb", organism=_TC_ORG, term_ids=["tcdb:3.A.1"])
+        cypher, params = _qltc.build_genes_by_ontology_detail(**_detail_kw(
+            ontology="tcdb", organism=_TC_ORG, term_ids=["tcdb:3.A.1"]))
         _assert_tcdb_gate_pass(cypher, params)
 
     def test_match_stage_gate_precedes_size_collapse(self):
         """Gene sets are gated before collect(DISTINCT g), so TERM2GENE sizes
         equal TcdbFamily.gene_count (spec: 0 mismatches)."""
         cypher, _ = _qltc._genes_by_ontology_match_stage(
-            ontology="tcdb", level=2, term_ids=None, organism=_TC_ORG)
+            ontology="tcdb", level=2, term_ids=None, organisms=_TC_ORG)
         gate = cypher.index("tcdb_gate")
         collapse = cypher.index("collect(DISTINCT g) AS term_genes")
         assert gate < collapse, cypher
@@ -15332,7 +15371,7 @@ class TestTcdbRepresentativeEdge:
             _qltc.ONTOLOGY_CONFIG["merops"]) == "confidence_score"
 
     def test_rollup_rebind_uses_call_precedence(self):
-        cypher, params = _qltc.build_genes_by_ontology_detail(**_gbo_kw())
+        cypher, params = _qltc.build_genes_by_ontology_detail(**_detail_kw(**_gbo_kw()))
         assert "evidence_score" not in cypher
         self._assert_precedence(cypher, params)
 
@@ -15504,7 +15543,7 @@ class TestTcdbCallFilter:
 
     def test_predicate_precedes_hierarchy_walk(self):
         cypher, _ = _qltc._genes_by_ontology_match_stage(
-            ontology="tcdb", level=2, term_ids=None, organism=_TC_ORG,
+            ontology="tcdb", level=2, term_ids=None, organisms=_TC_ORG,
             tcdb_call=["eggnog"])
         pred = cypher.index("r.tcdb_call IN $tcdb_call")
         assert pred < cypher.index("collect(DISTINCT g) AS term_genes")
@@ -15950,8 +15989,10 @@ class TestTcdbCleanupReviewFixes:
         assert len(returns) == (2 if walk else 1)
 
     # --- 2. include_weak_tcdb_hits sizes gated terms on gated genes ---
+    # 2d.4 C6: the detail query no longer sizes (Query A's buckets are
+    # already sized), so only the sizing builders are parametrized here.
     @pytest.mark.parametrize("builder_name", [
-        "build_genes_by_ontology_detail", "build_genes_by_ontology_per_term",
+        "build_genes_by_ontology_per_term",
         "build_genes_by_ontology_per_gene",
     ])
     @pytest.mark.parametrize("kwargs", [
@@ -15973,7 +16014,8 @@ class TestTcdbCleanupReviewFixes:
         assert "size(term_genes) >= $min_gene_set_size" not in cypher
 
     def test_default_sizing_unchanged(self):
-        cypher, _ = _qltc.build_genes_by_ontology_detail(**_gbo_kw())
+        # 2d.4 C6: sizing lives in Query A (per-term), not the detail query.
+        cypher, _ = _qltc.build_genes_by_ontology_per_term(**_gbo_kw())
         assert "gated_genes" not in cypher
         assert "size(term_genes) >= $min_gene_set_size" in cypher
 
@@ -16160,10 +16202,10 @@ class TestGenesByOntologyDetailTcdbDisplayName:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology="tcdb", organism=_DN_ORG, term_ids=[_DN_TCDB_TERM],
             level=None, min_gene_set_size=5, max_gene_set_size=500,
-        )
+        ))
         assert _dn_as(cypher, "t", "term_name"), cypher
         assert "t.name AS term_name" not in cypher
 
@@ -16174,10 +16216,10 @@ class TestGenesByOntologyDetailTcdbDisplayName:
         from multiomics_explorer.kg.queries_lib import (
             build_genes_by_ontology_detail,
         )
-        cypher, _ = build_genes_by_ontology_detail(
+        cypher, _ = build_genes_by_ontology_detail(**_detail_kw(
             ontology=ontology, organism=_DN_ORG, term_ids=[term],
             level=None, min_gene_set_size=5, max_gene_set_size=500,
-        )
+        ))
         assert "display_name" not in cypher
         assert "t.name AS term_name" in cypher
 
@@ -16898,3 +16940,488 @@ class TestBuildGeneDerivedMetricsOrganismColumn:
         )
         assert "$org" not in cypher
         assert "org" not in params
+
+
+# ===========================================================================
+# 2d.4 — genes_by_ontology across organisms + bucket paging (Stage 1 RED).
+# Spec: docs/tool-specs/2d4-genes-by-ontology-cross-organism.md (C1-C6).
+#
+# Builder kwarg names (pinned here for the implementers):
+#   * `_genes_by_ontology_match_stage(organisms=...)`: str | list[str] | None
+#     (the spec's C1 name).
+#   * `build_genes_by_ontology_{per_term,per_gene,trust_rollups}(organism=...)`:
+#     same three forms, forwarded to the match stage.
+#   * `build_genes_by_ontology_trust_rollups(buckets=...)`: list of
+#     {organism_name, term_id} (Query A's surviving buckets); turned into the
+#     `$bucket_set` map {"<org>|<term_id>": True} only when size bounds are
+#     active (min_gene_set_size > 1 or max_gene_set_size is not None).
+#   * `build_genes_by_ontology_detail(buckets=..., level=..., offset=,
+#     limit=, ...)`: no `organism`, `term_ids` or size bounds; the page's
+#     distinct organisms -> `$orgs`, distinct term_ids -> `$term_ids`,
+#     "<org>|<term_id>" keys -> `$bucket_keys`.
+# ===========================================================================
+
+from multiomics_explorer.kg import queries_lib as _ql2d4
+
+_2D4_MED4 = "Prochlorococcus MED4"
+_2D4_EZ55 = "Alteromonas macleodii EZ55"
+_2D4_ORGS = [_2D4_MED4, _2D4_EZ55]
+
+_2D4_REBIND = [
+    o for o in ONTOLOGY_CONFIG
+    if _ql2d4._uses_best_edge_rebind(o, False, force_trust_axes=True)
+]
+_2D4_FLAT = [o for o in ONTOLOGY_CONFIG if o not in _2D4_REBIND]
+_2D4_FACET = {"brite": {"tree": "transporters"},
+              "interpro": {"interpro_type": "FAMILY"}}
+
+# (case id, match-stage kwargs) covering every head branch: hierarchical
+# walk-down (term_ids), walk-up (level), Mode 3, pfam dual-label walk-down,
+# pfam walk-up, BRITE bridge, flat level, flat term_ids, TCDB gated, TCDB
+# weak sizing, trust-filtered, informative_only, InterPro facet.
+_2D4_BRANCHES = [
+    ("go_bp_term_ids", dict(ontology="go_bp", level=None,
+                            term_ids=["go:0006260"])),
+    ("go_bp_level", dict(ontology="go_bp", level=3, term_ids=None)),
+    ("kegg_mode3", dict(ontology="kegg", level=2,
+                        term_ids=["kegg.pathway:ko00195"])),
+    ("pfam_term_ids", dict(ontology="pfam", level=None,
+                           term_ids=["pfam:PF00005"])),
+    ("pfam_level", dict(ontology="pfam", level=0, term_ids=None)),
+    ("brite_level", dict(ontology="brite", level=1, term_ids=None,
+                         tree="transporters")),
+    ("cog_level", dict(ontology="cog_category", level=0, term_ids=None)),
+    ("psortb_term_ids", dict(ontology="subcellular_localization", level=None,
+                             term_ids=["psortb_OuterMembrane"])),
+    ("tcdb_level", dict(ontology="tcdb", level=1, term_ids=None)),
+    ("tcdb_weak", dict(ontology="tcdb", level=1, term_ids=None,
+                       include_weak_tcdb_hits=True)),
+    ("tcdb_weak_informative", dict(ontology="tcdb", level=1, term_ids=None,
+                                   include_weak_tcdb_hits=True,
+                                   informative_only=True)),
+    ("go_bp_evidence", dict(ontology="go_bp", level=1, term_ids=None,
+                            evidence=["curated"])),
+    ("interpro_term_ids", dict(ontology="interpro", level=None,
+                               term_ids=["interpro:IPR063966"],
+                               interpro_type="FAMILY")),
+]
+_2D4_BRANCH_IDS = [c[0] for c in _2D4_BRANCHES]
+_2D4_BRANCH_KW = [c[1] for c in _2D4_BRANCHES]
+
+_2D4_GROUPING = (
+    "WITH t, g.organism_name AS org, collect(DISTINCT g) AS term_genes")
+
+
+def _2d4_stage(kw, organisms):
+    return _ql2d4._genes_by_ontology_match_stage(organisms=organisms, **kw)
+
+
+class TestGbo2d4OrganismScopeC1:
+    """C1: str unchanged; list -> `(g:Gene)` + `g.organism_name IN $orgs` in
+    the gene->leaf WHERE; None -> `(g:Gene)`, no predicate."""
+
+    @pytest.mark.parametrize("kw", _2D4_BRANCH_KW, ids=_2D4_BRANCH_IDS)
+    def test_str_scope_is_the_single_organism_property_map(self, kw):
+        cypher, params = _2d4_stage(kw, _2D4_MED4)
+        assert "(g:Gene {organism_name: $org})" in cypher
+        assert params["org"] == _2D4_MED4
+        assert "orgs" not in params
+        assert "$orgs" not in cypher
+
+    @pytest.mark.parametrize("kw", _2D4_BRANCH_KW, ids=_2D4_BRANCH_IDS)
+    def test_list_scope_uses_in_orgs(self, kw):
+        cypher, params = _2d4_stage(kw, list(_2D4_ORGS))
+        assert "{organism_name: $org}" not in cypher
+        assert not re.search(r"\$org\b", cypher), cypher
+        assert "(g:Gene)" in cypher
+        assert "g.organism_name IN $orgs" in cypher
+        assert params["orgs"] == _2D4_ORGS
+        assert "org" not in params
+
+    @pytest.mark.parametrize("kw", _2D4_BRANCH_KW, ids=_2D4_BRANCH_IDS)
+    def test_list_predicate_binds_after_gene_match_before_collapse(self, kw):
+        cypher, _ = _2d4_stage(kw, list(_2D4_ORGS))
+        pred = cypher.index("g.organism_name IN $orgs")
+        assert cypher.index("(g:Gene") < pred, cypher
+        assert pred < cypher.index("collect(DISTINCT g)"), cypher
+
+    @pytest.mark.parametrize("ontology,walk_rel", [
+        ("go_bp", "Biological_process_is_a_biological_process"),
+        ("tcdb", "Tcdb_family_is_a_tcdb_family"),
+        ("merops", "Merops_family_is_a_merops_family"),
+    ])
+    def test_list_predicate_rides_the_gene_leaf_where_in_level_mode(
+            self, ontology, walk_rel):
+        """Spec C1: and-joined into the gene->leaf WHERE that carries the
+        trust / gate predicates — ahead of the hierarchy walk."""
+        cypher, _ = _2d4_stage(
+            dict(ontology=ontology, level=0, term_ids=None), list(_2D4_ORGS))
+        assert cypher.index("g.organism_name IN $orgs") < cypher.index(walk_rel)
+
+    def test_list_predicate_and_joined_with_the_tcdb_gate(self):
+        cypher, _ = _2d4_stage(
+            dict(ontology="tcdb", level=1, term_ids=None), list(_2D4_ORGS))
+        gate = cypher.index("tcdb_gate")
+        pred = cypher.index("g.organism_name IN $orgs")
+        # one WHERE carries both (no second WHERE opened between them)
+        lo, hi = sorted((gate, pred))
+        assert "WHERE" not in cypher[lo:hi], cypher
+
+    def test_list_predicate_and_joined_with_trust_filters(self):
+        cypher, params = _2d4_stage(
+            dict(ontology="go_bp", level=1, term_ids=None,
+                 evidence=["curated"]), list(_2D4_ORGS))
+        ev = cypher.index("r.evidence IN $evidence")
+        pred = cypher.index("g.organism_name IN $orgs")
+        lo, hi = sorted((ev, pred))
+        assert "WHERE" not in cypher[lo:hi], cypher
+        assert params["evidence"] == ["curated"]
+
+    @pytest.mark.parametrize("kw", _2D4_BRANCH_KW, ids=_2D4_BRANCH_IDS)
+    def test_none_scope_has_no_organism_predicate(self, kw):
+        cypher, params = _2d4_stage(kw, None)
+        assert "(g:Gene)" in cypher
+        assert "{organism_name:" not in cypher
+        assert "g.organism_name IN" not in cypher
+        assert "org" not in params and "orgs" not in params
+
+    def test_str_scope_head_is_byte_identical_to_pre_2d4(self):
+        """The single-string head (everything before the size collapse) is
+        unchanged."""
+        cypher, _ = _2d4_stage(
+            dict(ontology="go_bp", level=3, term_ids=None), _2D4_MED4)
+        assert cypher.startswith(
+            "MATCH (g:Gene {organism_name: $org})"
+            "-[r:Gene_involved_in_biological_process]->(leaf:BiologicalProcess)\n"
+            "MATCH (leaf)-[:Biological_process_is_a_biological_process"
+            "|Biological_process_part_of_biological_process*0..]"
+            "->(t:BiologicalProcess)\n"
+            "WHERE t.level = $level\n"
+        ), cypher
+
+    @pytest.mark.parametrize("builder", [
+        "build_genes_by_ontology_per_term",
+        "build_genes_by_ontology_per_gene",
+        "build_genes_by_ontology_trust_rollups",
+    ])
+    @pytest.mark.parametrize("organism,expect", [
+        (_2D4_MED4, "str"), (list(_2D4_ORGS), "list"), (None, "none"),
+    ], ids=["str", "list", "none"])
+    def test_public_builders_forward_the_scope(self, builder, organism, expect):
+        fn = getattr(_ql2d4, builder)
+        cypher, params = fn(ontology="go_bp", organism=organism, level=1,
+                            min_gene_set_size=1, max_gene_set_size=None)
+        if expect == "str":
+            assert "(g:Gene {organism_name: $org})" in cypher
+            assert params["org"] == _2D4_MED4
+        elif expect == "list":
+            assert "g.organism_name IN $orgs" in cypher
+            assert params["orgs"] == _2D4_ORGS
+            assert "{organism_name: $org}" not in cypher
+        else:
+            assert "{organism_name: $org}" not in cypher
+            assert "$orgs" not in cypher
+            assert "org" not in params and "orgs" not in params
+
+
+class TestGbo2d4BucketGroupingC2:
+    """C2: the size collapse groups per (term, organism) in every branch."""
+
+    @pytest.mark.parametrize("organisms", [_2D4_MED4, list(_2D4_ORGS), None],
+                             ids=["str", "list", "none"])
+    @pytest.mark.parametrize("kw", _2D4_BRANCH_KW, ids=_2D4_BRANCH_IDS)
+    def test_grouping_key_carries_organism(self, kw, organisms):
+        cypher, _ = _2d4_stage(kw, organisms)
+        assert _2D4_GROUPING in cypher, cypher
+        assert "WITH t, collect(DISTINCT g) AS term_genes" not in cypher
+
+    @pytest.mark.parametrize("organisms", [_2D4_MED4, list(_2D4_ORGS), None],
+                             ids=["str", "list", "none"])
+    def test_tcdb_weak_sizing_carries_org_through_its_withs(self, organisms):
+        cypher, _ = _2d4_stage(
+            dict(ontology="tcdb", level=1, term_ids=None,
+                 include_weak_tcdb_hits=True), organisms)
+        assert _2D4_GROUPING in cypher
+        assert "gated_genes" in cypher
+        assert "WITH t, org, term_genes, CASE" in cypher
+        assert cypher.rstrip().endswith("WITH t, org, term_genes"), cypher
+        assert not re.search(r"WITH t, term_genes\b", cypher), cypher
+
+    def test_size_bounds_still_parameters_of_the_bucket_collapse(self):
+        cypher, _ = _2d4_stage(
+            dict(ontology="go_bp", level=3, term_ids=None), list(_2D4_ORGS))
+        assert "size(term_genes) >= $min_gene_set_size" in cypher
+        assert cypher.index(_2D4_GROUPING) < cypher.index("$min_gene_set_size")
+
+
+class TestGbo2d4PerTermBucketsC3:
+    """C3: Query A returns one row per (organism, term) bucket."""
+
+    _KEYS = ("organism_name", "term_id", "term_name", "level", "tree",
+             "tree_code", "best_effort", "n_genes", "cat_freqs",
+             "is_informative")
+
+    @pytest.mark.parametrize("organism", [_2D4_MED4, list(_2D4_ORGS), None],
+                             ids=["str", "list", "none"])
+    @pytest.mark.parametrize("kw", [
+        dict(ontology="go_bp", level=3),
+        dict(ontology="kegg", term_ids=["kegg.pathway:ko00195"]),
+        dict(ontology="cog_category", level=0),
+        dict(ontology="tcdb", level=1, include_weak_tcdb_hits=True),
+    ], ids=["go_level", "kegg_term", "cog_flat", "tcdb_weak"])
+    def test_returns_bucket_keys_and_orders_by_bucket(self, kw, organism):
+        cypher, _ = _ql2d4.build_genes_by_ontology_per_term(
+            organism=organism, **kw)
+        ret = cypher[cypher.index("RETURN"):]
+        for key in self._KEYS:
+            assert f"AS {key}" in ret, key
+        # organism_name leads the row
+        assert ret.index("AS organism_name") < ret.index("AS term_id")
+        assert "ORDER BY organism_name, term_id" in cypher
+        assert "ORDER BY t.id" not in cypher
+
+    def test_gene_rows_are_collected_per_bucket(self):
+        cypher, _ = _ql2d4.build_genes_by_ontology_per_term(
+            ontology="go_bp", organism=list(_2D4_ORGS), level=3)
+        tail = cypher[cypher.index("UNWIND term_genes AS g"):]
+        assert re.search(r"WITH t, org, collect\(\{lt:", tail), tail
+
+    def test_no_pagination(self):
+        cypher, _ = _ql2d4.build_genes_by_ontology_per_term(
+            ontology="go_bp", organism=None, level=3)
+        assert "LIMIT" not in cypher and "SKIP" not in cypher
+
+
+class TestGbo2d4PerGeneOrganismC4:
+    """C4: Query B carries the gene's organism (feeds by_organism.gene_count)."""
+
+    @pytest.mark.parametrize("organism", [_2D4_MED4, list(_2D4_ORGS), None],
+                             ids=["str", "list", "none"])
+    def test_returns_organism_name(self, organism):
+        cypher, _ = _ql2d4.build_genes_by_ontology_per_gene(
+            ontology="go_bp", organism=organism, level=3)
+        ret = cypher[cypher.index("RETURN"):]
+        assert "g.organism_name AS organism_name" in ret
+        for key in ("locus_tag", "gene_category", "n_terms", "levels_hit"):
+            assert f"AS {key}" in ret, key
+
+
+class TestGbo2d4TrustRollupsC5:
+    """C5: rollups read the head's own (g, r, leaf) edges — no re-walk
+    pattern comprehension, no gene-list collect; `$bucket_set` only when
+    size bounds are active."""
+
+    _BUCKETS = [{"organism_name": _2D4_MED4, "term_id": "go:0006260"},
+                {"organism_name": _2D4_EZ55, "term_id": "go:0006260"}]
+
+    def _build(self, ontology, *, bounds=True, organism=None, **kw):
+        kw = {**_2D4_FACET.get(ontology, {}), **kw}
+        if "term_ids" not in kw:
+            kw.setdefault("level", 1)
+        if bounds:
+            kw.update(min_gene_set_size=5, max_gene_set_size=500,
+                      buckets=self._BUCKETS)
+        else:
+            kw.update(min_gene_set_size=1, max_gene_set_size=None)
+        return _ql2d4.build_genes_by_ontology_trust_rollups(
+            ontology=ontology, organism=organism, **kw)
+
+    @pytest.mark.parametrize("bounds", [True, False], ids=["bounds", "nobounds"])
+    @pytest.mark.parametrize("ontology", _2D4_REBIND)
+    def test_no_rewalk_pattern_comprehension(self, ontology, bounds):
+        cypher, _ = self._build(ontology, bounds=bounds)
+        assert "[(g)-[r2" not in cypher, cypher
+        assert "r2." not in cypher
+        assert "l2." not in cypher
+
+    @pytest.mark.parametrize("ontology", _2D4_REBIND)
+    def test_no_gene_list_collect(self, ontology):
+        cypher, _ = self._build(ontology)
+        assert "collect(DISTINCT g)" not in cypher
+        assert "UNWIND term_genes" not in cypher
+
+    @pytest.mark.parametrize("ontology", _2D4_REBIND)
+    def test_edges_come_from_the_head_binding(self, ontology):
+        cypher, _ = self._build(ontology)
+        assert "WITH DISTINCT t, g, r, leaf" in cypher
+        assert "attachment_level: leaf.level" in cypher
+        assert "attachment_id: leaf.id" in cypher
+        assert "apoc.coll.sortMulti(edges" in cypher
+
+    def test_rank_keys_unchanged(self):
+        cypher, _ = self._build("go_bp")
+        assert ("'evidence_score', 'attachment_level', '^attachment_id', "
+                "'^sources_key']") in cypher
+
+    @pytest.mark.parametrize("ontology", _2D4_REBIND)
+    def test_bucket_set_when_bounds_active(self, ontology):
+        cypher, params = self._build(ontology, bounds=True)
+        assert "$bucket_set[g.organism_name + '|' + t.id]" in cypher
+        assert params["bucket_set"] == {
+            f"{_2D4_MED4}|go:0006260": True,
+            f"{_2D4_EZ55}|go:0006260": True,
+        }
+        # sizing is the bucket set's job — no re-sized collect
+        assert "$min_gene_set_size" not in cypher
+        assert "$max_gene_set_size" not in cypher
+
+    @pytest.mark.parametrize("ontology", _2D4_REBIND)
+    def test_no_bucket_set_when_bounds_off(self, ontology):
+        cypher, params = self._build(ontology, bounds=False)
+        assert "$bucket_set" not in cypher
+        assert "bucket_set" not in params
+
+    def test_bucket_filter_precedes_the_edge_collect(self):
+        cypher, _ = self._build("go_bp")
+        assert cypher.index("$bucket_set") < cypher.index("AS edges")
+
+    @pytest.mark.parametrize("organism,needle", [
+        (_2D4_MED4, "(g:Gene {organism_name: $org})"),
+        (list(_2D4_ORGS), "g.organism_name IN $orgs"),
+    ], ids=["str", "list"])
+    def test_organism_scope_threads(self, organism, needle):
+        cypher, _ = self._build("go_bp", organism=organism)
+        assert needle in cypher
+
+    def test_aggregation_tail_unchanged(self):
+        cypher, _ = self._build("tcdb")
+        for key in ("total_rows", "by_evidence", "by_tier", "by_sources",
+                    "by_call_class", "by_tcdb_call"):
+            assert key in cypher
+        assert "AS locus_tag" not in cypher and "LIMIT" not in cypher
+
+    def test_trust_filter_binds_on_the_head_edge(self):
+        cypher, params = self._build("tcdb", sources=["eggnog"], max_tier=2)
+        assert "$sources" in cypher and params["sources"] == ["eggnog"]
+        assert "r.tier IS NULL" in cypher
+
+    @pytest.mark.parametrize("ontology", _2D4_FLAT)
+    def test_flat_ontologies_keep_the_direct_optional_match(self, ontology):
+        cypher, _ = self._build(ontology, level=0)
+        assert "$bucket_set" not in cypher
+        assert _2D4_GROUPING in cypher
+        if _ql2d4.ontology_row_columns(ontology, False, force_trust_axes=True):
+            gene_rel = ONTOLOGY_CONFIG[ontology]["gene_rel"]
+            assert f"OPTIONAL MATCH (g)-[r:{gene_rel}]->(t)" in cypher
+
+
+class TestGbo2d4DetailC6:
+    """C6: Query D is driven by the page's buckets."""
+
+    _PAGE = [
+        {"organism_name": _2D4_EZ55, "term_id": "go:0006260"},
+        {"organism_name": _2D4_MED4, "term_id": "go:0006260"},
+        {"organism_name": _2D4_MED4, "term_id": "go:0006412"},
+    ]
+
+    def _build(self, **kw):
+        kw.setdefault("ontology", "go_bp")
+        kw.setdefault("buckets", self._PAGE)
+        kw.setdefault("level", 3)
+        return _ql2d4.build_genes_by_ontology_detail(**kw)
+
+    def test_signature_has_buckets_and_no_size_bounds_or_organism(self):
+        import inspect
+        params = inspect.signature(
+            _ql2d4.build_genes_by_ontology_detail).parameters
+        assert "buckets" in params
+        for gone in ("organism", "term_ids", "min_gene_set_size",
+                     "max_gene_set_size"):
+            assert gone not in params, gone
+        for kept in ("offset", "limit", "level", "verbose"):
+            assert kept in params, kept
+
+    @pytest.mark.parametrize("level", [3, None], ids=["level", "term_ids"])
+    def test_no_gene_list_collect(self, level):
+        cypher, _ = self._build(level=level)
+        assert "collect(DISTINCT g)" not in cypher
+        assert "UNWIND term_genes" not in cypher
+        assert "AS term_genes" not in cypher
+
+    @pytest.mark.parametrize("level", [3, None], ids=["level", "term_ids"])
+    def test_bucket_keys_filter(self, level):
+        cypher, params = self._build(level=level)
+        assert "WITH DISTINCT t, g" in cypher
+        assert "g.organism_name + '|' + t.id IN $bucket_keys" in cypher
+        assert sorted(params["bucket_keys"]) == sorted(
+            f"{b['organism_name']}|{b['term_id']}" for b in self._PAGE)
+
+    def test_page_organisms_and_terms_scope_the_head(self):
+        cypher, params = self._build()
+        assert sorted(params["orgs"]) == sorted(_2D4_ORGS)
+        assert len(params["orgs"]) == len(set(params["orgs"]))
+        assert sorted(params["term_ids"]) == ["go:0006260", "go:0006412"]
+        assert len(params["term_ids"]) == len(set(params["term_ids"]))
+        assert "g.organism_name IN $orgs" in cypher
+        assert "{organism_name: $org}" not in cypher
+        assert "org" not in params
+
+    def test_level_only_mode_runs_as_mode3_for_the_page(self):
+        cypher, params = self._build(level=3)
+        assert "t.level = $level AND t.id IN $term_ids" in cypher
+        assert params["level"] == 3
+
+    def test_term_ids_mode_walks_down_from_the_page_terms(self):
+        cypher, params = self._build(level=None)
+        assert "UNWIND $term_ids AS input_tid" in cypher
+        assert sorted(params["term_ids"]) == ["go:0006260", "go:0006412"]
+
+    def test_no_size_bounds(self):
+        cypher, params = self._build()
+        assert "$min_gene_set_size" not in cypher
+        assert "$max_gene_set_size" not in cypher
+        assert "min_gene_set_size" not in params
+        assert "max_gene_set_size" not in params
+
+    def test_orders_by_organism_term_locus(self):
+        cypher, _ = self._build()
+        assert "ORDER BY organism_name, term_id, locus_tag" in cypher
+        assert "ORDER BY t.id" not in cypher
+
+    def test_returns_organism_name_after_locus_tag(self):
+        cypher, _ = self._build()
+        ret = cypher[cypher.index("RETURN"):]
+        assert "g.organism_name AS organism_name" in ret
+        assert (ret.index("AS locus_tag") < ret.index("AS organism_name")
+                < ret.index("AS term_id"))
+
+    def test_inner_offset_and_limit(self):
+        cypher, params = self._build(offset=7, limit=100)
+        assert "SKIP $offset" in cypher and params["offset"] == 7
+        assert "LIMIT $limit" in cypher and params["limit"] == 100
+        assert cypher.index("ORDER BY") < cypher.index("SKIP $offset")
+
+    def test_no_limit_means_no_limit_clause(self):
+        cypher, params = self._build(limit=None)
+        assert "LIMIT" not in cypher and "limit" not in params
+
+    def test_best_edge_rebind_kept(self):
+        """The detail rows keep today's one-edge-per-(gene, term) rebind."""
+        cypher, _ = self._build()
+        assert "apoc.coll.sortMulti(" in cypher
+        assert "attachment_id: l2.id" in cypher
+
+    def test_flat_ontology_page(self):
+        cypher, params = self._build(
+            ontology="cog_category", level=0,
+            buckets=[{"organism_name": _2D4_MED4, "term_id": "cog.category:J"}])
+        assert ("(g:Gene)-[r:Gene_in_cog_category]->(t:CogFunctionalCategory)"
+                in cypher)
+        assert params["bucket_keys"] == [f"{_2D4_MED4}|cog.category:J"]
+
+    def test_tcdb_weak_page_keeps_the_weak_branch(self):
+        page = [{"organism_name": _2D4_MED4, "term_id": "tcdb:3"}]
+        default, _ = self._build(ontology="tcdb", level=1, buckets=page)
+        weak, _ = self._build(ontology="tcdb", level=1, buckets=page,
+                              include_weak_tcdb_hits=True)
+        assert weak != default
+        assert "below_gate" not in default
+
+    def test_trust_filters_still_thread(self):
+        cypher, params = self._build(evidence=["curated"])
+        assert "r.evidence IN $evidence" in cypher
+        assert params["evidence"] == ["curated"]
+
+    def test_empty_page_raises(self):
+        with pytest.raises(ValueError):
+            self._build(buckets=[])

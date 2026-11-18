@@ -300,6 +300,8 @@ class TestGenesByOntologyContract:
             "by_category", "by_level", "top_terms", "n_best_effort_terms",
             "not_found", "wrong_ontology", "wrong_level", "filtered_out",
             "returned", "truncated", "offset", "results",
+            # 2d.4 across organisms
+            "by_organism", "organisms_without_genes", "not_found_organisms",
         ):
             assert key in result, f"Missing envelope key: {key}"
         assert result["total_matching"] >= 1
@@ -315,6 +317,8 @@ class TestGenesByOntologyContract:
         expected_keys = {
             "locus_tag", "gene_name", "product", "gene_category",
             "term_id", "term_name", "level", "is_informative",
+            # 2d.4: compact organism_name on every row
+            "organism_name",
             # Annotation-trust surface (spec section 0 / 6): `evidence` is the
             # one compact trust column. go_bp owns no other row column, so the
             # strip rule keeps interpro_type / call_class off this row.
@@ -345,6 +349,26 @@ class TestGenesByOntologyContract:
         )
         row = result["results"][0]
         assert "function_description" in row
+
+    def test_cross_organism_envelope_shape(self, conn):
+        """2d.4: list scope -> organism_name None, by_organism rows sum to
+        total_matching, top_terms carry organism_count."""
+        result = api.genes_by_ontology(
+            ontology="interpro",
+            organism=["Prochlorococcus MED4", "Prochlorococcus MIT9313"],
+            term_ids=["interpro:IPR063966"], interpro_type="FAMILY",
+            limit=5, conn=conn,
+        )
+        assert result["organism_name"] is None
+        assert result["not_found_organisms"] == []
+        assert result["by_organism"]
+        for b in result["by_organism"]:
+            assert set(b) == {"organism_name", "gene_count", "term_count",
+                              "row_count"}
+        assert (sum(b["row_count"] for b in result["by_organism"])
+                == result["total_matching"])
+        assert all("organism_count" in t for t in result["top_terms"])
+        assert all("organism_name" in r for r in result["results"])
 
 
 # ---------------------------------------------------------------------------

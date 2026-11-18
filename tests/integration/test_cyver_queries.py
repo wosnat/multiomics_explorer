@@ -442,6 +442,35 @@ _BUILDERS: list[tuple[str, ...]] = [
      {"elements": ["N"], "search_text": "amino"}),
 ]
 
+# 2d.4 genes_by_ontology across organisms: list / None organism scope (C1),
+# per-(organism, term) buckets (C2/C3), C5 carried-edge rollups with the
+# `$bucket_set` filter.
+from multiomics_explorer.kg.queries_lib import (  # noqa: E402
+    build_genes_by_ontology_trust_rollups as _gbo_rollups_2d4,
+)
+_2D4_ORGS = ["Prochlorococcus MED4", "Prochlorococcus MIT9313"]
+_BUILDERS.extend([
+    ("genes_by_ontology_per_term_org_list", build_genes_by_ontology_per_term,
+     {"ontology": "go_bp", "organism": _2D4_ORGS, "level": 3,
+      "min_gene_set_size": 1, "max_gene_set_size": None}),
+    ("genes_by_ontology_per_term_org_none", build_genes_by_ontology_per_term,
+     {"ontology": "kegg", "organism": None, "level": 1,
+      "min_gene_set_size": 1, "max_gene_set_size": None}),
+    ("genes_by_ontology_per_gene_org_list", build_genes_by_ontology_per_gene,
+     {"ontology": "go_bp", "organism": _2D4_ORGS, "level": 3,
+      "min_gene_set_size": 1, "max_gene_set_size": None}),
+    # bounds off: `_substitute_params` cannot inline the `$bucket_set` map,
+    # so this covers the C5 carried-edge shape without the bucket filter.
+    ("genes_by_ontology_rollups_carried_edges", _gbo_rollups_2d4,
+     {"ontology": "go_bp", "organism": _2D4_ORGS, "level": 3,
+      "min_gene_set_size": 1, "max_gene_set_size": None,
+      "informative_only": True}),
+    ("genes_by_ontology_detail_multi_org_page", build_genes_by_ontology_detail,
+     {"ontology": "go_bp", "level": 3,
+      "buckets": [{"organism_name": o, "term_id": "go:0006260"}
+                  for o in _2D4_ORGS]}),
+])
+
 # Ontology-dependent builders: expand for each ontology key.
 for _ont_key in ONTOLOGY_CONFIG:
     _BUILDERS.extend([
@@ -464,22 +493,22 @@ for _ont_key in ONTOLOGY_CONFIG:
             f"genes_by_ontology_detail_{_ont_key}",
             build_genes_by_ontology_detail,
             {
+                # 2d.4 C6: bucket-driven detail (no organism / size bounds)
                 "ontology": _ont_key,
-                "organism": "Prochlorococcus MED4",
+                "buckets": [{"organism_name": "Prochlorococcus MED4",
+                             "term_id": "test:term"}],
                 "level": 1,
-                "min_gene_set_size": 5,
-                "max_gene_set_size": 500,
             },
         ),
         (
             f"genes_by_ontology_detail_verbose_{_ont_key}",
             build_genes_by_ontology_detail,
             {
+                # 2d.4 C6: bucket-driven detail (no organism / size bounds)
                 "ontology": _ont_key,
-                "organism": "Prochlorococcus MED4",
+                "buckets": [{"organism_name": "Prochlorococcus MED4",
+                             "term_id": "test:term"}],
                 "level": 1,
-                "min_gene_set_size": 5,
-                "max_gene_set_size": 500,
                 "verbose": True,
             },
         ),

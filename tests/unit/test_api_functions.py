@@ -25077,3 +25077,656 @@ def _2d7_resolver_tolerant(responses):
         return queue.pop(0)
 
     return _exec
+
+
+# ===========================================================================
+# 2d.4 — genes_by_ontology across organisms + bucket paging (Stage 1 RED).
+# Spec: docs/tool-specs/2d4-genes-by-ontology-cross-organism.md.
+#
+# Harness: every genes_by_ontology builder is patched in the api namespace
+# and answers with sentinels; the fake connection simulates each query:
+#   * Query A (per-term)  -> bucket rows {organism_name, term_id, n_genes, ..}
+#   * Query B (per-gene)  -> gene rows {locus_tag, organism_name, ..}
+#   * Query D (detail)    -> n_genes synthetic rows per bucket of the page,
+#                            ordered (organism_name, term_id, locus_tag),
+#                            then SKIP offset / LIMIT limit — what the C6
+#                            Cypher returns.
+#   * organism resolution -> build_resolve_organism_for_organism, keyed by
+#                            the input string.
+#   * any other query (the organism universe for organism=None, however
+#     the implementation reads it) -> rows shaped
+#     {organism_name, organisms} over every organism with genes.
+# Expected api -> builder kwargs: per_term / per_gene / trust_rollups take
+# `organism` (str | list[str] | None) and resolved size bounds;
+# trust_rollups also `buckets`; detail takes `buckets` + inner `offset` /
+# `limit` (no organism / term_ids / size bounds).
+# ===========================================================================
+
+import re
+
+_2D4_MED4 = "Prochlorococcus MED4"
+_2D4_MIT9313 = "Prochlorococcus MIT9313"
+_2D4_NATL2A = "Prochlorococcus NATL2A"
+_2D4_EZ55 = "Alteromonas macleodii EZ55"
+_2D4_MIT1002 = "Alteromonas macleodii MIT1002"
+_2D4_ALL = sorted([_2D4_MED4, _2D4_MIT9313, _2D4_NATL2A, _2D4_EZ55,
+                   _2D4_MIT1002])
+_2D4_RESOLVE = {
+    "MED4": [_2D4_MED4],
+    "Prochlorococcus MED4": [_2D4_MED4],
+    "EZ55": [_2D4_EZ55],
+    "Prochlorococcus": [_2D4_MED4, _2D4_MIT9313, _2D4_NATL2A],
+    "Alteromonas": [_2D4_EZ55, _2D4_MIT1002],
+    "nope": [],
+    "nope2": [],
+}
+_2D4_ROW_CAP = 20_000
+
+
+def _2d4_pt(org, term, n, level=1, name=None):
+    return {"organism_name": org, "term_id": term, "term_name": name or term,
+            "level": level, "tree": None, "tree_code": None,
+            "best_effort": False, "n_genes": n,
+            "cat_freqs": [{"item": "Stress", "count": n}],
+            "is_informative": True}
+
+
+def _2d4_pg(org, lt, levels=(1,), n_terms=1, cat="Stress"):
+    return {"locus_tag": lt, "organism_name": org, "gene_category": cat,
+            "n_terms": n_terms, "levels_hit": list(levels)}
+
+
+def _2d4_lt(org, term, k):
+    return f"{org.split()[-1]}_{term}_{k:06d}"
+
+
+def _2d4_scope_set(organism):
+    if organism is None:
+        return None
+    if isinstance(organism, str):
+        return {organism}
+    return set(organism)
+
+
+def _2d4_bucket_pairs(buckets):
+    return [(b["organism_name"], b["term_id"]) for b in buckets]
+
+
+class _Gbo2d4Harness:
+    def __init__(self, per_term=(), per_gene=()):
+        self.per_term = sorted(per_term,
+                               key=lambda r: (r["organism_name"], r["term_id"]))
+        self.per_gene = list(per_gene)
+        self.calls = {"pt": [], "pg": [], "detail": [], "rollup": [],
+                      "resolve": [], "other": []}
+        self._n = {(r["organism_name"], r["term_id"]): r["n_genes"]
+                   for r in self.per_term}
+
+    # --- builders -------------------------------------------------------
+    def _pt_builder(self, **k):
+        self.calls["pt"].append(k)
+        return ("PT", {})
+
+    def _pg_builder(self, **k):
+        self.calls["pg"].append(k)
+        return ("PG", {})
+
+    def _detail_builder(self, **k):
+        self.calls["detail"].append(k)
+        return (f"DETAIL|{len(self.calls['detail']) - 1}", {})
+
+    def _rollup_builder(self, **k):
+        self.calls["rollup"].append(k)
+        return ("ROLLUP", {})
+
+    def _resolve_builder(self, **k):
+        self.calls["resolve"].append(k["organism"])
+        return ("RESOLVE", {"organism": k["organism"]})
+
+    # --- connection -----------------------------------------------------
+    def _detail_rows(self, k):
+        rows = []
+        for b in k["buckets"]:
+            org, term = b["organism_name"], b["term_id"]
+            for i in range(self._n[(org, term)]):
+                rows.append({
+                    "locus_tag": _2d4_lt(org, term, i), "organism_name": org,
+                    "gene_name": None, "product": None,
+                    "gene_category": "Stress", "term_id": term,
+                    "term_name": term, "level": 1, "tree": None,
+                    "tree_code": None, "is_informative": True,
+                    "evidence": "curated", "sources": ["x"],
+                    "evidence_score": None,
+                })
+        rows.sort(key=lambda r: (r["organism_name"], r["term_id"],
+                                 r["locus_tag"]))
+        off = k.get("offset") or 0
+        lim = k.get("limit")
+        return rows[off:] if lim is None else rows[off:off + lim]
+
+    def execute_query(self, cypher, **params):
+        if cypher == "PT":
+            return [dict(r) for r in self.per_term]
+        if cypher == "PG":
+            return [dict(r) for r in self.per_gene]
+        if cypher == "ROLLUP":
+            return []
+        if cypher == "VALIDATE":
+            return []
+        if cypher == "RESOLVE":
+            return [{"organisms": list(_2D4_RESOLVE.get(params["organism"], []))}]
+        if cypher.startswith("DETAIL|"):
+            return self._detail_rows(self.calls["detail"][int(cypher[7:])])
+        self.calls["other"].append(cypher)
+        return [{"organism_name": o, "organisms": list(_2D4_ALL)}
+                for o in _2D4_ALL]
+
+    def run(self, **kw):
+        conn = MagicMock()
+        conn.execute_query.side_effect = self.execute_query
+        ns = "multiomics_explorer.api.functions"
+        with patch(f"{ns}.build_genes_by_ontology_per_term",
+                   side_effect=self._pt_builder), \
+             patch(f"{ns}.build_genes_by_ontology_per_gene",
+                   side_effect=self._pg_builder), \
+             patch(f"{ns}.build_genes_by_ontology_detail",
+                   side_effect=self._detail_builder), \
+             patch(f"{ns}.build_genes_by_ontology_trust_rollups",
+                   side_effect=self._rollup_builder), \
+             patch(f"{ns}.build_genes_by_ontology_validate",
+                   return_value=("VALIDATE", {})), \
+             patch(f"{ns}.build_resolve_organism_for_organism",
+                   side_effect=self._resolve_builder):
+            kw.setdefault("ontology", "go_bp")
+            if "term_ids" not in kw:
+                kw.setdefault("level", 1)
+            return api.genes_by_ontology(conn=conn, **kw)
+
+    # --- helpers ----------------------------------------------------------
+    def main_pt_call(self):
+        """The sized Query A call (diagnostic reruns pass 0 / None)."""
+        assert self.calls["pt"], "Query A never built"
+        return self.calls["pt"][0]
+
+
+def _2d4_three_buckets():
+    """A: (MED4, go:1) 10, (MED4, go:2) 10, (MIT9313, go:1) 10 = 30 rows."""
+    pt = [_2d4_pt(_2D4_MED4, "go:1", 10), _2d4_pt(_2D4_MED4, "go:2", 10),
+          _2d4_pt(_2D4_MIT9313, "go:1", 10)]
+    pg = ([_2d4_pg(_2D4_MED4, f"m{i}") for i in range(10)]
+          + [_2d4_pg(_2D4_MIT9313, f"t{i}") for i in range(10)])
+    return pt, pg
+
+
+class TestGbo2d4Signature:
+
+    def test_organism_is_second_and_defaults_to_none(self):
+        import inspect
+        params = list(inspect.signature(api.genes_by_ontology).parameters.values())
+        assert params[1].name == "organism"
+        assert params[1].default is None
+
+    def test_omitting_organism_is_accepted(self):
+        h = _Gbo2d4Harness([_2d4_pt(_2D4_MED4, "go:1", 2)],
+                           [_2d4_pg(_2D4_MED4, "m1"), _2d4_pg(_2D4_MED4, "m2")])
+        out = h.run(summary=True)
+        assert out["organism_name"] is None
+        assert h.main_pt_call()["organism"] is None
+
+
+class TestGbo2d4BucketPager:
+    """Spec "API paging": Query D gets exactly the buckets overlapping
+    [offset, offset + limit) plus the inner offset into the first one."""
+
+    def test_offset_inside_a_bucket(self):
+        pt, pg = _2d4_three_buckets()
+        h = _Gbo2d4Harness(pt, pg)
+        out = h.run(organism=["Prochlorococcus"], offset=12, limit=5)
+        assert len(h.calls["detail"]) == 1
+        k = h.calls["detail"][0]
+        assert _2d4_bucket_pairs(k["buckets"]) == [(_2D4_MED4, "go:2")]
+        assert (k.get("offset") or 0) == 2
+        assert k["limit"] == 5
+        assert [r["locus_tag"] for r in out["results"]] == [
+            _2d4_lt(_2D4_MED4, "go:2", i) for i in range(2, 7)]
+        assert out["returned"] == 5
+        assert out["offset"] == 12
+        assert out["truncated"] is True
+        assert out["total_matching"] == 30
+
+    def test_page_spanning_many_tiny_buckets(self):
+        pt = [_2d4_pt(_2D4_MED4, f"go:{i:02d}", 1) for i in range(10)]
+        h = _Gbo2d4Harness(pt, [_2d4_pg(_2D4_MED4, "m1", n_terms=10)])
+        out = h.run(organism=["MED4"], offset=3, limit=4)
+        assert len(h.calls["detail"]) == 1
+        k = h.calls["detail"][0]
+        assert _2d4_bucket_pairs(k["buckets"]) == [
+            (_2D4_MED4, f"go:{i:02d}") for i in range(3, 7)]
+        assert (k.get("offset") or 0) == 0
+        assert [r["term_id"] for r in out["results"]] == [
+            f"go:{i:02d}" for i in range(3, 7)]
+
+    def test_page_spanning_two_organisms(self):
+        pt, pg = _2d4_three_buckets()
+        h = _Gbo2d4Harness(pt, pg)
+        out = h.run(organism=["Prochlorococcus"], offset=15, limit=10)
+        k = h.calls["detail"][0]
+        assert _2d4_bucket_pairs(k["buckets"]) == [
+            (_2D4_MED4, "go:2"), (_2D4_MIT9313, "go:1")]
+        assert (k.get("offset") or 0) == 5
+        assert [r["organism_name"] for r in out["results"]] == (
+            [_2D4_MED4] * 5 + [_2D4_MIT9313] * 5)
+
+    @pytest.mark.parametrize("offset,expected", [
+        (0, [(_2D4_MED4, "go:1")]),
+        (10, [(_2D4_MED4, "go:2")]),
+        (20, [(_2D4_MIT9313, "go:1")]),
+    ])
+    def test_exact_bucket_boundary(self, offset, expected):
+        pt, pg = _2d4_three_buckets()
+        h = _Gbo2d4Harness(pt, pg)
+        out = h.run(organism=["Prochlorococcus"], offset=offset, limit=10)
+        k = h.calls["detail"][0]
+        assert _2d4_bucket_pairs(k["buckets"]) == expected
+        assert (k.get("offset") or 0) == 0
+        assert out["returned"] == 10
+
+    @pytest.mark.parametrize("offset", [30, 31, 10_000])
+    def test_offset_past_the_end_runs_no_detail_query(self, offset):
+        pt, pg = _2d4_three_buckets()
+        h = _Gbo2d4Harness(pt, pg)
+        out = h.run(organism=["Prochlorococcus"], offset=offset, limit=10)
+        assert h.calls["detail"] == []
+        assert out["results"] == []
+        assert out["returned"] == 0
+        assert out["truncated"] is False
+        assert out["total_matching"] == 30
+
+    def test_last_partial_page_is_not_truncated(self):
+        pt, pg = _2d4_three_buckets()
+        h = _Gbo2d4Harness(pt, pg)
+        out = h.run(organism=["Prochlorococcus"], offset=25, limit=10)
+        assert out["returned"] == 5
+        assert out["truncated"] is False
+
+    def test_pages_are_disjoint_and_cover_the_match(self):
+        pt, pg = _2d4_three_buckets()
+        seen = []
+        for off in range(0, 30, 7):
+            h = _Gbo2d4Harness(pt, pg)
+            out = h.run(organism=["Prochlorococcus"], offset=off, limit=7)
+            seen.extend((r["organism_name"], r["term_id"], r["locus_tag"])
+                        for r in out["results"])
+        assert len(seen) == 30
+        assert seen == sorted(seen)
+        assert len(set(seen)) == 30
+
+    def test_detail_kwargs_carry_no_organism_or_size_bounds(self):
+        pt, pg = _2d4_three_buckets()
+        h = _Gbo2d4Harness(pt, pg)
+        h.run(organism=["Prochlorococcus"], min_gene_set_size=5,
+              max_gene_set_size=500, limit=5)
+        k = h.calls["detail"][0]
+        for gone in ("organism", "term_ids", "min_gene_set_size",
+                     "max_gene_set_size"):
+            assert gone not in k, gone
+
+    def test_limit_none_chunks_buckets_at_20000_rows(self):
+        sizes = [15_000, 8_000, 30_000, 100, 100]
+        pt = [_2d4_pt(_2D4_MED4, f"go:{i}", n) for i, n in enumerate(sizes)]
+        h = _Gbo2d4Harness(pt, [_2d4_pg(_2D4_MED4, "m1", n_terms=5)])
+        out = h.run(organism=["MED4"], limit=None)
+        calls = h.calls["detail"]
+        assert len(calls) >= 4
+        flat = []
+        for k in calls:
+            assert k.get("limit") is None
+            assert (k.get("offset") or 0) == 0
+            n = sum(h._n[(b["organism_name"], b["term_id"])]
+                    for b in k["buckets"])
+            assert n <= _2D4_ROW_CAP or len(k["buckets"]) == 1, n
+            flat.extend(_2d4_bucket_pairs(k["buckets"]))
+        assert flat == [(_2D4_MED4, f"go:{i}") for i in range(5)]
+        assert out["returned"] == sum(sizes)
+        assert len(out["results"]) == sum(sizes)
+        keys = [(r["organism_name"], r["term_id"], r["locus_tag"])
+                for r in out["results"]]
+        assert keys == sorted(keys)
+        assert out["truncated"] is False
+
+    def test_limit_none_small_match_is_one_detail_call(self):
+        pt, pg = _2d4_three_buckets()
+        h = _Gbo2d4Harness(pt, pg)
+        out = h.run(organism=["Prochlorococcus"], limit=None)
+        assert len(h.calls["detail"]) == 1
+        assert out["returned"] == 30
+
+    def test_summary_runs_no_detail_query(self):
+        pt, pg = _2d4_three_buckets()
+        h = _Gbo2d4Harness(pt, pg)
+        out = h.run(organism=["Prochlorococcus"], summary=True)
+        assert h.calls["detail"] == []
+        assert out["results"] == []
+        assert out["total_matching"] == 30
+
+    def test_rollups_get_the_surviving_buckets_when_bounds_active(self):
+        pt, pg = _2d4_three_buckets()
+        h = _Gbo2d4Harness(pt, pg)
+        h.run(organism=["Prochlorococcus"], min_gene_set_size=5,
+              max_gene_set_size=500, limit=5)
+        assert len(h.calls["rollup"]) == 1
+        k = h.calls["rollup"][0]
+        assert _2d4_bucket_pairs(k["buckets"]) == _2d4_bucket_pairs(pt)
+        assert _2d4_scope_set(k["organism"]) == {
+            _2D4_MED4, _2D4_MIT9313, _2D4_NATL2A}
+
+
+class TestGbo2d4SizeMarkers:
+    """Spec "Size bounds": markers resolve to 5 / 500 for one organism (str)
+    and to no bound (min 1, max None) for a list or None; explicit values
+    always apply, per (term, organism)."""
+
+    def _bounds(self, **kw):
+        h = _Gbo2d4Harness([_2d4_pt(_2D4_MED4, "go:1", 6)],
+                           [_2d4_pg(_2D4_MED4, f"m{i}") for i in range(6)])
+        h.run(summary=True, **kw)
+        k = h.main_pt_call()
+        return k["min_gene_set_size"], k["max_gene_set_size"], h
+
+    def test_str_markers_resolve_to_5_500(self):
+        mn, mx, _ = self._bounds(organism="MED4")
+        assert (mn, mx) == (5, 500)
+
+    @pytest.mark.parametrize("organism", [["MED4"], ["Prochlorococcus"], None],
+                             ids=["list1", "listN", "none"])
+    def test_cross_organism_markers_resolve_to_no_bounds(self, organism):
+        mn, mx, h = self._bounds(organism=organism)
+        assert (mn, mx) == (1, None)
+        # bounds off -> no size-diagnostic reruns of A / B
+        assert len(h.calls["pt"]) == 1
+        assert len(h.calls["pg"]) == 1
+
+    @pytest.mark.parametrize("organism", [["Prochlorococcus"], None],
+                             ids=["list", "none"])
+    def test_explicit_5_500_apply_across_organisms(self, organism):
+        mn, mx, _ = self._bounds(organism=organism, min_gene_set_size=5,
+                                 max_gene_set_size=500)
+        assert (mn, mx) == (5, 500)
+
+    def test_explicit_min_with_max_marker_across_organisms(self):
+        mn, mx, _ = self._bounds(organism=["Prochlorococcus"],
+                                 min_gene_set_size=3)
+        assert (mn, mx) == (3, None)
+
+    def test_explicit_max_none_with_min_marker_across_organisms(self):
+        mn, mx, _ = self._bounds(organism=None, max_gene_set_size=None)
+        assert (mn, mx) == (1, None)
+
+    def test_explicit_max_none_single_organism(self):
+        mn, mx, _ = self._bounds(organism="MED4", max_gene_set_size=None)
+        assert (mn, mx) == (5, None)
+
+    @pytest.mark.parametrize("organism", [["Prochlorococcus"], None],
+                             ids=["list", "none"])
+    def test_resolved_bounds_reach_query_b_and_rollups(self, organism):
+        h = _Gbo2d4Harness([_2d4_pt(_2D4_MED4, "go:1", 6)],
+                           [_2d4_pg(_2D4_MED4, f"m{i}") for i in range(6)])
+        h.run(organism=organism, limit=2)
+        pg = h.calls["pg"][0]
+        assert (pg["min_gene_set_size"], pg["max_gene_set_size"]) == (1, None)
+        for k in h.calls["rollup"]:
+            assert (k["min_gene_set_size"], k["max_gene_set_size"]) == (1, None)
+
+    def test_no_size_warning_across_organisms_with_markers(self):
+        h2 = _Gbo2d4Harness([_2d4_pt(_2D4_MED4, "go:1", 6)],
+                            [_2d4_pg(_2D4_MED4, f"m{i}") for i in range(6)])
+        out = h2.run(organism=["Prochlorococcus"], summary=True)
+        assert out["size_filtered_terms"] == 0
+        assert not any("min_gene_set_size" in w for w in out["warnings"])
+
+
+class TestGbo2d4OrganismResolution:
+
+    def test_str_resolves_through_the_single_organism_gate(self):
+        h = _Gbo2d4Harness([_2d4_pt(_2D4_MED4, "go:1", 6)],
+                           [_2d4_pg(_2D4_MED4, f"m{i}") for i in range(6)])
+        out = h.run(organism="MED4", summary=True)
+        assert h.main_pt_call()["organism"] == _2D4_MED4
+        assert out["organism_name"] == _2D4_MED4
+        assert out["not_found_organisms"] == []
+
+    def test_str_no_match_raises(self):
+        with pytest.raises(ValueError, match="nope"):
+            _Gbo2d4Harness().run(organism="nope", summary=True)
+
+    def test_str_matching_several_raises_and_suggests_a_list(self):
+        with pytest.raises(ValueError) as ei:
+            _Gbo2d4Harness().run(organism="Alteromonas", summary=True)
+        msg = str(ei.value)
+        assert _2D4_EZ55 in msg and _2D4_MIT1002 in msg
+        assert re.search(r"\blist\b", msg), msg
+
+    def test_empty_list_raises(self):
+        with pytest.raises(ValueError,
+                           match="organism list must not be empty"):
+            _Gbo2d4Harness().run(organism=[], summary=True)
+
+    def test_list_entry_expands_to_several_organisms(self):
+        h = _Gbo2d4Harness([_2d4_pt(_2D4_MED4, "go:1", 6)],
+                           [_2d4_pg(_2D4_MED4, f"m{i}") for i in range(6)])
+        out = h.run(organism=["Prochlorococcus"], summary=True)
+        assert _2d4_scope_set(h.main_pt_call()["organism"]) == {
+            _2D4_MED4, _2D4_MIT9313, _2D4_NATL2A}
+        assert out["organism_name"] is None
+        assert out["not_found_organisms"] == []
+
+    def test_list_union_of_entries(self):
+        h = _Gbo2d4Harness([_2d4_pt(_2D4_MED4, "go:1", 6)],
+                           [_2d4_pg(_2D4_MED4, f"m{i}") for i in range(6)])
+        h.run(organism=["Prochlorococcus", "Alteromonas"], summary=True)
+        assert _2d4_scope_set(h.main_pt_call()["organism"]) == {
+            _2D4_MED4, _2D4_MIT9313, _2D4_NATL2A, _2D4_EZ55, _2D4_MIT1002}
+
+    def test_list_deduplicates(self):
+        h = _Gbo2d4Harness([_2d4_pt(_2D4_MED4, "go:1", 6)],
+                           [_2d4_pg(_2D4_MED4, f"m{i}") for i in range(6)])
+        out = h.run(organism=["MED4", "Prochlorococcus MED4"], summary=True)
+        org = h.main_pt_call()["organism"]
+        if isinstance(org, list):
+            assert org == [_2D4_MED4]
+        else:
+            assert org == _2D4_MED4
+        # one organism in scope -> organism_name is that organism
+        assert out["organism_name"] == _2D4_MED4
+
+    def test_overlapping_entries_deduplicate(self):
+        h = _Gbo2d4Harness([_2d4_pt(_2D4_MED4, "go:1", 6)],
+                           [_2d4_pg(_2D4_MED4, f"m{i}") for i in range(6)])
+        h.run(organism=["MED4", "Prochlorococcus"], summary=True)
+        org = h.main_pt_call()["organism"]
+        assert sorted(org) == sorted({_2D4_MED4, _2D4_MIT9313, _2D4_NATL2A})
+
+    def test_unknown_entry_goes_to_not_found_organisms(self):
+        h = _Gbo2d4Harness([_2d4_pt(_2D4_MED4, "go:1", 6)],
+                           [_2d4_pg(_2D4_MED4, f"m{i}") for i in range(6)])
+        out = h.run(organism=["MED4", "nope"], summary=True)
+        assert out["not_found_organisms"] == ["nope"]
+        assert _2d4_scope_set(h.main_pt_call()["organism"]) == {_2D4_MED4}
+        assert out["total_matching"] == 6
+
+    def test_all_unknown_list_is_an_empty_envelope(self):
+        h = _Gbo2d4Harness([_2d4_pt(_2D4_MED4, "go:1", 6)],
+                           [_2d4_pg(_2D4_MED4, f"m{i}") for i in range(6)])
+        out = h.run(organism=["nope", "nope2"], limit=10)
+        assert out["not_found_organisms"] == ["nope", "nope2"]
+        assert out["total_matching"] == 0
+        assert out["total_genes"] == 0
+        assert out["total_terms"] == 0
+        assert out["results"] == []
+        assert out["returned"] == 0
+        assert out["truncated"] is False
+        assert out["by_organism"] == []
+        assert out["organisms_without_genes"] == []
+        assert out["organism_name"] is None
+        assert h.calls["detail"] == []
+
+    def test_none_needs_no_resolution_query(self):
+        h = _Gbo2d4Harness([_2d4_pt(_2D4_MED4, "go:1", 6)],
+                           [_2d4_pg(_2D4_MED4, f"m{i}") for i in range(6)])
+        out = h.run(organism=None, summary=True)
+        assert h.calls["resolve"] == []
+        assert h.main_pt_call()["organism"] is None
+        assert out["not_found_organisms"] == []
+
+
+class TestGbo2d4Envelope:
+
+    _PT = [_2d4_pt(_2D4_MED4, "go:1", 3), _2d4_pt(_2D4_MED4, "go:2", 2),
+           _2d4_pt(_2D4_EZ55, "go:1", 4)]
+    _PG = ([_2d4_pg(_2D4_MED4, f"m{i}", n_terms=1) for i in range(3)]
+           + [_2d4_pg(_2D4_EZ55, f"e{i}") for i in range(4)])
+
+    def _run(self, organism=("MED4", "EZ55"), **kw):
+        h = _Gbo2d4Harness(self._PT, self._PG)
+        org = list(organism) if isinstance(organism, tuple) else organism
+        return h.run(organism=org, **kw), h
+
+    def test_new_envelope_keys_present(self):
+        out, _ = self._run(summary=True)
+        for key in ("by_organism", "organisms_without_genes",
+                    "not_found_organisms"):
+            assert key in out, key
+
+    def test_by_organism_rows_and_order(self):
+        out, _ = self._run(summary=True)
+        assert out["by_organism"] == [
+            {"organism_name": _2D4_EZ55, "gene_count": 4, "term_count": 1,
+             "row_count": 4},
+            {"organism_name": _2D4_MED4, "gene_count": 3, "term_count": 2,
+             "row_count": 5},
+        ]
+
+    def test_by_organism_ties_break_by_name(self):
+        pt = [_2d4_pt(_2D4_MED4, "go:1", 2), _2d4_pt(_2D4_EZ55, "go:1", 2)]
+        pg = [_2d4_pg(_2D4_MED4, "m1"), _2d4_pg(_2D4_MED4, "m2"),
+              _2d4_pg(_2D4_EZ55, "e1"), _2d4_pg(_2D4_EZ55, "e2")]
+        out = _Gbo2d4Harness(pt, pg).run(organism=["MED4", "EZ55"],
+                                         summary=True)
+        assert [b["organism_name"] for b in out["by_organism"]] == [
+            _2D4_EZ55, _2D4_MED4]
+
+    @pytest.mark.parametrize("organism", [("MED4", "EZ55"), None],
+                             ids=["list", "none"])
+    def test_by_organism_row_count_sums_to_total_matching(self, organism):
+        out, _ = self._run(organism=organism, summary=True)
+        assert out["total_matching"] == 9
+        assert sum(b["row_count"] for b in out["by_organism"]) == 9
+
+    def test_organism_name_none_when_several_in_scope(self):
+        out, _ = self._run(summary=True)
+        assert out["organism_name"] is None
+
+    def test_organism_name_none_when_all_organisms(self):
+        out, _ = self._run(organism=None, summary=True)
+        assert out["organism_name"] is None
+
+    def test_organisms_without_genes_for_a_list(self):
+        pt = [_2d4_pt(_2D4_MED4, "go:1", 6)]
+        pg = [_2d4_pg(_2D4_MED4, f"m{i}") for i in range(6)]
+        out = _Gbo2d4Harness(pt, pg).run(organism=["Prochlorococcus"],
+                                         summary=True)
+        assert out["organisms_without_genes"] == sorted(
+            [_2D4_MIT9313, _2D4_NATL2A])
+        assert [b["organism_name"] for b in out["by_organism"]] == [_2D4_MED4]
+
+    def test_organisms_without_genes_for_none_is_every_other_organism(self):
+        out, _ = self._run(organism=None, summary=True)
+        assert out["organisms_without_genes"] == sorted(
+            set(_2D4_ALL) - {_2D4_MED4, _2D4_EZ55})
+
+    def test_organisms_without_genes_single_str(self):
+        out = _Gbo2d4Harness().run(organism="MED4", summary=True)
+        assert out["organisms_without_genes"] == [_2D4_MED4]
+        assert out["by_organism"] == []
+        pt = [_2d4_pt(_2D4_MED4, "go:1", 6)]
+        pg = [_2d4_pg(_2D4_MED4, f"m{i}") for i in range(6)]
+        out = _Gbo2d4Harness(pt, pg).run(organism="MED4", summary=True)
+        assert out["organisms_without_genes"] == []
+        assert out["by_organism"] == [
+            {"organism_name": _2D4_MED4, "gene_count": 6, "term_count": 1,
+             "row_count": 6}]
+
+    def test_not_found_organisms_empty_for_str_and_none(self):
+        out, _ = self._run(organism=None, summary=True)
+        assert out["not_found_organisms"] == []
+        pt = [_2d4_pt(_2D4_MED4, "go:1", 6)]
+        out = _Gbo2d4Harness(pt, []).run(organism="MED4", summary=True)
+        assert out["not_found_organisms"] == []
+
+    def test_top_terms_sum_across_organisms_with_organism_count(self):
+        out, _ = self._run(summary=True)
+        top = {t["term_id"]: t for t in out["top_terms"]}
+        assert top["go:1"]["count"] == 7
+        assert top["go:1"]["organism_count"] == 2
+        assert top["go:2"]["count"] == 2
+        assert top["go:2"]["organism_count"] == 1
+        assert [t["term_id"] for t in out["top_terms"]] == ["go:1", "go:2"]
+
+    def test_total_terms_and_by_level_count_distinct_terms(self):
+        out, _ = self._run(summary=True)
+        assert out["total_terms"] == 2
+        (lvl,) = out["by_level"]
+        assert lvl["n_terms"] == 2
+        assert lvl["row_count"] == 9
+        assert lvl["n_genes"] == 7
+
+    def test_total_genes_counts_genes_across_organisms(self):
+        out, _ = self._run(summary=True)
+        assert out["total_genes"] == 7
+
+    def test_genes_per_term_stats_are_per_bucket(self):
+        out, _ = self._run(summary=True)
+        assert out["genes_per_term_min"] == 2
+        assert out["genes_per_term_median"] == 3.0
+        assert out["genes_per_term_max"] == 4
+
+    def test_filtered_out_uses_distinct_terms(self):
+        """An ok term_id is filtered_out only when no bucket of any organism
+        survives."""
+        h = _Gbo2d4Harness(self._PT, self._PG)
+
+        validate_rows = [
+            {"tid": t, "status": "ok", "matched_label": "BiologicalProcess"}
+            for t in ("go:1", "go:2", "go:3")]
+        orig = h.execute_query
+
+        def _exec(cypher, **params):
+            if cypher == "VALIDATE":
+                return validate_rows
+            return orig(cypher, **params)
+        h.execute_query = _exec
+        out = h.run(organism=["MED4", "EZ55"], term_ids=["go:1", "go:2", "go:3"],
+                    summary=True)
+        assert out["filtered_out"] == ["go:3"]
+
+    def test_rows_carry_organism_name(self):
+        out, _ = self._run(limit=20)
+        assert out["returned"] == 9
+        assert all("organism_name" in r for r in out["results"])
+        assert {r["organism_name"] for r in out["results"]} == {
+            _2D4_MED4, _2D4_EZ55}
+        keys = [(r["organism_name"], r["term_id"], r["locus_tag"])
+                for r in out["results"]]
+        assert keys == sorted(keys)
+
+    def test_single_organism_rows_carry_organism_name(self):
+        pt = [_2d4_pt(_2D4_MED4, "go:1", 3)]
+        pg = [_2d4_pg(_2D4_MED4, f"m{i}") for i in range(3)]
+        out = _Gbo2d4Harness(pt, pg).run(organism="MED4", limit=10)
+        assert [r["organism_name"] for r in out["results"]] == [_2D4_MED4] * 3
+        assert out["organism_name"] == _2D4_MED4
+
+    def test_by_organism_on_paged_call_describes_the_whole_match(self):
+        out, _ = self._run(limit=2)
+        assert sum(b["row_count"] for b in out["by_organism"]) == 9
+        assert out["returned"] == 2

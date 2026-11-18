@@ -41,6 +41,19 @@ _2D7_MIXED_ORG_BATCH = ["PMM0001", "PMT0419"]
 _2D7_MIXED_ORG_CLUSTER_BATCH = ["PMM0370", "PMT0856"]
 _2D7_ALL_UNKNOWN = [fx.UNKNOWN_LOCUS, ""]
 
+# 2d.4 genes_by_ontology across organisms
+# (docs/tool-specs/2d4-genes-by-ontology-cross-organism.md, "Degenerate
+# inputs"). Pinned on the release KG alpha.9 (2026-11-18):
+#   MATCH (t:KeggTerm {id:'kegg.pathway:ko00140'})
+#   OPTIONAL MATCH (t)<-[:Kegg_term_is_a_kegg_term*0..]-()<-[:Gene_has_kegg_ko]-(g:Gene)
+#   RETURN count(DISTINCT g)  -> 0 (Steroid hormone biosynthesis, no genome)
+#   MATCH (t:InterproEntry) WHERE t.id IN $hli
+#   RETURN t.id, t.interpro_type, t.gene_count, t.organism_count
+#     -> IPR063966 FAMILY 500 genes / 102 strains; IPR054650 FAMILY 100 / 100
+_2D4_GENELESS_KEGG_TERM = "kegg.pathway:ko00140"
+_2D4_HLI_TERMS = ["interpro:IPR063966", "interpro:IPR054650"]
+_2D4_UNKNOWN_ORG = "nope_2d4_organism"
+
 
 @dataclass
 class Scenario:
@@ -157,6 +170,49 @@ def genes_by_ontology_scenarios():
             "tier_null_bucket_visible_in_compact",
             dict(ontology="tcdb", organism=fx.CONTROL_ORGANISM, level=2,
                  max_tier=3, verbose=False)),
+        # --- 2d.4 across organisms: the spec's "Degenerate inputs" table ---
+        Scenario(
+            "organism_empty_list",
+            dict(ontology="kegg", organism=[], level=1),
+            expects_error=ToolError),
+        Scenario(
+            # every list entry unknown -> empty envelope, no raise
+            "organism_list_all_unknown",
+            dict(ontology="kegg", organism=[_2D4_UNKNOWN_ORG], level=1)),
+        Scenario(
+            "organism_list_known_plus_unknown",
+            dict(ontology="interpro", organism=["MED4", _2D4_UNKNOWN_ORG],
+                 term_ids=_2D4_HLI_TERMS, interpro_type="FAMILY")),
+        Scenario(
+            "organism_list_duplicate_spellings",
+            dict(ontology="interpro",
+                 organism=["MED4", fx.CONTROL_ORGANISM],
+                 term_ids=_2D4_HLI_TERMS, interpro_type="FAMILY")),
+        Scenario(
+            # ALL organisms, a term no genome carries -> empty envelope,
+            # organisms_without_genes = every organism with genes.
+            "all_organisms_term_with_no_genes",
+            dict(ontology="kegg", term_ids=[_2D4_GENELESS_KEGG_TERM],
+                 summary=True)),
+        Scenario(
+            "organism_str_unknown",
+            dict(ontology="kegg", organism=_2D4_UNKNOWN_ORG, level=1),
+            expects_error=ToolError),
+        Scenario(
+            # a single string must name ONE organism (matches 11 here)
+            "organism_str_matches_several",
+            dict(ontology="kegg", organism="Alteromonas", level=1),
+            expects_error=ToolError),
+        Scenario(
+            "cross_organism_offset_past_end",
+            dict(ontology="interpro", organism=["Prochlorococcus"],
+                 term_ids=_2D4_HLI_TERMS, interpro_type="FAMILY",
+                 offset=fx.OFFSET_PAST_END)),
+        Scenario(
+            # presence answer across every strain (the 2d.4 origin)
+            "all_organisms_hli_presence_summary",
+            dict(ontology="interpro", term_ids=_2D4_HLI_TERMS,
+                 interpro_type="FAMILY", summary=True)),
     ]
 
 
