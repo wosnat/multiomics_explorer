@@ -3805,7 +3805,8 @@ class TestBuildDifferentialExpressionByGene:
 
     def test_verbose_false_no_extra_columns(self):
         cypher, _ = build_differential_expression_by_gene(verbose=False)
-        assert "product" not in cypher
+        # backlog 2d.1: product moved to compact (see
+        # TestBuildDifferentialExpressionByGeneCompactProduct).
         assert "experiment_name" not in cypher
         assert "gene_category" not in cypher
 
@@ -4131,6 +4132,129 @@ class TestBuildGenesByHomologGroup:
         )
         assert "SKIP" not in cypher
         assert "offset" not in params
+
+
+class TestBuildDifferentialExpressionByGeneCompactProduct:
+    """backlog 2d.1: `product` is a compact column, right after gene_name."""
+
+    def test_compact_returns_product(self):
+        cypher, _ = build_differential_expression_by_gene(verbose=False)
+        assert "g.product AS product" in cypher
+
+    def test_compact_product_after_gene_name(self):
+        cypher, _ = build_differential_expression_by_gene(verbose=False)
+        assert (
+            cypher.index("g.gene_name AS gene_name")
+            < cypher.index("g.product AS product")
+            < cypher.index("e.id AS experiment_id")
+        )
+
+    def test_verbose_returns_product_once(self):
+        cypher, _ = build_differential_expression_by_gene(verbose=True)
+        assert cypher.count("g.product AS product") == 1
+
+    def test_compact_has_16_return_keys(self):
+        cypher, _ = build_differential_expression_by_gene(verbose=False)
+        ret = cypher.split("RETURN", 1)[1].split("ORDER BY", 1)[0]
+        aliases = re.findall(r"\bAS (\w+)", ret)
+        assert aliases == [
+            "locus_tag", "gene_name", "product", "experiment_id",
+            "treatment_type", "timepoint", "timepoint_hours",
+            "timepoint_order", "log2fc", "padj", "rank", "rank_up",
+            "rank_down", "expression_status", "growth_phase",
+            "control_timing",
+        ]
+
+
+class TestBuildGenesByHomologGroupByClade:
+    """backlog 2d.2: build_genes_by_homolog_group_by_clade (by_clade rollup)."""
+
+    @staticmethod
+    def _build(**kwargs):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_homolog_group_by_clade,
+        )
+        return build_genes_by_homolog_group_by_clade(**kwargs)
+
+    def test_returns_tuple(self):
+        out = self._build(group_ids=["cyanorak:CK_1"])
+        assert isinstance(out, tuple) and len(out) == 2
+        cypher, params = out
+        assert isinstance(cypher, str)
+        assert isinstance(params, dict)
+
+    def test_params_group_ids_and_organisms_default_none(self):
+        _, params = self._build(group_ids=["cyanorak:CK_1", "eggnog:COG0592@2"])
+        assert params["group_ids"] == ["cyanorak:CK_1", "eggnog:COG0592@2"]
+        assert params["organisms"] is None
+
+    def test_params_organisms(self):
+        _, params = self._build(group_ids=["cyanorak:CK_1"], organisms=["MED4"])
+        assert params["organisms"] == ["MED4"]
+
+    def test_keyword_only(self):
+        from multiomics_explorer.kg.queries_lib import (
+            build_genes_by_homolog_group_by_clade,
+        )
+        with pytest.raises(TypeError):
+            build_genes_by_homolog_group_by_clade(["cyanorak:CK_1"])  # type: ignore[misc]
+
+    def test_unwinds_group_ids_and_joins_organism(self):
+        cypher, _ = self._build(group_ids=["cyanorak:CK_1"])
+        assert "UNWIND $group_ids AS gid" in cypher
+        assert "Gene_in_ortholog_group" in cypher
+        assert "Gene_belongs_to_organism" in cypher
+        assert "OrganismTaxon" in cypher
+
+    def test_organism_word_match_clause(self):
+        """Same organism word-match as the summary builder."""
+        cypher, _ = self._build(group_ids=["cyanorak:CK_1"], organisms=["MED4"])
+        assert "$organisms IS NULL" in cypher
+        assert "ANY(org_input IN $organisms" in cypher
+        assert "ALL(word IN split(toLower(org_input), ' ')" in cypher
+        assert "toLower(g.organism_name) CONTAINS word" in cypher
+
+    def test_groups_by_genus_and_clade(self):
+        cypher, _ = self._build(group_ids=["cyanorak:CK_1"])
+        assert "o.genus AS genus" in cypher
+        assert "o.clade AS clade" in cypher
+        assert "count(DISTINCT o) AS organism_count" in cypher
+        assert "count(g) AS gene_count" in cypher
+
+    def test_denominator_subquery_imports_with_with(self):
+        """KG Neo4j rejects `CALL (x) { }` — import via `WITH` instead."""
+        cypher, _ = self._build(group_ids=["cyanorak:CK_1"])
+        assert "CALL {" in cypher
+        assert "CALL (" not in cypher
+        call_body = cypher.split("CALL {", 1)[1]
+        assert call_body.lstrip().startswith("WITH genus, clade")
+
+    def test_denominator_counts_populated_organisms(self):
+        cypher, _ = self._build(group_ids=["cyanorak:CK_1"])
+        assert "t.gene_count > 0" in cypher
+        assert "t.genus = genus" in cypher
+        assert "t.clade IS NULL" in cypher
+        assert "t.clade = clade" in cypher
+        assert "AS organisms_in_clade" in cypher
+
+    def test_denominator_ignores_organisms_filter(self):
+        """organisms narrows numerators only — not inside the CALL subquery."""
+        cypher, _ = self._build(group_ids=["cyanorak:CK_1"], organisms=["MED4"])
+        call_body = cypher.split("CALL {", 1)[1].split("}", 1)[0]
+        assert "$organisms" not in call_body
+
+    def test_return_columns(self):
+        cypher, _ = self._build(group_ids=["cyanorak:CK_1"])
+        final_return = cypher.rsplit("RETURN", 1)[1]
+        assert re.search(
+            r"genus,\s*clade,\s*organism_count,\s*organisms_in_clade,"
+            r"\s*gene_count",
+            final_return,
+        )
+
+    def test_order_by_genus_clade(self):
+        cypher, _ = self._build(group_ids=["cyanorak:CK_1"])
+        assert "ORDER BY genus, clade" in cypher
 
 
 class TestBuildGenesByHomologGroupSummary:

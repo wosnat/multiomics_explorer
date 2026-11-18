@@ -3812,6 +3812,147 @@ class TestGenesByHomologGroupWrapper:
 
 
 # ---------------------------------------------------------------------------
+# backlog 2d.2 — genes_by_homolog_group by_clade envelope rollup
+# ---------------------------------------------------------------------------
+class TestGenesByHomologGroupByCladeWrapper:
+    """`by_clade: list[HomologGroupCladeBreakdown]` on the response model."""
+
+    _BY_CLADE = [
+        {"genus": "Prochlorococcus", "clade": "HLII", "organism_count": 18,
+         "organisms_in_clade": 19, "gene_count": 30},
+        {"genus": "Alteromonas", "clade": None, "organism_count": 1,
+         "organisms_in_clade": 5, "gene_count": 1},
+        {"genus": None, "clade": None, "organism_count": 1,
+         "organisms_in_clade": 1, "gene_count": 2},
+    ]
+
+    @staticmethod
+    def _models(tool_fns):
+        import typing
+        resp = typing.get_type_hints(tool_fns["genes_by_homolog_group"])["return"]
+        ann = resp.model_fields["by_clade"].annotation
+        assert typing.get_origin(ann) is list
+        (item,) = typing.get_args(ann)
+        return resp, item
+
+    def test_response_has_by_clade_list(self, tool_fns):
+        resp, item = self._models(tool_fns)
+        assert "by_clade" in resp.model_fields
+        assert item.__name__ == "HomologGroupCladeBreakdown"
+        assert resp.model_fields["by_clade"].description
+
+    def test_breakdown_fields_and_types(self, tool_fns):
+        _, item = self._models(tool_fns)
+        fields = item.model_fields
+        assert set(fields) == {"genus", "clade", "organism_count",
+                               "organisms_in_clade", "gene_count"}
+        assert fields["genus"].annotation == (str | None)
+        assert fields["clade"].annotation == (str | None)
+        for name in ("organism_count", "organisms_in_clade", "gene_count"):
+            assert fields[name].annotation is int, name
+        for name, f in fields.items():
+            assert f.description, f"HomologGroupCladeBreakdown.{name} needs a description"
+
+    @pytest.mark.asyncio
+    async def test_by_clade_passed_through(self, tool_fns, mock_ctx):
+        api_return = {**TestGenesByHomologGroupWrapper._SAMPLE_API_RETURN,
+                      "by_clade": self._BY_CLADE}
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_homolog_group",
+            return_value=api_return,
+        ):
+            result = await tool_fns["genes_by_homolog_group"](
+                mock_ctx, group_ids=["cyanorak:CK_00000570"],
+            )
+        assert len(result.by_clade) == 3
+        first = result.by_clade[0]
+        assert first.genus == "Prochlorococcus"
+        assert first.clade == "HLII"
+        assert first.organism_count == 18
+        assert first.organisms_in_clade == 19
+        assert first.gene_count == 30
+        assert result.by_clade[1].clade is None
+        assert result.by_clade[2].genus is None
+        dumped = result.model_dump()
+        assert dumped["by_clade"] == self._BY_CLADE
+
+    @pytest.mark.asyncio
+    async def test_by_clade_empty(self, tool_fns, mock_ctx):
+        api_return = {**TestGenesByHomologGroupWrapper._SAMPLE_API_RETURN,
+                      "by_clade": []}
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_homolog_group",
+            return_value=api_return,
+        ):
+            result = await tool_fns["genes_by_homolog_group"](
+                mock_ctx, group_ids=["cyanorak:CK_00000570"], summary=True,
+            )
+        assert result.by_clade == []
+        assert result.model_dump()["by_clade"] == []
+
+
+# ---------------------------------------------------------------------------
+# backlog 2d.1 — differential_expression_by_gene compact `product`
+# ---------------------------------------------------------------------------
+class TestDifferentialExpressionByGeneCompactProductWrapper:
+    """ExpressionRow.product is a compact column (no longer verbose-only)."""
+
+    @staticmethod
+    def _row_model(tool_fns):
+        import typing
+        resp = typing.get_type_hints(
+            tool_fns["differential_expression_by_gene"])["return"]
+        ann = resp.model_fields["results"].annotation
+        return typing.get_args(ann)[0]
+
+    def test_product_field_declared_with_compact_columns(self, tool_fns):
+        """Declared after gene_name, before experiment_id (compact order)."""
+        names = list(self._row_model(tool_fns).model_fields)
+        assert names.index("gene_name") < names.index("product") < (
+            names.index("experiment_id"))
+
+    def test_product_field_nullable_with_description(self, tool_fns):
+        f = self._row_model(tool_fns).model_fields["product"]
+        assert f.annotation == (str | None)
+        assert f.description
+        assert "verbose" not in f.description.lower()
+
+    @pytest.mark.asyncio
+    async def test_compact_row_serializes_product(self, tool_fns, mock_ctx):
+        import copy
+        data = copy.deepcopy(TestDifferentialExpressionByGeneWrapper._SAMPLE_API_RETURN)
+        data["results"][0]["product"] = "DNA polymerase III, beta subunit"
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=data,
+        ):
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4",
+            )
+        assert result.results[0].product == "DNA polymerase III, beta subunit"
+        dumped = result.model_dump()
+        assert dumped["results"][0]["product"] == (
+            "DNA polymerase III, beta subunit")
+
+    @pytest.mark.asyncio
+    async def test_compact_row_null_product_kept(self, tool_fns, mock_ctx):
+        """A gene with no product serializes product: null on compact rows."""
+        import copy
+        data = copy.deepcopy(TestDifferentialExpressionByGeneWrapper._SAMPLE_API_RETURN)
+        data["results"][0]["product"] = None
+        with patch(
+            "multiomics_explorer.api.functions.differential_expression_by_gene",
+            return_value=data,
+        ):
+            result = await tool_fns["differential_expression_by_gene"](
+                mock_ctx, organism="MED4",
+            )
+        dumped = result.model_dump()
+        assert "product" in dumped["results"][0]
+        assert dumped["results"][0]["product"] is None
+
+
+# ---------------------------------------------------------------------------
 # differential_expression_by_ortholog
 # ---------------------------------------------------------------------------
 class TestDifferentialExpressionByOrthologWrapper:

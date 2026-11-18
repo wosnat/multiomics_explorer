@@ -4002,6 +4002,7 @@ class TestGenesByHomologGroup:
               "by_category_raw": [{"item": "Photosynthesis", "count": 9}],
               "by_group_raw": [{"item": "cyanorak:CK_00000570", "count": 9}],
               "not_found_groups": [], "not_matched_groups": []}],
+            [],  # by_clade (backlog 2d.2)
             [{"locus_tag": "PMM0315", "gene_name": "psbB",
               "product": "photosystem II", "organism_name": "Prochlorococcus MED4",
               "gene_category": "Photosynthesis", "group_id": "cyanorak:CK_00000570"}],
@@ -4032,19 +4033,21 @@ class TestGenesByHomologGroup:
               "by_category_raw": [],
               "by_group_raw": [{"item": "cyanorak:CK_00000570", "count": 9}],
               "not_found_groups": [], "not_matched_groups": []}],
+            [],  # by_clade (backlog 2d.2)
         ]
         result = api.genes_by_homolog_group(
             ["cyanorak:CK_00000570"], summary=True, conn=mock_conn)
         assert result["returned"] == 0
         assert result["truncated"] is True
         assert result["results"] == []
-        assert mock_conn.execute_query.call_count == 1
+        assert mock_conn.execute_query.call_count == 2  # summary + by_clade (2d.2)
 
     def test_not_found_groups(self, mock_conn):
         mock_conn.execute_query.side_effect = [
             [{"total_matching": 0, "total_genes": 0, "total_categories": 0,
               "by_organism": [], "by_category_raw": [], "by_group_raw": [],
               "not_found_groups": ["FAKE_GROUP"], "not_matched_groups": []}],
+            [],  # by_clade (backlog 2d.2)
         ]
         result = api.genes_by_homolog_group(
             ["FAKE_GROUP"], summary=True, conn=mock_conn)
@@ -4061,6 +4064,7 @@ class TestGenesByHomologGroup:
               "by_organism": [], "by_category_raw": [], "by_group_raw": [],
               "not_found_groups": [], "not_matched_groups": []}],
             [{"not_found_organisms": [], "not_matched_organisms": []}],
+            [],  # by_clade (backlog 2d.2)
         ]
         api.genes_by_homolog_group(
             ["cyanorak:CK_1"], organisms=["MED4"], summary=True, conn=mock_conn)
@@ -4085,6 +4089,7 @@ class TestGenesByHomologGroup:
               "by_category_raw": [],
               "by_group_raw": [{"item": "cyanorak:CK_00000570", "count": 6}],
               "not_found_groups": [], "not_matched_groups": []}],
+            [],  # by_clade (backlog 2d.2)
         ]
         result = api.genes_by_homolog_group(
             ["cyanorak:CK_00000570"], summary=True, conn=mock_conn)
@@ -4106,12 +4111,13 @@ class TestGenesByHomologGroup:
               "by_category_raw": [{"item": "Photosynthesis", "count": 9}],
               "by_group_raw": [{"item": "cyanorak:CK_00000570", "count": 9}],
               "not_found_groups": [], "not_matched_groups": []}],
+            [],  # by_clade (backlog 2d.2)
             [{"locus_tag": "PMM0315", "gene_name": "psbB",
               "product": "photosystem II", "organism_name": "Prochlorococcus MED4",
               "gene_category": "Photosynthesis", "group_id": "cyanorak:CK_00000570"}],
         ]
         api.genes_by_homolog_group(["cyanorak:CK_00000570"], offset=5, conn=mock_conn)
-        detail_call = mock_conn.execute_query.call_args_list[1]
+        detail_call = mock_conn.execute_query.call_args_list[-1]
         assert detail_call[1].get("offset") == 5
 
     def test_offset_in_response(self, mock_conn):
@@ -4122,12 +4128,184 @@ class TestGenesByHomologGroup:
               "by_category_raw": [{"item": "Photosynthesis", "count": 9}],
               "by_group_raw": [{"item": "cyanorak:CK_00000570", "count": 9}],
               "not_found_groups": [], "not_matched_groups": []}],
+            [],  # by_clade (backlog 2d.2)
             [{"locus_tag": "PMM0315", "gene_name": "psbB",
               "product": "photosystem II", "organism_name": "Prochlorococcus MED4",
               "gene_category": "Photosynthesis", "group_id": "cyanorak:CK_00000570"}],
         ]
         result = api.genes_by_homolog_group(["cyanorak:CK_00000570"], offset=5, conn=mock_conn)
         assert result["offset"] == 5
+
+
+class TestGenesByHomologGroupByClade:
+    """backlog 2d.2: `by_clade` envelope rollup on summary AND detail calls.
+
+    The mock dispatches on cypher content so the tests do not pin the
+    order of the extra by_clade query relative to diagnostics/detail.
+    """
+
+    _SUMMARY = {
+        "total_matching": 5, "total_genes": 5, "total_categories": 1,
+        "by_organism": [{"item": "Prochlorococcus MED4", "count": 5}],
+        "by_category_raw": [{"item": "Photosynthesis", "count": 5}],
+        "by_group_raw": [{"item": "cyanorak:CK_00002025", "count": 5}],
+        "not_found_groups": [], "not_matched_groups": [],
+    }
+    _EMPTY_SUMMARY = {
+        "total_matching": 0, "total_genes": 0, "total_categories": 0,
+        "by_organism": [], "by_category_raw": [], "by_group_raw": [],
+        "not_found_groups": ["FAKE_GROUP"], "not_matched_groups": [],
+    }
+    _DETAIL = [{
+        "locus_tag": "PMM1404", "gene_name": "hli", "product": "HLIP",
+        "organism_name": "Prochlorococcus MED4",
+        "gene_category": "Photosynthesis",
+        "group_id": "cyanorak:CK_00002025",
+    }]
+    # Deliberately out of order: the api must sort genus, then clade,
+    # nulls last (deterministic regardless of Cypher row order).
+    _BY_CLADE_ROWS = [
+        {"genus": "Synechococcus", "clade": None, "organism_count": 1,
+         "organisms_in_clade": 2, "gene_count": 1},
+        {"genus": "Prochlorococcus", "clade": "LLI", "organism_count": 1,
+         "organisms_in_clade": 1, "gene_count": 1},
+        {"genus": None, "clade": None, "organism_count": 1,
+         "organisms_in_clade": 1, "gene_count": 1},
+        {"genus": "Prochlorococcus", "clade": "HLII", "organism_count": 1,
+         "organisms_in_clade": 19, "gene_count": 1},
+        {"genus": "Synechococcus", "clade": "5.2", "organism_count": 1,
+         "organisms_in_clade": 3, "gene_count": 1},
+    ]
+    _EXPECTED_ORDER = [
+        ("Prochlorococcus", "HLII"),
+        ("Prochlorococcus", "LLI"),
+        ("Synechococcus", "5.2"),
+        ("Synechococcus", None),
+        (None, None),
+    ]
+    _FIELDS = {"genus", "clade", "organism_count", "organisms_in_clade",
+               "gene_count"}
+
+    def _dispatch(self, summary=None, by_clade=None, detail=None):
+        summary = self._SUMMARY if summary is None else summary
+        by_clade = self._BY_CLADE_ROWS if by_clade is None else by_clade
+        detail = self._DETAIL if detail is None else detail
+
+        def _side_effect(cypher, **params):
+            if "organisms_in_clade" in cypher:
+                return [dict(r) for r in by_clade]
+            if "not_found_organisms" in cypher:
+                return [{"not_found_organisms": [],
+                         "not_matched_organisms": []}]
+            if "by_group_raw" in cypher:
+                return [dict(summary)]
+            return [dict(r) for r in detail]
+        return _side_effect
+
+    def _by_clade_calls(self, mock_conn):
+        return [c for c in mock_conn.execute_query.call_args_list
+                if "organisms_in_clade" in c.args[0]]
+
+    def test_by_clade_on_detail_call(self, mock_conn):
+        mock_conn.execute_query.side_effect = self._dispatch()
+        result = api.genes_by_homolog_group(
+            ["cyanorak:CK_00002025"], conn=mock_conn)
+        assert "by_clade" in result
+        assert isinstance(result["by_clade"], list)
+        assert len(result["by_clade"]) == 5
+        assert len(result["results"]) == 1
+        assert len(self._by_clade_calls(mock_conn)) == 1
+
+    def test_by_clade_on_summary_call(self, mock_conn):
+        mock_conn.execute_query.side_effect = self._dispatch()
+        result = api.genes_by_homolog_group(
+            ["cyanorak:CK_00002025"], summary=True, conn=mock_conn)
+        assert result["results"] == []
+        assert len(result["by_clade"]) == 5
+        assert len(self._by_clade_calls(mock_conn)) == 1
+
+    def test_by_clade_entry_fields(self, mock_conn):
+        mock_conn.execute_query.side_effect = self._dispatch()
+        result = api.genes_by_homolog_group(
+            ["cyanorak:CK_00002025"], summary=True, conn=mock_conn)
+        for entry in result["by_clade"]:
+            assert isinstance(entry, dict)
+            assert set(entry) == self._FIELDS
+        hlii = next(e for e in result["by_clade"] if e["clade"] == "HLII")
+        assert hlii == {"genus": "Prochlorococcus", "clade": "HLII",
+                        "organism_count": 1, "organisms_in_clade": 19,
+                        "gene_count": 1}
+
+    def test_by_clade_sorted_genus_then_clade_nulls_last(self, mock_conn):
+        mock_conn.execute_query.side_effect = self._dispatch()
+        result = api.genes_by_homolog_group(
+            ["cyanorak:CK_00002025"], summary=True, conn=mock_conn)
+        assert [(e["genus"], e["clade"]) for e in result["by_clade"]] == (
+            self._EXPECTED_ORDER)
+
+    def test_by_clade_empty_when_nothing_matched(self, mock_conn):
+        mock_conn.execute_query.side_effect = self._dispatch(
+            summary=self._EMPTY_SUMMARY, by_clade=[], detail=[])
+        result = api.genes_by_homolog_group(["FAKE_GROUP"], conn=mock_conn)
+        assert result["by_clade"] == []
+        assert result["not_found_groups"] == ["FAKE_GROUP"]
+
+    def test_by_clade_empty_when_nothing_matched_summary(self, mock_conn):
+        mock_conn.execute_query.side_effect = self._dispatch(
+            summary=self._EMPTY_SUMMARY, by_clade=[], detail=[])
+        result = api.genes_by_homolog_group(
+            ["FAKE_GROUP"], summary=True, conn=mock_conn)
+        assert result["by_clade"] == []
+
+    def test_by_clade_query_receives_group_ids_and_organisms(self, mock_conn):
+        mock_conn.execute_query.side_effect = self._dispatch()
+        api.genes_by_homolog_group(
+            ["cyanorak:CK_00002025"], organisms=["MED4"], summary=True,
+            conn=mock_conn)
+        (call,) = self._by_clade_calls(mock_conn)
+        assert call.kwargs["group_ids"] == ["cyanorak:CK_00002025"]
+        assert call.kwargs["organisms"] == ["MED4"]
+
+    def test_by_clade_query_uses_coerced_group_ids(self, mock_conn):
+        """Bare group IDs are coerced before the by_clade query, too."""
+        mock_conn.execute_query.side_effect = self._dispatch()
+        api.genes_by_homolog_group(
+            ["CK_00002025"], summary=True, conn=mock_conn)
+        (call,) = self._by_clade_calls(mock_conn)
+        assert call.kwargs["group_ids"] == ["cyanorak:CK_00002025"]
+        assert call.kwargs["organisms"] is None
+
+
+class TestDifferentialExpressionByGeneCompactProduct:
+    """backlog 2d.1: compact (verbose=False) rows carry `product`."""
+
+    def _side_effect(self):
+        helper = TestDifferentialExpressionByGene()
+        rows = helper._detail_rows()
+        for r in rows:
+            r["product"] = "DNA polymerase III, beta subunit"
+        return [
+            helper._organism_result(),
+            helper._global_summary(),
+            helper._experiment_summary(),
+            helper._diagnostics_summary(),
+            rows,
+        ]
+
+    def test_compact_detail_query_returns_product(self, mock_conn):
+        mock_conn.execute_query.side_effect = self._side_effect()
+        api.differential_expression_by_gene(
+            organism="MED4", verbose=False, conn=mock_conn)
+        detail_cypher = mock_conn.execute_query.call_args_list[-1].args[0]
+        assert "g.product AS product" in detail_cypher
+        assert "e.name AS experiment_name" not in detail_cypher
+
+    def test_compact_rows_carry_product(self, mock_conn):
+        mock_conn.execute_query.side_effect = self._side_effect()
+        result = api.differential_expression_by_gene(
+            organism="MED4", verbose=False, conn=mock_conn)
+        assert result["results"][0]["product"] == (
+            "DNA polymerase III, beta subunit")
 
 
 class TestDETreatmentBackgroundApi:
