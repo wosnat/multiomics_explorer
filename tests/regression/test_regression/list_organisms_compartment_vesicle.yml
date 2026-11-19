@@ -20,10 +20,10 @@ rows:
   genus: Alteromonas
   go_transport_metabolite_count: 85
   growth_phases: []
-  interpro_gene_count: 3495
+  interpro_gene_count: 3543
   measured_metabolite_count: 0
   ncbi_taxon_id: 1004787
-  ncbifam_gene_count: 1611
+  ncbifam_gene_count: 1615
   nonpeptidase_homolog_gene_count: 32
   omics_types:
   - BIOINFORMATIC
@@ -33,7 +33,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 129
   publication_count: 2
-  reaction_count: 1259
+  reaction_count: 1227
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -63,10 +63,10 @@ rows:
   go_transport_metabolite_count: 89
   growth_phases:
   - nutrient_limited
-  interpro_gene_count: 3456
+  interpro_gene_count: 3494
   measured_metabolite_count: 0
   ncbi_taxon_id: 529120
-  ncbifam_gene_count: 1598
+  ncbifam_gene_count: 1604
   nonpeptidase_homolog_gene_count: 37
   omics_types:
   - BIOINFORMATIC
@@ -77,7 +77,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 125
   publication_count: 3
-  reaction_count: 1251
+  reaction_count: 1219
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -105,10 +105,10 @@ rows:
   genus: Alteromonas
   go_transport_metabolite_count: 96
   growth_phases: []
-  interpro_gene_count: 3608
+  interpro_gene_count: 3661
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
-  ncbifam_gene_count: 1656
+  ncbifam_gene_count: 1661
   nonpeptidase_homolog_gene_count: 33
   omics_types:
   - VESICLE_PROTEOMICS
@@ -117,7 +117,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 127
   publication_count: 1
-  reaction_count: 1275
+  reaction_count: 1243
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -142,10 +142,10 @@ rows:
   genus: Alteromonas
   go_transport_metabolite_count: 83
   growth_phases: []
-  interpro_gene_count: 3349
+  interpro_gene_count: 3396
   measured_metabolite_count: 0
   ncbi_taxon_id: 1004785
-  ncbifam_gene_count: 1577
+  ncbifam_gene_count: 1581
   nonpeptidase_homolog_gene_count: 29
   omics_types:
   - VESICLE_PROTEOMICS
@@ -154,7 +154,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 123
   publication_count: 1
-  reaction_count: 1228
+  reaction_count: 1196
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -185,10 +185,10 @@ rows:
   growth_phases:
   - exponential
   - nutrient_limited
-  interpro_gene_count: 3563
+  interpro_gene_count: 3613
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
-  ncbifam_gene_count: 1678
+  ncbifam_gene_count: 1683
   nonpeptidase_homolog_gene_count: 33
   omics_types:
   - BIOINFORMATIC
@@ -200,7 +200,7 @@ rows:
   partner_experiment_count: 6
   peptidase_gene_count: 118
   publication_count: 4
-  reaction_count: 1266
+  reaction_count: 1234
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -236,10 +236,10 @@ rows:
   - darkness
   - diel
   - unknown
-  interpro_gene_count: 3584
+  interpro_gene_count: 3636
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
-  ncbifam_gene_count: 1699
+  ncbifam_gene_count: 1704
   nonpeptidase_homolog_gene_count: 32
   omics_types:
   - BIOINFORMATIC
@@ -250,7 +250,7 @@ rows:
   partner_experiment_count: 3
   peptidase_gene_count: 120
   publication_count: 5
-  reaction_count: 1288
+  reaction_count: 1256
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -299,10 +299,10 @@ rows:
   - infected
   - nutrient_limited
   - recovery
-  interpro_gene_count: 1545
+  interpro_gene_count: 1581
   measured_metabolite_count: 0
   ncbi_taxon_id: 59919
-  ncbifam_gene_count: 744
+  ncbifam_gene_count: 745
   nonpeptidase_homolog_gene_count: 8
   omics_types:
   - BIOINFORMATIC
@@ -317,7 +317,7 @@ rows:
   partner_experiment_count: 11
   peptidase_gene_count: 50
   publication_count: 21
-  reaction_count: 943
+  reaction_count: 915
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -365,10 +365,10 @@ rows:
   - acute_stress
   - exponential
   - stationary
-  interpro_gene_count: 1557
+  interpro_gene_count: 1592
   measured_metabolite_count: 70
   ncbi_taxon_id: 74546
-  ncbifam_gene_count: 759
+  ncbifam_gene_count: 761
   nonpeptidase_homolog_gene_count: 9
   omics_types:
   - BIOINFORMATIC
@@ -381,7 +381,7 @@ rows:
   partner_experiment_count: 4
   peptidase_gene_count: 50
   publication_count: 6
-  reaction_count: 943
+  reaction_count: 915
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -419,10 +419,10 @@ rows:
   - exponential
   - nutrient_limited
   - recovery
-  interpro_gene_count: 1888
+  interpro_gene_count: 1964
   measured_metabolite_count: 134
   ncbi_taxon_id: 74547
-  ncbifam_gene_count: 905
+  ncbifam_gene_count: 911
   nonpeptidase_homolog_gene_count: 11
   omics_types:
   - BIOINFORMATIC
@@ -435,7 +435,7 @@ rows:
   partner_experiment_count: 2
   peptidase_gene_count: 60
   publication_count: 11
-  reaction_count: 953
+  reaction_count: 939
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus

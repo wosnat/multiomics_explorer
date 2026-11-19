@@ -357,11 +357,11 @@ top_metabolite_pathways:
   metabolite_pathway_id: kegg.pathway:ko01240
   metabolite_pathway_name: Biosynthesis of cofactors
 - count: 87
-  metabolite_pathway_id: kegg.pathway:ko00860
-  metabolite_pathway_name: Porphyrin metabolism
-- count: 87
   metabolite_pathway_id: kegg.pathway:ko01250
   metabolite_pathway_name: Biosynthesis of nucleotide sugars
+- count: 87
+  metabolite_pathway_id: kegg.pathway:ko00860
+  metabolite_pathway_name: Porphyrin metabolism
 - count: 78
   metabolite_pathway_id: kegg.pathway:ko01230
   metabolite_pathway_name: Biosynthesis of amino acids

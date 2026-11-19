@@ -87,12 +87,17 @@ VALID_OMICS_TYPES: set[str] = {
 # 2026-10-28: new treatment_type values mutant and essentiality on all four
 # treatment_type vocabularies, built 2026-10-31T08:59Z; + docs-review K3: new
 # ClusteringAnalysis.omics_type vocabulary (genomic_island analyses ''
-# -> BIOINFORMATIC), built 2026-10-31T19:34Z). The recipe lives KG-side (docs/kg-changes/
+# -> BIOINFORMATIC), built 2026-10-31T19:34Z; + KEGG modules (KeggModule.
+# {level_kind, module_type}, Kegg_term_in_kegg_module.component,
+# Organism_has_kegg_module.{status, steps_total, steps_present,
+# steps_present_via_ec}) and OrganismTaxon assembly quality (assembly_level,
+# assembly_status, checkm_*, contig_*, gc_percent, genome_length) — additions
+# only, no existing value set changed, built 2026-11-18T22:37Z). The recipe lives KG-side (docs/kg-changes/
 # vocabulary-contract.md). A mismatch means baked docs / parameter descriptions
 # may list stale values — filters still validate live. Must equal the live
 # KG's value at release cut.
 EXPECTED_CONTROLLED_VOCABULARIES_HASH: str = (
-    "sha256:e3147f37fd9b798230b18a9f4a378346dbef00c55ae10c4edfb85f80659a15d9"
+    "sha256:b48434f909c60665bcbad25a47b90be0f4ddb0dd364103b5f609c7450dea454e"
 )
 
 EXPECTED_KG_SHAPE: dict[str, tuple[str, ...] | str] = {

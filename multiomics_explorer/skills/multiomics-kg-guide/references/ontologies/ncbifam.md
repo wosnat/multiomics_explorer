@@ -100,8 +100,10 @@ Read `family_type` before trusting the name: `equivalog` (and
 name can be used as the gene's function; `subfamily` / `superfamily` /
 `domain` mean shared ancestry, not shared function; `hypoth_equivalog`
 is a conserved hypothetical; `exception` marks a family whose name is a
-deliberate carve-out; `retired` families are kept for provenance and
-should not be reported. Rank competing hits on one gene by `bit_score`
+deliberate carve-out; `retired` marks a family a newer InterPro release
+dropped, kept for provenance and not to be reported. The value is
+declared but may be carried by no family: a scan against the current
+InterPro release leaves none. Rank competing hits on one gene by `bit_score`
 (verbose). `gene_symbol` is the quickest way to answer "which gene is
 ntcA in this genome".
 
@@ -128,8 +130,9 @@ the `by_family_type` envelope on `search_ontology`, browse with
 - `bit_score` / `evalue` are verbose-only and never filterable.
 - Flat: `level=1` returns nothing; hierarchy questions go through the
   InterPro bridge, which only about half of the families carry.
-- `retired` families (`family_type='retired'`) still hold gene edges;
-  do not quote them as current names.
+- A `retired` family (`family_type='retired'`), when one is present, still
+  holds gene edges; do not quote it as a current name. Check
+  `list_filter_values` before assuming any exist.
 
 ## Typical questions
 

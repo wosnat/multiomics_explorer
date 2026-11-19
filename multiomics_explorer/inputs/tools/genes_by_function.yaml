@@ -7,23 +7,23 @@ examples:
     call: genes_by_function(search_text="photosystem")
     response: |
       {
-        "total_search_hits": 7651,
-        "total_matching": 7651,
+        "total_search_hits": 7932,
+        "total_matching": 7932,
         "by_organism": [
-          {"organism_name": "Synechococcus BIOS-U3-1", "count": 93},
-          {"organism_name": "Synechococcus CC9616", "count": 92},
-          {"organism_name": "Synechococcus KORDI-100", "count": 88},
+          {"organism_name": "Synechococcus BIOS-U3-1", "count": 99},
+          {"organism_name": "Synechococcus CC9616", "count": 97},
+          {"organism_name": "Synechococcus KORDI-100", "count": 94},
           ...
         ],
         "by_organism_truncated": true,
         "by_category": [
           {"category": "Photosynthesis", "count": 4484},
-          {"category": "Stress response and adaptation", "count": 1302},
-          {"category": "Energy production", "count": 464},
+          {"category": "Stress response and adaptation", "count": 1436},
+          {"category": "Unknown", "count": 545},
           ...
         ],
-        "score_max": 6.0255126953125,
-        "score_median": 4.030897617340088,
+        "score_max": 5.997106552124023,
+        "score_median": 3.9823899269104004,
         "returned": 5,
         "offset": 0,
         "truncated": true,
@@ -36,7 +36,7 @@ examples:
             "organism_name": "Synechococcus elongatus PCC 7942",
             "gene_category": "Unknown",
             "annotation_quality": 3,
-            "score": 6.0255126953125
+            "score": 5.997106552124023
           },
           {
             "locus_tag": "M744_01545",
@@ -45,7 +45,7 @@ examples:
             "organism_name": "Synechococcus elongatus UTEX 2973",
             "gene_category": "Unknown",
             "annotation_quality": 3,
-            "score": 6.0255126953125
+            "score": 5.997106552124023
           },
           {
             "locus_tag": "SYNPCC7002_A0269",
@@ -54,7 +54,7 @@ examples:
             "organism_name": "Synechococcus PCC 7002",
             "gene_category": "Unknown",
             "annotation_quality": 3,
-            "score": 6.0255126953125
+            "score": 5.997106552124023
           },
           ...
         ]
@@ -67,23 +67,23 @@ examples:
     call: genes_by_function(search_text="chaperone", summary=True)
     response: |
       {
-        "total_search_hits": 3608,
-        "total_matching": 3608,
+        "total_search_hits": 3635,
+        "total_matching": 3635,
         "by_organism": [
-          {"organism_name": "Pseudomonas putida KT2440", "count": 62},
-          {"organism_name": "Shewanella sp. W3-18-1", "count": 54},
-          {"organism_name": "Marinobacter (MarRef v6)", "count": 54},
+          {"organism_name": "Pseudomonas putida KT2440", "count": 63},
+          {"organism_name": "Shewanella sp. W3-18-1", "count": 55},
+          {"organism_name": "Marinobacter (MarRef v6)", "count": 55},
           ...
         ],
         "by_organism_truncated": null,
         "by_category": [
-          {"category": "Post-translational modification", "count": 1554},
+          {"category": "Post-translational modification", "count": 1559},
           {"category": "Stress response and adaptation", "count": 898},
           {"category": "Coenzyme metabolism", "count": 385},
           ...
         ],
-        "score_max": 7.7078094482421875,
-        "score_median": 4.20149040222168,
+        "score_max": 7.7050580978393555,
+        "score_median": 4.206903457641602,
         "returned": 0,
         "offset": 0,
         "truncated": true,

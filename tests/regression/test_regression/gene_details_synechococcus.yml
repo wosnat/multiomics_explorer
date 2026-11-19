@@ -21,7 +21,7 @@ rows:
   - '[eggnog] Acts as a processive, ATP-dependent zinc metallopeptidase for both cytoplasmic
     and membrane proteins. Plays a role in the quality control of integral membrane
     proteins'
-  - '[hamap] ATP-dependent zinc metalloprotease FtsH [ftsH].'
+  - '[hamap] ATP-dependent zinc metalloprotease FtsH [ftsH]'
   - '[interpro] AAA ATPase, AAA+ lid domain'
   - '[interpro] AAA+ ATPase domain'
   - '[interpro] ATP-dependent zinc metalloprotease, FtsH'

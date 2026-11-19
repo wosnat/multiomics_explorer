@@ -3928,7 +3928,7 @@ class TestKGReleaseInfoMCPSmoke:
 
 _BATCH6_LIVE = [
     "tcdb:3.A.1", "merops.family:S14", "interpro:IPR000362",
-    "ncbifam:NF000812", "go:0006979", "bogus:xyz",
+    "ncbifam:NF000584", "go:0006979", "bogus:xyz",  # NF000812 → NF000584 2026-11-18T22:37Z: NF000812 was a retired family the InterProScan 6 re-scan dropped; NF000584 has the same 0/0/0 profile
 ]
 
 
@@ -4128,15 +4128,15 @@ class TestOntologyTermDetailsLive:
         assert row["ontology"] == "interpro"
         assert row["parents"] == []
         assert row["children_total"] == 4
-        assert len(row["links_out"]) == 5
+        assert len(row["links_out"]) == 3  # 5 → 3 2026-11-18T22:37Z: InterPro 111 routes IPR000362 to 3 ECs (4.2.1.2, 4.3.2.1, 5.5.1.2)
         assert all(lk["link_kind"] == "router" for lk in row["links_out"])
         assert all(lk["target_ontology"] == "ec" for lk in row["links_out"])
         assert all(lk["props"]["router_ambiguous"] is True
                    for lk in row["links_out"])
 
-    def test_ncbifam_nf000812(self, conn):
+    def test_ncbifam_nf000584(self, conn):
         _, rows = self._rows(conn)
-        row = rows["ncbifam:NF000812"]
+        row = rows["ncbifam:NF000584"]
         assert row["ontology"] == "ncbifam"
         assert row["parents"] == [] and row["children_total"] == 0
         assert row["links_out"] == []
@@ -4159,9 +4159,9 @@ class TestOntologyTermDetailsLive:
     def test_envelope_rollups(self, conn):
         result, _ = self._rows(conn)
         # 134 → 17 2026-10-24T17:33Z: TCDB 3a emits bridges on the nearest kept node, mostly tc_system children
-        assert result["links_out_total"] == 17
+        assert result["links_out_total"] == 15  # 17 → 15 2026-11-18T22:37Z: IPR000362 routers 5 → 3 (InterPro 111)
         by_kind = {e["link_kind"]: e["count"] for e in result["by_link_kind"]}
-        assert by_kind == {"composition": 12, "router": 5}  # 129 → 12 2026-10-24T17:33Z: TCDB 3a
+        assert by_kind == {"composition": 12, "router": 3}  # 129 → 12 2026-10-24T17:33Z: TCDB 3a; router 5 → 3 2026-11-18T22:37Z: InterPro 111
         by_ont = {e["ontology"]: e["count"] for e in result["by_ontology"]}
         assert by_ont == {"tcdb": 1, "merops": 1, "interpro": 1,
                           "ncbifam": 1, "go_bp": 1}
@@ -4169,8 +4169,8 @@ class TestOntologyTermDetailsLive:
     def test_link_kinds_filter(self, conn):
         result, rows = self._rows(conn, link_kinds=["router"])
         assert rows["tcdb:3.A.1"]["links_out"] == []
-        assert len(rows["interpro:IPR000362"]["links_out"]) == 5
-        assert result["links_out_total"] == 5
+        assert len(rows["interpro:IPR000362"]["links_out"]) == 3  # 5 → 3 2026-11-18T22:37Z: InterPro 111 routes IPR000362 to 3 ECs (4.2.1.2, 4.3.2.1, 5.5.1.2)
+        assert result["links_out_total"] == 3
 
     def test_organism_scope(self, conn):
         _, rows = self._rows(conn, organism="Prochlorococcus MED4", verbose=True)
@@ -4389,8 +4389,8 @@ class TestListOrganismsAnnotationCapabilityLive:
         assert cap[0]["preferred_name"] == _SLICE4_MARREF
         assert cap[0]["peptidase_gene_count"] == 148
         assert cap[0]["nonpeptidase_homolog_gene_count"] == 31
-        assert cap[0]["interpro_gene_count"] == 3746
-        assert cap[0]["ncbifam_gene_count"] == 1379
+        assert cap[0]["interpro_gene_count"] == 3791  # 3746 → 3791 2026-11-18T22:37Z: InterProScan 6 re-scan
+        assert cap[0]["ncbifam_gene_count"] == 1385  # 1379 → 1385 2026-11-18T22:37Z: InterProScan 6 re-scan
         # then AD45 129, Shewanella W3-18-1 128, BGP6 127 (spec §10)
         assert [c["peptidase_gene_count"] for c in cap[:4]] == [148, 129, 128, 127]
         peps = [c["peptidase_gene_count"] for c in cap]

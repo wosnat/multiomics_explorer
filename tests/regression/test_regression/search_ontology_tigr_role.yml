@@ -64,7 +64,7 @@ rows:
   score: 0.7296
   tree: null
   tree_code: null
-- gene_count: 1338
+- gene_count: 1352
   id: tigr.role:109
   is_informative: true
   level: 1
@@ -308,7 +308,7 @@ rows:
   score: 0.8056
   tree: null
   tree_code: null
-- gene_count: 28339
+- gene_count: 28353
   id: tigr.role:energy_metabolism
   is_informative: true
   level: 0

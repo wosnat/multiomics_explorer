@@ -1374,7 +1374,7 @@ rows:
   - PROTEOMICS
   organisms:
   - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
-  study_type: Proteomics
+  study_type: Quantitative proteomics
   title: Quantitative Proteomics Shows Extensive Remodeling Induced by Nitrogen Limitation
     in Prochlorococcus marinus SS120
   treatment_types:
@@ -2360,8 +2360,8 @@ rows:
   - MICROARRAY
   organisms:
   - Prochlorococcus MED4
-  study_type: Microarray (transcriptomics)
-  title: Genome-Wide Analysis of Light Sensing in Prochlorococcus/H17188
+  study_type: Microarray
+  title: Genome-Wide Analysis of Light Sensing in Prochlorococcus
   treatment_types:
   - light
   year: 2006

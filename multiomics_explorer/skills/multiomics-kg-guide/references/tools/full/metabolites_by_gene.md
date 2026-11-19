@@ -374,7 +374,7 @@ metabolites_by_gene(locus_tags=["PMM0970"], organism="Prochlorococcus MED4")
       "metabolite_pathway_name": "Biosynthesis of various antibiotics",
       "gene_count": 1,
       "pathway_reaction_count": 5,
-      "pathway_metabolite_count": 41
+      "pathway_metabolite_count": 46
     },
     ...
   ],

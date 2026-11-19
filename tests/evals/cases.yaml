@@ -2185,14 +2185,16 @@
   desc: |
     The verified §7.5 batch: tcdb 3.A.1 (1 parent / 55 children capped at 50 /
     129 composition links), merops S14 (1 link), interpro IPR000362 (4 children /
-    5 router links), ncbifam NF000812 (0/0/0), go:0006979 (L3, 1050/42),
+    5 router links), ncbifam NF000584 (0/0/0), go:0006979 (L3, 1050/42),
     bogus:xyz -> not_found. Rows in input order.
   params:
     term_ids:
       - "tcdb:3.A.1"
       - "merops.family:S14"
       - "interpro:IPR000362"
-      - "ncbifam:NF000812"
+      # ncbifam:NF000812 -> NF000584 (verified live 2026-11-19): NF000812 was a retired
+      # family the InterProScan 6 rescan dropped; NF000584 is the same 0/0/0 profile
+      - "ncbifam:NF000584"
       - "go:0006979"
       - "bogus:xyz"
   expect:
@@ -2213,7 +2215,9 @@
       - "tcdb:3.A.1"
       - "merops.family:S14"
       - "interpro:IPR000362"
-      - "ncbifam:NF000812"
+      # ncbifam:NF000812 -> NF000584 (verified live 2026-11-19): NF000812 was a retired
+      # family the InterProScan 6 rescan dropped; NF000584 is the same 0/0/0 profile
+      - "ncbifam:NF000584"
       - "go:0006979"
       - "bogus:xyz"
     verbose: true

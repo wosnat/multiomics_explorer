@@ -31,9 +31,9 @@ by_sources:
 - count: 13
   source: uniprot
 - count: 11
-  source: ncbi
-- count: 10
   source: interproscan
+- count: 11
+  source: ncbi
 - count: 5
   source: eggnog
 by_tcdb_call: []
@@ -41,7 +41,7 @@ by_tier: []
 case_id: genes_by_ontology_mode1_term_ids
 evidence_score_stats:
   max: 1.0
-  median: 0.667
+  median: 0.8335
   min: 0.667
   n_null: 0
 filtered_out: []

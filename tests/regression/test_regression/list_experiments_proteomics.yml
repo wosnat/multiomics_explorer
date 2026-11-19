@@ -2833,9 +2833,14 @@ rows:
   significant_down_count: 3
   significant_up_count: 3
   table_scope: all_detected_genes
-  table_scope_detail: All proteins quantified in either iTRAQ1 or iTRAQ2 are reported
-    (~184 unique proteins; ~11% of MED4 coding genes); only ~15 reach the paper^s
-    combined logFC + p-value + error-factor + relative-variance significance criteria.
+  table_scope_detail: 'All proteins quantified in either iTRAQ1 or iTRAQ2 are reported
+    (~184 unique proteins; ~11% of MED4 coding genes). The paper calls ~15 proteins
+    differentially expressed over both comparisons, using the ratio boundary (1.25
+    / 0.75), the ProGroup p-value, the error factor, more than one peptide and a final
+    ProQuant re-analysis of each protein. The KG significant call does not reproduce
+    that: it applies only absolute log2FC >= 0.322 and p < 0.05 to the mean log ratio
+    and the worst p-value across the iTRAQ ratios, so it marks fewer proteins (6 here).
+    Read the paper for its own list.'
   time_point_count: 1
   time_point_growth_phases:
   - acclimated_steady_state
@@ -2884,8 +2889,12 @@ rows:
   significant_down_count: 4
   significant_up_count: 6
   table_scope: all_detected_genes
-  table_scope_detail: All proteins quantified in either iTRAQ1 or iTRAQ2 are reported
-    (~184 unique proteins; ~11% of MED4 coding genes).
+  table_scope_detail: 'All proteins quantified in either iTRAQ1 or iTRAQ2 are reported
+    (~184 unique proteins; ~11% of MED4 coding genes). The KG significant call does
+    not reproduce the paper (ratio boundary 1.25 / 0.75, ProGroup p-value, error factor,
+    more than one peptide, final ProQuant re-analysis): it applies only absolute log2FC
+    >= 0.322 and p < 0.05 to the mean log ratio and the worst p-value across the iTRAQ
+    ratios. Read the paper for its own list.'
   time_point_count: 1
   time_point_growth_phases:
   - acclimated_steady_state

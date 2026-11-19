@@ -716,8 +716,8 @@ rows:
   - MICROARRAY
   organisms:
   - Prochlorococcus MED4
-  study_type: Microarray (transcriptomics)
-  title: Genome-Wide Analysis of Light Sensing in Prochlorococcus/H17188
+  study_type: Microarray
+  title: Genome-Wide Analysis of Light Sensing in Prochlorococcus
   treatment_types:
   - light
   year: 2006

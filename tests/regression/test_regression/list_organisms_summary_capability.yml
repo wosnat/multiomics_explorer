@@ -62,62 +62,62 @@ results: []
 returned: 0
 row_count: 0
 top_annotation_capability:
-- interpro_gene_count: 3746
-  ncbifam_gene_count: 1379
+- interpro_gene_count: 3791
+  ncbifam_gene_count: 1385
   nonpeptidase_homolog_gene_count: 31
   organism_name: Alteromonas (MarRef v6)
   peptidase_gene_count: 148
   preferred_name: Alteromonas (MarRef v6)
-- interpro_gene_count: 3495
-  ncbifam_gene_count: 1611
+- interpro_gene_count: 3543
+  ncbifam_gene_count: 1615
   nonpeptidase_homolog_gene_count: 32
   organism_name: Alteromonas macleodii AD45
   peptidase_gene_count: 129
   preferred_name: Alteromonas macleodii AD45
-- interpro_gene_count: 3636
-  ncbifam_gene_count: 1853
+- interpro_gene_count: 3698
+  ncbifam_gene_count: 1859
   nonpeptidase_homolog_gene_count: 23
   organism_name: Shewanella sp. W3-18-1
   peptidase_gene_count: 128
   preferred_name: Shewanella sp. W3-18-1
-- interpro_gene_count: 3605
-  ncbifam_gene_count: 1656
+- interpro_gene_count: 3658
+  ncbifam_gene_count: 1661
   nonpeptidase_homolog_gene_count: 33
   organism_name: Alteromonas macleodii 83-1
   peptidase_gene_count: 127
   preferred_name: Alteromonas macleodii 83-1
-- interpro_gene_count: 3608
-  ncbifam_gene_count: 1656
+- interpro_gene_count: 3661
+  ncbifam_gene_count: 1661
   nonpeptidase_homolog_gene_count: 33
   organism_name: Alteromonas macleodii BGP6
   peptidase_gene_count: 127
   preferred_name: Alteromonas macleodii BGP6
-- interpro_gene_count: 3456
-  ncbifam_gene_count: 1598
+- interpro_gene_count: 3494
+  ncbifam_gene_count: 1604
   nonpeptidase_homolog_gene_count: 37
   organism_name: Alteromonas macleodii ATCC27126
   peptidase_gene_count: 125
   preferred_name: Alteromonas macleodii ATCC27126
-- interpro_gene_count: 4961
-  ncbifam_gene_count: 2264
+- interpro_gene_count: 5047
+  ncbifam_gene_count: 2290
   nonpeptidase_homolog_gene_count: 43
   organism_name: Pseudomonas putida KT2440
   peptidase_gene_count: 125
   preferred_name: Pseudomonas putida KT2440
-- interpro_gene_count: 3659
-  ncbifam_gene_count: 1701
+- interpro_gene_count: 3710
+  ncbifam_gene_count: 1706
   nonpeptidase_homolog_gene_count: 34
   organism_name: Alteromonas macleodii EZ55
   peptidase_gene_count: 124
   preferred_name: Alteromonas macleodii EZ55
-- interpro_gene_count: 3349
-  ncbifam_gene_count: 1577
+- interpro_gene_count: 3396
+  ncbifam_gene_count: 1581
   nonpeptidase_homolog_gene_count: 29
   organism_name: Alteromonas macleodii BS11
   peptidase_gene_count: 123
   preferred_name: Alteromonas macleodii BS11
-- interpro_gene_count: 3584
-  ncbifam_gene_count: 1699
+- interpro_gene_count: 3636
+  ncbifam_gene_count: 1704
   nonpeptidase_homolog_gene_count: 32
   organism_name: Alteromonas macleodii MIT1002
   peptidase_gene_count: 120
@@ -127,52 +127,52 @@ top_metabolic_capability:
 - catalyzed_metabolite_count: 1489
   go_transport_metabolite_count: 147
   organism_name: Pseudomonas putida KT2440
-  reaction_count: 1449
+  reaction_count: 1434
   transported_metabolite_count: 279
 - catalyzed_metabolite_count: 1464
   go_transport_metabolite_count: 83
   organism_name: Ruegeria pomeroyi DSS-3
-  reaction_count: 1377
+  reaction_count: 1362
   transported_metabolite_count: 154
 - catalyzed_metabolite_count: 1424
   go_transport_metabolite_count: 101
   organism_name: Alteromonas macleodii EZ55
-  reaction_count: 1348
+  reaction_count: 1316
   transported_metabolite_count: 147
 - catalyzed_metabolite_count: 1354
   go_transport_metabolite_count: 75
   organism_name: Alteromonas (MarRef v6)
-  reaction_count: 1263
+  reaction_count: 1232
   transported_metabolite_count: 128
 - catalyzed_metabolite_count: 1350
   go_transport_metabolite_count: 91
   organism_name: Alteromonas macleodii MIT1002
-  reaction_count: 1288
+  reaction_count: 1256
   transported_metabolite_count: 142
 - catalyzed_metabolite_count: 1342
-  go_transport_metabolite_count: 106
+  go_transport_metabolite_count: 107
   organism_name: Marinobacter (MarRef v6)
-  reaction_count: 1278
+  reaction_count: 1258
   transported_metabolite_count: 161
 - catalyzed_metabolite_count: 1337
   go_transport_metabolite_count: 96
   organism_name: Alteromonas macleodii 83-1
-  reaction_count: 1275
+  reaction_count: 1243
   transported_metabolite_count: 151
 - catalyzed_metabolite_count: 1337
   go_transport_metabolite_count: 96
   organism_name: Alteromonas macleodii BGP6
-  reaction_count: 1275
+  reaction_count: 1243
   transported_metabolite_count: 151
 - catalyzed_metabolite_count: 1332
   go_transport_metabolite_count: 88
   organism_name: Alteromonas macleodii HOT1A3
-  reaction_count: 1266
+  reaction_count: 1234
   transported_metabolite_count: 142
 - catalyzed_metabolite_count: 1324
   go_transport_metabolite_count: 85
   organism_name: Alteromonas macleodii AD45
-  reaction_count: 1259
+  reaction_count: 1227
   transported_metabolite_count: 144
 top_metabolic_capability_truncated: true
 total_entries: 123

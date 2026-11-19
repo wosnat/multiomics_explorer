@@ -494,15 +494,15 @@ top_metabolite_pathways:
   pathway_metabolite_count: 27
   pathway_reaction_count: 20
 - gene_count: 1
-  metabolite_pathway_id: kegg.pathway:ko00998
-  metabolite_pathway_name: Biosynthesis of various antibiotics
-  pathway_metabolite_count: 41
-  pathway_reaction_count: 5
-- gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko00790
   metabolite_pathway_name: Folate biosynthesis
   pathway_metabolite_count: 46
   pathway_reaction_count: 42
+- gene_count: 1
+  metabolite_pathway_id: kegg.pathway:ko00998
+  metabolite_pathway_name: Biosynthesis of various antibiotics
+  pathway_metabolite_count: 46
+  pathway_reaction_count: 5
 - gene_count: 1
   metabolite_pathway_id: kegg.pathway:ko00270
   metabolite_pathway_name: Cysteine and methionine metabolism

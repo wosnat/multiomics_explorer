@@ -50,10 +50,10 @@ rows:
   growth_phases:
   - darkness
   - exponential
-  interpro_gene_count: 3746
+  interpro_gene_count: 3791
   measured_metabolite_count: 0
   ncbi_taxon_id: 232
-  ncbifam_gene_count: 1379
+  ncbifam_gene_count: 1385
   nonpeptidase_homolog_gene_count: 31
   omics_types:
   - PROTEOMICS
@@ -62,7 +62,7 @@ rows:
   partner_experiment_count: 40
   peptidase_gene_count: 148
   publication_count: 1
-  reaction_count: 1263
+  reaction_count: 1232
   reference_database: MarRef v6
   reference_proteome: UP000262181
   species: null
@@ -90,10 +90,10 @@ rows:
   - exponential
   - other:no_net_growth
   - stationary
-  interpro_gene_count: 3605
+  interpro_gene_count: 3658
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
-  ncbifam_gene_count: 1656
+  ncbifam_gene_count: 1661
   nonpeptidase_homolog_gene_count: 33
   omics_types:
   - BIOINFORMATIC
@@ -104,7 +104,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 127
   publication_count: 2
-  reaction_count: 1275
+  reaction_count: 1243
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -133,10 +133,10 @@ rows:
   genus: Alteromonas
   go_transport_metabolite_count: 85
   growth_phases: []
-  interpro_gene_count: 3495
+  interpro_gene_count: 3543
   measured_metabolite_count: 0
   ncbi_taxon_id: 1004787
-  ncbifam_gene_count: 1611
+  ncbifam_gene_count: 1615
   nonpeptidase_homolog_gene_count: 32
   omics_types:
   - BIOINFORMATIC
@@ -146,7 +146,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 129
   publication_count: 2
-  reaction_count: 1259
+  reaction_count: 1227
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -176,10 +176,10 @@ rows:
   go_transport_metabolite_count: 89
   growth_phases:
   - nutrient_limited
-  interpro_gene_count: 3456
+  interpro_gene_count: 3494
   measured_metabolite_count: 0
   ncbi_taxon_id: 529120
-  ncbifam_gene_count: 1598
+  ncbifam_gene_count: 1604
   nonpeptidase_homolog_gene_count: 37
   omics_types:
   - BIOINFORMATIC
@@ -190,7 +190,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 125
   publication_count: 3
-  reaction_count: 1251
+  reaction_count: 1219
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -218,10 +218,10 @@ rows:
   genus: Alteromonas
   go_transport_metabolite_count: 96
   growth_phases: []
-  interpro_gene_count: 3608
+  interpro_gene_count: 3661
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
-  ncbifam_gene_count: 1656
+  ncbifam_gene_count: 1661
   nonpeptidase_homolog_gene_count: 33
   omics_types:
   - VESICLE_PROTEOMICS
@@ -230,7 +230,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 127
   publication_count: 1
-  reaction_count: 1275
+  reaction_count: 1243
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -255,10 +255,10 @@ rows:
   genus: Alteromonas
   go_transport_metabolite_count: 83
   growth_phases: []
-  interpro_gene_count: 3349
+  interpro_gene_count: 3396
   measured_metabolite_count: 0
   ncbi_taxon_id: 1004785
-  ncbifam_gene_count: 1577
+  ncbifam_gene_count: 1581
   nonpeptidase_homolog_gene_count: 29
   omics_types:
   - VESICLE_PROTEOMICS
@@ -267,7 +267,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 123
   publication_count: 1
-  reaction_count: 1228
+  reaction_count: 1196
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -296,10 +296,10 @@ rows:
   growth_phases:
   - acclimated_steady_state
   - exponential
-  interpro_gene_count: 3659
+  interpro_gene_count: 3710
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
-  ncbifam_gene_count: 1701
+  ncbifam_gene_count: 1706
   nonpeptidase_homolog_gene_count: 34
   omics_types:
   - BIOINFORMATIC
@@ -311,7 +311,7 @@ rows:
   partner_experiment_count: 4
   peptidase_gene_count: 124
   publication_count: 4
-  reaction_count: 1348
+  reaction_count: 1316
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -345,10 +345,10 @@ rows:
   growth_phases:
   - exponential
   - nutrient_limited
-  interpro_gene_count: 3563
+  interpro_gene_count: 3613
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
-  ncbifam_gene_count: 1678
+  ncbifam_gene_count: 1683
   nonpeptidase_homolog_gene_count: 33
   omics_types:
   - BIOINFORMATIC
@@ -360,7 +360,7 @@ rows:
   partner_experiment_count: 6
   peptidase_gene_count: 118
   publication_count: 4
-  reaction_count: 1266
+  reaction_count: 1234
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -396,10 +396,10 @@ rows:
   - darkness
   - diel
   - unknown
-  interpro_gene_count: 3584
+  interpro_gene_count: 3636
   measured_metabolite_count: 0
   ncbi_taxon_id: 28108
-  ncbifam_gene_count: 1699
+  ncbifam_gene_count: 1704
   nonpeptidase_homolog_gene_count: 32
   omics_types:
   - BIOINFORMATIC
@@ -410,7 +410,7 @@ rows:
   partner_experiment_count: 3
   peptidase_gene_count: 120
   publication_count: 5
-  reaction_count: 1288
+  reaction_count: 1256
   reference_database: null
   reference_proteome: null
   species: Alteromonas macleodii
@@ -434,10 +434,10 @@ rows:
   genus: Alteromonas
   go_transport_metabolite_count: 97
   growth_phases: []
-  interpro_gene_count: 3363
+  interpro_gene_count: 3414
   measured_metabolite_count: 0
   ncbi_taxon_id: 1774373
-  ncbifam_gene_count: 1591
+  ncbifam_gene_count: 1596
   nonpeptidase_homolog_gene_count: 31
   omics_types: []
   organism_name: Alteromonas mediterranea AltDE
@@ -445,7 +445,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 104
   publication_count: 0
-  reaction_count: 1206
+  reaction_count: 1174
   reference_database: null
   reference_proteome: null
   species: Alteromonas mediterranea
@@ -465,10 +465,10 @@ rows:
   genus: Alteromonas
   go_transport_metabolite_count: 90
   growth_phases: []
-  interpro_gene_count: 3621
+  interpro_gene_count: 3678
   measured_metabolite_count: 0
   ncbi_taxon_id: 1004786
-  ncbifam_gene_count: 1686
+  ncbifam_gene_count: 1691
   nonpeptidase_homolog_gene_count: 31
   omics_types: []
   organism_name: Alteromonas mediterranea AltDE1
@@ -476,7 +476,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 116
   publication_count: 0
-  reaction_count: 1249
+  reaction_count: 1217
   reference_database: null
   reference_proteome: null
   species: Alteromonas mediterranea
@@ -498,10 +498,10 @@ rows:
   genus: Cyanobium
   go_transport_metabolite_count: 48
   growth_phases: []
-  interpro_gene_count: 2354
+  interpro_gene_count: 2427
   measured_metabolite_count: 0
   ncbi_taxon_id: 261284
-  ncbifam_gene_count: 989
+  ncbifam_gene_count: 997
   nonpeptidase_homolog_gene_count: 11
   omics_types:
   - BIOINFORMATIC
@@ -510,7 +510,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 74
   publication_count: 1
-  reaction_count: 1037
+  reaction_count: 1022
   reference_database: null
   reference_proteome: null
   species: null
@@ -533,10 +533,10 @@ rows:
   genus: Cyanobium
   go_transport_metabolite_count: 48
   growth_phases: []
-  interpro_gene_count: 2800
+  interpro_gene_count: 2876
   measured_metabolite_count: 0
   ncbi_taxon_id: 292564
-  ncbifam_gene_count: 1060
+  ncbifam_gene_count: 1069
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
@@ -545,7 +545,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 82
   publication_count: 1
-  reaction_count: 1043
+  reaction_count: 1027
   reference_database: null
   reference_proteome: null
   species: Cyanobium gracile
@@ -568,10 +568,10 @@ rows:
   genus: Cyanobium
   go_transport_metabolite_count: 46
   growth_phases: []
-  interpro_gene_count: 2396
+  interpro_gene_count: 2464
   measured_metabolite_count: 0
   ncbi_taxon_id: 180281
-  ncbifam_gene_count: 978
+  ncbifam_gene_count: 987
   nonpeptidase_homolog_gene_count: 13
   omics_types:
   - BIOINFORMATIC
@@ -580,7 +580,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 72
   publication_count: 1
-  reaction_count: 1030
+  reaction_count: 1015
   reference_database: null
   reference_proteome: null
   species: null
@@ -633,14 +633,14 @@ rows:
   experiment_count: 20
   gene_count: 4240
   genus: Marinobacter
-  go_transport_metabolite_count: 106
+  go_transport_metabolite_count: 107
   growth_phases:
   - darkness
   - exponential
-  interpro_gene_count: 3780
+  interpro_gene_count: 3856
   measured_metabolite_count: 0
   ncbi_taxon_id: 225937
-  ncbifam_gene_count: 1712
+  ncbifam_gene_count: 1722
   nonpeptidase_homolog_gene_count: 31
   omics_types:
   - PROTEOMICS
@@ -649,7 +649,7 @@ rows:
   partner_experiment_count: 40
   peptidase_gene_count: 94
   publication_count: 1
-  reaction_count: 1278
+  reaction_count: 1258
   reference_database: MarRef v6
   reference_proteome: GCF_000166295.1
   species: Marinobacter adhaerens
@@ -671,10 +671,10 @@ rows:
   genus: Meiothermus
   go_transport_metabolite_count: 65
   growth_phases: []
-  interpro_gene_count: 2492
+  interpro_gene_count: 2531
   measured_metabolite_count: 0
   ncbi_taxon_id: 172827
-  ncbifam_gene_count: 951
+  ncbifam_gene_count: 956
   nonpeptidase_homolog_gene_count: 26
   omics_types: []
   organism_name: Meiothermus ruber
@@ -682,7 +682,7 @@ rows:
   partner_experiment_count: 1
   peptidase_gene_count: 99
   publication_count: 1
-  reaction_count: 1138
+  reaction_count: 1112
   reference_database: null
   reference_proteome: null
   species: null
@@ -739,10 +739,10 @@ rows:
   go_transport_metabolite_count: 42
   growth_phases:
   - acclimated_steady_state
-  interpro_gene_count: 1547
+  interpro_gene_count: 1584
   measured_metabolite_count: 0
   ncbi_taxon_id: 146891
-  ncbifam_gene_count: 758
+  ncbifam_gene_count: 760
   nonpeptidase_homolog_gene_count: 8
   omics_types:
   - BIOINFORMATIC
@@ -752,7 +752,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 49
   publication_count: 2
-  reaction_count: 924
+  reaction_count: 896
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -776,10 +776,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 39
   growth_phases: []
-  interpro_gene_count: 1537
+  interpro_gene_count: 1574
   measured_metabolite_count: 0
   ncbi_taxon_id: 190047
-  ncbifam_gene_count: 742
+  ncbifam_gene_count: 743
   nonpeptidase_homolog_gene_count: 8
   omics_types:
   - BIOINFORMATIC
@@ -788,7 +788,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 50
   publication_count: 1
-  reaction_count: 942
+  reaction_count: 914
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -811,10 +811,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 36
   growth_phases: []
-  interpro_gene_count: 1502
+  interpro_gene_count: 1536
   measured_metabolite_count: 0
   ncbi_taxon_id: 59925
-  ncbifam_gene_count: 752
+  ncbifam_gene_count: 754
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
@@ -823,7 +823,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 48
   publication_count: 1
-  reaction_count: 907
+  reaction_count: 879
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -846,10 +846,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 16
   growth_phases: []
-  interpro_gene_count: 1172
+  interpro_gene_count: 1202
   measured_metabolite_count: 0
   ncbi_taxon_id: 1041938
-  ncbifam_gene_count: 588
+  ncbifam_gene_count: 589
   nonpeptidase_homolog_gene_count: 9
   omics_types:
   - BIOINFORMATIC
@@ -858,7 +858,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 32
   publication_count: 1
-  reaction_count: 733
+  reaction_count: 706
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -881,10 +881,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 19
   growth_phases: []
-  interpro_gene_count: 1233
+  interpro_gene_count: 1260
   measured_metabolite_count: 0
   ncbi_taxon_id: 1041939
-  ncbifam_gene_count: 634
+  ncbifam_gene_count: 635
   nonpeptidase_homolog_gene_count: 7
   omics_types:
   - BIOINFORMATIC
@@ -893,7 +893,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 45
   publication_count: 1
-  reaction_count: 783
+  reaction_count: 755
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -916,10 +916,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 34
   growth_phases: []
-  interpro_gene_count: 1533
+  interpro_gene_count: 1583
   measured_metabolite_count: 0
   ncbi_taxon_id: 167556
-  ncbifam_gene_count: 778
+  ncbifam_gene_count: 783
   nonpeptidase_homolog_gene_count: 9
   omics_types:
   - BIOINFORMATIC
@@ -928,7 +928,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 49
   publication_count: 1
-  reaction_count: 919
+  reaction_count: 905
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -974,10 +974,10 @@ rows:
   - infected
   - nutrient_limited
   - recovery
-  interpro_gene_count: 1545
+  interpro_gene_count: 1581
   measured_metabolite_count: 0
   ncbi_taxon_id: 59919
-  ncbifam_gene_count: 744
+  ncbifam_gene_count: 745
   nonpeptidase_homolog_gene_count: 8
   omics_types:
   - BIOINFORMATIC
@@ -992,7 +992,7 @@ rows:
   partner_experiment_count: 11
   peptidase_gene_count: 50
   publication_count: 21
-  reaction_count: 943
+  reaction_count: 915
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1029,10 +1029,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 30
   growth_phases: []
-  interpro_gene_count: 1510
+  interpro_gene_count: 1553
   measured_metabolite_count: 0
   ncbi_taxon_id: 1499498
-  ncbifam_gene_count: 771
+  ncbifam_gene_count: 775
   nonpeptidase_homolog_gene_count: 11
   omics_types:
   - BIOINFORMATIC
@@ -1041,7 +1041,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 47
   publication_count: 1
-  reaction_count: 893
+  reaction_count: 879
   reference_database: null
   reference_proteome: null
   species: null
@@ -1064,10 +1064,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 32
   growth_phases: []
-  interpro_gene_count: 1526
+  interpro_gene_count: 1572
   measured_metabolite_count: 0
   ncbi_taxon_id: 1499499
-  ncbifam_gene_count: 765
+  ncbifam_gene_count: 770
   nonpeptidase_homolog_gene_count: 8
   omics_types:
   - BIOINFORMATIC
@@ -1076,7 +1076,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 51
   publication_count: 1
-  reaction_count: 927
+  reaction_count: 913
   reference_database: null
   reference_proteome: null
   species: null
@@ -1099,10 +1099,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 35
   growth_phases: []
-  interpro_gene_count: 1532
+  interpro_gene_count: 1578
   measured_metabolite_count: 0
   ncbi_taxon_id: 1499500
-  ncbifam_gene_count: 770
+  ncbifam_gene_count: 775
   nonpeptidase_homolog_gene_count: 8
   omics_types:
   - BIOINFORMATIC
@@ -1111,7 +1111,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 52
   publication_count: 1
-  reaction_count: 927
+  reaction_count: 913
   reference_database: null
   reference_proteome: null
   species: null
@@ -1136,10 +1136,10 @@ rows:
   go_transport_metabolite_count: 35
   growth_phases:
   - acute_stress
-  interpro_gene_count: 1599
+  interpro_gene_count: 1639
   measured_metabolite_count: 0
   ncbi_taxon_id: 1501268
-  ncbifam_gene_count: 770
+  ncbifam_gene_count: 772
   nonpeptidase_homolog_gene_count: 8
   omics_types:
   - BIOINFORMATIC
@@ -1149,7 +1149,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 50
   publication_count: 2
-  reaction_count: 930
+  reaction_count: 901
   reference_database: null
   reference_proteome: null
   species: null
@@ -1174,10 +1174,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 47
   growth_phases: []
-  interpro_gene_count: 1945
+  interpro_gene_count: 2015
   measured_metabolite_count: 0
   ncbi_taxon_id: 1499502
-  ncbifam_gene_count: 868
+  ncbifam_gene_count: 873
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
@@ -1186,7 +1186,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 73
   publication_count: 1
-  reaction_count: 969
+  reaction_count: 955
   reference_database: null
   reference_proteome: null
   species: null
@@ -1209,10 +1209,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 47
   growth_phases: []
-  interpro_gene_count: 1941
+  interpro_gene_count: 2010
   measured_metabolite_count: 0
   ncbi_taxon_id: 1499503
-  ncbifam_gene_count: 869
+  ncbifam_gene_count: 874
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
@@ -1221,7 +1221,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 73
   publication_count: 1
-  reaction_count: 971
+  reaction_count: 957
   reference_database: null
   reference_proteome: null
   species: null
@@ -1244,10 +1244,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 44
   growth_phases: []
-  interpro_gene_count: 1937
+  interpro_gene_count: 2010
   measured_metabolite_count: 0
   ncbi_taxon_id: 1499504
-  ncbifam_gene_count: 867
+  ncbifam_gene_count: 872
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
@@ -1256,7 +1256,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 71
   publication_count: 1
-  reaction_count: 971
+  reaction_count: 957
   reference_database: null
   reference_proteome: null
   species: null
@@ -1280,10 +1280,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 38
   growth_phases: []
-  interpro_gene_count: 1616
+  interpro_gene_count: 1662
   measured_metabolite_count: 92
   ncbi_taxon_id: 1501269
-  ncbifam_gene_count: 793
+  ncbifam_gene_count: 799
   nonpeptidase_homolog_gene_count: 11
   omics_types:
   - BIOINFORMATIC
@@ -1293,7 +1293,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 52
   publication_count: 2
-  reaction_count: 934
+  reaction_count: 905
   reference_database: null
   reference_proteome: null
   species: null
@@ -1316,10 +1316,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 26
   growth_phases: []
-  interpro_gene_count: 1541
+  interpro_gene_count: 1583
   measured_metabolite_count: 0
   ncbi_taxon_id: 3096220
-  ncbifam_gene_count: 753
+  ncbifam_gene_count: 755
   nonpeptidase_homolog_gene_count: 12
   omics_types: []
   organism_name: Prochlorococcus MIT1314
@@ -1327,7 +1327,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 46
   publication_count: 0
-  reaction_count: 928
+  reaction_count: 900
   reference_database: null
   reference_proteome: null
   species: null
@@ -1347,10 +1347,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 44
   growth_phases: []
-  interpro_gene_count: 1922
+  interpro_gene_count: 1996
   measured_metabolite_count: 0
   ncbi_taxon_id: 1801626
-  ncbifam_gene_count: 883
+  ncbifam_gene_count: 889
   nonpeptidase_homolog_gene_count: 10
   omics_types: []
   organism_name: Prochlorococcus MIT1327
@@ -1358,7 +1358,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 70
   publication_count: 0
-  reaction_count: 956
+  reaction_count: 942
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1380,10 +1380,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 33
   growth_phases: []
-  interpro_gene_count: 1536
+  interpro_gene_count: 1575
   measured_metabolite_count: 0
   ncbi_taxon_id: 59921
-  ncbifam_gene_count: 749
+  ncbifam_gene_count: 751
   nonpeptidase_homolog_gene_count: 8
   omics_types:
   - BIOINFORMATIC
@@ -1392,7 +1392,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 48
   publication_count: 1
-  reaction_count: 945
+  reaction_count: 917
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1415,10 +1415,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 33
   growth_phases: []
-  interpro_gene_count: 1534
+  interpro_gene_count: 1571
   measured_metabolite_count: 0
   ncbi_taxon_id: 167544
-  ncbifam_gene_count: 746
+  ncbifam_gene_count: 748
   nonpeptidase_homolog_gene_count: 8
   omics_types:
   - BIOINFORMATIC
@@ -1427,7 +1427,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 49
   publication_count: 1
-  reaction_count: 946
+  reaction_count: 918
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1450,10 +1450,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 33
   growth_phases: []
-  interpro_gene_count: 1546
+  interpro_gene_count: 1583
   measured_metabolite_count: 0
   ncbi_taxon_id: 167545
-  ncbifam_gene_count: 749
+  ncbifam_gene_count: 751
   nonpeptidase_homolog_gene_count: 8
   omics_types:
   - BIOINFORMATIC
@@ -1462,7 +1462,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 48
   publication_count: 1
-  reaction_count: 946
+  reaction_count: 918
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1485,10 +1485,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 39
   growth_phases: []
-  interpro_gene_count: 1539
+  interpro_gene_count: 1581
   measured_metabolite_count: 0
   ncbi_taxon_id: 93057
-  ncbifam_gene_count: 754
+  ncbifam_gene_count: 756
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
@@ -1497,7 +1497,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 46
   publication_count: 1
-  reaction_count: 919
+  reaction_count: 891
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1520,10 +1520,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 39
   growth_phases: []
-  interpro_gene_count: 1529
+  interpro_gene_count: 1570
   measured_metabolite_count: 0
   ncbi_taxon_id: 93058
-  ncbifam_gene_count: 756
+  ncbifam_gene_count: 758
   nonpeptidase_homolog_gene_count: 11
   omics_types:
   - BIOINFORMATIC
@@ -1532,7 +1532,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 48
   publication_count: 1
-  reaction_count: 921
+  reaction_count: 892
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1555,10 +1555,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 41
   growth_phases: []
-  interpro_gene_count: 1522
+  interpro_gene_count: 1563
   measured_metabolite_count: 0
   ncbi_taxon_id: 93059
-  ncbifam_gene_count: 779
+  ncbifam_gene_count: 784
   nonpeptidase_homolog_gene_count: 9
   omics_types:
   - BIOINFORMATIC
@@ -1567,7 +1567,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 47
   publication_count: 1
-  reaction_count: 901
+  reaction_count: 887
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1590,10 +1590,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 42
   growth_phases: []
-  interpro_gene_count: 1580
+  interpro_gene_count: 1621
   measured_metabolite_count: 0
   ncbi_taxon_id: 93060
-  ncbifam_gene_count: 770
+  ncbifam_gene_count: 772
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
@@ -1602,7 +1602,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 50
   publication_count: 1
-  reaction_count: 950
+  reaction_count: 922
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1631,10 +1631,10 @@ rows:
   go_transport_metabolite_count: 46
   growth_phases:
   - exponential
-  interpro_gene_count: 1537
+  interpro_gene_count: 1572
   measured_metabolite_count: 96
   ncbi_taxon_id: 167546
-  ncbifam_gene_count: 774
+  ncbifam_gene_count: 776
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
@@ -1645,7 +1645,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 49
   publication_count: 4
-  reaction_count: 945
+  reaction_count: 917
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1671,10 +1671,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 36
   growth_phases: []
-  interpro_gene_count: 1578
+  interpro_gene_count: 1615
   measured_metabolite_count: 0
   ncbi_taxon_id: 74545
-  ncbifam_gene_count: 767
+  ncbifam_gene_count: 769
   nonpeptidase_homolog_gene_count: 8
   omics_types:
   - BIOINFORMATIC
@@ -1683,7 +1683,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 49
   publication_count: 1
-  reaction_count: 940
+  reaction_count: 911
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1710,10 +1710,10 @@ rows:
   go_transport_metabolite_count: 53
   growth_phases:
   - exponential
-  interpro_gene_count: 2015
+  interpro_gene_count: 2093
   measured_metabolite_count: 16
   ncbi_taxon_id: 59922
-  ncbifam_gene_count: 895
+  ncbifam_gene_count: 900
   nonpeptidase_homolog_gene_count: 13
   omics_types:
   - BIOINFORMATIC
@@ -1724,7 +1724,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 72
   publication_count: 2
-  reaction_count: 993
+  reaction_count: 979
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1748,10 +1748,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 38
   growth_phases: []
-  interpro_gene_count: 1564
+  interpro_gene_count: 1600
   measured_metabolite_count: 0
   ncbi_taxon_id: 167547
-  ncbifam_gene_count: 758
+  ncbifam_gene_count: 760
   nonpeptidase_homolog_gene_count: 9
   omics_types:
   - BIOINFORMATIC
@@ -1760,7 +1760,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 50
   publication_count: 1
-  reaction_count: 942
+  reaction_count: 914
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1794,10 +1794,10 @@ rows:
   - acute_stress
   - exponential
   - stationary
-  interpro_gene_count: 1557
+  interpro_gene_count: 1592
   measured_metabolite_count: 70
   ncbi_taxon_id: 74546
-  ncbifam_gene_count: 759
+  ncbifam_gene_count: 761
   nonpeptidase_homolog_gene_count: 9
   omics_types:
   - BIOINFORMATIC
@@ -1810,7 +1810,7 @@ rows:
   partner_experiment_count: 4
   peptidase_gene_count: 50
   publication_count: 6
-  reaction_count: 943
+  reaction_count: 915
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1848,10 +1848,10 @@ rows:
   - exponential
   - nutrient_limited
   - recovery
-  interpro_gene_count: 1888
+  interpro_gene_count: 1964
   measured_metabolite_count: 134
   ncbi_taxon_id: 74547
-  ncbifam_gene_count: 905
+  ncbifam_gene_count: 911
   nonpeptidase_homolog_gene_count: 11
   omics_types:
   - BIOINFORMATIC
@@ -1864,7 +1864,7 @@ rows:
   partner_experiment_count: 2
   peptidase_gene_count: 60
   publication_count: 11
-  reaction_count: 953
+  reaction_count: 939
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1895,10 +1895,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 37
   growth_phases: []
-  interpro_gene_count: 1576
+  interpro_gene_count: 1613
   measured_metabolite_count: 0
   ncbi_taxon_id: 167548
-  ncbifam_gene_count: 776
+  ncbifam_gene_count: 778
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
@@ -1907,7 +1907,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 48
   publication_count: 1
-  reaction_count: 952
+  reaction_count: 924
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1930,10 +1930,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 34
   growth_phases: []
-  interpro_gene_count: 1532
+  interpro_gene_count: 1574
   measured_metabolite_count: 0
   ncbi_taxon_id: 167549
-  ncbifam_gene_count: 758
+  ncbifam_gene_count: 760
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
@@ -1942,7 +1942,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 46
   publication_count: 1
-  reaction_count: 935
+  reaction_count: 907
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -1965,10 +1965,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 34
   growth_phases: []
-  interpro_gene_count: 1532
+  interpro_gene_count: 1573
   measured_metabolite_count: 0
   ncbi_taxon_id: 167550
-  ncbifam_gene_count: 761
+  ncbifam_gene_count: 763
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
@@ -1977,7 +1977,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 46
   publication_count: 1
-  reaction_count: 936
+  reaction_count: 908
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -2000,10 +2000,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 34
   growth_phases: []
-  interpro_gene_count: 1542
+  interpro_gene_count: 1584
   measured_metabolite_count: 0
   ncbi_taxon_id: 167551
-  ncbifam_gene_count: 761
+  ncbifam_gene_count: 763
   nonpeptidase_homolog_gene_count: 9
   omics_types:
   - BIOINFORMATIC
@@ -2012,7 +2012,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 48
   publication_count: 1
-  reaction_count: 936
+  reaction_count: 908
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -2035,10 +2035,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 41
   growth_phases: []
-  interpro_gene_count: 1538
+  interpro_gene_count: 1578
   measured_metabolite_count: 0
   ncbi_taxon_id: 167542
-  ncbifam_gene_count: 744
+  ncbifam_gene_count: 746
   nonpeptidase_homolog_gene_count: 8
   omics_types:
   - BIOINFORMATIC
@@ -2047,7 +2047,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 50
   publication_count: 1
-  reaction_count: 926
+  reaction_count: 898
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -2074,10 +2074,10 @@ rows:
   go_transport_metabolite_count: 47
   growth_phases:
   - acclimated_steady_state
-  interpro_gene_count: 1573
+  interpro_gene_count: 1621
   measured_metabolite_count: 0
   ncbi_taxon_id: 167555
-  ncbifam_gene_count: 777
+  ncbifam_gene_count: 783
   nonpeptidase_homolog_gene_count: 12
   omics_types:
   - BIOINFORMATIC
@@ -2087,7 +2087,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 49
   publication_count: 2
-  reaction_count: 935
+  reaction_count: 907
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -2126,10 +2126,10 @@ rows:
   - infected
   - nutrient_limited
   - recovery
-  interpro_gene_count: 1566
+  interpro_gene_count: 1612
   measured_metabolite_count: 0
   ncbi_taxon_id: 59920
-  ncbifam_gene_count: 775
+  ncbifam_gene_count: 781
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
@@ -2140,7 +2140,7 @@ rows:
   partner_experiment_count: 4
   peptidase_gene_count: 50
   publication_count: 7
-  reaction_count: 927
+  reaction_count: 899
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -2167,10 +2167,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 40
   growth_phases: []
-  interpro_gene_count: 1563
+  interpro_gene_count: 1609
   measured_metabolite_count: 0
   ncbi_taxon_id: 59924
-  ncbifam_gene_count: 771
+  ncbifam_gene_count: 777
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
@@ -2179,7 +2179,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 50
   publication_count: 1
-  reaction_count: 959
+  reaction_count: 931
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -2201,10 +2201,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 30
   growth_phases: []
-  interpro_gene_count: 1550
+  interpro_gene_count: 1589
   measured_metabolite_count: 0
   ncbi_taxon_id: 1924285
-  ncbifam_gene_count: 760
+  ncbifam_gene_count: 762
   nonpeptidase_homolog_gene_count: 10
   omics_types: []
   organism_name: Prochlorococcus RSP50
@@ -2212,7 +2212,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 49
   publication_count: 0
-  reaction_count: 948
+  reaction_count: 920
   reference_database: null
   reference_proteome: null
   species: null
@@ -2234,10 +2234,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 44
   growth_phases: []
-  interpro_gene_count: 1524
+  interpro_gene_count: 1567
   measured_metabolite_count: 0
   ncbi_taxon_id: 59926
-  ncbifam_gene_count: 760
+  ncbifam_gene_count: 762
   nonpeptidase_homolog_gene_count: 8
   omics_types:
   - BIOINFORMATIC
@@ -2246,7 +2246,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 51
   publication_count: 1
-  reaction_count: 931
+  reaction_count: 903
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -2269,10 +2269,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 33
   growth_phases: []
-  interpro_gene_count: 1532
+  interpro_gene_count: 1582
   measured_metabolite_count: 0
   ncbi_taxon_id: 167552
-  ncbifam_gene_count: 778
+  ncbifam_gene_count: 783
   nonpeptidase_homolog_gene_count: 9
   omics_types:
   - BIOINFORMATIC
@@ -2281,7 +2281,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 49
   publication_count: 1
-  reaction_count: 919
+  reaction_count: 905
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -2304,10 +2304,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 33
   growth_phases: []
-  interpro_gene_count: 1532
+  interpro_gene_count: 1582
   measured_metabolite_count: 0
   ncbi_taxon_id: 167553
-  ncbifam_gene_count: 778
+  ncbifam_gene_count: 783
   nonpeptidase_homolog_gene_count: 9
   omics_types:
   - BIOINFORMATIC
@@ -2316,7 +2316,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 49
   publication_count: 1
-  reaction_count: 919
+  reaction_count: 905
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -2339,10 +2339,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 34
   growth_phases: []
-  interpro_gene_count: 1531
+  interpro_gene_count: 1581
   measured_metabolite_count: 0
   ncbi_taxon_id: 167554
-  ncbifam_gene_count: 778
+  ncbifam_gene_count: 783
   nonpeptidase_homolog_gene_count: 9
   omics_types:
   - BIOINFORMATIC
@@ -2351,7 +2351,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 49
   publication_count: 1
-  reaction_count: 919
+  reaction_count: 905
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -2374,10 +2374,10 @@ rows:
   genus: Prochlorococcus
   go_transport_metabolite_count: 33
   growth_phases: []
-  interpro_gene_count: 1536
+  interpro_gene_count: 1586
   measured_metabolite_count: 0
   ncbi_taxon_id: 1499501
-  ncbifam_gene_count: 779
+  ncbifam_gene_count: 784
   nonpeptidase_homolog_gene_count: 9
   omics_types:
   - BIOINFORMATIC
@@ -2386,7 +2386,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 49
   publication_count: 1
-  reaction_count: 919
+  reaction_count: 905
   reference_database: null
   reference_proteome: null
   species: null
@@ -2419,10 +2419,10 @@ rows:
   - darkness
   - exponential
   - stationary
-  interpro_gene_count: 1527
+  interpro_gene_count: 1578
   measured_metabolite_count: 0
   ncbi_taxon_id: 167539
-  ncbifam_gene_count: 778
+  ncbifam_gene_count: 783
   nonpeptidase_homolog_gene_count: 9
   omics_types:
   - BIOINFORMATIC
@@ -2432,7 +2432,7 @@ rows:
   partner_experiment_count: 8
   peptidase_gene_count: 49
   publication_count: 4
-  reaction_count: 919
+  reaction_count: 905
   reference_database: null
   reference_proteome: null
   species: Prochlorococcus marinus
@@ -2458,10 +2458,10 @@ rows:
   go_transport_metabolite_count: 147
   growth_phases:
   - exponential
-  interpro_gene_count: 4961
+  interpro_gene_count: 5047
   measured_metabolite_count: 0
   ncbi_taxon_id: 160488
-  ncbifam_gene_count: 2264
+  ncbifam_gene_count: 2290
   nonpeptidase_homolog_gene_count: 43
   omics_types:
   - PROTEOMICS
@@ -2471,7 +2471,7 @@ rows:
   partner_experiment_count: 2
   peptidase_gene_count: 125
   publication_count: 1
-  reaction_count: 1449
+  reaction_count: 1434
   reference_database: null
   reference_proteome: null
   species: Pseudomonas putida
@@ -2501,10 +2501,10 @@ rows:
   - acclimated_steady_state
   - exponential
   - unknown
-  interpro_gene_count: 3952
+  interpro_gene_count: 4049
   measured_metabolite_count: 0
   ncbi_taxon_id: 89184
-  ncbifam_gene_count: 1453
+  ncbifam_gene_count: 1465
   nonpeptidase_homolog_gene_count: 33
   omics_types:
   - EXOPROTEOMICS
@@ -2515,7 +2515,7 @@ rows:
   partner_experiment_count: 5
   peptidase_gene_count: 111
   publication_count: 7
-  reaction_count: 1377
+  reaction_count: 1362
   reference_database: null
   reference_proteome: null
   species: Ruegeria pomeroyi
@@ -2539,10 +2539,10 @@ rows:
   go_transport_metabolite_count: 110
   growth_phases:
   - acclimated_steady_state
-  interpro_gene_count: 3636
+  interpro_gene_count: 3698
   measured_metabolite_count: 0
   ncbi_taxon_id: 351745
-  ncbifam_gene_count: 1853
+  ncbifam_gene_count: 1859
   nonpeptidase_homolog_gene_count: 23
   omics_types:
   - RNASEQ
@@ -2551,7 +2551,7 @@ rows:
   partner_experiment_count: 3
   peptidase_gene_count: 128
   publication_count: 1
-  reaction_count: 1260
+  reaction_count: 1228
   reference_database: null
   reference_proteome: null
   species: Shewanella sp.
@@ -2575,10 +2575,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 48
   growth_phases: []
-  interpro_gene_count: 2133
+  interpro_gene_count: 2204
   measured_metabolite_count: 0
   ncbi_taxon_id: 1050624
-  ncbifam_gene_count: 915
+  ncbifam_gene_count: 924
   nonpeptidase_homolog_gene_count: 11
   omics_types:
   - BIOINFORMATIC
@@ -2587,7 +2587,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 68
   publication_count: 1
-  reaction_count: 1064
+  reaction_count: 1036
   reference_database: null
   reference_proteome: null
   species: null
@@ -2610,10 +2610,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 46
   growth_phases: []
-  interpro_gene_count: 2085
+  interpro_gene_count: 2153
   measured_metabolite_count: 0
   ncbi_taxon_id: 1050635
-  ncbifam_gene_count: 903
+  ncbifam_gene_count: 914
   nonpeptidase_homolog_gene_count: 12
   omics_types:
   - BIOINFORMATIC
@@ -2622,7 +2622,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 64
   publication_count: 1
-  reaction_count: 1043
+  reaction_count: 1015
   reference_database: null
   reference_proteome: null
   species: null
@@ -2645,10 +2645,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 46
   growth_phases: []
-  interpro_gene_count: 2118
+  interpro_gene_count: 2181
   measured_metabolite_count: 0
   ncbi_taxon_id: 1050638
-  ncbifam_gene_count: 903
+  ncbifam_gene_count: 915
   nonpeptidase_homolog_gene_count: 11
   omics_types:
   - BIOINFORMATIC
@@ -2657,7 +2657,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 64
   publication_count: 1
-  reaction_count: 1030
+  reaction_count: 1002
   reference_database: null
   reference_proteome: null
   species: null
@@ -2680,10 +2680,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 41
   growth_phases: []
-  interpro_gene_count: 2244
+  interpro_gene_count: 2317
   measured_metabolite_count: 0
   ncbi_taxon_id: 1050646
-  ncbifam_gene_count: 943
+  ncbifam_gene_count: 952
   nonpeptidase_homolog_gene_count: 12
   omics_types:
   - BIOINFORMATIC
@@ -2692,7 +2692,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 64
   publication_count: 1
-  reaction_count: 1029
+  reaction_count: 1001
   reference_database: null
   reference_proteome: null
   species: null
@@ -2715,10 +2715,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 40
   growth_phases: []
-  interpro_gene_count: 2186
+  interpro_gene_count: 2253
   measured_metabolite_count: 0
   ncbi_taxon_id: 1050655
-  ncbifam_gene_count: 951
+  ncbifam_gene_count: 960
   nonpeptidase_homolog_gene_count: 13
   omics_types:
   - BIOINFORMATIC
@@ -2727,7 +2727,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 74
   publication_count: 1
-  reaction_count: 1051
+  reaction_count: 1023
   reference_database: null
   reference_proteome: null
   species: null
@@ -2750,10 +2750,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 41
   growth_phases: []
-  interpro_gene_count: 2032
+  interpro_gene_count: 2096
   measured_metabolite_count: 0
   ncbi_taxon_id: 1050657
-  ncbifam_gene_count: 894
+  ncbifam_gene_count: 904
   nonpeptidase_homolog_gene_count: 11
   omics_types:
   - BIOINFORMATIC
@@ -2762,7 +2762,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 65
   publication_count: 1
-  reaction_count: 1015
+  reaction_count: 987
   reference_database: null
   reference_proteome: null
   species: null
@@ -2785,10 +2785,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 40
   growth_phases: []
-  interpro_gene_count: 2180
+  interpro_gene_count: 2245
   measured_metabolite_count: 0
   ncbi_taxon_id: 1866938
-  ncbifam_gene_count: 957
+  ncbifam_gene_count: 966
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
@@ -2797,7 +2797,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 72
   publication_count: 1
-  reaction_count: 1047
+  reaction_count: 1019
   reference_database: null
   reference_proteome: null
   species: null
@@ -2820,10 +2820,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 42
   growth_phases: []
-  interpro_gene_count: 2086
+  interpro_gene_count: 2156
   measured_metabolite_count: 0
   ncbi_taxon_id: 1866939
-  ncbifam_gene_count: 904
+  ncbifam_gene_count: 916
   nonpeptidase_homolog_gene_count: 12
   omics_types:
   - BIOINFORMATIC
@@ -2832,7 +2832,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 59
   publication_count: 1
-  reaction_count: 1028
+  reaction_count: 1000
   reference_database: null
   reference_proteome: null
   species: null
@@ -2855,10 +2855,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 42
   growth_phases: []
-  interpro_gene_count: 2133
+  interpro_gene_count: 2205
   measured_metabolite_count: 0
   ncbi_taxon_id: 1866940
-  ncbifam_gene_count: 929
+  ncbifam_gene_count: 940
   nonpeptidase_homolog_gene_count: 12
   omics_types:
   - BIOINFORMATIC
@@ -2867,7 +2867,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 59
   publication_count: 1
-  reaction_count: 1033
+  reaction_count: 1005
   reference_database: null
   reference_proteome: null
   species: null
@@ -2890,10 +2890,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 46
   growth_phases: []
-  interpro_gene_count: 2579
+  interpro_gene_count: 2670
   measured_metabolite_count: 0
   ncbi_taxon_id: 1400864
-  ncbifam_gene_count: 1141
+  ncbifam_gene_count: 1152
   nonpeptidase_homolog_gene_count: 16
   omics_types:
   - BIOINFORMATIC
@@ -2902,7 +2902,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 75
   publication_count: 1
-  reaction_count: 1039
+  reaction_count: 1011
   reference_database: null
   reference_proteome: null
   species: null
@@ -2925,10 +2925,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 44
   growth_phases: []
-  interpro_gene_count: 2204
+  interpro_gene_count: 2280
   measured_metabolite_count: 0
   ncbi_taxon_id: 1400865
-  ncbifam_gene_count: 940
+  ncbifam_gene_count: 951
   nonpeptidase_homolog_gene_count: 13
   omics_types:
   - BIOINFORMATIC
@@ -2937,7 +2937,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 71
   publication_count: 1
-  reaction_count: 1035
+  reaction_count: 1007
   reference_database: null
   reference_proteome: null
   species: null
@@ -2960,10 +2960,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 49
   growth_phases: []
-  interpro_gene_count: 2304
+  interpro_gene_count: 2387
   measured_metabolite_count: 0
   ncbi_taxon_id: 1442551
-  ncbifam_gene_count: 943
+  ncbifam_gene_count: 952
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
@@ -2972,7 +2972,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 63
   publication_count: 1
-  reaction_count: 1067
+  reaction_count: 1039
   reference_database: null
   reference_proteome: null
   species: null
@@ -2995,10 +2995,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 44
   growth_phases: []
-  interpro_gene_count: 2056
+  interpro_gene_count: 2128
   measured_metabolite_count: 0
   ncbi_taxon_id: 1442552
-  ncbifam_gene_count: 894
+  ncbifam_gene_count: 906
   nonpeptidase_homolog_gene_count: 13
   omics_types:
   - BIOINFORMATIC
@@ -3007,7 +3007,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 57
   publication_count: 1
-  reaction_count: 1031
+  reaction_count: 1003
   reference_database: null
   reference_proteome: null
   species: null
@@ -3030,10 +3030,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 32
   growth_phases: []
-  interpro_gene_count: 2352
+  interpro_gene_count: 2423
   measured_metabolite_count: 0
   ncbi_taxon_id: 232348
-  ncbifam_gene_count: 976
+  ncbifam_gene_count: 985
   nonpeptidase_homolog_gene_count: 15
   omics_types:
   - BIOINFORMATIC
@@ -3042,7 +3042,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 64
   publication_count: 1
-  reaction_count: 998
+  reaction_count: 985
   reference_database: null
   reference_proteome: null
   species: null
@@ -3065,10 +3065,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 43
   growth_phases: []
-  interpro_gene_count: 2148
+  interpro_gene_count: 2216
   measured_metabolite_count: 0
   ncbi_taxon_id: 232363
-  ncbifam_gene_count: 914
+  ncbifam_gene_count: 925
   nonpeptidase_homolog_gene_count: 15
   omics_types:
   - BIOINFORMATIC
@@ -3077,7 +3077,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 71
   publication_count: 1
-  reaction_count: 1002
+  reaction_count: 973
   reference_database: null
   reference_proteome: null
   species: null
@@ -3106,10 +3106,10 @@ rows:
   go_transport_metabolite_count: 39
   growth_phases:
   - exponential
-  interpro_gene_count: 2152
+  interpro_gene_count: 2223
   measured_metabolite_count: 0
   ncbi_taxon_id: 64471
-  ncbifam_gene_count: 909
+  ncbifam_gene_count: 921
   nonpeptidase_homolog_gene_count: 17
   omics_types:
   - BIOINFORMATIC
@@ -3120,7 +3120,7 @@ rows:
   partner_experiment_count: 3
   peptidase_gene_count: 70
   publication_count: 3
-  reaction_count: 1039
+  reaction_count: 1011
   reference_database: null
   reference_proteome: null
   species: null
@@ -3145,10 +3145,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 42
   growth_phases: []
-  interpro_gene_count: 2119
+  interpro_gene_count: 2189
   measured_metabolite_count: 0
   ncbi_taxon_id: 110662
-  ncbifam_gene_count: 908
+  ncbifam_gene_count: 918
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
@@ -3157,7 +3157,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 62
   publication_count: 1
-  reaction_count: 1049
+  reaction_count: 1021
   reference_database: null
   reference_proteome: null
   species: null
@@ -3180,10 +3180,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 45
   growth_phases: []
-  interpro_gene_count: 2208
+  interpro_gene_count: 2275
   measured_metabolite_count: 0
   ncbi_taxon_id: 110663
-  ncbifam_gene_count: 928
+  ncbifam_gene_count: 938
   nonpeptidase_homolog_gene_count: 11
   omics_types:
   - BIOINFORMATIC
@@ -3192,7 +3192,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 75
   publication_count: 1
-  reaction_count: 1060
+  reaction_count: 1031
   reference_database: null
   reference_proteome: null
   species: null
@@ -3215,10 +3215,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 37
   growth_phases: []
-  interpro_gene_count: 1962
+  interpro_gene_count: 2024
   measured_metabolite_count: 0
   ncbi_taxon_id: 316279
-  ncbifam_gene_count: 878
+  ncbifam_gene_count: 887
   nonpeptidase_homolog_gene_count: 11
   omics_types:
   - BIOINFORMATIC
@@ -3227,7 +3227,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 59
   publication_count: 1
-  reaction_count: 1003
+  reaction_count: 975
   reference_database: null
   reference_proteome: null
   species: null
@@ -3250,10 +3250,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 42
   growth_phases: []
-  interpro_gene_count: 2281
+  interpro_gene_count: 2350
   measured_metabolite_count: 0
   ncbi_taxon_id: 1280380
-  ncbifam_gene_count: 937
+  ncbifam_gene_count: 946
   nonpeptidase_homolog_gene_count: 11
   omics_types:
   - BIOINFORMATIC
@@ -3262,7 +3262,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 75
   publication_count: 1
-  reaction_count: 1055
+  reaction_count: 1027
   reference_database: null
   reference_proteome: null
   species: null
@@ -3285,10 +3285,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 44
   growth_phases: []
-  interpro_gene_count: 2117
+  interpro_gene_count: 2185
   measured_metabolite_count: 0
   ncbi_taxon_id: 585423
-  ncbifam_gene_count: 900
+  ncbifam_gene_count: 910
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
@@ -3297,7 +3297,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 67
   publication_count: 1
-  reaction_count: 1066
+  reaction_count: 1037
   reference_database: null
   reference_proteome: null
   species: null
@@ -3320,10 +3320,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 43
   growth_phases: []
-  interpro_gene_count: 2124
+  interpro_gene_count: 2197
   measured_metabolite_count: 0
   ncbi_taxon_id: 585425
-  ncbifam_gene_count: 915
+  ncbifam_gene_count: 927
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
@@ -3332,7 +3332,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 65
   publication_count: 1
-  reaction_count: 1033
+  reaction_count: 1005
   reference_database: null
   reference_proteome: null
   species: null
@@ -3355,10 +3355,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 39
   growth_phases: []
-  interpro_gene_count: 1903
+  interpro_gene_count: 1964
   measured_metabolite_count: 0
   ncbi_taxon_id: 1442553
-  ncbifam_gene_count: 868
+  ncbifam_gene_count: 880
   nonpeptidase_homolog_gene_count: 13
   omics_types:
   - BIOINFORMATIC
@@ -3367,7 +3367,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 57
   publication_count: 1
-  reaction_count: 1013
+  reaction_count: 985
   reference_database: null
   reference_proteome: null
   species: null
@@ -3390,10 +3390,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 46
   growth_phases: []
-  interpro_gene_count: 2111
+  interpro_gene_count: 2184
   measured_metabolite_count: 0
   ncbi_taxon_id: 1442554
-  ncbifam_gene_count: 894
+  ncbifam_gene_count: 906
   nonpeptidase_homolog_gene_count: 12
   omics_types:
   - BIOINFORMATIC
@@ -3402,7 +3402,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 68
   publication_count: 1
-  reaction_count: 1047
+  reaction_count: 1019
   reference_database: null
   reference_proteome: null
   species: null
@@ -3425,10 +3425,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 47
   growth_phases: []
-  interpro_gene_count: 2039
+  interpro_gene_count: 2096
   measured_metabolite_count: 0
   ncbi_taxon_id: 221341
-  ncbifam_gene_count: 900
+  ncbifam_gene_count: 909
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
@@ -3437,7 +3437,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 65
   publication_count: 1
-  reaction_count: 1023
+  reaction_count: 1009
   reference_database: null
   reference_proteome: null
   species: null
@@ -3460,10 +3460,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 39
   growth_phases: []
-  interpro_gene_count: 2048
+  interpro_gene_count: 2120
   measured_metabolite_count: 0
   ncbi_taxon_id: 166309
-  ncbifam_gene_count: 871
+  ncbifam_gene_count: 881
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
@@ -3472,7 +3472,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 64
   publication_count: 1
-  reaction_count: 1024
+  reaction_count: 996
   reference_database: null
   reference_proteome: null
   species: null
@@ -3495,10 +3495,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 41
   growth_phases: []
-  interpro_gene_count: 2092
+  interpro_gene_count: 2166
   measured_metabolite_count: 0
   ncbi_taxon_id: 1386941
-  ncbifam_gene_count: 907
+  ncbifam_gene_count: 917
   nonpeptidase_homolog_gene_count: 16
   omics_types:
   - BIOINFORMATIC
@@ -3507,7 +3507,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 62
   publication_count: 1
-  reaction_count: 1040
+  reaction_count: 1012
   reference_database: null
   reference_proteome: null
   species: null
@@ -3530,10 +3530,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 41
   growth_phases: []
-  interpro_gene_count: 2178
+  interpro_gene_count: 2250
   measured_metabolite_count: 0
   ncbi_taxon_id: 1442555
-  ncbifam_gene_count: 925
+  ncbifam_gene_count: 935
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
@@ -3542,7 +3542,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 72
   publication_count: 1
-  reaction_count: 1055
+  reaction_count: 1027
   reference_database: null
   reference_proteome: null
   species: null
@@ -3565,10 +3565,10 @@ rows:
   go_transport_metabolite_count: 48
   growth_phases:
   - acclimated_steady_state
-  interpro_gene_count: 2721
+  interpro_gene_count: 2874
   measured_metabolite_count: 0
   ncbi_taxon_id: 32049
-  ncbifam_gene_count: 1161
+  ncbifam_gene_count: 1177
   nonpeptidase_homolog_gene_count: 15
   omics_types:
   - RNASEQ
@@ -3577,7 +3577,7 @@ rows:
   partner_experiment_count: 3
   peptidase_gene_count: 94
   publication_count: 1
-  reaction_count: 977
+  reaction_count: 962
   reference_database: null
   reference_proteome: null
   species: null
@@ -3601,10 +3601,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 46
   growth_phases: []
-  interpro_gene_count: 2236
+  interpro_gene_count: 2305
   measured_metabolite_count: 0
   ncbi_taxon_id: 1442556
-  ncbifam_gene_count: 936
+  ncbifam_gene_count: 946
   nonpeptidase_homolog_gene_count: 16
   omics_types:
   - BIOINFORMATIC
@@ -3613,7 +3613,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 72
   publication_count: 1
-  reaction_count: 1065
+  reaction_count: 1037
   reference_database: null
   reference_proteome: null
   species: null
@@ -3636,10 +3636,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 39
   growth_phases: []
-  interpro_gene_count: 1938
+  interpro_gene_count: 1997
   measured_metabolite_count: 0
   ncbi_taxon_id: 1968775
-  ncbifam_gene_count: 870
+  ncbifam_gene_count: 880
   nonpeptidase_homolog_gene_count: 13
   omics_types:
   - BIOINFORMATIC
@@ -3648,7 +3648,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 57
   publication_count: 1
-  reaction_count: 1012
+  reaction_count: 984
   reference_database: null
   reference_proteome: null
   species: null
@@ -3671,10 +3671,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 42
   growth_phases: []
-  interpro_gene_count: 2162
+  interpro_gene_count: 2234
   measured_metabolite_count: 0
   ncbi_taxon_id: 1400866
-  ncbifam_gene_count: 923
+  ncbifam_gene_count: 933
   nonpeptidase_homolog_gene_count: 13
   omics_types:
   - BIOINFORMATIC
@@ -3683,7 +3683,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 69
   publication_count: 1
-  reaction_count: 1064
+  reaction_count: 1036
   reference_database: null
   reference_proteome: null
   species: null
@@ -3706,10 +3706,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 28
   growth_phases: []
-  interpro_gene_count: 1995
+  interpro_gene_count: 2052
   measured_metabolite_count: 0
   ncbi_taxon_id: 316278
-  ncbifam_gene_count: 883
+  ncbifam_gene_count: 893
   nonpeptidase_homolog_gene_count: 12
   omics_types:
   - BIOINFORMATIC
@@ -3718,7 +3718,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 64
   publication_count: 1
-  reaction_count: 1013
+  reaction_count: 999
   reference_database: null
   reference_proteome: null
   species: null
@@ -3741,10 +3741,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 44
   growth_phases: []
-  interpro_gene_count: 2355
+  interpro_gene_count: 2434
   measured_metabolite_count: 0
   ncbi_taxon_id: 1442557
-  ncbifam_gene_count: 933
+  ncbifam_gene_count: 942
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
@@ -3753,7 +3753,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 66
   publication_count: 1
-  reaction_count: 1090
+  reaction_count: 1062
   reference_database: null
   reference_proteome: null
   species: null
@@ -3776,10 +3776,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 41
   growth_phases: []
-  interpro_gene_count: 2081
+  interpro_gene_count: 2146
   measured_metabolite_count: 0
   ncbi_taxon_id: 221345
-  ncbifam_gene_count: 902
+  ncbifam_gene_count: 912
   nonpeptidase_homolog_gene_count: 11
   omics_types:
   - BIOINFORMATIC
@@ -3788,7 +3788,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 67
   publication_count: 1
-  reaction_count: 1023
+  reaction_count: 994
   reference_database: null
   reference_proteome: null
   species: null
@@ -3811,10 +3811,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 41
   growth_phases: []
-  interpro_gene_count: 2160
+  interpro_gene_count: 2226
   measured_metabolite_count: 0
   ncbi_taxon_id: 221350
-  ncbifam_gene_count: 928
+  ncbifam_gene_count: 938
   nonpeptidase_homolog_gene_count: 12
   omics_types:
   - BIOINFORMATIC
@@ -3823,7 +3823,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 66
   publication_count: 1
-  reaction_count: 1030
+  reaction_count: 1002
   reference_database: null
   reference_proteome: null
   species: null
@@ -3846,10 +3846,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 44
   growth_phases: []
-  interpro_gene_count: 2269
+  interpro_gene_count: 2344
   measured_metabolite_count: 0
   ncbi_taxon_id: 221352
-  ncbifam_gene_count: 962
+  ncbifam_gene_count: 968
   nonpeptidase_homolog_gene_count: 17
   omics_types:
   - BIOINFORMATIC
@@ -3858,7 +3858,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 60
   publication_count: 1
-  reaction_count: 1020
+  reaction_count: 1006
   reference_database: null
   reference_proteome: null
   species: null
@@ -3881,10 +3881,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 47
   growth_phases: []
-  interpro_gene_count: 2096
+  interpro_gene_count: 2171
   measured_metabolite_count: 0
   ncbi_taxon_id: 221358
-  ncbifam_gene_count: 909
+  ncbifam_gene_count: 921
   nonpeptidase_homolog_gene_count: 13
   omics_types:
   - BIOINFORMATIC
@@ -3893,7 +3893,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 59
   publication_count: 1
-  reaction_count: 1027
+  reaction_count: 999
   reference_database: null
   reference_proteome: null
   species: null
@@ -3919,10 +3919,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 41
   growth_phases: []
-  interpro_gene_count: 2166
+  interpro_gene_count: 2245
   measured_metabolite_count: 0
   ncbi_taxon_id: 221359
-  ncbifam_gene_count: 939
+  ncbifam_gene_count: 949
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
@@ -3932,7 +3932,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 70
   publication_count: 2
-  reaction_count: 1039
+  reaction_count: 1025
   reference_database: null
   reference_proteome: null
   species: null
@@ -3959,10 +3959,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 42
   growth_phases: []
-  interpro_gene_count: 2244
+  interpro_gene_count: 2321
   measured_metabolite_count: 0
   ncbi_taxon_id: 221360
-  ncbifam_gene_count: 950
+  ncbifam_gene_count: 956
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
@@ -3972,7 +3972,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 61
   publication_count: 2
-  reaction_count: 1012
+  reaction_count: 998
   reference_database: null
   reference_proteome: null
   species: null
@@ -3996,10 +3996,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 43
   growth_phases: []
-  interpro_gene_count: 2197
+  interpro_gene_count: 2270
   measured_metabolite_count: 0
   ncbi_taxon_id: 1050714
-  ncbifam_gene_count: 916
+  ncbifam_gene_count: 925
   nonpeptidase_homolog_gene_count: 15
   omics_types:
   - BIOINFORMATIC
@@ -4008,7 +4008,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 64
   publication_count: 1
-  reaction_count: 1036
+  reaction_count: 1008
   reference_database: null
   reference_proteome: null
   species: null
@@ -4031,10 +4031,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 41
   growth_phases: []
-  interpro_gene_count: 1935
+  interpro_gene_count: 1996
   measured_metabolite_count: 0
   ncbi_taxon_id: 1442558
-  ncbifam_gene_count: 883
+  ncbifam_gene_count: 894
   nonpeptidase_homolog_gene_count: 13
   omics_types:
   - BIOINFORMATIC
@@ -4043,7 +4043,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 60
   publication_count: 1
-  reaction_count: 993
+  reaction_count: 965
   reference_database: null
   reference_proteome: null
   species: null
@@ -4070,10 +4070,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 49
   growth_phases: []
-  interpro_gene_count: 2664
+  interpro_gene_count: 2749
   measured_metabolite_count: 0
   ncbi_taxon_id: 69042
-  ncbifam_gene_count: 1071
+  ncbifam_gene_count: 1080
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
@@ -4083,7 +4083,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 74
   publication_count: 2
-  reaction_count: 1046
+  reaction_count: 1031
   reference_database: null
   reference_proteome: null
   species: null
@@ -4121,10 +4121,10 @@ rows:
   - infected
   - nutrient_limited
   - stationary
-  interpro_gene_count: 2079
+  interpro_gene_count: 2154
   measured_metabolite_count: 0
   ncbi_taxon_id: 32051
-  ncbifam_gene_count: 884
+  ncbifam_gene_count: 895
   nonpeptidase_homolog_gene_count: 9
   omics_types:
   - BIOINFORMATIC
@@ -4137,7 +4137,7 @@ rows:
   partner_experiment_count: 12
   peptidase_gene_count: 68
   publication_count: 8
-  reaction_count: 1045
+  reaction_count: 1017
   reference_database: null
   reference_proteome: null
   species: null
@@ -4168,10 +4168,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 47
   growth_phases: []
-  interpro_gene_count: 2177
+  interpro_gene_count: 2246
   measured_metabolite_count: 0
   ncbi_taxon_id: 59931
-  ncbifam_gene_count: 904
+  ncbifam_gene_count: 912
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
@@ -4181,7 +4181,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 61
   publication_count: 2
-  reaction_count: 1058
+  reaction_count: 1030
   reference_database: null
   reference_proteome: null
   species: null
@@ -4205,10 +4205,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 42
   growth_phases: []
-  interpro_gene_count: 2216
+  interpro_gene_count: 2291
   measured_metabolite_count: 0
   ncbi_taxon_id: 166318
-  ncbifam_gene_count: 914
+  ncbifam_gene_count: 925
   nonpeptidase_homolog_gene_count: 12
   omics_types:
   - BIOINFORMATIC
@@ -4217,7 +4217,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 69
   publication_count: 1
-  reaction_count: 1062
+  reaction_count: 1034
   reference_database: null
   reference_proteome: null
   species: null
@@ -4240,10 +4240,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 45
   growth_phases: []
-  interpro_gene_count: 2284
+  interpro_gene_count: 2365
   measured_metabolite_count: 0
   ncbi_taxon_id: 59932
-  ncbifam_gene_count: 993
+  ncbifam_gene_count: 1000
   nonpeptidase_homolog_gene_count: 13
   omics_types:
   - BIOINFORMATIC
@@ -4252,7 +4252,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 69
   publication_count: 1
-  reaction_count: 1044
+  reaction_count: 1030
   reference_database: null
   reference_proteome: null
   species: null
@@ -4287,10 +4287,10 @@ rows:
   - infected
   - nutrient_limited
   - other:early_incubation
-  interpro_gene_count: 2105
+  interpro_gene_count: 2175
   measured_metabolite_count: 0
   ncbi_taxon_id: 84588
-  ncbifam_gene_count: 908
+  ncbifam_gene_count: 919
   nonpeptidase_homolog_gene_count: 13
   omics_types:
   - BIOINFORMATIC
@@ -4303,7 +4303,7 @@ rows:
   partner_experiment_count: 12
   peptidase_gene_count: 61
   publication_count: 9
-  reaction_count: 1027
+  reaction_count: 999
   reference_database: null
   reference_proteome: null
   species: Parasynechococcus marenigrum
@@ -4334,10 +4334,10 @@ rows:
   genus: Synechococcus
   go_transport_metabolite_count: 27
   growth_phases: []
-  interpro_gene_count: 2076
+  interpro_gene_count: 2148
   measured_metabolite_count: 0
   ncbi_taxon_id: 29410
-  ncbifam_gene_count: 913
+  ncbifam_gene_count: 925
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - BIOINFORMATIC
@@ -4346,7 +4346,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 58
   publication_count: 1
-  reaction_count: 1018
+  reaction_count: 990
   reference_database: null
   reference_proteome: null
   species: null
@@ -4371,10 +4371,10 @@ rows:
   go_transport_metabolite_count: 38
   growth_phases:
   - infected
-  interpro_gene_count: 1869
+  interpro_gene_count: 1932
   measured_metabolite_count: 0
   ncbi_taxon_id: 166314
-  ncbifam_gene_count: 858
+  ncbifam_gene_count: 869
   nonpeptidase_homolog_gene_count: 12
   omics_types:
   - BIOINFORMATIC
@@ -4384,7 +4384,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 60
   publication_count: 2
-  reaction_count: 983
+  reaction_count: 955
   reference_database: null
   reference_proteome: null
   species: null
@@ -4411,10 +4411,10 @@ rows:
   go_transport_metabolite_count: 58
   growth_phases:
   - exponential
-  interpro_gene_count: 2339
+  interpro_gene_count: 2444
   measured_metabolite_count: 0
   ncbi_taxon_id: 1140
-  ncbifam_gene_count: 1081
+  ncbifam_gene_count: 1096
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - DNASEQ
@@ -4425,7 +4425,7 @@ rows:
   partner_experiment_count: 2
   peptidase_gene_count: 81
   publication_count: 2
-  reaction_count: 1033
+  reaction_count: 1003
   reference_database: null
   reference_proteome: null
   species: Synechococcus elongatus
@@ -4449,10 +4449,10 @@ rows:
   go_transport_metabolite_count: 39
   growth_phases:
   - exponential
-  interpro_gene_count: 2336
+  interpro_gene_count: 2440
   measured_metabolite_count: 0
   ncbi_taxon_id: 1350461
-  ncbifam_gene_count: 1085
+  ncbifam_gene_count: 1100
   nonpeptidase_homolog_gene_count: 14
   omics_types:
   - PROTEOMICS
@@ -4462,7 +4462,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 82
   publication_count: 1
-  reaction_count: 1058
+  reaction_count: 1028
   reference_database: null
   reference_proteome: null
   species: Synechococcus elongatus
@@ -4492,10 +4492,10 @@ rows:
   growth_phases:
   - darkness
   - exponential
-  interpro_gene_count: 1998
+  interpro_gene_count: 2053
   measured_metabolite_count: 0
   ncbi_taxon_id: 313625
-  ncbifam_gene_count: 884
+  ncbifam_gene_count: 893
   nonpeptidase_homolog_gene_count: 10
   omics_types:
   - BIOINFORMATIC
@@ -4506,7 +4506,7 @@ rows:
   partner_experiment_count: 8
   peptidase_gene_count: 61
   publication_count: 3
-  reaction_count: 989
+  reaction_count: 961
   reference_database: null
   reference_proteome: null
   species: Synechococcus sp.
@@ -4562,10 +4562,10 @@ rows:
   genus: Thermosynechococcus
   go_transport_metabolite_count: 57
   growth_phases: []
-  interpro_gene_count: 2178
+  interpro_gene_count: 2271
   measured_metabolite_count: 0
   ncbi_taxon_id: 197221
-  ncbifam_gene_count: 1078
+  ncbifam_gene_count: 1097
   nonpeptidase_homolog_gene_count: 16
   omics_types:
   - RNASEQ
@@ -4574,7 +4574,7 @@ rows:
   partner_experiment_count: 0
   peptidase_gene_count: 77
   publication_count: 1
-  reaction_count: 894
+  reaction_count: 878
   reference_database: null
   reference_proteome: null
   species: Thermosynechococcus vestitus

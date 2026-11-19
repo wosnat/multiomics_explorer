@@ -1,7 +1,7 @@
 case_id: search_ontology_lucene_wildcard
 row_count: 37
 rows:
-- gene_count: 22810
+- gene_count: 22878
   id: ec:1.-.-.-
   is_informative: true
   level: 0
@@ -235,21 +235,21 @@ rows:
   score: 1.0
   tree: null
   tree_code: null
-- gene_count: 435
+- gene_count: 447
   id: ec:1.97.-.-
   is_informative: true
   level: 1
   name: Other oxidoreductases
-  organism_count: 106
+  organism_count: 114
   score: 1.0
   tree: null
   tree_code: null
-- gene_count: 435
+- gene_count: 447
   id: ec:1.97.1.-
   is_informative: true
   level: 2
   name: Other oxidoreductases
-  organism_count: 106
+  organism_count: 114
   score: 1.0
   tree: null
   tree_code: null
@@ -271,7 +271,7 @@ rows:
   score: 1.0
   tree: null
   tree_code: null
-- gene_count: 1343
+- gene_count: 1414
   id: ec:5.3.-.-
   is_informative: true
   level: 1
@@ -289,7 +289,7 @@ rows:
   score: 1.0
   tree: null
   tree_code: null
-- gene_count: 3517
+- gene_count: 3519
   id: ec:7.1.1.-
   is_informative: true
   level: 2

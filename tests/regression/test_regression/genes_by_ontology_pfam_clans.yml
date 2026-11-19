@@ -2,14 +2,14 @@ by_call_class: []
 by_category:
 - category: Coenzyme metabolism
   count: 117
+- category: Unknown
+  count: 97
 - category: Stress response and adaptation
-  count: 91
+  count: 92
 - category: Translation
   count: 86
-- category: Unknown
-  count: 77
 - category: Amino acid metabolism
-  count: 73
+  count: 74
 - category: Cell wall and membrane
   count: 60
 - category: Carbohydrate metabolism
@@ -17,26 +17,26 @@ by_category:
 - category: Replication and repair
   count: 51
 - category: Transport
-  count: 44
+  count: 45
 - category: Post-translational modification
   count: 38
 - category: Nucleotide metabolism
   count: 27
 - category: Transcription
-  count: 25
+  count: 26
 - category: Photosynthesis
   count: 19
-- category: Central intermediary metabolism
-  count: 18
 - category: Lipid metabolism
-  count: 16
+  count: 17
+- category: Central intermediary metabolism
+  count: 17
 - category: Regulatory functions
   count: 13
 - category: Cell cycle and division
-  count: 11
-- category: Cellular processes
-  count: 11
+  count: 10
 - category: Energy production
+  count: 10
+- category: Cellular processes
   count: 10
 - category: Signal transduction
   count: 8
@@ -49,30 +49,30 @@ by_category:
 - category: Cell motility
   count: 1
 by_evidence:
-- count: 1007
+- count: 1022
   evidence: curated
-- count: 48
+- count: 49
   evidence: family_inferred
-- count: 21
+- count: 39
   evidence: signature
 by_level:
 - level: 0
-  n_genes: 863
-  n_terms: 77
-  row_count: 1076
+  n_genes: 885
+  n_terms: 79
+  row_count: 1110
 by_organism:
-- gene_count: 863
+- gene_count: 885
   organism_name: Prochlorococcus MED4
-  row_count: 1076
-  term_count: 77
+  row_count: 1110
+  term_count: 79
 by_sources:
-- count: 989
+- count: 1006
   source: eggnog
-- count: 955
+- count: 977
   source: interproscan
-- count: 950
+- count: 965
   source: cyanorak
-- count: 651
+- count: 661
   source: uniprot
 by_tcdb_call: []
 by_tier: []
@@ -85,7 +85,7 @@ evidence_score_stats:
 filtered_out: []
 filters_applied: {}
 genes_per_term_max: 148
-genes_per_term_median: 7.0
+genes_per_term_median: 8.0
 genes_per_term_min: 5
 n_best_effort_terms: 0
 not_found: []
@@ -517,6 +517,16 @@ results:
   product: ABC transporter involved in Fe-S cluster assembly, ATPase component
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- evidence: curated
+  gene_category: Transcription
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0075
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0159
+  term_name: E-set
 - evidence: curated
   gene_category: Carbohydrate metabolism
   gene_name: pgmA2
@@ -1347,6 +1357,16 @@ results:
   product: ribosome biogenesis GTPase A
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- evidence: signature
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0196
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0159
+  term_name: E-set
 - evidence: curated
   gene_category: Cell wall and membrane
   gene_name: murG
@@ -1789,6 +1809,16 @@ results:
   term_id: pfam.clan:CL0139
   term_name: GADPH_aa-bio_dh
 - evidence: curated
+  gene_category: Transport
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0274
+  organism_name: Prochlorococcus MED4
+  product: CNNM domain-containing protein
+  term_id: pfam.clan:CL1065
+  term_name: CBS_sf
+- evidence: curated
   gene_category: Nucleotide metabolism
   gene_name: pyrE
   is_informative: true
@@ -1988,6 +2018,16 @@ results:
   product: poly(A) polymerase
   term_id: pfam.clan:CL0260
   term_name: NTP_transf
+- evidence: family_inferred
+  gene_category: Transcription
+  gene_name: pcnB
+  is_informative: true
+  level: 0
+  locus_tag: PMM0303
+  organism_name: Prochlorococcus MED4
+  product: poly(A) polymerase
+  term_id: pfam.clan:CL1065
+  term_name: CBS_sf
 - evidence: curated
   gene_category: Replication and repair
   gene_name: uvrD
@@ -2299,16 +2339,6 @@ results:
   product: cyanate ABC transporter ATP-binding protein
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
-- evidence: signature
-  gene_category: Central intermediary metabolism
-  gene_name: cynS
-  is_informative: true
-  level: 0
-  locus_tag: PMM0373
-  organism_name: Prochlorococcus MED4
-  product: cyanate hydratase
-  term_id: pfam.clan:CL0123
-  term_name: HTH
 - evidence: curated
   gene_category: Unknown
   gene_name: null
@@ -2953,7 +2983,7 @@ results:
   product: glutamyl-tRNA synthetase
   term_id: pfam.clan:CL0039
   term_name: HUP
-- evidence: family_inferred
+- evidence: signature
   gene_category: Photosynthesis
   gene_name: null
   is_informative: true
@@ -3014,6 +3044,16 @@ results:
   product: glutamate-1-semialdehyde-2,1-aminomutase
   term_id: pfam.clan:CL0061
   term_name: PLP_aminotran
+- evidence: signature
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0486
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0021
+  term_name: OB
 - evidence: curated
   gene_category: Stress response and adaptation
   gene_name: futB
@@ -3124,6 +3164,16 @@ results:
   product: proline--tRNA ligase
   term_id: pfam.clan:CL0040
   term_name: tRNA_synt_II
+- evidence: signature
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0509
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0123
+  term_name: HTH
 - evidence: curated
   gene_category: Stress response and adaptation
   gene_name: arsC
@@ -3144,7 +3194,7 @@ results:
   product: signal peptidase I
   term_id: pfam.clan:CL0299
   term_name: Peptidase_SF
-- evidence: family_inferred
+- evidence: curated
   gene_category: Nucleotide metabolism
   gene_name: pyrC
   is_informative: true
@@ -3324,6 +3374,16 @@ results:
   product: metallopeptidase M50 family protein
   term_id: pfam.clan:CL0126
   term_name: Peptidase_MA
+- evidence: family_inferred
+  gene_category: Post-translational modification
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0538
+  organism_name: Prochlorococcus MED4
+  product: metallopeptidase M50 family protein
+  term_id: pfam.clan:CL1065
+  term_name: CBS_sf
 - evidence: curated
   gene_category: Coenzyme metabolism
   gene_name: lplA
@@ -3766,6 +3826,16 @@ results:
   term_id: pfam.clan:CL0142
   term_name: Membrane_trans
 - evidence: curated
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0604
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein (DUF4336)
+  term_id: pfam.clan:CL0381
+  term_name: Metallo-HOrase
+- evidence: curated
   gene_category: Post-translational modification
   gene_name: lepB
   is_informative: true
@@ -3968,16 +4038,6 @@ results:
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
 - evidence: curated
-  gene_category: Transport
-  gene_name: mscS
-  is_informative: true
-  level: 0
-  locus_tag: PMM0635
-  organism_name: Prochlorococcus MED4
-  product: small-conductance mechanosensitive ion channel, MscS family
-  term_id: pfam.clan:CL0010
-  term_name: SH3
-- evidence: curated
   gene_category: Stress response and adaptation
   gene_name: fur
   is_informative: true
@@ -4007,6 +4067,16 @@ results:
   product: radical SAM/Cys-rich domain protein
   term_id: pfam.clan:CL0344
   term_name: 4Fe-4S
+- evidence: curated
+  gene_category: Lipid metabolism
+  gene_name: ggpP
+  is_informative: true
+  level: 0
+  locus_tag: PMM0639
+  organism_name: Prochlorococcus MED4
+  product: glucosylglycerol 3-phosphatase
+  term_id: pfam.clan:CL0137
+  term_name: HAD
 - evidence: curated
   gene_category: Amino acid metabolism
   gene_name: metY
@@ -4277,6 +4347,16 @@ results:
   product: N5-carboxyaminoimidazole ribonucleotide synthetase monomer
   term_id: pfam.clan:CL0179
   term_name: ATP-grasp
+- evidence: signature
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0685
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0113
+  term_name: GT-B
 - evidence: curated
   gene_category: Lipid metabolism
   gene_name: null
@@ -4417,7 +4497,7 @@ results:
   product: arsenate efflux pump
   term_id: pfam.clan:CL0064
   term_name: CPA_AT
-- evidence: family_inferred
+- evidence: signature
   gene_category: Inorganic ion transport
   gene_name: null
   is_informative: true
@@ -4447,6 +4527,16 @@ results:
   product: transcriptional regulator, Crp family
   term_id: pfam.clan:CL0123
   term_name: HTH
+- evidence: curated
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0719
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein (DUF3764)
+  term_id: pfam.clan:CL0032
+  term_name: Dim_A_B_barrel
 - evidence: curated
   gene_category: Stress response and adaptation
   gene_name: pstC
@@ -4525,6 +4615,26 @@ results:
   locus_tag: PMM0732
   organism_name: Prochlorococcus MED4
   product: translation initiation factor IF-2, N-terminal domain-containing protein
+  term_id: pfam.clan:CL0123
+  term_name: HTH
+- evidence: curated
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0733
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0236
+  term_name: PDDEXK
+- evidence: signature
+  gene_category: Unknown
+  gene_name: unk1
+  is_informative: true
+  level: 0
+  locus_tag: PMM0735
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein
   term_id: pfam.clan:CL0123
   term_name: HTH
 - evidence: curated
@@ -4898,6 +5008,16 @@ results:
   product: haloacid dehalogenase (HAD) family phosphatase
   term_id: pfam.clan:CL0137
   term_name: HAD
+- evidence: signature
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0793
+  organism_name: Prochlorococcus MED4
+  product: uncharacterized conserved secreted protein
+  term_id: pfam.clan:CL0159
+  term_name: E-set
 - evidence: family_inferred
   gene_category: Transcription
   gene_name: ycf55
@@ -4989,6 +5109,16 @@ results:
   product: ferritin
   term_id: pfam.clan:CL0044
   term_name: Ferritin
+- evidence: signature
+  gene_category: Stress response and adaptation
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0806
+  organism_name: Prochlorococcus MED4
+  product: possible transcriptional regulator of iron metabolism, Crp/Fnr family protein
+  term_id: pfam.clan:CL0029
+  term_name: Cupin
 - evidence: curated
   gene_category: Stress response and adaptation
   gene_name: null
@@ -5009,6 +5139,16 @@ results:
   product: ABC transporter family protein
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- evidence: curated
+  gene_category: Amino acid metabolism
+  gene_name: ansA
+  is_informative: true
+  level: 0
+  locus_tag: PMM0821
+  organism_name: Prochlorococcus MED4
+  product: L-asparaginase II family protein
+  term_id: pfam.clan:CL0013
+  term_name: Beta-lactamase
 - evidence: curated
   gene_category: Translation
   gene_name: rsfS
@@ -5390,6 +5530,16 @@ results:
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
 - evidence: curated
+  gene_category: Amino acid metabolism
+  gene_name: metH
+  is_informative: true
+  level: 0
+  locus_tag: PMM0877
+  organism_name: Prochlorococcus MED4
+  product: methionine synthase
+  term_id: pfam.clan:CL0304
+  term_name: CheY
+- evidence: curated
   gene_category: Unknown
   gene_name: null
   is_informative: true
@@ -5449,6 +5599,16 @@ results:
   product: penicillin-binding-like protein Pbp4
   term_id: pfam.clan:CL0013
   term_name: Beta-lactamase
+- evidence: curated
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM0886
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0023
+  term_name: P-loop_NTPase
 - evidence: curated
   gene_category: Coenzyme metabolism
   gene_name: iscS1
@@ -5549,6 +5709,16 @@ results:
   product: molecular chaperone HtpG
   term_id: pfam.clan:CL0025
   term_name: His_Kinase_A
+- evidence: signature
+  gene_category: Stress response and adaptation
+  gene_name: htpG
+  is_informative: true
+  level: 0
+  locus_tag: PMM0901
+  organism_name: Prochlorococcus MED4
+  product: molecular chaperone HtpG
+  term_id: pfam.clan:CL0329
+  term_name: S5
 - evidence: curated
   gene_category: Stress response and adaptation
   gene_name: prxQ
@@ -6139,6 +6309,16 @@ results:
   product: aminopeptidase N
   term_id: pfam.clan:CL0126
   term_name: Peptidase_MA
+- evidence: curated
+  gene_category: Stress response and adaptation
+  gene_name: pepN
+  is_informative: true
+  level: 0
+  locus_tag: PMM1002
+  organism_name: Prochlorococcus MED4
+  product: aminopeptidase N
+  term_id: pfam.clan:CL0159
+  term_name: E-set
 - evidence: signature
   gene_category: Nucleotide metabolism
   gene_name: purT
@@ -6319,6 +6499,16 @@ results:
   product: peptide/nickel transport system substrate-binding protein
   term_id: pfam.clan:CL0177
   term_name: PBP
+- evidence: signature
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1050
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0010
+  term_name: SH3
 - evidence: curated
   gene_category: Amino acid metabolism
   gene_name: thrA
@@ -6820,6 +7010,16 @@ results:
   product: pyridoxine 5^-phosphate synthase
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
+- evidence: signature
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1109
+  organism_name: Prochlorococcus MED4
+  product: uncharacterized conserved secreted protein
+  term_id: pfam.clan:CL0020
+  term_name: TPR
 - evidence: curated
   gene_category: Coenzyme metabolism
   gene_name: grx3
@@ -6920,6 +7120,16 @@ results:
   product: hydrogenase/urease accessory protein
   term_id: pfam.clan:CL0292
   term_name: LysE
+- evidence: family_inferred
+  gene_category: Signal transduction
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1124
+  organism_name: Prochlorococcus MED4
+  product: autotransporter beta-domain containing protein
+  term_id: pfam.clan:CL0159
+  term_name: E-set
 - evidence: curated
   gene_category: Signal transduction
   gene_name: null
@@ -7253,6 +7463,16 @@ results:
   product: signal peptide peptidase SppA (protease IV)
   term_id: pfam.clan:CL0127
   term_name: ClpP_crotonase
+- evidence: curated
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1182
+  organism_name: Prochlorococcus MED4
+  product: uncharacterized conserved lipoprotein (DUF2808)
+  term_id: pfam.clan:CL0159
+  term_name: E-set
 - evidence: curated
   gene_category: Transcription
   gene_name: rnpA
@@ -8113,6 +8333,16 @@ results:
   product: thiamine-phosphate pyrophosphorylase
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
+- evidence: signature
+  gene_category: Coenzyme metabolism
+  gene_name: thiE
+  is_informative: true
+  level: 0
+  locus_tag: PMM1274
+  organism_name: Prochlorococcus MED4
+  product: thiamine-phosphate pyrophosphorylase
+  term_id: pfam.clan:CL0044
+  term_name: Ferritin
 - evidence: curated
   gene_category: Coenzyme metabolism
   gene_name: thiS
@@ -8324,7 +8554,7 @@ results:
   product: bifunctional dihydrofolate synthase / folylpolyglutamate synthase
   term_id: pfam.clan:CL0794
   term_name: Mur_ligase_C_sf
-- evidence: family_inferred
+- evidence: curated
   gene_category: Amino acid metabolism
   gene_name: codA
   is_informative: true
@@ -8879,6 +9109,16 @@ results:
   gene_name: null
   is_informative: true
   level: 0
+  locus_tag: PMM1401
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein (DUF3764)
+  term_id: pfam.clan:CL0032
+  term_name: Dim_A_B_barrel
+- evidence: curated
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
   locus_tag: PMM1409
   organism_name: Prochlorococcus MED4
   product: conserved hypothetical protein (DUF3303)
@@ -8914,6 +9154,16 @@ results:
   product: possible UBX domain
   term_id: pfam.clan:CL0028
   term_name: AB_hydrolase
+- evidence: family_inferred
+  gene_category: Stress response and adaptation
+  gene_name: PsiP1
+  is_informative: true
+  level: 0
+  locus_tag: PMM1416
+  organism_name: Prochlorococcus MED4
+  product: phosphate starvation inducible protein 1
+  term_id: pfam.clan:CL0159
+  term_name: E-set
 - evidence: curated
   gene_category: Replication and repair
   gene_name: null
@@ -8944,6 +9194,16 @@ results:
   product: glutaredoxin family protein
   term_id: pfam.clan:CL0172
   term_name: Thioredoxin
+- evidence: signature
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1427
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0113
+  term_name: GT-B
 - evidence: curated
   gene_category: Unknown
   gene_name: null
@@ -9009,6 +9269,16 @@ results:
   gene_name: null
   is_informative: true
   level: 0
+  locus_tag: PMM1443
+  organism_name: Prochlorococcus MED4
+  product: CBS and DUF21 domain-containing protein
+  term_id: pfam.clan:CL1065
+  term_name: CBS_sf
+- evidence: curated
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
   locus_tag: PMM1444
   organism_name: Prochlorococcus MED4
   product: GTP-binding protein of unknown function (DUF697)
@@ -9065,16 +9335,6 @@ results:
   term_id: pfam.clan:CL0866
   term_name: ALR_C-like
 - evidence: curated
-  gene_category: Cell cycle and division
-  gene_name: ftsW
-  is_informative: true
-  level: 0
-  locus_tag: PMM1458
-  organism_name: Prochlorococcus MED4
-  product: cell division protein FtsW
-  term_id: pfam.clan:CL0142
-  term_name: Membrane_trans
-- evidence: curated
   gene_category: Stress response and adaptation
   gene_name: ccsC1
   is_informative: true
@@ -9114,6 +9374,16 @@ results:
   product: ribosomal RNA methyltransferase FtsJ family
   term_id: pfam.clan:CL0492
   term_name: S4
+- evidence: signature
+  gene_category: Replication and repair
+  gene_name: ski2
+  is_informative: true
+  level: 0
+  locus_tag: PMM1467
+  organism_name: Prochlorococcus MED4
+  product: ATP-dependent DNA/RNA helicase, superfamily 1/2
+  term_id: pfam.clan:CL0010
+  term_name: SH3
 - evidence: curated
   gene_category: Replication and repair
   gene_name: ski2
@@ -9354,6 +9624,16 @@ results:
   product: radical SAM superfamily protein
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
+- evidence: signature
+  gene_category: Energy production
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1498
+  organism_name: Prochlorococcus MED4
+  product: radical SAM superfamily protein
+  term_id: pfam.clan:CL0304
+  term_name: CheY
 - evidence: curated
   gene_category: Amino acid metabolism
   gene_name: dapL
@@ -9855,16 +10135,6 @@ results:
   term_id: pfam.clan:CL0025
   term_name: His_Kinase_A
 - evidence: curated
-  gene_category: Cellular processes
-  gene_name: mrdB
-  is_informative: true
-  level: 0
-  locus_tag: PMM1580
-  organism_name: Prochlorococcus MED4
-  product: rod shape determining protein
-  term_id: pfam.clan:CL0142
-  term_name: Membrane_trans
-- evidence: curated
   gene_category: Coenzyme metabolism
   gene_name: abpC
   is_informative: true
@@ -10044,6 +10314,16 @@ results:
   product: holliday junction ATP-dependent DNA helicase RuvB
   term_id: pfam.clan:CL0671
   term_name: AAA_lid
+- evidence: signature
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1617
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0010
+  term_name: SH3
 - evidence: curated
   gene_category: Translation
   gene_name: lysS
@@ -10155,6 +10435,16 @@ results:
   term_id: pfam.clan:CL0123
   term_name: HTH
 - evidence: curated
+  gene_category: Transport
+  gene_name: mgtE
+  is_informative: true
+  level: 0
+  locus_tag: PMM1630
+  organism_name: Prochlorococcus MED4
+  product: magnesium transporter
+  term_id: pfam.clan:CL1065
+  term_name: CBS_sf
+- evidence: curated
   gene_category: Cell cycle and division
   gene_name: null
   is_informative: true
@@ -10254,6 +10544,16 @@ results:
   product: DNA mismatch repair protein MutS
   term_id: pfam.clan:CL0023
   term_name: P-loop_NTPase
+- evidence: curated
+  gene_category: Replication and repair
+  gene_name: mutS
+  is_informative: true
+  level: 0
+  locus_tag: PMM1645
+  organism_name: Prochlorococcus MED4
+  product: DNA mismatch repair protein MutS
+  term_id: pfam.clan:CL0219
+  term_name: RNase_H
 - evidence: curated
   gene_category: Replication and repair
   gene_name: holA
@@ -10714,6 +11014,16 @@ results:
   product: putative chloride channel
   term_id: pfam.clan:CL0039
   term_name: HUP
+- evidence: family_inferred
+  gene_category: Transport
+  gene_name: clc2
+  is_informative: true
+  level: 0
+  locus_tag: PMM1701
+  organism_name: Prochlorococcus MED4
+  product: putative chloride channel
+  term_id: pfam.clan:CL1065
+  term_name: CBS_sf
 - evidence: curated
   gene_category: Nucleotide metabolism
   gene_name: purU
@@ -10854,6 +11164,16 @@ results:
   product: Putative Type III restriction-modification system, R subunit
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
+- evidence: signature
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM1919
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein
+  term_id: pfam.clan:CL0072
+  term_name: Ubiquitin
 - evidence: curated
   gene_category: Unknown
   gene_name: null
@@ -10874,10 +11194,30 @@ results:
   product: putative sxtK
   term_id: pfam.clan:CL0184
   term_name: DMT
-returned: 1076
-row_count: 1076
-size_filtered_genes: 263
-size_filtered_terms: 228
+- evidence: curated
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: PMM2002
+  organism_name: Prochlorococcus MED4
+  product: conserved hypothetical protein (DUF3764)
+  term_id: pfam.clan:CL0032
+  term_name: Dim_A_B_barrel
+- evidence: signature
+  gene_category: Unknown
+  gene_name: null
+  is_informative: true
+  level: 0
+  locus_tag: TX50_RS09290
+  organism_name: Prochlorococcus MED4
+  product: hypothetical protein
+  term_id: pfam.clan:CL0072
+  term_name: Ubiquitin
+returned: 1110
+row_count: 1110
+size_filtered_genes: 299
+size_filtered_terms: 262
 skipped_ontologies: []
 terms_per_gene_max: 4
 terms_per_gene_median: 1.0
@@ -10888,7 +11228,7 @@ top_terms:
   organism_count: 1
   term_id: pfam.clan:CL0063
   term_name: NADP_Rossmann
-- count: 130
+- count: 131
   is_informative: true
   organism_count: 1
   term_id: pfam.clan:CL0023
@@ -10898,20 +11238,20 @@ top_terms:
   organism_count: 1
   term_id: pfam.clan:CL0036
   term_name: TIM_barrel
-- count: 36
+- count: 37
   is_informative: true
   organism_count: 1
   term_id: pfam.clan:CL0123
   term_name: HTH
-- count: 30
+- count: 31
   is_informative: true
   organism_count: 1
   term_id: pfam.clan:CL0021
   term_name: OB
 total_categories: 24
-total_genes: 863
-total_matching: 1076
-total_terms: 77
+total_genes: 885
+total_matching: 1110
+total_terms: 79
 truncated: false
 trust_axes:
   pfam:
@@ -10919,7 +11259,7 @@ trust_axes:
   - evidence
   - evidence_score
 warnings:
-- 228 terms (263 genes not otherwise covered) fell outside min_gene_set_size=5 / max_gene_set_size=500
+- 262 terms (299 genes not otherwise covered) fell outside min_gene_set_size=5 / max_gene_set_size=500
   and were dropped. The defaults suit enrichment; to enumerate every gene pass min_gene_set_size=1
   and a large max_gene_set_size (e.g. 100000 via MCP; None from Python).
 wrong_level: []

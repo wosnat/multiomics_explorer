@@ -191,10 +191,10 @@ genes_by_ontology(ontology="go_bp", organism="MED4", term_ids=["go:0006260"])
   "by_sources": [
     {"count": 18, "source": "cyanorak"},
     {"count": 13, "source": "uniprot"},
-    {"count": 11, "source": "ncbi"},
+    {"count": 11, "source": "interproscan"},
     ...
   ],
-  "evidence_score_stats": {"min": 0.667, "median": 0.667, "max": 1.0, "n_null": 0},
+  "evidence_score_stats": {"min": 0.667, "median": 0.8335, "max": 1.0, "n_null": 0},
   "results": [
     {
       "locus_tag": "PMM0001",
@@ -369,33 +369,33 @@ genes_by_ontology(ontology="interpro", term_ids=["interpro:IPR063966"], interpro
   "ontology": "interpro",
   "...": "12 empty fields omitted",
   "by_organism": [
-    {"organism_name": "Synechococcus CC9311", "gene_count": 11, "term_count": 1, "row_count": 11},
-    {"organism_name": "Synechococcus BIOS-E4-1", "gene_count": 9, "term_count": 1, "row_count": 9},
+    {"organism_name": "Synechococcus CC9311", "gene_count": 12, "term_count": 1, "row_count": 12},
+    {"organism_name": "Synechococcus BIOS-E4-1", "gene_count": 11, "term_count": 1, "row_count": 11},
     {"organism_name": "Synechococcus WH5701", "gene_count": 9, "term_count": 1, "row_count": 9},
     ...
   ],
   "organisms_without_genes": ["Alteromonas (MarRef v6)", "Alteromonas macleodii 83-1", "Alteromonas macleodii AD45", ...],
-  "total_matching": 500,
-  "total_genes": 500,
+  "total_matching": 498,
+  "total_genes": 498,
   "total_terms": 1,
   "total_categories": 3,
-  "genes_per_term_min": 3,
-  "genes_per_term_median": 5.0,
-  "genes_per_term_max": 11,
+  "genes_per_term_min": 2,
+  "genes_per_term_median": 4.5,
+  "genes_per_term_max": 12,
   "terms_per_gene_min": 1,
   "terms_per_gene_median": 1.0,
   "terms_per_gene_max": 1,
   "by_category": [
-    {"category": "Stress response and adaptation", "count": 467},
-    {"category": "Unknown", "count": 31},
+    {"category": "Stress response and adaptation", "count": 466},
+    {"category": "Unknown", "count": 30},
     {"category": "Coenzyme metabolism", "count": 2}
   ],
-  "by_level": [{"level": 0, "n_terms": 1, "n_genes": 500, "row_count": 500}],
+  "by_level": [{"level": 0, "n_terms": 1, "n_genes": 498, "row_count": 498}],
   "top_terms": [
     {
       "term_id": "interpro:IPR063966",
       "term_name": "High light-inducible protein HliA-D-like",
-      "count": 500,
+      "count": 498,
       "organism_count": 102,
       "is_informative": true
     }
@@ -409,8 +409,8 @@ genes_by_ontology(ontology="interpro", term_ids=["interpro:IPR063966"], interpro
   "truncated": true,
   "trust_axes": {"interpro": ["sources", "evidence"]},
   "filters_applied": {"interpro_type": "FAMILY"},
-  "by_evidence": [{"count": 500, "evidence": "signature"}],
-  "by_sources": [{"count": 500, "source": "interproscan"}],
+  "by_evidence": [{"count": 498, "evidence": "signature"}],
+  "by_sources": [{"count": 498, "source": "interproscan"}],
   "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
   "results": []
 }

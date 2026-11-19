@@ -1,7 +1,7 @@
 by_link_kind:
 - count: 12
   link_kind: composition
-- count: 5
+- count: 3
   link_kind: router
 by_ontology:
 - count: 1
@@ -15,7 +15,7 @@ by_ontology:
 - count: 1
   ontology: go_bp
 case_id: ontology_term_details_batch6
-links_out_total: 17
+links_out_total: 15
 not_found:
 - bogus:xyz
 offset: 0
@@ -238,13 +238,7 @@ results:
     ''target_id'': ''ec:4.2.1.2'', ''target_ontology'': ''ec'', ''target_name'': ''fumarate
     hydratase''}'
   - '{''rel'': ''Interpro_entry_related_to_ec_number'', ''link_kind'': ''router'',
-    ''target_id'': ''ec:4.3.1.1'', ''target_ontology'': ''ec'', ''target_name'': ''aspartate
-    ammonia-lyase''}'
-  - '{''rel'': ''Interpro_entry_related_to_ec_number'', ''link_kind'': ''router'',
     ''target_id'': ''ec:4.3.2.1'', ''target_ontology'': ''ec'', ''target_name'': ''argininosuccinate
-    lyase''}'
-  - '{''rel'': ''Interpro_entry_related_to_ec_number'', ''link_kind'': ''router'',
-    ''target_id'': ''ec:4.3.2.2'', ''target_ontology'': ''ec'', ''target_name'': ''adenylosuccinate
     lyase''}'
   - '{''rel'': ''Interpro_entry_related_to_ec_number'', ''link_kind'': ''router'',
     ''target_id'': ''ec:5.5.1.2'', ''target_ontology'': ''ec'', ''target_name'': ''3-carboxy-cis,cis-muconate
@@ -259,20 +253,20 @@ results:
   children_total: 0
   children_truncated: false
   description: null
-  family_type: retired
-  gene_count: 14
-  gene_symbol: null
+  family_type: equivalog
+  gene_count: 116
+  gene_symbol: ppc
   is_informative: true
   label: NcbifamFamily
   level: 0
   level_kind: null
   links_out: []
-  name: 6,7-dimethyl-8-ribityllumazine synthase
-  ncbifam_id: NF000812
+  name: phosphoenolpyruvate carboxylase
+  ncbifam_id: NF000584
   ontology: ncbifam
-  organism_count: 14
+  organism_count: 116
   parents: []
-  term_id: ncbifam:NF000812
+  term_id: ncbifam:NF000584
 - children:
   - '{''id'': ''go:0000302'', ''level'': 4, ''name'': ''response to reactive oxygen
     species''}'

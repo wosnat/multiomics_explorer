@@ -1,46 +1,16 @@
 by_background_factors:
 - background_factor: axenic
-  count: 23
+  count: 24
 - background_factor: light
-  count: 17
+  count: 18
 - background_factor: chemical
   count: 4
 by_compartment:
 - compartment: whole_cell
   count: 20
 - compartment: vesicle
-  count: 3
+  count: 4
 by_metric:
-- count: 1
-  derived_metric_id: derived_metric:1471-2180-14-11:med4_expression_level:pangenome_membership
-  metric_type: pangenome_membership
-  name: MED4 core vs flexible genome assignment (Wang 2014)
-  value_kind: categorical
-- count: 1
-  derived_metric_id: derived_metric:1471-2180-14-11:med4_expression_level:expression_level_class
-  metric_type: expression_level_class
-  name: MED4 RPKM expression-level class (Wang 2014)
-  value_kind: categorical
-- count: 1
-  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
-  metric_type: predicted_subcellular_localization
-  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
-  value_kind: categorical
-- count: 1
-  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:has_primary_tss
-  metric_type: has_primary_tss
-  name: Has mapped primary TSS (gTSS)
-  value_kind: boolean
-- count: 1
-  derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:expressed_above_background
-  metric_type: expressed_above_background
-  name: Expressed above background at t0
-  value_kind: boolean
-- count: 1
-  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
-  metric_type: vesicle_proteome_member
-  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
-  value_kind: boolean
 - count: 1
   derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:internal_tss_count
   metric_type: internal_tss_count
@@ -103,6 +73,41 @@ by_metric:
     S2)
   value_kind: numeric
 - count: 1
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_med4:has_primary_tss
+  metric_type: has_primary_tss
+  name: Has mapped primary TSS (gTSS)
+  value_kind: boolean
+- count: 1
+  derived_metric_id: derived_metric:gb-2010-11-5-r54:halflife_table:expressed_above_background
+  metric_type: expressed_above_background
+  name: Expressed above background at t0
+  value_kind: boolean
+- count: 1
+  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:vesicle_proteome_member
+  metric_type: vesicle_proteome_member
+  name: MED4 protein detected in vesicle proteome (Biller 2014 Table S2)
+  value_kind: boolean
+- count: 1
+  derived_metric_id: derived_metric:1471-2180-14-11:med4_expression_level:pangenome_membership
+  metric_type: pangenome_membership
+  name: MED4 core vs flexible genome assignment (Wang 2014)
+  value_kind: categorical
+- count: 1
+  derived_metric_id: derived_metric:1471-2180-14-11:med4_expression_level:expression_level_class
+  metric_type: expression_level_class
+  name: MED4 RPKM expression-level class (Wang 2014)
+  value_kind: categorical
+- count: 1
+  derived_metric_id: derived_metric:science.1243457:s2_med4_vesicle_proteome:predicted_subcellular_localization
+  metric_type: predicted_subcellular_localization
+  name: MED4 vesicle protein PSORTb predicted localization (Biller 2014 Table S2)
+  value_kind: categorical
+- count: 1
+  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:has_primary_tss
+  metric_type: has_primary_tss
+  name: Has mapped primary TSS (gTSS)
+  value_kind: boolean
+- count: 1
   derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:tss_distance_to_cds
   metric_type: tss_distance_to_cds
   name: TSS distance to CDS (5^UTR length)
@@ -118,32 +123,22 @@ by_metric:
   name: Internal TSS count
   value_kind: numeric
 - count: 1
+  derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  metric_type: cell_abundance_biovolume_normalized
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  value_kind: numeric
+- count: 1
   derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:antisense_tss_count
   metric_type: antisense_tss_count
   name: Antisense TSS count
   value_kind: numeric
-- count: 1
-  derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:has_primary_tss
-  metric_type: has_primary_tss
-  name: Has mapped primary TSS (gTSS)
-  value_kind: boolean
 by_metric_type:
-- count: 2
-  metric_type: has_primary_tss
 - count: 2
   metric_type: internal_tss_count
 - count: 2
   metric_type: antisense_tss_count
-- count: 1
-  metric_type: pangenome_membership
-- count: 1
-  metric_type: expression_level_class
-- count: 1
-  metric_type: predicted_subcellular_localization
-- count: 1
-  metric_type: expressed_above_background
-- count: 1
-  metric_type: vesicle_proteome_member
+- count: 2
+  metric_type: has_primary_tss
 - count: 1
   metric_type: expression_at_t0_log2
 - count: 1
@@ -165,13 +160,25 @@ by_metric_type:
 - count: 1
   metric_type: mascot_identification_probability
 - count: 1
+  metric_type: expressed_above_background
+- count: 1
+  metric_type: vesicle_proteome_member
+- count: 1
+  metric_type: pangenome_membership
+- count: 1
+  metric_type: expression_level_class
+- count: 1
+  metric_type: predicted_subcellular_localization
+- count: 1
   metric_type: tss_distance_to_cds
 - count: 1
   metric_type: minus10_element_score
+- count: 1
+  metric_type: cell_abundance_biovolume_normalized
 by_organism:
 - count: 18
   organism_name: Prochlorococcus MED4
-- count: 5
+- count: 6
   organism_name: Prochlorococcus MIT9313
 by_publication:
 - count: 8
@@ -184,6 +191,8 @@ by_publication:
   publication_doi: 10.1126/science.1243457
 - count: 2
   publication_doi: 10.1186/1471-2180-14-11
+- count: 1
+  publication_doi: 10.1111/1462-2920.15834
 by_treatment_type:
 - count: 8
   treatment_type: tss_mapping
@@ -191,12 +200,12 @@ by_treatment_type:
   treatment_type: diel
 - count: 4
   treatment_type: rna_decay
-- count: 3
+- count: 4
   treatment_type: compartment
 - count: 2
   treatment_type: growth_phase
 by_value_kind:
-- count: 16
+- count: 17
   value_kind: numeric
 - count: 4
   value_kind: boolean
@@ -849,6 +858,35 @@ results:
   background_factors:
   - axenic
   - light
+  compartment: vesicle
+  derived_metric_id: derived_metric:1462-2920.15834:s3_mit9313_abundance:cell_abundance_biovolume_normalized
+  experimental_context: Mid-to-late exponential phase axenic culture; vesicles purified
+    by tangential flow filtration + OptiPrep gradient; biovolume-normalized trypsin/Lys-C
+    spectral counts
+  field_description: Hi3-normalized adjusted spectral counts per cell biovolume (Trypsin/Lys-C,
+    COMETa); Biller 2022 Table S3
+  gene_name: psbA
+  has_p_value: false
+  light_condition: continuous light
+  locus_tag: PMT0419
+  metric_bucket: top_decile
+  metric_percentile: 90.7707
+  metric_type: cell_abundance_biovolume_normalized
+  name: MIT9313 whole-cell protein abundance (biovolume-normalized, Trypsin/Lys-C)
+  organism_name: Prochlorococcus MIT9313
+  publication_doi: 10.1111/1462-2920.15834
+  rank_by_metric: 98
+  rankable: true
+  treatment: Vesicle fraction (extracellular)
+  treatment_type:
+  - compartment
+  unit: spectral counts / cell biovolume
+  value: 0.0
+  value_kind: numeric
+- allowed_categories: null
+  background_factors:
+  - axenic
+  - light
   compartment: whole_cell
   derived_metric_id: derived_metric:ismej.2014.57:tss_metrics_mit9313:antisense_tss_count
   experimental_context: MIT9313 monoculture at 22C in AMP1 medium under 10-30 umol
@@ -981,9 +1019,9 @@ results:
   unit: nt
   value: 7.0
   value_kind: numeric
-returned: 23
-row_count: 23
-total_derived_metrics: 23
-total_matching: 23
+returned: 24
+row_count: 24
+total_derived_metrics: 24
+total_matching: 24
 truncated: false
 warnings: []

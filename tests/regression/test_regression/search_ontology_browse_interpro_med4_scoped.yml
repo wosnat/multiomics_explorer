@@ -3,14 +3,14 @@ by_interpro_type:
 - count: 5
   interpro_type: HOMOLOGOUS_SUPERFAMILY
 by_level:
-- count: 74
+- count: 75
   level: 0
 by_ontology:
 - ontology: interpro
   returned: 5
   score_max: null
-  total_entries: 13314
-  total_matching: 74
+  total_entries: 14663
+  total_matching: 75
   truncated: true
 case_id: search_ontology_browse_interpro_med4_scoped
 mode: browse
@@ -26,7 +26,7 @@ results:
   organism_count: 118
   organism_gene_count: 32
   score: null
-- gene_count: 3094
+- gene_count: 3092
   id: interpro:IPR015421
   interpro_type: HOMOLOGOUS_SUPERFAMILY
   is_informative: true
@@ -71,7 +71,7 @@ row_count: 5
 score_max: null
 score_median: null
 skipped_ontologies: []
-total_entries: 13314
-total_matching: 74
+total_entries: 14663
+total_matching: 75
 truncated: true
 warnings: []

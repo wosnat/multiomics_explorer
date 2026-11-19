@@ -76,7 +76,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/genes_by_homolog_group/full` — ~2539 tok
 - `docs://tools/genes_by_metabolite/full` — ~11107 tok
 - `docs://tools/genes_by_numeric_metric/full` — ~6342 tok
-- `docs://tools/genes_by_ontology/full` — ~13778 tok
+- `docs://tools/genes_by_ontology/full` — ~13780 tok
 - `docs://tools/genes_in_cluster/full` — ~1979 tok
 - `docs://tools/kg_release_info/full` — ~2354 tok
 - `docs://tools/kg_schema/full` — ~2178 tok
@@ -85,14 +85,14 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://tools/list_experiments/full` — ~9415 tok
 - `docs://tools/list_filter_values/full` — ~7212 tok
 - `docs://tools/list_metabolite_assays/full` — ~3659 tok
-- `docs://tools/list_metabolites/full` — ~12588 tok
+- `docs://tools/list_metabolites/full` — ~12595 tok
 - `docs://tools/list_organisms/full` — ~11949 tok
 - `docs://tools/list_publications/full` — ~7988 tok
 - `docs://tools/metabolites_by_flags_assay/full` — ~4421 tok
 - `docs://tools/metabolites_by_gene/full` — ~12215 tok
 - `docs://tools/metabolites_by_quantifies_assay/full` — ~6094 tok
-- `docs://tools/ontology_landscape/full` — ~7407 tok
-- `docs://tools/ontology_term_details/full` — ~7575 tok
+- `docs://tools/ontology_landscape/full` — ~7406 tok
+- `docs://tools/ontology_term_details/full` — ~7578 tok
 - `docs://tools/pathway_enrichment/full` — ~9547 tok
 - `docs://tools/resolve_gene/full` — ~1543 tok
 - `docs://tools/run_cypher/full` — ~945 tok
@@ -123,7 +123,7 @@ Append /full for the complete page — all worked examples + full response forma
 - `docs://ontologies/interpro` — ~2434 tok
 - `docs://ontologies/kegg` — ~2325 tok
 - `docs://ontologies/merops` — ~2673 tok
-- `docs://ontologies/ncbifam` — ~2307 tok
+- `docs://ontologies/ncbifam` — ~2362 tok
 - `docs://ontologies/pfam` — ~1995 tok
 - `docs://ontologies/signal_peptide_type` — ~1488 tok
 - `docs://ontologies/subcellular_localization` — ~1510 tok

@@ -4,8 +4,8 @@ by_level: []
 by_ontology:
 - ontology: go_bp
   returned: 5
-  score_max: 1.5253678560256958
-  total_entries: 3411
+  score_max: 1.530442476272583
+  total_entries: 3434
   total_matching: 332
   truncated: true
 - ontology: tcdb
@@ -18,14 +18,14 @@ case_id: search_ontology_multi_go_bp_tcdb_transport
 mode: search
 offset: 0
 results:
-- gene_count: 24309
+- gene_count: 24375
   id: go:0006810
   is_informative: true
   level: 3
   name: transport
   ontology_type: go_bp
   organism_count: 118
-  score: 1.5254
+  score: 1.5304
 - gene_count: 210
   id: go:0006821
   is_informative: true
@@ -33,7 +33,7 @@ results:
   name: chloride transport
   ontology_type: go_bp
   organism_count: 118
-  score: 1.3283
+  score: 1.3332
 - gene_count: 9
   id: go:0006833
   is_informative: true
@@ -41,7 +41,7 @@ results:
   name: water transport
   ontology_type: go_bp
   organism_count: 9
-  score: 1.3283
+  score: 1.3332
 - gene_count: 5
   id: go:0006836
   is_informative: true
@@ -49,7 +49,7 @@ results:
   name: neurotransmitter transport
   ontology_type: go_bp
   organism_count: 3
-  score: 1.3283
+  score: 1.3332
 - gene_count: 245
   id: go:0015990
   is_informative: true
@@ -57,7 +57,7 @@ results:
   name: electron transport coupled proton transport
   ontology_type: go_bp
   organism_count: 117
-  score: 1.3568
+  score: 1.362
 - gene_count: 0
   id: tcdb:1.A.1.29.5
   is_informative: true
@@ -102,9 +102,9 @@ results:
 returned: 10
 row_count: 10
 score_max: 7.373953342437744
-score_median: 3.3975949883461
+score_median: 3.4001322984695435
 skipped_ontologies: []
-total_entries: 13173
+total_entries: 13196
 total_matching: 883
 truncated: true
 warnings: []

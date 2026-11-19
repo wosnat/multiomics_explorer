@@ -124,10 +124,10 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
     {"ontology": "interpro", "count": 1},
     ...
   ],
-  "links_out_total": 20,
+  "links_out_total": 18,
   "by_link_kind": [
     {"link_kind": "composition", "count": 12},
-    {"link_kind": "router", "count": 7},
+    {"link_kind": "router", "count": 5},
     {"link_kind": "membership", "count": 1}
   ],
   "resolved_aliases": {},
@@ -255,18 +255,17 @@ ontology_term_details(term_ids=["tcdb:3.A.1", "merops.family:S14", "interpro:IPR
         {
           "rel": "Interpro_entry_related_to_ec_number",
           "link_kind": "router",
-          "target_id": "ec:4.3.1.1",
-          "target_ontology": "ec",
-          "target_name": "aspartate ammonia-lyase"
-        },
-        {
-          "rel": "Interpro_entry_related_to_ec_number",
-          "link_kind": "router",
           "target_id": "ec:4.3.2.1",
           "target_ontology": "ec",
           "target_name": "argininosuccinate lyase"
         },
-        ...
+        {
+          "rel": "Interpro_entry_related_to_ec_number",
+          "link_kind": "router",
+          "target_id": "ec:5.5.1.2",
+          "target_ontology": "ec",
+          "target_name": "3-carboxy-cis,cis-muconate cycloisomerase"
+        }
       ]
     },
     ...
@@ -302,7 +301,7 @@ ontology_term_details(term_ids=["tigr.role:energy_metabolism"])
       "level": 0,
       "level_kind": "tigr_mainrole",
       "is_informative": true,
-      "gene_count": 28339,
+      "gene_count": 28353,
       "organism_count": 118,
       "direct_gene_count": 0,
       "code": "energy_metabolism",
@@ -415,8 +414,8 @@ ontology_term_details(term_ids=["interpro:IPR000362"], verbose=True)
   "truncated": false,
   "not_found": [],
   "by_ontology": [{"ontology": "interpro", "count": 1}],
-  "links_out_total": 5,
-  "by_link_kind": [{"link_kind": "router", "count": 5}],
+  "links_out_total": 3,
+  "by_link_kind": [{"link_kind": "router", "count": 3}],
   "resolved_aliases": {},
   "warnings": [],
   "results": [
@@ -456,20 +455,19 @@ ontology_term_details(term_ids=["interpro:IPR000362"], verbose=True)
         {
           "rel": "Interpro_entry_related_to_ec_number",
           "link_kind": "router",
-          "target_id": "ec:4.3.1.1",
-          "target_ontology": "ec",
-          "target_name": "aspartate ammonia-lyase",
-          "props": {"id": "IPR000362-related_ec-4.3.1.1", "router_ambiguous": true}
-        },
-        {
-          "rel": "Interpro_entry_related_to_ec_number",
-          "link_kind": "router",
           "target_id": "ec:4.3.2.1",
           "target_ontology": "ec",
           "target_name": "argininosuccinate lyase",
           "props": {"id": "IPR000362-related_ec-4.3.2.1", "router_ambiguous": true}
         },
-        ...
+        {
+          "rel": "Interpro_entry_related_to_ec_number",
+          "link_kind": "router",
+          "target_id": "ec:5.5.1.2",
+          "target_ontology": "ec",
+          "target_name": "3-carboxy-cis,cis-muconate cycloisomerase",
+          "props": {"id": "IPR000362-related_ec-5.5.1.2", "router_ambiguous": true}
+        }
       ],
       "properties": {
         "id": "interpro:IPR000362",

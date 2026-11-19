@@ -7,7 +7,7 @@ rows:
   level: 3
   name: nicotine blue oxidoreductase
   organism_count: 2
-  score: 2.722
+  score: 2.7626
   tree: null
   tree_code: null
 - gene_count: 0
@@ -16,7 +16,7 @@ rows:
   level: 3
   name: F420H2:quinone oxidoreductase
   organism_count: 0
-  score: 2.722
+  score: 2.7626
   tree: null
   tree_code: null
 - gene_count: 13
@@ -25,7 +25,7 @@ rows:
   level: 3
   name: glucose-fructose oxidoreductase
   organism_count: 13
-  score: 2.722
+  score: 2.7626
   tree: null
   tree_code: null
 - gene_count: 10
@@ -34,7 +34,7 @@ rows:
   level: 3
   name: hydrogen:quinone oxidoreductase
   organism_count: 8
-  score: 3.0869
+  score: 3.1214
   tree: null
   tree_code: null
 - gene_count: 0
@@ -43,7 +43,7 @@ rows:
   level: 3
   name: oxalate oxidoreductase
   organism_count: 0
-  score: 3.0869
+  score: 3.1214
   tree: null
   tree_code: null
 - gene_count: 2
@@ -52,7 +52,7 @@ rows:
   level: 3
   name: 2-oxoacid oxidoreductase (ferredoxin)
   organism_count: 1
-  score: 2.4343
+  score: 2.4778
   tree: null
   tree_code: null
 - gene_count: 1
@@ -61,7 +61,7 @@ rows:
   level: 3
   name: aldehyde ferredoxin oxidoreductase
   organism_count: 1
-  score: 2.722
+  score: 2.7626
   tree: null
   tree_code: null
 - gene_count: 7
@@ -70,7 +70,7 @@ rows:
   level: 3
   name: indolepyruvate ferredoxin oxidoreductase
   organism_count: 2
-  score: 2.722
+  score: 2.7626
   tree: null
   tree_code: null
 - gene_count: 90
@@ -79,7 +79,7 @@ rows:
   level: 3
   name: 15,16-dihydrobiliverdin:ferredoxin oxidoreductase
   organism_count: 90
-  score: 2.722
+  score: 2.7626
   tree: null
   tree_code: null
 - gene_count: 92
@@ -88,7 +88,7 @@ rows:
   level: 3
   name: phycoerythrobilin:ferredoxin oxidoreductase
   organism_count: 90
-  score: 3.0869
+  score: 3.1214
   tree: null
   tree_code: null
 - gene_count: 0
@@ -97,7 +97,7 @@ rows:
   level: 3
   name: phytochromobilin:ferredoxin oxidoreductase
   organism_count: 0
-  score: 3.0869
+  score: 3.1214
   tree: null
   tree_code: null
 - gene_count: 103
@@ -106,7 +106,7 @@ rows:
   level: 3
   name: phycocyanobilin:ferredoxin oxidoreductase
   organism_count: 102
-  score: 3.0869
+  score: 3.1214
   tree: null
   tree_code: null
 - gene_count: 57
@@ -115,7 +115,7 @@ rows:
   level: 3
   name: isoquinoline 1-oxidoreductase
   organism_count: 16
-  score: 2.722
+  score: 2.7626
   tree: null
   tree_code: null
 - gene_count: 0
@@ -124,7 +124,7 @@ rows:
   level: 3
   name: quinoline 2-oxidoreductase
   organism_count: 0
-  score: 2.722
+  score: 2.7626
   tree: null
   tree_code: null
 - gene_count: 0
@@ -133,7 +133,7 @@ rows:
   level: 3
   name: quinaldate 4-oxidoreductase
   organism_count: 0
-  score: 2.722
+  score: 2.7626
   tree: null
   tree_code: null
 - gene_count: 0
@@ -142,7 +142,7 @@ rows:
   level: 3
   name: quinoline-4-carboxylate 2-oxidoreductase
   organism_count: 0
-  score: 2.2016
+  score: 2.2462
   tree: null
   tree_code: null
 - gene_count: 0
@@ -151,7 +151,7 @@ rows:
   level: 3
   name: 8-hydroxy-5-deazaflavin:NADPH oxidoreductase
   organism_count: 0
-  score: 2.2016
+  score: 2.2462
   tree: null
   tree_code: null
 - gene_count: 0
@@ -160,7 +160,7 @@ rows:
   level: 3
   name: glyphosate oxidoreductase
   organism_count: 0
-  score: 3.0869
+  score: 3.1214
   tree: null
   tree_code: null
 - gene_count: 0
@@ -169,7 +169,7 @@ rows:
   level: 3
   name: coenzyme F420 oxidoreductase (ferredoxin)
   organism_count: 0
-  score: 2.4343
+  score: 2.4778
   tree: null
   tree_code: null
 - gene_count: 0
@@ -178,7 +178,7 @@ rows:
   level: 3
   name: NAD(P)H sulfur oxidoreductase (CoA-dependent)
   organism_count: 0
-  score: 1.8482
+  score: 1.8925
   tree: null
   tree_code: null
 - gene_count: 0
@@ -187,7 +187,7 @@ rows:
   level: 3
   name: S-disulfanyl-L-cysteine oxidoreductase
   organism_count: 0
-  score: 2.2016
+  score: 2.2462
   tree: null
   tree_code: null
 - gene_count: 0
@@ -196,7 +196,7 @@ rows:
   level: 3
   name: protein dithiol oxidoreductase (disulfide-forming)
   organism_count: 0
-  score: 2.2016
+  score: 2.2462
   tree: null
   tree_code: null
 - gene_count: 17
@@ -205,7 +205,7 @@ rows:
   level: 3
   name: eukaryotic sulfide quinone oxidoreductase
   organism_count: 15
-  score: 2.4343
+  score: 2.4778
   tree: null
   tree_code: null
 - gene_count: 0
@@ -214,7 +214,7 @@ rows:
   level: 3
   name: protein dithiol:quinone oxidoreductase DsbB
   organism_count: 0
-  score: 2.4343
+  score: 2.4778
   tree: null
   tree_code: null
 - gene_count: 0
@@ -223,16 +223,16 @@ rows:
   level: 3
   name: aliphatic sulfonate oxidoreductase
   organism_count: 0
-  score: 2.722
+  score: 2.7626
   tree: null
   tree_code: null
-- gene_count: 3517
+- gene_count: 3519
   id: ec:7.1.1.-
   is_informative: true
   level: 2
   name: Hydron translocation or charge separation linked to oxidoreductase reactions
   organism_count: 118
-  score: 1.5925
+  score: 1.635
   tree: null
   tree_code: null
 - gene_count: 0
@@ -241,7 +241,7 @@ rows:
   level: 3
   name: ferredoxin--quinone oxidoreductase (H(+)-translocating)
   organism_count: 0
-  score: 2.2016
+  score: 2.2462
   tree: null
   tree_code: null
 - gene_count: 0
@@ -250,7 +250,7 @@ rows:
   level: 3
   name: ferredoxin--NAD(+) oxidoreductase (H(+)-transporting)
   organism_count: 0
-  score: 2.2016
+  score: 2.2462
   tree: null
   tree_code: null
 - gene_count: 90
@@ -259,7 +259,7 @@ rows:
   level: 2
   name: Linked to oxidoreductase reactions
   organism_count: 14
-  score: 2.4343
+  score: 2.4778
   tree: null
   tree_code: null
 - gene_count: 0
@@ -268,6 +268,6 @@ rows:
   level: 3
   name: ferredoxin--NAD(+) oxidoreductase (Na(+)-transporting)
   organism_count: 0
-  score: 2.2016
+  score: 2.2462
   tree: null
   tree_code: null

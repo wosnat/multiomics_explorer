@@ -997,7 +997,7 @@ class TestSearchOntologyBrowseCorrectnessKG:
 @pytest.mark.kg
 class TestOntologyTermDetailsCorrectnessKG:
     _IDS = ["tcdb:3.A.1", "merops.family:S14", "interpro:IPR000362",
-            "ncbifam:NF000812", "go:0006979", "bogus:xyz"]
+            "ncbifam:NF000584", "go:0006979", "bogus:xyz"]  # NF000812 → NF000584 2026-11-18T22:37Z: NF000812 was a retired family the InterProScan 6 re-scan dropped; NF000584 has the same 0/0/0 profile
 
     def _rows(self, conn, **kw):
         from multiomics_explorer.kg.queries_lib import build_ontology_term_details
@@ -1019,8 +1019,8 @@ class TestOntologyTermDetailsCorrectnessKG:
         s = rows["merops.family:S14"]
         assert (len(s["parents"]), s["children_total"], s["links_total"]) == (1, 0, 1)
         i = rows["interpro:IPR000362"]
-        assert (len(i["parents"]), i["children_total"], i["links_total"]) == (0, 4, 5)
-        n = rows["ncbifam:NF000812"]
+        assert (len(i["parents"]), i["children_total"], i["links_total"]) == (0, 4, 3)  # 5 → 3 2026-11-18T22:37Z: InterPro 111 routes IPR000362 to 3 ECs (4.2.1.2, 4.3.2.1, 5.5.1.2)
+        n = rows["ncbifam:NF000584"]
         assert (len(n["parents"]), n["children_total"], n["links_total"]) == (0, 0, 0)
         g = rows["go:0006979"]
         live = run_query(
@@ -1036,7 +1036,7 @@ class TestOntologyTermDetailsCorrectnessKG:
     def test_link_kinds_router_only(self, conn):
         rows = self._rows(conn, link_kinds=["router"])
         assert rows["tcdb:3.A.1"]["links_total"] == 0
-        assert rows["interpro:IPR000362"]["links_total"] == 5
+        assert rows["interpro:IPR000362"]["links_total"] == 3  # 5 → 3 2026-11-18T22:37Z: InterPro 111 routes IPR000362 to 3 ECs (4.2.1.2, 4.3.2.1, 5.5.1.2)
 
     def test_verbose_shape(self, conn, kg_count):
         rows = self._rows(conn, verbose=True)
