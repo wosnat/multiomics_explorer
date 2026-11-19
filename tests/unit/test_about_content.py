@@ -973,4 +973,4 @@ def test_every_tool_has_brief_and_full():
     briefs = {p.stem for p in ABOUT_DIR.glob("*.md")}
     fulls = {p.stem for p in (ABOUT_DIR / "full").glob("*.md")}
     assert briefs == fulls
-    assert len(briefs) == 42
+    assert len(briefs) == 43  # 42 → 43: kegg_module_completeness

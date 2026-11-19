@@ -1825,6 +1825,77 @@ def ontology_term_details_scenarios():
     ]
 
 
+# kegg_module_completeness (docs/tool-specs/kegg-module-completeness.md).
+# Pinned on the dev KG built_at 2026-11-18T22:37:52Z:
+#   MATCH (o:OrganismTaxon {preferred_name:'Synechococcus elongatus PCC 7942'})
+#   OPTIONAL MATCH (o)-[r:Organism_has_kegg_module]->
+#     (:KeggModule {id:'kegg.module:M00161'}) RETURN r  -> null (no edge:
+#     psbD K02706 unannotated)
+#   'Phage' is a gene-less OrganismTaxon: the resolver (gene_count > 0)
+#     matches nothing -> not_found_organisms.
+#   M00531 x MED4: no edge (no nitrate / nitrite reductase).
+_KMC_PCC7942 = "Synechococcus elongatus PCC 7942"
+_KMC_PSII = "kegg.module:M00161"
+_KMC_GENELESS_ORGANISM = "Phage"
+_KMC_UNKNOWN_MODULE = "kegg.module:M99999"
+
+
+def kegg_module_completeness_scenarios():
+    # Organism x module completeness edges. not_found_modules /
+    # not_matched_modules / not_found_organisms are named lists (not a flat
+    # not_found), so input_ids stays empty.
+    return [
+        Scenario(
+            "unknown_module_id",
+            dict(organism=fx.CONTROL_ORGANISM,
+                 module_ids=[_KMC_UNKNOWN_MODULE])),
+        Scenario(
+            "empty_module_ids",
+            dict(module_ids=[]),
+            expects_error=ToolError),
+        Scenario(
+            # gene-less taxon in a list -> not_found_organisms, empty
+            # well-formed envelope (short-circuit), never a crash.
+            "organism_without_genes_in_list",
+            dict(organism=[_KMC_GENELESS_ORGANISM])),
+        Scenario(
+            # a single string must resolve to an organism with genes.
+            "organism_without_genes_str",
+            dict(organism=_KMC_GENELESS_ORGANISM),
+            expects_error=ToolError),
+        Scenario(
+            "genome_only_organism",
+            dict(organism=fx.GENOME_ONLY_ORGANISM)),
+        Scenario(
+            # MIT9313 x M00531 is one_step_missing: status=['complete']
+            # filters the only row away; absence counts are unchanged.
+            "status_filter_empties_rows",
+            dict(organism="Prochlorococcus MIT9313",
+                 module_ids=["kegg.module:M00531"], status=["complete"])),
+        Scenario(
+            "status_band_with_no_edges_in_scope",
+            dict(organism=fx.CONTROL_ORGANISM, status=["two_steps_missing"],
+                 module_ids=["kegg.module:M00001"])),
+        Scenario(
+            # limit=0 on a pair with no edge: summary-only envelope with
+            # top_modules[*].organisms_without_edge populated, 0 matches.
+            "limit_zero_no_edge_pair",
+            dict(organism=[_KMC_PCC7942], module_ids=[_KMC_PSII], limit=0)),
+        Scenario(
+            "offset_past_end",
+            dict(module_ids=["kegg.module:M00531"],
+                 offset=fx.OFFSET_PAST_END)),
+        Scenario(
+            "signature_module_under_default_module_type",
+            dict(organism=fx.CONTROL_ORGANISM,
+                 module_ids=["kegg.module:M00851"])),
+        Scenario(
+            "invalid_status",
+            dict(organism=fx.CONTROL_ORGANISM, status=["bogus"]),
+            expects_error=ToolError),
+    ]
+
+
 SCENARIO_BUILDERS = {
     "genes_by_ontology": genes_by_ontology_scenarios,
     "gene_overview": gene_overview_scenarios,
@@ -1875,4 +1946,6 @@ SCENARIO_BUILDERS = {
     "genes_by_categorical_metric": genes_by_categorical_metric_scenarios,
     # Annotation-trust surface (PR 3b): term-side drill-down.
     "ontology_term_details": ontology_term_details_scenarios,
+    # KEGG module completeness (Build B).
+    "kegg_module_completeness": kegg_module_completeness_scenarios,
 }

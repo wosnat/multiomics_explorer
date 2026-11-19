@@ -2417,3 +2417,71 @@
     row0:
       evidence_source: transport
       tcdb_route: direct
+
+# ── kegg_module_completeness (docs/tool-specs/kegg-module-completeness.md) ──
+# `dispatch: api` throughout: the envelope (by_status, no_edge_count,
+# by_class, top_organisms, top_modules[*].organisms_without_edge) is the
+# contract. Live facts verified 2026-11-19 against the dev KG built_at
+# 2026-11-18T22:37:52Z.
+
+- id: kegg_module_completeness_med4_summary
+  tool: kegg_module_completeness
+  dispatch: api
+  desc: |
+    One organism, default module_type='pathway', summary: MED4 bands
+    complete 51 / one_step_missing 43 / two_steps_missing 30 / partial 75
+    (199 edges); by_class + top_organisms + no_edge_count pinned by the
+    golden. complete 51 == list_organisms complete_pathway_module_count.
+  params:
+    organism: Prochlorococcus MED4
+    summary: true
+  expect:
+    min_rows: 0
+    max_rows: 0
+
+- id: kegg_module_completeness_m00531_cross_strain
+  tool: kegg_module_completeness
+  dispatch: api
+  desc: |
+    Assimilatory nitrate reduction across every organism with genes:
+    complete 56 / one_step_missing 26 edges (82 rows), no edge in 36
+    (MED4 among them, in top_modules[0].organisms_without_edge). Rows sort
+    module -> band -> organism, so complete rows come first.
+  params:
+    module_ids: ["kegg.module:M00531"]
+    limit: 100
+  expect:
+    min_rows: 82
+    max_rows: 82
+    columns: [organism_name, module_id, module_name, module_type,
+              module_class, status, steps_total, steps_present,
+              steps_present_via_ec, missing_step_indices, missing_kos]
+    row0:
+      module_id: kegg.module:M00531
+      status: complete
+    contains:
+      organism_name: Prochlorococcus MIT9313
+
+- id: kegg_module_completeness_nitrogen_subclass_detail
+  tool: kegg_module_completeness
+  dispatch: api
+  desc: |
+    A subclass id expands to its 7 modules; MED4 + WH8102 + MIT9313 ->
+    2 rows (M00531 WH8102 complete 2/2; MIT9313 one_step_missing 1/2,
+    missing_kos [K00367, K00372, K10534]). Verbose pins module_subclass,
+    definition, missing_step_definitions and the coalesced EC lists.
+  params:
+    organism: ["Prochlorococcus MED4", "Synechococcus WH8102",
+               "Prochlorococcus MIT9313"]
+    module_ids: ["kegg.module:pathway_modules.energy_metabolism.nitrogen_metabolism"]
+    verbose: true
+  expect:
+    min_rows: 2
+    max_rows: 2
+    columns: [organism_name, module_id, status, missing_kos,
+              module_subclass, definition, missing_step_definitions,
+              ec_filled_step_indices, ec_genes]
+    row0:
+      organism_name: Synechococcus WH8102
+      module_id: kegg.module:M00531
+      status: complete

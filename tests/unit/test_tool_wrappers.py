@@ -78,6 +78,7 @@ EXPECTED_TOOLS = [
     "gene_neighbors",
     "discussed_by_publication",
     "ontology_term_details",
+    "kegg_module_completeness",
 ]
 
 
@@ -7838,7 +7839,9 @@ class TestExpectedToolsUnchangedForTcdbCazy:
         # tool; the 3 sibling extensions add fields only, no new tool).
         # Bumped 41 → 42 by ontology_term_details (annotation-trust surface
         # PR 3b — term-side drill-down, legitimate new MCP tool).
-        assert len(EXPECTED_TOOLS) == 42, (
+        # Bumped 42 → 43 by kegg_module_completeness (KEGG module
+        # completeness per organism, legitimate new MCP tool).
+        assert len(EXPECTED_TOOLS) == 43, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "tcdb/cazy adds NO new tools (it's a Mode-B ontology surface "
             "refresh); MBG legitimately adds one; "
@@ -8476,7 +8479,9 @@ class TestExpectedToolsUnchangedForPhase1Plumbing:
         # tool; its 3 sibling extensions add fields only, no new tool).
         # Bumped 41 → 42 by ontology_term_details (annotation-trust surface
         # PR 3b — term-side drill-down, legitimate new MCP tool).
-        assert len(EXPECTED_TOOLS) == 42, (
+        # Bumped 42 → 43 by kegg_module_completeness (KEGG module
+        # completeness per organism, legitimate new MCP tool).
+        assert len(EXPECTED_TOOLS) == 43, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "Phase 1 plumbing adds no new tools — only field additions; "
             "Phase 5 list_metabolite_assays legitimately adds one; "
@@ -10321,7 +10326,9 @@ class TestExpectedToolsUnchangedForPsortbSignalp:
         # tool; its 3 sibling extensions add fields only, no new tool).
         # Bumped 41 → 42 by ontology_term_details (annotation-trust surface
         # PR 3b — term-side drill-down, legitimate new MCP tool).
-        assert len(EXPECTED_TOOLS) == 42, (
+        # Bumped 42 → 43 by kegg_module_completeness (KEGG module
+        # completeness per organism, legitimate new MCP tool).
+        assert len(EXPECTED_TOOLS) == 43, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "psortb/signalp adds NO new tools (Mode-B ontology surface refresh); "
             "kg_release_info legitimately adds one."
@@ -11208,7 +11215,7 @@ class TestExpectedToolsUnchangedForAnnotationTrust:
     PR 3b adds exactly one: `ontology_term_details` (41 → 42)."""
 
     def test_expected_tools_size_is_42(self):
-        assert len(EXPECTED_TOOLS) == 42, (
+        assert len(EXPECTED_TOOLS) == 43, (
             f"EXPECTED_TOOLS unexpectedly has {len(EXPECTED_TOOLS)} entries; "
             "the annotation-trust surface adds exactly one tool "
             "(ontology_term_details, PR 3b)"
@@ -12280,7 +12287,7 @@ class TestSlice4NoNewTool:
     """Slice 4 is Mode B — no new tool; EXPECTED_TOOLS stays at 42."""
 
     def test_expected_tools_unchanged(self, tool_fns):
-        assert len(EXPECTED_TOOLS) == 42
+        assert len(EXPECTED_TOOLS) == 43
         assert sorted(tool_fns) == sorted(EXPECTED_TOOLS)
 
 
@@ -12315,7 +12322,7 @@ class TestMetaboliteIdCoercionWrappers:
     `resolved_aliases` + `warnings` and its two ID params document bare IDs."""
 
     def test_expected_tools_unchanged(self, tool_fns):
-        assert len(EXPECTED_TOOLS) == 42
+        assert len(EXPECTED_TOOLS) == 43
         assert sorted(tool_fns) == sorted(EXPECTED_TOOLS)
 
     @pytest.mark.parametrize("name", _METABOLITE_ID_TOOLS)
@@ -12369,7 +12376,7 @@ class TestBareTermGroupIdCoercionWrappers:
     """`resolved_aliases: dict[str, list[str]]` on the term/group-ID tools."""
 
     def test_expected_tools_unchanged(self, tool_fns):
-        assert len(EXPECTED_TOOLS) == 42
+        assert len(EXPECTED_TOOLS) == 43
         assert sorted(tool_fns) == sorted(EXPECTED_TOOLS)
 
     @pytest.mark.parametrize("name", _TERM_ID_TOOLS + _GROUP_ID_TOOLS)
@@ -12429,7 +12436,7 @@ class TestLocusTagCaseMismatchWarningWrappers:
     the 2b.3 Task 2 brief (append-only; never a second key)."""
 
     def test_expected_tools_unchanged(self, tool_fns):
-        assert len(EXPECTED_TOOLS) == 42
+        assert len(EXPECTED_TOOLS) == 43
         assert sorted(tool_fns) == sorted(EXPECTED_TOOLS)
 
     @pytest.mark.parametrize("name", _LOCUS_TAG_WARNING_TOOLS)
@@ -13185,7 +13192,7 @@ class TestListMetabolitesIdentitySurfaceWrapper:
     """§B/§C/§C2 at the MCP boundary."""
 
     def test_expected_tools_unchanged(self, tool_fns):
-        assert len(EXPECTED_TOOLS) == 42
+        assert len(EXPECTED_TOOLS) == 43
         assert sorted(tool_fns) == sorted(EXPECTED_TOOLS)
 
     @pytest.mark.asyncio
@@ -15752,3 +15759,420 @@ class TestKgReleaseInfoKeggRelease:
         field = KGIdentity.model_fields["kegg_release"]
         assert field.description
         assert len(field.description) <= 250
+
+
+# ===========================================================================
+# kegg_module_completeness + module rollups (Build B)
+# (docs/tool-specs/kegg-module-completeness.md)
+# ===========================================================================
+
+import typing as _typing_kmc  # noqa: E402
+
+_KMC_TOOL = "kegg_module_completeness"
+_KMC_BANDS = ["complete", "one_step_missing", "two_steps_missing", "partial"]
+_KMC_MED4 = "Prochlorococcus MED4"
+_KMC_MIT9313 = "Prochlorococcus MIT9313"
+_KMC_WH8102 = "Synechococcus WH8102"
+_KMC_ENERGY = "kegg.module:pathway_modules.energy_metabolism"
+
+
+def _kmc_resp_model(tool_fns, name):
+    return _typing_kmc.get_type_hints(tool_fns[name])["return"]
+
+
+def _kmc_list_item_model(model, field):
+    return _typing_kmc.get_args(model.model_fields[field].annotation)[0]
+
+
+def _kmc_api_return(**over):
+    out = {
+        "total_entries": 26004, "total_matching": 2, "returned": 2,
+        "truncated": False, "offset": 0, "organism_name": None,
+        "organisms_in_scope": 3, "modules_in_scope": 1,
+        "by_status": [{"status": "complete", "count": 1},
+                      {"status": "one_step_missing", "count": 1},
+                      {"status": "two_steps_missing", "count": 0},
+                      {"status": "partial", "count": 0}],
+        "no_edge_count": 1,
+        "by_class": [{"class_id": _KMC_ENERGY,
+                      "class_name": "Energy metabolism", "module_count": 1,
+                      "complete": 1, "one_step_missing": 1,
+                      "two_steps_missing": 0, "partial": 0, "no_edge": 1}],
+        "top_organisms": [
+            {"organism_name": _KMC_WH8102, "complete": 1,
+             "one_step_missing": 0, "two_steps_missing": 0, "partial": 0,
+             "no_edge": 0},
+            {"organism_name": _KMC_MED4, "complete": 0,
+             "one_step_missing": 0, "two_steps_missing": 0, "partial": 0,
+             "no_edge": 1},
+            {"organism_name": _KMC_MIT9313, "complete": 0,
+             "one_step_missing": 1, "two_steps_missing": 0, "partial": 0,
+             "no_edge": 0}],
+        "top_modules": [
+            {"module_id": "kegg.module:M00531",
+             "module_name": "Assimilatory nitrate reduction, nitrate => ammonia",
+             "module_type": "pathway", "complete": 1, "one_step_missing": 1,
+             "two_steps_missing": 0, "partial": 0, "no_edge": 1,
+             "organisms_without_edge": [_KMC_MED4]}],
+        "not_found_modules": [], "not_matched_modules": [],
+        "not_found_organisms": [], "warnings": [],
+        "results": [
+            {"organism_name": _KMC_WH8102, "module_id": "kegg.module:M00531",
+             "module_name": "Assimilatory nitrate reduction, nitrate => ammonia",
+             "module_type": "pathway", "module_class": "Energy metabolism",
+             "status": "complete", "steps_total": 2, "steps_present": 2,
+             "steps_present_via_ec": 0, "missing_step_indices": [],
+             "missing_kos": []},
+            {"organism_name": _KMC_MIT9313,
+             "module_id": "kegg.module:M00531",
+             "module_name": "Assimilatory nitrate reduction, nitrate => ammonia",
+             "module_type": "pathway", "module_class": "Energy metabolism",
+             "status": "one_step_missing", "steps_total": 2,
+             "steps_present": 1, "steps_present_via_ec": 0,
+             "missing_step_indices": [1],
+             "missing_kos": ["K00367", "K00372", "K10534"]},
+        ],
+    }
+    out.update(over)
+    return out
+
+
+async def _kmc_call(tool_fns, mock_ctx, api_return=None, **kwargs):
+    with patch("multiomics_explorer.api.functions.kegg_module_completeness",
+               return_value=api_return or _kmc_api_return()) as m:
+        resp = await tool_fns[_KMC_TOOL](mock_ctx, **kwargs)
+    return resp, m
+
+
+class TestKeggModuleCompletenessWrapper:
+    def test_registered(self, tool_fns):
+        assert _KMC_TOOL in tool_fns
+        assert _KMC_TOOL in EXPECTED_TOOLS
+
+    @pytest.mark.parametrize("param,default", [
+        ("organism", None), ("module_ids", None), ("status", None),
+        ("module_type", "pathway"), ("summary", False), ("verbose", False),
+        ("limit", 50), ("offset", 0),
+    ])
+    def test_signature_defaults(self, tool_fns, param, default):
+        sig = _inspect3b.signature(tool_fns[_KMC_TOOL])
+        assert sig.parameters[param].default == default
+
+    def test_organism_accepts_str_list_or_none(self, tool_fns):
+        hint = _hint_str(tool_fns, _KMC_TOOL, "organism")
+        assert "str" in hint and "list" in hint and "None" in hint
+
+    def test_status_is_a_list_of_the_four_bands(self, tool_fns):
+        hint = _hint_str(tool_fns, _KMC_TOOL, "status")
+        assert "list" in hint
+        literal_part = hint[hint.index("Literal["):]
+        assert set(_re_km.findall(r"'([a-z_]+)'", literal_part)) == set(
+            _KMC_BANDS)
+
+    def test_module_type_literal(self, tool_fns):
+        hint = _hint_str(tool_fns, _KMC_TOOL, "module_type")
+        literal_part = hint[hint.index("Literal["):]
+        assert set(_re_km.findall(r"'([a-z_]+)'", literal_part)) == {
+            "pathway", "signature"}
+        assert "None" in hint
+
+    @pytest.mark.parametrize("param", [
+        "organism", "module_ids", "status", "module_type", "summary",
+        "verbose", "limit", "offset"])
+    def test_field_descriptions_present_and_short(self, tool_fns, param):
+        descs = [d for d in _field_descriptions(tool_fns, _KMC_TOOL, param)
+                 if d]
+        assert descs, f"{param} has no Field description"
+        for d in descs:
+            assert len(d) <= 250, (param, len(d))
+
+    @pytest.mark.parametrize("needle", [
+        "genes_by_ontology", "missing_kos", "docs://tools/kegg_module_completeness"])
+    def test_docstring_routes(self, tool_fns, needle):
+        doc = _inspect3b.getdoc(tool_fns[_KMC_TOOL]) or ""
+        assert needle in doc
+
+    @pytest.mark.asyncio
+    async def test_params_forwarded(self, tool_fns, mock_ctx):
+        _resp, m = await _kmc_call(
+            tool_fns, mock_ctx, organism=["MED4", "WH8102"],
+            module_ids=["M00531"], status=["complete", "partial"],
+            module_type=None, summary=False, verbose=True, limit=7, offset=3)
+        kw = m.call_args.kwargs
+        assert kw["organism"] == ["MED4", "WH8102"]
+        assert kw["module_ids"] == ["M00531"]
+        assert kw["status"] == ["complete", "partial"]
+        assert kw["module_type"] is None
+        assert kw["verbose"] is True
+        assert kw["limit"] == 7
+        assert kw["offset"] == 3
+        assert "conn" in kw
+
+    @pytest.mark.asyncio
+    async def test_default_module_type_forwarded(self, tool_fns, mock_ctx):
+        _resp, m = await _kmc_call(tool_fns, mock_ctx, organism=_KMC_MED4)
+        assert m.call_args.kwargs["module_type"] == "pathway"
+        assert m.call_args.kwargs["organism"] == _KMC_MED4
+
+    @pytest.mark.asyncio
+    async def test_summary_forwarded(self, tool_fns, mock_ctx):
+        _resp, m = await _kmc_call(
+            tool_fns, mock_ctx, summary=True,
+            api_return=_kmc_api_return(results=[], returned=0,
+                                       truncated=True))
+        kw = m.call_args.kwargs
+        assert kw.get("summary") is True or kw.get("limit") == 0
+
+    @pytest.mark.asyncio
+    async def test_envelope_converted(self, tool_fns, mock_ctx):
+        resp, _m = await _kmc_call(tool_fns, mock_ctx,
+                                   module_ids=["kegg.module:M00531"])
+        assert resp.total_entries == 26004
+        assert resp.total_matching == 2
+        assert resp.returned == 2
+        assert resp.truncated is False
+        assert resp.offset == 0
+        assert resp.organism_name is None
+        assert resp.organisms_in_scope == 3
+        assert resp.modules_in_scope == 1
+        assert [(e.status, e.count) for e in resp.by_status] == [
+            ("complete", 1), ("one_step_missing", 1),
+            ("two_steps_missing", 0), ("partial", 0)]
+        assert resp.no_edge_count == 1
+        assert resp.by_class[0].class_id == _KMC_ENERGY
+        assert resp.by_class[0].module_count == 1
+        assert resp.by_class[0].no_edge == 1
+        assert resp.top_organisms[0].organism_name == _KMC_WH8102
+        assert resp.top_organisms[1].no_edge == 1
+        assert resp.top_modules[0].organisms_without_edge == [_KMC_MED4]
+        assert resp.not_found_modules == []
+        assert resp.not_matched_modules == []
+        assert resp.not_found_organisms == []
+        assert resp.warnings == []
+        assert resp.results[1].missing_kos == ["K00367", "K00372", "K10534"]
+
+    @pytest.mark.asyncio
+    async def test_organisms_without_edge_absent_on_the_wire(self, tool_fns, mock_ctx):
+        ret = _kmc_api_return()
+        ret["top_modules"] = [dict(ret["top_modules"][0])]
+        ret["top_modules"][0].pop("organisms_without_edge")
+        ret["modules_in_scope"] = 4
+        resp, _m = await _kmc_call(tool_fns, mock_ctx, api_return=ret)
+        dumped = resp.model_dump()
+        assert "organisms_without_edge" not in dumped["top_modules"][0]
+
+    @pytest.mark.asyncio
+    async def test_compact_row_has_no_verbose_keys_on_the_wire(self, tool_fns, mock_ctx):
+        resp, _m = await _kmc_call(tool_fns, mock_ctx)
+        row = resp.model_dump()["results"][0]
+        for key in ("module_subclass", "definition",
+                    "missing_step_definitions", "ec_filled_step_indices",
+                    "ec_genes"):
+            assert key not in row, key
+        assert row["missing_step_indices"] == []
+
+    @pytest.mark.asyncio
+    async def test_verbose_row_fields(self, tool_fns, mock_ctx):
+        ret = _kmc_api_return()
+        ret["results"] = [dict(ret["results"][1], **{
+            "module_subclass": "Nitrogen metabolism",
+            "definition": "(K00367,K10534,K00372+K00360) (K00366,K17877)",
+            "missing_step_definitions": ["(K00367,K10534,K00372+K00360)"],
+            "ec_filled_step_indices": [], "ec_genes": [],
+        })]
+        ret["returned"] = 1
+        resp, _m = await _kmc_call(tool_fns, mock_ctx, api_return=ret,
+                                   verbose=True)
+        row = resp.model_dump()["results"][0]
+        assert row["module_subclass"] == "Nitrogen metabolism"
+        assert row["missing_step_definitions"] == [
+            "(K00367,K10534,K00372+K00360)"]
+        assert row["ec_filled_step_indices"] == []
+        assert row["ec_genes"] == []
+
+    @pytest.mark.asyncio
+    async def test_value_error_becomes_tool_error(self, tool_fns, mock_ctx):
+        with patch("multiomics_explorer.api.functions.kegg_module_completeness",
+                   side_effect=ValueError("module_ids must not be empty")):
+            with pytest.raises(ToolError, match="module_ids"):
+                await tool_fns[_KMC_TOOL](mock_ctx, module_ids=[])
+
+    @pytest.mark.asyncio
+    async def test_unexpected_error_becomes_tool_error(self, tool_fns, mock_ctx):
+        with patch("multiomics_explorer.api.functions.kegg_module_completeness",
+                   side_effect=RuntimeError("boom")):
+            with pytest.raises(ToolError):
+                await tool_fns[_KMC_TOOL](mock_ctx)
+
+    @pytest.mark.asyncio
+    async def test_empty_envelope_is_not_an_error(self, tool_fns, mock_ctx):
+        ret = _kmc_api_return(
+            total_matching=0, returned=0, organisms_in_scope=0,
+            modules_in_scope=0, no_edge_count=0, by_class=[],
+            top_organisms=[], top_modules=[], results=[],
+            by_status=[{"status": b, "count": 0} for b in _KMC_BANDS],
+            not_found_organisms=["nope"])
+        resp, _m = await _kmc_call(tool_fns, mock_ctx, organism=["nope"],
+                                   api_return=ret)
+        assert resp.results == []
+        assert resp.not_found_organisms == ["nope"]
+
+
+class TestKeggModuleCompletenessResponseModel:
+    _ENVELOPE = [
+        "total_entries", "total_matching", "returned", "truncated", "offset",
+        "organism_name", "organisms_in_scope", "modules_in_scope",
+        "by_status", "no_edge_count", "by_class", "top_organisms",
+        "top_modules", "not_found_modules", "not_matched_modules",
+        "not_found_organisms", "warnings", "results",
+    ]
+
+    def test_envelope_fields(self, tool_fns):
+        model = _kmc_resp_model(tool_fns, _KMC_TOOL)
+        assert set(model.model_fields) == set(self._ENVELOPE)
+
+    @pytest.mark.parametrize("field", [
+        "organism_name", "module_id", "module_name", "module_type",
+        "module_class", "status", "steps_total", "steps_present",
+        "steps_present_via_ec", "missing_step_indices", "missing_kos",
+        "module_subclass", "definition", "missing_step_definitions",
+        "ec_filled_step_indices", "ec_genes"])
+    def test_row_fields(self, tool_fns, field):
+        row = _kmc_list_item_model(_kmc_resp_model(tool_fns, _KMC_TOOL),
+                                   "results")
+        assert field in row.model_fields
+        assert row.model_fields[field].description
+
+    def test_row_model_is_sparse(self, tool_fns):
+        row = _kmc_list_item_model(_kmc_resp_model(tool_fns, _KMC_TOOL),
+                                   "results")
+        assert issubclass(row, _SparseRow3b)
+
+    def test_missing_kos_description_names_the_prefix_for_chaining(self, tool_fns):
+        row = _kmc_list_item_model(_kmc_resp_model(tool_fns, _KMC_TOOL),
+                                   "results")
+        assert "kegg.orthology:" in row.model_fields["missing_kos"].description
+
+    def test_status_description_says_complete_is_not_shown_to_run(self, tool_fns):
+        row = _kmc_list_item_model(_kmc_resp_model(tool_fns, _KMC_TOOL),
+                                   "results")
+        desc = row.model_fields["status"].description.lower()
+        assert "complete" in desc
+
+    @pytest.mark.parametrize("field,keys", [
+        ("by_status", {"status", "count"}),
+        ("by_class", {"class_id", "class_name", "module_count", "complete",
+                      "one_step_missing", "two_steps_missing", "partial",
+                      "no_edge"}),
+        ("top_organisms", {"organism_name", "complete", "one_step_missing",
+                           "two_steps_missing", "partial", "no_edge"}),
+        ("top_modules", {"module_id", "module_name", "module_type",
+                         "complete", "one_step_missing", "two_steps_missing",
+                         "partial", "no_edge", "organisms_without_edge"}),
+    ])
+    def test_rollup_entry_fields(self, tool_fns, field, keys):
+        entry = _kmc_list_item_model(_kmc_resp_model(tool_fns, _KMC_TOOL),
+                                     field)
+        assert set(entry.model_fields) == keys
+
+    @pytest.mark.parametrize("field", ["top_organisms", "top_modules"])
+    def test_top_descriptions_say_capped(self, tool_fns, field):
+        model = _kmc_resp_model(tool_fns, _KMC_TOOL)
+        assert "20" in (model.model_fields[field].description or "")
+
+
+# --- extensions ------------------------------------------------------------
+
+
+class TestListOrganismsCompletePathwayModuleCountWrapper:
+    def test_field_on_row_model(self, tool_fns):
+        row = _kmc_list_item_model(_kmc_resp_model(tool_fns, "list_organisms"),
+                                   "results")
+        field = row.model_fields["complete_pathway_module_count"]
+        assert field.description
+        assert "kegg_module_completeness" in field.description
+
+    @pytest.mark.asyncio
+    async def test_value_passes_through(self, tool_fns, mock_ctx):
+        ret = {
+            "total_entries": 1, "total_matching": 1, "by_cluster_type": [],
+            "by_organism_type": [], "by_value_kind": [], "by_metric_type": [],
+            "by_compartment": [], "top_metabolic_capability": [],
+            "by_measurement_capability": {"has_metabolomics": 0,
+                                          "no_metabolomics": 1},
+            "top_annotation_capability": [], "returned": 1, "offset": 0,
+            "truncated": False, "not_found": [], "warnings": [],
+            "results": [{"organism_name": _KMC_MED4,
+                         "organism_type": "genome_strain",
+                         "complete_pathway_module_count": 51}],
+        }
+        with patch("multiomics_explorer.api.functions.list_organisms",
+                   return_value=ret):
+            resp = await tool_fns["list_organisms"](mock_ctx)
+        assert resp.model_dump()["results"][0][
+            "complete_pathway_module_count"] == 51
+
+
+class TestOntologyTermDetailsOrganismModuleStatusWrapper:
+    @pytest.mark.parametrize("field", [
+        "organism_module_status", "organism_steps_present"])
+    def test_row_model_fields(self, tool_fns, field):
+        row = _row_model(tool_fns, "ontology_term_details")
+        assert field in row.model_fields
+        assert row.model_fields[field].description
+
+    def test_status_description_says_null_means_no_edge(self, tool_fns):
+        row = _row_model(tool_fns, "ontology_term_details")
+        desc = row.model_fields["organism_module_status"].description.lower()
+        assert "null" in desc or "none" in desc
+
+    def _ret(self, status, steps):
+        return {
+            "total_matching": 1, "returned": 1, "offset": 0,
+            "truncated": False, "not_found": [],
+            "by_ontology": [{"ontology": "kegg_module", "count": 1}],
+            "links_out_total": 0, "by_link_kind": [], "warnings": [],
+            "results": [{
+                "term_id": "kegg.module:M00531", "ontology": "kegg_module",
+                "label": "KeggModule",
+                "name": "Assimilatory nitrate reduction, nitrate => ammonia",
+                "description": None, "level": 3, "level_kind": "kegg_module",
+                "is_informative": True, "gene_count": 180,
+                "organism_count": 120, "organism_gene_count": 0,
+                "organism_module_status": status,
+                "organism_steps_present": steps,
+                "parents": [], "children": [], "children_total": 0,
+                "children_truncated": False, "links_out": [],
+            }],
+        }
+
+    @pytest.mark.asyncio
+    async def test_null_status_kept_on_the_wire(self, tool_fns, mock_ctx):
+        with patch("multiomics_explorer.api.functions.ontology_term_details",
+                   return_value=self._ret(None, None)):
+            resp = await tool_fns["ontology_term_details"](
+                mock_ctx, term_ids=["kegg.module:M00531"],
+                organism=_KMC_MED4)
+        row = resp.model_dump()["results"][0]
+        assert "organism_module_status" in row
+        assert row["organism_module_status"] is None
+        assert "organism_steps_present" in row
+        assert row["organism_steps_present"] is None
+
+    @pytest.mark.asyncio
+    async def test_status_on_the_wire(self, tool_fns, mock_ctx):
+        with patch("multiomics_explorer.api.functions.ontology_term_details",
+                   return_value=self._ret("complete", 2)):
+            resp = await tool_fns["ontology_term_details"](
+                mock_ctx, term_ids=["kegg.module:M00531"],
+                organism=_KMC_WH8102)
+        row = resp.model_dump()["results"][0]
+        assert row["organism_module_status"] == "complete"
+        assert row["organism_steps_present"] == 2
+
+
+class TestListFilterValuesKeggModuleTypesWrapper:
+    @pytest.mark.parametrize("value", ["kegg_module_status", "module_type"])
+    def test_filter_type_literal_includes(self, tool_fns, value):
+        hint = _hint_str(tool_fns, "list_filter_values", "filter_type")
+        assert f"'{value}'" in hint

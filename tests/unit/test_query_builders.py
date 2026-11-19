@@ -17903,3 +17903,384 @@ class TestKeggModuleTermDetails:
             term_ids=["kegg.pathway:ko00910"], verbose=True)
         walk = [ln for ln in cypher.splitlines() if "<-[gr:" in ln]
         assert walk and "Kegg_module_in_kegg_pathway" not in walk[0], cypher
+
+
+# ===========================================================================
+# kegg_module_completeness + module rollups (Build B)
+# (docs/tool-specs/kegg-module-completeness.md)
+# ===========================================================================
+
+import multiomics_explorer.kg.queries_lib as _qlkmc  # noqa: E402
+
+_KMC_MED4 = "Prochlorococcus MED4"
+_KMC_WH8102 = "Synechococcus WH8102"
+_KMC_M00531 = "kegg.module:M00531"
+_KMC_SUBCLASS = (
+    "kegg.module:pathway_modules.energy_metabolism.nitrogen_metabolism")
+
+
+def _kmc_builder(name):
+    fn = getattr(_qlkmc, name, None)
+    assert fn is not None, f"queries_lib.{name} missing"
+    return fn
+
+
+def _kmc_norm(cypher):
+    """Whitespace-collapsed Cypher, so assertions ignore line layout."""
+    return " ".join(cypher.split())
+
+
+def _kmc_detail(**kw):
+    kw.setdefault("organisms", None)
+    kw.setdefault("module_ids", None)
+    kw.setdefault("module_type", "pathway")
+    kw.setdefault("status", None)
+    return _kmc_builder("build_kegg_module_completeness")(**kw)
+
+
+def _kmc_summary(**kw):
+    kw.setdefault("organisms", None)
+    kw.setdefault("module_ids", None)
+    kw.setdefault("module_type", "pathway")
+    kw.setdefault("status", None)
+    return _kmc_builder("build_kegg_module_completeness_summary")(**kw)
+
+
+def _kmc_scope(**kw):
+    kw.setdefault("organisms", None)
+    kw.setdefault("module_ids", None)
+    kw.setdefault("module_type", "pathway")
+    return _kmc_builder("build_kegg_module_completeness_scope")(**kw)
+
+
+_KMC_COMPACT = [
+    "organism_name", "module_id", "module_name", "module_type",
+    "module_class", "status", "steps_total", "steps_present",
+    "steps_present_via_ec", "missing_step_indices", "missing_kos",
+]
+_KMC_VERBOSE = [
+    "module_subclass", "definition", "missing_step_definitions",
+    "ec_filled_step_indices", "ec_genes",
+]
+
+# The four shared WHERE pieces (spec "Shared WHERE (_kmc_where)").
+_KMC_WHERE_ORGANISMS = "$organisms IS NULL OR o.preferred_name IN $organisms"
+_KMC_WHERE_MODULE_TYPE = "$module_type IS NULL OR m.module_type = $module_type"
+_KMC_WHERE_STATUS = "$status IS NULL OR r.status IN $status"
+_KMC_EXPANSION = re.compile(
+    r"\$module_ids IS NULL OR EXISTS \{ MATCH \(m\)-\[:Kegg_module_is_a_kegg_module\*0\.\.3\]->"
+    r"\(a:KeggModule\) WHERE a\.id IN \$module_ids \}")
+
+
+class TestBuildKeggModuleCompleteness:
+    """Detail builder: one row per Organism_has_kegg_module edge."""
+
+    def test_matches_the_organism_module_edge(self):
+        cypher, _ = _kmc_detail()
+        n = _kmc_norm(cypher)
+        assert ("(o:OrganismTaxon)-[r:Organism_has_kegg_module]->"
+                "(m:KeggModule {level: 3})") in n
+
+    @pytest.mark.parametrize("col", _KMC_COMPACT)
+    def test_compact_columns(self, col):
+        cypher, _ = _kmc_detail()
+        assert f"AS {col}" in cypher
+
+    @pytest.mark.parametrize("col", _KMC_VERBOSE)
+    def test_verbose_columns_absent_in_compact(self, col):
+        cypher, _ = _kmc_detail()
+        assert f"AS {col}" not in cypher
+
+    @pytest.mark.parametrize("col", _KMC_VERBOSE)
+    def test_verbose_columns_present_in_verbose(self, col):
+        cypher, _ = _kmc_detail(verbose=True)
+        assert f"AS {col}" in cypher
+
+    def test_module_class_is_the_level1_class_name(self):
+        cypher, _ = _kmc_detail()
+        n = _kmc_norm(cypher)
+        assert "cls.name AS module_class" in n
+        # module -> subclass -> class: two single hops of the is-a rel.
+        assert re.search(
+            r"\(m\)-\[:Kegg_module_is_a_kegg_module\]->\(sub:KeggModule\)\s*"
+            r"-\[:Kegg_module_is_a_kegg_module\]->\(cls:KeggModule\)", n), n
+
+    def test_verbose_subclass_name(self):
+        cypher, _ = _kmc_detail(verbose=True)
+        assert "sub.name AS module_subclass" in _kmc_norm(cypher)
+
+    def test_ec_fields_are_coalesced_to_empty_lists(self):
+        cypher, _ = _kmc_detail(verbose=True)
+        n = _kmc_norm(cypher)
+        assert "coalesce(r.ec_filled_step_indices, []) AS ec_filled_step_indices" in n
+        assert "coalesce(r.ec_genes, []) AS ec_genes" in n
+
+    def test_missing_kos_read_from_the_edge(self):
+        cypher, _ = _kmc_detail()
+        assert "r.missing_kos AS missing_kos" in _kmc_norm(cypher)
+
+    def test_status_rank_bands(self):
+        cypher, _ = _kmc_detail()
+        n = _kmc_norm(cypher)
+        assert "AS status_rank" in n
+        assert re.search(
+            r"CASE r\.status WHEN 'complete' THEN 0 WHEN 'one_step_missing' THEN 1 "
+            r"WHEN 'two_steps_missing' THEN 2 ELSE 3 END", n), n
+
+    def test_order_by_module_band_organism(self):
+        cypher, _ = _kmc_detail()
+        assert "ORDER BY module_id, status_rank, organism_name" in _kmc_norm(cypher)
+
+    def test_skip_limit_paging(self):
+        cypher, params = _kmc_detail(limit=10, offset=5)
+        n = _kmc_norm(cypher)
+        assert "SKIP $offset" in n
+        assert "LIMIT $limit" in n
+        assert params["limit"] == 10
+        assert params["offset"] == 5
+        assert n.index("ORDER BY") < n.index("SKIP $offset") < n.index("LIMIT $limit")
+
+    def test_no_limit_clause_when_limit_is_none(self):
+        # Repo convention: LIMIT only when a limit is given (api limit=None
+        # means every row; `LIMIT null` is a Cypher error).
+        cypher, params = _kmc_detail(limit=None)
+        assert "LIMIT" not in _kmc_norm(cypher)
+        assert params.get("limit") is None
+
+    def test_shared_where_pieces(self):
+        cypher, _ = _kmc_detail()
+        n = _kmc_norm(cypher)
+        assert _KMC_WHERE_ORGANISMS in n
+        assert _KMC_WHERE_MODULE_TYPE in n
+        assert _KMC_WHERE_STATUS in n
+        assert _KMC_EXPANSION.search(n), n
+
+    def test_params_default_to_null(self):
+        _, params = _kmc_detail(module_type=None)
+        assert params["organisms"] is None
+        assert params["module_ids"] is None
+        assert params["module_type"] is None
+        assert params["status"] is None
+
+    def test_params_forwarded(self):
+        _, params = _kmc_detail(
+            organisms=[_KMC_MED4, _KMC_WH8102], module_ids=[_KMC_SUBCLASS],
+            module_type="signature", status=["complete", "partial"])
+        assert params["organisms"] == [_KMC_MED4, _KMC_WH8102]
+        assert params["module_ids"] == [_KMC_SUBCLASS]
+        assert params["module_type"] == "signature"
+        assert params["status"] == ["complete", "partial"]
+
+    def test_expansion_walks_up_to_three_hops(self):
+        cypher, _ = _kmc_detail(module_ids=[_KMC_SUBCLASS])
+        assert "Kegg_module_is_a_kegg_module*0..3" in cypher
+
+    def test_returns_tuple(self):
+        out = _kmc_detail()
+        assert isinstance(out, tuple) and len(out) == 2
+        assert isinstance(out[0], str) and isinstance(out[1], dict)
+
+
+class TestBuildKeggModuleCompletenessSummary:
+    """Summary builder: one aggregate row; the api pivots it."""
+
+    @pytest.mark.parametrize("key", [
+        "total_entries", "total_matching", "by_status",
+        "by_organism_status", "by_module_status", "by_class_status"])
+    def test_return_keys(self, key):
+        cypher, _ = _kmc_summary()
+        assert f"AS {key}" in cypher
+
+    def test_total_entries_counts_every_edge(self):
+        cypher, _ = _kmc_summary()
+        n = _kmc_norm(cypher)
+        assert re.search(r"\(\)-\[\w*:Organism_has_kegg_module\]->\(\)", n), n
+
+    def test_same_where_as_detail(self):
+        cypher, _ = _kmc_summary()
+        n = _kmc_norm(cypher)
+        assert _KMC_WHERE_ORGANISMS in n
+        assert _KMC_WHERE_MODULE_TYPE in n
+        assert _KMC_WHERE_STATUS in n
+        assert _KMC_EXPANSION.search(n), n
+
+    def test_class_hop_present(self):
+        cypher, _ = _kmc_summary()
+        assert "cls" in cypher
+        assert "Kegg_module_is_a_kegg_module" in cypher
+
+    def test_no_paging(self):
+        cypher, params = _kmc_summary()
+        n = _kmc_norm(cypher)
+        assert "SKIP" not in n
+        assert "LIMIT $limit" not in n
+        assert "limit" not in params
+        assert "offset" not in params
+
+    def test_status_param_forwarded(self):
+        _, params = _kmc_summary(status=["complete"])
+        assert params["status"] == ["complete"]
+
+    def test_class_status_carries_class_id_and_name(self):
+        cypher, _ = _kmc_summary()
+        n = _kmc_norm(cypher)
+        assert "class_id" in n and "class_name" in n
+
+    def test_aggregates(self):
+        cypher, _ = _kmc_summary()
+        assert "count(" in cypher
+
+
+class TestBuildKeggModuleCompletenessScope:
+    """Status-independent scope: one row per level-3 module in scope."""
+
+    @pytest.mark.parametrize("col", [
+        "module_id", "module_name", "module_type", "class_id", "class_name",
+        "organisms_with_edge"])
+    def test_return_columns(self, col):
+        cypher, _ = _kmc_scope()
+        assert f"AS {col}" in cypher
+
+    def test_starts_from_level3_modules(self):
+        cypher, _ = _kmc_scope()
+        assert "(m:KeggModule {level: 3})" in _kmc_norm(cypher)
+
+    def test_edge_is_optional(self):
+        cypher, _ = _kmc_scope()
+        n = _kmc_norm(cypher)
+        assert "OPTIONAL MATCH (o:OrganismTaxon)-[:Organism_has_kegg_module]->(m)" in n
+
+    def test_never_filters_on_status(self):
+        cypher, params = _kmc_scope()
+        assert "$status" not in cypher
+        assert "status" not in params
+
+    def test_organism_module_type_and_expansion_filters(self):
+        cypher, _ = _kmc_scope()
+        n = _kmc_norm(cypher)
+        assert _KMC_WHERE_ORGANISMS in n
+        assert _KMC_WHERE_MODULE_TYPE in n
+        assert _KMC_EXPANSION.search(n), n
+
+    def test_null_safe_organism_collect(self):
+        cypher, _ = _kmc_scope()
+        n = _kmc_norm(cypher)
+        assert "collect(o.preferred_name)" in n
+        assert "IS NOT NULL" in n
+
+    def test_order_by_module_id(self):
+        cypher, _ = _kmc_scope()
+        assert "ORDER BY module_id" in _kmc_norm(cypher)
+
+    def test_params(self):
+        _, params = _kmc_scope(
+            organisms=[_KMC_MED4], module_ids=[_KMC_M00531], module_type=None)
+        assert params["organisms"] == [_KMC_MED4]
+        assert params["module_ids"] == [_KMC_M00531]
+        assert params["module_type"] is None
+
+
+class TestBuildKeggModuleCompletenessResolve:
+    """Input module ids -> found / matched under module_type.
+
+    Row contract (one row per input id, in input order):
+    ``module_id`` (the input id), ``found`` (a KeggModule node exists),
+    ``matched`` (at least one level-3 module at or under it passes
+    ``module_type``).
+    """
+
+    def _build(self, **kw):
+        kw.setdefault("module_ids", [_KMC_M00531, "kegg.module:M99999"])
+        kw.setdefault("module_type", "pathway")
+        return _kmc_builder("build_kegg_module_completeness_resolve")(**kw)
+
+    def test_unwinds_the_input_ids(self):
+        cypher, params = self._build()
+        assert "UNWIND $module_ids AS" in cypher
+        assert params["module_ids"] == [_KMC_M00531, "kegg.module:M99999"]
+
+    def test_lookup_is_optional(self):
+        cypher, _ = self._build()
+        assert "OPTIONAL MATCH" in cypher
+        assert "KeggModule" in cypher
+
+    @pytest.mark.parametrize("col", ["module_id", "found", "matched"])
+    def test_return_columns(self, col):
+        cypher, _ = self._build()
+        assert f"AS {col}" in cypher
+
+    def test_module_type_param(self):
+        cypher, params = self._build(module_type="signature")
+        assert params["module_type"] == "signature"
+        assert "$module_type" in cypher
+
+    def test_module_type_none_is_passed_as_null(self):
+        _, params = self._build(module_type=None)
+        assert params["module_type"] is None
+
+    def test_matched_walks_down_to_level3(self):
+        cypher, _ = self._build()
+        assert "Kegg_module_is_a_kegg_module" in cypher
+        assert "level" in cypher
+
+
+class TestBuildListOrganismsCompletePathwayModuleCount:
+    """list_organisms gains compact `complete_pathway_module_count`."""
+
+    def test_column_in_compact(self):
+        cypher, _ = build_list_organisms()
+        assert "AS complete_pathway_module_count" in cypher
+
+    def test_column_in_verbose(self):
+        cypher, _ = build_list_organisms(verbose=True)
+        assert "AS complete_pathway_module_count" in cypher
+
+    def test_counts_complete_pathway_module_edges(self):
+        cypher, _ = build_list_organisms()
+        full = _kmc_norm(cypher)
+        end = full.index("AS complete_pathway_module_count")
+        start = full.rfind(" AS ", 0, end)
+        n = full[start:end]
+        assert "Organism_has_kegg_module" in n
+        assert "'complete'" in n
+        assert "'pathway'" in n
+        assert "COUNT {" in n or "count(" in n
+
+
+class TestBuildOntologyTermDetailsOrganismModuleStatus:
+    """ontology_term_details(organism=...) projects the organism's
+    Organism_has_kegg_module edge onto the row."""
+
+    def test_organism_projects_status_and_steps(self):
+        cypher, params = _qlkmc.build_ontology_term_details(
+            term_ids=[_KMC_M00531], organism=_KMC_WH8102)
+        n = _kmc_norm(cypher)
+        assert "AS organism_module_status" in n
+        assert "AS organism_steps_present" in n
+        assert params["organism"] == _KMC_WH8102
+
+    def test_edge_is_optional_and_organism_scoped(self):
+        cypher, _ = _qlkmc.build_ontology_term_details(
+            term_ids=[_KMC_M00531], organism=_KMC_WH8102)
+        n = _kmc_norm(cypher)
+        assert re.search(
+            r"OPTIONAL MATCH \(:OrganismTaxon \{preferred_name: \$organism\}\)"
+            r"-\[(\w+):Organism_has_kegg_module\]->\(t\)", n), n
+
+    def test_status_and_steps_come_from_the_edge(self):
+        cypher, _ = _qlkmc.build_ontology_term_details(
+            term_ids=[_KMC_M00531], organism=_KMC_WH8102)
+        n = _kmc_norm(cypher)
+        m = re.search(r"-\[(\w+):Organism_has_kegg_module\]->", n)
+        assert m, n
+        var = m.group(1)
+        assert f"{var}.status AS organism_module_status" in n
+        assert f"{var}.steps_present AS organism_steps_present" in n
+
+    @pytest.mark.parametrize("verbose", [False, True])
+    def test_absent_without_organism(self, verbose):
+        cypher, _ = _qlkmc.build_ontology_term_details(
+            term_ids=[_KMC_M00531], verbose=verbose)
+        assert "organism_module_status" not in cypher
+        assert "organism_steps_present" not in cypher
+        assert "Organism_has_kegg_module" not in cypher

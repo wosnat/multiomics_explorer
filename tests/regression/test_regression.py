@@ -145,6 +145,11 @@ TOOL_BUILDERS = {
     "ontology_landscape": None,
     # pathway_enrichment: dispatched via api (L2), not a query builder
     "pathway_enrichment": None,
+    # kegg_module_completeness: every case uses `dispatch: api` — the
+    # envelope (by_status, no_edge_count, by_class, top_organisms,
+    # top_modules[*].organisms_without_edge) is the contract; the detail
+    # builder rows alone would hide it.
+    "kegg_module_completeness": None,
 }
 
 

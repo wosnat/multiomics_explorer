@@ -274,7 +274,7 @@ def test_full_tool_pages_registered():
     uris = _all_resource_uris()
     briefs = [u for u in uris if u.startswith("docs://tools/") and not u.endswith("/full")]
     fulls = [u for u in uris if u.startswith("docs://tools/") and u.endswith("/full")]
-    assert len(briefs) == len(fulls) == 42
+    assert len(briefs) == len(fulls) == 43  # 42 → 43: kegg_module_completeness
 
 
 def test_resource_order_guides_first():

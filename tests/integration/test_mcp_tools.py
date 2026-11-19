@@ -6001,3 +6001,193 @@ class TestKeggModuleOntologyLive:
         report = api.kg_release_info(conn=conn)
         assert report["kg"]["kegg_release"]
         assert "module" in report["kg"]["kegg_release"]
+
+
+# ---------------------------------------------------------------------------
+# kegg_module_completeness + module rollups
+# (docs/tool-specs/kegg-module-completeness.md). Live facts verified
+# 2026-11-19 against the dev KG built_at 2026-11-18T22:37:52Z:
+#   M00531 edges: complete 56 / one_step_missing 26; 118 organisms with
+#   genes -> 36 without an edge (MED4 among them).
+#   MED4 complete pathway modules: 51.
+#   PCC 7942 x M00161 (PSII): no edge (psbD K02706 unannotated).
+# ---------------------------------------------------------------------------
+
+_KMC_MED4 = "Prochlorococcus MED4"
+_KMC_WH8102 = "Synechococcus WH8102"
+_KMC_MIT9313 = "Prochlorococcus MIT9313"
+_KMC_PCC7942 = "Synechococcus elongatus PCC 7942"
+_KMC_HOT1A3 = "Alteromonas macleodii HOT1A3"
+_KMC_M00531 = "kegg.module:M00531"
+_KMC_M00161 = "kegg.module:M00161"
+_KMC_SIGNATURE = "kegg.module:M00851"  # Carbapenem resistance (MED4 has an edge)
+_KMC_N_SUBCLASS = (
+    "kegg.module:pathway_modules.energy_metabolism.nitrogen_metabolism")
+
+
+def _kmc_bands(out):
+    return {e["status"]: e["count"] for e in out["by_status"]}
+
+
+@pytest.mark.kg
+class TestKeggModuleCompletenessLive:
+    def test_m00531_band_counts_and_absence(self, conn):
+        out = api.kegg_module_completeness(
+            module_ids=[_KMC_M00531], summary=True, conn=conn)
+        assert _kmc_bands(out) == {
+            "complete": 56, "one_step_missing": 26,
+            "two_steps_missing": 0, "partial": 0}
+        assert [e["status"] for e in out["by_status"]] == [
+            "complete", "one_step_missing", "two_steps_missing", "partial"]
+        assert out["total_matching"] == 82
+        assert out["modules_in_scope"] == 1
+        assert out["organisms_in_scope"] == 118
+        assert out["no_edge_count"] == 36
+        top = out["top_modules"][0]
+        assert top["module_id"] == _KMC_M00531
+        assert top["no_edge"] == 36
+        assert len(top["organisms_without_edge"]) == 36
+        assert _KMC_MED4 in top["organisms_without_edge"]
+        assert top["organisms_without_edge"] == sorted(
+            top["organisms_without_edge"])
+
+    def test_m00531_wh8102_complete_mit9313_one_step(self, conn):
+        out = api.kegg_module_completeness(
+            organism=[_KMC_WH8102, _KMC_MIT9313], module_ids=["M00531"],
+            conn=conn)
+        rows = {r["organism_name"]: r for r in out["results"]}
+        assert rows[_KMC_WH8102]["status"] == "complete"
+        assert rows[_KMC_WH8102]["missing_kos"] == []
+        mit = rows[_KMC_MIT9313]
+        assert mit["status"] == "one_step_missing"
+        assert mit["steps_present"] == 1
+        assert mit["steps_total"] == 2
+        assert sorted(mit["missing_kos"]) == ["K00367", "K00372", "K10534"]
+        assert mit["module_class"] == "Energy metabolism"
+
+    def test_rows_sort_module_band_organism(self, conn):
+        out = api.kegg_module_completeness(
+            module_ids=[_KMC_M00531], limit=100, conn=conn)
+        statuses = [r["status"] for r in out["results"]]
+        assert statuses == sorted(
+            statuses, key=["complete", "one_step_missing"].index)
+        complete = [r["organism_name"] for r in out["results"]
+                    if r["status"] == "complete"]
+        assert complete == sorted(complete)
+
+    def test_pcc7942_psii_has_no_row_and_is_listed_without_edge(self, conn):
+        out = api.kegg_module_completeness(
+            organism=[_KMC_PCC7942], module_ids=[_KMC_M00161], conn=conn)
+        assert out["results"] == []
+        assert out["total_matching"] == 0
+        assert out["no_edge_count"] == 1
+        assert out["top_modules"][0]["organisms_without_edge"] == [
+            _KMC_PCC7942]
+        assert out["not_found_modules"] == []
+        assert out["not_matched_modules"] == []
+
+    def test_med4_complete_count_matches_list_organisms(self, conn):
+        out = api.kegg_module_completeness(
+            organism=_KMC_MED4, status=["complete"], summary=True, conn=conn)
+        assert out["total_matching"] == 51
+        assert out["organism_name"] == _KMC_MED4
+        orgs = api.list_organisms(organism_names=[_KMC_MED4], conn=conn)
+        row = next(r for r in orgs["results"]
+                   if r["organism_name"] == _KMC_MED4)
+        assert row["complete_pathway_module_count"] == 51
+
+    def test_status_filter_leaves_absence_unchanged(self, conn):
+        base = api.kegg_module_completeness(
+            organism=_KMC_MED4, summary=True, conn=conn)
+        filt = api.kegg_module_completeness(
+            organism=_KMC_MED4, status=["complete"], summary=True, conn=conn)
+        assert filt["no_edge_count"] == base["no_edge_count"]
+        assert filt["modules_in_scope"] == base["modules_in_scope"]
+        assert _kmc_bands(filt)["partial"] == 0
+        assert base["total_matching"] == sum(_kmc_bands(base).values())
+
+    def test_signature_module_under_default_is_not_matched(self, conn):
+        out = api.kegg_module_completeness(
+            organism=_KMC_MED4, module_ids=[_KMC_SIGNATURE], conn=conn)
+        assert out["not_matched_modules"] == [_KMC_SIGNATURE]
+        assert out["results"] == []
+        assert any("signature" in w for w in out["warnings"])
+
+    def test_signature_module_with_module_type_none(self, conn):
+        out = api.kegg_module_completeness(
+            organism=_KMC_MED4, module_ids=[_KMC_SIGNATURE],
+            module_type=None, conn=conn)
+        assert out["not_matched_modules"] == []
+        assert len(out["results"]) == 1
+        assert out["results"][0]["module_type"] == "signature"
+
+    def test_class_id_expands_to_its_modules(self, conn):
+        out = api.kegg_module_completeness(
+            organism=[_KMC_MED4, _KMC_WH8102, _KMC_MIT9313],
+            module_ids=[_KMC_N_SUBCLASS], conn=conn)
+        assert out["modules_in_scope"] == 7
+        assert out["total_matching"] == 2
+        assert {(r["organism_name"], r["module_id"]) for r in out["results"]} == {
+            (_KMC_WH8102, _KMC_M00531), (_KMC_MIT9313, _KMC_M00531)}
+        by_id = {e["module_id"]: e for e in out["top_modules"]}
+        assert len(by_id) == 7
+        assert "organisms_without_edge" not in by_id[_KMC_M00531]
+
+    def test_hot1a3_glycolysis_complete(self, conn):
+        out = api.kegg_module_completeness(
+            organism=_KMC_HOT1A3, module_ids=["M00001"], conn=conn)
+        assert [r["status"] for r in out["results"]] == ["complete"]
+
+    def test_unknown_module_is_not_found(self, conn):
+        out = api.kegg_module_completeness(
+            organism=_KMC_MED4, module_ids=["kegg.module:M99999"], conn=conn)
+        assert out["not_found_modules"] == ["kegg.module:M99999"]
+        assert out["results"] == []
+
+    def test_top_caps_at_20(self, conn):
+        out = api.kegg_module_completeness(summary=True, conn=conn)
+        assert out["organisms_in_scope"] == 118
+        assert len(out["top_organisms"]) == 20
+        assert len(out["top_modules"]) == 20
+        completes = [e["complete"] for e in out["top_organisms"]]
+        assert completes == sorted(completes, reverse=True)
+        assert out["total_matching"] == 24563
+        assert _kmc_bands(out) == {
+            "complete": 6700, "one_step_missing": 5550,
+            "two_steps_missing": 4093, "partial": 8220}
+        assert out["total_entries"] == 26004
+
+    def test_term_details_organism_module_status(self, conn):
+        med4 = api.ontology_term_details(
+            term_ids=[_KMC_M00531], organism=_KMC_MED4, conn=conn)
+        row = med4["results"][0]
+        assert "organism_module_status" in row
+        assert row["organism_module_status"] is None
+        assert row["organism_steps_present"] is None
+        wh = api.ontology_term_details(
+            term_ids=[_KMC_M00531], organism=_KMC_WH8102, conn=conn)
+        assert wh["results"][0]["organism_module_status"] == "complete"
+        assert wh["results"][0]["organism_steps_present"] == 2
+
+    def test_term_details_class_row_has_no_module_status(self, conn):
+        out = api.ontology_term_details(
+            term_ids=[_KMC_N_SUBCLASS], organism=_KMC_WH8102, conn=conn)
+        assert "organism_module_status" not in out["results"][0]
+
+    @pytest.mark.parametrize("filter_type,values", [
+        ("kegg_module_status",
+         ["complete", "one_step_missing", "two_steps_missing", "partial"]),
+        ("module_type", ["pathway", "signature"]),
+    ])
+    def test_list_filter_values_new_types(self, conn, filter_type, values):
+        out = api.list_filter_values(filter_type=filter_type, conn=conn)
+        assert [r["value"] for r in out["results"]] == values
+        assert out["warnings"] == []
+
+    @pytest.mark.asyncio
+    async def test_wrapper_round_trip(self, conn, tool_fns):
+        ctx = _ctx_with_conn(conn)
+        resp = await tool_fns["kegg_module_completeness"](
+            ctx, module_ids=["M00531"], organism=[_KMC_WH8102, _KMC_MIT9313])
+        assert resp.total_matching == 2
+        assert resp.top_modules[0].organisms_without_edge == []
