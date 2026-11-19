@@ -51,7 +51,9 @@ node it is absent, so read `gene_count` there. The thirteen global / overview ma
 `ko012xx` block, `ko01310`, `ko01320`) have no parent subcategory in
 this KG — they are level-2 nodes with no `parents[]`. BRITE hierarchies
 are a *separate* view over the same KOs, reached through the
-`Kegg_term_in_brite_category` bridge.
+`Kegg_term_in_brite_category` bridge. KEGG modules are a separate
+ontology too (`kegg_module`), linked KO → module through
+`Kegg_term_in_kegg_module`.
 
 ## Graph shape (from the registry)
 
@@ -64,7 +66,8 @@ are a *separate* view over the same KOs, reached through the
 | Trust axes on the gene edge | `sources`, `evidence` |
 | Extra compact columns, `ontology_term_details` | `direct_gene_count`, `reaction_count`, `metabolite_count` |
 | Literature index | `Publication_discusses_kegg_pathway` (`discussed_by_n_publications`) |
-| Bridges out (`links_out`) | `Kegg_term_in_brite_category` → `brite` (*membership*) |
+| Bridges out (`links_out`) | `Kegg_term_in_brite_category` → `brite` (*membership*); `Kegg_term_in_kegg_module` → `kegg_module` (*membership*) |
+| Bridges in (read from the source term) | `Kegg_module_in_kegg_pathway` from `kegg_module` (*membership*) |
 
 Bridges are forward-only: `ontology_term_details` lists `links_out` on the source term; there is no `links_in`. `composition` = built from these parts; `membership` = one of that ontology's known members; `router` = a computed cross-reference, recall-biased, never a gene-function call.
 
@@ -95,6 +98,7 @@ Vocabulary snapshot (build time):
 
 - `Gene_has_kegg_ko.evidence`: `family_inferred`
 - `Gene_has_kegg_ko.sources`: `eggnog`
+- `Kegg_term_in_kegg_module.component`: `required`, `optional`
 
 ## Interpretation
 
@@ -156,6 +160,7 @@ in the background.
 ## See also
 
 - `docs://ontologies/brite`
+- `docs://ontologies/kegg_module`
 - `docs://ontologies/ec`
 - `docs://analysis/enrichment`
 - `docs://analysis/metabolites`

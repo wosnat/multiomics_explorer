@@ -1503,8 +1503,10 @@ class EnrichmentResult:
         shaped: ``filters_applied`` (the trust filters that were set),
         ``trust_axes`` (what this ontology can be filtered on),
         ``background_filtered`` (True when the filters moved the background
-        as well as the tested sets) and ``interpro_type`` (the stratum an
-        InterPro run was scoped to).
+        as well as the tested sets), ``interpro_type`` (the stratum an
+        InterPro run was scoped to) and ``module_type`` (the KEGG module kind
+        a kegg_module run was narrowed to; None when not requested, meaning
+        both kinds were tested).
 
         ``include_nonsignificant`` (read from ``self.params``, default
         True) gates a ``p_adjust < pvalue_cutoff`` filter applied to a
@@ -1537,6 +1539,7 @@ class EnrichmentResult:
         env["trust_axes"] = dict(params.get("trust_axes") or {})
         env["background_filtered"] = bool(params.get("background_filtered"))
         env["interpro_type"] = params.get("interpro_type")
+        env["module_type"] = params.get("module_type")
 
         frame = self.results
         if not params.get("include_nonsignificant", True) and not frame.empty:
@@ -1555,7 +1558,8 @@ class EnrichmentResult:
         eff_limit = limit if limit is not None else total
         sliced = frame.iloc[offset:offset + eff_limit] if total else frame
         returned_rows = sliced.to_dict(orient="records")
-        # Strip sparse tree/tree_code columns for non-BRITE rows; pandas turns
+        # Strip sparse tree/tree_code columns for non-BRITE rows and the
+        # sparse module_type column for non-kegg_module rows; pandas turns
         # a missing str (e.g. a cluster with no description text) into NaN,
         # which JSON/Pydantic reject — emit None instead.
         for r in returned_rows:
@@ -1563,6 +1567,9 @@ class EnrichmentResult:
             if tv is None or (isinstance(tv, float) and pd.isna(tv)):
                 r.pop("tree", None)
                 r.pop("tree_code", None)
+            mv = r.get("module_type")
+            if mv is None or (isinstance(mv, float) and pd.isna(mv)):
+                r.pop("module_type", None)
             for k, v in r.items():
                 if isinstance(v, float) and pd.isna(v):
                     r[k] = None

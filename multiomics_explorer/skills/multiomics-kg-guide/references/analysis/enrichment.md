@@ -56,7 +56,7 @@ from multiomics_explorer import (
 | `pathway_enrichment(...)` / `cluster_enrichment(...)` | The two wrappers: inputs helper → `genes_by_ontology` → `fisher_ora` → metadata merge → `EnrichmentResult` with `params`. |
 
 **`ontology` keys.** GO is three ontologies (`go_bp`, `go_mf`, `go_cc`); there
-is no `"go"`. `list_filter_values` does not enumerate them — the 17 keys are in
+is no `"go"`. `list_filter_values` does not enumerate them — the 18 keys are in
 `docs://ontologies/index`. `level` follows the hierarchy convention (0 = root,
 higher = more specific; `docs://guide/conventions`).
 
@@ -88,8 +88,9 @@ ranks are `tigr_role` 1, `cyanorak_role` 1, `go_mf` 2, `go_bp` 3. GO rows also
 carry `best_effort_share` — the fraction of terms whose depth is a min-path
 proxy because GO is a DAG (section 10).
 
-BRITE and InterPro rows are broken down per `tree` / `interpro_type`
-because each tree or type is a separate universe (section 8).
+BRITE, InterPro and KEGG module rows are broken down per `tree` /
+`interpro_type` / `module_type` because each tree or type is a separate
+universe (section 8).
 
 ---
 
@@ -258,7 +259,7 @@ directly; the envelope is for wrapper output.
 
 ---
 
-## 8. BRITE, InterPro, TCDB — scope the universe
+## 8. BRITE, InterPro, KEGG modules, TCDB — scope the universe
 
 **BRITE** is 12 independent trees; `enzymes` alone has ~10× the terms of
 `transporters`, so mixing trees would make every run an enzyme run. Both
@@ -277,6 +278,23 @@ or `pathway_enrichment(..., ontology="brite", tree="transporters", level=1)`.
 `interpro_type=` is **required** on both enrichment tools for
 `ontology="interpro"` (raises otherwise). See section 11 and
 `docs://analysis/annotation_evidence`.
+
+**KEGG modules** (`ontology="kegg_module"`) are the sharpest KEGG unit for
+ORA. A pathway map bundles many routes into one large gene set, so a hit says
+little more than "metabolism moved"; a module is a few steps of one route
+(`kegg.module:M00531` assimilatory nitrate reduction), so a hit names the
+route. Run module ORA at `level=3`
+(`pathway_enrichment(..., ontology="kegg_module", level=3)`); levels 0–2 are
+the module type / class / subclass rollups — never mix levels in one test.
+Each module is either a `pathway` module (a route) or a `signature` module
+(a marker set such as a drug-resistance or nutrient-assimilation signature,
+whose genes need not form a route). `module_type=` is optional: the default
+pools both kinds, which is valid; pass `module_type="pathway"` to test routes
+only. Rows carry `module_type`. Genes reach modules through their KO, so a
+module run re-partitions the same KO annotations as `ontology="kegg"` — a
+different lens, not independent evidence — and an enriched module's gene set
+says nothing about whether every step of the route is present. See
+`docs://ontologies/kegg_module`.
 
 **TCDB** TERM2GENE is gated: it is built from the `Gene_has_tcdb_family`
 edges the KG stamps `tcdb_gate` = `direct` or `annotated`, one row per
@@ -314,8 +332,8 @@ motivating case is `tigr_role`, whose roles cover only part of the genome, skewe
 well-characterised genes, so DE sets rich in poorly annotated
 genes look depleted everywhere. `background="annotated"` sets the universe to
 the genes with at least one edge in the chosen ontology, built by the same
-rules as TERM2GENE: the same trust filters, `tree`, `interpro_type` and
-`informative_only`, before the gene-set size filter. With `level` it spans
+rules as TERM2GENE: the same trust filters, `tree`, `interpro_type`,
+`module_type` and `informative_only`, before the gene-set size filter. With `level` it spans
 every term at that level, even when `term_ids` narrows the tested terms; with
 `term_ids` alone it is the union of their genes — every tested term then
 covers most of the universe, so the run warns; pass `level`. The annotated
@@ -369,7 +387,8 @@ fails the filter is absent from the term's members in numerator and
 denominator alike. The envelope echoes this as `filters_applied` (what you
 set), `trust_axes` (what this ontology can be filtered on),
 `background_filtered` (`True` when an edge-level filter was set; a facet like
-`interpro_type` or `tree` selects terms and does not count) and `interpro_type`.
+`interpro_type`, `tree` or `module_type` selects terms and does not count),
+`interpro_type` and `module_type`.
 
 ```python
 result = pathway_enrichment(
@@ -472,7 +491,7 @@ are clusterProfiler-compatible; `cluster` ↔ `Cluster`, `term_id` / `term_name`
 |---|---|---|
 | `cluster` | `Cluster` | Gene-set name (`"{experiment_id}|{timepoint}|{direction}"` for DE; `cluster_name` for clusters; your key otherwise) |
 | `term_id`, `term_name` | `ID`, `Description` | Term |
-| `level`, `is_informative`, `tree`, `tree_code`, `interpro_type` | — | Term context passed through from `genes_by_ontology` (`tree*` BRITE-only, `interpro_type` InterPro-only) |
+| `level`, `is_informative`, `tree`, `tree_code`, `interpro_type`, `module_type` | — | Term context passed through from `genes_by_ontology` (`tree*` BRITE-only, `interpro_type` InterPro-only, `module_type` KEGG-module-only) |
 | `gene_name`, `product`, `gene_category` | — | Passed through from the term's **first** gene in `term2gene` — term-level placeholders, not the overlap; use `overlap_genes()` for genes |
 | `count` | `Count` | `k` |
 | `bg_count` | — | `M` |

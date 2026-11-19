@@ -35,6 +35,205 @@ examples:
   - title: "InterPro enrichment scoped to one type"
     call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="interpro", interpro_type="HOMOLOGOUS_SUPERFAMILY", level=0)
 
+  - title: "KEGG module enrichment (module ORA, level=3)"
+    call: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="kegg_module", level=3)
+    note: "Modules are small functional units, so a hit names a specific route rather than a large pathway map. Rows carry `module_type`; pass `module_type='pathway'` to test routes only (signature modules are marker sets). Genes reach modules through their KO, so the module gene sets re-partition the same KOs as `ontology='kegg'`."
+    response: |
+      {
+        "organism_name": "Prochlorococcus MED4",
+        "ontology": "kegg_module",
+        "level": 3,
+        "total_matching": 5,
+        "returned": 5,
+        "truncated": false,
+        "offset": 0,
+        "n_significant": 5,
+        "by_experiment": [
+          {
+            "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
+            "name": "MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
+            "omics_type": "RNASEQ",
+            "table_scope": "all_detected_genes",
+            "treatment_type": ["nitrogen"],
+            "background_factors": ["axenic", "light"],
+            "is_time_course": false,
+            "n_tests": 110,
+            "n_significant": 5,
+            "n_clusters": 2
+          }
+        ],
+        "...": "8 empty fields omitted",
+        "by_direction": [
+          {"direction": "down", "n_tests": 55, "n_significant": 4},
+          {"direction": "up", "n_tests": 55, "n_significant": 1}
+        ],
+        "by_omics_type": [{"omics_type": "RNASEQ", "n_tests": 110, "n_significant": 5}],
+        "cluster_summary": {
+          "n_clusters": 2,
+          "n_tests_min": 55,
+          "n_tests_median": 55.0,
+          "n_tests_max": 55,
+          "n_significant_min": 1,
+          "n_significant_median": 2.5,
+          "...": "+4 more"
+        },
+        "top_clusters_by_min_padj": [
+          {
+            "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
+            "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
+            "name": "MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
+            "timepoint": "day 14",
+            "timepoint_hours": 336.0,
+            "timepoint_order": 1,
+            "direction": "down",
+            "omics_type": "RNASEQ",
+            "table_scope": "all_detected_genes",
+            "treatment_type": ["nitrogen"],
+            "background_factors": ["axenic", "light"],
+            "is_time_course": false,
+            "n_tests": 55,
+            "n_significant": 4,
+            "universe_size": 1849,
+            "min_padj": 0.001366135633039138
+          },
+          ...
+        ],
+        "top_pathways_by_padj": [
+          {
+            "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
+            "term_id": "kegg.module:M00157",
+            "term_name": "F-type ATPase, prokaryotes and chloroplasts",
+            "p_adjust": 0.001366135633039138,
+            "signed_score": -2.8645061807743475
+          },
+          {
+            "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|up",
+            "term_id": "kegg.module:M00145",
+            "term_name": "NAD(P)H:quinone oxidoreductase, chloroplasts and cyanobacteria",
+            "p_adjust": 0.004379359722616209,
+            "signed_score": 2.3585893801947573
+          },
+          {
+            "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
+            "term_id": "kegg.module:M00163",
+            "term_name": "Photosystem I",
+            "p_adjust": 0.015779648727325214,
+            "signed_score": -1.8019026689011437
+          },
+          ...
+        ],
+        "not_found": [],
+        "not_matched": [],
+        "term_validation": {"not_found": [], "wrong_ontology": [], "wrong_level": [], "filtered_out": [], "resolved_aliases": {}},
+        "enrichment_params": {
+          "organism": "MED4",
+          "ontology": "kegg_module",
+          "level": 3,
+          "term_ids": null,
+          "tree": null,
+          "informative_only": true,
+          "...": "+21 more"
+        },
+        "trust_axes": {"kegg_module": ["sources", "evidence"]},
+        "background_filtered": false,
+        "results": [
+          {
+            "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
+            "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
+            "name": "MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
+            "timepoint": "day 14",
+            "timepoint_hours": 336.0,
+            "timepoint_order": 1,
+            "direction": "down",
+            "omics_type": "RNASEQ",
+            "table_scope": "all_detected_genes",
+            "treatment_type": ["nitrogen"],
+            "background_factors": ["axenic", "light"],
+            "is_time_course": false,
+            "growth_phase": "death",
+            "term_id": "kegg.module:M00157",
+            "term_name": "F-type ATPase, prokaryotes and chloroplasts",
+            "level": 3,
+            "is_informative": true,
+            "module_type": "pathway",
+            "gene_ratio": "9/572",
+            "gene_ratio_numeric": 0.015734265734265736,
+            "bg_ratio": "9/1849",
+            "bg_ratio_numeric": 0.0048674959437533805,
+            "rich_factor": 1.0,
+            "fold_enrichment": 3.2325174825174825,
+            "pvalue": 2.4838829691620687e-05,
+            "p_adjust": 0.001366135633039138,
+            "count": 9,
+            "bg_count": 9,
+            "signed_score": -2.8645061807743475
+          },
+          {
+            "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|up",
+            "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
+            "name": "MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
+            "timepoint": "day 14",
+            "timepoint_hours": 336.0,
+            "timepoint_order": 1,
+            "direction": "up",
+            "omics_type": "RNASEQ",
+            "table_scope": "all_detected_genes",
+            "treatment_type": ["nitrogen"],
+            "background_factors": ["axenic", "light"],
+            "is_time_course": false,
+            "growth_phase": "death",
+            "term_id": "kegg.module:M00145",
+            "term_name": "NAD(P)H:quinone oxidoreductase, chloroplasts and cyanobacteria",
+            "level": 3,
+            "is_informative": true,
+            "module_type": "pathway",
+            "gene_ratio": "12/551",
+            "gene_ratio_numeric": 0.021778584392014518,
+            "bg_ratio": "15/1849",
+            "bg_ratio_numeric": 0.008112493239588967,
+            "rich_factor": 0.8,
+            "fold_enrichment": 2.684573502722323,
+            "pvalue": 7.962472222938561e-05,
+            "p_adjust": 0.004379359722616209,
+            "count": 12,
+            "bg_count": 15,
+            "signed_score": 2.3585893801947573
+          },
+          {
+            "cluster": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic|day 14|down",
+            "experiment_id": "10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic",
+            "name": "MED4 axenic, PRO99-lowN nutrient starvation vs PRO99-lowN exponential growth (RNASEQ)",
+            "timepoint": "day 14",
+            "timepoint_hours": 336.0,
+            "timepoint_order": 1,
+            "direction": "down",
+            "omics_type": "RNASEQ",
+            "table_scope": "all_detected_genes",
+            "treatment_type": ["nitrogen"],
+            "background_factors": ["axenic", "light"],
+            "is_time_course": false,
+            "growth_phase": "death",
+            "term_id": "kegg.module:M00163",
+            "term_name": "Photosystem I",
+            "level": 3,
+            "is_informative": true,
+            "module_type": "pathway",
+            "gene_ratio": "6/572",
+            "gene_ratio_numeric": 0.01048951048951049,
+            "bg_ratio": "6/1849",
+            "bg_ratio_numeric": 0.003244997295835587,
+            "rich_factor": 1.0,
+            "fold_enrichment": 3.2325174825174825,
+            "pvalue": 0.0008607081123995571,
+            "p_adjust": 0.015779648727325214,
+            "count": 6,
+            "bg_count": 6,
+            "signed_score": -1.8019026689011437
+          },
+          ...
+        ]
+      }
+
   - title: "MEROPS enrichment restricted to peptidase calls (call_class)"
     call: pathway_enrichment(organism="MIT1002", experiment_ids=["10.1093/ismeco/ycae131_darkness_darktolerant_coculture_under_1311_mit1002_rnaseq"], ontology="merops", call_class=["peptidase"], level=0)
     note: "call_class shapes the TERM2GENE mapping and the background identically (both go through the same gene->leaf MATCH), so foreground and background stay apples-to-apples. Omitting call_class tests nonpeptidase_homolog rows alongside real peptidases, inflating clan term sizes with catalytically-dead hits. Pick the experiment with list_experiments(organism='MIT1002', omics_type='rnaseq') — a MIT9301 metabolomics experiment passed here would return 0 rows."
@@ -66,7 +265,7 @@ examples:
             "n_clusters": 2
           }
         ],
-        "...": "6 empty fields omitted",
+        "...": "7 empty fields omitted",
         "by_direction": [
           {"direction": "down", "n_tests": 8, "n_significant": 3},
           {"direction": "up", "n_tests": 8, "n_significant": 1}
@@ -136,7 +335,7 @@ examples:
           "term_ids": null,
           "tree": null,
           "informative_only": true,
-          "...": "+20 more"
+          "...": "+21 more"
         },
         "filters_applied": {"evidence": ["homology"]},
         "trust_axes": {"tcdb": ["sources", "evidence", "tier"]},
@@ -264,7 +463,7 @@ examples:
             "n_clusters": 2
           }
         ],
-        "...": "7 empty fields omitted",
+        "...": "8 empty fields omitted",
         "by_direction": [
           {"direction": "down", "n_tests": 67, "n_significant": 7},
           {"direction": "up", "n_tests": 67, "n_significant": 2}
@@ -353,7 +552,8 @@ examples:
           "filters_applied": {},
           "trust_axes": {"cyanorak_role": ["sources", "evidence"]},
           "background_filtered": false,
-          "interpro_type": null
+          "interpro_type": null,
+          "module_type": null
         },
         "trust_axes": {"cyanorak_role": ["sources", "evidence"]},
         "background_filtered": false,
@@ -426,6 +626,7 @@ mistakes:
     right: "pathway_enrichment(..., ontology='interpro', interpro_type='HOMOLOGOUS_SUPERFAMILY', level=0)"
   - "growth_phase is a timepoint-level condition describing the culture's physiological state at sampling — NOT a gene-specific property"
   - "For DAG ontologies (`go_*`), `level=N`-only enrichment silently drops biologically-meaningful terms at heterogeneous depths. For narrow research questions, hand-curate a `term_ids` panel via `search_ontology(ontology='go_bp', search_text=...)` and pass it directly. Use `level` only when surveying a whole branch."
+  - "`ontology='kegg_module', level=3` is module ORA. `module_type` is optional (unlike `interpro_type`): the default pools routes and signature marker sets, which is valid; pass `module_type='pathway'` to test routes only. Never mix module levels in one run. See docs://ontologies/kegg_module."
   - "`ontology='interpro'` requires `interpro_type` — one of `FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`, `ACTIVE_SITE`, `BINDING_SITE`, `PTM`. Omitting it raises. Check sizing per type via `ontology_landscape(organism=..., ontology='interpro')` first."
   - "Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call`) shape the TERM2GENE mapping fed to Fisher, not the row output — they change which (gene × term) pairs are tested, applied identically to foreground and background. Defaults are `None` and never filter. `min_evidence_score` is the only numeric cutoff; there is no filter on native scalars (`evalue`, `bit_score`, `confidence_score`, ...). See `docs://analysis/annotation_evidence`."
   - "MEROPS `call_class=['peptidase']` excludes `nonpeptidase_homolog` rows (catalytically-dead homologs) from both the tested gene set and the pathway definitions — run it whenever the enrichment question is about peptidase activity, not sequence homology to a peptidase family."

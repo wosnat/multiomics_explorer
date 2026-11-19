@@ -15,7 +15,7 @@ docs://tools/cluster_enrichment; summary=True first.
 |---|---|---|---|
 | analysis_id | string | — | Clustering analysis ID. Get from list_clustering_analyses. |
 | organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') | — | Ontology for pathway definitions. Run ontology_landscape first. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops', 'kegg_module') | — | Ontology for pathway definitions. Run ontology_landscape first. |
 | tree | string \| None | None | BRITE tree name filter. REQUIRED when ontology='brite' (12 trees; see list_filter_values(filter_type='brite_tree')) — a tree-less BRITE run raises, since it would mix taxonomy and function terms. Invalid for any other ontology. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level (0 = root). At least one of `level` or `term_ids` required. See docs://guide/conventions. |
 | term_ids | list[string] \| None | None | Specific term IDs to test. Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced to canonical (see `term_validation.resolved_aliases`). |
@@ -37,6 +37,7 @@ docs://tools/cluster_enrichment; summary=True first.
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
 | tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked, so an ancestor-term row reports a surviving call kind. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
+| module_type | string ('pathway', 'signature') \| None | None | KEGG module type (kegg_module only): 'pathway' = routes, 'signature' = marker sets such as drug resistance. Default both. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -51,10 +52,10 @@ cluster_enrichment(analysis_id="clustering_analysis:journal.pone.0005135:med4_di
 ## Response sketch
 
 ```expected-keys
-analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_type, treatment_type, background_factors, growth_phases, experiment_ids, ontology, level, tree, total_matching, returned, truncated, offset, n_significant, by_cluster, by_term, clusters_tested, not_found, not_matched, warnings, clusters_skipped, term_validation, enrichment_params, filters_applied, trust_axes, background_filtered, interpro_type, results
+analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_type, treatment_type, background_factors, growth_phases, experiment_ids, ontology, level, tree, total_matching, returned, truncated, offset, n_significant, by_cluster, by_term, clusters_tested, not_found, not_matched, warnings, clusters_skipped, term_validation, enrichment_params, filters_applied, trust_axes, background_filtered, interpro_type, module_type, results
 ```
 
-Result row: `cluster, cluster_id, term_id, term_name, level, is_informative, tree, tree_code, gene_ratio, gene_ratio_numeric, bg_ratio, bg_ratio_numeric, …`
+Result row: `cluster, cluster_id, term_id, term_name, level, is_informative, tree, tree_code, module_type, gene_ratio, gene_ratio_numeric, bg_ratio, …`
 
 ## Common mistakes
 

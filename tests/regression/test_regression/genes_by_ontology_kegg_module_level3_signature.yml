@@ -1,0 +1,133 @@
+by_call_class: []
+by_category:
+- category: Central intermediary metabolism
+  count: 3
+- category: Stress response and adaptation
+  count: 1
+- category: Cell wall and membrane
+  count: 1
+by_evidence:
+- count: 5
+  evidence: family_inferred
+by_level:
+- level: 3
+  n_genes: 5
+  n_terms: 2
+  row_count: 5
+by_organism:
+- gene_count: 5
+  organism_name: Prochlorococcus MED4
+  row_count: 5
+  term_count: 2
+by_sources:
+- count: 5
+  source: eggnog
+by_tcdb_call: []
+by_tier: []
+case_id: genes_by_ontology_kegg_module_level3_signature
+evidence_score_stats:
+  max: null
+  median: null
+  min: null
+  n_null: 0
+filtered_out: []
+filters_applied:
+  module_type: signature
+genes_per_term_max: 3
+genes_per_term_median: 2.5
+genes_per_term_min: 2
+n_best_effort_terms: 0
+not_found: []
+not_found_organisms: []
+offset: 0
+ontology: kegg_module
+organism_name: Prochlorococcus MED4
+organisms_without_genes: []
+resolved_aliases: {}
+results:
+- evidence: family_inferred
+  gene_category: Central intermediary metabolism
+  gene_name: cynA
+  is_informative: true
+  level: 3
+  locus_tag: PMM0370
+  module_type: signature
+  organism_name: Prochlorococcus MED4
+  product: cyanate ABC transporter, substrate-binding protein
+  term_id: kegg.module:M00615
+  term_name: Nitrate assimilation
+- evidence: family_inferred
+  gene_category: Central intermediary metabolism
+  gene_name: cynB
+  is_informative: true
+  level: 3
+  locus_tag: PMM0371
+  module_type: signature
+  organism_name: Prochlorococcus MED4
+  product: cyanate ABC transporter, permease protein
+  term_id: kegg.module:M00615
+  term_name: Nitrate assimilation
+- evidence: family_inferred
+  gene_category: Central intermediary metabolism
+  gene_name: cynD
+  is_informative: true
+  level: 3
+  locus_tag: PMM0372
+  module_type: signature
+  organism_name: Prochlorococcus MED4
+  product: cyanate ABC transporter ATP-binding protein
+  term_id: kegg.module:M00615
+  term_name: Nitrate assimilation
+- evidence: family_inferred
+  gene_category: Stress response and adaptation
+  gene_name: ddpX
+  is_informative: true
+  level: 3
+  locus_tag: PMM0757
+  module_type: signature
+  organism_name: Prochlorococcus MED4
+  product: D-alanyl-D-alanine dipeptidase
+  term_id: kegg.module:M00651
+  term_name: Vancomycin resistance, D-Ala-D-Lac type
+- evidence: family_inferred
+  gene_category: Cell wall and membrane
+  gene_name: vanY
+  is_informative: true
+  level: 3
+  locus_tag: PMM0761
+  module_type: signature
+  organism_name: Prochlorococcus MED4
+  product: D-alanyl-D-alanine carboxypeptidase
+  term_id: kegg.module:M00651
+  term_name: Vancomycin resistance, D-Ala-D-Lac type
+returned: 5
+row_count: 5
+size_filtered_genes: 0
+size_filtered_terms: 0
+skipped_ontologies: []
+terms_per_gene_max: 1
+terms_per_gene_median: 1.0
+terms_per_gene_min: 1
+top_terms:
+- count: 3
+  is_informative: true
+  organism_count: 1
+  term_id: kegg.module:M00615
+  term_name: Nitrate assimilation
+- count: 2
+  is_informative: true
+  organism_count: 1
+  term_id: kegg.module:M00651
+  term_name: Vancomycin resistance, D-Ala-D-Lac type
+total_categories: 3
+total_genes: 5
+total_matching: 5
+total_terms: 2
+truncated: false
+trust_axes:
+  kegg_module:
+  - sources
+  - evidence
+warnings: []
+wrong_level: []
+wrong_ontology: []

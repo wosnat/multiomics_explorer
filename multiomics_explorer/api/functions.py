@@ -297,11 +297,12 @@ def _run_fulltext(conn: "GraphConnection", cypher: str, params: dict, search_tex
 # ---------------------------------------------------------------------------
 
 # Every generic trust / facet filter, in the order envelopes echo them.
-# `tree` and `interpro_type` are facets: they narrow terms rather than edges,
+# `tree`, `interpro_type` and `module_type` are facets: they narrow terms
+# rather than edges,
 # and they route to their owning ontology through `_facet_owner`.
 _TRUST_PARAMS: tuple[str, ...] = (
     "sources", "evidence", "max_tier", "min_evidence_score",
-    "call_class", "tcdb_call", "interpro_type", "tree",
+    "call_class", "tcdb_call", "interpro_type", "tree", "module_type",
 )
 
 _TRUST_AXIS_HINT = "list_filter_values(filter_type='trust_axes')"
@@ -1219,6 +1220,7 @@ _CATEGORICAL_VALUE_SOURCE: dict[str, tuple[str, str]] = {
     "call_class": ("edge", "call_class"),
     "tcdb_call": ("edge", "tcdb_call"),
     "interpro_type": ("node", "interpro_type"),
+    "module_type": ("node", "module_type"),
 }
 
 
@@ -1248,11 +1250,17 @@ def _validate_categorical_values(
         wanted = value if isinstance(value, list) else [value]
         unknown = [v for v in wanted if v not in allowed]
         if unknown:
+            # Point at list_filter_values only when it serves this param
+            # (module_type is a facet with no filter_type of its own).
+            hint = (
+                f" Call list_filter_values(filter_type='{param}') for the "
+                "full set."
+                if param in _TRUST_FILTER_VALUE_SPECS else ""
+            )
             raise ValueError(
                 f"Unknown {param} value(s) {', '.join(map(repr, unknown))} "
                 f"for ontology '{ontology}'. Allowed: "
-                f"{', '.join(map(str, allowed))}. Call "
-                f"list_filter_values(filter_type='{param}') for the full set."
+                f"{', '.join(map(str, allowed))}.{hint}"
             )
     return warns
 
@@ -1415,9 +1423,10 @@ def _enrichment_trust_params(
     """The trust block enrichment envelopes echo back.
 
     `background_filtered` counts only the *edge* filters. A facet
-    (`interpro_type`, `tree`) selects which terms are tested; it never
-    removes a gene from the universe, so it does not make the background
-    narrower than the organism.
+    (`interpro_type`, `tree`, `module_type`) selects which terms are tested;
+    it never removes a gene from the universe, so it does not make the
+    background narrower than the organism. `module_type` is echoed from
+    `trust_filters` (None when not requested).
     """
     narrowing = [p for p in trust_filters if _facet_owner(p) is None]
     return {
@@ -1425,6 +1434,7 @@ def _enrichment_trust_params(
         "trust_axes": {ontology: ontology_trust_axes(ontology)},
         "background_filtered": bool(narrowing),
         "interpro_type": interpro_type,
+        "module_type": trust_filters.get("module_type"),
     }
 
 
@@ -3217,7 +3227,9 @@ def list_experiments(
     return _cap_list_experiments_breakdowns(envelope, summary=summary)
 
 
-_SEARCH_ONTOLOGY_NARROWING = ("level", "tree", "interpro_type", "min_gene_count", "organism")
+_SEARCH_ONTOLOGY_NARROWING = (
+    "level", "tree", "interpro_type", "module_type", "min_gene_count", "organism",
+)
 
 
 def _search_ontology_one(
@@ -3300,6 +3312,7 @@ def search_ontology(
     interpro_type: str | None = None,
     min_gene_count: int | None = None,
     organism: str | None = None,
+    module_type: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -3311,12 +3324,12 @@ def search_ontology(
       names, rows ranked by `score` DESC within each ontology.
     - **browse** (`search_text` None / empty): plain label scan, rows ranked
       by `gene_count` DESC then id, `score` is None. Narrow with `level`,
-      a facet (`tree` / `interpro_type`), `min_gene_count` or `organism`;
-      a truncated browse with none of those set adds a warning.
+      a facet (`tree` / `interpro_type` / `module_type`), `min_gene_count`
+      or `organism`; a truncated browse with none of those set adds a warning.
 
     Args:
         search_text: Lucene fulltext query, or None/'' for browse mode.
-        ontology: One ontology key, a list of keys, or None for all 17 in
+        ontology: One ontology key, a list of keys, or None for all 18 in
             ONTOLOGY_CONFIG order. Duplicates collapse; unknown keys raise.
         summary: Return only summary fields (forces limit=0, empty results).
         limit: Max detail rows PER ONTOLOGY (lockstep paging on multi-
@@ -3336,6 +3349,9 @@ def search_ontology(
             `organism_gene_count` and browse ranks by it. Resolved by the
             shared organism resolver (word match, e.g. 'MED4'); an unknown
             or ambiguous name raises ValueError.
+        module_type: kegg_module-only facet: 'pathway' (a route) or
+            'signature' (a marker set). None keeps both. Raises when
+            kegg_module is not in the set.
         conn: Optional graph connection (defaults to the shared connection).
 
     Returns dict with keys: mode ('search' | 'browse'), total_entries,
@@ -3348,7 +3364,7 @@ def search_ontology(
     across ontologies and rows are grouped by ontology in config order.
     Per result: id, name, ontology_type, score, level, is_informative,
     gene_count, organism_count, tree / tree_code (BRITE), interpro_type
-    (InterPro), organism_gene_count (when `organism` is set). KEGG rows
+    (InterPro), module_type (kegg_module), organism_gene_count (when `organism` is set). KEGG rows
     also carry discussed_by_n_publications.
 
     Raises ValueError on an unknown ontology key, or when a facet's owning
@@ -3365,7 +3381,9 @@ def search_ontology(
     # Config order is the row / by_ontology order, whatever the caller wrote.
     ontologies = [key for key in ONTOLOGY_CONFIG if key in requested]
 
-    facet_filters = _active_trust_filters(tree=tree, interpro_type=interpro_type)
+    facet_filters = _active_trust_filters(
+        tree=tree, interpro_type=interpro_type, module_type=module_type,
+    )
     if len(ontologies) == 1:
         _validate_trust_filters(ontologies[0], facet_filters)
     targets, skipped, warnings, per_ontology = _resolve_multi_ontology(
@@ -3404,6 +3422,9 @@ def search_ontology(
             if r.get("tree") is None:
                 r.pop("tree", None)
                 r.pop("tree_code", None)
+            # Sparse kegg_module-only facet column
+            if r.get("module_type") is None:
+                r.pop("module_type", None)
         results.extend(rows)
         by_ontology.append({
             "ontology": key,
@@ -3432,11 +3453,13 @@ def search_ontology(
 
     truncated = any(e["truncated"] for e in by_ontology)
     if mode == "browse" and truncated and not any(
-        v is not None for v in (level, tree, interpro_type, min_gene_count, organism)
+        v is not None
+        for v in (level, tree, interpro_type, module_type, min_gene_count, organism)
     ):
         warnings = warnings + [
             "Browse mode truncated with no narrowing filter — set level, "
-            "min_gene_count, organism or a facet (tree / interpro_type), "
+            "min_gene_count, organism or a facet (tree / interpro_type / "
+            "module_type), "
             "or raise limit / page with offset, to see the rest."
         ]
     if sanitised_text is not None:
@@ -3756,13 +3779,15 @@ def _bridge_registry() -> dict[str, tuple[str, str]]:
     return out
 
 
-# Count props carried by only SOME nodes of their label (KEGG chemistry
-# counts live on pathway terms, not KO / module rows). Neo4j has no null
-# property, so a null here means "not carried" — stripped, like
-# `direct_gene_count`. Every other owned prop keeps a null (e.g. ncbifam
+# Props carried by only SOME nodes of their label (KEGG chemistry counts live
+# on pathway terms, not KO / module rows; KeggModule `module_id` /
+# `step_count` / `definition` live on level-3 modules, not class nodes).
+# Neo4j has no null property, so a null here means "not carried" — stripped,
+# like `direct_gene_count`. Every other owned prop keeps a null (e.g. ncbifam
 # `gene_symbol`), which is information.
 _TERM_DETAILS_SPARSE_COUNTS: frozenset[str] = frozenset({
     "direct_gene_count", "reaction_count", "metabolite_count",
+    "module_id", "step_count", "definition",
 })
 
 
@@ -3873,14 +3898,15 @@ def ontology_term_details(
 
     Batch and cross-ontology — term IDs are self-prefixed CURIEs
     (`go:0006979`, `tcdb:3.A.1`, `merops.family:S14`, `interpro:IPR000362`,
-    `ncbifam:NF000812`, `kegg.pathway:ko00010`, `pfam:PF00005`, `ec:1.1.1.1`,
-    `cazy:GH13`). Rows come back in input order; IDs with no node land in
+    `ncbifam:NF000812`, `kegg.pathway:ko00010`, `kegg.module:M00531`,
+    `pfam:PF00005`, `ec:1.1.1.1`, `cazy:GH13`). Rows come back in input order; IDs with no node land in
     `not_found`.
 
     Links are forward-only by construction. `composition` (tcdb / merops ->
     pfam, tcdb -> go_*) says what a family is built from — read it forward,
     never as "this Pfam domain implies that transporter". `membership`
-    (pfam / ncbifam -> interpro, kegg -> brite) is a grouping. `router`
+    (pfam / ncbifam -> interpro, kegg -> brite, KO -> kegg_module,
+    kegg_module -> pathway map) is a grouping. `router`
     (interpro -> ec / cazy) is recall-biased: it points at candidate
     functions and never assigns one to a gene — verbose `router_ambiguous`
     flags entries with more than one target or a non-FAMILY type.
@@ -3907,8 +3933,10 @@ def ontology_term_details(
     level, level_kind, is_informative, gene_count, organism_count,
     direct_gene_count (hierarchical ontologies), the ontology's own detail
     props (e.g. tcdb_id / tc_class_id, family_class / catalytic_type,
-    interpro_type, family_type / gene_symbol — a prop the ontology does not
-    own is absent, an owned null survives), parents [{id, name, level}],
+    interpro_type, family_type / gene_symbol, module_type / module_id /
+    step_count / definition / complete_organism_count — a prop the ontology
+    does not own is absent, an owned null survives; module_id / step_count /
+    definition are absent on KEGG module class nodes), parents [{id, name, level}],
     children [{id, name, level}] (capped at 50), children_total,
     children_truncated, links_out [{rel, link_kind, target_id,
     target_ontology, target_name}]. The rollups describe the whole batch,
@@ -4155,6 +4183,7 @@ def genes_by_ontology(
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
     include_weak_tcdb_hits: bool = False,
+    module_type: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -4203,6 +4232,9 @@ def genes_by_ontology(
       (``diamond_best_hit``, ``diamond_tier``, ``eggnog``); values are
       validated against the ``Gene_has_tcdb_family.tcdb_call`` vocabulary.
     - ``interpro_type``: InterPro only — the term-side stratum facet.
+    - ``module_type``: kegg_module only — the term-side facet:
+      ``'pathway'`` (a route) or ``'signature'`` (a marker set). None keeps
+      both. Rows of kegg_module carry ``module_type``.
 
     TCDB gene sets are gated: only ``tcdb_gate`` ``direct`` / ``annotated``
     edges count, so distinct genes per term equal ``TcdbFamily.gene_count``.
@@ -4259,6 +4291,7 @@ def genes_by_ontology(
         sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class,
         tcdb_call=tcdb_call, interpro_type=interpro_type, tree=tree,
+        module_type=module_type,
     )
     _validate_trust_filters(ontology, trust_filters)
     if level is None and not term_ids:
@@ -4671,6 +4704,7 @@ def gene_ontology_terms(
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
     include_weak_tcdb_hits: bool = False,
+    module_type: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -4690,7 +4724,9 @@ def gene_ontology_terms(
     them carry is applied everywhere; one only some of them carry is applied
     to the carriers and the rest are reported in ``skipped_ontologies``; one
     none of them carries raises. A facet applies to its owner alone and
-    raises when that owner is absent from the list.
+    raises when that owner is absent from the list. The facets are ``tree``
+    (BRITE), ``interpro_type`` (InterPro) and ``module_type`` (kegg_module:
+    ``'pathway'`` or ``'signature'``; None keeps both).
 
     TCDB rows read gated edges only (``tcdb_gate`` ``direct`` /
     ``annotated``). Leaf mode drops a target that is an ancestor of another
@@ -4724,7 +4760,8 @@ def gene_ontology_terms(
     Per result: locus_tag, term_id, term_name, level.
     Verbose adds: organism_name.
     All-ontology queries add: ontology_type.
-    BRITE results include sparse tree/tree_code fields.
+    BRITE results include sparse tree/tree_code fields; kegg_module results
+    include module_type.
 
     Raises ValueError if locus_tags is empty or None (checked first), if an
     ontology name is unknown, if an ontology cannot carry a filter you set,
@@ -4747,6 +4784,7 @@ def gene_ontology_terms(
         sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class,
         tcdb_call=tcdb_call, interpro_type=interpro_type, tree=tree,
+        module_type=module_type,
     )
     requested_all = requested if requested is not None else sorted(ONTOLOGY_CONFIG)
     if single_ontology:
@@ -7730,6 +7768,7 @@ def ontology_landscape(
     call_class: list[str] | None = None,
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    module_type: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ) -> dict:
@@ -7744,7 +7783,11 @@ def ontology_landscape(
     ``ontology`` takes one key, a list of keys, or None to survey every
     registered ontology. InterPro is stratified by (interpro_type, level)
     because its types are not comparable strata; ``by_ontology`` reports
-    ``best_interpro_type`` alongside ``best_level``.
+    ``best_interpro_type`` alongside ``best_level``. kegg_module rows are
+    split by (module_type, level) the same way and carry ``module_type``
+    ('pathway' = routes, 'signature' = marker sets). ``module_type``
+    narrows kegg_module to one kind; None keeps both. Like ``tree`` and
+    ``interpro_type``, it raises on a single ontology that does not own it.
 
     ``call_class`` (MEROPS) and ``tcdb_call`` (TCDB call kind:
     ``diamond_best_hit`` / ``diamond_tier`` / ``eggnog``) narrow the
@@ -7767,7 +7810,7 @@ def ontology_landscape(
 
     trust_filters = _active_trust_filters(
         call_class=call_class, tcdb_call=tcdb_call,
-        interpro_type=interpro_type, tree=tree,
+        interpro_type=interpro_type, tree=tree, module_type=module_type,
     )
     requested_all = requested if requested is not None else list(ALL_ONTOLOGIES)
     if isinstance(ontology, str):
@@ -7881,6 +7924,8 @@ def ontology_landscape(
             # Sparse facet column: only the ontology that owns it carries it.
             if r.get("interpro_type") is not None:
                 row["interpro_type"] = r["interpro_type"]
+            if r.get("module_type") is not None:
+                row["module_type"] = r["module_type"]
             if verbose:
                 row["example_terms"] = r["example_terms"]
             if valid_eids:
@@ -8021,7 +8066,8 @@ def _check_enrichment_level(ontology: str, level: int | None, conn: "GraphConnec
 def _annotated_background(term2gene, gbo_kwargs: dict) -> list[str]:
     """`background='annotated'` universe (backlog 3.12): genes that reach at
     least one term of the ontology under the run's own TERM2GENE rules —
-    same trust filters, tree, interpro_type and informative_only, before the
+    same trust filters, tree, interpro_type, module_type and
+    informative_only, before the
     gene-set size filter. With `level` + `term_ids` the universe is every
     term at that level (one extra genes_by_ontology call), not only the
     requested terms; with `term_ids` alone it is their union."""
@@ -8087,6 +8133,7 @@ def pathway_enrichment(
     call_class: list[str] | None = None,
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    module_type: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ):
@@ -8104,10 +8151,17 @@ def pathway_enrichment(
     types are separate strata, not levels of one hierarchy, and pooling
     them mixes families with domains and superfamilies.
 
+    ``module_type`` (kegg_module only) narrows the tested modules to
+    ``'pathway'`` (routes) or ``'signature'`` (marker sets) and shapes
+    TERM2GENE and the annotated background the same way. It is optional:
+    None tests both kinds together, which is valid (unlike InterPro
+    strata). ``ontology='kegg_module', level=3`` is module ORA; rows carry
+    ``module_type`` and the envelope echoes the requested value.
+
     ``background``: ``'table_scope'`` (default, the genes each experiment
     quantified), ``'organism'`` (every gene), ``'annotated'`` (genes with at
     least one edge in the chosen ontology under the same trust filters /
-    tree / interpro_type / informative_only as TERM2GENE — counters
+    tree / interpro_type / module_type / informative_only as TERM2GENE — counters
     annotation-coverage bias such as TIGR roles covering only part of the
     genome; intersected with each gene set's table_scope; with ``level`` +
     ``term_ids`` it spans every term at that level, with ``term_ids`` alone
@@ -8138,6 +8192,7 @@ def pathway_enrichment(
         sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class,
         tcdb_call=tcdb_call, interpro_type=interpro_type, tree=tree,
+        module_type=module_type,
     )
     _require_interpro_stratum(ontology, interpro_type)
     _validate_trust_filters(ontology, trust_filters)
@@ -8348,6 +8403,7 @@ def cluster_enrichment(
     call_class: list[str] | None = None,
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    module_type: str | None = None,
     *,
     conn: GraphConnection | None = None,
 ):
@@ -8358,6 +8414,8 @@ def cluster_enrichment(
     background move together. TCDB gene sets are gated, as in
     pathway_enrichment.
     ``interpro_type`` is required when ``ontology='interpro'``.
+    ``module_type`` (kegg_module only, optional) narrows the tested modules
+    to ``'pathway'`` or ``'signature'`` exactly as in pathway_enrichment.
 
     ``background``: ``'cluster_union'`` (default), ``'organism'``,
     ``'annotated'`` (genes with at least one edge in the chosen ontology,
@@ -8385,6 +8443,7 @@ def cluster_enrichment(
         sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class,
         tcdb_call=tcdb_call, interpro_type=interpro_type, tree=tree,
+        module_type=module_type,
     )
     _require_interpro_stratum(ontology, interpro_type)
     _validate_trust_filters(ontology, trust_filters)
@@ -12905,7 +12964,7 @@ _KG_IDENTITY_FIELDS = (
     "version", "built_at", "mcp_min_version", "git_sha_short", "git_branch",
     "gene_count", "experiment_count", "paper_count", "organism_count",
     "expression_edge_count", "release_notes_url",
-    "release_highlights", "breaking_changes", "deployment_role",
+    "release_highlights", "breaking_changes", "deployment_role", "kegg_release",
     "controlled_vocabularies_hash", "go_transport_excluded_targets",
     "tcdb_substrate_excluded_targets",
 )

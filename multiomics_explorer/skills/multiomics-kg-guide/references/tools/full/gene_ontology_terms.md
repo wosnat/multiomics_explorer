@@ -15,7 +15,7 @@ docs://tools/gene_ontology_terms; summary=True first.
 |---|---|---|---|
 | locus_tags | list[string] | — | Gene locus tags to look up. E.g. ['PMM0001', 'PMM0845']. |
 | organism | string \| None | None | Organism, optional: omit to take tags from any organisms (batches may mix). When given it must resolve to ONE organism ('MED4') and every tag must belong to it; a tag from another organism raises. |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') \| list[string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops')] \| None | None | Filter to one ontology, or a list of ontologies (trust filters/facets shape all-or-skip-or-raise per docs://guide/conventions). None returns all. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops', 'kegg_module') \| list[string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops', 'kegg_module')] \| None | None | Filter to one ontology, or a list of ontologies (trust filters/facets shape all-or-skip-or-raise per docs://guide/conventions). None returns all. |
 | mode | string ('leaf', 'rollup') | leaf | 'leaf' returns most-specific annotations (default). 'rollup' walks up to ancestors at the given level. |
 | level | int \| None | None | Hierarchy level (0 = broadest). In leaf mode: filter to leaves at this level. In rollup mode: required — target ancestor level. See docs://guide/conventions. |
 | tree | string \| None | None | BRITE tree name filter. Narrows brite and leaves any other ontology in the list untouched; raises when brite is not among them. See docs://guide/conventions for the BRITE-tree scoping rule. |
@@ -29,6 +29,7 @@ docs://tools/gene_ontology_terms; summary=True first.
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
 | tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked. Leaf mode drops ancestors via all gated edges, so a kind only on an ancestor yields no row. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
+| module_type | string ('pathway', 'signature') \| None | None | KEGG module type (kegg_module only): 'pathway' = routes, 'signature' = marker sets such as drug resistance. Default both. |
 | include_weak_tcdb_hits | bool | False | TCDB only: also return one row per weak hit (tcdb_gate='below_gate', diamond only), tagged in tcdb_gate. Adds rows; default rows are unchanged. No-op for other ontologies. |
 | limit | int | 50 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
@@ -87,6 +88,7 @@ total_matching, total_genes, total_terms, by_ontology, by_term, terms_per_gene_m
 | tcdb_gate | string \| None (optional) | KG gate of the representative TCDB edge: 'direct' / 'annotated' (default rows) or 'below_gate' (only with include_weak_tcdb_hits=True). Sparse: tcdb only. |
 | tcdb_calls | list[string] \| None (optional) | TCDB call kinds on the gene's gated edges along the term's lineage, in precedence order. The two diamond kinds are one run; eggnog + diamond = independent agreement. Sparse: tcdb only. |
 | interpro_type | string \| None (optional) | InterPro entry type (sparse: interpro only). |
+| module_type | string \| None (optional) | KEGG module type: 'pathway' (a route) or 'signature' (a marker set). kegg_module only. |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -705,7 +707,9 @@ See docs://analysis/annotation_evidence for the full trust-axis reference and ra
 
 - Use `tree` to scope BRITE rollup to a single tree (e.g. 'transporters'). Without it, rollup mixes all BRITE trees.
 
-- Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`.
+- For kegg_module: leaf rows are the modules a gene's KO sits in; `mode='rollup'` with `level=0/1/2` climbs to module type / class / subclass. `module_type=` scopes to routes (`pathway`) or marker sets (`signature`).
+
+- Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`, `kegg_module`.
 
 - `ontology` accepts `str | list[str] | None`. With a list: a filter carried by all requested ontologies applies normally; carried by some but not all applies to those and drops the rest into `skipped_ontologies` with a warning; carried by none raises `ValueError`. An unknown ontology name always raises.
 
@@ -715,7 +719,7 @@ See docs://analysis/annotation_evidence for the full trust-axis reference and ra
 
 - Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call`) mirror `genes_by_ontology` exactly — same defaults (`None`, never filter), same per-ontology axis gating, same `ValueError` on an unsupported axis (`min_evidence_score` with `ontology='tcdb'` raises: TCDB has no evidence score). See `docs://analysis/annotation_evidence` for the per-ontology axis table.
 
-- Compact rows carry `evidence` on the 15 functional-edge ontologies (null on PSORTb/SignalP), plus `call_class` on MEROPS, `interpro_type` on InterPro and `tcdb_call` / `tcdb_gate` / `tcdb_calls` on TCDB. `sources` / `evidence_score` / `tier` and native scalars (`identity` / `qcov` in percent, `evalue`, ...) are verbose. Per-ontology table: `docs://analysis/annotation_evidence`.
+- Compact rows carry `evidence` on the 16 functional-edge ontologies (null on PSORTb/SignalP), plus `call_class` on MEROPS, `interpro_type` on InterPro, `module_type` on KEGG modules and `tcdb_call` / `tcdb_gate` / `tcdb_calls` on TCDB. `sources` / `evidence_score` / `tier` and native scalars (`identity` / `qcov` in percent, `evalue`, ...) are verbose. Per-ontology table: `docs://analysis/annotation_evidence`.
 
 - CAZy rollup at `level=0` returns the 6 top-level classes (GH, GT, PL, CE, AA, CBM). Genes commonly belong to multiple top-level classes (e.g. a CBM-domain-containing GH); duplicates per `(gene × class)` are de-duped automatically.
 

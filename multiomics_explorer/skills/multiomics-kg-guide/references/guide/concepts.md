@@ -202,7 +202,7 @@ and `vesicle` simultaneously — distinct rows. Filter via
   `metabolites_by_gene` accept role ids and return role rows
   (`target_kind='chemical_role'`).
 
-### Ontology nodes (17 ontologies)
+### Ontology nodes (18 ontologies)
 
 All ontology nodes share a `level: int` property
 (0 = root / broadest, higher = more specific) and most carry
@@ -215,7 +215,7 @@ ontologies. Flat ontologies are `level=0` only. The `key` column is the
 | Gene Ontology — biological process | `go_bp` | `BiologicalProcess` | DAG — `level` is min-path-from-root, `level_is_best_effort` flags ambiguous depth |
 | Gene Ontology — molecular function | `go_mf` | `MolecularFunction` | DAG, as above |
 | Gene Ontology — cellular component | `go_cc` | `CellularComponent` | DAG, as above |
-| KEGG | `kegg` | `KeggTerm` | Tree-ish; `level_kind` ∈ {`category`, `subcategory`, `pathway`, `ko`}. KO IDs are `kegg.orthology:K…`, pathways `kegg.pathway:ko…`. Bridges to BRITE (membership). |
+| KEGG | `kegg` | `KeggTerm` | Tree-ish; `level_kind` ∈ {`category`, `subcategory`, `pathway`, `ko`}. KO IDs are `kegg.orthology:K…`, pathways `kegg.pathway:ko…`. Bridges to BRITE and KEGG modules (membership). |
 | EC numbers | `ec` | `EcNumber` | Tree (4-level enzyme nomenclature) |
 | COG functional categories | `cog_category` | `CogFunctionalCategory` | **Flat**, single-letter codes |
 | Cyanorak roles | `cyanorak_role` | `CyanorakRole` | Tree (Prochlorococcus/Synechococcus-specific) |
@@ -228,6 +228,7 @@ ontologies. Flat ontologies are `level=0` only. The `key` column is the
 | SignalP signal-peptide type | `signal_peptide_type` | `SignalPeptideType` | Flat, 5 nodes (SP, LIPO, TAT, TATLIPO, PILIN). Scored edge: `probability: float` ∈[0, 1], plus optional `cleavage_site: int` / `cleavage_probability: float` (verbose). 1:1. **Structural** — how the protein is handled at the membrane. |
 | InterPro | `interpro` | `InterproEntry` | Hierarchical (`Interpro_entry_is_a_interpro_entry`); each term carries `interpro_type` — one of `FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`, `ACTIVE_SITE`, `BINDING_SITE`, `PTM`. Forward-only router bridges to EC and CAZy (recall-biased, not a functional call). |
 | NCBIfam | `ncbifam` | `NcbifamFamily` | Flat. Term-side `family_type` and `gene_symbol`. Bridges to InterPro (membership) and to TIGR roles (router — an NCBIfam family names the TIGR role it was curated under; never a gene-function call). |
+| KEGG modules | `kegg_module` | `KeggModule` | Tree, 4 levels (module type → class → subclass → module, `level=3`). Genes reach modules through their KO, as BRITE. Modules are `kegg.module:M…`; class nodes use house slug ids. Facet `module_type=` (`pathway` route / `signature` marker set). Bridges to KEGG pathway maps (membership). |
 | MEROPS | `merops` | `MeropsFamily` | Hierarchical (`Merops_family_is_a_merops_family`); families roll up into clans. Edge-level `call_class` (`peptidase` / `inhibitor` / `nonpeptidase_homolog`) distinguishes an active peptidase call, a peptidase-inhibitor family, and a catalytically-dead homolog. Bridges to Pfam (composition). |
 
 Each ontology has its own reference page at `docs://ontologies/{key}` —
@@ -239,12 +240,13 @@ ontologies) and `ontology_term_details` (batch term IDs → parents,
 children, bridges, counts). **Bridges** are forward-only term→term
 links of three kinds: `composition` (a TCDB or MEROPS family is built
 from these Pfam / GO terms), `membership` (a Pfam or NCBIfam entry
-belongs to this InterPro entry; a KO sits in this BRITE category), and
+belongs to this InterPro entry; a KO sits in this BRITE category or KEGG
+module; a module sits in this KEGG pathway map), and
 `router` (InterPro → EC / CAZy, NCBIfam → TIGR role — recall-biased
 pointers, never gene-function calls). Walk them with
 `ontology_term_details(term_ids=[...])`, read `links_out[].link_kind`.
 
-Fifteen of the seventeen carry a gene-edge **annotation-trust surface** —
+Sixteen of the eighteen carry a gene-edge **annotation-trust surface** —
 `sources[]`, an `evidence` ladder (`curated > signature > homology >
 family_inferred > domain_inferred`), and (on a subset) `evidence_score` /
 `tier` — plus ontology-specific detail (TCDB's `tcdb_call` / `tcdb_gate` and
@@ -255,7 +257,7 @@ on). PSORTb and SignalP carry no trust axes (their `localization_score` /
 `docs://guide/conventions` for the compact/verbose placement rule.
 
 Two reverse-mode ontology tools — `genes_by_ontology` (term → genes) and
-`gene_ontology_terms` (genes → terms) — operate on all 17 uniformly
+`gene_ontology_terms` (genes → terms) — operate on all 18 uniformly
 (with hierarchy expansion where applicable; COG / `subcellular_localization` (PSORTb) / `signal_peptide_type` (SignalP) /
 NCBIfam are flat so there's nothing to expand). For methodology see
 `docs://analysis/enrichment`.

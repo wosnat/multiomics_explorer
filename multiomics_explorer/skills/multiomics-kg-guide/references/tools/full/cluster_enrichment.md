@@ -15,7 +15,7 @@ docs://tools/cluster_enrichment; summary=True first.
 |---|---|---|---|
 | analysis_id | string | — | Clustering analysis ID. Get from list_clustering_analyses. |
 | organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') | — | Ontology for pathway definitions. Run ontology_landscape first. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops', 'kegg_module') | — | Ontology for pathway definitions. Run ontology_landscape first. |
 | tree | string \| None | None | BRITE tree name filter. REQUIRED when ontology='brite' (12 trees; see list_filter_values(filter_type='brite_tree')) — a tree-less BRITE run raises, since it would mix taxonomy and function terms. Invalid for any other ontology. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level (0 = root). At least one of `level` or `term_ids` required. See docs://guide/conventions. |
 | term_ids | list[string] \| None | None | Specific term IDs to test. Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced to canonical (see `term_validation.resolved_aliases`). |
@@ -37,6 +37,7 @@ docs://tools/cluster_enrichment; summary=True first.
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
 | tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked, so an ancestor-term row reports a surviving call kind. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
+| module_type | string ('pathway', 'signature') \| None | None | KEGG module type (kegg_module only): 'pathway' = routes, 'signature' = marker sets such as drug resistance. Default both. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -45,7 +46,7 @@ docs://tools/cluster_enrichment; summary=True first.
 ### Envelope
 
 ```expected-keys
-analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_type, treatment_type, background_factors, growth_phases, experiment_ids, ontology, level, tree, total_matching, returned, truncated, offset, n_significant, by_cluster, by_term, clusters_tested, not_found, not_matched, warnings, clusters_skipped, term_validation, enrichment_params, filters_applied, trust_axes, background_filtered, interpro_type, results
+analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_type, treatment_type, background_factors, growth_phases, experiment_ids, ontology, level, tree, total_matching, returned, truncated, offset, n_significant, by_cluster, by_term, clusters_tested, not_found, not_matched, warnings, clusters_skipped, term_validation, enrichment_params, filters_applied, trust_axes, background_filtered, interpro_type, module_type, results
 ```
 
 - **analysis_id** (string | None): Clustering analysis ID
@@ -79,6 +80,7 @@ analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_t
 - **trust_axes** (object): Trust axes the chosen ontology carries, e.g. {'tcdb': ['sources','evidence','tier']} (TCDB has no evidence_score).
 - **background_filtered** (bool): True when a trust filter narrowed the background.
 - **interpro_type** (string | None): Echo of the interpro_type stratum used (sparse: only when ontology='interpro').
+- **module_type** (string | None): Echo of the module_type filter used; null when none was given (kegg_module only).
 
 ### Per-result fields
 
@@ -92,6 +94,7 @@ analysis_id, analysis_name, organism_name, cluster_method, cluster_type, omics_t
 | is_informative | bool | True if the term is not flagged is_uninformative in the KG. Always present, regardless of informative_only setting, so callers can post-filter or diagnose. With default informative_only=True, all rows have is_informative=True by construction; pass informative_only=False to opt out and see uninformative terms. |
 | tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
 | tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
+| module_type | string \| None (optional) | KEGG module type: 'pathway' (a route) or 'signature' (a marker set). kegg_module only. |
 | gene_ratio | string | 'k/n' string — cluster genes in pathway over total cluster genes (clusterProfiler: GeneRatio) |
 | gene_ratio_numeric | float | k/n as float |
 | bg_ratio | string | 'M/N' string — pathway members over background size (clusterProfiler: BgRatio) |
@@ -216,6 +219,8 @@ See `docs://analysis/annotation_evidence` for the trust-axis registry and rank-v
 - `ontology='brite'` requires `tree=` (raises without it). Use `list_filter_values('brite_tree')` to discover trees.
 
 - When a KEGG pathway is significantly enriched in a cluster, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. The cluster's gene-KO membership and the pathway's compound-membership reach the same KEGG map via different relations — name the anchor when answering. See docs://analysis/metabolites.
+
+- `ontology='kegg_module', level=3` is module ORA; `module_type` is optional (default pools routes and signature marker sets; `module_type='pathway'` keeps routes only).
 
 - `ontology='interpro'` requires `interpro_type` (one of the 8 InterPro types) — omitting it raises. Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call`) shape the per-cluster TERM2GENE mapping identically to `pathway_enrichment`; defaults never filter. See `docs://analysis/annotation_evidence`.
 

@@ -1,10 +1,10 @@
 """Shared parameter types for MCP tool wrappers (spec 2b.5 R2 + D3).
 
-``OntologyKey`` is the single source of truth for the 17-way ontology enum
+``OntologyKey`` is the single source of truth for the 18-way ontology enum
 that recurs across `list_filter_values`, `search_ontology`,
 `genes_by_ontology`, `gene_ontology_terms`, `ontology_landscape`,
 `pathway_enrichment`, and `cluster_enrichment` — one Literal instead of the
-same 17 strings retyped per tool. Order matches
+same 18 strings retyped per tool. Order matches
 `multiomics_explorer.kg.queries_lib.ONTOLOGY_CONFIG`.
 
 The `*Param` names below (D3) are each a full
@@ -45,7 +45,7 @@ OntologyKey = Literal[
     "cog_category", "cyanorak_role", "tigr_role", "pfam", "brite",
     "tcdb", "cazy",
     "subcellular_localization", "signal_peptide_type",
-    "interpro", "ncbifam", "merops",
+    "interpro", "ncbifam", "merops", "kegg_module",
 ]
 
 # ---------------------------------------------------------------------------
@@ -200,4 +200,8 @@ CallClassParam = Annotated[list[CallClass] | None, Field(
 
 TcdbCallParam = Annotated[list[str] | None, Field(
     description="TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked, so an ancestor-term row reports a surviving call kind. Values: list_filter_values('tcdb_call').",
+)]
+
+ModuleTypeParam = Annotated[Literal["pathway", "signature"] | None, Field(
+    description="KEGG module type (kegg_module only): 'pathway' = routes, 'signature' = marker sets such as drug resistance. Default both.",
 )]

@@ -127,19 +127,19 @@
 
 - id: ontology_count
   source: ontology_config
-  expect: {ontologies: 17}
+  expect: {ontologies: 18}
   quoted:
-    - '17 ontologies'
-    - '17 supported ontologies'
-    - 'of the 17'
-    - 'all 17'
+    - '18 ontologies'
+    - '18 supported ontologies'
+    - 'of the 18'
+    - 'all 18'
   used_in:
     - CLAUDE.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/start_here.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/concepts.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/analysis/annotation_evidence.md
     - examples/README.md
-  note: "len(ONTOLOGY_CONFIG) — '17 ontologies'"
+  note: "len(ONTOLOGY_CONFIG) — '18 ontologies'"
 
 - id: tool_count
   source: tool_registry

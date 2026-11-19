@@ -267,6 +267,77 @@ examples:
     call: genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:2.A", "tcdb:2.A.1"])
     note: "Each term expands DOWN through its families, subfamilies and systems before binding to genes, over gated edges only (`tcdb_gate` direct or annotated), so a term's gene set matches its `gene_count`. The default size filter applies to the expanded set: the subclass tcdb:2.A (Porters) keeps its MED4 genes, while MFS tcdb:2.A.1 has fewer than `min_gene_set_size=5` gated MED4 genes and lands in `filtered_out` with 0 rows — pass `min_gene_set_size=1` to see it. Rows carry `tcdb_call` / `tcdb_gate` / `tcdb_calls`; envelope `by_tcdb_call` counts them."
 
+  - title: KEGG module → genes (genes reach a module through their KO)
+    call: genes_by_ontology(ontology="kegg_module", term_ids=["kegg.module:M00531"], organism="Synechococcus WH8102", min_gene_set_size=1)
+    note: "A module's gene set is the organism's genes whose KO is in the module definition; modules are small, so pass `min_gene_set_size=1` or the default size filter drops them into `filtered_out`. Passing the subclass id (`kegg.module:pathway_modules.energy_metabolism.nitrogen_metabolism`) expands down to the same genes plus its other modules. A gene set is not a complete route: read the module's `definition` / `step_count` (`ontology_term_details`) before calling the route present."
+    response: |
+      {
+        "ontology": "kegg_module",
+        "organism_name": "Synechococcus WH8102",
+        "by_organism": [{"organism_name": "Synechococcus WH8102", "gene_count": 2, "term_count": 1, "row_count": 2}],
+        "...": "13 empty fields omitted",
+        "total_matching": 2,
+        "total_genes": 2,
+        "total_terms": 1,
+        "total_categories": 1,
+        "genes_per_term_min": 2,
+        "genes_per_term_median": 2.0,
+        "genes_per_term_max": 2,
+        "terms_per_gene_min": 1,
+        "terms_per_gene_median": 1.0,
+        "terms_per_gene_max": 1,
+        "by_category": [{"category": "Stress response and adaptation", "count": 2}],
+        "by_level": [{"level": 3, "n_terms": 1, "n_genes": 2, "row_count": 2}],
+        "top_terms": [
+          {
+            "term_id": "kegg.module:M00531",
+            "term_name": "Assimilatory nitrate reduction, nitrate => ammonia",
+            "count": 2,
+            "organism_count": 1,
+            "is_informative": true
+          }
+        ],
+        "n_best_effort_terms": 0,
+        "not_found": [],
+        "size_filtered_terms": 0,
+        "size_filtered_genes": 0,
+        "returned": 2,
+        "offset": 0,
+        "truncated": false,
+        "trust_axes": {"kegg_module": ["sources", "evidence"]},
+        "by_evidence": [{"count": 2, "evidence": "family_inferred"}],
+        "by_sources": [{"count": 2, "source": "eggnog"}],
+        "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
+        "results": [
+          {
+            "locus_tag": "SYNW2464",
+            "organism_name": "Synechococcus WH8102",
+            "gene_name": "narB",
+            "product": "nitrate reductase",
+            "gene_category": "Stress response and adaptation",
+            "term_id": "kegg.module:M00531",
+            "term_name": "Assimilatory nitrate reduction, nitrate => ammonia",
+            "level": 3,
+            "is_informative": true,
+            "evidence": "family_inferred",
+            "module_type": "pathway"
+          },
+          {
+            "locus_tag": "SYNW2477",
+            "organism_name": "Synechococcus WH8102",
+            "gene_name": "nirA",
+            "product": "ferredoxin--nitrite reductase",
+            "gene_category": "Stress response and adaptation",
+            "term_id": "kegg.module:M00531",
+            "term_name": "Assimilatory nitrate reduction, nitrate => ammonia",
+            "level": 3,
+            "is_informative": true,
+            "evidence": "family_inferred",
+            "module_type": "pathway"
+          }
+        ]
+      }
+
   - title: CAZy class roll-up — genes by glycoside hydrolase / glycosyltransferase class
     call: genes_by_ontology(ontology="cazy", organism="MED4", level=0)
 
@@ -784,9 +855,10 @@ mistakes:
   - "Pfam is a 2-level ontology: `level=1` → Pfam domains (leaf), `level=0` → PfamClan (parent). Both kinds of IDs are accepted under `ontology='pfam'`."
   - "KEGG: gene edges only hit the KO leaf (`level=3`). Passing `level=0/1/2` rolls up to category/subcategory/pathway via `is_a`."
   - "BRITE: gene edges hit the KO leaf (`level=3`, same as KEGG). Passing `level=0/1/2` rolls up through BRITE tree hierarchy. Each BRITE tree is a separate functional classification — use `tree` to scope to a specific tree (e.g. `tree='transporters'`). Without `tree`, results mix all BRITE trees. Use `list_filter_values('brite_tree')` to discover available trees."
+  - "KEGG modules (`kegg_module`): genes reach a module through their KO, so a module's gene set is the genes whose KO is in its definition — not a complete route. `level=3` = modules; `level=0/1/2` roll up to module type / class / subclass. `term_ids` on a module or a class id expands down to the genes. `module_type='pathway'` keeps routes, `'signature'` marker sets. See docs://ontologies/kegg_module."
   - "Flat ontologies (`cog_category`, `subcellular_localization`, `signal_peptide_type`, `ncbifam`) have only `level=0`: passing `level >= 1` in Mode 2 returns empty results; in Mode 3 the ids route to `wrong_level`. `tigr_role` is two-level, not flat: `level=0` = the 21 main roles, `level=1` = sub roles."
-  - "Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`."
-  - "Compact rows carry `evidence` on the 15 functional-edge ontologies (null on PSORTb/SignalP), plus `call_class` on MEROPS, `interpro_type` on InterPro and `tcdb_call` / `tcdb_gate` / `tcdb_calls` on TCDB. `sources` / `evidence_score` / `tier` and native scalars are verbose. Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call`) default to `None`; an axis the ontology lacks raises `ValueError`. Per-ontology table: `docs://analysis/annotation_evidence`."
+  - "Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`, `kegg_module`."
+  - "Compact rows carry `evidence` on the 16 functional-edge ontologies (null on PSORTb/SignalP), plus `call_class` on MEROPS, `interpro_type` on InterPro, `module_type` on KEGG modules and `tcdb_call` / `tcdb_gate` / `tcdb_calls` on TCDB. `sources` / `evidence_score` / `tier` and native scalars are verbose. Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call`) default to `None`; an axis the ontology lacks raises `ValueError`. Per-ontology table: `docs://analysis/annotation_evidence`."
   - "`max_tier` keeps tier-null rows (`r.tier <= max_tier OR r.tier IS NULL`) — an eggNOG-only TCDB edge with no `tier` passes any `max_tier` filter. Check the envelope's `by_tier` `\"null\"` bucket to see how many rows that affects."
   - "`sources` is set-membership ANY (`any(s IN $sources WHERE s IN r.sources)`), not exact match — an edge with `sources=['eggnog', 'uniprot']` matches `sources=['eggnog']`."
   - "Row strip rule: a row only carries the columns its ontology owns. `tier` never appears on a `kegg` row (KEGG carries no `tier` axis); `interpro_type` never appears on a `tcdb` row. Owned-but-null stays — e.g. `tier` is present and `null` on a TCDB edge with only eggNOG support (no tier assigned)."

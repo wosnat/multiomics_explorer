@@ -313,7 +313,8 @@
      "signal_peptide_type",
      "interpro",
      "ncbifam",
-     "merops"
+     "merops",
+     "kegg_module"
     ],
     "type": "string"
    }
@@ -1356,7 +1357,8 @@
         "signal_peptide_type",
         "interpro",
         "ncbifam",
-        "merops"
+        "merops",
+        "kegg_module"
        ],
        "type": "string"
       },
@@ -1380,7 +1382,8 @@
        "signal_peptide_type",
        "interpro",
        "ncbifam",
-       "merops"
+       "merops",
+       "kegg_module"
       ],
       "type": "string"
      },
@@ -2701,7 +2704,8 @@
      "signal_peptide_type",
      "interpro",
      "ncbifam",
-     "merops"
+     "merops",
+     "kegg_module"
     ],
     "type": "string"
    }
@@ -3605,7 +3609,8 @@
        "signal_peptide_type",
        "interpro",
        "ncbifam",
-       "merops"
+       "merops",
+       "kegg_module"
       ],
       "type": "string"
      },
@@ -5070,7 +5075,8 @@
         "signal_peptide_type",
         "interpro",
         "ncbifam",
-        "merops"
+        "merops",
+        "kegg_module"
        ],
        "type": "string"
       },
@@ -5094,7 +5100,8 @@
        "signal_peptide_type",
        "interpro",
        "ncbifam",
-       "merops"
+       "merops",
+       "kegg_module"
       ],
       "type": "string"
      },
@@ -5430,7 +5437,8 @@
      "signal_peptide_type",
      "interpro",
      "ncbifam",
-     "merops"
+     "merops",
+     "kegg_module"
     ],
     "type": "string"
    }
@@ -5784,7 +5792,8 @@
         "signal_peptide_type",
         "interpro",
         "ncbifam",
-        "merops"
+        "merops",
+        "kegg_module"
        ],
        "type": "string"
       },
@@ -5808,7 +5817,8 @@
        "signal_peptide_type",
        "interpro",
        "ncbifam",
-       "merops"
+       "merops",
+       "kegg_module"
       ],
       "type": "string"
      },

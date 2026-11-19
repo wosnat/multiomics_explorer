@@ -414,7 +414,7 @@ commit to paginating its details.
 
 ### Lockstep paging on multi-ontology calls
 
-`search_ontology` accepts `ontology=[...]` (or `None` for all 17) and
+`search_ontology` accepts `ontology=[...]` (or `None` for all 18) and
 fans out per ontology; **`limit` / `offset` apply to each ontology
 separately** — a `limit=5` call over three ontologies returns up to 15
 rows. Flat envelope keys are sums / max across the set; `by_ontology[]`
@@ -428,7 +428,8 @@ Two modes, chosen by whether `search_text` is set: **Search**
 (`search_text='...'`) — Lucene over term names, rows carry `score` sorted
 desc, envelope `mode: "search"`. **Browse** (omitted/empty) — every term,
 sorted `gene_count DESC, id`, `score` null, envelope `mode: "browse"` plus
-`by_level[]`; narrow with `level=`, a facet (`tree=` / `interpro_type=`),
+`by_level[]`; narrow with `level=`, a facet (`tree=` / `interpro_type=` /
+`module_type=`),
 `min_gene_count=`, or `organism=` (rows gain `organism_gene_count`). A
 browse that truncates without a narrowing filter adds a warning.
 
@@ -460,11 +461,11 @@ The choice of background matters more than the choice of ontology.
 
 ## Trust surface summary (ontology tools)
 
-**15 of the 17 ontologies carry the trust surface** (all but PSORTb
+**16 of the 18 ontologies carry the trust surface** (all but PSORTb
 `subcellular_localization` / SignalP `signal_peptide_type`): a compact
 `evidence` ladder on every gene→term row, verbose `sources[]` /
 `evidence_score` / `tier`; native scalars (`tcdb_bitscore`, `evalue`, ...)
-are verbose-only and never filterable. Rank by `evidence_score`; narrow
+are verbose-only, never filterable. Rank by `evidence_score`; narrow
 the *kind* of evidence with `evidence=` / `sources=` / `max_tier=` (TCDB:
 `tcdb_call=`, no `evidence_score`; weak hits only via
 `include_weak_tcdb_hits`). InterPro enrichment requires `interpro_type=`.
@@ -475,10 +476,10 @@ Per-ontology profile, the rank-vs-filter rule and MEROPS `call_class`:
 
 ## Hierarchy `level` convention (ontology tools)
 
-For all 17 supported ontologies, `level: int` follows the same convention:
+For all 18 ontologies, `level: int` follows one convention:
 **`level=0`** = root (broadest term), higher integers = more specific.
-Tree-shaped ontologies (Cyanorak, TIGR, EC, TCDB, CAZy, BRITE within a
-tree) have exact level semantics (TIGR: exactly two, main role →
+Tree-shaped ontologies (Cyanorak, TIGR, EC, TCDB, CAZy, KEGG modules,
+BRITE per tree) have exact levels (TIGR: two, main role →
 sub-role). DAG-shaped ontologies (GO, sometimes KEGG) use
 min-path-from-root, with a sparse `level_is_best_effort='true'` flag on
 affected terms. Flat ontologies (COG functional categories, NCBIfam,

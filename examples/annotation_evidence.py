@@ -1,5 +1,5 @@
 """Example: reading the annotation-trust surface (evidence / evidence_score /
-tier / call_class / interpro_type) across the 17 supported ontologies.
+tier / call_class / interpro_type) across the 18 supported ontologies.
 
 See docs://analysis/annotation_evidence for the LLM-facing guide; this
 script is its runnable companion. Each scenario names the trust axis it

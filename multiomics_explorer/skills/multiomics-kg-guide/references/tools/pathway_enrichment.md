@@ -15,7 +15,7 @@ docs://tools/pathway_enrichment; summary=True first.
 |---|---|---|---|
 | organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
 | experiment_ids | list[string] | — | Experiments to pull DE from. Get IDs from list_experiments. |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') | — | Ontology for pathway definitions. Run ontology_landscape first to rank by relevance. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops', 'kegg_module') | — | Ontology for pathway definitions. Run ontology_landscape first to rank by relevance. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). REQUIRED when ontology='brite' (12 trees; see list_filter_values(filter_type='brite_tree')) — a tree-less BRITE run raises, since it would mix taxonomy and function terms. Invalid for any other ontology. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level (0 = root). At least one of `level` or `term_ids` required. See docs://guide/conventions. |
 | term_ids | list[string] \| None | None | Specific term IDs to test. Combines with level to scope rollup. Bare ids are accepted (e.g. 'ko00910', 'GO:0006979') and coerced to canonical (see `term_validation.resolved_aliases`). |
@@ -39,6 +39,7 @@ docs://tools/pathway_enrichment; summary=True first.
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
 | tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked, so an ancestor-term row reports a surviving call kind. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
+| module_type | string ('pathway', 'signature') \| None | None | KEGG module type (kegg_module only): 'pathway' = routes, 'signature' = marker sets such as drug resistance. Default both. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -53,7 +54,7 @@ pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_g
 ## Response sketch
 
 ```expected-keys
-organism_name, ontology, level, total_matching, returned, truncated, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, warnings, no_expression, not_found_experiments, term_validation, clusters_skipped, enrichment_params, filters_applied, trust_axes, background_filtered, interpro_type, results
+organism_name, ontology, level, total_matching, returned, truncated, offset, n_significant, by_experiment, by_direction, by_omics_type, cluster_summary, top_clusters_by_min_padj, top_pathways_by_padj, not_found, not_matched, warnings, no_expression, not_found_experiments, term_validation, clusters_skipped, enrichment_params, filters_applied, trust_axes, background_filtered, interpro_type, module_type, results
 ```
 
 Result row: `cluster, experiment_id, name, timepoint, timepoint_hours, timepoint_order, direction, omics_type, table_scope, treatment_type, background_factors, is_time_course, …`

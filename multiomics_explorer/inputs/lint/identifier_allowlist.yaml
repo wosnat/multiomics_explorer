@@ -32,6 +32,9 @@
     - merops_clan
     - merops_family
     - merops_subfamily
+    - kegg_module_type
+    - kegg_module_class
+    - kegg_module_subclass
   reason: ontology-term level_kind values (level_kind is skipped by the vocab snapshot; cazy_subfamily is a listed but unpopulated vocabulary value).
 
 - tokens: [transcription_factors, two_component, translation_factors, trna_biogenesis, dna_replication]

@@ -8,7 +8,7 @@ One page per supported ontology — what it is, how genes get annotated, identif
 | `go_mf` | GO molecular function | `MolecularFunction` | 0–9 | DAG | yes | sources, evidence, evidence_score | — | Gene Ontology *molecular function* — the biochemical activity a gene product performs… |
 | `go_cc` | GO cellular component | `CellularComponent` | 0–6 | DAG | yes | sources, evidence, evidence_score | — | Gene Ontology *cellular component* — where a gene product is found… |
 | `ec` | EC numbers | `EcNumber` | 0–3 | tree | yes | sources, evidence, evidence_score | — | Enzyme Commission numbers — the four-field nomenclature of enzyme *reactions*… |
-| `kegg` | KEGG (categories, pathways, KOs) | `KeggTerm` | 0–3 | tree | yes | sources, evidence | brite (membership) | KEGG orthology and pathway maps — the most common "which pathway is this gene in" vocabulary. |
+| `kegg` | KEGG (categories, pathways, KOs) | `KeggTerm` | 0–3 | tree | yes | sources, evidence | brite (membership), kegg_module (membership) | KEGG orthology and pathway maps — the most common "which pathway is this gene in" vocabulary. |
 | `cog_category` | COG functional categories | `CogFunctionalCategory` | 0 | flat | yes | sources, evidence | — | COG functional categories — the 26 single-letter classes of the Clusters of Orthologous Groups system… |
 | `cyanorak_role` | Cyanorak roles | `CyanorakRole` | 0–2 | tree | yes | sources, evidence | — | Cyanorak functional roles — the curated, cyanobacteria-specific role hierarchy of the Cyanorak information… |
 | `tigr_role` | TIGR roles | `TigrRole` | 0–1 | tree | yes | sources, evidence | — | TIGR (JCVI) functional roles — the classic "main role / sub role" scheme from TIGR genome annotation… |
@@ -21,6 +21,7 @@ One page per supported ontology — what it is, how genes get annotated, identif
 | `interpro` | InterPro entries | `InterproEntry` | 0–2 | tree, facet `interpro_type` | yes | sources, evidence | ec (router), cazy (router) | InterPro — the integrated protein-signature database that unifies Pfam, TIGRFAMs/NCBIfam, PANTHER, SMART… |
 | `ncbifam` | NCBIfam families | `NcbifamFamily` | 0 | flat | yes | sources, evidence | interpro (membership), tigr_role (router) | NCBIfam — NCBI's curated protein-family HMM collection, which absorbed and continues TIGRFAMs. |
 | `merops` | MEROPS peptidase families | `MeropsFamily` | 0–2 | tree | yes | sources, evidence, evidence_score, tier | pfam (composition) | MEROPS — the peptidase (protease) and peptidase-inhibitor database. |
+| `kegg_module` | KEGG modules (module classes, modules) | `KeggModule` | 0–3 | tree, facet `module_type` | yes | sources, evidence | kegg (membership) | KEGG modules — small functional units, each written by KEGG as a formula over KOs… |
 
 `Levels` is the observed `level` range (0 = root / broadest); `Hierarchy` is tree (kegg: DAG below pathway level), DAG (GO — `level` is a min-path proxy) or flat; `Trust` says whether the gene edge carries comparable trust axes (`evidence` / `sources`, filterable on `genes_by_ontology` and friends).
 

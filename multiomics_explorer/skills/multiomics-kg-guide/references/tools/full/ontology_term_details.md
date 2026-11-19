@@ -2,7 +2,7 @@
 
 ## What it does
 
-Batch term lookup across the 17 ontologies — name, level, informativeness, gene and organism counts, parents, children, forward-only cross-ontology bridges.
+Batch term lookup across the 18 ontologies — name, level, informativeness, gene and organism counts, parents, children, forward-only cross-ontology bridges.
 
 Use when you already hold self-prefixed term IDs; to find IDs use `search_ontology`, for the member genes `genes_by_ontology`.
 Filters: term_ids, organism, link_kinds.
@@ -76,6 +76,11 @@ total_matching, returned, offset, truncated, not_found, by_ontology, links_out_t
 | signalp_id | string \| None (optional) | SignalP type ID (sparse: signal_peptide_type) |
 | interpro_id | string \| None (optional) | Bare InterPro accession (sparse: interpro) |
 | interpro_type | string \| None (optional) | InterPro entry type, e.g. 'FAMILY', 'DOMAIN' (sparse: interpro) |
+| module_type | string \| None (optional) | KEGG module type: 'pathway' (a route) or 'signature' (a marker set). kegg_module only. |
+| module_id | string \| None (optional) | Bare KEGG module ID, e.g. 'M00531' (sparse: kegg_module modules, level 3). |
+| step_count | int \| None (optional) | Steps in the KEGG module definition (sparse: kegg_module modules, level 3). |
+| definition | string \| None (optional) | KEGG module definition over KOs: top-level space = next step, space inside () = all of, ',' = alternatives, '+' = complex subunits, '-K' = optional (sparse: modules, level 3). |
+| complete_organism_count | int \| None (optional) | Organisms whose module edge is 'complete' (sparse: kegg_module). Differs from organism_count, which counts organisms with any gene reaching the module via the KO bridge. |
 | ncbifam_family_count | int \| None (optional) | NCBIfam families whose router link points at this TIGR role (sparse: tigr_role). A router, not gene evidence. |
 | ncbifam_id | string \| None (optional) | Bare NCBIfam accession (sparse: ncbifam) |
 | family_type | string \| None (optional) | NCBIfam family type, e.g. 'equivalog' (sparse: ncbifam) |
@@ -559,6 +564,8 @@ discussed_by_publication(publication_dois=[...]) → ontology_term_details(term_
 - `gene_count` / `organism_count` are subtree-inclusive on hierarchical labels and direct on flat ones; `direct_gene_count` is node-local and absent (not null) on flat labels and on PfamClan / BriteCategory — see docs://ontologies/{ontology} for what each count means there.
 
 - `member_count` (TCDB, MEROPS, InterPro) is the upstream database's family size, not a KG gene count.
+
+- KEGG module rows (`kegg.module:M…`) carry `module_type`, `module_id`, `definition` (KEGG's KO formula) and `step_count`; class nodes use house slug ids and carry only `module_type` of these. `complete_organism_count` counts organisms with every step annotated — it differs from `organism_count`, which counts organisms with a gene whose KO is in the module. See docs://ontologies/kegg_module.
 
 - TCDB rows carry `tcdb_substrate_count` (distinct substrates TCDB curates on the systems in the node's subtree; substrate edges leave `tc_system` nodes only, so a family's own range is the sum below it), `direction` (`uptake` / `export` / `unknown`, TCDB-stated and conservative: ABC uptake numbering, which also marks ABC subfamilies, or a system's own name; family-level and higher nodes read `unknown`; rule: `docs://ontologies/tcdb`), sparse `direction_basis` and, on `tc_system` nodes, `proteins` (TCDB's protein list: gene symbols, accessions, source organism). Use `tcdb_substrate_count` to see how broad a family call is before trusting a family walk: the ABC superfamily tcdb:3.A.1 reads 547. Many children are range-only (`gene_count = 0`): curated systems no KG gene is called to.
 

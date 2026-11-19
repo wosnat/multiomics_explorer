@@ -13,7 +13,7 @@ docs://tools/genes_by_ontology; summary=True first.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') | — | Ontology for these term_ids / this level. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops', 'kegg_module') | — | Ontology for these term_ids / this level. |
 | organism | string \| list[string] \| None | None | One organism, a list (each entry word-matched and may expand to several strains), or omit for all organisms. A single string must resolve to ONE organism. See list_organisms. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Only valid when ontology='brite'. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | level | int \| None | None | Hierarchy level to roll UP to (0 = broadest). At least one of `level` or `term_ids` must be provided. See docs://guide/conventions. |
@@ -30,6 +30,7 @@ docs://tools/genes_by_ontology; summary=True first.
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
 | tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked, so an ancestor-term row reports a surviving call kind. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
+| module_type | string ('pathway', 'signature') \| None | None | KEGG module type (kegg_module only): 'pathway' = routes, 'signature' = marker sets such as drug resistance. Default both. |
 | include_weak_tcdb_hits | bool | False | TCDB only: also return one row per weak hit (tcdb_gate='below_gate', diamond only), tagged in tcdb_gate. Adds rows; default rows are unchanged. No-op for other ontologies. |
 | limit | int | 50 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
@@ -106,6 +107,7 @@ ontology, organism_name, by_organism, organisms_without_genes, not_found_organis
 | tcdb_gate | string \| None (optional) | KG gate of the representative TCDB edge: 'direct' / 'annotated' (default rows) or 'below_gate' (only with include_weak_tcdb_hits=True). Sparse: tcdb only. |
 | tcdb_calls | list[string] \| None (optional) | TCDB call kinds on the gene's gated edges along the term's lineage, in precedence order. The two diamond kinds are one run; eggnog + diamond = independent agreement. Sparse: tcdb only. |
 | interpro_type | string \| None (optional) | InterPro entry type (sparse: interpro only), e.g. 'DOMAIN', 'FAMILY', 'HOMOLOGOUS_SUPERFAMILY'. |
+| module_type | string \| None (optional) | KEGG module type: 'pathway' (a route) or 'signature' (a marker set). kegg_module only. |
 
 **Verbose-only fields** (included when `verbose=True`):
 
@@ -436,13 +438,90 @@ genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:2.A", "tcdb:
 
 *Each term expands DOWN through its families, subfamilies and systems before binding to genes, over gated edges only (`tcdb_gate` direct or annotated), so a term's gene set matches its `gene_count`. The default size filter applies to the expanded set: the subclass tcdb:2.A (Porters) keeps its MED4 genes, while MFS tcdb:2.A.1 has fewer than `min_gene_set_size=5` gated MED4 genes and lands in `filtered_out` with 0 rows — pass `min_gene_set_size=1` to see it. Rows carry `tcdb_call` / `tcdb_gate` / `tcdb_calls`; envelope `by_tcdb_call` counts them.*
 
-### Example 9: CAZy class roll-up — genes by glycoside hydrolase / glycosyltransferase class
+### Example 9: KEGG module → genes (genes reach a module through their KO)
+
+```example-call
+genes_by_ontology(ontology="kegg_module", term_ids=["kegg.module:M00531"], organism="Synechococcus WH8102", min_gene_set_size=1)
+```
+
+*A module's gene set is the organism's genes whose KO is in the module definition; modules are small, so pass `min_gene_set_size=1` or the default size filter drops them into `filtered_out`. Passing the subclass id (`kegg.module:pathway_modules.energy_metabolism.nitrogen_metabolism`) expands down to the same genes plus its other modules. A gene set is not a complete route: read the module's `definition` / `step_count` (`ontology_term_details`) before calling the route present.*
+
+```example-response
+{
+  "ontology": "kegg_module",
+  "organism_name": "Synechococcus WH8102",
+  "by_organism": [{"organism_name": "Synechococcus WH8102", "gene_count": 2, "term_count": 1, "row_count": 2}],
+  "...": "13 empty fields omitted",
+  "total_matching": 2,
+  "total_genes": 2,
+  "total_terms": 1,
+  "total_categories": 1,
+  "genes_per_term_min": 2,
+  "genes_per_term_median": 2.0,
+  "genes_per_term_max": 2,
+  "terms_per_gene_min": 1,
+  "terms_per_gene_median": 1.0,
+  "terms_per_gene_max": 1,
+  "by_category": [{"category": "Stress response and adaptation", "count": 2}],
+  "by_level": [{"level": 3, "n_terms": 1, "n_genes": 2, "row_count": 2}],
+  "top_terms": [
+    {
+      "term_id": "kegg.module:M00531",
+      "term_name": "Assimilatory nitrate reduction, nitrate => ammonia",
+      "count": 2,
+      "organism_count": 1,
+      "is_informative": true
+    }
+  ],
+  "n_best_effort_terms": 0,
+  "not_found": [],
+  "size_filtered_terms": 0,
+  "size_filtered_genes": 0,
+  "returned": 2,
+  "offset": 0,
+  "truncated": false,
+  "trust_axes": {"kegg_module": ["sources", "evidence"]},
+  "by_evidence": [{"count": 2, "evidence": "family_inferred"}],
+  "by_sources": [{"count": 2, "source": "eggnog"}],
+  "evidence_score_stats": {"min": null, "median": null, "max": null, "n_null": 0},
+  "results": [
+    {
+      "locus_tag": "SYNW2464",
+      "organism_name": "Synechococcus WH8102",
+      "gene_name": "narB",
+      "product": "nitrate reductase",
+      "gene_category": "Stress response and adaptation",
+      "term_id": "kegg.module:M00531",
+      "term_name": "Assimilatory nitrate reduction, nitrate => ammonia",
+      "level": 3,
+      "is_informative": true,
+      "evidence": "family_inferred",
+      "module_type": "pathway"
+    },
+    {
+      "locus_tag": "SYNW2477",
+      "organism_name": "Synechococcus WH8102",
+      "gene_name": "nirA",
+      "product": "ferredoxin--nitrite reductase",
+      "gene_category": "Stress response and adaptation",
+      "term_id": "kegg.module:M00531",
+      "term_name": "Assimilatory nitrate reduction, nitrate => ammonia",
+      "level": 3,
+      "is_informative": true,
+      "evidence": "family_inferred",
+      "module_type": "pathway"
+    }
+  ]
+}
+```
+
+### Example 10: CAZy class roll-up — genes by glycoside hydrolase / glycosyltransferase class
 
 ```example-call
 genes_by_ontology(ontology="cazy", organism="MED4", level=0)
 ```
 
-### Example 10: PSORTb outer-membrane proteins with confidence score
+### Example 11: PSORTb outer-membrane proteins with confidence score
 
 ```example-call
 genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMembrane"], organism="MED4")
@@ -528,7 +607,7 @@ genes_by_ontology(ontology="subcellular_localization", term_ids=["psortb_OuterMe
 }
 ```
 
-### Example 11: SignalP lipoproteins with cleavage info
+### Example 12: SignalP lipoproteins with cleavage info
 
 ```example-call
 genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_LIPO"], organism="MED4")
@@ -614,7 +693,7 @@ genes_by_ontology(ontology="signal_peptide_type", term_ids=["signalp_LIPO"], org
 }
 ```
 
-### Example 12: InterPro homologous-superfamily census (interpro_type facet)
+### Example 13: InterPro homologous-superfamily census (interpro_type facet)
 
 ```example-call
 genes_by_ontology(ontology="interpro", organism="MED4", term_ids=["interpro:IPR027417"])
@@ -708,7 +787,7 @@ genes_by_ontology(ontology="interpro", organism="MED4", term_ids=["interpro:IPR0
 }
 ```
 
-### Example 13: MEROPS peptidase-only clan census (call_class filter)
+### Example 14: MEROPS peptidase-only clan census (call_class filter)
 
 ```example-call
 genes_by_ontology(ontology="merops", organism="MIT1002", level=0, call_class=["peptidase"])
@@ -803,7 +882,7 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0, call_class=["p
 }
 ```
 
-### Example 14: MEROPS clan census without call_class (warns)
+### Example 15: MEROPS clan census without call_class (warns)
 
 ```example-call
 genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
@@ -900,7 +979,7 @@ genes_by_ontology(ontology="merops", organism="MIT1002", level=0)
 }
 ```
 
-### Example 15: TCDB trust detail — sources / tier / DIAMOND statistics (verbose)
+### Example 16: TCDB trust detail — sources / tier / DIAMOND statistics (verbose)
 
 ```example-call
 genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1.4"], min_gene_set_size=1, verbose=True)
@@ -908,7 +987,7 @@ genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1.4"], m
 
 *The urea / amino-acid subfamily tcdb:3.A.1.4 in MED4: the urtABCDE genes. Each row reports one edge by precedence (best hit, then tier, then eggNOG; then identity): `tcdb_call`, `tcdb_gate`, `sources`, `tier` and, on DIAMOND rows, `identity` / `qcov` (percent), `evalue`, `tcdb_scov`, `tcdb_best_hit_rank`, `tcdb_bitscore`, `tcdb_bitscore_ratio`. `tcdb_calls` lists every call kind on the gene's lineage through the term. TCDB carries no evidence score.*
 
-### Example 16: Trust filters on TCDB — DIAMOND calls only (evidence + tcdb_call)
+### Example 17: Trust filters on TCDB — DIAMOND calls only (evidence + tcdb_call)
 
 ```example-call
 genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], evidence=["homology"], tcdb_call=["diamond_best_hit", "diamond_tier"])
@@ -916,7 +995,7 @@ genes_by_ontology(ontology="tcdb", organism="MED4", term_ids=["tcdb:3.A.1"], evi
 
 *TCDB's trust axes are `sources`, `evidence` and `tier`, plus the `tcdb_call` filter; `min_evidence_score` raises on tcdb. `evidence=['homology']` and `tcdb_call` both drop the eggNOG rows here. Default TCDB rows are gated, so their tier is 1, 2 or null (eggNOG): `max_tier=2` changes nothing unless `include_weak_tcdb_hits=True`. `max_tier=1` keeps tier-1 calls plus the tier-null eggNOG rows, so pair it with `evidence=['homology']`; on tcdb:3.A.1 in MED4 that leaves 4 genes, below the default `min_gene_set_size=5`, so also pass `min_gene_set_size=1`. `include_weak_tcdb_hits=True` adds the below-gate DIAMOND edges instead.*
 
-### Example 17: Filter out uninformative terms (term-side filter, opt-in)
+### Example 18: Filter out uninformative terms (term-side filter, opt-in)
 
 ```example-call
 genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=True, min_gene_set_size=1)
@@ -924,7 +1003,7 @@ genes_by_ontology(ontology="kegg", organism="MED4", level=3, informative_only=Tr
 
 *`informative_only=True` excludes terms flagged `is_uninformative='true'` (GO roots, catch-all Cyanorak / TIGR / COG roles, KEGG KOs named 'uncharacterized protein' — for KEGG also the global / overview pathway maps such as `kegg.pathway:ko01100`). Term-side only — never narrows the gene set. Every detail row carries `is_informative: bool`. MED4 KEGG level 3: 1124 → 1094 rows. `min_gene_set_size=1` is needed here because most KOs carry a single MED4 gene and the default size filter (5) would drop them all.*
 
-### Example 18: From level-survey to pathway defs
+### Example 19: From level-survey to pathway defs
 
 ```
 Step 1: ontology_landscape(organism="MED4")
@@ -988,11 +1067,13 @@ genes_by_ontology(ontology='kegg', organism=['Alteromonas'], level=1)  # a list 
 
 - BRITE: gene edges hit the KO leaf (`level=3`, same as KEGG). Passing `level=0/1/2` rolls up through BRITE tree hierarchy. Each BRITE tree is a separate functional classification — use `tree` to scope to a specific tree (e.g. `tree='transporters'`). Without `tree`, results mix all BRITE trees. Use `list_filter_values('brite_tree')` to discover available trees.
 
+- KEGG modules (`kegg_module`): genes reach a module through their KO, so a module's gene set is the genes whose KO is in its definition — not a complete route. `level=3` = modules; `level=0/1/2` roll up to module type / class / subclass. `term_ids` on a module or a class id expands down to the genes. `module_type='pathway'` keeps routes, `'signature'` marker sets. See docs://ontologies/kegg_module.
+
 - Flat ontologies (`cog_category`, `subcellular_localization`, `signal_peptide_type`, `ncbifam`) have only `level=0`: passing `level >= 1` in Mode 2 returns empty results; in Mode 3 the ids route to `wrong_level`. `tigr_role` is two-level, not flat: `level=0` = the 21 main roles, `level=1` = sub roles.
 
-- Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`.
+- Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`, `kegg_module`.
 
-- Compact rows carry `evidence` on the 15 functional-edge ontologies (null on PSORTb/SignalP), plus `call_class` on MEROPS, `interpro_type` on InterPro and `tcdb_call` / `tcdb_gate` / `tcdb_calls` on TCDB. `sources` / `evidence_score` / `tier` and native scalars are verbose. Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call`) default to `None`; an axis the ontology lacks raises `ValueError`. Per-ontology table: `docs://analysis/annotation_evidence`.
+- Compact rows carry `evidence` on the 16 functional-edge ontologies (null on PSORTb/SignalP), plus `call_class` on MEROPS, `interpro_type` on InterPro, `module_type` on KEGG modules and `tcdb_call` / `tcdb_gate` / `tcdb_calls` on TCDB. `sources` / `evidence_score` / `tier` and native scalars are verbose. Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call`) default to `None`; an axis the ontology lacks raises `ValueError`. Per-ontology table: `docs://analysis/annotation_evidence`.
 
 - `max_tier` keeps tier-null rows (`r.tier <= max_tier OR r.tier IS NULL`) — an eggNOG-only TCDB edge with no `tier` passes any `max_tier` filter. Check the envelope's `by_tier` `"null"` bucket to see how many rows that affects.
 

@@ -46,7 +46,9 @@ hierarchy: |
   `ko012xx` block, `ko01310`, `ko01320`) have no parent subcategory in
   this KG — they are level-2 nodes with no `parents[]`. BRITE hierarchies
   are a *separate* view over the same KOs, reached through the
-  `Kegg_term_in_brite_category` bridge.
+  `Kegg_term_in_brite_category` bridge. KEGG modules are a separate
+  ontology too (`kegg_module`), linked KO → module through
+  `Kegg_term_in_kegg_module`.
 
 interpretation: |
   Pathway level (`level=2`) is the interpretable enrichment unit — it maps
@@ -96,6 +98,7 @@ typical_questions:
 
 see_also:
   - docs://ontologies/brite
+  - docs://ontologies/kegg_module
   - docs://ontologies/ec
   - docs://analysis/enrichment
   - docs://analysis/metabolites

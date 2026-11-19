@@ -46,6 +46,7 @@ from multiomics_explorer.mcp_server.params import (  # noqa: E402
     MetaboliteIdsParam,
     MetaboliteIdsRequiredParam,
     MinEvidenceScoreParam,
+    ModuleTypeParam,
     OffsetParam,
     OmicsTypeParam,
     OntologyKey,
@@ -154,6 +155,10 @@ class PathwayEnrichmentResult(SparseRow):
     )
     tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
     tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
+    module_type: str | None = Field(
+        default=None,
+        description="KEGG module type: 'pathway' (a route) or 'signature' (a marker set). kegg_module only.",
+    )
     gene_ratio: str = Field(
         description="'k/n' string — DE genes in pathway over total DE genes in cluster (clusterProfiler: GeneRatio)"
     )
@@ -379,6 +384,10 @@ class PathwayEnrichmentResponse(BaseModel):
         default=None,
         description="Echo of the interpro_type stratum used (sparse: only when ontology='interpro').",
     )
+    module_type: str | None = Field(
+        default=None,
+        description="Echo of the module_type filter used; null when none was given (kegg_module only).",
+    )
     results: list[PathwayEnrichmentResult] = Field(
         default_factory=list, description="Long-format result rows (one Fisher test per row)"
     )
@@ -405,6 +414,10 @@ class ClusterEnrichmentResult(SparseRow):
     )
     tree: str | None = Field(default=None, description="BRITE tree name (sparse: BRITE only)")
     tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
+    module_type: str | None = Field(
+        default=None,
+        description="KEGG module type: 'pathway' (a route) or 'signature' (a marker set). kegg_module only.",
+    )
     gene_ratio: str = Field(
         description="'k/n' string — cluster genes in pathway over total cluster genes (clusterProfiler: GeneRatio)"
     )
@@ -525,6 +538,10 @@ class ClusterEnrichmentResponse(BaseModel):
     interpro_type: str | None = Field(
         default=None,
         description="Echo of the interpro_type stratum used (sparse: only when ontology='interpro').",
+    )
+    module_type: str | None = Field(
+        default=None,
+        description="Echo of the module_type filter used; null when none was given (kegg_module only).",
     )
     results: list[ClusterEnrichmentResult] = Field(
         default_factory=list, description="Long-format result rows"
@@ -1818,6 +1835,10 @@ class KGIdentity(BaseModel):
         default=None,
         description="Metabolite ids curated out of the TCDB substrate route (coupling ions H+ / Na+, placeholders such as molecule / cation / anion); a superset of go_transport_excluded_targets. An empty TCDB answer for these is curation, not biology: Na+/H+ antiporters carry no metabolite rows. Null on older KGs.",
     )
+    kegg_release: str | None = Field(
+        default=None,
+        description="KEGG release dates per database (pathway, brite, module, ko, ...) the KG was built from, e.g. 'pathway 2026-11-18, module 2026-11-09'. Null on older KGs.",
+    )
     gene_count: int | None = Field(default=None, description="Number of Gene nodes in the KG.")
     experiment_count: int | None = Field(default=None, description="Number of Experiment nodes in the KG.")
     paper_count: int | None = Field(default=None, description="Number of Publication nodes in the KG.")
@@ -2991,6 +3012,8 @@ def register_tools(mcp: FastMCP):
         interpro_type: str | None = Field(default=None,
             description="InterPro entry type (sparse: interpro only), e.g. "
                         "'DOMAIN', 'FAMILY', 'HOMOLOGOUS_SUPERFAMILY'.")
+        module_type: str | None = Field(default=None,
+            description="KEGG module type: 'pathway' (a route) or 'signature' (a marker set). kegg_module only.")
         discussed_by_n_publications: int | None = Field(
             default=None,
             description="Publications that discuss this KEGG pathway in prose (KEGG only; None on other ontologies). Recall-biased narrative mention, NOT gene annotation. When > 0, set verbose=True for the per-paper DOI list, or call discussed_by_publication.")
@@ -3103,7 +3126,7 @@ def register_tools(mcp: FastMCP):
             "gene_count DESC (score null). See docs://guide/conventions for Lucene scoring.",
         )] = None,
         ontology: Annotated[list[OntologyKey] | OntologyKey | None, Field(
-            description="Ontology key or list. None = all 17. limit/offset "
+            description="Ontology key or list. None = all 18. limit/offset "
             "apply per ontology.",
         )] = None,
         summary: SummaryParam = False,
@@ -3125,6 +3148,7 @@ def register_tools(mcp: FastMCP):
             description="Restrict to this InterPro entry type. Applies to "
                         "'interpro' only; raises if 'interpro' is not in the set.",
         )] = None,
+        module_type: ModuleTypeParam = None,
         min_gene_count: Annotated[int | None, Field(
             description="Keep terms with gene_count >= this (subtree organism_gene_count "
                         "when `organism` is set). Works in search and browse mode.",
@@ -3132,7 +3156,7 @@ def register_tools(mcp: FastMCP):
         )] = None,
         organism: OrganismSingleParam = None,
     ) -> SearchOntologyResponse:
-        """Search (Lucene over term names) or browse (omit search_text: terms by gene_count) across one or many of the 17 ontologies.
+        """Search (Lucene over term names) or browse (omit search_text: terms by gene_count) across one or many of the 18 ontologies.
 
         Use to find term IDs or size an ontology; a term's hierarchy and bridges are `ontology_term_details`, its genes `genes_by_ontology`.
         Filters: search_text, ontology, level, tree, interpro_type, min_gene_count, organism, informative_only.
@@ -3149,6 +3173,7 @@ def register_tools(mcp: FastMCP):
                 informative_only=informative_only,
                 verbose=verbose,
                 interpro_type=interpro_type,
+                module_type=module_type,
                 min_gene_count=min_gene_count,
                 organism=organism,
                 conn=conn,
@@ -3251,6 +3276,16 @@ def register_tools(mcp: FastMCP):
         interpro_id: str | None = Field(default=None, description="Bare InterPro accession (sparse: interpro)")
         interpro_type: str | None = Field(default=None,
             description="InterPro entry type, e.g. 'FAMILY', 'DOMAIN' (sparse: interpro)")
+        module_type: str | None = Field(default=None,
+            description="KEGG module type: 'pathway' (a route) or 'signature' (a marker set). kegg_module only.")
+        module_id: str | None = Field(default=None,
+            description="Bare KEGG module ID, e.g. 'M00531' (sparse: kegg_module modules, level 3).")
+        step_count: int | None = Field(default=None,
+            description="Steps in the KEGG module definition (sparse: kegg_module modules, level 3).")
+        definition: str | None = Field(default=None,
+            description="KEGG module definition over KOs: top-level space = next step, space inside () = all of, ',' = alternatives, '+' = complex subunits, '-K' = optional (sparse: modules, level 3).")
+        complete_organism_count: int | None = Field(default=None,
+            description="Organisms whose module edge is 'complete' (sparse: kegg_module). Differs from organism_count, which counts organisms with any gene reaching the module via the KO bridge.")
         ncbifam_family_count: int | None = Field(default=None,
             description="NCBIfam families whose router link points at this TIGR role (sparse: tigr_role). A router, not gene evidence.")
         ncbifam_id: str | None = Field(default=None, description="Bare NCBIfam accession (sparse: ncbifam)")
@@ -3339,7 +3374,7 @@ def register_tools(mcp: FastMCP):
         limit: LimitParam = 50,
         offset: OffsetParam = 0,
     ) -> OntologyTermDetailsResponse:
-        """Batch term lookup across the 17 ontologies — name, level, informativeness, gene and organism counts, parents, children, forward-only cross-ontology bridges.
+        """Batch term lookup across the 18 ontologies — name, level, informativeness, gene and organism counts, parents, children, forward-only cross-ontology bridges.
 
         Use when you already hold self-prefixed term IDs; to find IDs use `search_ontology`, for the member genes `genes_by_ontology`.
         Filters: term_ids, organism, link_kinds.
@@ -3435,6 +3470,8 @@ def register_tools(mcp: FastMCP):
         interpro_type: str | None = Field(default=None,
             description="InterPro entry type (sparse: interpro only), e.g. "
                         "'DOMAIN', 'FAMILY', 'HOMOLOGOUS_SUPERFAMILY'.")
+        module_type: str | None = Field(default=None,
+            description="KEGG module type: 'pathway' (a route) or 'signature' (a marker set). kegg_module only.")
         # Trust surface — verbose axes + native detail (never a cross-ontology
         # comparison; rank within one ontology only).
         sources: list[str] | None = Field(default=None,
@@ -3659,6 +3696,7 @@ def register_tools(mcp: FastMCP):
                 "Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful."
             ),
         )] = None,
+        module_type: ModuleTypeParam = None,
         include_weak_tcdb_hits: Annotated[bool, Field(
             description=(
                 "TCDB only: also return one row per weak hit (tcdb_gate='below_gate', diamond only), tagged in tcdb_gate. Adds rows; default rows are unchanged. No-op for other ontologies."
@@ -3692,6 +3730,7 @@ def register_tools(mcp: FastMCP):
                 sources=sources, evidence=evidence,
                 max_tier=max_tier, min_evidence_score=min_evidence_score,
                 call_class=call_class, tcdb_call=tcdb_call, interpro_type=interpro_type,
+                module_type=module_type,
                 include_weak_tcdb_hits=include_weak_tcdb_hits,
                 conn=conn,
             )
@@ -3768,6 +3807,8 @@ def register_tools(mcp: FastMCP):
                         "agreement. Sparse: tcdb only.")
         interpro_type: str | None = Field(default=None,
             description="InterPro entry type (sparse: interpro only).")
+        module_type: str | None = Field(default=None,
+            description="KEGG module type: 'pathway' (a route) or 'signature' (a marker set). kegg_module only.")
         sources: list[str] | None = Field(default=None,
             description="Provenance tags on this edge (verbose only; sparse).")
         evidence_score: float | None = Field(default=None,
@@ -3943,6 +3984,7 @@ def register_tools(mcp: FastMCP):
                 "Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful."
             ),
         )] = None,
+        module_type: ModuleTypeParam = None,
         include_weak_tcdb_hits: Annotated[bool, Field(
             description=(
                 "TCDB only: also return one row per weak hit (tcdb_gate='below_gate', diamond only), tagged in tcdb_gate. Adds rows; default rows are unchanged. No-op for other ontologies."
@@ -3972,6 +4014,7 @@ def register_tools(mcp: FastMCP):
                 sources=sources, evidence=evidence,
                 max_tier=max_tier, min_evidence_score=min_evidence_score,
                 call_class=call_class, tcdb_call=tcdb_call, interpro_type=interpro_type,
+                module_type=module_type,
                 include_weak_tcdb_hits=include_weak_tcdb_hits,
                 conn=conn,
             )
@@ -6921,6 +6964,8 @@ def register_tools(mcp: FastMCP):
         tree_code: str | None = Field(default=None, description="BRITE tree code (sparse: BRITE only)")
         interpro_type: str | None = Field(default=None,
             description="InterPro entry type this stratum covers (sparse: interpro only).")
+        module_type: str | None = Field(default=None,
+            description="KEGG module type: 'pathway' (a route) or 'signature' (a marker set). kegg_module only.")
         relevance_rank: int = Field(
             description="1 = best stratum: coverage (genome, or median "
                         "experiment coverage with experiment_ids) x a size "
@@ -7003,7 +7048,7 @@ def register_tools(mcp: FastMCP):
         organism: OrganismRequiredParam,
         ontology: Annotated[
             list[OntologyKey] | OntologyKey | None,
-            Field(description="If None, surveys all 17 ontologies. Accepts a "
+            Field(description="If None, surveys all 18 ontologies. Accepts a "
                               "list; a facet carried by only some of them "
                               "drops the rest into skipped_ontologies."),
         ] = None,
@@ -7038,6 +7083,7 @@ def register_tools(mcp: FastMCP):
                 "Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful."
             ),
         )] = None,
+        module_type: ModuleTypeParam = None,
     ) -> OntologyLandscapeResponse:
         """Rank (ontology × level) strata by enrichment suitability — term sizes, genome coverage, relevance_rank.
 
@@ -7059,6 +7105,7 @@ def register_tools(mcp: FastMCP):
                 tree=tree,
                 informative_only=informative_only,
                 call_class=call_class, tcdb_call=tcdb_call, interpro_type=interpro_type,
+                module_type=module_type,
                 conn=conn,
             )
             response = OntologyLandscapeResponse(**data)
@@ -7158,6 +7205,7 @@ def register_tools(mcp: FastMCP):
                 "Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful."
             ),
         )] = None,
+        module_type: ModuleTypeParam = None,
     ) -> PathwayEnrichmentResponse:
         """Over-representation analysis (Fisher + BH) over DE gene sets in ONE organism — one test per experiment × timepoint × direction × term.
 
@@ -7197,6 +7245,7 @@ def register_tools(mcp: FastMCP):
                 sources=sources, evidence=evidence,
                 max_tier=max_tier, min_evidence_score=min_evidence_score,
                 call_class=call_class, tcdb_call=tcdb_call, interpro_type=interpro_type,
+                module_type=module_type,
                 conn=conn,
             )
         except ValueError as e:
@@ -7284,6 +7333,7 @@ def register_tools(mcp: FastMCP):
                 "Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful."
             ),
         )] = None,
+        module_type: ModuleTypeParam = None,
     ) -> ClusterEnrichmentResponse:
         """Over-representation analysis (Fisher + BH) over one clustering analysis in ONE organism — one test per cluster × term.
 
@@ -7321,6 +7371,7 @@ def register_tools(mcp: FastMCP):
                 sources=sources, evidence=evidence,
                 max_tier=max_tier, min_evidence_score=min_evidence_score,
                 call_class=call_class, tcdb_call=tcdb_call, interpro_type=interpro_type,
+                module_type=module_type,
                 conn=conn,
             )
         except ValueError as e:

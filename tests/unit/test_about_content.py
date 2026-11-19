@@ -626,7 +626,7 @@ class TestOntologyReferenceDocs:
             for p, n, line, tok in violations]
 
     def test_lint_matrix_is_not_vacuous(self):
-        assert len(list(_ONTOLOGY_DOCS_DIR.glob("*.md"))) == 18
+        assert len(list(_ONTOLOGY_DOCS_DIR.glob("*.md"))) == 19  # 18 ontology pages + index; 18 -> 19 with kegg_module (kegg-module-ontology spec)
 
 
 class TestOntologiesGeneratorStage:

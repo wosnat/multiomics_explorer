@@ -71,7 +71,11 @@
 
 - pattern: '\b(?:14|15|16) ontologies\b'
   reason: "ontology count predates InterPro / NCBIfam / MEROPS registration"
-  replacement: "17 ontologies (ONTOLOGY_CONFIG)"
+  replacement: "18 ontologies (ONTOLOGY_CONFIG)"
+
+- pattern: '\b17 ontologies\b'
+  reason: "ontology count predates the kegg_module ontology"
+  replacement: "18 ontologies (ONTOLOGY_CONFIG)"
 
 - pattern: '\b41 tools\b'
   reason: "tool count from before the 42nd tool"

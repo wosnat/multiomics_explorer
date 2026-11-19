@@ -1371,6 +1371,7 @@ class TestOntologyConfig:
             "brite", "tcdb", "cazy",
             "subcellular_localization", "signal_peptide_type",
             "interpro", "ncbifam", "merops",
+            "kegg_module",  # 18th ontology (kegg-module-ontology spec)
         }
 
     def test_required_fields_present(self):
@@ -5495,6 +5496,7 @@ def test_all_ontologies_matches_config_keys():
         "brite", "tcdb", "cazy",
         "subcellular_localization", "signal_peptide_type",
         "interpro", "ncbifam", "merops",
+        "kegg_module",  # appended, never inserted (kegg-module-ontology spec)
     ]
 
 
@@ -12606,11 +12608,12 @@ class TestBuildOntologyTermDetails:
         cypher, _ = _otd3b()
         assert f"t:{label}" in cypher
 
-    def test_label_guard_covers_exactly_18_labels(self):
+    def test_label_guard_covers_exactly_19_labels(self):
         cypher, _ = _otd3b()
         guarded = set(_re3b.findall(r"\bt:([A-Za-z]+)", cypher))
         assert set(_ALL_TERM_LABELS_3B) <= guarded
-        assert len(_ALL_TERM_LABELS_3B) == 18
+        # 18 ontology labels + PfamClan; 18 -> 19 with KeggModule (kegg-module-ontology spec)
+        assert len(_ALL_TERM_LABELS_3B) == 19
 
     def test_lookup_is_optional_so_missing_ids_survive(self):
         cypher, _ = _otd3b()

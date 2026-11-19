@@ -16,7 +16,7 @@ Usage:
     uv run python scripts/build_about_content.py --skeleton search_genes  # generate input YAML skeleton
     uv run python scripts/build_about_content.py --ontologies        # per-ontology reference only
 
-The default / ``--all`` build also runs the ``ontologies`` stage: 17
+The default / ``--all`` build also runs the ``ontologies`` stage: 18
 hand-authored ``inputs/ontologies/{key}.yaml`` files (keys =
 ``ONTOLOGY_CONFIG`` keys) are merged with the registry row, the
 ``config/schema_baseline.yaml`` node properties and — when a KG is
@@ -866,6 +866,7 @@ ONTOLOGY_DISPLAY_NAMES = {
     "interpro": "InterPro entries",
     "ncbifam": "NCBIfam families",
     "merops": "MEROPS peptidase families",
+    "kegg_module": "KEGG modules (module classes, modules)",
 }
 
 # One-clause semantics for node props that recur across labels. Anything not
@@ -917,6 +918,11 @@ _NODE_PROP_NOTES = {
     "cleavage_summary": "MEROPS cleavage-site specificity summary text (sparse; family level)",
     "cleavage_p1_residues": "residues MEROPS reports at the P1 cleavage position (sparse; family level)",
     "known_cleavage_count": "number of MEROPS-recorded cleavage sites behind the specificity summary (sparse)",
+    "module_type": "KEGG module type: `pathway` (a route) or `signature` (a marker set); class nodes carry their tree's type — the `module_type=` facet value",
+    "module_id": "bare KEGG module id (e.g. `M00531`); modules only — class nodes have house slug ids",
+    "definition": "KEGG's module formula over KOs, verbatim (top-level space = step, space inside `()` = AND, `,` = OR, `+` = complex subunit, `-K` = optional subunit); modules only",
+    "step_count": "steps in the module definition; modules only",
+    "complete_organism_count": "organisms whose genome has every step of a module in this subtree annotated; differs from `organism_count` (KO-bridge genes)",
 }
 
 
@@ -930,6 +936,7 @@ ONTOLOGY_LEVEL_RANGES: dict[str, tuple[int, int]] = {
     "brite": (0, 3), "tcdb": (0, 4), "cazy": (0, 1),
     "subcellular_localization": (0, 0), "signal_peptide_type": (0, 0),
     "interpro": (0, 2), "ncbifam": (0, 0), "merops": (0, 2),
+    "kegg_module": (0, 3),
 }
 
 # `list_filter_values` filter types owned by one ontology (rendered with
@@ -1453,7 +1460,7 @@ def render_ontology_index(inputs: dict) -> str:
 def build_ontologies(*, live_vocab: bool = False) -> int:
     """Render every ``inputs/ontologies/*.yaml`` into ``references/ontologies/``.
 
-    Returns the number of pages written (17 + index on a complete input set).
+    Returns the number of pages written (18 + index on a complete input set).
     """
     from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
 
@@ -2009,6 +2016,7 @@ _ONTOLOGY_PROSE_ALIASES = {
     "interpro": ("InterPro",),
     "ncbifam": ("NCBIfam",),
     "merops": ("MEROPS",),
+    "kegg_module": ("KEGG module", "KEGG modules"),
 }
 
 _FLAT_TRIGGER_RE = re.compile(

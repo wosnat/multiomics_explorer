@@ -112,6 +112,7 @@ ONTOLOGY_CONFIG = {
         "term_details_verbose": "*",
         "bridges_out": [
             ("Kegg_term_in_brite_category", "brite", "membership"),
+            ("Kegg_term_in_kegg_module", "kegg_module", "membership"),
         ],
     },
     "cog_category": {
@@ -340,6 +341,30 @@ ONTOLOGY_CONFIG = {
         "term_details_verbose": "*",
         "bridges_out": [
             ("Merops_family_has_pfam_domain", "pfam", "composition"),
+        ],
+    },
+    "kegg_module": {
+        "label": "KeggModule",
+        "gene_rel": "Gene_has_kegg_ko",
+        "hierarchy_rels": ["Kegg_module_is_a_kegg_module"],
+        "fulltext_index": "keggModuleFullText",
+        "bridge": {"node_label": "KeggTerm", "edge": "Kegg_term_in_kegg_module"},
+        # binds `r` on Gene_has_kegg_ko, so it carries KEGG's trust axes (as BRITE)
+        "trust": dict(_TRUST_SOURCES_EVIDENCE),
+        # Third facet (after BRITE `tree`, InterPro `interpro_type`). Dense on
+        # every level in the KG, so binding on `t` works at any level. The facet
+        # machinery adds the `module_type` column to term / gene / landscape rows.
+        "facet": {"prop": "module_type", "param": "module_type"},
+        "term_compact": ["gene_count", "organism_count"],
+        # module_id / step_count / definition / direct_gene_count live on
+        # level-3 modules only (strip rule: absent on class rows).
+        "term_details_compact": [
+            "module_type", "module_id", "step_count", "definition",
+            "direct_gene_count", "complete_organism_count",
+        ],
+        "term_details_verbose": "*",
+        "bridges_out": [
+            ("Kegg_module_in_kegg_pathway", "kegg", "membership"),
         ],
     },
 }
@@ -669,6 +694,7 @@ def _resolve_facet(
     *,
     tree: str | None = None,
     interpro_type: str | None = None,
+    module_type: str | None = None,
 ) -> tuple[str, str, str] | None:
     """Validate the facet params and return (prop, param, value) or None.
 
@@ -676,7 +702,9 @@ def _resolve_facet(
     and bound on `t` AFTER the hierarchy walk. Passing a facet param to an
     ontology that does not own it raises ValueError.
     """
-    requested = {"tree": tree, "interpro_type": interpro_type}
+    requested = {
+        "tree": tree, "interpro_type": interpro_type, "module_type": module_type,
+    }
     resolved: tuple[str, str, str] | None = None
     for param, value in requested.items():
         if value is None:
@@ -4237,6 +4265,7 @@ def build_search_ontology_summary(
     tree: str | None = None,
     informative_only: bool = False,
     interpro_type: str | None = None,
+    module_type: str | None = None,
     min_gene_count: int | None = None,
     organism: str | None = None,
 ) -> tuple[str, dict]:
@@ -4256,7 +4285,9 @@ def build_search_ontology_summary(
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
-    facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
+    facet = _resolve_facet(
+        ontology, tree=tree, interpro_type=interpro_type, module_type=module_type,
+    )
     cfg = ONTOLOGY_CONFIG[ontology]
     index_name = cfg["fulltext_index"]
     parent_index = cfg.get("parent_fulltext_index")
@@ -4372,6 +4403,7 @@ def build_search_ontology(
     informative_only: bool = False,
     verbose: bool = False,
     interpro_type: str | None = None,
+    module_type: str | None = None,
     min_gene_count: int | None = None,
     organism: str | None = None,
 ) -> tuple[str, dict]:
@@ -4405,7 +4437,9 @@ def build_search_ontology(
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
-    facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
+    facet = _resolve_facet(
+        ontology, tree=tree, interpro_type=interpro_type, module_type=module_type,
+    )
     cfg = ONTOLOGY_CONFIG[ontology]
     term_name = _term_name_cypher(cfg)
     index_name = cfg["fulltext_index"]
@@ -4641,6 +4675,7 @@ def _genes_by_ontology_match_stage(
     call_class: list[str] | None = None,
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    module_type: str | None = None,
     include_weak_tcdb_hits: bool = False,
     collapse: bool = True,
     carry_edges: bool = False,
@@ -4672,7 +4707,7 @@ def _genes_by_ontology_match_stage(
     Trust filters (`sources` / `evidence` / `max_tier` / `min_evidence_score` /
     `call_class`) bind on the gene→leaf relationship `r`, BEFORE the hierarchy
     walk and BEFORE `collect(DISTINCT g)`, so per-term gene-set sizes reflect
-    the filtered edges (spec §7.1). Facets (`tree`, `interpro_type`) bind on
+    the filtered edges (spec §7.1). Facets (`tree`, `interpro_type`, `module_type`) bind on
     `t`: after the walk UP in level mode, and on the input term itself in
     term_ids mode (where the facet narrows the caller's own list rather than
     the walk). Enrichment reaches the same filters through this stage.
@@ -4685,7 +4720,9 @@ def _genes_by_ontology_match_stage(
     Consumers are responsible for adding $min_gene_set_size / $max_gene_set_size
     into params, and for appending their own UNWIND/RETURN tail.
     """
-    facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
+    facet = _resolve_facet(
+        ontology, tree=tree, interpro_type=interpro_type, module_type=module_type,
+    )
     trust_frag, trust_params = build_trust_filter_clause(
         ontology, sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
@@ -4752,6 +4789,14 @@ def _genes_by_ontology_match_stage(
             # Single-label: walk DOWN from root to leaf to gene.
             # Flat ontologies: no walk, leaf = t.
             trust_where = f"WHERE {trust_frag}\n" if trust_frag else ""
+            # A bridged ontology (BRITE, kegg_module) reaches its leaf through
+            # the bridge node (gene -> KO -> leaf); `r` stays the gene edge
+            # so trust / gate / organism predicates bind unchanged (2d.10).
+            bridge = _ontology_cfg(ontology).get("bridge")
+            bridge_hop = (
+                f"->(:{bridge['node_label']})-[:{bridge['edge']}]"
+                if bridge else ""
+            )
             if walk:
                 cypher_head = (
                     "UNWIND $term_ids AS input_tid\n"
@@ -4759,7 +4804,7 @@ def _genes_by_ontology_match_stage(
                     f"{facet_where}"
                     f"{walk}\n"
                     f"MATCH {gene_node}"
-                    f"-[r:{frag['gene_rel']}]->(leaf)\n"
+                    f"-[r:{frag['gene_rel']}]{bridge_hop}->(leaf)\n"
                     f"{trust_where}"
                 )
             else:
@@ -4864,6 +4909,7 @@ def build_genes_by_ontology_detail(
     call_class: list[str] | None = None,
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    module_type: str | None = None,
     include_weak_tcdb_hits: bool = False,
 ) -> tuple[str, dict]:
     """Build the (gene × term) detail query for one page of buckets (2d.4 C6).
@@ -4885,7 +4931,7 @@ def build_genes_by_ontology_detail(
 
     Trust filters (`sources` / `evidence` / `max_tier` / `min_evidence_score` /
     `call_class` / `tcdb_call`) bind on the gene→leaf relationship `r`.
-    Facets (`tree`, `interpro_type`) bind on `t`. On a hierarchical ontology
+    Facets (`tree`, `interpro_type`, `module_type`) bind on `t`. On a hierarchical ontology
     the trust columns come from the gene's best edge under `t` via the
     one-edge-per-(gene, term) rebind (spec §7.2).
 
@@ -4922,6 +4968,7 @@ def build_genes_by_ontology_detail(
         sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
         interpro_type=interpro_type,
+        module_type=module_type,
         include_weak_tcdb_hits=include_weak_tcdb_hits,
         collapse=False,
     )
@@ -5055,7 +5102,7 @@ def build_ontology_term_details(
     """Build the batch term-details query (spec §7.5).
 
     One `UNWIND $term_ids` over a cross-ontology batch; the lookup is an
-    OPTIONAL MATCH guarded by an OR over every registry label (17 `label`s +
+    OPTIONAL MATCH guarded by an OR over every registry label (18 `label`s +
     `PfamClan`) so an unknown id survives as `not_found = true`. Rows come
     back in input order.
 
@@ -5227,6 +5274,7 @@ def build_genes_by_ontology_trust_rollups(
     call_class: list[str] | None = None,
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    module_type: str | None = None,
     include_weak_tcdb_hits: bool = False,
     buckets: list[dict] | None = None,
 ) -> tuple[str, dict]:
@@ -5291,6 +5339,7 @@ def build_genes_by_ontology_trust_rollups(
         sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
         interpro_type=interpro_type,
+        module_type=module_type,
         include_weak_tcdb_hits=include_weak_tcdb_hits,
         collapse=not head_edges, carry_edges=head_edges,
     )
@@ -5439,6 +5488,7 @@ def build_genes_by_ontology_per_term(
     call_class: list[str] | None = None,
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    module_type: str | None = None,
     include_weak_tcdb_hits: bool = False,
 ) -> tuple[str, dict]:
     """Per-bucket aggregate (Query A). One row per surviving (organism, term).
@@ -5466,6 +5516,7 @@ def build_genes_by_ontology_per_term(
         sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
         interpro_type=interpro_type,
+        module_type=module_type,
         include_weak_tcdb_hits=include_weak_tcdb_hits,
     )
     params["min_gene_set_size"] = min_gene_set_size
@@ -5506,6 +5557,7 @@ def build_genes_by_ontology_per_gene(
     call_class: list[str] | None = None,
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    module_type: str | None = None,
     include_weak_tcdb_hits: bool = False,
 ) -> tuple[str, dict]:
     """Per-gene aggregate. One row per surviving gene.
@@ -5530,6 +5582,7 @@ def build_genes_by_ontology_per_gene(
         sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
         interpro_type=interpro_type,
+        module_type=module_type,
         include_weak_tcdb_hits=include_weak_tcdb_hits,
     )
     params["min_gene_set_size"] = min_gene_set_size
@@ -5659,6 +5712,7 @@ def build_gene_ontology_terms_summary(
     call_class: list[str] | None = None,
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    module_type: str | None = None,
     include_weak_tcdb_hits: bool = False,
 ) -> tuple[str, dict]:
     """Build summary for gene_ontology_terms for ONE ontology.
@@ -5686,7 +5740,9 @@ def build_gene_ontology_terms_summary(
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
     if mode == "rollup" and level is None:
         raise ValueError("level is required when mode='rollup'")
-    facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
+    facet = _resolve_facet(
+        ontology, tree=tree, interpro_type=interpro_type, module_type=module_type,
+    )
     trust_frag, trust_params = build_trust_filter_clause(
         ontology, sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
@@ -5860,6 +5916,7 @@ def build_gene_ontology_terms(
     call_class: list[str] | None = None,
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    module_type: str | None = None,
     include_weak_tcdb_hits: bool = False,
 ) -> tuple[str, dict]:
     """Build detail Cypher for gene_ontology_terms for ONE ontology.
@@ -5900,7 +5957,9 @@ def build_gene_ontology_terms(
         raise ValueError(f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}")
     if mode == "rollup" and level is None:
         raise ValueError("level is required when mode='rollup'")
-    facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
+    facet = _resolve_facet(
+        ontology, tree=tree, interpro_type=interpro_type, module_type=module_type,
+    )
     trust_frag, trust_params = build_trust_filter_clause(
         ontology, sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
@@ -8570,6 +8629,7 @@ def build_ontology_landscape(
     call_class: list[str] | None = None,
     tcdb_call: list[str] | None = None,
     interpro_type: str | None = None,
+    module_type: str | None = None,
 ) -> tuple[str, dict]:
     """Per-(ontology, level[, facet]) aggregated landscape stats for one ontology.
 
@@ -8590,14 +8650,16 @@ def build_ontology_landscape(
     RETURN keys: level, tree, tree_code, n_terms_with_genes, n_genes_at_level,
     min_genes_per_term, q1_genes_per_term, median_genes_per_term,
     q3_genes_per_term, max_genes_per_term, n_best_effort.
-    InterPro adds: interpro_type.
+    InterPro adds: interpro_type; kegg_module adds: module_type.
     Verbose adds: example_terms (list of {term_id, name, n_genes}).
     """
     if ontology not in ONTOLOGY_CONFIG:
         raise ValueError(
             f"Invalid ontology '{ontology}'. Valid: {sorted(ONTOLOGY_CONFIG)}"
         )
-    facet = _resolve_facet(ontology, tree=tree, interpro_type=interpro_type)
+    facet = _resolve_facet(
+        ontology, tree=tree, interpro_type=interpro_type, module_type=module_type,
+    )
     trust_frag, trust_params = build_trust_filter_clause(
         ontology, sources=sources, evidence=evidence, max_tier=max_tier,
         min_evidence_score=min_evidence_score, call_class=call_class, tcdb_call=tcdb_call,
@@ -8616,7 +8678,8 @@ def build_ontology_landscape(
     # per-term aggregation.
     bind_up = frag["bind_up"] + (f"\nWHERE {trust_frag}" if trust_frag else "")
 
-    # Facet filter (BRITE `tree`, InterPro `interpro_type`): applied after the
+    # Facet filter (BRITE `tree`, InterPro `interpro_type`, kegg_module
+    # `module_type`): applied after the
     # hierarchy walk, before per-term aggregation. Flat ontologies own no
     # facet, so this never collides with the trust WHERE on the same MATCH.
     facet_filter = ""

@@ -1,0 +1,53 @@
+case_id: search_ontology_kegg_module_nitrate
+row_count: 5
+rows:
+- gene_count: 13
+  id: kegg.module:M00529
+  is_informative: true
+  level: 3
+  module_type: pathway
+  name: Denitrification, nitrate => nitrogen
+  organism_count: 3
+  score: 2.5167
+  tree: null
+  tree_code: null
+- gene_count: 35
+  id: kegg.module:M00530
+  is_informative: true
+  level: 3
+  module_type: pathway
+  name: Dissimilatory nitrate reduction, nitrate => ammonia
+  organism_count: 14
+  score: 2.8894
+  tree: null
+  tree_code: null
+- gene_count: 144
+  id: kegg.module:M00531
+  is_informative: true
+  level: 3
+  module_type: pathway
+  name: Assimilatory nitrate reduction, nitrate => ammonia
+  organism_count: 82
+  score: 2.8894
+  tree: null
+  tree_code: null
+- gene_count: 166
+  id: kegg.module:M00615
+  is_informative: true
+  level: 3
+  module_type: signature
+  name: Nitrate assimilation
+  organism_count: 71
+  score: 2.7607
+  tree: null
+  tree_code: null
+- gene_count: 4
+  id: kegg.module:M00804
+  is_informative: true
+  level: 3
+  module_type: pathway
+  name: Complete nitrification, comammox, ammonia => nitrite => nitrate
+  organism_count: 2
+  score: 1.9892
+  tree: null
+  tree_code: null

@@ -77,6 +77,7 @@ mistakes:
   - "`min/max_gene_set_size` is the pathway M filter (per-cluster, clusterProfiler semantics). `min/max_cluster_size` is the cluster membership filter."
   - "`ontology='brite'` requires `tree=` (raises without it). Use `list_filter_values('brite_tree')` to discover trees."
   - "When a KEGG pathway is significantly enriched in a cluster, drill into its chemistry via `list_metabolites(pathway_ids=[<term_id>])`. The cluster's gene-KO membership and the pathway's compound-membership reach the same KEGG map via different relations — name the anchor when answering. See docs://analysis/metabolites."
+  - "`ontology='kegg_module', level=3` is module ORA; `module_type` is optional (default pools routes and signature marker sets; `module_type='pathway'` keeps routes only)."
   - "`ontology='interpro'` requires `interpro_type` (one of the 8 InterPro types) — omitting it raises. Trust filters (`sources`, `evidence`, `max_tier`, `min_evidence_score`, `call_class`, `tcdb_call`) shape the per-cluster TERM2GENE mapping identically to `pathway_enrichment`; defaults never filter. See `docs://analysis/annotation_evidence`."
   - wrong: "cluster_enrichment(..., background='table_scope')  # not valid"
     right: "cluster_enrichment(..., background='cluster_union')  # or 'organism', 'annotated', or a locus_tag list"

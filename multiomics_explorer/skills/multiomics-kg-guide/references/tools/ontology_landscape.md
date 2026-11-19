@@ -14,7 +14,7 @@ docs://tools/ontology_landscape.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') \| list[string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops')] \| None | None | If None, surveys all 17 ontologies. Accepts a list; a facet carried by only some of them drops the rest into skipped_ontologies. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops', 'kegg_module') \| list[string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops', 'kegg_module')] \| None | None | If None, surveys all 18 ontologies. Accepts a list; a facet carried by only some of them drops the rest into skipped_ontologies. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Narrows brite and leaves any other ontology in the list untouched; raises when brite is not among them. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | experiment_ids | list[string] \| None | None | Restrict coverage computation to genes quantified in these experiments. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
@@ -27,6 +27,7 @@ docs://tools/ontology_landscape.
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
 | tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked, so an ancestor-term row reports a surviving call kind. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
+| module_type | string ('pathway', 'signature') \| None | None | KEGG module type (kegg_module only): 'pathway' = routes, 'signature' = marker sets such as drug resistance. Default both. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -44,7 +45,7 @@ ontology_landscape(organism="MED4")
 organism_name, organism_gene_count, n_ontologies, by_ontology, not_found, not_matched, total_matching, returned, truncated, offset, filters_applied, trust_axes, skipped_ontologies, warnings, results
 ```
 
-Result row: `ontology_type, level, tree, tree_code, interpro_type, relevance_rank, n_terms_with_genes, n_genes_at_level, genome_coverage, min_genes_per_term, q1_genes_per_term, median_genes_per_term, …`
+Result row: `ontology_type, level, tree, tree_code, interpro_type, module_type, relevance_rank, n_terms_with_genes, n_genes_at_level, genome_coverage, min_genes_per_term, q1_genes_per_term, …`
 
 ## Common mistakes
 

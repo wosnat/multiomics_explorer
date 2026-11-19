@@ -435,6 +435,21 @@ schema:
         time_point_totals: list
         treatment: string
         treatment_type: list
+    KeggModule:
+      properties:
+        complete_organism_count: int
+        definition: string
+        direct_gene_count: int
+        gene_count: int
+        id: string
+        level: int
+        level_kind: string
+        module_id: string
+        module_type: string
+        name: string
+        organism_count: int
+        preferred_id: string
+        step_count: int
     KeggTerm:
       properties:
         direct_gene_count: int
@@ -578,6 +593,22 @@ schema:
       properties:
         name_synonyms: list
         taxonomy_note: string
+        assembly_current_accession: string
+        assembly_level: string
+        assembly_name: string
+        assembly_release_date: string
+        assembly_report_date: string
+        assembly_status: string
+        assembly_suppression_reason: string
+        checkm_completeness: float
+        checkm_contamination: float
+        checkm_marker_set: string
+        checkm_marker_set_rank: string
+        checkm_version: string
+        contig_count: int
+        contig_n50: int
+        gc_percent: float
+        genome_length: int
         background_factors: list
         catalyzed_metabolite_count: int
         clade: string
@@ -766,6 +797,7 @@ schema:
         git_sha: string
         git_sha_short: string
         id: string
+        kegg_release: string
         mcp_min_version: string
         organism_count: int
         paper_count: int
@@ -1551,6 +1583,28 @@ schema:
       - NamedThing
       properties:
         id: string
+    Kegg_module_in_kegg_pathway:
+      source_labels:
+      - Entity
+      - KeggModule
+      - NamedThing
+      target_labels:
+      - Entity
+      - KeggTerm
+      - NamedThing
+      properties:
+        id: string
+    Kegg_module_is_a_kegg_module:
+      source_labels:
+      - Entity
+      - KeggModule
+      - NamedThing
+      target_labels:
+      - Entity
+      - KeggModule
+      - NamedThing
+      properties:
+        id: string
     Kegg_term_in_brite_category:
       source_labels:
       - Entity
@@ -1562,6 +1616,19 @@ schema:
       - NamedThing
       properties:
         id: string
+    Kegg_term_in_kegg_module:
+      source_labels:
+      - Entity
+      - KeggTerm
+      - NamedThing
+      target_labels:
+      - Entity
+      - KeggModule
+      - NamedThing
+      properties:
+        component: string
+        id: string
+        steps: list
     Kegg_term_is_a_kegg_term:
       source_labels:
       - Entity
@@ -1718,6 +1785,26 @@ schema:
       - NamedThing
       properties:
         id: string
+    Organism_has_kegg_module:
+      source_labels:
+      - Entity
+      - NamedThing
+      - OrganismTaxon
+      target_labels:
+      - Entity
+      - KeggModule
+      - NamedThing
+      properties:
+        ec_filled_step_indices: list
+        ec_genes: list
+        id: string
+        missing_kos: list
+        missing_step_definitions: list
+        missing_step_indices: list
+        status: string
+        steps_present: int
+        steps_present_via_ec: int
+        steps_total: int
     Organism_has_metabolite:
       source_labels:
       - Entity

@@ -1,7 +1,7 @@
 # Annotation trust — reading "why do we believe this"
 
 LLM-facing guide to the trust surface that sits on every gene→ontology-term
-annotation across all 17 supported ontologies. Every `Gene_has_*` /
+annotation across all 18 supported ontologies. Every `Gene_has_*` /
 `Gene_involved_in_*` / `Gene_catalyzes_*` edge carries some subset of the
 facts below; this page tells you which ontology carries which fact, where it
 lives (compact row / verbose row / filter param), and how to use it without
@@ -36,10 +36,10 @@ Facts with the *same meaning* wherever they occur:
   `diamond_tier`, identity band on `diamond_best_hit`, null on eggNOG. Never
   compare across kinds.
 
-Where they live: `evidence` is compact on every row of the 15 functional-edge
-ontologies — all but PSORTb / SignalP, which carry no trust axes (brite
-shares kegg's `Gene_has_kegg_ko` edge, so 14 distinct edge types serve 15
-ontologies). `sources`,
+Where they live: `evidence` is compact on every row of the 16 functional-edge
+ontologies — all but PSORTb / SignalP, which carry no trust axes (brite and
+kegg_module share kegg's `Gene_has_kegg_ko` edge, so 14 distinct edge types
+serve these 16). `sources`,
 `evidence_score`, `tier` are verbose. All four are filterable (`sources=`,
 `evidence=`, `max_tier=`, `min_evidence_score=`), default `None` — a call with
 no trust filters returns exactly what it always did.
@@ -86,7 +86,7 @@ confidence:
 Why one compact column and not four: rollups already carry the distribution
 (`by_evidence`, `by_tier`, `by_sources`), so the per-row payload only needs
 the one axis an agent can read on **every** functional-edge row —
-`evidence`. `evidence_score` is null on most of the 15 (only MEROPS,
+`evidence`. `evidence_score` is null on most of the 16 (only MEROPS,
 GO×3, EC, Pfam, CAZy carry it), so it moved to verbose and kept its role as
 the within-ontology sort key and the *only* numeric cutoff in the whole
 surface (`min_evidence_score`).
@@ -135,6 +135,7 @@ edge is 0.333 (single source, transferred). The per-ontology pages
 | `cyanorak_role` | sources, evidence | — | — | — | — |
 | `pfam` | sources, evidence, evidence_score | — | — | — | — |
 | `brite` | (inherits kegg's — the gene edge is `Gene_has_kegg_ko`) | — | — | — | `tree` |
+| `kegg_module` | (inherits kegg's — the gene edge is `Gene_has_kegg_ko`) | — | — | — | `module_type` |
 | `tcdb` | sources, evidence, tier | `tcdb_call` (best hit → tier → eggNOG), then identity | `tcdb_call`, `tcdb_gate`, `tcdb_calls` | identity, qcov, evalue, tcdb_scov, tcdb_best_hit_rank, tcdb_bitscore, tcdb_bitscore_ratio | — |
 | `cazy` | sources, evidence, evidence_score | — | — | — | — |
 | `subcellular_localization` (PSORTb) | *none* | — | — | localization_score | — |
@@ -270,7 +271,7 @@ On `gene_ontology_terms` and `ontology_landscape`, a trust filter carried by
 every requested ontology applies normally; carried by some but not all
 applies to those and drops the rest into `skipped_ontologies` with a
 warning; carried by none raises. A **facet** — `interpro_type` for InterPro,
-`tree` for BRITE — behaves differently: it narrows its own ontology and
+`tree` for BRITE, `module_type` for KEGG modules — behaves differently: it narrows its own ontology and
 leaves the others untouched (nothing is skipped), and raises when its owner
 is not in the list at all.
 

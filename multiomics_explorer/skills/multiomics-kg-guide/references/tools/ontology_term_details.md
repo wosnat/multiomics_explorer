@@ -2,7 +2,7 @@
 
 ## What it does
 
-Batch term lookup across the 17 ontologies — name, level, informativeness, gene and organism counts, parents, children, forward-only cross-ontology bridges.
+Batch term lookup across the 18 ontologies — name, level, informativeness, gene and organism counts, parents, children, forward-only cross-ontology bridges.
 
 Use when you already hold self-prefixed term IDs; to find IDs use `search_ontology`, for the member genes `genes_by_ontology`.
 Filters: term_ids, organism, link_kinds.

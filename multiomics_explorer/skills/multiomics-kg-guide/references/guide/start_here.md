@@ -101,16 +101,16 @@ This is **cross-feeding**: pair one organism's production with another's uptake 
 3. Compare the two gene sets per metabolite. Full tree + the undirected-reaction caveat: `docs://analysis/metabolites`.
 
 ### "Which genes belong to BRITE category / TCDB family / CAZy family / InterPro entry / MEROPS clan X?"
-- `genes_by_ontology(ontology=..., term_ids=[...], organism=...)` builds the TERM2GENE for any of the 17 ontologies. BRITE: scope with `tree=` (`list_filter_values(filter_type='brite_tree')`).
+- `genes_by_ontology(ontology=..., term_ids=[...], organism=...)` builds TERM2GENE for any of the 18 ontologies. BRITE: scope with `tree=` (`list_filter_values(filter_type='brite_tree')`). KEGG modules: optional `module_type=`.
 - **Substrate-anchored TCDB** ("which genes transport metabolite Y", not "which genes are in family X")? Use `genes_by_metabolite` instead.
-- Trust filters (`sources=`, `evidence=`, `max_tier=`, `min_evidence_score=`, `call_class=` (MEROPS), `tcdb_call=` (TCDB), `interpro_type=`) on 15 of the 17; rank-vs-filter rule + per-ontology axes: `docs://analysis/annotation_evidence`.
+- Trust filters (`sources=`, `evidence=`, `max_tier=`, `min_evidence_score=`, `call_class=` (MEROPS), `tcdb_call=` (TCDB), `interpro_type=`) on 16 of the 18; rank-vs-filter rule + per-ontology axes: `docs://analysis/annotation_evidence`.
 - No term ID yet? `search_ontology(ontology=['tcdb'], level=2)` browses by size. Have the ID? `ontology_term_details(term_ids=[...])`. Per-ontology semantics: `docs://ontologies/{key}`.
 
 ### "Are transporters as a class responding to this condition?"
 This is **DE by functional class**: roll a DE result up to an ontology family instead of reading gene-by-gene.
 1. `genes_by_ontology(ontology='tcdb', level=0, organism=...)` — TERM2GENE: every gene under a top-level TCDB family.
 2. Pull those `locus_tags` into `differential_expression_by_gene(locus_tags=[...], experiment_ids=[...])` for row-level fold changes, or `pathway_enrichment(experiment_ids=[...], organism=..., ontology='tcdb', level=0)` for a class-level test.
-3. Swap `ontology='tcdb'` for any other of the 17 to ask the same question of a different functional grouping.
+3. Swap `ontology='tcdb'` for any other of the 18 for another grouping.
 
 ### "This gene has a Pfam domain / InterPro entry — which transporter, peptidase or TIGR role does that point to?"
 This is **bridge walking**: `ontology_term_details(term_ids=[...]).links_out[]` (`link_kind` = `composition` / `membership` / `router`; definitions: `docs://tools/ontology_term_details/full`).

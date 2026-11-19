@@ -14,7 +14,7 @@ docs://tools/ontology_landscape.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | organism | string | — | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
-| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops') \| list[string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops')] \| None | None | If None, surveys all 17 ontologies. Accepts a list; a facet carried by only some of them drops the rest into skipped_ontologies. |
+| ontology | string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops', 'kegg_module') \| list[string ('go_bp', 'go_mf', 'go_cc', 'ec', 'kegg', 'cog_category', 'cyanorak_role', 'tigr_role', 'pfam', 'brite', 'tcdb', 'cazy', 'subcellular_localization', 'signal_peptide_type', 'interpro', 'ncbifam', 'merops', 'kegg_module')] \| None | None | If None, surveys all 18 ontologies. Accepts a list; a facet carried by only some of them drops the rest into skipped_ontologies. |
 | tree | string \| None | None | BRITE tree name filter (e.g. 'transporters'). Narrows brite and leaves any other ontology in the list untouched; raises when brite is not among them. See docs://guide/conventions for the BRITE-tree scoping rule. |
 | experiment_ids | list[string] \| None | None | Restrict coverage computation to genes quantified in these experiments. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
@@ -27,6 +27,7 @@ docs://tools/ontology_landscape.
 | call_class | list[string ('peptidase', 'inhibitor', 'nonpeptidase_homolog')] \| None | None | MEROPS peptidase-call filter: keep rows whose call_class is in this list. Merops only; unfiltered mixes in catalytically-dead nonpeptidase_homolog rows. |
 | tcdb_call | list[string] \| None | None | TCDB only: keep edges whose tcdb_call is in this list, applied before the representative edge is picked, so an ancestor-term row reports a surviving call kind. Values: list_filter_values('tcdb_call'). |
 | interpro_type | string ('FAMILY', 'DOMAIN', 'HOMOLOGOUS_SUPERFAMILY', 'REPEAT', 'CONSERVED_SITE', 'ACTIVE_SITE', 'BINDING_SITE', 'PTM') \| None | None | Restrict to this InterPro entry type (e.g. 'DOMAIN', 'FAMILY'). InterPro only; required on interpro enrichment/landscape strata - ranking across mixed entry types is not meaningful. |
+| module_type | string ('pathway', 'signature') \| None | None | KEGG module type (kegg_module only): 'pathway' = routes, 'signature' = marker sets such as drug resistance. Default both. |
 
 **Discovery:** use `list_organisms` for valid organism names.
 
@@ -62,6 +63,7 @@ organism_name, organism_gene_count, n_ontologies, by_ontology, not_found, not_ma
 | tree | string \| None (optional) | BRITE tree name (sparse: BRITE only) |
 | tree_code | string \| None (optional) | BRITE tree code (sparse: BRITE only) |
 | interpro_type | string \| None (optional) | InterPro entry type this stratum covers (sparse: interpro only). |
+| module_type | string \| None (optional) | KEGG module type: 'pathway' (a route) or 'signature' (a marker set). kegg_module only. |
 | relevance_rank | int | 1 = best stratum: coverage (genome, or median experiment coverage with experiment_ids) x a size factor favouring median term sizes of 5-50 genes; stable under pagination |
 | n_terms_with_genes | int | Terms at this level within min/max_gene_set_size |
 | n_genes_at_level | int |  |
@@ -92,13 +94,13 @@ organism_name, organism_gene_count, n_ontologies, by_ontology, not_found, not_ma
 ontology_landscape(organism="MED4")
 ```
 
-*One row per (ontology × level) — BRITE per tree, InterPro per `interpro_type` — ranked by `relevance_rank`. `by_ontology` is an object keyed by ontology name (`brite:<tree>` for BRITE) with each ontology's best level. Ranks and coverages shift with each KG build; read the live response, not this one. All 17 ontologies are surveyed by default (`n_ontologies`).*
+*One row per (ontology × level) — BRITE per tree, InterPro per `interpro_type` — ranked by `relevance_rank`. `by_ontology` is an object keyed by ontology name (`brite:<tree>` for BRITE) with each ontology's best level. Ranks and coverages shift with each KG build; read the live response, not this one. All 18 ontologies are surveyed by default (`n_ontologies`).*
 
 ```example-response
 {
   "organism_name": "Prochlorococcus MED4",
   "organism_gene_count": 1973,
-  "n_ontologies": 17,
+  "n_ontologies": 18,
   "by_ontology": {
     "tigr_role": {
       "best_level": 1,
@@ -154,11 +156,11 @@ ontology_landscape(organism="MED4")
       "tree_code": null,
       "best_interpro_type": null
     },
-    "...": "+21 more"
+    "...": "+22 more"
   },
   "not_found": [],
   "not_matched": [],
-  "total_matching": 81,
+  "total_matching": 86,
   "returned": 15,
   "truncated": true,
   "offset": 0,
@@ -170,7 +172,7 @@ ontology_landscape(organism="MED4")
     "ec": ["sources", "evidence", "evidence_score"],
     "kegg": ["sources", "evidence"],
     "cog_category": ["sources", "evidence"],
-    "...": "+11 more"
+    "...": "+12 more"
   },
   "results": [
     {
@@ -714,11 +716,13 @@ results[0]['relevance_rank']
 
 - BRITE rows are always broken down per tree — each row carries `tree` / `tree_code`, and `by_ontology` keys them as `brite:<tree>` (never a pooled `brite` entry). `tree=` merely restricts the fan-out to one tree (e.g. `tree='transporters'`). Use `list_filter_values('brite_tree')` to discover available trees.
 
-- Default surveys all 17 ontologies (`go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`). Pass `ontology=[...]` (str or list) to restrict the fan-out.
+- Default surveys all 18 ontologies (`go_bp`, `go_mf`, `go_cc`, `ec`, `kegg`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`, `kegg_module`). Pass `ontology=[...]` (str or list) to restrict the fan-out.
 
 - `call_class` (merops-only) and `interpro_type` (interpro-only; scopes to one InterPro type instead of the per-type breakdown) narrow landscape term-size stats the same way they narrow `genes_by_ontology` / enrichment gene sets — pass them here first to check what a trust-filtered enrichment run will actually test.
 
 - InterPro rows break down by `interpro_type` the same way BRITE rows break down by `tree` — without a specific `interpro_type`, `results` mixes all 8 InterPro types (HOMOLOGOUS_SUPERFAMILY, DOMAIN, FAMILY, REPEAT, CONSERVED_SITE, ACTIVE_SITE, BINDING_SITE, PTM), each carrying `interpro_type` per row (`by_ontology` still has a single `interpro` key).
+
+- `kegg_module` rows break down by `module_type` the same way — one row per (level, `module_type`): `pathway` modules are routes, `signature` modules are marker sets. Pass `module_type='pathway'` to survey routes only; `level=3` is the module level (`docs://ontologies/kegg_module`).
 
 - CAZy is a small ontology (6 classes, ~90 families; `docs://ontologies/cazy`). With default `min_gene_set_size=5`, only a handful of CAZy terms ever pass the filter — typically 1–2 rows per organism. This is expected, not a bug. Pass `min_gene_set_size=1` to see all CAZy classes/families.
 

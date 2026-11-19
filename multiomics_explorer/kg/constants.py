@@ -1,15 +1,16 @@
 """Shared constants for the knowledge graph layer."""
 
-# Canonical ontology keys — all 17 supported by ONTOLOGY_CONFIG.
+# Canonical ontology keys — all 18 supported by ONTOLOGY_CONFIG.
 # Order is load-bearing for ontology_landscape regression-fixture determinism:
 # new ontologies are APPENDED, never inserted (interpro / ncbifam / merops
-# joined in the 2026-08 annotation-trust surface).
+# joined in the 2026-08 annotation-trust surface; kegg_module in 2026-11).
 ALL_ONTOLOGIES: list[str] = [
     "go_bp", "go_mf", "go_cc", "ec", "kegg",
     "cog_category", "cyanorak_role", "tigr_role", "pfam",
     "brite", "tcdb", "cazy",
     "subcellular_localization", "signal_peptide_type",
     "interpro", "ncbifam", "merops",
+    "kegg_module",
 ]
 
 # Subset of ALL_ONTOLOGIES that have GO-DAG-based level assignments.

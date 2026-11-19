@@ -375,11 +375,11 @@ examples:
     response: |
       {
         "mode": "search",
-        "total_entries": 61307,
-        "total_matching": 211,
+        "total_entries": 61778,
+        "total_matching": 216,
         "score_max": 11.387791633605957,
-        "score_median": 3.469608783721924,
-        "returned": 19,
+        "score_median": 3.1768798828125,
+        "returned": 21,
         "offset": 0,
         "truncated": true,
         "by_ontology": [
@@ -681,6 +681,68 @@ examples:
             "interpro_type": "HOMOLOGOUS_SUPERFAMILY",
             "gene_count": 8,
             "organism_count": 8
+          },
+          ...
+        ]
+      }
+
+  - title: Search KEGG modules (small functional units)
+    call: search_ontology(search_text="nitrate", ontology="kegg_module")
+    note: "Modules (`level=3`, `kegg.module:M…`) and their class nodes share one search. Each row carries `module_type`: `pathway` = a route, `signature` = a marker set; pass `module_type='pathway'` to keep routes only. Next: `genes_by_ontology(ontology='kegg_module', term_ids=[...])` for the genes."
+    response: |
+      {
+        "mode": "search",
+        "total_entries": 471,
+        "total_matching": 5,
+        "score_max": 2.8893566131591797,
+        "score_median": 2.7606866359710693,
+        "returned": 5,
+        "offset": 0,
+        "truncated": false,
+        "by_ontology": [
+          {
+            "ontology": "kegg_module",
+            "total_entries": 471,
+            "total_matching": 5,
+            "score_max": 2.8893566131591797,
+            "returned": 5,
+            "truncated": false
+          }
+        ],
+        "...": "5 empty fields omitted",
+        "results": [
+          {
+            "id": "kegg.module:M00530",
+            "name": "Dissimilatory nitrate reduction, nitrate => ammonia",
+            "ontology_type": "kegg_module",
+            "score": 2.8893566131591797,
+            "level": 3,
+            "is_informative": true,
+            "module_type": "pathway",
+            "gene_count": 35,
+            "organism_count": 14
+          },
+          {
+            "id": "kegg.module:M00531",
+            "name": "Assimilatory nitrate reduction, nitrate => ammonia",
+            "ontology_type": "kegg_module",
+            "score": 2.8893566131591797,
+            "level": 3,
+            "is_informative": true,
+            "module_type": "pathway",
+            "gene_count": 144,
+            "organism_count": 82
+          },
+          {
+            "id": "kegg.module:M00615",
+            "name": "Nitrate assimilation",
+            "ontology_type": "kegg_module",
+            "score": 2.7606866359710693,
+            "level": 3,
+            "is_informative": true,
+            "module_type": "signature",
+            "gene_count": 166,
+            "organism_count": 71
           },
           ...
         ]
@@ -1000,15 +1062,15 @@ chaining:
 
 mistakes:
   - "search_ontology finds term IDs — use genes_by_ontology to find (gene × term) pairs annotated to those terms (single organism required, hierarchy expanded DOWN by default), and ontology_term_details for a term's parents / children / bridges. Neither search nor browse walks the hierarchy for you — but the counts they show (`gene_count`, `organism_gene_count`) are subtree-scoped on hierarchical ontologies."
-  - "`ontology` is a list (a single string is accepted); omit it to fan out over all 17 in registry order. `limit` / `offset` apply PER ontology (lockstep paging — `returned <= limit x n`); read `by_ontology[].truncated` to see which ontology still has pages. See docs://guide/conventions."
+  - "`ontology` is a list (a single string is accepted); omit it to fan out over all 18 in registry order. `limit` / `offset` apply PER ontology (lockstep paging — `returned <= limit x n`); read `by_ontology[].truncated` to see which ontology still has pages. See docs://guide/conventions."
   - "Browse mode (no `search_text`) sorts by `gene_count DESC, id` and leaves `score` null; a browse that truncates with no `level` / facet / `min_gene_count` / `organism` filter adds a warning — you are paging through a whole ontology. Narrow first."
   - "`organism=` (browse) changes what is sorted and filtered: rows gain `organism_gene_count`, `min_gene_count` applies to it, and `gene_count` stays KG-wide. Without `organism=`, `gene_count` / `organism_count` are counts across all organisms on the term node. The name resolves like every other tool (`'MED4'` → `'Prochlorococcus MED4'`; unknown or ambiguous raises)."
   - "`organism_gene_count` is subtree-scoped (term + descendants, one organism; BRITE via its KEGG bridge) — the same scope as `gene_count` (all organisms) and the same number `ontology_term_details(organism=...)` reports (`tcdb:3.A.1` in MED4: 52 on both; TCDB counts use gated edges only). A parent therefore never shows fewer genes than its child. For node-local counts read `direct_gene_count` (verbose, hierarchical labels only)."
   - "`score_median` is over the full match on a single-ontology search, but over the RETURNED PAGE on multi-ontology calls (the per-ontology summaries carry no pooled median). `score_max` is exact in both cases."
   - "Lucene scores are per index: rows of two ontologies in one call are grouped by ontology, not interleaved by score. Never rank a `go_bp` row against a `tcdb` row by `score`."
-  - "A facet (`tree` for BRITE, `interpro_type` for InterPro) narrows only its owner and raises when the owner is not in the ontology list. For BRITE, always pass `tree=` — without it the `enzymes` tree dominates. Discover trees via `list_filter_values('brite_tree')`."
+  - "A facet (`tree` for BRITE, `interpro_type` for InterPro, `module_type` for KEGG modules) narrows only its owner and raises when the owner is not in the ontology list. For BRITE, always pass `tree=` — without it the `enzymes` tree dominates. Discover trees via `list_filter_values('brite_tree')`."
   - "`interpro_type` scopes InterPro to one of the 8 types (`FAMILY`, `DOMAIN`, `HOMOLOGOUS_SUPERFAMILY`, `REPEAT`, `CONSERVED_SITE`, `ACTIVE_SITE`, `BINDING_SITE`, `PTM`); the envelope's `by_interpro_type` (and `by_family_type` for NCBIfam) shows the mix when you don't."
-  - "Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`. Each has a reference page at docs://ontologies/{key} (identifier form, levels, what `gene_count` means there)."
+  - "Supported ontologies: `go_bp`, `go_mf`, `go_cc`, `kegg`, `ec`, `cog_category`, `cyanorak_role`, `tigr_role`, `pfam`, `brite`, `tcdb`, `cazy`, `subcellular_localization`, `signal_peptide_type`, `interpro`, `ncbifam`, `merops`, `kegg_module`. Each has a reference page at docs://ontologies/{key} (identifier form, levels, what `gene_count` means there)."
   - "Use `level` to restrict results to a hierarchy depth (0 = broadest). PSORTb, SignalP, COG and NCBIfam are flat — `level=1` returns nothing for them. Pfam clans are level 0, domains level 1. TIGR is two-level: level 0 = the 21 main roles (`level_kind='tigr_mainrole'`), level 1 = sub roles (`level_kind='tigr_subrole'`)."
   - "TCDB is a 5-level transporter classification (class → system). For substrate-anchored questions ('which genes transport sucrose?'), chain via `genes_by_metabolite` instead — that tool surfaces the TCDB substrate edges directly."
   - "PSORTb / SignalP are structural ontologies (where a protein is / how it is handled), not functional — use them for localization / secretion questions."
