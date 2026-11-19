@@ -58,5 +58,6 @@ Result row: `organism_name, organism_type, genus, species, strain, clade, ncbi_t
 - list_organisms (per-row measured_metabolite_count > 0) → list_metabolite_assays(organism=...) for the metabolomics measurement layer
 - list_organisms → list_experiments(organism=...) to scope experiments to the chosen organism
 - list_organisms (per-row partner_experiment_count > 0) → list_experiments(coculture_partner=organism_name) for the experiments in which this organism is the coculture partner
+- list_organisms (per-row complete_pathway_module_count) → kegg_module_completeness(organism=..., status=['complete']) for the modules behind the count, and the near-misses with `status=['one_step_missing']`
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/list_organisms/full`

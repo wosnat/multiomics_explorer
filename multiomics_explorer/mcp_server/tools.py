@@ -2091,13 +2091,14 @@ def register_tools(mcp: FastMCP):
                     "table_scope", "detection_status", "expression_status",
                     "partner_role", "structure_kind",
                     "kegg_functional_category", "kegg_brite_class",
-                    "stereo_assignment", "control_timing"],
+                    "stereo_assignment", "control_timing",
+                    "kegg_module_status", "module_type"],
             Field(description=(
-                "Which filter to enumerate: gene/expression (incl. "
+                "Filter to enumerate: gene/expression (incl. "
                 "cluster_type), DerivedMetric, chemistry (detection_status, structure_kind, "
                 "kegg_functional_category, kegg_brite_class, "
                 "stereo_assignment), experiment (partner_role, "
-                "control_timing) or trust."
+                "control_timing), KEGG modules, trust."
             )),
         ] = "gene_category",
         ontology: Annotated[OntologyKey | None, Field(
@@ -2172,6 +2173,7 @@ def register_tools(mcp: FastMCP):
         nonpeptidase_homolog_gene_count: int = Field(default=0, description="Genes with a MEROPS 'nonpeptidase_homolog' call (a gene can carry both classes). Precomputed OrganismTaxon.nonpeptidase_homolog_gene_count; 0 when none.")
         interpro_gene_count: int = Field(default=0, description="Genes with at least one InterPro entry. Precomputed OrganismTaxon.interpro_gene_count; 0 when none. Coverage count for reading, not selecting.")
         ncbifam_gene_count: int = Field(default=0, description="Genes with at least one NCBIfam family. Precomputed OrganismTaxon.ncbifam_gene_count; 0 when none. Coverage count for reading, not selecting.")
+        complete_pathway_module_count: int = Field(default=0, description="KEGG pathway modules with every step covered in this organism (signature modules not counted); 0 without genes. Equals kegg_module_completeness(organism=X, status=['complete'], summary=True).total_matching.")
         # DM verbose-only fields
         derived_metric_gene_count: int | None = Field(default=None, description="Total gene-level DM annotation count (verbose-only).")
         derived_metric_types: list[str] | None = Field(default=None, description="Distinct metric_type tags observed (verbose-only).")
@@ -3286,6 +3288,10 @@ def register_tools(mcp: FastMCP):
             description="KEGG module definition over KOs: top-level space = next step, space inside () = all of, ',' = alternatives, '+' = complex subunits, '-K' = optional (sparse: modules, level 3).")
         complete_organism_count: int | None = Field(default=None,
             description="Organisms whose module edge is 'complete' (sparse: kegg_module). Differs from organism_count, which counts organisms with any gene reaching the module via the KO bridge.")
+        organism_module_status: str | None = Field(default=None,
+            description="`organism`'s completeness band for this module ('complete', 'one_step_missing', 'two_steps_missing', 'partial'); null = no step covered in that organism (no edge). Only on level-3 kegg_module rows with organism set.")
+        organism_steps_present: int | None = Field(default=None,
+            description="Module steps covered in `organism` (KO or EC fallback); null = no step covered. Only on level-3 kegg_module rows with organism set. Full detail: kegg_module_completeness.")
         ncbifam_family_count: int | None = Field(default=None,
             description="NCBIfam families whose router link points at this TIGR role (sparse: tigr_role). A router, not gene evidence.")
         ncbifam_id: str | None = Field(default=None, description="Bare NCBIfam accession (sparse: ncbifam)")
@@ -3410,6 +3416,174 @@ def register_tools(mcp: FastMCP):
         except Exception as e:
             await ctx.error(f"ontology_term_details unexpected error: {e}")
             raise ToolError(f"Error in ontology_term_details: {e}")
+
+    # --- kegg_module_completeness ---
+
+    class KeggModuleCompletenessRow(SparseRow):
+        organism_name: str = Field(
+            description="Organism (e.g. 'Prochlorococcus MIT9313').")
+        module_id: str = Field(
+            description="KEGG module ID (e.g. 'kegg.module:M00531').")
+        module_name: str | None = Field(default=None,
+            description="Module name (e.g. 'Assimilatory nitrate reduction, nitrate => ammonia').")
+        module_type: str | None = Field(default=None,
+            description="'pathway' (a route) or 'signature' (a marker set).")
+        module_class: str | None = Field(default=None,
+            description="Level-1 module class name (e.g. 'Energy metabolism').")
+        status: str = Field(
+            description="Completeness band: 'complete', 'one_step_missing', 'two_steps_missing', 'partial'. 'complete' = every step has an annotated gene (KO or EC fallback), not that the route is shown to run.")
+        steps_total: int | None = Field(default=None,
+            description="Steps in the module (optional '--' steps excluded).")
+        steps_present: int | None = Field(default=None,
+            description="Steps covered in this organism, by KO or EC fallback.")
+        steps_present_via_ec: int | None = Field(default=None,
+            description="Of steps_present, covered only through EC; KO-covered = steps_present - steps_present_via_ec.")
+        missing_step_indices: list[int] = Field(default_factory=list,
+            description="1-based indices of uncovered steps; [] when complete.")
+        missing_kos: list[str] = Field(default_factory=list,
+            description="Every KO named in the missing steps, bare as stored (e.g. ['K00367','K00372','K10534']); prefix 'kegg.orthology:' to chain. One KO may not complete a step ('+' complexes need all subunits).")
+        # verbose only
+        module_subclass: str | None = Field(default=None,
+            description="Level-2 subclass name (e.g. 'Nitrogen metabolism') (verbose only).")
+        definition: str | None = Field(default=None,
+            description="Module KO formula: space = next step, ',' = alternatives, '+' = complex subunits (verbose only).")
+        missing_step_definitions: list[str] | None = Field(default=None,
+            description="Formula of each missing step, parallel to missing_step_indices (e.g. ['(K00367,K10534,K00372+K00360)']) (verbose only).")
+        ec_filled_step_indices: list[int] | None = Field(default=None,
+            description="Steps covered only through EC; [] when none (verbose only).")
+        ec_genes: list[str] | None = Field(default=None,
+            description="Locus tag filling each EC step, parallel to ec_filled_step_indices; a module ID ('M#####') = a module-reference step completed via EC; [] when none (verbose only).")
+
+    class KmcStatusCount(BaseModel):
+        status: str = Field(description="Completeness band (e.g. 'complete').")
+        count: int = Field(description="Rows in this band after filters (e.g. 56).")
+
+    class KmcByClass(BaseModel):
+        class_id: str = Field(
+            description="Level-1 module class ID (e.g. 'kegg.module:pathway_modules.energy_metabolism').")
+        class_name: str = Field(description="Class name (e.g. 'Energy metabolism').")
+        module_count: int = Field(description="Modules in scope under this class.")
+        complete: int = Field(default=0, description="Rows with status 'complete' (after filters).")
+        one_step_missing: int = Field(default=0, description="Rows with status 'one_step_missing' (after filters).")
+        two_steps_missing: int = Field(default=0, description="Rows with status 'two_steps_missing' (after filters).")
+        partial: int = Field(default=0, description="Rows with status 'partial' (after filters).")
+        no_edge: int = Field(default=0,
+            description="(organism, module) pairs under this class with no step covered; independent of status.")
+
+    class KmcTopOrganism(BaseModel):
+        organism_name: str = Field(description="Organism (e.g. 'Prochlorococcus MED4').")
+        complete: int = Field(default=0, description="Modules 'complete' in this organism (after filters).")
+        one_step_missing: int = Field(default=0, description="Modules 'one_step_missing' (after filters).")
+        two_steps_missing: int = Field(default=0, description="Modules 'two_steps_missing' (after filters).")
+        partial: int = Field(default=0, description="Modules 'partial' (after filters).")
+        no_edge: int = Field(default=0,
+            description="Modules in scope with no step covered in this organism; independent of status.")
+
+    class KmcTopModule(SparseRow):
+        module_id: str = Field(description="KEGG module ID (e.g. 'kegg.module:M00531').")
+        module_name: str | None = Field(default=None,
+            description="Module name (e.g. 'Assimilatory nitrate reduction, nitrate => ammonia').")
+        module_type: str | None = Field(default=None, description="'pathway' or 'signature'.")
+        complete: int = Field(default=0, description="Organisms with the module 'complete' (after filters).")
+        one_step_missing: int = Field(default=0, description="Organisms at 'one_step_missing' (after filters).")
+        two_steps_missing: int = Field(default=0, description="Organisms at 'two_steps_missing' (after filters).")
+        partial: int = Field(default=0, description="Organisms at 'partial' (after filters).")
+        no_edge: int = Field(default=0,
+            description="Organisms in scope with no step of this module covered; independent of status.")
+        organisms_without_edge: list[str] | None = Field(default=None,
+            description="Names of organisms in scope with no step covered (sorted); present only when modules_in_scope <= 3.")
+
+    class KeggModuleCompletenessResponse(BaseModel):
+        total_entries: int = Field(description="All organism-module completeness edges in the KG.")
+        total_matching: int = Field(description="Rows matching every filter.")
+        returned: int = Field(description="Rows in this response.")
+        truncated: bool = Field(description="True when total_matching > offset + returned.")
+        offset: int = Field(default=0, description="Offset into the matching rows.")
+        organism_name: str | None = Field(default=None,
+            description="The organism when exactly one is in scope (e.g. 'Prochlorococcus MED4'); null otherwise.")
+        organisms_in_scope: int = Field(default=0, description="Organisms the call covers after resolution.")
+        modules_in_scope: int = Field(default=0,
+            description="Level-3 modules the call covers after module_ids expansion and module_type.")
+        by_status: list[KmcStatusCount] = Field(default_factory=list,
+            description="Rows per band, all four bands in band order (after filters).")
+        no_edge_count: int = Field(default=0,
+            description="(organism, module) pairs in scope with no step covered (no row); independent of status.")
+        by_class: list[KmcByClass] = Field(default_factory=list,
+            description="Complete breakdown per level-1 class with a module in scope: module_count, band counts, no_edge.")
+        top_organisms: list[KmcTopOrganism] = Field(default_factory=list,
+            description="Organisms in scope sorted by complete desc, capped at 20 — compare length with organisms_in_scope; page rows for the full table.")
+        top_modules: list[KmcTopModule] = Field(default_factory=list,
+            description="Modules in scope sorted by complete desc, capped at 20 — compare length with modules_in_scope; organisms_without_edge only when modules_in_scope <= 3.")
+        not_found_modules: list[str] = Field(default_factory=list,
+            description="Input module_ids with no KEGG module node.")
+        not_matched_modules: list[str] = Field(default_factory=list,
+            description="Input module_ids that exist but yield no module under module_type (set module_type='signature' or None).")
+        not_found_organisms: list[str] = Field(default_factory=list,
+            description="Organism list entries matching no organism.")
+        warnings: list[str] = Field(default_factory=list, description="Advisory messages (e.g. not_matched_modules fix).")
+        results: list[KeggModuleCompletenessRow] = Field(default_factory=list,
+            description="One row per (organism, module) with at least one step covered; sorted module_id, band, organism_name.")
+
+    @mcp.tool(
+        tags={"kegg", "modules", "organism", "metabolism"},
+        annotations={"readOnlyHint": True, "destructiveHint": False,
+                     "idempotentHint": True, "openWorldHint": False},
+    )
+    async def kegg_module_completeness(
+        ctx: Context,
+        organism: OrganismScopeParam = None,
+        module_ids: Annotated[list[str] | None, Field(
+            description="KEGG module IDs (e.g. 'kegg.module:M00531'; bare 'M00531' accepted). A class, subclass or type ID expands to every module under it. None = all modules.",
+        )] = None,
+        status: Annotated[list[Literal["complete", "one_step_missing", "two_steps_missing", "partial"]] | None, Field(
+            description="Keep rows in these bands. Filters rows and band counts, never the no-edge counts. Values: list_filter_values with filter_type kegg_module_status.",
+        )] = None,
+        module_type: Annotated[Literal["pathway", "signature"] | None, Field(
+            description="'pathway' (default; routes) or 'signature' (marker sets such as drug resistance); None = both.",
+        )] = "pathway",
+        summary: SummaryParam = False,
+        verbose: VerboseParam = False,
+        limit: LimitParam = 50,
+        offset: OffsetParam = 0,
+    ) -> KeggModuleCompletenessResponse:
+        """Report how complete each KEGG module is per organism (KEGG Mapper bands; KO + EC); rows = organism x module, a step covered.
+
+        Use for what a strain can run or lacks; 'complete' = every step annotated, not shown to run; no edge != no genes.
+        Filters: organism, module_ids (classes expand), status, module_type.
+        Returns: by_status, by_class, top_organisms, top_modules (cap 20), no_edge_count; one row = (organism, module, status, missing_kos).
+        docs://tools/kegg_module_completeness. Routing: missing_kos to genes_by_function; genes: genes_by_ontology(ontology='kegg_module', min_gene_set_size=1).
+        """
+        await ctx.info(
+            f"kegg_module_completeness organism={organism} "
+            f"module_ids_count={len(module_ids) if module_ids else 0} "
+            f"status={status} module_type={module_type} summary={summary}")
+        try:
+            conn = _conn(ctx)
+            data = api.kegg_module_completeness(
+                organism=organism, module_ids=module_ids, status=status,
+                module_type=module_type, summary=summary, verbose=verbose,
+                limit=limit, offset=offset, conn=conn,
+            )
+            response = KeggModuleCompletenessResponse(**data)
+            for w in response.warnings:
+                await ctx.warning(w)
+            if response.not_found_modules:
+                await ctx.warning(
+                    f"{len(response.not_found_modules)} module_ids not_found: "
+                    f"{response.not_found_modules[:5]}")
+            if response.not_found_organisms:
+                await ctx.warning(
+                    f"{len(response.not_found_organisms)} organisms not_found: "
+                    f"{response.not_found_organisms[:5]}")
+            await ctx.info(
+                f"Returning {response.returned}/{response.total_matching} rows")
+            return response
+        except ValueError as e:
+            await ctx.warning(f"kegg_module_completeness error: {e}")
+            raise ToolError(str(e))
+        except Exception as e:
+            await ctx.error(f"kegg_module_completeness unexpected error: {e}")
+            raise ToolError(f"Error in kegg_module_completeness: {e}")
 
     # --- genes_by_ontology ---
 

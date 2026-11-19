@@ -66,6 +66,10 @@ from multiomics_explorer.kg.queries_lib import (
     build_genes_by_ontology_per_term,
     build_genes_by_ontology_trust_rollups,
     build_genes_by_ontology_validate,
+    build_kegg_module_completeness,
+    build_kegg_module_completeness_resolve,
+    build_kegg_module_completeness_scope,
+    build_kegg_module_completeness_summary,
     build_gene_details,
     build_gene_details_summary,
     build_gene_homologs,
@@ -1250,12 +1254,12 @@ def _validate_categorical_values(
         wanted = value if isinstance(value, list) else [value]
         unknown = [v for v in wanted if v not in allowed]
         if unknown:
-            # Point at list_filter_values only when it serves this param
-            # (module_type is a facet with no filter_type of its own).
+            # Point at list_filter_values only when it serves this param.
             hint = (
                 f" Call list_filter_values(filter_type='{param}') for the "
                 "full set."
-                if param in _TRUST_FILTER_VALUE_SPECS else ""
+                if param in _TRUST_FILTER_VALUE_SPECS
+                or param in _ORDERED_VOCABS else ""
             )
             raise ValueError(
                 f"Unknown {param} value(s) {', '.join(map(repr, unknown))} "
@@ -2211,6 +2215,14 @@ _MULTI_LABEL_VOCABS: dict[str, tuple[str, tuple[str, ...], str]] = {
     "kegg_brite_class": ("kegg_brite_classes", ("Metabolite",), "node"),
 }
 
+# Single-owner vocabularies whose values keep the ControlledVocabulary order
+# (an ordered band, not an alphabet): filter_type -> (applies_to, property,
+# kind).
+_ORDERED_VOCABS: dict[str, tuple[str, str, str]] = {
+    "kegg_module_status": ("Organism_has_kegg_module", "status", "edge"),
+    "module_type": ("KeggModule", "module_type", "node"),
+}
+
 
 def list_filter_values(
     filter_type: str = "gene_category",
@@ -2285,6 +2297,15 @@ def list_filter_values(
         Metabolite.kegg_brite_classes (7 other KEGG compound BRITE trees).
         No per-value descriptions; the envelope ``description`` names the
         tree codes.
+      - ``kegg_module_status``: the completeness bands on the
+        ``Organism_has_kegg_module`` edge (``complete`` /
+        ``one_step_missing`` / ``two_steps_missing`` / ``partial``, in band
+        order, with value descriptions); the values accepted by
+        ``kegg_module_completeness(status=...)``.
+      - ``module_type``: KeggModule.module_type (``pathway`` = a route,
+        ``signature`` = a marker set); the values accepted by the
+        ``module_type`` parameter of ``kegg_module_completeness`` and the
+        kegg_module ontology tools.
 
     ``ontology`` scopes any of the annotation-trust types to one ontology.
     Values come from the graph's ControlledVocabulary nodes; when a node is
@@ -2326,6 +2347,18 @@ def list_filter_values(
                 "applies_to": ["ClusteringAnalysis"],
                 "source": read["source"],
             }
+            for v in read["values"]
+        ]
+    elif filter_type in _ORDERED_VOCABS:
+        applies_to, prop, kind = _ORDERED_VOCABS[filter_type]
+        read = _read_vocab_values(conn, applies_to, prop, kind, cache=False)
+        if read["warning"]:
+            warnings_out.append(read["warning"])
+        envelope_description = read["description"]
+        results = [
+            {"value": v, "applies_to": [applies_to], "source": read["source"],
+             **({"description": read["value_descriptions"][v]}
+                if v in read["value_descriptions"] else {})}
             for v in read["values"]
         ]
     elif filter_type in _MULTI_LABEL_VOCABS:
@@ -2404,6 +2437,7 @@ def list_filter_values(
             "value_kind", "compartment", "omics_type", "evidence_source",
             *sorted(_TRUST_FILTER_VALUE_SPECS), "trust_axes", "link_kinds",
             "cluster_type", *sorted(_MULTI_LABEL_VOCABS),
+            *_ORDERED_VOCABS,
         ]
         raise ValueError(
             f"Unknown filter_type: {filter_type!r}. Valid options: "
@@ -2476,7 +2510,11 @@ def list_organisms(
     nonpeptidase_homolog_gene_count, interpro_gene_count, ncbifam_gene_count
     (annotation-coverage counts of genes carrying a MEROPS peptidase call,
     a MEROPS non-peptidase-homolog call, at least one InterPro term, at
-    least one NCBIfam family; 0 when the organism has none).
+    least one NCBIfam family; 0 when the organism has none),
+    complete_pathway_module_count (KEGG pathway modules whose every step
+    has an annotated gene in this organism; signature modules are not
+    counted; 0 for organisms without genes — per-module detail and the
+    near-misses via kegg_module_completeness(organism=...)).
     Sparse fields (omitted when null): reference_database, reference_proteome.
     When verbose=True, also includes: family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count, derived_metric_gene_count,
@@ -3840,6 +3878,11 @@ def _term_details_row(row: dict, *, verbose: bool, organism: str | None) -> dict
             out[prop] = value
     if organism is not None:
         out["organism_gene_count"] = row.get("organism_gene_count")
+        # Level-3 KEGG modules carry the organism's completeness edge; a
+        # null status means no step is covered, so it is kept, not stripped.
+        if ontology == "kegg_module" and row.get("level") == 3:
+            out["organism_module_status"] = _prop("organism_module_status")
+            out["organism_steps_present"] = _prop("organism_steps_present")
 
     children = list(row.get("children") or [])
     children_total = row.get("children_total")
@@ -3914,9 +3957,12 @@ def ontology_term_details(
     Args:
         term_ids: Term CURIEs to describe (any ontology, mixed is fine).
         organism: Scope `genes_by_organism` (verbose) to one organism and
-            add `organism_gene_count` to every row. Resolved by the shared
-            organism resolver (word match, e.g. 'MED4'); an unknown or
-            ambiguous name raises ValueError.
+            add `organism_gene_count` to every row. On KEGG module rows
+            (level 3 of kegg_module) also add `organism_module_status` (the
+            organism's completeness band) and `organism_steps_present`;
+            both are null when no step of the module is covered in that
+            organism. Resolved by the shared organism resolver (word match,
+            e.g. 'MED4'); an unknown or ambiguous name raises ValueError.
         link_kinds: Keep only these link kinds ('composition', 'membership',
             'router'); None keeps all.
         verbose: Add `properties` (every node prop), `links_out[].props`
@@ -3946,7 +3992,8 @@ def ontology_term_details(
     unknown kind.
 
     Routing: genes_by_ontology(term_ids=[...]) for the annotated genes;
-    search_ontology for discovery; docs://ontologies/{ontology} for the
+    search_ontology for discovery; kegg_module_completeness for module
+    completeness across organisms; docs://ontologies/{ontology} for the
     per-ontology reference.
     """
     from collections import Counter
@@ -4993,6 +5040,395 @@ def gene_ontology_terms(
         + _case_mismatch_warnings(conn, not_found)
     )
     return envelope
+
+
+# ---------------------------------------------------------------------------
+# KEGG module completeness (organism-level, Organism_has_kegg_module edges)
+# ---------------------------------------------------------------------------
+
+_KMC_BANDS: tuple[str, ...] = (
+    "complete", "one_step_missing", "two_steps_missing", "partial",
+)
+_KMC_TOP_N = 20
+_KMC_BARE_MODULE_RE = re.compile(r"^M\d{5}$", re.I)
+_KMC_STATUS_HINT = "list_filter_values(filter_type='kegg_module_status')"
+_KMC_MODULE_TYPE_HINT = "list_filter_values(filter_type='module_type')"
+
+
+def _kmc_normalise_module_id(mid: str) -> str:
+    """Bare ``M00531`` -> ``kegg.module:M00531``; anything else unchanged."""
+    s = str(mid).strip()
+    if _KMC_BARE_MODULE_RE.match(s):
+        return f"kegg.module:M{s[1:]}"
+    return s
+
+
+def _kmc_band_counts(counts: dict | None) -> dict:
+    counts = counts or {}
+    return {b: int(counts.get(b, 0)) for b in _KMC_BANDS}
+
+
+def _kmc_by_status(rows: list[dict] | None) -> list[dict]:
+    counts: dict[str, int] = {}
+    for r in rows or []:
+        st = r.get("status")
+        counts[st] = counts.get(st, 0) + int(r.get("count") or 0)
+    out = [{"status": b, "count": counts.pop(b, 0)} for b in _KMC_BANDS]
+    out.extend({"status": s, "count": n} for s, n in counts.items()
+               if s is not None)
+    return out
+
+
+def _kmc_validate_vocab(
+    conn, status: list[str] | None, module_type: str | None,
+) -> list[str]:
+    """Check `status` / `module_type` against the ControlledVocabulary.
+
+    Raises ValueError listing the allowed set on an unknown value; returns
+    the pivot-fallback warnings (if any).
+    """
+    warns: list[str] = []
+    if status is not None:
+        if not status:
+            raise ValueError(
+                "status must not be empty; pass None for every band.")
+        read = _read_vocab_values(
+            conn, "Organism_has_kegg_module", "status", "edge")
+        if read["warning"]:
+            warns.append(read["warning"])
+        allowed = read["values"] or list(_KMC_BANDS)
+        bad = [s for s in status if s not in allowed]
+        if bad:
+            raise ValueError(
+                f"Unknown status value(s) {', '.join(map(repr, bad))}. "
+                f"Allowed: {', '.join(map(str, allowed))}. "
+                f"See {_KMC_STATUS_HINT}."
+            )
+    if module_type is not None:
+        read = _read_vocab_values(conn, "KeggModule", "module_type", "node")
+        if read["warning"]:
+            warns.append(read["warning"])
+        allowed = read["values"] or ["pathway", "signature"]
+        if module_type not in allowed:
+            raise ValueError(
+                f"Unknown module_type {module_type!r}. Allowed: "
+                f"{', '.join(map(str, allowed))}, or None for every type. "
+                f"See {_KMC_MODULE_TYPE_HINT}."
+            )
+    return warns
+
+
+def _kmc_empty_envelope(
+    *, offset: int, organism_name: str | None, organisms_in_scope: int,
+    not_found_modules: list[str], not_matched_modules: list[str],
+    not_found_organisms: list[str], warnings: list[str],
+) -> dict:
+    return {
+        "total_entries": 0,
+        "total_matching": 0,
+        "returned": 0,
+        "truncated": False,
+        "offset": offset,
+        "organism_name": organism_name,
+        "organisms_in_scope": organisms_in_scope,
+        "modules_in_scope": 0,
+        "by_status": _kmc_by_status([]),
+        "no_edge_count": 0,
+        "by_class": [],
+        "top_organisms": [],
+        "top_modules": [],
+        "not_found_modules": not_found_modules,
+        "not_matched_modules": not_matched_modules,
+        "not_found_organisms": not_found_organisms,
+        "warnings": warnings,
+        "results": [],
+    }
+
+
+@listify_bare_str
+def kegg_module_completeness(
+    organism: str | list[str] | None = None,
+    module_ids: list[str] | None = None,
+    status: list[str] | None = None,
+    module_type: str | None = "pathway",
+    summary: bool = False,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+    *,
+    conn: GraphConnection | None = None,
+) -> dict:
+    """Report how complete each KEGG module is in each organism.
+
+    Completeness is the KEGG Mapper band over the module's steps, from KO
+    annotations plus an EC fallback. One row per (organism, module) pair
+    with at least one step covered; organisms with no covered step on a
+    module have no row and are counted in the envelope (``no_edge``) instead.
+    ``complete`` means every step has an annotated gene, not that the route
+    is shown to run. No row does not mean no genes: a one-step complex
+    module with a single unannotated subunit has no covered step.
+
+    Args:
+        organism: ``str`` = exactly one organism (word match, e.g. 'MED4';
+            a name matching several raises ValueError — pass a list);
+            ``list[str]`` = the union of word-matched organisms (unmatched
+            entries land in ``not_found_organisms``; an empty list raises);
+            None = every organism with genes.
+        module_ids: KeggModule ids at any level — a module
+            (``kegg.module:M00531``; bare ``M00531`` accepted) or a type /
+            class / subclass id, which expands to every module under it.
+            Unknown ids land in ``not_found_modules``; ids that exist but
+            hold no module of ``module_type`` land in
+            ``not_matched_modules`` with a warning. None = every module.
+            An empty list raises ValueError.
+        status: Keep only these bands (``complete``, ``one_step_missing``,
+            ``two_steps_missing``, ``partial``). Filters rows and the
+            status counts, never the ``no_edge`` counts. An unknown value
+            raises ValueError listing the allowed set.
+        module_type: 'pathway' (default, routes), 'signature' (marker
+            sets) or None for both.
+        summary: Envelope only (same as ``limit=0``).
+        verbose: Add module_subclass, definition, missing_step_definitions,
+            ec_filled_step_indices and ec_genes to each row.
+        limit: Max rows returned (None = all).
+        offset: Skip this many rows.
+        conn: Optional graph connection (defaults to the shared connection).
+
+    Returns dict with keys: total_entries (all organism-module completeness
+    edges in the KG), total_matching, returned, truncated, offset,
+    organism_name (the organism when exactly one is in scope, else None),
+    organisms_in_scope, modules_in_scope, by_status [{status, count}] (all
+    four bands, band order), no_edge_count ((organism, module) pairs in
+    scope with no covered step; independent of ``status``), by_class
+    [{class_id, class_name, module_count, complete, one_step_missing,
+    two_steps_missing, partial, no_edge}] (every class in scope),
+    top_organisms [{organism_name, <bands>, no_edge}] (capped at 20,
+    sorted by complete descending), top_modules [{module_id, module_name,
+    module_type, <bands>, no_edge, organisms_without_edge}] (capped at 20,
+    sorted by complete descending; ``organisms_without_edge`` only when
+    modules_in_scope is 3 or fewer), not_found_modules,
+    not_matched_modules, not_found_organisms, warnings, results.
+    Compare the length of top_organisms / top_modules with
+    organisms_in_scope / modules_in_scope; page rows for the whole table.
+
+    Per result (compact): organism_name, module_id, module_name,
+    module_type, module_class, status, steps_total, steps_present,
+    steps_present_via_ec (steps covered only through EC), missing_step_indices
+    (1-based), missing_kos (bare ``K#####`` ids named in the missing steps,
+    flattened; prefix ``kegg.orthology:`` to chain into ontology_term_details
+    / genes_by_ontology(ontology='kegg'); one KO alone may not complete a
+    step that needs a complex). Verbose adds module_subclass, definition,
+    missing_step_definitions, ec_filled_step_indices, ec_genes (locus tag
+    per EC-filled step; a module id in a slot = a module-reference step
+    completed through EC). Rows sort by module_id, then band (complete
+    first), then organism_name.
+
+    Routing: missing_kos -> genes_by_function / resolve_gene to look for an
+    unannotated candidate; genes_by_ontology(ontology='kegg_module',
+    term_ids=[module_id], organism=..., min_gene_set_size=1) for the genes
+    behind KO-covered steps; list_organisms for complete_pathway_module_count per organism.
+    """
+    conn = _default_conn(conn)
+    if summary:
+        limit = 0
+
+    warnings: list[str] = list(_kmc_validate_vocab(conn, status, module_type))
+    status_arg = list(status) if status is not None else None
+
+    # --- organism scope --------------------------------------------------
+    scope, not_found_organisms = _gbo_resolve_organism_scope(organism, conn)
+    if scope is None:
+        universe = _gbo_organisms_with_genes(conn)
+        organisms_arg = None
+    elif isinstance(scope, str):
+        universe = [scope]
+        organisms_arg = [scope]
+    else:
+        universe = list(scope)
+        organisms_arg = list(scope)
+    universe_set = set(universe)
+    organism_name = universe[0] if len(universe) == 1 else None
+
+    # --- module ids --------------------------------------------------------
+    not_found_modules: list[str] = []
+    not_matched_modules: list[str] = []
+    module_ids_arg: list[str] | None = None
+    if module_ids is not None:
+        if not module_ids:
+            raise ValueError(
+                "module_ids must not be empty; pass None for every module.")
+        original: dict[str, str] = {}
+        for mid in module_ids:
+            original.setdefault(_kmc_normalise_module_id(mid), mid)
+        normalised = list(original)
+        r_cypher, r_params = build_kegg_module_completeness_resolve(
+            module_ids=normalised, module_type=module_type,
+        )
+        status_by_id = {
+            r["module_id"]: r for r in conn.execute_query(r_cypher, **r_params)
+        }
+        matched: list[str] = []
+        for mid in normalised:
+            r = status_by_id.get(mid) or {}
+            if not r.get("found"):
+                not_found_modules.append(original[mid])
+            elif not r.get("matched"):
+                not_matched_modules.append(original[mid])
+            else:
+                matched.append(mid)
+        if not_matched_modules:
+            if module_type == "pathway":
+                fix = "module_type='signature' or module_type=None"
+            elif module_type == "signature":
+                fix = "module_type='pathway' or module_type=None"
+            else:
+                fix = "module_type=None"
+            warnings.append(
+                f"module_ids {', '.join(not_matched_modules)}: no "
+                f"{module_type} module at or under these ids, skipped; "
+                f"pass {fix} to include them."
+            )
+        module_ids_arg = matched
+
+    def _empty(organisms_in_scope: int) -> dict:
+        env = _kmc_empty_envelope(
+            offset=offset, organism_name=organism_name,
+            organisms_in_scope=organisms_in_scope,
+            not_found_modules=not_found_modules,
+            not_matched_modules=not_matched_modules,
+            not_found_organisms=not_found_organisms, warnings=warnings,
+        )
+        # total_entries is KG-wide: an empty scope (organisms=[]) still
+        # returns the full edge count from the summary query.
+        t_cypher, t_params = build_kegg_module_completeness_summary(
+            organisms=[], module_ids=None, module_type=module_type,
+            status=None,
+        )
+        t_rows = conn.execute_query(t_cypher, **t_params) or []
+        if t_rows:
+            env["total_entries"] = t_rows[0].get("total_entries") or 0
+        return env
+
+    if not universe or (module_ids_arg is not None and not module_ids_arg):
+        return _empty(len(universe))
+
+    # --- scope (status-independent absence) -------------------------------
+    s_cypher, s_params = build_kegg_module_completeness_scope(
+        organisms=organisms_arg, module_ids=module_ids_arg,
+        module_type=module_type,
+    )
+    scope_rows = conn.execute_query(s_cypher, **s_params) or []
+    if not scope_rows:
+        return _empty(len(universe))
+    n_orgs = len(universe)
+    n_mods = len(scope_rows)
+    with_edge: dict[str, set[str]] = {
+        r["module_id"]: set(r.get("organisms_with_edge") or []) & universe_set
+        for r in scope_rows
+    }
+    modules_with_edge_by_org: dict[str, int] = {o: 0 for o in universe}
+    for orgs in with_edge.values():
+        for o in orgs:
+            modules_with_edge_by_org[o] += 1
+    no_edge_count = n_orgs * n_mods - sum(len(v) for v in with_edge.values())
+
+    # --- summary (status-filtered rollups) --------------------------------
+    sm_cypher, sm_params = build_kegg_module_completeness_summary(
+        organisms=organisms_arg, module_ids=module_ids_arg,
+        module_type=module_type, status=status_arg,
+    )
+    sm_rows = conn.execute_query(sm_cypher, **sm_params) or []
+    sm = sm_rows[0] if sm_rows else {}
+    total_entries = int(sm.get("total_entries") or 0)
+    total_matching = int(sm.get("total_matching") or 0)
+
+    org_counts: dict[str, dict[str, int]] = {}
+    for r in sm.get("by_organism_status") or []:
+        d = org_counts.setdefault(r["organism_name"], {})
+        d[r["status"]] = d.get(r["status"], 0) + int(r.get("count") or 0)
+    mod_counts: dict[str, dict[str, int]] = {}
+    for r in sm.get("by_module_status") or []:
+        d = mod_counts.setdefault(r["module_id"], {})
+        d[r["status"]] = d.get(r["status"], 0) + int(r.get("count") or 0)
+    cls_counts: dict[str, dict[str, int]] = {}
+    for r in sm.get("by_class_status") or []:
+        d = cls_counts.setdefault(r["class_id"], {})
+        d[r["status"]] = d.get(r["status"], 0) + int(r.get("count") or 0)
+
+    # by_class: every class with a module in scope.
+    classes: dict[str, dict] = {}
+    for r in scope_rows:
+        c = classes.setdefault(r["class_id"], {
+            "class_id": r["class_id"], "class_name": r.get("class_name"),
+            "module_count": 0, "no_edge": 0,
+        })
+        c["module_count"] += 1
+        c["no_edge"] += n_orgs - len(with_edge[r["module_id"]])
+    by_class = []
+    for cid in sorted(classes):
+        c = classes[cid]
+        by_class.append({
+            "class_id": cid, "class_name": c["class_name"],
+            "module_count": c["module_count"],
+            **_kmc_band_counts(cls_counts.get(cid)),
+            "no_edge": c["no_edge"],
+        })
+
+    top_organisms = [
+        {"organism_name": o, **_kmc_band_counts(org_counts.get(o)),
+         "no_edge": n_mods - modules_with_edge_by_org[o]}
+        for o in universe
+    ]
+    top_organisms.sort(key=lambda e: (-e["complete"], e["organism_name"]))
+    top_organisms = top_organisms[:_KMC_TOP_N]
+
+    name_absent = n_mods <= 3
+    top_modules = []
+    for r in scope_rows:
+        mid = r["module_id"]
+        entry = {
+            "module_id": mid, "module_name": r.get("module_name"),
+            "module_type": r.get("module_type"),
+            **_kmc_band_counts(mod_counts.get(mid)),
+            "no_edge": n_orgs - len(with_edge[mid]),
+        }
+        if name_absent:
+            entry["organisms_without_edge"] = sorted(
+                universe_set - with_edge[mid])
+        top_modules.append(entry)
+    top_modules.sort(key=lambda e: (-e["complete"], e["module_id"]))
+    top_modules = top_modules[:_KMC_TOP_N]
+
+    # --- detail ------------------------------------------------------------
+    results: list[dict] = []
+    if limit != 0:
+        d_cypher, d_params = build_kegg_module_completeness(
+            organisms=organisms_arg, module_ids=module_ids_arg,
+            module_type=module_type, status=status_arg, verbose=verbose,
+            limit=limit, offset=offset,
+        )
+        results = list(conn.execute_query(d_cypher, **d_params) or [])
+
+    return {
+        "total_entries": total_entries,
+        "total_matching": total_matching,
+        "returned": len(results),
+        "truncated": total_matching > offset + len(results),
+        "offset": offset,
+        "organism_name": organism_name,
+        "organisms_in_scope": n_orgs,
+        "modules_in_scope": n_mods,
+        "by_status": _kmc_by_status(sm.get("by_status")),
+        "no_edge_count": no_edge_count,
+        "by_class": by_class,
+        "top_organisms": top_organisms,
+        "top_modules": top_modules,
+        "not_found_modules": not_found_modules,
+        "not_matched_modules": not_matched_modules,
+        "not_found_organisms": not_found_organisms,
+        "warnings": warnings,
+        "results": results,
+    }
 
 
 def run_cypher(

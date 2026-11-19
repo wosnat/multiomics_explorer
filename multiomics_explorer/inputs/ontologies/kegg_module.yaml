@@ -46,8 +46,9 @@ interpretation: |
   does this route use" (`genes_by_ontology(term_ids=['kegg.module:M00531'])`);
   class levels 1-2 give a coarse functional profile. A gene set is not a
   route: it does not say whether every step of the module is present in the
-  genome. Per-genome completeness lives on the organism-to-module edge,
-  which `complete_organism_count` summarises on the term side.
+  genome. Per-genome completeness (KEGG Mapper bands, missing steps and
+  KOs) comes from `kegg_module_completeness`; `complete_organism_count`
+  only summarises it on the term side.
 
 informativeness_rule: |
   No module or class node is flagged uninformative, so
@@ -64,10 +65,10 @@ pitfalls: |
     module. It is not the number of organisms with a module edge: an
     organism can reach a module only through EC-only genes or a module
     reference, so a module with `organism_count = 0` can still have
-    organism edges. Read `complete_organism_count` for completeness.
+    organism edges. For completeness call `kegg_module_completeness`.
   - A module gene set is not a complete route — finding genes for one
-    step says nothing about the others. Read `definition` and
-    `step_count` before calling a route present.
+    step says nothing about the others. Ask `kegg_module_completeness`
+    whether every step is covered before calling a route present.
   - Signature modules are marker sets, not pathways; scope with
     `module_type='pathway'` when the question is about metabolism.
   - `kegg`, `brite` and `kegg_module` share one gene edge
@@ -84,6 +85,7 @@ typical_questions:
   - "Which WH8102 genes make up assimilatory nitrate reduction? — `genes_by_ontology(ontology='kegg_module', term_ids=['kegg.module:M00531'], organism='Synechococcus WH8102', min_gene_set_size=1)` (SYNW2464, SYNW2477)"
   - "Which KEGG modules are enriched among genes up in this experiment? — `pathway_enrichment(organism='MED4', experiment_ids=[...], ontology='kegg_module', level=3, module_type='pathway')`"
   - "Which subclass and pathway maps does M00531 sit under? — `ontology_term_details(term_ids=['kegg.module:M00531'])` and read `parents[]` / `links_out[]`"
+  - "Does MED4 have a complete assimilatory nitrate reduction module? — `kegg_module_completeness(organism='Prochlorococcus MED4', module_ids=['M00531'])` (no row: no step covered; read `top_modules[0].organisms_without_edge`)"
   - "Which modules do these genes' KOs belong to? — `gene_ontology_terms(locus_tags=[...], ontology='kegg_module')`"
 
 see_also:
@@ -92,3 +94,4 @@ see_also:
   - docs://analysis/enrichment
   - docs://analysis/annotation_evidence
   - docs://tools/ontology_term_details
+  - docs://tools/kegg_module_completeness

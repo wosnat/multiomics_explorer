@@ -1,6 +1,6 @@
 # Start here — picking the right tool
 
-This MCP server exposes 42 tools over a Prochlorococcus/Alteromonas
+This MCP server exposes 43 tools over a Prochlorococcus/Alteromonas
 multi-omics KG, in ten families below. Match your question to a
 family, then read the entry-point tool's brief at `docs://tools/{name}`
 (append /full for every worked example).
@@ -36,9 +36,9 @@ tested-absent rows, summary/verbose modes, rankable-gated filters,
 Plus five orthogonal helpers:
 
 - **`kg_release_info`** — release identity + compatibility verdict. Call it first (see above).
-- **`kg_schema`** — node labels, relationship types, properties. Read this before reaching for `run_cypher`.
+- **`kg_schema`** — node labels, relationship types, properties. Read it before `run_cypher`.
 - **`list_filter_values`** — canonical values for every closed vocabulary (gene, expression, DM, chemistry, trust), with counts and descriptions where stored. Full enum: `docs://tools/list_filter_values/full`.
-- **`list_organisms`** — organism taxonomy plus per-organism capability rollups (gene/expression/DM/chemistry/metabolomics/annotation counts).
+- **`list_organisms`** — organism taxonomy plus per-organism capability rollups (gene/expression/DM/chemistry/metabolomics/annotation counts, complete KEGG modules).
 - **`run_cypher`** — read-only Cypher escape hatch for the rare question no tool covers; validate against `kg_schema` first.
 
 ---
@@ -56,7 +56,7 @@ Plus five orthogonal helpers:
 3. Holding term IDs already? `ontology_term_details(term_ids=[...])` gives parents, children, bridges and counts across ontologies. Per-ontology semantics: `docs://ontologies/{key}` (index: `docs://ontologies/index`).
 
 ### "What pathways / functional categories are enriched in my DE set?"
-0. **Step 0, always:** `ontology_landscape(organism=..., experiment_ids=[...])` — pick a defensible (ontology, level) before enrichment, or risk an oversized or uninformative term set.
+0. **Step 0, always:** `ontology_landscape(organism=..., experiment_ids=[...])` — pick a defensible (ontology, level) first, or risk an oversized or uninformative term set.
 1. `pathway_enrichment(experiment_ids=[...], organism=..., ontology=..., level=...)`. Methodology, background semantics, `informative_only` default: `docs://analysis/enrichment`.
 2. Trust filters (`sources=`, `evidence=`, `max_tier=`, `min_evidence_score=`, `call_class=`, `tcdb_call=`) shape TERM2GENE and background identically; `interpro_type=` is **required** for `ontology='interpro'`.
 
@@ -101,7 +101,7 @@ This is **cross-feeding**: pair one organism's production with another's uptake 
 3. Compare the two gene sets per metabolite. Full tree + the undirected-reaction caveat: `docs://analysis/metabolites`.
 
 ### "Which genes belong to BRITE category / TCDB family / CAZy family / InterPro entry / MEROPS clan X?"
-- `genes_by_ontology(ontology=..., term_ids=[...], organism=...)` builds TERM2GENE for any of the 18 ontologies. BRITE: scope with `tree=` (`list_filter_values(filter_type='brite_tree')`). KEGG modules: optional `module_type=`.
+- `genes_by_ontology(ontology=..., term_ids=[...], organism=...)` builds TERM2GENE for any of the 18 ontologies. BRITE: scope with `tree=` (`list_filter_values(filter_type='brite_tree')`). KEGG modules: optional `module_type=`; complete in a strain (not just genes)? `kegg_module_completeness`.
 - **Substrate-anchored TCDB** ("which genes transport metabolite Y", not "which genes are in family X")? Use `genes_by_metabolite` instead.
 - Trust filters (`sources=`, `evidence=`, `max_tier=`, `min_evidence_score=`, `call_class=` (MEROPS), `tcdb_call=` (TCDB), `interpro_type=`) on 16 of the 18; rank-vs-filter rule + per-ontology axes: `docs://analysis/annotation_evidence`.
 - No term ID yet? `search_ontology(ontology=['tcdb'], level=2)` browses by size. Have the ID? `ontology_term_details(term_ids=[...])`. Per-ontology semantics: `docs://ontologies/{key}`.
@@ -114,7 +114,7 @@ This is **DE by functional class**: roll a DE result up to an ontology family in
 
 ### "This gene has a Pfam domain / InterPro entry — which transporter, peptidase or TIGR role does that point to?"
 This is **bridge walking**: `ontology_term_details(term_ids=[...]).links_out[]` (`link_kind` = `composition` / `membership` / `router`; definitions: `docs://tools/ontology_term_details/full`).
-- `router` links are recall-biased, **never** a gene-function call. Bridges are forward-only — to go the other way, browse the target ontology or intersect two `genes_by_ontology` calls.
+- `router` links are recall-biased, **never** a gene-function call. Bridges are forward-only — to go back, browse the target ontology or intersect two `genes_by_ontology` calls.
 - TIGR roles: directly (`ontology='tigr_role'`, the gene-level call) or via the NCBIfam router (explains *why*, not a call on its own). Filter with `link_kinds=[...]`.
 
 ### "Where in the cell does gene X live? / Is gene X secreted (signal peptide)?"
@@ -123,7 +123,7 @@ This is **bridge walking**: `ontology_term_details(term_ids=[...]).links_out[]` 
 - Per-gene lookup: `gene_ontology_terms(locus_tags=[...], ontology=..., mode="leaf")`; `gene_details` carries the same calls as plain `Gene` properties.
 
 ### "Get the protein/AA sequence of gene X (for BLAST/alignment)."
-- `gene_aa_sequence(locus_tags=[...], fasta=True)` — returns amino-acid sequences (no nucleotide). `fasta=True` gives one multi-FASTA blob ready to paste into an external aligner / search tool.
+- `gene_aa_sequence(locus_tags=[...], fasta=True)` — returns amino-acid sequences (no nucleotide). `fasta=True` gives one multi-FASTA blob for an external aligner.
 
 ### "What genes sit next to X on the genome / is X in an operon?"
 - `gene_neighbors(locus_tags=["X"], window=5)` — genes flanking the anchor on the same contig, with `rank_offset`, `bp_gap`, and `same_strand`. Positional only — confirm co-regulation with the expression tools.
@@ -135,13 +135,13 @@ The **literature index** — a recall-biased index of genes and KEGG pathways ea
 - KEGG pathway → discussing papers: `search_ontology(ontology='kegg')` carries `discussed_by_n_publications` per term (verbose: the DOI list).
 
 ### "I want raw Cypher."
-- `run_cypher(query="...")`. Read-only; writes blocked. Validate against `kg_schema` first; reach for Cypher only when you are sure no typed tool fits. Apostrophes in stored names are carets (`^`) — `docs://guide/conventions`.
+- `run_cypher(query="...")`. Read-only; writes blocked. Validate against `kg_schema` first; use it only when no typed tool fits. Apostrophes in stored names are carets (`^`) — `docs://guide/conventions`.
 
 ---
 
 ## When to call `summary=True` first
 
-36 of 42 tools accept `summary=True`: returns only the envelope rollups
+37 of 43 tools accept `summary=True`: returns only the envelope rollups
 (`by_organism`, `top_*`, counts) over the **full matched set**, with
 `results=[]`. Pattern: `summary=True` → read rollups → narrow with
 filters → drop `summary=True` for detail rows. The 6 tools without it,

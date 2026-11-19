@@ -69,7 +69,7 @@ mcp = FastMCP(
     "multiomics-kg",
     instructions=(
         "Multi-omics knowledge graph for Prochlorococcus and Alteromonas "
-        "(42 tools).\n\n"
+        "(43 tools).\n\n"
         "First call: kg_release_info — KG identity + compatibility verdict.\n"
         "Directory: docs://index — every docs:// page with its ~token size "
         "(read-when notes on the guide/analysis/example rows). Start with "

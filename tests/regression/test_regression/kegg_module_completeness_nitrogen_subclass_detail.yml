@@ -1,0 +1,147 @@
+by_class:
+- class_id: kegg.module:pathway_modules.energy_metabolism
+  class_name: Energy metabolism
+  complete: 1
+  module_count: 7
+  no_edge: 19
+  one_step_missing: 1
+  partial: 0
+  two_steps_missing: 0
+by_status:
+- count: 1
+  status: complete
+- count: 1
+  status: one_step_missing
+- count: 0
+  status: two_steps_missing
+- count: 0
+  status: partial
+case_id: kegg_module_completeness_nitrogen_subclass_detail
+modules_in_scope: 7
+no_edge_count: 19
+not_found_modules: []
+not_found_organisms: []
+not_matched_modules: []
+offset: 0
+organism_name: null
+organisms_in_scope: 3
+results:
+- definition: (K00367,K10534,(K00372-K00360)) (K00366,K17877,(K26139+K26138),K00361)
+  ec_filled_step_indices: []
+  ec_genes: []
+  missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_definitions:
+  - (K00367,K10534,(K00372-K00360))
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_subclass: Nitrogen metabolism
+  module_type: pathway
+  organism_name: Prochlorococcus MIT9313
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- definition: (K00367,K10534,(K00372-K00360)) (K00366,K17877,(K26139+K26138),K00361)
+  ec_filled_step_indices: []
+  ec_genes: []
+  missing_kos: []
+  missing_step_definitions: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_subclass: Nitrogen metabolism
+  module_type: pathway
+  organism_name: Synechococcus WH8102
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+returned: 2
+row_count: 2
+top_modules:
+- complete: 1
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  no_edge: 1
+  one_step_missing: 1
+  partial: 0
+  two_steps_missing: 0
+- complete: 0
+  module_id: kegg.module:M00528
+  module_name: Nitrification, ammonia => nitrite
+  module_type: pathway
+  no_edge: 3
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 0
+  module_id: kegg.module:M00529
+  module_name: Denitrification, nitrate => nitrogen
+  module_type: pathway
+  no_edge: 3
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 0
+  module_id: kegg.module:M00530
+  module_name: Dissimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  no_edge: 3
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 0
+  module_id: kegg.module:M00804
+  module_name: Complete nitrification, comammox, ammonia => nitrite => nitrate
+  module_type: pathway
+  no_edge: 3
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 0
+  module_id: kegg.module:M00973
+  module_name: Anammox, nitrite + ammonia => nitrogen
+  module_type: pathway
+  no_edge: 3
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 0
+  module_id: kegg.module:M01069
+  module_name: Nitrogen cycle
+  module_type: pathway
+  no_edge: 3
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+top_organisms:
+- complete: 1
+  no_edge: 6
+  one_step_missing: 0
+  organism_name: Synechococcus WH8102
+  partial: 0
+  two_steps_missing: 0
+- complete: 0
+  no_edge: 7
+  one_step_missing: 0
+  organism_name: Prochlorococcus MED4
+  partial: 0
+  two_steps_missing: 0
+- complete: 0
+  no_edge: 6
+  one_step_missing: 1
+  organism_name: Prochlorococcus MIT9313
+  partial: 0
+  two_steps_missing: 0
+total_entries: 26004
+total_matching: 2
+truncated: false
+warnings: []

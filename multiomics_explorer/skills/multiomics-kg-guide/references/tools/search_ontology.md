@@ -61,6 +61,7 @@ Result row: `id, name, ontology_type, score, level, is_informative, tree, tree_c
 - search_ontology(ontology=[key], level=N) (browse) → ontology_landscape(ontology=[key]) → pathway_enrichment(ontology=key, level=N)
 - list_filter_values('brite_tree') → search_ontology(ontology=['brite'], tree=...)
 - search_ontology(ontology=['kegg'], verbose=True) → read per-term discussed_in_publications DOIs → list_publications(publication_dois=[...]) or discussed_by_publication(publication_dois=[...])
+- search_ontology(search_text=..., ontology='kegg_module') → kegg_module_completeness(module_ids=[...]) — which strains carry the module complete, and what the others miss
 - search_ontology(ontology=['interpro'], interpro_type=...) / ['ncbifam'] / ['merops'] → genes_by_ontology(ontology=..., term_ids=[...], organism=...) — same forward chain as every other ontology
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/search_ontology/full`

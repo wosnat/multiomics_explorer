@@ -79,7 +79,11 @@
 
 - pattern: '\b41 tools\b'
   reason: "tool count from before the 42nd tool"
-  replacement: "42 tools (server.py instructions / registry)"
+  replacement: "43 tools (server.py instructions / registry)"
+
+- pattern: '\b42 (?:\w+ )?(?:tools|functions)\b'
+  reason: "tool count from before the 43rd tool (kegg_module_completeness)"
+  replacement: "43 tools (server.py instructions / registry)"
 
 - pattern: 'docs://ontologies(?![/\w])'
   reason: "bare docs://ontologies is not a served resource"

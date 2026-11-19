@@ -763,6 +763,7 @@ ontology_landscape → genes_by_ontology(level=N) → pathway_enrichment
 pathway_enrichment → gene_overview
 differential_expression_by_gene → pathway_enrichment
 pathway_enrichment(ontology='kegg', ...) → list_metabolites(pathway_ids=[<enriched_pathway_id>]) — inspect the chemistry of an enriched KEGG pathway (compound-anchored membership, distinct from the gene-KO membership the enrichment used). See docs://analysis/metabolites for the pathway-anchor disambiguation.
+pathway_enrichment(ontology='kegg_module', level=3) → kegg_module_completeness(organism=..., module_ids=[enriched term_ids]) — module ORA tests gene sets; this says whether the enriched route is complete in the genome
 See `docs://analysis/enrichment` for the full methodology and the `informative_only` filter semantics.
 ontology_landscape(ontology='interpro') → pathway_enrichment(ontology='interpro', interpro_type=..., level=...) — pick the InterPro type before enrichment; the param is required.
 See `docs://analysis/annotation_evidence` for the trust-axis registry (which filters apply to which ontology) and rank-vs-filter guidance for evidence_score.

@@ -1,0 +1,1231 @@
+by_class:
+- class_id: kegg.module:pathway_modules.energy_metabolism
+  class_name: Energy metabolism
+  complete: 56
+  module_count: 1
+  no_edge: 36
+  one_step_missing: 26
+  partial: 0
+  two_steps_missing: 0
+by_status:
+- count: 56
+  status: complete
+- count: 26
+  status: one_step_missing
+- count: 0
+  status: two_steps_missing
+- count: 0
+  status: partial
+case_id: kegg_module_completeness_m00531_cross_strain
+modules_in_scope: 1
+no_edge_count: 36
+not_found_modules: []
+not_found_organisms: []
+not_matched_modules: []
+offset: 0
+organism_name: null
+organisms_in_scope: 118
+results:
+- missing_kos:
+  - K00361
+  - K00366
+  - K17877
+  - K26138
+  - K26139
+  missing_step_indices:
+  - '2'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Alteromonas (MarRef v6)
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00361
+  - K00366
+  - K17877
+  - K26138
+  - K26139
+  missing_step_indices:
+  - '2'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Alteromonas macleodii 83-1
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00361
+  - K00366
+  - K17877
+  - K26138
+  - K26139
+  missing_step_indices:
+  - '2'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Alteromonas macleodii AD45
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00361
+  - K00366
+  - K17877
+  - K26138
+  - K26139
+  missing_step_indices:
+  - '2'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Alteromonas macleodii ATCC27126
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00361
+  - K00366
+  - K17877
+  - K26138
+  - K26139
+  missing_step_indices:
+  - '2'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Alteromonas macleodii BGP6
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00361
+  - K00366
+  - K17877
+  - K26138
+  - K26139
+  missing_step_indices:
+  - '2'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Alteromonas macleodii BS11
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00361
+  - K00366
+  - K17877
+  - K26138
+  - K26139
+  missing_step_indices:
+  - '2'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Alteromonas macleodii EZ55
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00361
+  - K00366
+  - K17877
+  - K26138
+  - K26139
+  missing_step_indices:
+  - '2'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Alteromonas macleodii HOT1A3
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00361
+  - K00366
+  - K17877
+  - K26138
+  - K26139
+  missing_step_indices:
+  - '2'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Alteromonas macleodii MIT1002
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00361
+  - K00366
+  - K17877
+  - K26138
+  - K26139
+  missing_step_indices:
+  - '2'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Alteromonas mediterranea AltDE
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00361
+  - K00366
+  - K17877
+  - K26138
+  - K26139
+  missing_step_indices:
+  - '2'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Alteromonas mediterranea AltDE1
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Cyanobium NS01
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Cyanobium PCC6307
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Cyanobium PCC7001
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Meiothermus ruber
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Prochlorococcus MIT0604
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Prochlorococcus MIT0701
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Prochlorococcus MIT0702
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Prochlorococcus MIT0703
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Prochlorococcus MIT0801
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Prochlorococcus MIT1327
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Prochlorococcus MIT9303
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Prochlorococcus MIT9313
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Prochlorococcus NATL1A
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Prochlorococcus NATL2A
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Prochlorococcus PAC1
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Prochlorococcus SB
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00361
+  - K00366
+  - K17877
+  - K26138
+  - K26139
+  missing_step_indices:
+  - '2'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Pseudomonas putida KT2440
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus A15-127
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus A15-24
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus A15-28
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus A15-44
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus A15-60
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus A15-62
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus A18-25c
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus A18-40
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus A18-46.1
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus BIOS-E4-1
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus BIOS-U3-1
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus BMK-MC-1
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus BOUM118
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus CB0101
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus CB0205
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus CC9311
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus CC9605
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus CC9616
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus CC9902
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus KORDI-100
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus KORDI-49
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus KORDI-52
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus M16.1
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus MEDNS5
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus MINOS11
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus MITS9220
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus MVIR-18-1
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus NOUM97013
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus PCC 7002
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus PROS-7-1
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus PROS-9-1
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus PROS-U-1
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus RCC307
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus ROS8604
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus RS9902
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus RS9907
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus RS9909
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus RS9915
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus RS9916
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos:
+  - K00367
+  - K00372
+  - K10534
+  missing_step_indices:
+  - '1'
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus RS9917
+  status: one_step_missing
+  steps_present: 1
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus SYN20
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus TAK9802
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus WH5701
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus WH7803
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus WH7805
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus WH8016
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus WH8101
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus WH8102
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus WH8103
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus WH8109
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus elongatus PCC 7942
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus elongatus UTEX 2973
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Synechococcus sp. BL107
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+- missing_kos: []
+  missing_step_indices: []
+  module_class: Energy metabolism
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  organism_name: Thermosynechococcus vestitus BP-1
+  status: complete
+  steps_present: 2
+  steps_present_via_ec: 0
+  steps_total: 2
+returned: 82
+row_count: 82
+top_modules:
+- complete: 56
+  module_id: kegg.module:M00531
+  module_name: Assimilatory nitrate reduction, nitrate => ammonia
+  module_type: pathway
+  no_edge: 36
+  one_step_missing: 26
+  organisms_without_edge:
+  - Marinobacter (MarRef v6)
+  - Prochlorococcus AS9601
+  - Prochlorococcus EQPAC1
+  - Prochlorococcus GP2
+  - Prochlorococcus HNLC1
+  - Prochlorococcus HNLC2
+  - Prochlorococcus LG
+  - Prochlorococcus MED4
+  - Prochlorococcus MIT0601
+  - Prochlorococcus MIT0602
+  - Prochlorococcus MIT0603
+  - Prochlorococcus MIT1314
+  - Prochlorococcus MIT9107
+  - Prochlorococcus MIT9116
+  - Prochlorococcus MIT9123
+  - Prochlorococcus MIT9201
+  - Prochlorococcus MIT9202
+  - Prochlorococcus MIT9211
+  - Prochlorococcus MIT9215
+  - Prochlorococcus MIT9301
+  - Prochlorococcus MIT9302
+  - Prochlorococcus MIT9311
+  - Prochlorococcus MIT9312
+  - Prochlorococcus MIT9314
+  - Prochlorococcus MIT9321
+  - Prochlorococcus MIT9322
+  - Prochlorococcus MIT9401
+  - Prochlorococcus MIT9515
+  - Prochlorococcus RSP50
+  - Prochlorococcus SS2
+  - Prochlorococcus SS35
+  - Prochlorococcus SS51
+  - Prochlorococcus SS52
+  - Prochlorococcus marinus subsp. marinus CCMP1375 (SS120)
+  - Ruegeria pomeroyi DSS-3
+  - Shewanella sp. W3-18-1
+  partial: 0
+  two_steps_missing: 0
+top_organisms:
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Cyanobium NS01
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Cyanobium PCC6307
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Cyanobium PCC7001
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Prochlorococcus MIT0604
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Prochlorococcus PAC1
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Prochlorococcus SB
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Synechococcus A15-127
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Synechococcus A15-24
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Synechococcus A15-28
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Synechococcus A15-44
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Synechococcus A15-60
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Synechococcus A15-62
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Synechococcus A18-25c
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Synechococcus A18-40
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Synechococcus A18-46.1
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Synechococcus BIOS-E4-1
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Synechococcus BIOS-U3-1
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Synechococcus BMK-MC-1
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Synechococcus BOUM118
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  no_edge: 0
+  one_step_missing: 0
+  organism_name: Synechococcus CB0101
+  partial: 0
+  two_steps_missing: 0
+total_entries: 26004
+total_matching: 82
+truncated: false
+warnings: []

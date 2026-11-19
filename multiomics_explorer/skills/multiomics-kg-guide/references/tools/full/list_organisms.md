@@ -80,6 +80,7 @@ total_entries, total_matching, by_cluster_type, by_organism_type, by_value_kind,
 | nonpeptidase_homolog_gene_count | int (optional) | Genes with a MEROPS 'nonpeptidase_homolog' call (a gene can carry both classes). Precomputed OrganismTaxon.nonpeptidase_homolog_gene_count; 0 when none. |
 | interpro_gene_count | int (optional) | Genes with at least one InterPro entry. Precomputed OrganismTaxon.interpro_gene_count; 0 when none. Coverage count for reading, not selecting. |
 | ncbifam_gene_count | int (optional) | Genes with at least one NCBIfam family. Precomputed OrganismTaxon.ncbifam_gene_count; 0 when none. Coverage count for reading, not selecting. |
+| complete_pathway_module_count | int (optional) | KEGG pathway modules with every step covered in this organism (signature modules not counted); 0 without genes. Equals kegg_module_completeness(organism=X, status=['complete'], summary=True).total_matching. |
 | reference_database | string \| None (optional) | Reference database used for matching (e.g. 'MarRef v6'). Only on reference_proteome_match organisms. |
 | reference_proteome | string \| None (optional) | Accession of matched reference proteome (e.g. 'GCA_003513035.1'). Only on reference_proteome_match organisms. |
 
@@ -225,6 +226,7 @@ list_organisms()
       "nonpeptidase_homolog_gene_count": 0,
       "interpro_gene_count": 0,
       "ncbifam_gene_count": 0,
+      "complete_pathway_module_count": 0,
       "...": "3 null fields omitted (species, strain, clade)"
     },
     {
@@ -257,6 +259,7 @@ list_organisms()
       "nonpeptidase_homolog_gene_count": 31,
       "interpro_gene_count": 3791,
       "ncbifam_gene_count": 1385,
+      "complete_pathway_module_count": 61,
       "reference_database": "MarRef v6",
       "reference_proteome": "UP000262181"
     },
@@ -289,7 +292,8 @@ list_organisms()
       "peptidase_gene_count": 127,
       "nonpeptidase_homolog_gene_count": 33,
       "interpro_gene_count": 3658,
-      "ncbifam_gene_count": 1661
+      "ncbifam_gene_count": 1661,
+      "complete_pathway_module_count": 83
     },
     ...
   ]
@@ -497,7 +501,8 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
       "peptidase_gene_count": 120,
       "nonpeptidase_homolog_gene_count": 32,
       "interpro_gene_count": 3636,
-      "ncbifam_gene_count": 1704
+      "ncbifam_gene_count": 1704,
+      "complete_pathway_module_count": 85
     },
     {
       "organism_name": "Prochlorococcus MED4",
@@ -528,7 +533,8 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Alteromonas macleodii MI
       "peptidase_gene_count": 50,
       "nonpeptidase_homolog_gene_count": 8,
       "interpro_gene_count": 1581,
-      "ncbifam_gene_count": 745
+      "ncbifam_gene_count": 745,
+      "complete_pathway_module_count": 51
     }
   ]
 }
@@ -640,7 +646,8 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
       "peptidase_gene_count": 50,
       "nonpeptidase_homolog_gene_count": 8,
       "interpro_gene_count": 1581,
-      "ncbifam_gene_count": 745
+      "ncbifam_gene_count": 745,
+      "complete_pathway_module_count": 51
     },
     {
       "organism_name": "Prochlorococcus MIT9301",
@@ -671,7 +678,8 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Prochlorococcus MIT9301"
       "peptidase_gene_count": 49,
       "nonpeptidase_homolog_gene_count": 10,
       "interpro_gene_count": 1572,
-      "ncbifam_gene_count": 776
+      "ncbifam_gene_count": 776,
+      "complete_pathway_module_count": 52
     }
   ]
 }
@@ -807,7 +815,8 @@ list_organisms(compartment="vesicle")
       "peptidase_gene_count": 129,
       "nonpeptidase_homolog_gene_count": 32,
       "interpro_gene_count": 3543,
-      "ncbifam_gene_count": 1615
+      "ncbifam_gene_count": 1615,
+      "complete_pathway_module_count": 81
     },
     {
       "organism_name": "Alteromonas macleodii ATCC27126",
@@ -838,7 +847,8 @@ list_organisms(compartment="vesicle")
       "peptidase_gene_count": 125,
       "nonpeptidase_homolog_gene_count": 37,
       "interpro_gene_count": 3494,
-      "ncbifam_gene_count": 1604
+      "ncbifam_gene_count": 1604,
+      "complete_pathway_module_count": 82
     },
     {
       "organism_name": "Alteromonas macleodii BGP6",
@@ -869,7 +879,8 @@ list_organisms(compartment="vesicle")
       "peptidase_gene_count": 127,
       "nonpeptidase_homolog_gene_count": 33,
       "interpro_gene_count": 3661,
-      "ncbifam_gene_count": 1661
+      "ncbifam_gene_count": 1661,
+      "complete_pathway_module_count": 83
     },
     ...
   ]
@@ -994,7 +1005,8 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Pseudomonas putida KT244
       "peptidase_gene_count": 50,
       "nonpeptidase_homolog_gene_count": 8,
       "interpro_gene_count": 1581,
-      "ncbifam_gene_count": 745
+      "ncbifam_gene_count": 745,
+      "complete_pathway_module_count": 51
     },
     {
       "organism_name": "Pseudomonas putida KT2440",
@@ -1025,7 +1037,8 @@ list_organisms(organism_names=["Prochlorococcus MED4", "Pseudomonas putida KT244
       "peptidase_gene_count": 125,
       "nonpeptidase_homolog_gene_count": 43,
       "interpro_gene_count": 5047,
-      "ncbifam_gene_count": 2290
+      "ncbifam_gene_count": 2290,
+      "complete_pathway_module_count": 95
     }
   ]
 }
@@ -1046,6 +1059,7 @@ list_organisms → per-row interpro_gene_count / ncbifam_gene_count → ontology
 list_organisms (per-row measured_metabolite_count > 0) → list_metabolite_assays(organism=...) for the metabolomics measurement layer
 list_organisms → list_experiments(organism=...) to scope experiments to the chosen organism
 list_organisms (per-row partner_experiment_count > 0) → list_experiments(coculture_partner=organism_name) for the experiments in which this organism is the coculture partner
+list_organisms (per-row complete_pathway_module_count) → kegg_module_completeness(organism=..., status=['complete']) for the modules behind the count, and the near-misses with `status=['one_step_missing']`
 ```
 
 ## Common mistakes
@@ -1055,6 +1069,8 @@ list_organisms (per-row partner_experiment_count > 0) → list_experiments(cocul
 - `catalyzed_metabolite_count` counts catalysis capability only — distinct metabolites reachable through Gene → Reaction → Metabolite. Transport reach is the separate `transported_metabolite_count` (distinct metabolites curated on the TC systems the organism's genes point at directly, `tcdb_gate='direct'`; family-level calls and weak hits do not count). Measurement-side coverage is `measured_metabolite_count`. catalyzed_metabolite_count=0 means no catalysis path in this organism, not that chemistry is absent from the KG.
 
 - `go_transport_metabolite_count` counts metabolites reached through direct GO transport terms (chemical roles and is_a-inherited targets excluded). It is a separate route from `transported_metabolite_count` (TCDB); the two overlap and do not add up to a total transport reach.
+
+- `complete_pathway_module_count` counts KEGG pathway modules with every step covered by an annotated gene (signature modules are not counted). It is a capability-presence count, not proof the routes run; per-module status and missing KOs come from kegg_module_completeness.
 
 - gene_count and publication_count are counts of data in the KG, not biological totals.
 

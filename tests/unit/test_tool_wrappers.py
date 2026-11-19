@@ -16104,6 +16104,8 @@ class TestListOrganismsCompletePathwayModuleCountWrapper:
             "truncated": False, "not_found": [], "warnings": [],
             "results": [{"organism_name": _KMC_MED4,
                          "organism_type": "genome_strain",
+                         "gene_count": 1976, "publication_count": 0,
+                         "experiment_count": 0,
                          "complete_pathway_module_count": 51}],
         }
         with patch("multiomics_explorer.api.functions.list_organisms",

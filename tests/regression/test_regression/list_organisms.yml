@@ -7,6 +7,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 0
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 0
@@ -41,6 +42,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 61
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 20
@@ -78,6 +80,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 83
   derived_metric_count: 5
   derived_metric_value_kinds:
   - boolean
@@ -124,6 +127,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 81
   derived_metric_count: 4
   derived_metric_value_kinds:
   - boolean
@@ -165,6 +169,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 82
   derived_metric_count: 6
   derived_metric_value_kinds:
   - boolean
@@ -210,6 +215,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - vesicle
+  complete_pathway_module_count: 83
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
@@ -247,6 +253,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - vesicle
+  complete_pathway_module_count: 82
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
@@ -286,6 +293,7 @@ rows:
   compartments:
   - exoproteome
   - whole_cell
+  complete_pathway_module_count: 84
   derived_metric_count: 15
   derived_metric_value_kinds:
   - boolean
@@ -334,6 +342,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 83
   derived_metric_count: 4
   derived_metric_value_kinds:
   - boolean
@@ -384,6 +393,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 85
   derived_metric_count: 6
   derived_metric_value_kinds:
   - boolean
@@ -427,6 +437,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 74
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 0
@@ -458,6 +469,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 82
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 0
@@ -490,6 +502,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 58
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -525,6 +538,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 58
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -560,6 +574,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 56
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -594,6 +609,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 0
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 0
@@ -628,6 +644,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 76
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 20
@@ -664,6 +681,7 @@ rows:
   - condition_comparison
   clustering_analysis_count: 2
   compartments: []
+  complete_pathway_module_count: 58
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 0
@@ -695,6 +713,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 0
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 0
@@ -730,6 +749,7 @@ rows:
   clustering_analysis_count: 1
   compartments:
   - whole_cell
+  complete_pathway_module_count: 52
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -768,6 +788,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -803,6 +824,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 50
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -838,6 +860,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 41
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -873,6 +896,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 43
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -908,6 +932,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -955,6 +980,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 28
   derived_metric_value_kinds:
   - boolean
@@ -1021,6 +1047,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1056,6 +1083,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1091,6 +1119,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1127,6 +1156,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 54
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1166,6 +1196,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 49
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1201,6 +1232,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1236,6 +1268,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1272,6 +1305,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 49
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1309,6 +1343,7 @@ rows:
   - genomic_island
   clustering_analysis_count: 1
   compartments: []
+  complete_pathway_module_count: 51
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 0
@@ -1340,6 +1375,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 51
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 0
@@ -1372,6 +1408,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 53
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1407,6 +1444,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 53
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1442,6 +1480,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 53
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1477,6 +1516,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1512,6 +1552,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 47
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1547,6 +1588,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1582,6 +1624,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 53
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1622,6 +1665,7 @@ rows:
   clustering_analysis_count: 2
   compartments:
   - whole_cell
+  complete_pathway_module_count: 52
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1663,6 +1707,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 52
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1701,6 +1746,7 @@ rows:
   clustering_analysis_count: 1
   compartments:
   - whole_cell
+  complete_pathway_module_count: 52
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1740,6 +1786,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1781,6 +1828,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 52
   derived_metric_count: 5
   derived_metric_value_kinds:
   - categorical
@@ -1834,6 +1882,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 13
   derived_metric_value_kinds:
   - boolean
@@ -1887,6 +1936,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 54
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1922,6 +1972,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 50
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1957,6 +2008,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -1992,6 +2044,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2027,6 +2080,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 52
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2065,6 +2119,7 @@ rows:
   clustering_analysis_count: 1
   compartments:
   - whole_cell
+  complete_pathway_module_count: 49
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2110,6 +2165,7 @@ rows:
   clustering_analysis_count: 3
   compartments:
   - whole_cell
+  complete_pathway_module_count: 50
   derived_metric_count: 7
   derived_metric_value_kinds:
   - boolean
@@ -2159,6 +2215,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 52
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2194,6 +2251,7 @@ rows:
   - genomic_island
   clustering_analysis_count: 1
   compartments: []
+  complete_pathway_module_count: 49
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 0
@@ -2226,6 +2284,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 52
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2261,6 +2320,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2296,6 +2356,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2331,6 +2392,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2366,6 +2428,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2407,6 +2470,7 @@ rows:
   clustering_analysis_count: 1
   compartments:
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2450,6 +2514,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 95
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 2
@@ -2489,6 +2554,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - exoproteome
+  complete_pathway_module_count: 74
   derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
@@ -2531,6 +2597,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 83
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 3
@@ -2567,6 +2634,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2602,6 +2670,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 56
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2637,6 +2706,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 54
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2672,6 +2742,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2707,6 +2778,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2742,6 +2814,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 56
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2777,6 +2850,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2812,6 +2886,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 56
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2847,6 +2922,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 54
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2882,6 +2958,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2917,6 +2994,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 58
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2952,6 +3030,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -2987,6 +3066,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3022,6 +3102,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 54
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3057,6 +3138,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 53
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3096,6 +3178,7 @@ rows:
   compartments:
   - exoproteome
   - whole_cell
+  complete_pathway_module_count: 54
   derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
@@ -3137,6 +3220,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 54
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3172,6 +3256,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 54
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3207,6 +3292,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 56
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3242,6 +3328,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 57
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3277,6 +3364,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3312,6 +3400,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3347,6 +3436,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3382,6 +3472,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 54
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3417,6 +3508,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 58
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3452,6 +3544,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3487,6 +3580,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 53
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3522,6 +3616,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 60
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3557,6 +3652,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 57
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 3
@@ -3593,6 +3689,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 53
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3628,6 +3725,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 53
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3663,6 +3761,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 56
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3698,6 +3797,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 57
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3733,6 +3833,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3768,6 +3869,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 57
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3803,6 +3905,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 56
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3838,6 +3941,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 56
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3873,6 +3977,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 54
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -3910,6 +4015,7 @@ rows:
   compartments:
   - exoproteome
   - whole_cell
+  complete_pathway_module_count: 58
   derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
@@ -3950,6 +4056,7 @@ rows:
   compartments:
   - exoproteome
   - whole_cell
+  complete_pathway_module_count: 54
   derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
@@ -3988,6 +4095,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 54
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -4023,6 +4131,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 53
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -4061,6 +4170,7 @@ rows:
   compartments:
   - exoproteome
   - whole_cell
+  complete_pathway_module_count: 56
   derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
@@ -4106,6 +4216,7 @@ rows:
   compartments:
   - exoproteome
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
@@ -4159,6 +4270,7 @@ rows:
   compartments:
   - exoproteome
   - whole_cell
+  complete_pathway_module_count: 56
   derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
@@ -4197,6 +4309,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -4232,6 +4345,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 56
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -4273,6 +4387,7 @@ rows:
   compartments:
   - exoproteome
   - whole_cell
+  complete_pathway_module_count: 56
   derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
@@ -4326,6 +4441,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 57
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -4362,6 +4478,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 53
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical
@@ -4402,6 +4519,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - whole_cell
+  complete_pathway_module_count: 53
   derived_metric_count: 1
   derived_metric_value_kinds:
   - categorical
@@ -4441,6 +4559,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 54
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 2
@@ -4481,6 +4600,7 @@ rows:
   compartments:
   - exoproteome
   - whole_cell
+  complete_pathway_module_count: 55
   derived_metric_count: 4
   derived_metric_value_kinds:
   - categorical
@@ -4522,6 +4642,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 0
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 0
@@ -4555,6 +4676,7 @@ rows:
   - condition_comparison
   clustering_analysis_count: 2
   compartments: []
+  complete_pathway_module_count: 53
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 1
@@ -4589,6 +4711,7 @@ rows:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 0
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 0

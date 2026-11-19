@@ -293,8 +293,10 @@ pools both kinds, which is valid; pass `module_type="pathway"` to test routes
 only. Rows carry `module_type`. Genes reach modules through their KO, so a
 module run re-partitions the same KO annotations as `ontology="kegg"` — a
 different lens, not independent evidence — and an enriched module's gene set
-says nothing about whether every step of the route is present. See
-`docs://ontologies/kegg_module`.
+says nothing about whether every step of the route is present. Module ORA
+tests gene sets; `kegg_module_completeness(organism=..., module_ids=[...])`
+says whether the route is complete in the genome and which KOs are missing.
+See `docs://ontologies/kegg_module`.
 
 **TCDB** TERM2GENE is gated: it is built from the `Gene_has_tcdb_family`
 edges the KG stamps `tcdb_gate` = `direct` or `annotated`, one row per

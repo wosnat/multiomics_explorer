@@ -64,6 +64,7 @@ results:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 61
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 20
@@ -99,6 +100,7 @@ results:
   cluster_types: []
   clustering_analysis_count: 0
   compartments: []
+  complete_pathway_module_count: 0
   derived_metric_count: 0
   derived_metric_value_kinds: []
   experiment_count: 0
@@ -141,6 +143,7 @@ results:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 28
   derived_metric_value_kinds:
   - boolean

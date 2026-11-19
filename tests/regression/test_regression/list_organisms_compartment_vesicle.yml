@@ -11,6 +11,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 81
   derived_metric_count: 4
   derived_metric_value_kinds:
   - boolean
@@ -52,6 +53,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 82
   derived_metric_count: 6
   derived_metric_value_kinds:
   - boolean
@@ -97,6 +99,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - vesicle
+  complete_pathway_module_count: 83
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
@@ -134,6 +137,7 @@ rows:
   clustering_analysis_count: 0
   compartments:
   - vesicle
+  complete_pathway_module_count: 82
   derived_metric_count: 3
   derived_metric_value_kinds:
   - numeric
@@ -174,6 +178,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 83
   derived_metric_count: 4
   derived_metric_value_kinds:
   - boolean
@@ -224,6 +229,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 85
   derived_metric_count: 6
   derived_metric_value_kinds:
   - boolean
@@ -280,6 +286,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 28
   derived_metric_value_kinds:
   - boolean
@@ -352,6 +359,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 52
   derived_metric_count: 5
   derived_metric_value_kinds:
   - categorical
@@ -405,6 +413,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 13
   derived_metric_value_kinds:
   - boolean

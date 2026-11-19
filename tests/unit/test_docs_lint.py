@@ -52,7 +52,8 @@ DOC_FILES: list[Path] = sorted(
     list(REFS.rglob("*.md"))
     + list((INPUTS / "tools").rglob("*.yaml"))
     + list((INPUTS / "ontologies").rglob("*.yaml"))
-    + [TOOLS_PY, SERVER_PY, CLAUDE_MD, EXAMPLES_DIR / "README.md"]
+    + [TOOLS_PY, SERVER_PY, CLAUDE_MD, EXAMPLES_DIR / "README.md",
+       REPO / "README.md"]
     + sorted(EXAMPLES_DIR.glob("*.py"))
 )
 

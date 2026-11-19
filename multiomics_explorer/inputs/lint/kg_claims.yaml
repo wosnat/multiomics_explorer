@@ -143,16 +143,16 @@
 
 - id: tool_count
   source: tool_registry
-  expect: {tools: 42}
+  expect: {tools: 43}
   quoted:
-    - '42 tools'
-    - '42 API functions'
+    - '43 tools'
+    - '43 API functions'
   used_in:
     - multiomics_explorer/mcp_server/server.py
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/start_here.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/python_api.md
-  note: "registered @mcp.tool count — '42 tools'"
+  note: "registered @mcp.tool count — '43 tools'"
 
 - id: cynd_tcdb_worked_example
   cypher: >
@@ -702,10 +702,26 @@
 
 - id: summary_param_tools
   source: summary_tools
-  expect: {summary_tools: 36, tools: 42}
+  expect: {summary_tools: 37, tools: 43}
   quoted:
-    - "36 of 42 tools accept `summary=True`"
+    - "37 of 43 tools accept `summary=True`"
   used_in:
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/start_here.md
     - multiomics_explorer/skills/multiomics-kg-guide/references/guide/conventions.md
   note: "registered tools whose MCP input schema has a `summary` param"
+
+- id: kegg_module_pcc7942_psii_no_edge
+  cypher: >
+    MATCH (o:OrganismTaxon {preferred_name: 'Synechococcus elongatus PCC 7942'}),
+          (m:KeggModule {id: 'kegg.module:M00161'})
+    OPTIONAL MATCH (o)-[r:Organism_has_kegg_module]->(m)
+    WITH o, m, count(r) AS edges
+    OPTIONAL MATCH (g:Gene)-[:Gene_has_kegg_ko]->(k)-[:Kegg_term_in_kegg_module]->(m)
+    WHERE g.organism_name = o.preferred_name
+    RETURN edges, count(DISTINCT k.id) AS kos_present, m.step_count AS steps
+  expect: {edges: 0, kos_present: 5, steps: 1}
+  quoted:
+    - '5 of the 6 Photosystem II (M00161) subunit KOs'
+  used_in:
+    - multiomics_explorer/inputs/tools/kegg_module_completeness.yaml
+  note: "no-edge-is-not-no-genes example: PCC 7942 has 5/6 PSII KOs (psbD K02706 missing), one-step module → no Organism_has_kegg_module edge"

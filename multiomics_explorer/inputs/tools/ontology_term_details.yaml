@@ -375,6 +375,80 @@ examples:
     call: ontology_term_details(term_ids=["go:0006979", "tcdb:3.A.1"], organism="MED4", verbose=True)
     note: "With organism= set ('MED4' resolves to 'Prochlorococcus MED4'), compact rows gain organism_gene_count (subtree count, term + descendants — the same number search_ontology(organism=...) shows: 52 for tcdb:3.A.1 on both tools, gated TCDB edges only) and the verbose genes_by_organism[] holds only that organism."
 
+  - title: One organism's completeness status on a KEGG module
+    call: ontology_term_details(term_ids=["kegg.module:M00531"], organism="Synechococcus WH8102")
+    note: "On level-3 KEGG module rows, `organism=` adds `organism_module_status` and `organism_steps_present`; with organism=\"Prochlorococcus MED4\" the status is null (no step covered). Bands and missing KOs across strains: kegg_module_completeness."
+    response: |
+      {
+        "total_matching": 1,
+        "returned": 1,
+        "offset": 0,
+        "truncated": false,
+        "not_found": [],
+        "by_ontology": [{"ontology": "kegg_module", "count": 1}],
+        "links_out_total": 4,
+        "by_link_kind": [{"link_kind": "membership", "count": 4}],
+        "resolved_aliases": {},
+        "warnings": [],
+        "results": [
+          {
+            "term_id": "kegg.module:M00531",
+            "ontology": "kegg_module",
+            "label": "KeggModule",
+            "name": "Assimilatory nitrate reduction, nitrate => ammonia",
+            "description": null,
+            "level": 3,
+            "level_kind": "kegg_module",
+            "is_informative": true,
+            "gene_count": 144,
+            "organism_count": 82,
+            "direct_gene_count": 144,
+            "organism_gene_count": 2,
+            "module_type": "pathway",
+            "module_id": "M00531",
+            "step_count": 2,
+            "definition": "(K00367,K10534,(K00372-K00360)) (K00366,K17877,(K26139+K26138),K00361)",
+            "complete_organism_count": 56,
+            "organism_module_status": "complete",
+            "organism_steps_present": 2,
+            "parents": [
+              {
+                "id": "kegg.module:pathway_modules.energy_metabolism.nitrogen_metabolism",
+                "name": "Nitrogen metabolism",
+                "level": 2
+              }
+            ],
+            "children": [],
+            "children_total": 0,
+            "children_truncated": false,
+            "links_out": [
+              {
+                "rel": "Kegg_module_in_kegg_pathway",
+                "link_kind": "membership",
+                "target_id": "kegg.pathway:ko00910",
+                "target_ontology": "kegg",
+                "target_name": "Nitrogen metabolism"
+              },
+              {
+                "rel": "Kegg_module_in_kegg_pathway",
+                "link_kind": "membership",
+                "target_id": "kegg.pathway:ko01100",
+                "target_ontology": "kegg",
+                "target_name": "Metabolic pathways"
+              },
+              {
+                "rel": "Kegg_module_in_kegg_pathway",
+                "link_kind": "membership",
+                "target_id": "kegg.pathway:ko01120",
+                "target_ontology": "kegg",
+                "target_name": "Microbial metabolism in diverse environments"
+              },
+              ...
+            ]
+          }
+        ]
+      }
+
   - title: From an enrichment table to term context to genes
     steps: |
       Step 1: pathway_enrichment(organism="MED4", experiment_ids=["10.1101/2025.11.24.690089_growth_state_pro99lown_nutrient_starvation_med4_rnaseq_axenic"], ontology="tcdb", level=2)
@@ -414,6 +488,7 @@ chaining:
   - "ontology_term_details(link_kinds=['composition']) → ontology_term_details(term_ids=[links_out[].target_id]) — hop across bridges (tcdb → pfam → interpro)"
   - "gene_ontology_terms(locus_tags=[...]) → ontology_term_details(term_ids=[row.term_id]) — from a gene's terms to the terms' context"
   - "discussed_by_publication(publication_dois=[...]) → ontology_term_details(term_ids=[kegg.pathway ids]) — context for pathways a paper names"
+  - "ontology_term_details(term_ids=[module_id], organism=...) → kegg_module_completeness(module_ids=[module_id]) — from one organism's status to the module across every strain, with missing KOs"
 
 mistakes:
   - "Term IDs are self-prefixed CURIEs and the ontology is inferred from the node label — pass `go:0006979`, `tcdb:3.A.1`, `merops.family:S14`, `pfam:PF00005` / `pfam.clan:CL0023`, `kegg.pathway:ko00910`, `kegg.orthology:K02338`, `interpro:IPR000362`, `ncbifam:TIGR00254` / `ncbifam:NF006762`, `tigr.role:energy_metabolism` (main role) / `tigr.role:112` (sub role), `ec:1.1.1.1`, `cazy:GT2`. There is no `ontology=` param; a bare accession is coerced when unambiguous (see `resolved_aliases`) — an unresolvable id lands in `not_found`."
@@ -423,7 +498,7 @@ mistakes:
   - "`children` is capped at 50 per term; read `children_total` / `children_truncated` and drill with `search_ontology(ontology=[...], level=<child level>)` or `genes_by_ontology(term_ids=[...])` (hierarchy expansion DOWN) for the full set."
   - "`gene_count` / `organism_count` are subtree-inclusive on hierarchical labels and direct on flat ones; `direct_gene_count` is node-local and absent (not null) on flat labels and on PfamClan / BriteCategory — see docs://ontologies/{ontology} for what each count means there."
   - "`member_count` (TCDB, MEROPS, InterPro) is the upstream database's family size, not a KG gene count."
-  - "KEGG module rows (`kegg.module:M…`) carry `module_type`, `module_id`, `definition` (KEGG's KO formula) and `step_count`; class nodes use house slug ids and carry only `module_type` of these. `complete_organism_count` counts organisms with every step annotated — it differs from `organism_count`, which counts organisms with a gene whose KO is in the module. See docs://ontologies/kegg_module."
+  - "KEGG module rows (`kegg.module:M…`) carry `module_type`, `module_id`, `definition` (KEGG's KO formula) and `step_count`; class nodes use house slug ids and carry only `module_type` of these. `complete_organism_count` counts organisms with every step annotated — it differs from `organism_count`, which counts organisms with a gene whose KO is in the module. With `organism=`, module rows add `organism_module_status` (null = no step covered in that organism, kept as null) and `organism_steps_present`; class rows and other ontologies never carry them. Per-strain bands and missing KOs: kegg_module_completeness. See docs://ontologies/kegg_module."
   - "TCDB rows carry `tcdb_substrate_count` (distinct substrates TCDB curates on the systems in the node's subtree; substrate edges leave `tc_system` nodes only, so a family's own range is the sum below it), `direction` (`uptake` / `export` / `unknown`, TCDB-stated and conservative: ABC uptake numbering, which also marks ABC subfamilies, or a system's own name; family-level and higher nodes read `unknown`; rule: `docs://ontologies/tcdb`), sparse `direction_basis` and, on `tc_system` nodes, `proteins` (TCDB's protein list: gene symbols, accessions, source organism). Use `tcdb_substrate_count` to see how broad a family call is before trusting a family walk: the ABC superfamily tcdb:3.A.1 reads 547. Many children are range-only (`gene_count = 0`): curated systems no KG gene is called to."
   - "A compact column that is missing on the node is absent, not null: GO rows carry only `direct_gene_count` from their compact extras, Pfam rows `short_name`, KEGG `reaction_count` / `metabolite_count` only on pathway terms (absent on KO / module rows). Do not treat an absent key as `0`."
   - "`limit` / `offset` page the *found* rows (input order); `total_matching` counts found terms, not input IDs. Default `limit=50`: a batch with more than 50 found IDs comes back `truncated: true` with the first 50 — pass a larger `limit` (Python also accepts `limit=None`) or page with `offset`; `not_found` is always complete regardless of paging. There is no `summary` mode."

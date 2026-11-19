@@ -20,6 +20,7 @@ rows:
   compartments:
   - vesicle
   - whole_cell
+  complete_pathway_module_count: 51
   derived_metric_count: 28
   derived_metric_value_kinds:
   - boolean
@@ -91,6 +92,7 @@ rows:
   clustering_analysis_count: 2
   compartments:
   - whole_cell
+  complete_pathway_module_count: 52
   derived_metric_count: 2
   derived_metric_value_kinds:
   - categorical

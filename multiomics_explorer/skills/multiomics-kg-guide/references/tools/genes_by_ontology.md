@@ -65,6 +65,7 @@ Result row: `locus_tag, organism_name, gene_name, product, gene_category, term_i
 - search_ontology → genes_by_ontology(term_ids=[...], organism=None, summary=True) → `by_organism` / `organisms_without_genes` for which strains carry the term
 - genes_by_ontology → pathway_enrichment
 - genes_by_ontology → gene_overview
+- genes_by_ontology(ontology='kegg_module', term_ids=[...], organism=...) → kegg_module_completeness(organism=..., module_ids=[...]) — a module gene set is not a route; this says whether every step is covered and which KOs are missing
 - genes_by_ontology(ontology='tcdb' | 'ec', term_ids=[...]) → genes_by_metabolite (substrate-anchored pivot — see docs://analysis/metabolites)
 - From PSORTb-filtered genes → differential_expression_by_gene to ask: are outer-membrane proteins enriched in the up-regulated set?
 - list_filter_values(filter_type='trust_axes') → check which trust params an ontology supports before filtering — see docs://analysis/annotation_evidence

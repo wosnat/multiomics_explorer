@@ -2108,3 +2108,69 @@ class TestGoTransportContract:
         r = api.kg_release_info(conn=conn)
         assert isinstance(r["kg"]["go_transport_excluded_targets"], list)
         assert isinstance(r["kg"]["tcdb_substrate_excluded_targets"], list)
+
+
+# ---------------------------------------------------------------------------
+# kegg_module_completeness
+# ---------------------------------------------------------------------------
+_KMC_ENVELOPE_KEYS = {
+    "total_entries", "total_matching", "returned", "truncated", "offset",
+    "organism_name", "organisms_in_scope", "modules_in_scope", "by_status",
+    "no_edge_count", "by_class", "top_organisms", "top_modules",
+    "not_found_modules", "not_matched_modules", "not_found_organisms",
+    "warnings", "results",
+}
+_KMC_COMPACT_ROW_KEYS = {
+    "organism_name", "module_id", "module_name", "module_type", "module_class",
+    "status", "steps_total", "steps_present", "steps_present_via_ec",
+    "missing_step_indices", "missing_kos",
+}
+_KMC_VERBOSE_ROW_KEYS = _KMC_COMPACT_ROW_KEYS | {
+    "module_subclass", "definition", "missing_step_definitions",
+    "ec_filled_step_indices", "ec_genes",
+}
+
+
+@pytest.mark.kg
+class TestKeggModuleCompletenessContract:
+    def test_envelope_keys(self, conn):
+        r = api.kegg_module_completeness(
+            organism="Prochlorococcus MED4", conn=conn)
+        assert set(r) == _KMC_ENVELOPE_KEYS
+        assert [b["status"] for b in r["by_status"]] == [
+            "complete", "one_step_missing", "two_steps_missing", "partial"]
+        assert sum(b["count"] for b in r["by_status"]) == r["total_matching"]
+
+    def test_compact_row_keys(self, conn):
+        r = api.kegg_module_completeness(
+            organism="Prochlorococcus MED4", limit=5, conn=conn)
+        assert r["results"]
+        for row in r["results"]:
+            assert set(row) == _KMC_COMPACT_ROW_KEYS
+
+    def test_verbose_row_keys(self, conn):
+        r = api.kegg_module_completeness(
+            organism="Prochlorococcus MED4", limit=5, verbose=True, conn=conn)
+        for row in r["results"]:
+            assert set(row) == _KMC_VERBOSE_ROW_KEYS
+            assert isinstance(row["ec_genes"], list)
+            assert len(row["ec_genes"]) == len(row["ec_filled_step_indices"])
+
+    def test_summary_matches_detail_count(self, conn):
+        kw = dict(module_ids=["kegg.module:pathway_modules.energy_metabolism"],
+                  organism=["Prochlorococcus MED4", "Synechococcus WH8102"])
+        s = api.kegg_module_completeness(summary=True, conn=conn, **kw)
+        d = api.kegg_module_completeness(limit=None, conn=conn, **kw)
+        assert s["results"] == []
+        assert s["total_matching"] == len(d["results"]) == d["total_matching"]
+
+    def test_organisms_without_edge_only_for_small_scope(self, conn):
+        small = api.kegg_module_completeness(
+            module_ids=["M00531"], summary=True, conn=conn)
+        assert "organisms_without_edge" in small["top_modules"][0]
+        big = api.kegg_module_completeness(
+            module_ids=["kegg.module:pathway_modules.energy_metabolism"],
+            summary=True, conn=conn)
+        assert big["modules_in_scope"] > 3
+        assert all("organisms_without_edge" not in m for m in big["top_modules"])
+        assert len(big["top_modules"]) <= 20

@@ -471,6 +471,37 @@ _BUILDERS.extend([
                   for o in _2D4_ORGS]}),
 ])
 
+# kegg_module_completeness (Organism_has_kegg_module) + organism-scoped
+# module status on ontology_term_details.
+from multiomics_explorer.kg.queries_lib import (  # noqa: E402
+    build_kegg_module_completeness as _kmc_detail,
+    build_kegg_module_completeness_resolve as _kmc_resolve,
+    build_kegg_module_completeness_scope as _kmc_scope,
+    build_kegg_module_completeness_summary as _kmc_summary,
+    build_ontology_term_details as _otd_builder,
+)
+_KMC_ORGS = ["Prochlorococcus MED4", "Synechococcus WH8102"]
+_KMC_IDS = ["kegg.module:M00531",
+            "kegg.module:pathway_modules.energy_metabolism.nitrogen_metabolism"]
+_BUILDERS.extend([
+    ("kegg_module_completeness", _kmc_detail,
+     {"organisms": _KMC_ORGS, "module_ids": _KMC_IDS, "module_type": "pathway",
+      "status": ["complete"], "limit": 10, "offset": 0}),
+    ("kegg_module_completeness_verbose_all", _kmc_detail,
+     {"organisms": None, "module_ids": None, "module_type": None,
+      "status": None, "verbose": True, "limit": 10, "offset": 0}),
+    ("kegg_module_completeness_summary", _kmc_summary,
+     {"organisms": _KMC_ORGS, "module_ids": _KMC_IDS, "module_type": "pathway",
+      "status": None}),
+    ("kegg_module_completeness_scope", _kmc_scope,
+     {"organisms": _KMC_ORGS, "module_ids": _KMC_IDS, "module_type": "pathway"}),
+    ("kegg_module_completeness_resolve", _kmc_resolve,
+     {"module_ids": _KMC_IDS, "module_type": "pathway"}),
+    ("ontology_term_details_organism_module",
+     _otd_builder,
+     {"term_ids": ["kegg.module:M00531"], "organism": "Prochlorococcus MED4"}),
+])
+
 # Ontology-dependent builders: expand for each ontology key.
 for _ont_key in ONTOLOGY_CONFIG:
     _BUILDERS.extend([

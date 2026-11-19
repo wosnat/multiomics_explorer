@@ -1,6 +1,6 @@
 # Using the Python API
 
-The `multiomics_explorer` package exposes the same 42 tools available
+The `multiomics_explorer` package exposes the same 43 tools available
 via MCP, plus a handful of analysis utilities, as ordinary Python
 functions. Use the package when you need bulk extraction, multi-step
 pipelines, custom plotting, or DataFrame workflows. Use MCP when you
@@ -69,7 +69,7 @@ level.
 
 ```python
 from multiomics_explorer import (
-    # 42 API functions — same names as the MCP tools.
+    # 43 API functions — same names as the MCP tools.
     list_metabolites, gene_overview,
     differential_expression_by_gene, pathway_enrichment,
     discussed_by_publication,  # paper → discussed genes + KEGG pathways
@@ -89,7 +89,7 @@ from multiomics_explorer import (
 ```
 
 That's the contract. `multiomics_explorer.__all__` lists every public
-name (55 total: 42 API + 9 enrichment + 3 analysis utilities + `GraphConnection`).
+name (56 total: 43 API + 9 enrichment + 3 analysis utilities + `GraphConnection`).
 
 Deeper paths (`multiomics_explorer.api`, `multiomics_explorer.analysis`,
 `multiomics_explorer.analysis.frames`,
@@ -104,10 +104,10 @@ contract is what's stable.
 
 ## Three return shapes
 
-The 42 API functions plus the analysis utilities cluster into three
+The 43 API functions plus the analysis utilities cluster into three
 return types:
 
-### 1. `dict` (default — 40 of 42 API functions)
+### 1. `dict` (default — 41 of 43 API functions)
 
 ```python
 result = list_metabolites(organism_names=["Prochlorococcus MED4"], elements=["N"])

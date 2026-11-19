@@ -26873,7 +26873,9 @@ class TestKeggModuleCompleteness:
         assert _kmc_by_status(out) == [(b, 0) for b in _KMC_BANDS]
         assert out["top_organisms"] == []
         assert h.calls["detail"] == []
-        assert h.calls["summary"] == []
+        # total_entries stays KG-wide: one summary call with an empty scope.
+        assert [c["organisms"] for c in h.calls["summary"]] == [[]]
+        assert out["total_entries"] == 26004
 
     def test_no_module_in_scope_short_circuits(self):
         h = _KmcHarness()
@@ -26888,7 +26890,9 @@ class TestKeggModuleCompleteness:
         assert out["top_modules"] == []
         assert _kmc_by_status(out) == [(b, 0) for b in _KMC_BANDS]
         assert h.calls["detail"] == []
-        assert h.calls["summary"] == []
+        # total_entries stays KG-wide: one summary call with an empty scope.
+        assert [c["organisms"] for c in h.calls["summary"]] == [[]]
+        assert out["total_entries"] == 26004
 
     def test_only_signature_ids_under_default_short_circuit(self):
         h = _KmcHarness()

@@ -3582,7 +3582,9 @@
      "kegg_functional_category",
      "kegg_brite_class",
      "stereo_assignment",
-     "control_timing"
+     "control_timing",
+     "kegg_module_status",
+     "module_type"
     ],
     "type": "string"
    }

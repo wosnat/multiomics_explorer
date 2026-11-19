@@ -491,7 +491,9 @@ response_notes:
       `kegg_brite_class` (the 7 other KEGG compound trees; no per-value
       descriptions, tree codes in the envelope `description`) on Metabolite,
       `detection_status` (the `Assay_quantifies_metabolite` edge) and
-      `stereo_assignment` (both metabolomics assay edges).
+      `stereo_assignment` (both metabolomics assay edges). KEGG modules:
+      `kegg_module_status` (the completeness bands on the
+      organism-to-module edge) and `module_type` (`pathway` / `signature`).
       Annotation-trust: `evidence`, `sources`, `call_class`,
       `interpro_type`, `ncbifam_family_type`, `merops_catalytic_type`,
       `merops_family_class`, `best_hit_kind`, `pfam_support` (MEROPS),
@@ -520,6 +522,7 @@ chaining:
   - "list_filter_values(filter_type='table_scope') → list_experiments(table_scope=[...]) to keep only experiments whose DE table reports every detected gene"
   - "list_filter_values(filter_type='control_timing') → list_experiments(control_timing=[...]) to find experiments whose control was sampled at another time, then read their design_notes"
   - "list_filter_values(filter_type='value_kind') → list_derived_metrics(value_kind=...) / list_metabolite_assays(value_kind=...) → the matching genes_by_{kind}_metric or metabolites_by_{quantifies,flags}_assay drill-down"
+  - "list_filter_values(filter_type='kegg_module_status') → kegg_module_completeness(status=[...]); filter_type='module_type' → kegg_module_completeness / genes_by_ontology / pathway_enrichment(module_type=...)"
   - "list_filter_values(filter_type='evidence_source') → pick 'go_transport' → list_metabolites(evidence_sources=['go_transport']) or genes_by_metabolite(evidence_sources=['go_transport'])"
 
 mistakes:

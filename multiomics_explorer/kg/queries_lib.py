@@ -3589,7 +3589,10 @@ def build_list_organisms(
     catalyzed_metabolite_count, transported_metabolite_count,
     go_transport_metabolite_count, measured_metabolite_count,
     peptidase_gene_count, nonpeptidase_homolog_gene_count,
-    interpro_gene_count, ncbifam_gene_count, reference_database, reference_proteome, growth_phases.
+    interpro_gene_count, ncbifam_gene_count, complete_pathway_module_count
+    (pathway modules with a `complete` Organism_has_kegg_module edge; 0 for
+    organisms without genes), reference_database, reference_proteome,
+    growth_phases.
     RETURN keys (verbose): adds family, order, tax_class, phylum, kingdom,
     superkingdom, lineage, cluster_count, derived_metric_gene_count,
     derived_metric_types.
@@ -3651,6 +3654,9 @@ def build_list_organisms(
         "       coalesce(o.nonpeptidase_homolog_gene_count, 0) AS nonpeptidase_homolog_gene_count,\n"
         "       coalesce(o.interpro_gene_count, 0) AS interpro_gene_count,\n"
         "       coalesce(o.ncbifam_gene_count, 0) AS ncbifam_gene_count,\n"
+        "       COUNT { (o)-[:Organism_has_kegg_module {status: 'complete'}]->"
+        "(:KeggModule {module_type: 'pathway'}) }"
+        " AS complete_pathway_module_count,\n"
         "       o.reference_database AS reference_database,\n"
         "       o.reference_proteome AS reference_proteome,\n"
         "       coalesce(o.growth_phases, []) AS growth_phases"
@@ -5133,7 +5139,9 @@ def build_ontology_term_details(
     level_kind, is_informative, gene_count, organism_count,
     direct_gene_count, <term_details_compact union>, parents,
     children_total, children, links_total, links_out;
-    + organism_gene_count (organism); + properties, genes_by_organism
+    + organism_gene_count, organism_module_status, organism_steps_present
+    (organism; the latter two null except on level-3 kegg_module rows with
+    an Organism_has_kegg_module edge); + properties, genes_by_organism
     (verbose).
     """
     if not term_ids:
@@ -5213,6 +5221,20 @@ def build_ontology_term_details(
             )
         if verbose:
             gene_cols += ",\n       genes_by_organism"
+        if organism is not None:
+            # Level-3 kegg_module rows: the organism's completeness edge
+            # (null = no step covered). Edges are unique per (organism,
+            # module); head(collect()) keeps one row per tid regardless.
+            gene_block += (
+                "OPTIONAL MATCH (:OrganismTaxon {preferred_name: $organism})"
+                "-[om:Organism_has_kegg_module]->(t)\n"
+                "WITH tid, t, parents, children_total, children, links_total, links_out,\n"
+                "     genes_by_organism, head(collect(om)) AS om\n"
+            )
+            gene_cols += (
+                ",\n       om.status AS organism_module_status"
+                ",\n       om.steps_present AS organism_steps_present"
+            )
 
     compact_cols = "".join(
         f",\n       t.{prop} AS {prop}" for prop in _term_details_compact_props()
@@ -13383,3 +13405,258 @@ CALL { CALL db.relationshipTypes() YIELD relationshipType
        RETURN collect(relationshipType) AS rel_types }
 RETURN schema_info, labels, rel_types"""
     return cypher.strip(), {}
+
+
+# --- kegg_module_completeness (docs/tool-specs/kegg-module-completeness.md) --
+
+# Expansion: an input id at any KeggModule level (3 = the module itself,
+# 0-2 = type / class / subclass) selects every level-3 module under it.
+_KMC_MODULE_IDS_EXPANSION = (
+    "($module_ids IS NULL OR EXISTS {\n"
+    "        MATCH (m)-[:Kegg_module_is_a_kegg_module*0..3]->(a:KeggModule)\n"
+    "        WHERE a.id IN $module_ids })"
+)
+
+# module -> subclass -> class (every module has exactly one chain).
+_KMC_CLASS_HOP = (
+    "MATCH (m)-[:Kegg_module_is_a_kegg_module]->(sub:KeggModule)\n"
+    "      -[:Kegg_module_is_a_kegg_module]->(cls:KeggModule)\n"
+)
+
+
+def _kmc_where() -> str:
+    """Shared WHERE for the edge-anchored kegg_module_completeness builders.
+
+    Binds `o` (OrganismTaxon), `r` (Organism_has_kegg_module), `m` (level-3
+    KeggModule). Params: `$organisms` (canonical names or null = all),
+    `$module_type` (str or null = both), `$module_ids` (normalised ids or
+    null), `$status` (bands or null).
+    """
+    return (
+        "WHERE ($organisms IS NULL OR o.preferred_name IN $organisms)\n"
+        "  AND ($module_type IS NULL OR m.module_type = $module_type)\n"
+        f"  AND {_KMC_MODULE_IDS_EXPANSION}\n"
+        "  AND ($status IS NULL OR r.status IN $status)\n"
+    )
+
+
+def _kmc_edge_match() -> str:
+    """MATCH + shared WHERE + class hop over Organism_has_kegg_module."""
+    return (
+        "MATCH (o:OrganismTaxon)-[r:Organism_has_kegg_module]->"
+        "(m:KeggModule {level: 3})\n"
+        + _kmc_where()
+        + _KMC_CLASS_HOP
+    )
+
+
+def _kmc_params(
+    organisms: list[str] | None,
+    module_ids: list[str] | None,
+    module_type: str | None,
+    status: list[str] | None,
+) -> dict:
+    return {
+        "organisms": list(organisms) if organisms is not None else None,
+        "module_ids": list(module_ids) if module_ids is not None else None,
+        "module_type": module_type,
+        "status": list(status) if status is not None else None,
+    }
+
+
+def build_kegg_module_completeness(
+    *,
+    organisms: list[str] | None = None,
+    module_ids: list[str] | None = None,
+    module_type: str | None = "pathway",
+    status: list[str] | None = None,
+    verbose: bool = False,
+    limit: int | None = None,
+    offset: int = 0,
+) -> tuple[str, dict]:
+    """Detail rows: one per Organism_has_kegg_module edge in scope.
+
+    `organisms` None = every organism (edges exist only on organisms with
+    genes). `module_ids` are already normalised (`kegg.module:` prefix) and
+    may name a class / subclass / type (expanded to its level-3 modules).
+
+    Sort: module_id, status band (complete -> one_step_missing ->
+    two_steps_missing -> partial), organism_name. `LIMIT` only when `limit`
+    is given.
+
+    RETURN keys (compact): organism_name, module_id, module_name,
+    module_type, module_class, status, steps_total, steps_present,
+    steps_present_via_ec, missing_step_indices, missing_kos.
+    RETURN keys (verbose): adds module_subclass, definition,
+    missing_step_definitions, ec_filled_step_indices, ec_genes (the two ec_*
+    lists coalesced to []).
+    """
+    params = _kmc_params(organisms, module_ids, module_type, status)
+    params["offset"] = offset
+
+    verbose_cols = (
+        ",\n       sub.name AS module_subclass,"
+        "\n       m.definition AS definition,"
+        "\n       r.missing_step_definitions AS missing_step_definitions,"
+        "\n       coalesce(r.ec_filled_step_indices, []) AS ec_filled_step_indices,"
+        "\n       coalesce(r.ec_genes, []) AS ec_genes"
+        if verbose else ""
+    )
+    if limit is not None:
+        limit_clause = "\nLIMIT $limit"
+        params["limit"] = limit
+    else:
+        limit_clause = ""
+
+    cypher = (
+        _kmc_edge_match()
+        + "WITH o, r, m, sub, cls,\n"
+        "     CASE r.status WHEN 'complete' THEN 0 WHEN 'one_step_missing' THEN 1\n"
+        "                   WHEN 'two_steps_missing' THEN 2 ELSE 3 END AS status_rank\n"
+        "RETURN o.preferred_name AS organism_name, m.id AS module_id,\n"
+        "       m.name AS module_name, m.module_type AS module_type,\n"
+        "       cls.name AS module_class, r.status AS status,\n"
+        "       r.steps_total AS steps_total, r.steps_present AS steps_present,\n"
+        "       r.steps_present_via_ec AS steps_present_via_ec,\n"
+        "       r.missing_step_indices AS missing_step_indices,\n"
+        "       r.missing_kos AS missing_kos"
+        f"{verbose_cols}\n"
+        "ORDER BY module_id, status_rank, organism_name\n"
+        "SKIP $offset"
+        f"{limit_clause}"
+    )
+    return cypher, params
+
+
+def build_kegg_module_completeness_summary(
+    *,
+    organisms: list[str] | None = None,
+    module_ids: list[str] | None = None,
+    module_type: str | None = "pathway",
+    status: list[str] | None = None,
+) -> tuple[str, dict]:
+    """Aggregate row for the kegg_module_completeness envelope.
+
+    Same MATCH / WHERE / class hop as the detail builder, aggregated per
+    axis in separate CALL subqueries; the api pivots the (axis, status,
+    count) lists into the envelope shapes. Each list is <= 4 x axis size.
+
+    RETURN keys: total_entries (every Organism_has_kegg_module edge in the
+    KG), total_matching, by_status [{status, count}],
+    by_organism_status [{organism_name, status, count}],
+    by_module_status [{module_id, status, count}],
+    by_class_status [{class_id, class_name, status, count}].
+    """
+    params = _kmc_params(organisms, module_ids, module_type, status)
+    match = _kmc_edge_match()
+
+    def _sub(body: str) -> str:
+        indented = "".join(f"  {line}\n" for line in (match + body).splitlines())
+        return "CALL {\n" + indented + "}\n"
+
+    cypher = (
+        "CALL {\n"
+        "  MATCH ()-[e:Organism_has_kegg_module]->()\n"
+        "  RETURN count(e) AS total_entries\n"
+        "}\n"
+        + _sub(
+            "WITH r.status AS status, count(*) AS n\n"
+            "ORDER BY status\n"
+            "RETURN sum(n) AS total_matching,\n"
+            "       collect({status: status, count: n}) AS by_status"
+        )
+        + _sub(
+            "WITH o.preferred_name AS organism_name, r.status AS status,\n"
+            "     count(*) AS n\n"
+            "ORDER BY organism_name, status\n"
+            "RETURN collect({organism_name: organism_name, status: status,\n"
+            "                count: n}) AS by_organism_status"
+        )
+        + _sub(
+            "WITH m.id AS module_id, r.status AS status, count(*) AS n\n"
+            "ORDER BY module_id, status\n"
+            "RETURN collect({module_id: module_id, status: status,\n"
+            "                count: n}) AS by_module_status"
+        )
+        + _sub(
+            "WITH cls.id AS class_id, cls.name AS class_name, r.status AS status,\n"
+            "     count(*) AS n\n"
+            "ORDER BY class_id, status\n"
+            "RETURN collect({class_id: class_id, class_name: class_name,\n"
+            "                status: status, count: n}) AS by_class_status"
+        )
+        + "RETURN total_entries, total_matching, by_status, by_organism_status,\n"
+        "       by_module_status, by_class_status"
+    )
+    return cypher, params
+
+
+def build_kegg_module_completeness_scope(
+    *,
+    organisms: list[str] | None = None,
+    module_ids: list[str] | None = None,
+    module_type: str | None = "pathway",
+) -> tuple[str, dict]:
+    """Status-independent scope: one row per level-3 module in scope.
+
+    `organisms_with_edge` lists (sorted) the in-scope organisms holding an
+    Organism_has_kegg_module edge to the module, whatever its status; the
+    api derives modules_in_scope, the `no_edge` counts and
+    `organisms_without_edge` from it.
+
+    RETURN keys: module_id, module_name, module_type, class_id, class_name,
+    organisms_with_edge.
+    """
+    params = {
+        "organisms": list(organisms) if organisms is not None else None,
+        "module_ids": list(module_ids) if module_ids is not None else None,
+        "module_type": module_type,
+    }
+    cypher = (
+        "MATCH (m:KeggModule {level: 3})\n"
+        "WHERE ($module_type IS NULL OR m.module_type = $module_type)\n"
+        f"  AND {_KMC_MODULE_IDS_EXPANSION}\n"
+        "MATCH (m)-[:Kegg_module_is_a_kegg_module]->(:KeggModule)\n"
+        "      -[:Kegg_module_is_a_kegg_module]->(cls:KeggModule)\n"
+        "OPTIONAL MATCH (o:OrganismTaxon)-[:Organism_has_kegg_module]->(m)\n"
+        "WHERE ($organisms IS NULL OR o.preferred_name IN $organisms)\n"
+        "WITH m, cls, o ORDER BY o.preferred_name\n"
+        "WITH m, cls,\n"
+        "     [x IN collect(o.preferred_name) WHERE x IS NOT NULL]"
+        " AS organisms_with_edge\n"
+        "RETURN m.id AS module_id, m.name AS module_name,\n"
+        "       m.module_type AS module_type, cls.id AS class_id,\n"
+        "       cls.name AS class_name, organisms_with_edge AS organisms_with_edge\n"
+        "ORDER BY module_id"
+    )
+    return cypher, params
+
+
+def build_kegg_module_completeness_resolve(
+    *,
+    module_ids: list[str],
+    module_type: str | None = "pathway",
+) -> tuple[str, dict]:
+    """Classify input module ids (already normalised) for the envelope.
+
+    One row per input id, in input order. `found` = a KeggModule node with
+    that id exists; `matched` = at least one level-3 module at or under it
+    passes `module_type` (null = both). api: not found -> not_found_modules;
+    found and not matched -> not_matched_modules.
+
+    RETURN keys: module_id, found, matched.
+    """
+    params = {"module_ids": list(module_ids), "module_type": module_type}
+    cypher = (
+        "UNWIND $module_ids AS mid\n"
+        "OPTIONAL MATCH (k:KeggModule {id: mid})\n"
+        "WITH mid, k\n"
+        "RETURN mid AS module_id, k IS NOT NULL AS found,\n"
+        "       CASE WHEN k IS NULL THEN false ELSE EXISTS {\n"
+        "         MATCH (m:KeggModule {level: 3})"
+        "-[:Kegg_module_is_a_kegg_module*0..3]->(k)\n"
+        "         WHERE $module_type IS NULL OR m.module_type = $module_type\n"
+        "       } END AS matched\n"
+        "ORDER BY apoc.coll.indexOf($module_ids, mid)"
+    )
+    return cypher, params

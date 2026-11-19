@@ -1,0 +1,275 @@
+by_class:
+- class_id: kegg.module:pathway_modules.amino_acid_metabolism
+  class_name: Amino acid metabolism
+  complete: 14
+  module_count: 67
+  no_edge: 30
+  one_step_missing: 8
+  partial: 8
+  two_steps_missing: 7
+- class_id: kegg.module:pathway_modules.biosynthesis_of_other_secondary_metabolites
+  class_name: Biosynthesis of other secondary metabolites
+  complete: 0
+  module_count: 28
+  no_edge: 23
+  one_step_missing: 0
+  partial: 5
+  two_steps_missing: 0
+- class_id: kegg.module:pathway_modules.biosynthesis_of_terpenoids_and_polyketides
+  class_name: Biosynthesis of terpenoids and polyketides
+  complete: 2
+  module_count: 25
+  no_edge: 18
+  one_step_missing: 2
+  partial: 2
+  two_steps_missing: 1
+- class_id: kegg.module:pathway_modules.carbohydrate_metabolism
+  class_name: Carbohydrate metabolism
+  complete: 8
+  module_count: 38
+  no_edge: 8
+  one_step_missing: 5
+  partial: 13
+  two_steps_missing: 4
+- class_id: kegg.module:pathway_modules.energy_metabolism
+  class_name: Energy metabolism
+  complete: 7
+  module_count: 57
+  no_edge: 35
+  one_step_missing: 1
+  partial: 12
+  two_steps_missing: 2
+- class_id: kegg.module:pathway_modules.glycan_metabolism
+  class_name: Glycan metabolism
+  complete: 6
+  module_count: 60
+  no_edge: 26
+  one_step_missing: 8
+  partial: 14
+  two_steps_missing: 6
+- class_id: kegg.module:pathway_modules.lipid_metabolism
+  class_name: Lipid metabolism
+  complete: 3
+  module_count: 31
+  no_edge: 20
+  one_step_missing: 1
+  partial: 5
+  two_steps_missing: 2
+- class_id: kegg.module:pathway_modules.metabolism_of_cofactors_and_vitamins
+  class_name: Metabolism of cofactors and vitamins
+  complete: 7
+  module_count: 51
+  no_edge: 7
+  one_step_missing: 15
+  partial: 16
+  two_steps_missing: 6
+- class_id: kegg.module:pathway_modules.nucleotide_metabolism
+  class_name: Nucleotide metabolism
+  complete: 4
+  module_count: 12
+  no_edge: 3
+  one_step_missing: 3
+  partial: 0
+  two_steps_missing: 2
+- class_id: kegg.module:pathway_modules.xenobiotics_biodegradation
+  class_name: Xenobiotics biodegradation
+  complete: 0
+  module_count: 13
+  no_edge: 13
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+by_status:
+- count: 51
+  status: complete
+- count: 43
+  status: one_step_missing
+- count: 30
+  status: two_steps_missing
+- count: 75
+  status: partial
+case_id: kegg_module_completeness_med4_summary
+modules_in_scope: 382
+no_edge_count: 183
+not_found_modules: []
+not_found_organisms: []
+not_matched_modules: []
+offset: 0
+organism_name: Prochlorococcus MED4
+organisms_in_scope: 1
+results: []
+returned: 0
+row_count: 0
+top_modules:
+- complete: 1
+  module_id: kegg.module:M00002
+  module_name: Glycolysis, core module involving three-carbon compounds
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00004
+  module_name: Pentose phosphate pathway (Pentose phosphate cycle)
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00005
+  module_name: PRPP biosynthesis, ribose-5P => PRPP
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00006
+  module_name: Pentose phosphate pathway, oxidative phase, glucose-6P => ribulose-5P
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00007
+  module_name: Pentose phosphate pathway, non-oxidative phase, fructose-6P => ribose-5P
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00010
+  module_name: Citrate cycle, first carbon oxidation, oxaloacetate => 2-oxoglutarate
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00015
+  module_name: Proline biosynthesis, glutamate => proline
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00018
+  module_name: Threonine biosynthesis, aspartate => homoserine => threonine
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00019
+  module_name: Valine/isoleucine biosynthesis, pyruvate => valine / 2-oxobutanoate
+    => isoleucine
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00021
+  module_name: Cysteine biosynthesis, serine => cysteine
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00022
+  module_name: Shikimate pathway, phosphoenolpyruvate + erythrose-4P => chorismate
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00023
+  module_name: Tryptophan biosynthesis, chorismate => tryptophan
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00028
+  module_name: Ornithine biosynthesis, glutamate => ornithine
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00048
+  module_name: De novo purine biosynthesis, PRPP + glutamine => IMP
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00049
+  module_name: Adenine ribonucleotide biosynthesis, IMP => ADP,ATP
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00050
+  module_name: Guanine ribonucleotide biosynthesis, IMP => GDP,GTP
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00052
+  module_name: Pyrimidine ribonucleotide biosynthesis, UMP => UDP/UTP,CDP/CTP
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00082
+  module_name: Fatty acid biosynthesis, initiation
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00083
+  module_name: Fatty acid biosynthesis, elongation
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+- complete: 1
+  module_id: kegg.module:M00086
+  module_name: beta-Oxidation, acyl-CoA synthesis
+  module_type: pathway
+  no_edge: 0
+  one_step_missing: 0
+  partial: 0
+  two_steps_missing: 0
+top_organisms:
+- complete: 51
+  no_edge: 183
+  one_step_missing: 43
+  organism_name: Prochlorococcus MED4
+  partial: 75
+  two_steps_missing: 30
+total_entries: 26004
+total_matching: 199
+truncated: true
+warnings: []

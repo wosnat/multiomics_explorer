@@ -25,7 +25,7 @@ uv run python scripts/validate_connection.py
 
 ### MCP Server (Claude Code integration)
 
-The MCP server exposes the KG to Claude Code through 42 typed tools (gene identity, expression, orthology, ontologies, clustering, derived metrics, chemistry, metabolomics, enrichment, literature index, plus a read-only Cypher escape hatch). The full table is in [CLAUDE.md](CLAUDE.md); per-tool docs are served as `docs://tools/{name}` and a routing guide as `docs://guide/start_here`.
+The MCP server exposes the KG to Claude Code through 43 typed tools (gene identity, expression, orthology, ontologies, clustering, derived metrics, chemistry, metabolomics, enrichment, literature index, plus a read-only Cypher escape hatch). The full table is in [CLAUDE.md](CLAUDE.md); per-tool docs are served as `docs://tools/{name}` and a routing guide as `docs://guide/start_here`.
 
 To use with Claude Code, add to your `.claude/settings.json`:
 

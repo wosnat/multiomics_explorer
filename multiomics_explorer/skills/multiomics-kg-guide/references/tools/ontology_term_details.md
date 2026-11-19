@@ -54,5 +54,6 @@ Result row: `term_id, ontology, label, name, description, level, level_kind, is_
 - ontology_term_details(link_kinds=['composition']) → ontology_term_details(term_ids=[links_out[].target_id]) — hop across bridges (tcdb → pfam → interpro)
 - gene_ontology_terms(locus_tags=[...]) → ontology_term_details(term_ids=[row.term_id]) — from a gene's terms to the terms' context
 - discussed_by_publication(publication_dois=[...]) → ontology_term_details(term_ids=[kegg.pathway ids]) — context for pathways a paper names
+- ontology_term_details(term_ids=[module_id], organism=...) → kegg_module_completeness(module_ids=[module_id]) — from one organism's status to the module across every strain, with missing KOs
 
 Full reference (all examples, full response format, verbose fields): `docs://tools/ontology_term_details/full`

@@ -1,6 +1,6 @@
 # Cross-tool conventions
 
-Patterns that hold across most or all 42 tools — things you'd otherwise
+Patterns that hold across most or all 43 tools — things you'd otherwise
 re-learn tool by tool.
 
 Node/edge meanings: `docs://guide/concepts`. Tool-by-tool routing
@@ -59,7 +59,7 @@ genuine top-10 in both modes, no `_truncated` companion key.
 
 ### `summary=True` mode
 
-**36 of 42 tools accept `summary=True`** — nearly universal. It returns
+**37 of 43 tools accept `summary=True`** — nearly universal. It returns
 only the envelope (`results=[]`, `returned=0`; `truncated` is `true`
 whenever rows were withheld and `false` when nothing matched). Use it as the **first call** for any
 question that doesn't already specify exact IDs. Pattern: `summary=True`
