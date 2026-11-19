@@ -54,6 +54,16 @@ _2D4_GENELESS_KEGG_TERM = "kegg.pathway:ko00140"
 _2D4_HLI_TERMS = ["interpro:IPR063966", "interpro:IPR054650"]
 _2D4_UNKNOWN_ORG = "nope_2d4_organism"
 
+# kegg_module ontology (docs/tool-specs/kegg-module-ontology.md). Pinned on
+# the dev KG built_at 2026-11-18T22:37:52Z:
+#   MATCH (t:KeggModule {id:$id})
+#   OPTIONAL MATCH (t)<-[:Kegg_module_is_a_kegg_module*0..]-(:KeggModule)
+#     <-[:Kegg_term_in_kegg_module]-(:KeggTerm)<-[:Gene_has_kegg_ko]-
+#     (g:Gene {organism_name:'Prochlorococcus MED4'})
+#   RETURN count(DISTINCT g)  -> 0 (subclass gene_count 185 KG-wide)
+_KM_CLASS_NO_MED4_GENES = (
+    "kegg.module:pathway_modules.energy_metabolism.nitrogen_metabolism")
+
 
 @dataclass
 class Scenario:
@@ -215,6 +225,25 @@ def genes_by_ontology_scenarios():
             "all_organisms_hli_presence_page",
             dict(ontology="interpro", term_ids=_2D4_HLI_TERMS,
                  interpro_type="FAMILY", limit=5)),
+        # --- kegg_module ontology + 2d.10 bridged walk-down ---
+        Scenario(
+            # A module class with genes KG-wide but none in MED4: the
+            # bridged walk-down head yields no rows -> empty envelope.
+            "kegg_module_class_with_no_genes_in_organism",
+            dict(ontology="kegg_module", organism=fx.CONTROL_ORGANISM,
+                 term_ids=[_KM_CLASS_NO_MED4_GENES], min_gene_set_size=0)),
+        Scenario(
+            # module_type narrows term_ids mode on the input term: a
+            # 'pathway' class filtered to 'signature' matches nothing.
+            "kegg_module_term_ids_with_a_facet_that_matches_nothing",
+            dict(ontology="kegg_module", organism=fx.CONTROL_ORGANISM,
+                 term_ids=[_KM_CLASS_NO_MED4_GENES], module_type="signature",
+                 min_gene_set_size=0)),
+        Scenario(
+            "module_type_on_non_kegg_module_ontology",
+            dict(ontology="kegg", organism=fx.CONTROL_ORGANISM, level=1,
+                 module_type="pathway"),
+            expects_error=ToolError),
     ]
 
 
@@ -1050,6 +1079,16 @@ def search_ontology_scenarios():
             dict(search_text="transport", ontology="kegg",
                  interpro_type="DOMAIN"),
             expects_error=ToolError),
+        # --- kegg_module ontology ---
+        Scenario(
+            "no_hits_kegg_module",
+            dict(search_text="zzzznonexistentontologytermzzz",
+                 ontology="kegg_module")),
+        Scenario(
+            "module_type_on_non_kegg_module",
+            dict(search_text="nitrate", ontology="kegg",
+                 module_type="pathway"),
+            expects_error=ToolError),
         Scenario(
             "ncbifam_search",
             dict(search_text="protein", ontology="ncbifam")),
@@ -1152,6 +1191,10 @@ def ontology_landscape_scenarios():
         Scenario(
             "interpro_stratum_rows",
             dict(organism=fx.CONTROL_ORGANISM, ontology="interpro")),
+        Scenario(
+            # kegg_module rows group by (module_type, level), levels 0-3.
+            "kegg_module_genome_only_organism",
+            dict(organism=fx.GENOME_ONLY_ORGANISM, ontology="kegg_module")),
         Scenario(
             "multi_ontology_list",
             dict(organism=fx.CONTROL_ORGANISM,

@@ -621,6 +621,21 @@
     min_rows: 1
     columns: [id, name, score, level]
 
+- id: search_ontology_kegg_module_nitrate
+  tool: search_ontology
+  desc: |
+    keggModuleFullText 'nitrate' -> nitrate-assimilation modules M00530 /
+    M00531 among the top hits (spec §8).
+  params:
+    search_text: nitrate
+    ontology: kegg_module
+    limit: 5
+  expect:
+    min_rows: 2
+    columns: [id, name, score, level]
+    contains:
+      id: kegg.module:M00531
+
 # ── Genes by ontology ──────────────────────────────────────
 # All four cases exercise the new long-format (gene × term) signature.
 # Single organism is required. Modes: term_ids only / level only / both.
@@ -669,6 +684,45 @@
   expect:
     min_rows: 1
     columns: [locus_tag, gene_name, product, gene_category, term_id, term_name, level]
+
+- id: genes_by_ontology_kegg_module_term_ids_m00531
+  tool: genes_by_ontology
+  desc: |
+    kegg_module mode 1 (term_ids) walks DOWN through the KO bridge (2d.10
+    fix): assimilatory nitrate reduction M00531 in Synechococcus WH8102 ->
+    SYNW2464, SYNW2477 (kegg-module-ontology spec §8).
+  params:
+    ontology: kegg_module
+    organism: Synechococcus WH8102
+    term_ids: ["kegg.module:M00531"]
+    min_gene_set_size: 0
+  expect:
+    min_rows: 2
+    max_rows: 2
+    columns: [locus_tag, term_id, term_name, level, module_type]
+    contains:
+      locus_tag: SYNW2464
+    row0:
+      term_id: kegg.module:M00531
+      module_type: pathway
+
+- id: genes_by_ontology_kegg_module_level3_signature
+  tool: genes_by_ontology
+  desc: |
+    kegg_module level=3 + module_type='signature' in MED4 -> 2 signature
+    modules covering 5 genes (spec §8); every row carries module_type.
+  params:
+    ontology: kegg_module
+    organism: Prochlorococcus MED4
+    level: 3
+    module_type: signature
+    min_gene_set_size: 0
+  expect:
+    min_rows: 5
+    columns: [locus_tag, term_id, level, module_type]
+    row0:
+      level: 3
+      module_type: signature
 
 # ── Gene ontology terms ────────────────────────────────────
 

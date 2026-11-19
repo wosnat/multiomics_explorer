@@ -4063,10 +4063,11 @@ class TestSearchOntologyMultiLive:
         assert not (ids1 & ids2)
         assert page2["offset"] == 3
 
-    def test_none_fans_out_to_all_17(self, conn):
+    def test_none_fans_out_to_all_18(self, conn):
+        # 17 -> 18 2026-11-19: kegg_module ontology (kegg-module-ontology spec)
         result = api.search_ontology("transport", None, limit=1, conn=conn)
-        assert len(result["by_ontology"]) == 17
-        assert result["returned"] <= 17
+        assert len(result["by_ontology"]) == 18
+        assert result["returned"] <= 18
 
     def test_facet_applies_to_owner_only(self, conn):
         result = api.search_ontology(
@@ -5867,3 +5868,136 @@ class TestTcdbDisplayNameAndStructureKind:
                    {"defined", "generic", "polymer"}
                    for r in out["results"]
                    if r.get("target_kind") != "chemical_role")
+
+
+# ---------------------------------------------------------------------------
+# kegg_module ontology + 2d.10 bridged walk-down fix
+# (docs/tool-specs/kegg-module-ontology.md §8). Numbers verified against the
+# live KG built_at 2026-11-18T22:37:52Z.
+# ---------------------------------------------------------------------------
+
+_KM_MED4 = "Prochlorococcus MED4"
+_KM_WH8102 = "Synechococcus WH8102"
+_KM_M00531 = "kegg.module:M00531"
+_KM_N_SUBCLASS = (
+    "kegg.module:pathway_modules.energy_metabolism.nitrogen_metabolism")
+
+
+@pytest.mark.kg
+class TestKeggModuleOntologyLive:
+    def test_med4_level3_rollup_counts(self, conn):
+        # Spec §8 mode-2 rollup: 386 genes / 205 modules at level 3.
+        result = api.genes_by_ontology(
+            ontology="kegg_module", organism=_KM_MED4, level=3,
+            min_gene_set_size=0, max_gene_set_size=None, summary=True,
+            conn=conn)
+        assert result["total_genes"] == 386
+        assert result["total_terms"] == 205
+
+    @pytest.mark.parametrize("module_type,n_terms,n_genes", [
+        ("pathway", 203, 381), ("signature", 2, 5)])
+    def test_med4_level3_module_type_facet(
+            self, conn, module_type, n_terms, n_genes):
+        result = api.genes_by_ontology(
+            ontology="kegg_module", organism=_KM_MED4, level=3,
+            module_type=module_type, min_gene_set_size=0,
+            max_gene_set_size=None, summary=True, conn=conn)
+        assert result["total_terms"] == n_terms
+        assert result["total_genes"] == n_genes
+
+    def test_module_type_column_on_rows(self, conn):
+        result = api.genes_by_ontology(
+            ontology="kegg_module", organism=_KM_MED4, level=3,
+            module_type="signature", min_gene_set_size=0,
+            max_gene_set_size=None, conn=conn)
+        assert result["results"]
+        assert {r["module_type"] for r in result["results"]} == {"signature"}
+
+    @pytest.mark.parametrize("term_id", [_KM_M00531, _KM_N_SUBCLASS],
+                             ids=["module", "subclass"])
+    def test_term_ids_walk_down_crosses_the_bridge(self, conn, term_id):
+        # 2d.10: mode 1 on a bridged ontology returns the KO-linked genes.
+        result = api.genes_by_ontology(
+            ontology="kegg_module", organism=_KM_WH8102, term_ids=[term_id],
+            min_gene_set_size=0, max_gene_set_size=None, conn=conn)
+        assert {r["locus_tag"] for r in result["results"]} == {
+            "SYNW2464", "SYNW2477"}
+
+    def test_brite_term_ids_returns_genes_2d10(self, conn):
+        # Before the fix the head skipped the KO hop: 0 genes. With it: 6.
+        result = api.genes_by_ontology(
+            ontology="brite", organism=_KM_MED4,
+            term_ids=["kegg.brite:ko02000.A1.B2"],
+            min_gene_set_size=0, max_gene_set_size=None, summary=True,
+            conn=conn)
+        assert result["total_genes"] == 6
+
+    def test_search_nitrate_top_hits(self, conn):
+        result = api.search_ontology(
+            "nitrate", "kegg_module", limit=5, conn=conn)
+        ids = [r["id"] for r in result["results"]]
+        assert "kegg.module:M00530" in ids
+        assert "kegg.module:M00531" in ids
+        assert all(r["ontology_type"] == "kegg_module"
+                   for r in result["results"])
+        assert all(r.get("module_type") in ("pathway", "signature")
+                   for r in result["results"])
+
+    def test_term_details_m00531(self, conn):
+        result = api.ontology_term_details(term_ids=[_KM_M00531], conn=conn)
+        assert result["not_found"] == []
+        row = result["results"][0]
+        assert row["ontology"] == "kegg_module"
+        assert row["module_type"] == "pathway"
+        assert row["module_id"] == "M00531"
+        assert row["step_count"] == 2
+        assert len(row["parents"]) == 1
+        assert row["parents"][0]["id"] == _KM_N_SUBCLASS
+        assert row["parents"][0]["level"] == 2
+        maps = [lk for lk in row["links_out"]
+                if lk["rel"] == "Kegg_module_in_kegg_pathway"]
+        assert maps
+        assert all(lk["target_ontology"] == "kegg"
+                   and lk["link_kind"] == "membership"
+                   and lk["target_id"].startswith("kegg.pathway:")
+                   for lk in maps)
+        assert "kegg.pathway:ko00910" in {lk["target_id"] for lk in maps}
+
+    def test_term_details_subclass_strips_module_only_props(self, conn):
+        result = api.ontology_term_details(
+            term_ids=[_KM_N_SUBCLASS], conn=conn)
+        row = result["results"][0]
+        assert row["ontology"] == "kegg_module"
+        assert row["module_type"] == "pathway"
+        for prop in ("module_id", "step_count", "definition"):
+            assert prop not in row, prop
+
+    def test_term_details_organism_gene_count_crosses_the_bridge(self, conn):
+        result = api.ontology_term_details(
+            term_ids=[_KM_M00531], organism=_KM_WH8102, conn=conn)
+        assert result["results"][0]["organism_gene_count"] == 2
+
+    def test_gene_ontology_terms_leaf_reaches_the_module(self, conn):
+        result = api.gene_ontology_terms(
+            locus_tags=["SYNW2464"], ontology="kegg_module",
+            organism=_KM_WH8102, conn=conn)
+        assert _KM_M00531 in {r["term_id"] for r in result["results"]}
+
+    def test_landscape_kegg_module_rows_carry_module_type(self, conn):
+        result = api.ontology_landscape(
+            organism=_KM_MED4, ontology="kegg_module", conn=conn)
+        rows = [r for r in result["results"]
+                if r["ontology_type"] == "kegg_module"]
+        assert rows
+        assert {r["module_type"] for r in rows} <= {"pathway", "signature"}
+
+    def test_module_type_on_non_owner_raises(self, conn):
+        with pytest.raises(ValueError, match="module_type"):
+            api.genes_by_ontology(
+                ontology="kegg", organism=_KM_MED4, level=1,
+                module_type="pathway", conn=conn)
+
+    def test_kg_release_info_carries_kegg_release(self, conn):
+        report = api.kg_release_info(conn=conn)
+        assert report["kg"]["kegg_release"]
+        assert "module" in report["kg"]["kegg_release"]

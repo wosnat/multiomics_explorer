@@ -68,12 +68,17 @@ EXISTING_14 = [
 ALL_17 = EXISTING_14 + NEW_ONTOLOGIES
 
 
-class TestRegistryMembership:
-    def test_all_ontologies_is_existing_14_plus_3_appended(self):
-        assert ALL_ONTOLOGIES == ALL_17
+# kegg-module-ontology spec §2: `kegg_module` is APPENDED (order is
+# load-bearing for landscape fixtures) — 17 -> 18 entries.
+ALL_18 = ALL_17 + ["kegg_module"]
 
-    def test_all_ontologies_has_17_entries(self):
-        assert len(ALL_ONTOLOGIES) == 17
+
+class TestRegistryMembership:
+    def test_all_ontologies_is_17_plus_kegg_module_appended(self):
+        assert ALL_ONTOLOGIES == ALL_18
+
+    def test_all_ontologies_has_18_entries(self):
+        assert len(ALL_ONTOLOGIES) == 18
 
     def test_config_covers_exactly_all_ontologies(self):
         assert set(ONTOLOGY_CONFIG) == set(ALL_ONTOLOGIES)
@@ -381,7 +386,12 @@ class TestTermSide:
 VALID_LINK_KINDS = {"composition", "membership", "router"}
 
 EXPECTED_BRIDGES = {
-    "kegg": [("Kegg_term_in_brite_category", "brite", "membership")],
+    # kegg-module-ontology §1: KO -> module membership bridge added.
+    "kegg": [
+        ("Kegg_term_in_brite_category", "brite", "membership"),
+        ("Kegg_term_in_kegg_module", "kegg_module", "membership"),
+    ],
+    "kegg_module": [("Kegg_module_in_kegg_pathway", "kegg", "membership")],
     "pfam": [("Pfam_in_interpro_entry", "interpro", "membership")],
     "tcdb": [
         ("Tcdb_family_has_pfam_domain", "pfam", "composition"),
@@ -546,3 +556,134 @@ class TestTcdbGateEntry:
 
     def test_no_tc_specificity_anywhere_in_tcdb_row(self):
         assert "tc_specificity" not in repr(ONTOLOGY_CONFIG["tcdb"])
+
+
+# --- kegg_module (docs/tool-specs/kegg-module-ontology.md §1) ---------------
+
+
+class TestKeggModuleRegistryRow:
+    """The 18th ontology: KEGG modules, reached through the KO bridge like
+    BRITE, with a third term-side facet (`module_type`)."""
+
+    def test_key_present(self):
+        assert "kegg_module" in ONTOLOGY_CONFIG
+
+    def test_core_fields(self):
+        cfg = ONTOLOGY_CONFIG["kegg_module"]
+        assert cfg["label"] == "KeggModule"
+        assert cfg["gene_rel"] == "Gene_has_kegg_ko"
+        assert cfg["hierarchy_rels"] == ["Kegg_module_is_a_kegg_module"]
+        assert cfg["fulltext_index"] == "keggModuleFullText"
+
+    def test_bridge_is_the_ko_hop(self):
+        assert ONTOLOGY_CONFIG["kegg_module"]["bridge"] == {
+            "node_label": "KeggTerm", "edge": "Kegg_term_in_kegg_module"}
+
+    def test_no_parent_label(self):
+        assert "parent_label" not in ONTOLOGY_CONFIG["kegg_module"]
+
+    def test_trust_axes_are_keggs(self):
+        """Binds `r` on Gene_has_kegg_ko, so it carries KEGG's axes (as BRITE)."""
+        cfg = ONTOLOGY_CONFIG["kegg_module"]
+        assert list(cfg["trust"]) == ["sources", "evidence"]
+        assert cfg["trust"] == ONTOLOGY_CONFIG["kegg"]["trust"]
+        assert cfg["trust"] == ONTOLOGY_CONFIG["brite"]["trust"]
+
+    def test_facet_is_module_type(self):
+        assert ONTOLOGY_CONFIG["kegg_module"]["facet"] == {
+            "prop": "module_type", "param": "module_type"}
+
+    def test_no_compact_edge(self):
+        assert ONTOLOGY_CONFIG["kegg_module"].get("compact_edge") in (None, {})
+
+    def test_no_gate(self):
+        assert not ONTOLOGY_CONFIG["kegg_module"].get("gate")
+
+    def test_term_compact(self):
+        assert ONTOLOGY_CONFIG["kegg_module"]["term_compact"] == [
+            "gene_count", "organism_count"]
+
+    def test_term_details_compact_matches_spec(self):
+        assert ONTOLOGY_CONFIG["kegg_module"]["term_details_compact"] == [
+            "module_type", "module_id", "step_count", "definition",
+            "direct_gene_count", "complete_organism_count",
+        ]
+
+    def test_term_details_verbose_is_star(self):
+        assert ONTOLOGY_CONFIG["kegg_module"]["term_details_verbose"] == "*"
+
+    def test_term_verbose_empty(self):
+        assert ONTOLOGY_CONFIG["kegg_module"].get("term_verbose") in (None, [])
+
+    def test_no_verbose_edge(self):
+        assert _verbose_edge_pairs(ONTOLOGY_CONFIG["kegg_module"]) in ([], ())
+
+    def test_no_value_list_keys(self):
+        leaked = set(ONTOLOGY_CONFIG["kegg_module"]) & _VALUE_LIST_KEYS
+        assert not leaked, leaked
+
+    def test_only_three_facets_registered(self):
+        owners = sorted(k for k, c in ONTOLOGY_CONFIG.items() if c.get("facet"))
+        assert owners == ["brite", "interpro", "kegg_module"]
+
+
+class TestKeggModuleBridges:
+    """EXPECTED_BRIDGES above carries the kegg / kegg_module rows."""
+
+    def test_bridge_targets_are_known_config_keys(self):
+        for rel, target, kind in ONTOLOGY_CONFIG["kegg_module"]["bridges_out"]:
+            assert target in ONTOLOGY_CONFIG
+            assert kind in VALID_LINK_KINDS
+
+    def test_every_bridge_target_is_registered(self):
+        """`kegg` now points at `kegg_module` — the target must exist."""
+        for key, cfg in ONTOLOGY_CONFIG.items():
+            for rel, target, _kind in cfg.get("bridges_out") or []:
+                assert target in ONTOLOGY_CONFIG, (key, rel, target)
+
+    def test_no_bridges_elsewhere_across_all_18(self):
+        for key in ALL_18:
+            if key in EXPECTED_BRIDGES:
+                continue
+            assert ONTOLOGY_CONFIG[key].get("bridges_out") in (None, []), key
+
+
+class TestKeggModuleInSchemaBaseline:
+    """Spec §5: the hand-patched baseline carries the KeggModule label and
+    the three new relationship types."""
+
+    def test_label_and_gene_rel_in_baseline(self, baseline):
+        cfg = ONTOLOGY_CONFIG["kegg_module"]
+        assert cfg["label"] in baseline["nodes"]
+        assert cfg["gene_rel"] in baseline["relationships"]
+
+    def test_hierarchy_rel_in_baseline(self, baseline):
+        assert "Kegg_module_is_a_kegg_module" in baseline["relationships"]
+
+    def test_bridge_rels_in_baseline(self, baseline):
+        for rel in ("Kegg_term_in_kegg_module", "Kegg_module_in_kegg_pathway"):
+            assert rel in baseline["relationships"], rel
+
+    def test_ko_module_edge_props_in_baseline(self, baseline):
+        props = _rel_props(baseline, "Kegg_term_in_kegg_module")
+        assert {"steps", "component"} <= props
+
+    def test_facet_prop_on_label(self, baseline):
+        assert "module_type" in _node_props(baseline, "KeggModule")
+
+    def test_term_props_on_label(self, baseline):
+        props = _node_props(baseline, "KeggModule")
+        for prop in ("id", "name", "level", "level_kind", "module_type",
+                     "gene_count", "organism_count", "complete_organism_count",
+                     "module_id", "definition", "step_count",
+                     "direct_gene_count"):
+            assert prop in props, prop
+
+    def test_trust_props_on_gene_rel(self, baseline):
+        cfg = ONTOLOGY_CONFIG["kegg_module"]
+        props = _rel_props(baseline, cfg["gene_rel"])
+        for prop in cfg["trust"].values():
+            assert prop in props, prop
+
+    def test_schema_info_carries_kegg_release(self, baseline):
+        assert "kegg_release" in _node_props(baseline, "Schema_info")

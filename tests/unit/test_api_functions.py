@@ -16677,17 +16677,18 @@ class TestSearchOntologyMultiApi:
         # ontologies): multi-ontology browse emits [] (backlog 2.5).
         assert result["by_level"] == []
 
-    def test_none_means_all_17_in_config_order(self, mock_conn):
+    def test_none_means_all_18_in_config_order(self, mock_conn):
+        # kegg-module-ontology §2: kegg_module is the 18th ontology.
         calls = _so_dispatch(mock_conn, {})
         result = api.search_ontology("transport", None, limit=5, conn=mock_conn)
         summaries = [c for c, _ in calls if not _is_detail(c)]
-        assert len(summaries) == 17
+        assert len(summaries) == 18
         assert [e["ontology"] for e in result["by_ontology"]] == list(_CFG3B)
 
     def test_ontology_kwarg_defaults_to_all(self, mock_conn):
         calls = _so_dispatch(mock_conn, {})
         api.search_ontology("transport", limit=5, conn=mock_conn)
-        assert len([c for c, _ in calls if not _is_detail(c)]) == 17
+        assert len([c for c, _ in calls if not _is_detail(c)]) == 18
 
     def test_single_str_still_works_and_carries_ontology_type(self, mock_conn):
         self._go_tcdb(mock_conn)
@@ -16720,7 +16721,7 @@ class TestSearchOntologyMultiApi:
     def test_empty_list_means_all(self, mock_conn):
         calls = _so_dispatch(mock_conn, {})
         api.search_ontology("transport", [], limit=5, conn=mock_conn)
-        assert len([c for c, _ in calls if not _is_detail(c)]) == 17
+        assert len([c for c, _ in calls if not _is_detail(c)]) == 18
 
     # --- facet skip/raise matrix ---
 
@@ -25730,3 +25731,515 @@ class TestGbo2d4Envelope:
         out, _ = self._run(limit=2)
         assert sum(b["row_count"] for b in out["by_organism"]) == 9
         assert out["returned"] == 2
+
+
+# ===========================================================================
+# kegg_module ontology + `module_type` facet + kegg_release
+# (docs/tool-specs/kegg-module-ontology.md)
+# ===========================================================================
+
+_KM_MODULE = "kegg.module:M00531"
+_KM_SUBCLASS = "kegg.module:pathway_modules.energy_metabolism.nitrogen_metabolism"
+
+
+class TestKeggModuleKeyLists:
+    def test_kegg_module_is_appended_to_all_ontologies(self):
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert ALL_ONTOLOGIES[-1] == "kegg_module"
+        assert len(ALL_ONTOLOGIES) == 18
+
+    def test_existing_order_is_preserved(self):
+        from multiomics_explorer.kg.constants import ALL_ONTOLOGIES
+        assert ALL_ONTOLOGIES[:17] == [
+            "go_bp", "go_mf", "go_cc", "ec", "kegg",
+            "cog_category", "cyanorak_role", "tigr_role", "pfam",
+            "brite", "tcdb", "cazy",
+            "subcellular_localization", "signal_peptide_type",
+            "interpro", "ncbifam", "merops",
+        ]
+
+
+class TestModuleTypeSignatures:
+    """`module_type` rides every api function that carries `interpro_type`,
+    defaulting to None (both kinds)."""
+
+    @pytest.mark.parametrize("fn_name", [
+        "search_ontology", "genes_by_ontology", "gene_ontology_terms",
+        "ontology_landscape", "pathway_enrichment", "cluster_enrichment",
+    ])
+    def test_param_exists_and_defaults_to_none(self, fn_name):
+        sig = _inspect.signature(getattr(api, fn_name))
+        assert "module_type" in sig.parameters, fn_name
+        assert sig.parameters["module_type"].default is None, fn_name
+
+
+class TestGenesByOntologyKeggModule:
+    def _run(self, mock_conn, rows, **kwargs):
+        _trust_dispatch(mock_conn, _gbo_rules(rows), default=rows)
+        return api.genes_by_ontology(
+            ontology=kwargs.pop("ontology", "kegg_module"), organism=_ORG,
+            level=kwargs.pop("level", 3), conn=mock_conn, **kwargs,
+        )
+
+    def _rows(self, module_type="pathway"):
+        return [{
+            "locus_tag": "PMM0001", "gene_name": None, "product": None,
+            "gene_category": "Unknown", "term_id": "kegg.module:M00001",
+            "term_name": "Glycolysis", "level": 3, "is_informative": True,
+            "evidence": "signature", "module_type": module_type,
+        }]
+
+    def test_kegg_module_is_accepted(self, mock_conn):
+        result = self._run(mock_conn, [])
+        assert result["total_matching"] == 0
+
+    def test_row_keeps_module_type_in_compact(self, mock_conn):
+        result = self._run(mock_conn, self._rows("signature"))
+        assert result["results"][0]["module_type"] == "signature"
+
+    def test_module_type_reaches_the_builders(self, mock_conn):
+        calls = []
+
+        def _exec(cypher, **params):
+            calls.append((cypher, params))
+            if "MATCH (o:OrganismTaxon)" in cypher:
+                return _org_rows()
+            return []
+
+        mock_conn.execute_query.side_effect = _exec
+        api.genes_by_ontology(
+            ontology="kegg_module", organism=_ORG, level=3,
+            module_type="signature", conn=mock_conn)
+        facet_calls = [p for c, p in calls if "t.module_type = $module_type" in c]
+        assert facet_calls, [c for c, _ in calls]
+        assert all(p["module_type"] == "signature" for p in facet_calls)
+
+    @pytest.mark.parametrize("ontology", ["kegg", "brite", "interpro"])
+    def test_module_type_on_other_ontology_raises(self, mock_conn, ontology):
+        with pytest.raises(ValueError, match="module_type"):
+            api.genes_by_ontology(
+                ontology=ontology, organism=_ORG, level=1,
+                module_type="pathway", conn=mock_conn,
+            )
+
+    def test_trust_axes_are_keggs(self, mock_conn):
+        result = self._run(mock_conn, [])
+        axes = result.get("trust_axes") or {}
+        assert axes.get("kegg_module") == ["sources", "evidence"]
+
+    def test_unsupported_axis_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="max_tier"):
+            api.genes_by_ontology(
+                ontology="kegg_module", organism=_ORG, level=3, max_tier=2,
+                conn=mock_conn,
+            )
+
+
+class TestGeneOntologyTermsKeggModule:
+    def _rules(self):
+        return [
+            ("MATCH (o:OrganismTaxon)", _org_rows()),
+            ("AS found", [{"lt": "PMM0392", "found": True}]),
+            ("gene_term_counts", []),
+        ]
+
+    def test_module_type_applies_to_owner_only(self, mock_conn):
+        _trust_dispatch(mock_conn, self._rules(), default=[])
+        result = api.gene_ontology_terms(
+            locus_tags=["PMM0392"], organism=_ORG,
+            ontology=["kegg_module", "kegg"], module_type="pathway",
+            conn=mock_conn,
+        )
+        assert result["skipped_ontologies"] == []
+
+    def test_module_type_owner_absent_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="module_type"):
+            api.gene_ontology_terms(
+                locus_tags=["PMM0392"], organism=_ORG,
+                ontology=["kegg", "tcdb"], module_type="pathway",
+                conn=mock_conn,
+            )
+
+    def test_module_type_forwarded_to_the_owner_query(self, mock_conn):
+        calls = []
+
+        def _exec(cypher, **params):
+            calls.append((cypher, params))
+            if "MATCH (o:OrganismTaxon)" in cypher:
+                return _org_rows()
+            if "AS found" in cypher:
+                return [{"lt": "PMM0392", "found": True}]
+            return []
+
+        mock_conn.execute_query.side_effect = _exec
+        api.gene_ontology_terms(
+            locus_tags=["PMM0392"], organism=_ORG, ontology="kegg_module",
+            module_type="signature", conn=mock_conn,
+        )
+        hits = [p for c, p in calls if "t.module_type = $module_type" in c]
+        assert hits
+        assert all(p["module_type"] == "signature" for p in hits)
+
+
+class TestSearchOntologyKeggModule:
+    def test_module_type_forwarded(self, mock_conn):
+        seen = {}
+
+        def _exec(cypher, **params):
+            seen.update(params)
+            if "total_entries" in cypher:
+                return [{"total_entries": 10, "total_matching": 0,
+                         "score_max": None, "score_median": None}]
+            return []
+
+        mock_conn.execute_query.side_effect = _exec
+        api.search_ontology(
+            "nitrate", "kegg_module", module_type="pathway", conn=mock_conn)
+        assert seen.get("module_type") == "pathway"
+
+    def test_module_type_on_non_owner_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="module_type"):
+            api.search_ontology(
+                "nitrate", "kegg", module_type="pathway", conn=mock_conn)
+
+    def test_rows_carry_module_type(self, mock_conn):
+        _so_dispatch(mock_conn, {
+            "kegg_module": (_so_summary(), [
+                _so_row(_KM_MODULE, name="Assimilatory nitrate reduction",
+                        level=3, module_type="pathway")]),
+        })
+        result = api.search_ontology("nitrate", "kegg_module", conn=mock_conn)
+        assert result["results"][0]["module_type"] == "pathway"
+        assert result["results"][0]["ontology_type"] == "kegg_module"
+
+    def test_module_type_is_a_narrowing_param_in_browse(self, mock_conn):
+        """Browse with only a facet narrows (mirrors tree / interpro_type)."""
+        calls = _so_dispatch(mock_conn, {})
+        api.search_ontology(
+            ontology="kegg_module", module_type="signature", conn=mock_conn)
+        assert any("t.module_type = $module_type" in c for c, _ in calls)
+
+    def test_multi_ontology_facet_applies_to_owner_only(self, mock_conn):
+        calls = _so_dispatch(mock_conn, {
+            "kegg_module": (_so_summary(), [
+                _so_row(_KM_MODULE, module_type="pathway")]),
+        })
+        result = api.search_ontology(
+            "nitrate", ["kegg_module", "kegg"], module_type="pathway",
+            conn=mock_conn)
+        assert result["skipped_ontologies"] == []
+        for cypher, params in calls:
+            if "keggModuleFullText" in cypher:
+                assert params.get("module_type") == "pathway"
+            elif "kegg" in cypher.lower() and "keggModule" not in cypher:
+                assert "module_type" not in params
+
+
+class TestOntologyLandscapeKeggModule:
+    def _rules(self, stat_rows=None):
+        return [
+            ("MATCH (o:OrganismTaxon)", _org_rows()),
+            ("total_genes", [{"total_genes": 1000}]),
+            ("n_terms_with_genes", stat_rows or []),
+        ]
+
+    def _stat(self, module_type, level=3):
+        return {
+            "level": level, "tree": None, "tree_code": None,
+            "module_type": module_type,
+            "n_terms_with_genes": 20, "n_genes_at_level": 300,
+            "min_genes_per_term": 5, "q1_genes_per_term": 6.0,
+            "median_genes_per_term": 9.0, "q3_genes_per_term": 20.0,
+            "max_genes_per_term": 40, "n_best_effort": 0,
+        }
+
+    def test_rows_carry_module_type(self, mock_conn):
+        _trust_dispatch(
+            mock_conn, self._rules([self._stat("pathway")]), default=[])
+        result = api.ontology_landscape(
+            organism=_ORG, ontology="kegg_module", conn=mock_conn)
+        assert result["results"][0]["module_type"] == "pathway"
+
+    def test_one_row_per_module_type_stratum(self, mock_conn):
+        _trust_dispatch(mock_conn, self._rules(
+            [self._stat("pathway"), self._stat("signature")]), default=[])
+        result = api.ontology_landscape(
+            organism=_ORG, ontology="kegg_module", conn=mock_conn)
+        kinds = sorted(r["module_type"] for r in result["results"]
+                       if r["ontology_type"] == "kegg_module")
+        assert kinds == ["pathway", "signature"]
+
+    def test_non_kegg_module_rows_carry_no_module_type(self, mock_conn):
+        stat = self._stat(None, level=1)
+        stat.pop("module_type")
+        _trust_dispatch(mock_conn, self._rules([stat]), default=[])
+        result = api.ontology_landscape(
+            organism=_ORG, ontology="kegg", conn=mock_conn)
+        assert "module_type" not in result["results"][0]
+
+    def test_module_type_threads_to_the_landscape_builder(
+            self, mock_conn, monkeypatch):
+        calls: dict = {}
+        _recording(monkeypatch, "build_ontology_landscape", calls)
+        _trust_dispatch(mock_conn, self._rules(), default=[])
+        api.ontology_landscape(organism=_ORG, ontology="kegg_module",
+                               module_type="signature", conn=mock_conn)
+        assert calls["build_ontology_landscape"]
+        for kw in calls["build_ontology_landscape"]:
+            assert kw["module_type"] == "signature"
+
+    def test_module_type_on_non_owner_raises(self, mock_conn):
+        with pytest.raises(ValueError, match="module_type"):
+            api.ontology_landscape(organism=_ORG, ontology="kegg",
+                                   module_type="pathway", conn=mock_conn)
+
+    def test_default_fan_out_covers_kegg_module(self, mock_conn):
+        seen = []
+
+        def _exec(cypher, **params):
+            if "MATCH (o:OrganismTaxon)" in cypher:
+                return _org_rows()
+            if "total_genes" in cypher:
+                return [{"total_genes": 1000}]
+            seen.append(cypher)
+            return []
+
+        mock_conn.execute_query.side_effect = _exec
+        api.ontology_landscape(organism=_ORG, conn=mock_conn)
+        assert "Kegg_term_in_kegg_module" in "\n".join(seen)
+
+
+class TestEnrichmentKeggModule:
+    """module_type shapes TERM2GENE and the background (it rides
+    genes_by_ontology), the envelope echoes it, and — unlike interpro_type —
+    it is never required."""
+
+    @pytest.fixture(autouse=True)
+    def _enrichment_preflight(self, monkeypatch):
+        _patch_enrichment_preflight(monkeypatch)
+
+    def _patch_pathway(self, monkeypatch, seen):
+        import multiomics_explorer.api.functions as f
+        monkeypatch.setattr(
+            f, "differential_expression_by_gene",
+            lambda **_: TestPathwayEnrichment._stub_de_result())
+
+        def _gbo(**kw):
+            seen.append(kw)
+            return TestPathwayEnrichment._stub_gbo_result()
+        monkeypatch.setattr(f, "genes_by_ontology", _gbo)
+
+    def _patch_cluster(self, monkeypatch, seen):
+        import multiomics_explorer.api.functions as f
+        import multiomics_explorer.analysis.enrichment as enr
+        monkeypatch.setattr(enr, "cluster_enrichment_inputs",
+                            lambda **_: TestClusterEnrichment._stub_inputs())
+
+        def _gbo(**kw):
+            seen.append(kw)
+            return TestClusterEnrichment._stub_gbo_result()
+        monkeypatch.setattr(f, "genes_by_ontology", _gbo)
+
+    def test_pathway_enrichment_without_module_type_does_not_raise(
+            self, monkeypatch):
+        seen = []
+        self._patch_pathway(monkeypatch, seen)
+        api.pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"], ontology="kegg_module",
+            level=3)
+        assert seen
+        assert all(kw.get("module_type") is None for kw in seen)
+
+    def test_cluster_enrichment_without_module_type_does_not_raise(
+            self, monkeypatch):
+        seen = []
+        self._patch_cluster(monkeypatch, seen)
+        api.cluster_enrichment(
+            analysis_id="ca:test", organism="MED4", ontology="kegg_module",
+            level=3)
+        assert seen
+
+    def test_pathway_enrichment_threads_module_type(self, monkeypatch):
+        seen = []
+        self._patch_pathway(monkeypatch, seen)
+        api.pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"], ontology="kegg_module",
+            level=3, module_type="pathway")
+        assert seen
+        assert all(kw["module_type"] == "pathway" for kw in seen)
+
+    def test_cluster_enrichment_threads_module_type(self, monkeypatch):
+        seen = []
+        self._patch_cluster(monkeypatch, seen)
+        api.cluster_enrichment(
+            analysis_id="ca:test", organism="MED4", ontology="kegg_module",
+            level=3, module_type="signature")
+        assert seen
+        assert all(kw["module_type"] == "signature" for kw in seen)
+
+    def test_annotated_background_uses_the_same_facet(self, monkeypatch):
+        """The background is shaped by the same facet as TERM2GENE: every
+        genes_by_ontology call (tested sets and annotated universe) carries
+        module_type."""
+        seen = []
+        self._patch_pathway(monkeypatch, seen)
+        api.pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"], ontology="kegg_module",
+            level=3, module_type="pathway", background="annotated")
+        assert seen
+        assert all(kw["module_type"] == "pathway" for kw in seen)
+
+    def test_pathway_envelope_echoes_module_type(self, monkeypatch):
+        seen = []
+        self._patch_pathway(monkeypatch, seen)
+        result = api.pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"], ontology="kegg_module",
+            level=3, module_type="pathway")
+        assert result.params["module_type"] == "pathway"
+        assert result.to_envelope()["module_type"] == "pathway"
+
+    def test_cluster_envelope_echoes_module_type(self, monkeypatch):
+        seen = []
+        self._patch_cluster(monkeypatch, seen)
+        result = api.cluster_enrichment(
+            analysis_id="ca:test", organism="MED4", ontology="kegg_module",
+            level=3, module_type="signature")
+        assert result.to_envelope()["module_type"] == "signature"
+
+    def test_envelope_module_type_none_when_not_requested(self, monkeypatch):
+        seen = []
+        self._patch_pathway(monkeypatch, seen)
+        result = api.pathway_enrichment(
+            organism="MED4", experiment_ids=["exp1"], ontology="kegg_module",
+            level=3)
+        assert result.to_envelope()["module_type"] is None
+
+    @pytest.mark.parametrize("fn", ["pathway_enrichment", "cluster_enrichment"])
+    def test_module_type_on_non_owner_raises(self, fn):
+        kw = ({"experiment_ids": ["exp1"]} if fn == "pathway_enrichment"
+              else {"analysis_id": "ca:1"})
+        with pytest.raises(ValueError, match="module_type"):
+            getattr(api, fn)(organism="MED4", ontology="kegg", level=1,
+                             module_type="pathway", **kw)
+
+    def test_facet_alone_does_not_narrow_the_background(self):
+        from multiomics_explorer.api.functions import _enrichment_trust_params
+        block = _enrichment_trust_params(
+            "kegg_module", {"module_type": "pathway"}, None)
+        assert block["background_filtered"] is False
+        assert block["filters_applied"]["module_type"] == "pathway"
+
+    def test_envelope_key_declared_on_the_result(self):
+        from multiomics_explorer.analysis.enrichment import EnrichmentResult
+        src = _inspect.getsource(EnrichmentResult.to_envelope)
+        assert "module_type" in src
+
+
+class TestOntologyTermDetailsKeggModule:
+    def _module_row(self):
+        return _otd_row(
+            _KM_MODULE, "KeggModule",
+            name="Assimilatory nitrate reduction, nitrate => ammonia",
+            level=3, level_kind="kegg_module", gene_count=180,
+            organism_count=120, direct_gene_count=180,
+            parents=[{"id": _KM_SUBCLASS, "name": "Nitrogen metabolism",
+                      "level": 2}],
+            links=[_otd_link("Kegg_module_in_kegg_pathway",
+                             "kegg.pathway:ko00910", "Nitrogen metabolism")],
+            extra={"module_type": "pathway", "module_id": "M00531",
+                   "step_count": 2, "definition": "K00367 (K00366,K17877)",
+                   "complete_organism_count": 40})
+
+    def _class_row(self):
+        return _otd_row(
+            _KM_SUBCLASS, "KeggModule", name="Nitrogen metabolism", level=2,
+            level_kind="kegg_module_subclass", gene_count=185,
+            organism_count=130,
+            children=[{"id": _KM_MODULE, "name": "x", "level": 3}],
+            extra={"module_type": "pathway", "module_id": None,
+                   "step_count": None, "definition": None,
+                   "complete_organism_count": 60})
+
+    def _ko_row(self):
+        return _otd_row(
+            "kegg.ko:K00367", "KeggTerm", name="narB", level=3,
+            links=[_otd_link("Kegg_term_in_kegg_module", _KM_MODULE,
+                             "Assimilatory nitrate reduction")])
+
+    def test_keggmodule_label_maps_to_kegg_module(self, mock_conn):
+        result = _otd_run(mock_conn, rows=[self._module_row()],
+                          term_ids=[_KM_MODULE])
+        assert result["results"][0]["ontology"] == "kegg_module"
+        assert result["results"][0]["label"] == "KeggModule"
+
+    def test_module_to_map_link_is_membership_into_kegg(self, mock_conn):
+        result = _otd_run(mock_conn, rows=[self._module_row()],
+                          term_ids=[_KM_MODULE])
+        link = result["results"][0]["links_out"][0]
+        assert link["rel"] == "Kegg_module_in_kegg_pathway"
+        assert link["link_kind"] == "membership"
+        assert link["target_ontology"] == "kegg"
+
+    def test_ko_to_module_link_is_membership_into_kegg_module(self, mock_conn):
+        result = _otd_run(mock_conn, rows=[self._ko_row()],
+                          term_ids=["kegg.ko:K00367"])
+        link = result["results"][0]["links_out"][0]
+        assert link["link_kind"] == "membership"
+        assert link["target_ontology"] == "kegg_module"
+
+    def test_module_compact_props(self, mock_conn):
+        row = _otd_run(mock_conn, rows=[self._module_row()],
+                       term_ids=[_KM_MODULE])["results"][0]
+        assert row["module_type"] == "pathway"
+        assert row["module_id"] == "M00531"
+        assert row["step_count"] == 2
+        assert row["definition"] == "K00367 (K00366,K17877)"
+        assert row["complete_organism_count"] == 40
+
+    def test_class_row_strips_level3_only_props(self, mock_conn):
+        row = _otd_run(mock_conn, rows=[self._class_row()],
+                       term_ids=[_KM_SUBCLASS])["results"][0]
+        assert row["module_type"] == "pathway"
+        for prop in ("module_id", "step_count", "definition"):
+            assert prop not in row, prop
+
+    def test_module_props_do_not_leak_onto_other_ontologies(self, mock_conn):
+        result = _otd_run(mock_conn)
+        for row in result["results"]:
+            for prop in ("module_type", "module_id", "step_count",
+                         "complete_organism_count"):
+                assert prop not in row, (row["term_id"], prop)
+
+    def test_by_ontology_counts_kegg_module(self, mock_conn):
+        result = _otd_run(mock_conn, rows=[self._module_row(), self._class_row()],
+                          term_ids=[_KM_MODULE, _KM_SUBCLASS])
+        assert _by(result["by_ontology"], "ontology") == {"kegg_module": 2}
+
+
+class TestKgReleaseInfoKeggRelease:
+    """Spec §4: `kg.kegg_release` passes through from Schema_info."""
+
+    _KR = ("pathway 2026-11-18, brite 2026-11-17, module 2026-11-09, "
+           "ko 2026-11-18")
+
+    def test_identity_fields_list_carries_kegg_release(self):
+        assert "kegg_release" in api._KG_IDENTITY_FIELDS
+
+    def test_kegg_release_passes_through(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        helper = TestKGReleaseInfo()
+        si = helper._ok_schema_info(kegg_release=self._KR)
+        conn = helper._make_conn(
+            si, helper._ok_labels(), helper._ok_rel_types())
+        report = kg_release_info(conn=conn)
+        assert report["kg"]["kegg_release"] == self._KR
+
+    def test_kegg_release_null_when_absent(self):
+        from multiomics_explorer.api.functions import kg_release_info
+        helper = TestKGReleaseInfo()
+        conn = helper._make_conn(
+            helper._ok_schema_info(), helper._ok_labels(),
+            helper._ok_rel_types())
+        report = kg_release_info(conn=conn)
+        assert report["kg"].get("kegg_release") is None
+        assert report["verdict"] == "ok"

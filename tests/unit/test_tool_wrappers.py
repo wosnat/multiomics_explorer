@@ -15526,3 +15526,229 @@ class Test2d4GboEnvelopeWrapper:
     def test_docstring_drops_one_organism(self, tool_fns):
         doc = tool_fns["genes_by_ontology"].__doc__ or ""
         assert "ONE organism" not in doc
+
+
+# ===========================================================================
+# kegg_module ontology + `module_type` facet + kegg_release
+# (docs/tool-specs/kegg-module-ontology.md §4)
+# ===========================================================================
+
+import inspect as _inspect_km  # noqa: E402
+import re as _re_km  # noqa: E402
+
+_KM_FACET_TOOLS = [
+    "search_ontology", "genes_by_ontology", "gene_ontology_terms",
+    "ontology_landscape", "pathway_enrichment", "cluster_enrichment",
+]
+_KM_ONTOLOGY_TOOLS = _KM_FACET_TOOLS
+
+
+def _km_model_section(class_name):
+    """Source of a row model nested in register_tools, up to the next class."""
+    from multiomics_explorer.mcp_server.tools import register_tools
+    src = _inspect_km.getsource(register_tools)
+    m = _re_km.search(rf"class {class_name}\((BaseModel|SparseRow)\):", src)
+    assert m, class_name
+    nxt = _re_km.search(r"\n\s+class \w+\(", src[m.end():])
+    end = m.end() + nxt.start() if nxt else len(src)
+    return src[m.start():end]
+
+
+class TestModuleTypeParamOnWrappers:
+    @pytest.mark.parametrize("tool_name", _KM_FACET_TOOLS)
+    def test_param_present_and_defaults_to_none(self, tool_fns, tool_name):
+        sig = _inspect_km.signature(tool_fns[tool_name])
+        assert "module_type" in sig.parameters, tool_name
+        assert sig.parameters["module_type"].default is None, tool_name
+
+    @pytest.mark.parametrize("tool_name", _KM_FACET_TOOLS)
+    def test_literal_is_pathway_or_signature(self, tool_fns, tool_name):
+        hint = _hint_str(tool_fns, tool_name, "module_type")
+        assert "Literal[" in hint, hint
+        literal_part = hint[hint.index("Literal["):]
+        options = set(_re_km.findall(r"'([a-z_]+)'", literal_part))
+        assert options == {"pathway", "signature"}, options
+
+    @pytest.mark.parametrize("tool_name", _KM_FACET_TOOLS)
+    def test_field_description_present_and_short(self, tool_fns, tool_name):
+        descs = [d for d in _field_descriptions(tool_fns, tool_name, "module_type")
+                 if d]
+        assert descs, f"{tool_name}.module_type has no Field description"
+        for desc in descs:
+            assert len(desc) <= 250, (tool_name, len(desc))
+            assert "kegg_module" in desc, desc
+
+    def test_ontology_term_details_has_no_module_type_param(self, tool_fns):
+        sig = _inspect_km.signature(tool_fns["ontology_term_details"])
+        assert "module_type" not in sig.parameters
+
+
+class TestKeggModuleOntologyKey:
+    def test_ontology_key_literal_includes_kegg_module(self):
+        from multiomics_explorer.mcp_server.params import OntologyKey
+        assert "kegg_module" in typing_get_args_flat(OntologyKey)
+
+    def test_ontology_key_literal_has_18_keys(self):
+        from multiomics_explorer.mcp_server.params import OntologyKey
+        assert len(typing_get_args_flat(OntologyKey)) == 18
+
+    @pytest.mark.parametrize("tool_name", _KM_ONTOLOGY_TOOLS)
+    def test_ontology_param_accepts_kegg_module(self, tool_fns, tool_name):
+        assert "'kegg_module'" in _hint_str(tool_fns, tool_name, "ontology")
+
+    @pytest.mark.parametrize("tool_name", _KM_ONTOLOGY_TOOLS)
+    def test_ontology_description_does_not_say_17(self, tool_fns, tool_name):
+        for desc in _field_descriptions(tool_fns, tool_name, "ontology"):
+            if desc:
+                assert "17" not in desc, (tool_name, desc)
+
+
+def typing_get_args_flat(tp):
+    import typing
+    out = []
+    for a in typing.get_args(tp):
+        if typing.get_origin(a) is typing.Literal:
+            out.extend(typing.get_args(a))
+        else:
+            out.append(a)
+    return out
+
+
+class TestModuleTypeForwarding:
+    @pytest.mark.asyncio
+    async def test_genes_by_ontology_forwards_module_type(self, tool_fns, mock_ctx):
+        with patch("multiomics_explorer.api.functions.genes_by_ontology",
+                   return_value=_2d4_gbo_return(ontology="kegg_module")) as m:
+            await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="kegg_module", organism=_2D4_MED4,
+                level=3, module_type="signature")
+        assert m.call_args.kwargs["module_type"] == "signature"
+
+    @pytest.mark.asyncio
+    async def test_genes_by_ontology_row_keeps_module_type(self, tool_fns, mock_ctx):
+        rows = [{"locus_tag": "SYNW2464", "organism_name": "Synechococcus WH8102",
+                 "gene_name": None, "product": None, "gene_category": "N",
+                 "term_id": "kegg.module:M00531", "term_name": "nitrate",
+                 "level": 3, "is_informative": True, "evidence": "signature",
+                 "module_type": "pathway"}]
+        with patch("multiomics_explorer.api.functions.genes_by_ontology",
+                   return_value=_2d4_gbo_return(
+                       ontology="kegg_module", results=rows, returned=1,
+                       total_matching=1)):
+            resp = await tool_fns["genes_by_ontology"](
+                mock_ctx, ontology="kegg_module",
+                term_ids=["kegg.module:M00531"])
+        dumped = resp.model_dump() if hasattr(resp, "model_dump") else resp
+        assert dumped["results"][0]["module_type"] == "pathway"
+
+    @pytest.mark.asyncio
+    async def test_search_ontology_forwards_module_type(self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.search_ontology",
+            side_effect=RuntimeError("stop"),
+        ) as m:
+            with pytest.raises(Exception):
+                await tool_fns["search_ontology"](
+                    mock_ctx, search_text="nitrate", ontology="kegg_module",
+                    module_type="pathway")
+        assert m.call_args.kwargs["module_type"] == "pathway"
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("tool_name,kwargs", [
+        ("gene_ontology_terms", dict(locus_tags=["SYNW2464"],
+                                     ontology="kegg_module")),
+        ("ontology_landscape", dict(organism="MED4", ontology="kegg_module")),
+        ("pathway_enrichment", dict(organism="MED4", experiment_ids=["E1"],
+                                    ontology="kegg_module", level=3)),
+        ("cluster_enrichment", dict(analysis_id="A1", organism="MED4",
+                                    ontology="kegg_module", level=3)),
+    ])
+    async def test_other_tools_forward_module_type(
+            self, tool_fns, mock_ctx, tool_name, kwargs):
+        with patch(f"multiomics_explorer.api.functions.{tool_name}",
+                   side_effect=RuntimeError("stop")) as m:
+            with pytest.raises(Exception):
+                await tool_fns[tool_name](
+                    mock_ctx, module_type="signature", **kwargs)
+        assert m.call_args.kwargs["module_type"] == "signature"
+
+    @pytest.mark.asyncio
+    async def test_module_type_value_error_becomes_tool_error(
+            self, tool_fns, mock_ctx):
+        with patch(
+            "multiomics_explorer.api.functions.genes_by_ontology",
+            side_effect=ValueError(
+                "module_type filter is only valid for ontology='kegg_module'"),
+        ):
+            with pytest.raises(ToolError, match="module_type"):
+                await tool_fns["genes_by_ontology"](
+                    mock_ctx, ontology="kegg", organism="MED4", level=1,
+                    module_type="pathway")
+
+
+class TestModuleTypeOnRowModels:
+    """Sparse `module_type` on every row model that carries interpro_type
+    today, plus the enrichment rows (spec: kegg_module rows carry it)."""
+
+    @pytest.mark.parametrize("class_name", [
+        "SearchOntologyResult", "OntologyTermDetailsRow",
+        "GenesByOntologyResult", "OntologyTermRow", "OntologyLandscapeRow",
+    ])
+    def test_nested_row_models_declare_module_type(self, class_name):
+        assert "module_type:" in _km_model_section(class_name)
+
+    @pytest.mark.parametrize("class_name", [
+        "PathwayEnrichmentResult", "ClusterEnrichmentResult",
+    ])
+    def test_enrichment_rows_accept_sparse_module_type(self, class_name):
+        import multiomics_explorer.mcp_server.tools as tools_mod
+        model = getattr(tools_mod, class_name)
+        assert "module_type" in model.model_fields
+        assert model.model_fields["module_type"].default is None
+
+    @pytest.mark.parametrize("class_name", [
+        "PathwayEnrichmentResponse", "ClusterEnrichmentResponse",
+    ])
+    def test_enrichment_envelope_echoes_module_type(self, class_name):
+        import multiomics_explorer.mcp_server.tools as tools_mod
+        model = getattr(tools_mod, class_name)
+        assert "module_type" in model.model_fields
+        assert model.model_fields["module_type"].default is None
+
+    @pytest.mark.parametrize("field", [
+        "module_type", "module_id", "step_count", "definition",
+        "complete_organism_count",
+    ])
+    def test_term_details_row_accepts_module_props(self, field):
+        section = _km_model_section("OntologyTermDetailsRow")
+        assert f"{field}:" in section
+
+    def test_complete_organism_count_description_contrasts_organism_count(self):
+        section = _km_model_section("OntologyTermDetailsRow")
+        start = section.index("complete_organism_count:")
+        chunk = section[start:start + 600]
+        assert "complete" in chunk.lower()
+        assert "organism_count" in chunk[len("complete_organism_count:"):]
+
+
+class TestKgReleaseInfoKeggRelease:
+    def _ok_report(self):
+        return TestKGReleaseInfoTool()._ok_report()
+
+    def test_kg_identity_carries_kegg_release(self):
+        from multiomics_explorer.mcp_server.tools import KGReleaseInfoResponse
+        report = self._ok_report()
+        report["kg"]["kegg_release"] = "pathway 2026-11-18, module 2026-11-09"
+        response = KGReleaseInfoResponse(**report)
+        assert response.kg.kegg_release == "pathway 2026-11-18, module 2026-11-09"
+
+    def test_kegg_release_defaults_none(self):
+        from multiomics_explorer.mcp_server.tools import KGReleaseInfoResponse
+        response = KGReleaseInfoResponse(**self._ok_report())
+        assert response.kg.kegg_release is None
+
+    def test_kegg_release_field_description(self):
+        from multiomics_explorer.mcp_server.tools import KGIdentity
+        field = KGIdentity.model_fields["kegg_release"]
+        assert field.description
+        assert len(field.description) <= 250

@@ -17445,3 +17445,458 @@ class TestGbo2d4PfamGuardPrecedence:
         )
         assert "WHERE (t:Pfam OR t:PfamClan)" in cypher
         assert "WHERE t:Pfam OR t:PfamClan" not in cypher
+
+
+# ===========================================================================
+# kegg_module ontology + 2d.10 bridged walk-down fix
+# (docs/tool-specs/kegg-module-ontology.md)
+# ===========================================================================
+
+import multiomics_explorer.kg.queries_lib as _qlkm  # noqa: E402
+
+_KM_MED4 = "Prochlorococcus MED4"
+_KM_WH8102 = "Synechococcus WH8102"
+_KM_MODULE = "kegg.module:M00531"
+_KM_SUBCLASS = "kegg.module:pathway_modules.energy_metabolism.nitrogen_metabolism"
+_KM_BRITE_TERM = "kegg.brite:ko02000.A1.B2"
+
+# The bridge hop the term_ids (walk-down) head must cross: gene -> KO ->
+# leaf. The KeggTerm variable name is free; the leaf binding is not.
+_BRITE_HOP = re.compile(
+    r"-\[r:Gene_has_kegg_ko\]->\(\w*:KeggTerm\)"
+    r"-\[:Kegg_term_in_brite_category\]->\(leaf\)")
+_MODULE_HOP = re.compile(
+    r"-\[r:Gene_has_kegg_ko\]->\(\w*:KeggTerm\)"
+    r"-\[:Kegg_term_in_kegg_module\]->\(leaf\)")
+
+
+class TestKeggModuleHierarchyWalk:
+    """kegg_module walk fragments mirror BRITE's (gene -> KO -> module)."""
+
+    def test_up_uses_the_ko_bridge(self):
+        frag = _hierarchy_walk("kegg_module", direction="up")
+        assert frag["leaf_label"] == "KeggModule"
+        assert frag["gene_rel"] == "Gene_has_kegg_ko"
+        assert "Kegg_module_is_a_kegg_module" in frag["rel_union"]
+        assert ":Gene_has_kegg_ko" in frag["bind_up"]
+        assert ":KeggTerm" in frag["bind_up"]
+        assert ":Kegg_term_in_kegg_module" in frag["bind_up"]
+        assert "(leaf:KeggModule)" in frag["bind_up"]
+        assert "Kegg_module_is_a_kegg_module*0.." in frag["walk_up"]
+        assert "(t:KeggModule)" in frag["walk_up"]
+
+    def test_down_walks_the_module_class_tree(self):
+        frag = _hierarchy_walk("kegg_module", direction="down")
+        assert (
+            "(t:KeggModule)<-[:Kegg_module_is_a_kegg_module*0..]-(leaf:KeggModule)"
+            in frag["walk_down"])
+
+    def test_bind_up_starts_with_standard_prefix(self):
+        frag = _hierarchy_walk("kegg_module", direction="up")
+        assert frag["bind_up"].startswith("MATCH (g:Gene {organism_name: $org})")
+
+
+class TestBridgedTermIdsHead2d10:
+    """Backlog 2d.10: in term_ids (walk-down) mode a bridged ontology's gene
+    join must cross the bridge hop. Before the fix the head read
+    `(g)-[r:Gene_has_kegg_ko]->(leaf)` with `leaf` a BriteCategory, which
+    matches nothing, so BRITE term_ids returned no genes."""
+
+    @pytest.mark.parametrize("ontology,term,hop", [
+        ("brite", _KM_BRITE_TERM, _BRITE_HOP),
+        ("kegg_module", _KM_MODULE, _MODULE_HOP),
+    ], ids=["brite", "kegg_module"])
+    @pytest.mark.parametrize("organisms", [
+        _KM_MED4, [_KM_MED4, _KM_WH8102], None], ids=["str", "list", "none"])
+    def test_match_stage_term_ids_head_crosses_the_bridge(
+            self, ontology, term, hop, organisms):
+        cypher, params = _qlkm._genes_by_ontology_match_stage(
+            ontology=ontology, level=None, term_ids=[term],
+            organisms=organisms,
+        )
+        assert hop.search(cypher), cypher
+        assert params["term_ids"] == [term]
+
+    @pytest.mark.parametrize("ontology,term,hop", [
+        ("brite", _KM_BRITE_TERM, _BRITE_HOP),
+        ("kegg_module", _KM_MODULE, _MODULE_HOP),
+    ], ids=["brite", "kegg_module"])
+    def test_head_has_no_direct_gene_to_leaf_join(self, ontology, term, hop):
+        cypher, _ = _qlkm._genes_by_ontology_match_stage(
+            ontology=ontology, level=None, term_ids=[term], organisms=_KM_MED4,
+        )
+        assert "-[r:Gene_has_kegg_ko]->(leaf)" not in cypher, cypher
+
+    def test_trust_predicate_still_binds_on_r(self):
+        cypher, params = _qlkm._genes_by_ontology_match_stage(
+            ontology="kegg_module", level=None, term_ids=[_KM_MODULE],
+            organisms=_KM_MED4, evidence=["curated"],
+        )
+        assert _MODULE_HOP.search(cypher), cypher
+        assert re.search(r"r\.evidence\b", cypher), cypher
+        hop_at = _MODULE_HOP.search(cypher).start()
+        assert cypher.index("collect(DISTINCT g)") > hop_at
+
+    def test_organism_list_predicate_rides_the_bridged_match(self):
+        cypher, params = _qlkm._genes_by_ontology_match_stage(
+            ontology="brite", level=None, term_ids=[_KM_BRITE_TERM],
+            organisms=[_KM_MED4, _KM_WH8102],
+        )
+        assert "g.organism_name IN $orgs" in cypher
+        assert _BRITE_HOP.search(cypher).start() < cypher.index(
+            "g.organism_name IN $orgs")
+
+    def test_walk_down_precedes_the_gene_join(self):
+        cypher, _ = _qlkm._genes_by_ontology_match_stage(
+            ontology="kegg_module", level=None, term_ids=[_KM_SUBCLASS],
+            organisms=_KM_MED4,
+        )
+        walk = cypher.index("Kegg_module_is_a_kegg_module*0..")
+        assert walk < _MODULE_HOP.search(cypher).start(), cypher
+
+    @pytest.mark.parametrize("builder", [
+        "build_genes_by_ontology_per_term",
+        "build_genes_by_ontology_per_gene",
+        "build_genes_by_ontology_trust_rollups",
+    ])
+    @pytest.mark.parametrize("ontology,term,hop", [
+        ("brite", _KM_BRITE_TERM, _BRITE_HOP),
+        ("kegg_module", _KM_MODULE, _MODULE_HOP),
+    ], ids=["brite", "kegg_module"])
+    def test_term2gene_builders_cross_the_bridge(
+            self, builder, ontology, term, hop):
+        """Enrichment's term_ids-scoped TERM2GENE runs through these
+        builders (via genes_by_ontology), so the hop must be in each."""
+        cypher, _ = getattr(_qlkm, builder)(
+            ontology=ontology, organism=_KM_MED4, term_ids=[term])
+        assert hop.search(cypher), cypher
+
+    @pytest.mark.parametrize("ontology,term,hop", [
+        ("brite", _KM_BRITE_TERM, _BRITE_HOP),
+        ("kegg_module", _KM_MODULE, _MODULE_HOP),
+    ], ids=["brite", "kegg_module"])
+    def test_detail_builder_term_ids_mode_crosses_the_bridge(
+            self, ontology, term, hop):
+        cypher, _ = _qlkm.build_genes_by_ontology_detail(**_detail_kw(
+            ontology=ontology, organism=_KM_MED4, term_ids=[term]))
+        assert hop.search(cypher), cypher
+
+    def test_brite_term_ids_with_tree_keeps_the_facet(self):
+        cypher, params = _qlkm.build_genes_by_ontology_per_term(
+            ontology="brite", organism=_KM_MED4,
+            term_ids=["br:ko02000"], tree="transporters",
+        )
+        assert "t.tree = $tree" in cypher
+        assert _BRITE_HOP.search(cypher), cypher
+
+    def test_unbridged_hierarchical_term_ids_head_unchanged(self):
+        """Non-bridged ontologies keep the direct gene -> leaf join."""
+        cypher, _ = _qlkm._genes_by_ontology_match_stage(
+            ontology="kegg", level=None, term_ids=["kegg.pathway:ko00910"],
+            organisms=_KM_MED4,
+        )
+        assert "-[r:Gene_has_kegg_ko]->(leaf)" in cypher
+        assert "Kegg_term_in_kegg_module" not in cypher
+
+
+class TestKeggModuleLevelMode:
+    """Mode 2 / 3 already cross the bridge via `bind_up`."""
+
+    def test_level_mode_binds_through_the_bridge(self):
+        cypher, params = _qlkm._genes_by_ontology_match_stage(
+            ontology="kegg_module", level=3, term_ids=None, organisms=_KM_MED4,
+        )
+        assert ":Kegg_term_in_kegg_module" in cypher
+        assert "(leaf:KeggModule)" in cypher
+        assert "Kegg_module_is_a_kegg_module*0.." in cypher
+        assert "t.level = $level" in cypher
+        assert params["level"] == 3
+
+    def test_mode3_scopes_to_term_ids(self):
+        cypher, params = _qlkm._genes_by_ontology_match_stage(
+            ontology="kegg_module", level=2, term_ids=[_KM_SUBCLASS],
+            organisms=_KM_MED4,
+        )
+        assert "t.id IN $term_ids" in cypher
+        assert params["term_ids"] == [_KM_SUBCLASS]
+
+
+class TestKeggModuleFacet:
+    """`module_type` — the third facet (after BRITE `tree`, InterPro
+    `interpro_type`). Binds on `t`; kegg_module only (else ValueError)."""
+
+    def test_facet_params_registry_carries_module_type(self):
+        assert _qlkm._FACET_PARAMS["module_type"] == ("kegg_module", "module_type")
+
+    def test_resolve_facet_accepts_module_type(self):
+        assert _qlkm._resolve_facet("kegg_module", module_type="signature") == (
+            "module_type", "module_type", "signature")
+
+    def test_resolve_facet_rejects_module_type_elsewhere(self):
+        with pytest.raises(ValueError, match="module_type"):
+            _qlkm._resolve_facet("kegg", module_type="pathway")
+
+    def test_level_mode_binds_on_t_after_the_walk(self):
+        cypher, params = _qlkm._genes_by_ontology_match_stage(
+            ontology="kegg_module", level=3, term_ids=None,
+            organisms=_KM_MED4, module_type="signature",
+        )
+        assert "t.module_type = $module_type" in cypher
+        assert params["module_type"] == "signature"
+        walk = cypher.index("Kegg_module_is_a_kegg_module")
+        assert walk < cypher.index("t.module_type = $module_type"), cypher
+
+    def test_term_ids_mode_binds_on_the_input_term(self):
+        cypher, params = _qlkm._genes_by_ontology_match_stage(
+            ontology="kegg_module", level=None, term_ids=[_KM_MODULE],
+            organisms=_KM_MED4, module_type="pathway",
+        )
+        assert "t.module_type = $module_type" in cypher
+        assert params["module_type"] == "pathway"
+        facet = cypher.index("t.module_type = $module_type")
+        assert facet < cypher.index("Kegg_module_is_a_kegg_module"), cypher
+
+    def test_no_facet_no_predicate(self):
+        cypher, params = _qlkm._genes_by_ontology_match_stage(
+            ontology="kegg_module", level=3, term_ids=None, organisms=_KM_MED4,
+        )
+        assert "module_type = $" not in cypher
+        assert "module_type" not in params
+
+    @pytest.mark.parametrize("ontology", ["kegg", "brite", "interpro", "go_bp"])
+    def test_detail_builder_rejects_module_type_elsewhere(self, ontology):
+        with pytest.raises(ValueError, match="module_type"):
+            _qlkm.build_genes_by_ontology_detail(**_detail_kw(
+                ontology=ontology, organism=_KM_MED4, level=1,
+                module_type="pathway",
+            ))
+
+    @pytest.mark.parametrize("builder", [
+        "build_genes_by_ontology_per_term",
+        "build_genes_by_ontology_per_gene",
+        "build_genes_by_ontology_trust_rollups",
+    ])
+    def test_gene_set_builders_bind_module_type(self, builder):
+        cypher, params = getattr(_qlkm, builder)(
+            ontology="kegg_module", organism=_KM_MED4, level=3,
+            module_type="signature")
+        assert "t.module_type = $module_type" in cypher
+        assert params["module_type"] == "signature"
+
+    def test_detail_builder_binds_module_type(self):
+        cypher, params = _qlkm.build_genes_by_ontology_detail(**_detail_kw(
+            ontology="kegg_module", organism=_KM_MED4, level=3,
+            module_type="signature"))
+        assert "t.module_type = $module_type" in cypher
+        assert params["module_type"] == "signature"
+
+    def test_search_ontology_binds_module_type(self):
+        cypher, params = build_search_ontology(
+            ontology="kegg_module", search_text="nitrate",
+            module_type="pathway")
+        assert "t.module_type = $module_type" in cypher
+        assert params["module_type"] == "pathway"
+
+    def test_search_ontology_browse_binds_module_type(self):
+        cypher, params = build_search_ontology(
+            ontology="kegg_module", level=3, module_type="signature")
+        assert "t.module_type = $module_type" in cypher
+        assert params["module_type"] == "signature"
+
+    def test_search_ontology_summary_binds_module_type(self):
+        cypher, params = build_search_ontology_summary(
+            ontology="kegg_module", search_text="nitrate",
+            module_type="pathway")
+        assert "t.module_type = $module_type" in cypher
+        assert params["module_type"] == "pathway"
+
+    @pytest.mark.parametrize("fn", ["build_search_ontology",
+                                    "build_search_ontology_summary"])
+    def test_search_ontology_rejects_module_type_elsewhere(self, fn):
+        with pytest.raises(ValueError, match="module_type"):
+            getattr(_qlkm, fn)(ontology="kegg", search_text="nitrate",
+                               module_type="pathway")
+
+    def test_gene_ontology_terms_binds_module_type(self):
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["PMM0001"], ontology="kegg_module",
+            organism_name=_KM_MED4, mode="leaf", module_type="pathway",
+        )
+        assert "t.module_type = $module_type" in cypher
+        assert params["module_type"] == "pathway"
+
+    def test_gene_ontology_terms_summary_binds_module_type(self):
+        cypher, params = build_gene_ontology_terms_summary(
+            locus_tags=["PMM0001"], ontology="kegg_module",
+            organism_name=_KM_MED4, mode="leaf", module_type="pathway",
+        )
+        assert "t.module_type = $module_type" in cypher
+        assert params["module_type"] == "pathway"
+
+    def test_gene_ontology_terms_rejects_module_type_elsewhere(self):
+        with pytest.raises(ValueError, match="module_type"):
+            build_gene_ontology_terms(
+                locus_tags=["PMM0001"], ontology="kegg",
+                organism_name=_KM_MED4, mode="leaf", module_type="pathway",
+            )
+
+    def test_landscape_binds_module_type(self):
+        cypher, params = _qlkm.build_ontology_landscape(
+            ontology="kegg_module", organism_name=_KM_MED4,
+            module_type="signature")
+        assert "t.module_type = $module_type" in cypher
+        assert params["module_type"] == "signature"
+
+    def test_landscape_rejects_module_type_elsewhere(self):
+        with pytest.raises(ValueError, match="module_type"):
+            _qlkm.build_ontology_landscape(
+                ontology="interpro", organism_name=_KM_MED4,
+                module_type="pathway")
+
+    def test_interpro_type_on_kegg_module_raises(self):
+        with pytest.raises(ValueError, match="interpro_type"):
+            _qlkm._genes_by_ontology_match_stage(
+                ontology="kegg_module", level=3, term_ids=None,
+                organisms=_KM_MED4, interpro_type="FAMILY",
+            )
+
+
+class TestKeggModuleLandscapeStratum:
+    """Landscape rows for kegg_module group by (module_type, level) — the
+    facet is in the grouping key, like `interpro_type`."""
+
+    def test_module_type_is_in_the_grouping_key(self):
+        cypher, _ = _qlkm.build_ontology_landscape(
+            ontology="kegg_module", organism_name=_KM_MED4)
+        assert "t.module_type AS module_type" in cypher
+
+    def test_module_type_is_returned(self):
+        cypher, _ = _qlkm.build_ontology_landscape(
+            ontology="kegg_module", organism_name=_KM_MED4)
+        tail = cypher[cypher.index("RETURN"):]
+        assert "module_type" in tail
+
+    def test_landscape_crosses_the_bridge(self):
+        cypher, _ = _qlkm.build_ontology_landscape(
+            ontology="kegg_module", organism_name=_KM_MED4)
+        assert ":Kegg_term_in_kegg_module" in cypher
+
+    @pytest.mark.parametrize("ontology", ["kegg", "brite", "interpro"])
+    def test_other_landscapes_have_no_module_type_column(self, ontology):
+        cypher, _ = _qlkm.build_ontology_landscape(
+            ontology=ontology, organism_name=_KM_MED4)
+        assert "module_type" not in cypher
+
+
+class TestKeggModuleRowColumns:
+    """The facet machinery adds a `module_type` column to gene x term rows."""
+
+    def test_compact_carries_module_type(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("kegg_module", verbose=False) == [
+            "evidence", "module_type"]
+
+    def test_verbose(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        assert ontology_row_columns("kegg_module", verbose=True) == [
+            "evidence", "module_type", "sources"]
+
+    def test_module_type_is_kegg_module_only(self):
+        from multiomics_explorer.kg.queries_lib import ontology_row_columns
+        for ontology in ONTOLOGY_CONFIG:
+            if ontology == "kegg_module":
+                continue
+            assert "module_type" not in ontology_row_columns(
+                ontology, verbose=True), ontology
+
+    def test_detail_projects_module_type_from_the_term(self):
+        cypher, _ = _qlkm.build_genes_by_ontology_detail(**_detail_kw(
+            ontology="kegg_module", organism=_KM_MED4, level=3))
+        assert "t.module_type AS module_type" in cypher
+
+    def test_gene_ontology_terms_projects_module_type(self):
+        cypher, _ = build_gene_ontology_terms(
+            locus_tags=["SYNW2464"], ontology="kegg_module",
+            organism_name=_KM_WH8102, mode="leaf",
+        )
+        assert "AS module_type" in cypher
+        assert ":Kegg_term_in_kegg_module" in cypher
+
+    def test_gene_ontology_terms_rollup_walks_the_class_tree(self):
+        cypher, params = build_gene_ontology_terms(
+            locus_tags=["SYNW2464"], ontology="kegg_module",
+            organism_name=_KM_WH8102, mode="rollup", level=2,
+        )
+        assert "Kegg_module_is_a_kegg_module" in cypher
+        assert params["level"] == 2
+
+    def test_search_ontology_projects_module_type(self):
+        cypher, _ = build_search_ontology(
+            ontology="kegg_module", search_text="nitrate")
+        assert "module_type" in cypher
+
+    def test_search_ontology_uses_the_module_fulltext_index(self):
+        cypher, _ = build_search_ontology(
+            ontology="kegg_module", search_text="nitrate")
+        assert "keggModuleFullText" in cypher
+
+    def test_search_ontology_browse_matches_the_label(self):
+        cypher, _ = build_search_ontology(ontology="kegg_module", level=3)
+        assert "db.index.fulltext" not in cypher
+        assert "KeggModule" in cypher
+
+    def test_search_ontology_organism_scope_crosses_the_bridge(self):
+        cypher, params = build_search_ontology(
+            ontology="kegg_module", search_text="nitrate",
+            organism=_KM_WH8102)
+        assert "Kegg_term_in_kegg_module" in cypher
+        assert params["organism"] == _KM_WH8102
+
+
+class TestKeggModuleTermDetails:
+    """ontology_term_details routes `kegg.module:*` ids through the registry:
+    label guard, is-a union, bridge union, compact props."""
+
+    def test_label_guard_includes_keggmodule(self):
+        cypher, _ = _qlkm.build_ontology_term_details(term_ids=[_KM_MODULE])
+        assert "t:KeggModule" in cypher
+
+    def test_hierarchy_union_includes_the_module_is_a(self):
+        cypher, _ = _qlkm.build_ontology_term_details(term_ids=[_KM_MODULE])
+        assert "Kegg_module_is_a_kegg_module" in cypher
+
+    @pytest.mark.parametrize("rel", [
+        "Kegg_term_in_kegg_module", "Kegg_module_in_kegg_pathway"])
+    def test_bridge_union_includes_the_module_links(self, rel):
+        cypher, _ = _qlkm.build_ontology_term_details(term_ids=[_KM_MODULE])
+        bridge_line = [ln for ln in cypher.splitlines()
+                       if "OPTIONAL MATCH (t)-[b:" in ln]
+        assert bridge_line and rel in bridge_line[0], cypher
+
+    def test_router_only_link_kinds_drop_the_membership_bridges(self):
+        cypher, _ = _qlkm.build_ontology_term_details(
+            term_ids=[_KM_MODULE], link_kinds=["router"])
+        assert "Kegg_module_in_kegg_pathway" not in cypher
+        assert "Kegg_term_in_kegg_module|" not in cypher
+
+    @pytest.mark.parametrize("prop", [
+        "module_type", "module_id", "step_count", "definition",
+        "complete_organism_count"])
+    def test_compact_props_projected(self, prop):
+        cypher, _ = _qlkm.build_ontology_term_details(term_ids=[_KM_MODULE])
+        assert f"t.{prop} AS {prop}" in cypher
+
+    def test_gene_walk_crosses_the_ko_module_bridge(self):
+        cypher, params = _qlkm.build_ontology_term_details(
+            term_ids=[_KM_MODULE], organism=_KM_WH8102)
+        walk = [ln for ln in cypher.splitlines() if "<-[gr:" in ln]
+        assert walk and "Kegg_term_in_kegg_module" in walk[0], cypher
+        assert params["organism"] == _KM_WH8102
+
+    def test_gene_walk_does_not_follow_module_to_map_links(self):
+        """`Kegg_module_in_kegg_pathway` is a link-out, not a gene path: a
+        KEGG map's gene walk must not pull genes in through its modules."""
+        cypher, _ = _qlkm.build_ontology_term_details(
+            term_ids=["kegg.pathway:ko00910"], verbose=True)
+        walk = [ln for ln in cypher.splitlines() if "<-[gr:" in ln]
+        assert walk and "Kegg_module_in_kegg_pathway" not in walk[0], cypher
