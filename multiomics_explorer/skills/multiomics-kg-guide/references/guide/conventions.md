@@ -510,20 +510,19 @@ valid names via `list_filter_values(filter_type='brite_tree')`.
 
 `OrganismTaxon.preferred_name` is the canonical organism string (e.g.
 `"Prochlorococcus MED4"`) and equals `Gene.organism_name`. Scalar
-`organism=` resolves the same way everywhere: **word match** — every
-space-split input word must be a case-insensitive substring of
-`preferred_name` or an entry of `name_synonyms` (`"MED4"`, `"med4"`,
-`"Prochlorococcus MED4"` all resolve; `"MED 4"` does not); **genes
-required** — genus-level nodes, phages and treatment-only taxa (a
-coculture partner not sequenced here) never match, even by exact name;
-**ambiguity raises** `ValueError` listing candidates
-(`organism="Prochlorococcus"` on a DE tool) — add a strain token to
-narrow.
+`organism=` resolves the same way everywhere, case-insensitive on
+`preferred_name` + `name_synonyms`, **best tier only**: exact name or
+synonym → every input word is a whole word (`"MED4"`) → every word is a
+substring (`"9312"`). So `"AltDE"` / `"PAC1"` select one strain, not
+AltDE1 / EQPAC1. **Genes required** — genus-level nodes, phages and
+treatment-only taxa never match (`list_publications` excepted); single-organism tools raise "taxon
+without genes … use list_organisms". **Ambiguity raises** `ValueError`
+listing candidates (`"Prochlorococcus"`, DE tool);
+discovery filters pool every match instead.
 
-The list forms differ slightly: `organisms=[...]` (`genes_by_homolog_group`,
-`differential_expression_by_ortholog`) keeps every match per entry
-(`"Prochlorococcus"` selects every strain); `list_organisms(organism_names=[...])`
-additionally accepts an exact `preferred_name` for gene-less taxa;
+List forms: `organisms=[...]` (`genes_by_homolog_group`,
+`differential_expression_by_ortholog`) pool every match per entry;
+`list_organisms(organism_names=[...])` also accepts an exact `preferred_name` for gene-less taxa;
 `list_metabolites(organism_names=[...])` is exact, case-insensitive on
 `preferred_name` only.
 

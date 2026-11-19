@@ -13,7 +13,7 @@ docs://tools/list_publications; summary=True caps the same rollups (smaller than
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
+| organism | string \| None | None | Organism, matched by name (exact first, then whole words, then partial) on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
 | treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
 | background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
@@ -666,6 +666,8 @@ list_publications → list_derived_metrics(publication_dois=[doi]) for the paper
 
 ## Common mistakes
 
+- organism also matches taxa without genes that papers name (Phage, Escherichia coli, Vibrio parahaemolyticus, Thalassiosira pseudonana) — the only tool where they match; gene tools reject them.
+
 - Use the dedicated author param for author filtering (e.g. author='Biller'), not search_text — search_text searches title, abstract, and description only.
 
 - experiment_count is per-publication — a publication with experiment_count=10 may span multiple organisms and treatment types.
@@ -688,7 +690,7 @@ list_publications(author='Biller') then list_experiments(publication_dois=['10.1
 
 - Unknown treatment_type / background_factors / growth_phases values return 0 rows with a warning listing the valid values; check list_filter_values first.
 
-- `organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works.
+- `organism=` is matched by name on preferred_name + name_synonyms, case-insensitive (exact first, then whole words, then partial) — 'MED4' works and selects one strain.
 
 ## Package import equivalent
 

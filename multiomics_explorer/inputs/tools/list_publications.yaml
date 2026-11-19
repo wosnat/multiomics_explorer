@@ -549,6 +549,7 @@ chaining:
   - "list_publications → list_derived_metrics(publication_dois=[doi]) for the paper's non-DE, column-level evidence"
 
 mistakes:
+  - "organism also matches taxa without genes that papers name (Phage, Escherichia coli, Vibrio parahaemolyticus, Thalassiosira pseudonana) — the only tool where they match; gene tools reject them."
   - "Use the dedicated author param for author filtering (e.g. author='Biller'), not search_text — search_text searches title, abstract, and description only."
   - "experiment_count is per-publication — a publication with experiment_count=10 may span multiple organisms and treatment types."
   - "metabolite_count > 0 indicates a metabolomics-bearing publication. Drill into MetaboliteAssay nodes via list_metabolite_assays(publication_dois=[...]); inspect compartments via metabolite_compartments per row."
@@ -558,4 +559,4 @@ mistakes:
   - "`publication_dois` combines with the other filters via AND, and `not_found` lists any provided DOI that did not match — the same shape as `experiment_ids` on the sibling `list_*` tools."
   - "`compartment` keeps publications with at least one experiment in that compartment — it is not a per-publication property. `by_organism` and `by_metric_type` are capped at 10 entries on every call, `summary=True` included (`<key>_truncated: true` when trimmed). For a per-organism publication count across every organism, use list_organisms (`publication_count`)."
   - "Unknown treatment_type / background_factors / growth_phases values return 0 rows with a warning listing the valid values; check list_filter_values first."
-  - "`organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works."
+  - "`organism=` is matched by name on preferred_name + name_synonyms, case-insensitive (exact first, then whole words, then partial) — 'MED4' works and selects one strain."

@@ -1178,8 +1178,13 @@ def _hierarchy_walk(
 
 
 def build_resolve_gene(
-    *, identifier: str, organism: str | None = None
+    *, identifier: str, organism_names: list[str] | None = None
 ) -> tuple[str, dict]:
+    """Resolve an identifier to Gene nodes.
+
+    ``organism_names``: exact canonical organism names (pre-resolved by
+    the api layer); ``None`` = no filter, ``[]`` = 0 rows.
+    """
     cypher = (
         "MATCH (g:Gene)\n"
         "WHERE (\n"
@@ -1187,19 +1192,18 @@ def build_resolve_gene(
         "    OR toLower(g.gene_name) = toLower($identifier)\n"
         "    OR ANY(id IN g.all_identifiers WHERE toLower(id) = toLower($identifier))\n"
         "  )\n"
-        "  AND ($organism IS NULL OR ALL(word IN split(toLower($organism), ' ') WHERE toLower(g.organism_name) CONTAINS word))\n"
+        "  AND ($organism_names IS NULL OR g.organism_name IN $organism_names)\n"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.organism_name AS organism_name\n"
         "ORDER BY g.organism_name, g.locus_tag"
     )
-    return cypher, {"identifier": identifier, "organism": organism}
+    return cypher, {"identifier": identifier, "organism_names": organism_names}
 
 
 def _genes_by_function_filter_clause() -> str:
     """Return the shared WHERE filter expression for genes_by_function builders."""
     return (
-        "($organism IS NULL OR ALL(word IN split(toLower($organism), ' ')"
-        " WHERE toLower(g.organism_name) CONTAINS word))\n"
+        "($organism_names IS NULL OR g.organism_name IN $organism_names)\n"
         "  AND ($min_quality = 0 OR g.annotation_quality >= $min_quality)\n"
         "  AND ($gene_categories IS NULL OR g.gene_category IN $gene_categories)"
     )
@@ -1208,12 +1212,12 @@ def _genes_by_function_filter_clause() -> str:
 def _genes_by_function_params(
     *,
     search_text: str,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     gene_categories: list[str] | None = None,
     min_quality: int = 0,
 ) -> dict:
     return {
-        "search_text": search_text, "organism": organism,
+        "search_text": search_text, "organism_names": organism_names,
         "gene_categories": gene_categories, "min_quality": min_quality,
     }
 
@@ -1221,7 +1225,7 @@ def _genes_by_function_params(
 def build_genes_by_function_summary(
     *,
     search_text: str,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     gene_categories: list[str] | None = None,
     min_quality: int = 0,
 ) -> tuple[str, dict]:
@@ -1257,7 +1261,7 @@ def build_genes_by_function_summary(
         "       apoc.coll.frequencies(categories) AS by_category"
     )
     return cypher, _genes_by_function_params(
-        search_text=search_text, organism=organism,
+        search_text=search_text, organism_names=organism_names,
         gene_categories=gene_categories, min_quality=min_quality,
     )
 
@@ -1265,7 +1269,7 @@ def build_genes_by_function_summary(
 def build_genes_by_function(
     *,
     search_text: str,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     gene_categories: list[str] | None = None,
     min_quality: int = 0,
     verbose: bool = False,
@@ -1279,7 +1283,7 @@ def build_genes_by_function(
     RETURN keys (verbose): adds function_description, gene_summary.
     """
     params = _genes_by_function_params(
-        search_text=search_text, organism=organism,
+        search_text=search_text, organism_names=organism_names,
         gene_categories=gene_categories, min_quality=min_quality,
     )
 
@@ -2233,7 +2237,7 @@ def build_gene_homologs(
 
 def _list_publications_where(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
@@ -2256,11 +2260,13 @@ def _list_publications_where(
     if search_text:
         params["search_text"] = search_text
 
-    if organism:
+    if organism_names is not None:
+        # Exact canonical names (pre-resolved by the api layer; may include
+        # gene-less taxa such as 'Phage'). [] still filters → 0 rows.
         conditions.append(
-            "ANY(o IN p.organisms WHERE toLower(o) CONTAINS toLower($organism))"
+            "ANY(o IN p.organisms WHERE o IN $organism_names)"
         )
-        params["organism"] = organism
+        params["organism_names"] = organism_names
 
     if treatment_type:
         conditions.append(
@@ -2302,7 +2308,7 @@ def _list_publications_where(
 
 def build_list_publications(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
@@ -2326,7 +2332,7 @@ def build_list_publications(
     experiment in that wet-lab compartment.
     """
     where_block, params = _list_publications_where(
-        organism=organism, treatment_type=treatment_type,
+        organism_names=organism_names, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
         search_text=search_text, author=author,
         publication_dois=publication_dois, compartment=compartment,
@@ -2411,7 +2417,7 @@ def build_list_publications(
 
 def build_list_publications_summary(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
     growth_phases: list[str] | None = None,
@@ -2431,7 +2437,7 @@ def build_list_publications_summary(
     the precomputed list properties on each Publication node.
     """
     where_block, params = _list_publications_where(
-        organism=organism, treatment_type=treatment_type,
+        organism_names=organism_names, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
         search_text=search_text, author=author,
         publication_dois=publication_dois, compartment=compartment,
@@ -3793,7 +3799,7 @@ def build_list_organisms_capability(
 
 def _list_experiments_where(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     treatment_type: list[str] | None = None,
     omics_type: list[str] | None = None,
     publication_doi: list[str] | None = None,
@@ -3821,12 +3827,10 @@ def _list_experiments_where(
     if search_text:
         params["search_text"] = search_text
 
-    if organism:
-        conditions.append(
-            "ALL(word IN split(toLower($organism), ' ')"
-            " WHERE toLower(e.organism_name) CONTAINS word)"
-        )
-        params["organism"] = organism
+    if organism_names is not None:
+        # Exact canonical names, pre-resolved by the api layer ([] → 0 rows).
+        conditions.append("e.organism_name IN $organism_names")
+        params["organism_names"] = organism_names
 
     if treatment_type:
         conditions.append(
@@ -3904,7 +3908,7 @@ def _list_experiments_where(
 
 def build_list_experiments(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     treatment_type: list[str] | None = None,
     omics_type: list[str] | None = None,
     publication_doi: list[str] | None = None,
@@ -3961,7 +3965,7 @@ def build_list_experiments(
     slice-2 design D5).
     """
     where_block, params = _list_experiments_where(
-        organism=organism, treatment_type=treatment_type,
+        organism_names=organism_names, treatment_type=treatment_type,
         omics_type=omics_type, publication_doi=publication_doi,
         coculture_partner=coculture_partner, coculture_role=coculture_role,
         search_text=search_text,
@@ -4066,7 +4070,7 @@ def build_list_experiments(
 
 def build_list_experiments_summary(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     treatment_type: list[str] | None = None,
     omics_type: list[str] | None = None,
     publication_doi: list[str] | None = None,
@@ -4100,7 +4104,7 @@ def build_list_experiments_summary(
     directly (no apoc.coll.flatten) for the by_compartment rollup.
     """
     where_block, params = _list_experiments_where(
-        organism=organism, treatment_type=treatment_type,
+        organism_names=organism_names, treatment_type=treatment_type,
         omics_type=omics_type, publication_doi=publication_doi,
         coculture_partner=coculture_partner, coculture_role=coculture_role,
         search_text=search_text,
@@ -6372,7 +6376,7 @@ def build_gene_neighbors_summary(
 
 def _differential_expression_where(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     locus_tags: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
@@ -6384,20 +6388,18 @@ def _differential_expression_where(
     """Build WHERE conditions + params shared by all de_by_gene builders.
 
     direction takes precedence over significant_only (direction implies
-    significance). organism uses fuzzy word-based matching (same as
-    list_experiments). growth_phases filters on the edge-level r.growth_phase
+    significance). organism_names is the exact canonical-name list the
+    api resolved (same as list_experiments). growth_phases filters on the edge-level r.growth_phase
     property (case-insensitive). treatment_type / background_factors filter
     on the experiment's array properties (same fragments as
     _list_experiments_where; case-insensitive, background_factors null-safe).
     """
     conditions: list[str] = []
     params: dict = {}
-    if organism:
-        conditions.append(
-            "ALL(word IN split(toLower($organism), ' ')"
-            " WHERE toLower(e.organism_name) CONTAINS word)"
-        )
-        params["organism"] = organism
+    if organism_names is not None:
+        # Exact canonical names, pre-resolved by the api layer ([] → 0 rows).
+        conditions.append("e.organism_name IN $organism_names")
+        params["organism_names"] = organism_names
     if locus_tags:
         conditions.append("g.locus_tag IN $locus_tags")
         params["locus_tags"] = locus_tags
@@ -6439,31 +6441,50 @@ def _differential_expression_where(
 def build_resolve_organism_for_organism(
     *, organism: str,
 ) -> tuple[str, dict]:
-    """Resolve distinct organism_name values for a fuzzy organism name.
+    """Resolve an organism text to canonical organism names, exact name first.
 
-    RETURN keys: organisms (list[str]).
-    Matches against ``OrganismTaxon`` (the canonical organism registry, whose
-    ``preferred_name`` equals ``Gene.organism_name``) using the same word-based
-    CONTAINS matching as list_experiments. Resolving an organism is a genomic-
-    identity question, so it gates on the presence of GENES
-    (``gene_count > 0``), never on expression EXPERIMENTS — genome-only and
-    metabolomics-only strains have genes but no Changes_expression_of edges and
-    must still resolve, whereas gene-less higher-rank taxonomy nodes
-    (genus / phage / non-target species) should not resolve (they would only
-    yield empty downstream results with a confusing success).
+    RETURN keys (always exactly one row — the candidates aggregate without a
+    grouping key, so a no-match input still returns one row):
 
-    Each word must match ``preferred_name`` or one of the sparse
-    ``name_synonyms`` (HO-002: 'Meiothermus taiwanensis' resolves the
-    'Meiothermus ruber' genome strain).
+    - organisms (list[str], sorted): gene-bearing organisms at the best
+      match tier; ``[]`` when nothing gene-bearing matches.
+    - match_tier (int | null): the best tier reached by a gene-bearing
+      organism (1 = exact, 2 = whole word, 3 = substring); null when none.
+    - geneless_matches (list[str], sorted): gene-less taxa (coculture
+      partners, treatment taxa, higher-rank nodes) the input matched at any
+      tier — used for a clearer error; never resolved.
+
+    Candidates are matched against ``[preferred_name] + name_synonyms``,
+    lower-cased, input trimmed and lower-cased; only the best tier is kept:
+
+    1. exact — the whole input equals a name or synonym
+       ('Prochlorococcus PAC1' → PAC1 only, not EQPAC1);
+    2. whole word — every input word equals a space-separated word of a
+       name / synonym ('PAC1', 'AltDE', 'MED4');
+    3. substring — every input word is a substring of a name / synonym
+       ('9312' → MIT9312).
+
+    ``OrganismTaxon.preferred_name`` equals ``Gene.organism_name``.
+    Resolving an organism is a genomic-identity question, so only organisms
+    with genes (``gene_count > 0``) resolve — never gated on expression
+    experiments (genome-only and metabolomics-only strains still resolve).
+    Synonyms count at every tier (HO-002: 'Meiothermus taiwanensis'
+    resolves the 'Meiothermus ruber' genome strain).
     """
     cypher = (
         "MATCH (o:OrganismTaxon)\n"
-        "WHERE coalesce(o.gene_count, 0) > 0\n"
-        "  AND ALL(word IN split(toLower($organism), ' ')"
-        " WHERE toLower(o.preferred_name) CONTAINS word"
-        "    OR ANY(syn IN coalesce(o.name_synonyms, [])"
-        " WHERE toLower(syn) CONTAINS word))\n"
-        "RETURN collect(DISTINCT o.preferred_name) AS organisms"
+        "WITH o, toLower(trim($organism)) AS ql,\n"
+        "     [x IN split(toLower(trim($organism)), ' ') WHERE x <> ''] AS words,\n"
+        "     [a IN [o.preferred_name] + coalesce(o.name_synonyms, []) | toLower(a)] AS aliases\n"
+        "WITH o, CASE WHEN ql IN aliases THEN 1\n"
+        "             WHEN ALL(w IN words WHERE ANY(a IN aliases WHERE w IN split(a, ' '))) THEN 2\n"
+        "             WHEN ALL(w IN words WHERE ANY(a IN aliases WHERE a CONTAINS w)) THEN 3 END AS tier\n"
+        "WITH collect(CASE WHEN tier IS NOT NULL\n"
+        "                  THEN {n: o.preferred_name, t: tier, g: coalesce(o.gene_count, 0) > 0} END) AS cands\n"
+        "WITH cands, reduce(b = null, c IN cands | CASE WHEN c.g AND (b IS NULL OR c.t < b) THEN c.t ELSE b END) AS best\n"
+        "RETURN apoc.coll.sort([c IN cands WHERE c.g AND c.t = best | c.n]) AS organisms,\n"
+        "       best AS match_tier,\n"
+        "       apoc.coll.sort([c IN cands WHERE NOT c.g | c.n]) AS geneless_matches"
     )
     return cypher, {"organism": organism}
 
@@ -6505,7 +6526,7 @@ def build_resolve_organism_for_experiments(
 
 def build_differential_expression_by_gene_summary_global(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     locus_tags: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
@@ -6526,7 +6547,7 @@ def build_differential_expression_by_gene_summary_global(
     rows_by_growth_phase = apoc list [{item, count}] — api/ converts to dict.
     """
     conditions, params = _differential_expression_where(
-        organism=organism, locus_tags=locus_tags,
+        organism_names=organism_names, locus_tags=locus_tags,
         experiment_ids=experiment_ids, direction=direction,
         significant_only=significant_only, growth_phases=growth_phases,
         treatment_type=treatment_type, background_factors=background_factors,
@@ -6555,7 +6576,7 @@ def build_differential_expression_by_gene_summary_global(
 
 def build_differential_expression_by_gene_summary_by_experiment(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     locus_tags: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
@@ -6575,7 +6596,7 @@ def build_differential_expression_by_gene_summary_by_experiment(
     (sparse; null when absent — api/ drops the key).
     """
     conditions, params = _differential_expression_where(
-        organism=organism, locus_tags=locus_tags,
+        organism_names=organism_names, locus_tags=locus_tags,
         experiment_ids=experiment_ids, direction=direction,
         significant_only=significant_only, growth_phases=growth_phases,
         treatment_type=treatment_type, background_factors=background_factors,
@@ -6620,7 +6641,7 @@ def build_differential_expression_by_gene_summary_by_experiment(
 
 def build_differential_expression_by_gene_summary_diagnostics(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     locus_tags: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
@@ -6649,7 +6670,7 @@ def build_differential_expression_by_gene_summary_diagnostics(
     if locus_tags is None:
         # Simple: no batch diagnostics needed
         conditions, params = _differential_expression_where(
-            organism=organism, locus_tags=None,
+            organism_names=organism_names, locus_tags=None,
             experiment_ids=experiment_ids, direction=direction,
             significant_only=significant_only, growth_phases=growth_phases,
             treatment_type=treatment_type,
@@ -6683,7 +6704,7 @@ def build_differential_expression_by_gene_summary_diagnostics(
     # Batch diagnostics: UNWIND locus_tags for not_found/no_expression/filtered_out
     # Use where_block WITHOUT locus_tags condition (already applied via UNWIND)
     conditions_no_lt, params = _differential_expression_where(
-        organism=organism, locus_tags=None,
+        organism_names=organism_names, locus_tags=None,
         experiment_ids=experiment_ids, direction=direction,
         significant_only=significant_only, growth_phases=growth_phases,
         treatment_type=treatment_type, background_factors=background_factors,
@@ -6699,7 +6720,7 @@ def build_differential_expression_by_gene_summary_diagnostics(
     # background_factors mismatch never masquerades
     # as "no expression data at all" (see docstring).
     conditions_any, params_any = _differential_expression_where(
-        organism=organism, locus_tags=None,
+        organism_names=organism_names, locus_tags=None,
         experiment_ids=experiment_ids, direction=None,
         significant_only=False, growth_phases=None,
     )
@@ -6755,7 +6776,7 @@ def build_differential_expression_by_gene_summary_diagnostics(
 def build_differential_expression_by_gene_experiment_diagnostics(
     *,
     experiment_ids: list[str],
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     locus_tags: list[str] | None = None,
     direction: str | None = None,
     significant_only: bool = False,
@@ -6775,7 +6796,7 @@ def build_differential_expression_by_gene_experiment_diagnostics(
     """
     # WHERE conditions WITHOUT experiment_ids filter (already via UNWIND)
     conditions_no_eid, params = _differential_expression_where(
-        organism=organism, locus_tags=locus_tags,
+        organism_names=organism_names, locus_tags=locus_tags,
         experiment_ids=None, direction=direction,
         significant_only=significant_only, growth_phases=growth_phases,
         treatment_type=treatment_type, background_factors=background_factors,
@@ -6810,7 +6831,7 @@ def build_differential_expression_by_gene_experiment_diagnostics(
 
 def build_differential_expression_by_gene(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     locus_tags: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
@@ -6833,7 +6854,7 @@ def build_differential_expression_by_gene(
     table_scope_detail, background_factors.
     """
     conditions, params = _differential_expression_where(
-        organism=organism, locus_tags=locus_tags,
+        organism_names=organism_names, locus_tags=locus_tags,
         experiment_ids=experiment_ids, direction=direction,
         significant_only=significant_only, growth_phases=growth_phases,
         treatment_type=treatment_type, background_factors=background_factors,
@@ -7040,7 +7061,7 @@ def build_search_homolog_groups(
 def build_genes_by_homolog_group_summary(
     *,
     group_ids: list[str],
-    organisms: list[str] | None = None,
+    organism_names: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for genes_by_homolog_group.
 
@@ -7048,15 +7069,13 @@ def build_genes_by_homolog_group_summary(
     by_organism, by_category_raw, by_group_raw,
     not_found_groups, not_matched_groups.
     """
-    params: dict = {"group_ids": group_ids, "organisms": organisms}
+    params: dict = {"group_ids": group_ids, "organism_names": organism_names}
 
     cypher = (
         "UNWIND $group_ids AS gid\n"
         "OPTIONAL MATCH (og:OrthologGroup {id: gid})\n"
         "OPTIONAL MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og)\n"
-        "WHERE ($organisms IS NULL OR ANY(org_input IN $organisms\n"
-        "       WHERE ALL(word IN split(toLower(org_input), ' ')\n"
-        "             WHERE toLower(g.organism_name) CONTAINS word)))\n"
+        "WHERE ($organism_names IS NULL OR g.organism_name IN $organism_names)\n"
         "WITH gid, og, g\n"
         "WITH collect(DISTINCT CASE WHEN og IS NULL THEN gid END) AS nf_groups_raw,\n"
         "     collect(DISTINCT CASE WHEN og IS NOT NULL AND g IS NULL\n"
@@ -7084,12 +7103,12 @@ def build_genes_by_homolog_group_summary(
 def build_genes_by_homolog_group_by_clade(
     *,
     group_ids: list[str],
-    organisms: list[str] | None = None,
+    organism_names: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build the by_clade envelope rollup for genes_by_homolog_group.
 
     One row per (genus, clade) among matched genes, union across all
-    input groups. ``organisms`` narrows the numerators only; the
+    input groups. ``organism_names`` narrows the numerators only; the
     denominator (``organisms_in_clade``) counts every KG organism with
     ``gene_count > 0`` in that genus + clade. Zero rows when nothing
     matched.
@@ -7097,16 +7116,14 @@ def build_genes_by_homolog_group_by_clade(
     RETURN keys: genus, clade, organism_count, organisms_in_clade,
     gene_count. Ordered by genus, then clade.
     """
-    params: dict = {"group_ids": group_ids, "organisms": organisms}
+    params: dict = {"group_ids": group_ids, "organism_names": organism_names}
 
     # The KG's Neo4j rejects `CALL (x) { }`, so the subquery imports via WITH.
     cypher = (
         "UNWIND $group_ids AS gid\n"
         "MATCH (og:OrthologGroup {id: gid})<-[:Gene_in_ortholog_group]-(g:Gene)\n"
         "      -[:Gene_belongs_to_organism]->(o:OrganismTaxon)\n"
-        "WHERE ($organisms IS NULL OR ANY(org_input IN $organisms\n"
-        "       WHERE ALL(word IN split(toLower(org_input), ' ')\n"
-        "             WHERE toLower(g.organism_name) CONTAINS word)))\n"
+        "WHERE ($organism_names IS NULL OR g.organism_name IN $organism_names)\n"
         "WITH o.genus AS genus, o.clade AS clade,\n"
         "     count(DISTINCT o) AS organism_count, count(g) AS gene_count\n"
         "CALL {\n"
@@ -7126,34 +7143,39 @@ def build_genes_by_homolog_group_by_clade(
 def build_genes_by_homolog_group_diagnostics(
     *,
     group_ids: list[str],
-    organisms: list[str] | None = None,
+    organism_inputs: list[dict] | None = None,
 ) -> tuple[str, dict]:
-    """Validate organisms against KG + result set.
+    """Per-input organism diagnostics for genes_by_homolog_group.
 
-    RETURN keys: not_found_organisms, not_matched_organisms.
-    Returns empty lists when organisms is None.
+    ``organism_inputs``: one entry per raw ``organisms`` input, in input
+    order, pre-resolved by the api layer as
+    ``{"input": <raw entry>, "names": [<canonical organism_name>, ...]}``.
+    ``None`` = no organisms filter (both lists empty).
+
+    - not_found_organisms: inputs whose ``names`` is empty (resolved to no
+      gene-bearing organism).
+    - not_matched_organisms: inputs with names, but no gene of those
+      organisms is in any of ``group_ids``.
+
+    RETURN keys: not_found_organisms, not_matched_organisms (input order).
     """
-    params: dict = {"group_ids": group_ids, "organisms": organisms}
+    params: dict = {
+        "group_ids": group_ids, "organism_inputs": organism_inputs,
+    }
 
     cypher = (
-        "WITH $organisms AS org_inputs\n"
-        "UNWIND CASE WHEN org_inputs IS NULL THEN [null]\n"
-        "       ELSE org_inputs END AS org_input\n"
-        "OPTIONAL MATCH (g_any:Gene)\n"
-        "WHERE org_input IS NOT NULL\n"
-        "  AND ALL(word IN split(toLower(org_input), ' ')\n"
-        "          WHERE toLower(g_any.organism_name) CONTAINS word)\n"
-        "WITH org_input, count(g_any) AS kg_count\n"
-        "OPTIONAL MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
-        "WHERE org_input IS NOT NULL AND kg_count > 0\n"
+        "UNWIND range(0, size(coalesce($organism_inputs, [])) - 1) AS i\n"
+        "WITH i, $organism_inputs[i] AS oi\n"
+        "OPTIONAL MATCH (og:OrthologGroup)<-[:Gene_in_ortholog_group]-(g:Gene)\n"
+        "WHERE size(oi.names) > 0\n"
         "  AND og.id IN $group_ids\n"
-        "  AND ALL(word IN split(toLower(org_input), ' ')\n"
-        "          WHERE toLower(g.organism_name) CONTAINS word)\n"
-        "WITH org_input, kg_count, count(g) AS matched_count\n"
-        "WITH collect(CASE WHEN org_input IS NOT NULL AND kg_count = 0\n"
-        "             THEN org_input END) AS nf_raw,\n"
-        "     collect(CASE WHEN org_input IS NOT NULL AND kg_count > 0\n"
-        "                   AND matched_count = 0 THEN org_input END) AS nm_raw\n"
+        "  AND g.organism_name IN oi.names\n"
+        "WITH i, oi, count(g) AS matched_count\n"
+        "ORDER BY i\n"
+        "WITH collect(CASE WHEN size(oi.names) = 0\n"
+        "             THEN oi.input END) AS nf_raw,\n"
+        "     collect(CASE WHEN size(oi.names) > 0 AND matched_count = 0\n"
+        "             THEN oi.input END) AS nm_raw\n"
         "RETURN [x IN nf_raw WHERE x IS NOT NULL] AS not_found_organisms,\n"
         "       [x IN nm_raw WHERE x IS NOT NULL] AS not_matched_organisms"
     )
@@ -7163,7 +7185,7 @@ def build_genes_by_homolog_group_diagnostics(
 def build_genes_by_homolog_group(
     *,
     group_ids: list[str],
-    organisms: list[str] | None = None,
+    organism_names: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -7175,7 +7197,7 @@ def build_genes_by_homolog_group(
     RETURN keys (verbose): adds gene_summary, function_description,
     consensus_product, source.
     """
-    params: dict = {"group_ids": group_ids, "organisms": organisms}
+    params: dict = {"group_ids": group_ids, "organism_names": organism_names}
 
     verbose_cols = (
         ",\n       g.gene_summary AS gene_summary"
@@ -7199,9 +7221,7 @@ def build_genes_by_homolog_group(
     cypher = (
         "UNWIND $group_ids AS gid\n"
         "MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og:OrthologGroup {id: gid})\n"
-        "WHERE ($organisms IS NULL OR ANY(org_input IN $organisms\n"
-        "       WHERE ALL(word IN split(toLower(org_input), ' ')\n"
-        "             WHERE toLower(g.organism_name) CONTAINS word)))\n"
+        "WHERE ($organism_names IS NULL OR g.organism_name IN $organism_names)\n"
         "RETURN g.locus_tag AS locus_tag, g.gene_name AS gene_name,\n"
         "       g.product AS product, g.organism_name AS organism_name,\n"
         f"       g.gene_category AS gene_category, og.id AS group_id{verbose_cols}\n"
@@ -7217,7 +7237,7 @@ def build_genes_by_homolog_group(
 
 def _differential_expression_by_ortholog_where(
     *,
-    organisms: list[str] | None = None,
+    organism_names: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
     significant_only: bool = False,
@@ -7227,7 +7247,9 @@ def _differential_expression_by_ortholog_where(
 ) -> tuple[list[str], dict]:
     """Build WHERE conditions + params shared by de_by_ortholog builders.
 
-    organisms is a list with OR semantics (any matching organism).
+    organism_names: exact canonical organism names (pre-resolved by the api
+    layer; union over the raw ``organisms`` inputs). None = no filter,
+    [] = 0 rows.
     direction takes precedence over significant_only. growth_phases filters
     on the edge-level r.growth_phase property (case-insensitive).
     treatment_type / background_factors filter on the experiment's array
@@ -7236,13 +7258,9 @@ def _differential_expression_by_ortholog_where(
     """
     conditions: list[str] = []
     params: dict = {}
-    if organisms:
-        conditions.append(
-            "ANY(org_input IN $organisms"
-            " WHERE ALL(word IN split(toLower(org_input), ' ')"
-            " WHERE toLower(e.organism_name) CONTAINS word))"
-        )
-        params["organisms"] = organisms
+    if organism_names is not None:
+        conditions.append("e.organism_name IN $organism_names")
+        params["organism_names"] = organism_names
     if experiment_ids:
         conditions.append("e.id IN $experiment_ids")
         params["experiment_ids"] = experiment_ids
@@ -7298,7 +7316,7 @@ def build_differential_expression_by_ortholog_group_check(
 def build_differential_expression_by_ortholog_summary_global(
     *,
     group_ids: list[str],
-    organisms: list[str] | None = None,
+    organism_names: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
     significant_only: bool = False,
@@ -7316,7 +7334,7 @@ def build_differential_expression_by_ortholog_summary_global(
     sig_log2fcs, matched_group_ids.
     """
     conditions, params = _differential_expression_by_ortholog_where(
-        organisms=organisms, experiment_ids=experiment_ids,
+        organism_names=organism_names, experiment_ids=experiment_ids,
         direction=direction, significant_only=significant_only,
         growth_phases=growth_phases,
         treatment_type=treatment_type, background_factors=background_factors,
@@ -7358,7 +7376,7 @@ def build_differential_expression_by_ortholog_summary_global(
 def build_differential_expression_by_ortholog_top_groups(
     *,
     group_ids: list[str],
-    organisms: list[str] | None = None,
+    organism_names: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
     significant_only: bool = False,
@@ -7372,7 +7390,7 @@ def build_differential_expression_by_ortholog_top_groups(
     consensus_gene_name, consensus_product, significant_genes, total_genes).
     """
     conditions, params = _differential_expression_by_ortholog_where(
-        organisms=organisms, experiment_ids=experiment_ids,
+        organism_names=organism_names, experiment_ids=experiment_ids,
         direction=direction, significant_only=significant_only,
         growth_phases=growth_phases,
         treatment_type=treatment_type, background_factors=background_factors,
@@ -7406,7 +7424,7 @@ def build_differential_expression_by_ortholog_top_groups(
 def build_differential_expression_by_ortholog_top_experiments(
     *,
     group_ids: list[str],
-    organisms: list[str] | None = None,
+    organism_names: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
     significant_only: bool = False,
@@ -7420,7 +7438,7 @@ def build_differential_expression_by_ortholog_top_experiments(
     treatment_type, organism_name, significant_genes).
     """
     conditions, params = _differential_expression_by_ortholog_where(
-        organisms=organisms, experiment_ids=experiment_ids,
+        organism_names=organism_names, experiment_ids=experiment_ids,
         direction=direction, significant_only=significant_only,
         growth_phases=growth_phases,
         treatment_type=treatment_type, background_factors=background_factors,
@@ -7458,7 +7476,7 @@ def build_differential_expression_by_ortholog_top_experiments(
 def build_differential_expression_by_ortholog_results(
     *,
     group_ids: list[str],
-    organisms: list[str] | None = None,
+    organism_names: list[str] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
     significant_only: bool = False,
@@ -7480,7 +7498,7 @@ def build_differential_expression_by_ortholog_results(
     table_scope, table_scope_detail.
     """
     conditions, params = _differential_expression_by_ortholog_where(
-        organisms=organisms, experiment_ids=experiment_ids,
+        organism_names=organism_names, experiment_ids=experiment_ids,
         direction=direction, significant_only=significant_only,
         growth_phases=growth_phases,
         treatment_type=treatment_type, background_factors=background_factors,
@@ -7550,20 +7568,18 @@ def build_differential_expression_by_ortholog_results(
 def build_differential_expression_by_ortholog_membership_counts(
     *,
     group_ids: list[str],
-    organisms: list[str] | None = None,
+    organism_names: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Gene counts per ortholog group per organism (no expression filter).
 
     RETURN keys: group_id, organism_name, total_genes.
     """
-    params: dict = {"group_ids": group_ids, "organisms": organisms}
+    params: dict = {"group_ids": group_ids, "organism_names": organism_names}
 
     cypher = (
         "UNWIND $group_ids AS gid\n"
         "MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og:OrthologGroup {id: gid})\n"
-        "WHERE ($organisms IS NULL OR ANY(org_input IN $organisms\n"
-        "       WHERE ALL(word IN split(toLower(org_input), ' ')\n"
-        "             WHERE toLower(g.organism_name) CONTAINS word)))\n"
+        "WHERE ($organism_names IS NULL OR g.organism_name IN $organism_names)\n"
         "RETURN og.id AS group_id,\n"
         "       g.organism_name AS organism_name,\n"
         "       count(g) AS total_genes\n"
@@ -7580,7 +7596,7 @@ def build_differential_expression_by_ortholog_membership_counts(
 def _build_de_by_ortholog_organism_diagnostics(
     *,
     group_ids: list[str],
-    organisms: list[str],
+    organism_inputs: list[dict] | None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
     significant_only: bool = False,
@@ -7588,19 +7604,27 @@ def _build_de_by_ortholog_organism_diagnostics(
     treatment_type: list[str] | None = None,
     background_factors: list[str] | None = None,
 ) -> tuple[str, dict]:
-    """Validate organisms against KG + expression in ortholog groups.
+    """Per-input organism diagnostics for differential_expression_by_ortholog.
 
-    RETURN keys: not_found_organisms, not_matched_organisms.
+    ``organism_inputs``: one entry per raw ``organisms`` input, in input
+    order, pre-resolved by the api layer as
+    ``{"input": <raw entry>, "names": [<canonical organism_name>, ...]}``.
+
+    - not_found_organisms: inputs whose ``names`` is empty.
+    - not_matched_organisms: inputs with names but no expression edge (under
+      the other filters) on a gene of those organisms in ``group_ids``.
+
+    RETURN keys: not_found_organisms, not_matched_organisms (input order).
     """
     # Build expression WHERE conditions WITHOUT organism filter
     conditions_no_org, params = _differential_expression_by_ortholog_where(
-        organisms=None, experiment_ids=experiment_ids,
+        organism_names=None, experiment_ids=experiment_ids,
         direction=direction, significant_only=significant_only,
         growth_phases=growth_phases,
         treatment_type=treatment_type, background_factors=background_factors,
     )
     params["group_ids"] = group_ids
-    params["organisms"] = organisms
+    params["organism_inputs"] = organism_inputs
 
     expression_where = (
         "\nWHERE " + " AND ".join(conditions_no_org)
@@ -7608,26 +7632,20 @@ def _build_de_by_ortholog_organism_diagnostics(
     )
 
     cypher = (
-        "WITH $organisms AS org_inputs\n"
-        "UNWIND CASE WHEN org_inputs IS NULL THEN [null]\n"
-        "       ELSE org_inputs END AS org_input\n"
-        "OPTIONAL MATCH (g_any:Gene)\n"
-        "WHERE org_input IS NOT NULL\n"
-        "  AND ALL(word IN split(toLower(org_input), ' ')\n"
-        "          WHERE toLower(g_any.organism_name) CONTAINS word)\n"
-        "WITH org_input, count(g_any) AS kg_count\n"
-        "OPTIONAL MATCH (g:Gene)-[:Gene_in_ortholog_group]->(og:OrthologGroup)\n"
-        "WHERE org_input IS NOT NULL AND kg_count > 0\n"
+        "UNWIND range(0, size(coalesce($organism_inputs, [])) - 1) AS i\n"
+        "WITH i, $organism_inputs[i] AS oi\n"
+        "OPTIONAL MATCH (og:OrthologGroup)<-[:Gene_in_ortholog_group]-(g:Gene)\n"
+        "WHERE size(oi.names) > 0\n"
         "  AND og.id IN $group_ids\n"
-        "  AND ALL(word IN split(toLower(org_input), ' ')\n"
-        "          WHERE toLower(g.organism_name) CONTAINS word)\n"
+        "  AND g.organism_name IN oi.names\n"
         "OPTIONAL MATCH (e:Experiment)-[r:Changes_expression_of]->(g)"
         f"{expression_where}\n"
-        "WITH org_input, kg_count, count(r) AS matched_count\n"
-        "WITH collect(CASE WHEN org_input IS NOT NULL AND kg_count = 0\n"
-        "             THEN org_input END) AS nf_raw,\n"
-        "     collect(CASE WHEN org_input IS NOT NULL AND kg_count > 0\n"
-        "                   AND matched_count = 0 THEN org_input END) AS nm_raw\n"
+        "WITH i, oi, count(r) AS matched_count\n"
+        "ORDER BY i\n"
+        "WITH collect(CASE WHEN size(oi.names) = 0\n"
+        "             THEN oi.input END) AS nf_raw,\n"
+        "     collect(CASE WHEN size(oi.names) > 0 AND matched_count = 0\n"
+        "             THEN oi.input END) AS nm_raw\n"
         "RETURN [x IN nf_raw WHERE x IS NOT NULL] AS not_found_organisms,\n"
         "       [x IN nm_raw WHERE x IS NOT NULL] AS not_matched_organisms"
     )
@@ -7638,7 +7656,7 @@ def _build_de_by_ortholog_experiment_diagnostics(
     *,
     group_ids: list[str],
     experiment_ids: list[str],
-    organisms: list[str] | None = None,
+    organism_names: list[str] | None = None,
     direction: str | None = None,
     significant_only: bool = False,
     growth_phases: list[str] | None = None,
@@ -7651,7 +7669,7 @@ def _build_de_by_ortholog_experiment_diagnostics(
     """
     # Build WHERE conditions WITHOUT experiment_ids filter (already via UNWIND)
     conditions_no_eid, params = _differential_expression_by_ortholog_where(
-        organisms=organisms, experiment_ids=None,
+        organism_names=organism_names, experiment_ids=None,
         direction=direction, significant_only=significant_only,
         growth_phases=growth_phases,
         treatment_type=treatment_type, background_factors=background_factors,
@@ -7688,7 +7706,7 @@ def _build_de_by_ortholog_experiment_diagnostics(
 def build_differential_expression_by_ortholog_diagnostics(
     *,
     group_ids: list[str],
-    organisms: list[str] | None = None,
+    organism_inputs: list[dict] | None = None,
     experiment_ids: list[str] | None = None,
     direction: str | None = None,
     significant_only: bool = False,
@@ -7698,17 +7716,30 @@ def build_differential_expression_by_ortholog_diagnostics(
 ) -> list[tuple[str, dict]] | None:
     """Build diagnostic queries for differential_expression_by_ortholog.
 
-    Returns None when both organisms and experiment_ids are None.
+    ``organism_inputs``: per raw ``organisms`` input, ``{"input": raw,
+    "names": [canonical...]}`` in input order (pre-resolved by the api
+    layer); None = no organisms filter.
+
+    Returns None when both organism_inputs and experiment_ids are None.
     Otherwise returns a list of (cypher, params) tuples — one per
-    diagnostic sub-query that needs to run.
+    diagnostic sub-query that needs to run. The experiment sub-query
+    filters on the first-seen union of all resolved names.
     """
-    if organisms is None and experiment_ids is None:
+    if organism_inputs is None and experiment_ids is None:
         return None
 
+    organism_names: list[str] | None = None
+    if organism_inputs is not None:
+        organism_names = []
+        for entry in organism_inputs:
+            for name in entry.get("names") or []:
+                if name not in organism_names:
+                    organism_names.append(name)
+
     queries: list[tuple[str, dict]] = []
-    if organisms is not None:
+    if organism_inputs is not None:
         queries.append(_build_de_by_ortholog_organism_diagnostics(
-            group_ids=group_ids, organisms=organisms,
+            group_ids=group_ids, organism_inputs=organism_inputs,
             experiment_ids=experiment_ids, direction=direction,
             significant_only=significant_only, growth_phases=growth_phases,
             treatment_type=treatment_type,
@@ -7717,7 +7748,7 @@ def build_differential_expression_by_ortholog_diagnostics(
     if experiment_ids is not None:
         queries.append(_build_de_by_ortholog_experiment_diagnostics(
             group_ids=group_ids, experiment_ids=experiment_ids,
-            organisms=organisms, direction=direction,
+            organism_names=organism_names, direction=direction,
             significant_only=significant_only, growth_phases=growth_phases,
             treatment_type=treatment_type,
             background_factors=background_factors,
@@ -7999,7 +8030,7 @@ def build_gene_response_profile(
 
 def _clustering_analysis_where(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
     omics_type: list[str] | None = None,
@@ -8013,12 +8044,10 @@ def _clustering_analysis_where(
     """
     conditions: list[str] = []
     params: dict = {}
-    if organism is not None:
-        conditions.append(
-            "ALL(word IN split(toLower($organism), ' ')"
-            " WHERE toLower(ca.organism_name) CONTAINS word)"
-        )
-        params["organism"] = organism
+    if organism_names is not None:
+        # Exact canonical names, pre-resolved by the api layer ([] → 0 rows).
+        conditions.append("ca.organism_name IN $organism_names")
+        params["organism_names"] = organism_names
     if cluster_type is not None:
         conditions.append("ca.cluster_type = $cluster_type")
         params["cluster_type"] = cluster_type
@@ -8048,7 +8077,7 @@ def _clustering_analysis_where(
 def build_list_clustering_analyses_summary(
     *,
     search_text: str | None = None,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
     omics_type: list[str] | None = None,
@@ -8066,7 +8095,7 @@ def build_list_clustering_analyses_summary(
     When search_text: adds score_max, score_median.
     """
     conditions, params = _clustering_analysis_where(
-        organism=organism, cluster_type=cluster_type,
+        organism_names=organism_names, cluster_type=cluster_type,
         treatment_type=treatment_type, omics_type=omics_type,
         background_factors=background_factors, growth_phases=growth_phases,
     )
@@ -8128,7 +8157,7 @@ def build_list_clustering_analyses_summary(
 def build_list_clustering_analyses(
     *,
     search_text: str | None = None,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     cluster_type: str | None = None,
     treatment_type: list[str] | None = None,
     omics_type: list[str] | None = None,
@@ -8153,7 +8182,7 @@ def build_list_clustering_analyses(
     temporal_pattern.
     """
     conditions, params = _clustering_analysis_where(
-        organism=organism, cluster_type=cluster_type,
+        organism_names=organism_names, cluster_type=cluster_type,
         treatment_type=treatment_type, omics_type=omics_type,
         background_factors=background_factors, growth_phases=growth_phases,
     )
@@ -8437,7 +8466,7 @@ def build_genes_in_cluster_summary(
     *,
     cluster_ids: list[str] | None = None,
     analysis_id: str | None = None,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
 ) -> tuple[str, dict]:
     """Build summary Cypher for genes_in_cluster.
 
@@ -8453,16 +8482,16 @@ def build_genes_in_cluster_summary(
     reports an unknown id as `not_found_analysis`, llm-review 2b.3 Task 5),
     ca_organism_name (the analysis's own `ClusteringAnalysis.organism_name`
     property — same convention `_clustering_analysis_where` filters on;
-    api/ compares this against the requested `organism` word-for-word to
+    api/ compares this against the resolved `organism_names` to
     decide `not_matched_organism`, rather than assuming any zero-row
     result means a mismatch, llm-review 2b.3 Task 5 controller fix).
     """
-    params: dict = {"organism": organism}
+    params: dict = {"organism_names": organism_names}
 
+    # Exact canonical names, pre-resolved by the api layer ([] → 0 rows).
     organism_filter = (
-        "AND ALL(word IN split(toLower($organism), ' ')"
-        " WHERE toLower(g.organism_name) CONTAINS word)\n"
-        if organism is not None else ""
+        "AND g.organism_name IN $organism_names\n"
+        if organism_names is not None else ""
     )
 
     if analysis_id is not None:
@@ -8552,7 +8581,7 @@ def build_genes_in_cluster(
     *,
     cluster_ids: list[str] | None = None,
     analysis_id: str | None = None,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     verbose: bool = False,
     limit: int | None = None,
     offset: int = 0,
@@ -8609,12 +8638,11 @@ def build_genes_in_cluster(
         )
 
     # Conditional WHERE for organism filter
-    if organism is not None:
-        params["organism"] = organism
+    if organism_names is not None:
+        params["organism_names"] = organism_names
         cypher = (
             f"{match_base}"
-            "WHERE ALL(word IN split(toLower($organism), ' ')"
-            " WHERE toLower(g.organism_name) CONTAINS word)\n"
+            "WHERE g.organism_name IN $organism_names\n"
         )
     else:
         cypher = match_base
@@ -8914,7 +8942,7 @@ def build_ontology_organism_gene_count(
 
 def _list_derived_metrics_where(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     metric_types: list[str] | None = None,
     value_kind: str | None = None,
     compartment: str | None = None,
@@ -8946,12 +8974,10 @@ def _list_derived_metrics_where(
     conditions: list[str] = []
     params: dict = {}
 
-    if organism:
-        conditions.append(
-            "ALL(word IN split(toLower($organism), ' ')"
-            " WHERE toLower(dm.organism_name) CONTAINS word)"
-        )
-        params["organism"] = organism
+    if organism_names is not None:
+        # Exact canonical names, pre-resolved by the api layer ([] → 0 rows).
+        conditions.append("dm.organism_name IN $organism_names")
+        params["organism_names"] = organism_names
 
     if metric_types:
         conditions.append("dm.metric_type IN $metric_types")
@@ -9016,7 +9042,7 @@ def _list_derived_metrics_where(
 def build_list_derived_metrics_summary(
     *,
     search_text: str | None = None,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     metric_types: list[str] | None = None,
     value_kind: str | None = None,
     compartment: str | None = None,
@@ -9038,7 +9064,7 @@ def build_list_derived_metrics_summary(
     When search_text: adds score_max, score_median.
     """
     conditions, params = _list_derived_metrics_where(
-        organism=organism, metric_types=metric_types, value_kind=value_kind,
+        organism_names=organism_names, metric_types=metric_types, value_kind=value_kind,
         compartment=compartment, omics_type=omics_type,
         treatment_type=treatment_type, background_factors=background_factors,
         growth_phases=growth_phases, publication_doi=publication_doi,
@@ -9093,7 +9119,7 @@ def build_list_derived_metrics_summary(
 def build_list_derived_metrics(
     *,
     search_text: str | None = None,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     metric_types: list[str] | None = None,
     value_kind: str | None = None,
     compartment: str | None = None,
@@ -9126,7 +9152,7 @@ def build_list_derived_metrics(
     reinstatement rule (CASE-gated on dm.has_p_value='p_value').
     """
     conditions, params = _list_derived_metrics_where(
-        organism=organism, metric_types=metric_types, value_kind=value_kind,
+        organism_names=organism_names, metric_types=metric_types, value_kind=value_kind,
         compartment=compartment, omics_type=omics_type,
         treatment_type=treatment_type, background_factors=background_factors,
         growth_phases=growth_phases, publication_doi=publication_doi,
@@ -10226,7 +10252,7 @@ def build_genes_by_categorical_metric(
 def _genes_by_metabolite_metabolism_where(
     *,
     metabolite_ids: list[str],
-    organism: str,
+    organism_names: list[str],
     exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     mass_balance: str | None = None,
@@ -10236,12 +10262,11 @@ def _genes_by_metabolite_metabolism_where(
     """Build WHERE conditions + params for the metabolism arm."""
     conditions: list[str] = [
         "m.id IN $metabolite_ids",
-        "ALL(word IN split(toLower($organism), ' ')"
-        " WHERE toLower(g.organism_name) CONTAINS word)",
+        "g.organism_name IN $organism_names",
     ]
     params: dict = {
         "metabolite_ids": metabolite_ids,
-        "organism": organism,
+        "organism_names": organism_names,
     }
     if exclude_metabolite_ids:
         conditions.append("(NOT (m.id IN $exclude_metabolite_ids))")
@@ -10269,7 +10294,7 @@ def _genes_by_metabolite_metabolism_where(
 def _genes_by_metabolite_shared_where(
     *,
     metabolite_ids: list[str],
-    organism: str,
+    organism_names: list[str],
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
@@ -10277,12 +10302,11 @@ def _genes_by_metabolite_shared_where(
     """Shared gbm filters on `g` / `m` (both TCDB routes take exactly these)."""
     conditions: list[str] = [
         "m.id IN $metabolite_ids",
-        "ALL(word IN split(toLower($organism), ' ')"
-        " WHERE toLower(g.organism_name) CONTAINS word)",
+        "g.organism_name IN $organism_names",
     ]
     params: dict = {
         "metabolite_ids": metabolite_ids,
-        "organism": organism,
+        "organism_names": organism_names,
     }
     if exclude_metabolite_ids:
         conditions.append("(NOT (m.id IN $exclude_metabolite_ids))")
@@ -10302,7 +10326,7 @@ def _genes_by_metabolite_shared_where(
 def _genes_by_metabolite_transport_where(
     *,
     metabolite_ids: list[str],
-    organism: str,
+    organism_names: list[str],
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
@@ -10315,7 +10339,7 @@ def _genes_by_metabolite_transport_where(
     metabolism-arm filters and the transport arm is unaffected by them.
     """
     conditions, params = _genes_by_metabolite_shared_where(
-        metabolite_ids=metabolite_ids, organism=organism,
+        metabolite_ids=metabolite_ids, organism_names=organism_names,
         exclude_metabolite_ids=exclude_metabolite_ids,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
@@ -10327,7 +10351,7 @@ def _genes_by_metabolite_transport_where(
 def build_genes_by_metabolite_metabolism(
     *,
     metabolite_ids: list[str],
-    organism: str,
+    organism_names: list[str],
     exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     mass_balance: str | None = None,
@@ -10355,7 +10379,7 @@ def build_genes_by_metabolite_metabolism(
     """
     conditions, params = _genes_by_metabolite_metabolism_where(
         metabolite_ids=metabolite_ids,
-        organism=organism,
+        organism_names=organism_names,
         exclude_metabolite_ids=exclude_metabolite_ids,
         ec_numbers=ec_numbers,
         mass_balance=mass_balance,
@@ -10422,7 +10446,7 @@ def build_genes_by_metabolite_metabolism(
 def build_genes_by_metabolite_transport(
     *,
     metabolite_ids: list[str],
-    organism: str,
+    organism_names: list[str],
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
@@ -10459,7 +10483,7 @@ def build_genes_by_metabolite_transport(
     """
     conditions, params = _genes_by_metabolite_transport_where(
         metabolite_ids=metabolite_ids,
-        organism=organism,
+        organism_names=organism_names,
         exclude_metabolite_ids=exclude_metabolite_ids,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
@@ -10481,7 +10505,7 @@ def build_genes_by_metabolite_transport(
 def build_genes_by_metabolite_tcdb_family(
     *,
     metabolite_ids: list[str],
-    organism: str,
+    organism_names: list[str],
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
@@ -10508,7 +10532,7 @@ def build_genes_by_metabolite_tcdb_family(
     Arm-scoped filters (`ec_numbers`, `mass_balance`) are not accepted.
     """
     conditions, params = _genes_by_metabolite_shared_where(
-        metabolite_ids=metabolite_ids, organism=organism,
+        metabolite_ids=metabolite_ids, organism_names=organism_names,
         exclude_metabolite_ids=exclude_metabolite_ids,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
@@ -10562,7 +10586,7 @@ def _tcdb_family_hint_cypher(
 def build_genes_by_metabolite_tcdb_family_hint(
     *,
     metabolite_ids: list[str],
-    organism: str,
+    organism_names: list[str],
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
@@ -10578,7 +10602,7 @@ def build_genes_by_metabolite_tcdb_family_hint(
     "superfamily call, substrate unknown" genes for this query.
     """
     conditions, params = _genes_by_metabolite_shared_where(
-        metabolite_ids=metabolite_ids, organism=organism,
+        metabolite_ids=metabolite_ids, organism_names=organism_names,
         exclude_metabolite_ids=exclude_metabolite_ids,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
@@ -10596,7 +10620,7 @@ def build_genes_by_metabolite_tcdb_family_hint(
 def _genes_by_metabolite_go_transport_where(
     *,
     metabolite_ids: list[str],
-    organism: str,
+    organism_names: list[str],
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
@@ -10612,12 +10636,11 @@ def _genes_by_metabolite_go_transport_where(
     """
     conditions: list[str] = [
         "m.id IN $metabolite_ids",
-        "ALL(word IN split(toLower($organism), ' ')"
-        " WHERE toLower(g.organism_name) CONTAINS word)",
+        "g.organism_name IN $organism_names",
     ]
     params: dict = {
         "metabolite_ids": metabolite_ids,
-        "organism": organism,
+        "organism_names": organism_names,
     }
     if exclude_metabolite_ids:
         conditions.append("(NOT (m.id IN $exclude_metabolite_ids))")
@@ -10640,7 +10663,7 @@ def _genes_by_metabolite_go_transport_where(
 def build_genes_by_metabolite_go_transport(
     *,
     metabolite_ids: list[str],
-    organism: str,
+    organism_names: list[str],
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
     gene_categories: list[str] | None = None,
@@ -10679,7 +10702,7 @@ def build_genes_by_metabolite_go_transport(
     """
     conditions, params = _genes_by_metabolite_go_transport_where(
         metabolite_ids=metabolite_ids,
-        organism=organism,
+        organism_names=organism_names,
         exclude_metabolite_ids=exclude_metabolite_ids,
         metabolite_pathway_ids=metabolite_pathway_ids,
         gene_categories=gene_categories,
@@ -10743,7 +10766,7 @@ def _tcdb_family_summary_block(
 def build_genes_by_metabolite_summary(
     *,
     metabolite_ids: list[str],
-    organism: str,
+    organism_names: list[str],
     exclude_metabolite_ids: list[str] | None = None,
     ec_numbers: list[str] | None = None,
     mass_balance: str | None = None,
@@ -10804,7 +10827,7 @@ def build_genes_by_metabolite_summary(
     """
     params: dict = {
         "metabolite_ids": metabolite_ids,
-        "organism": organism,
+        "organism_names": organism_names,
     }
 
     arm_blocks: list[str] = []
@@ -10812,7 +10835,7 @@ def build_genes_by_metabolite_summary(
     if "metabolism" in arms:
         m_conditions, m_params = _genes_by_metabolite_metabolism_where(
             metabolite_ids=metabolite_ids,
-            organism=organism,
+            organism_names=organism_names,
             exclude_metabolite_ids=exclude_metabolite_ids,
             ec_numbers=ec_numbers,
             mass_balance=mass_balance,
@@ -10832,7 +10855,7 @@ def build_genes_by_metabolite_summary(
     if "transport" in arms:
         t_conditions, t_params = _genes_by_metabolite_transport_where(
             metabolite_ids=metabolite_ids,
-            organism=organism,
+            organism_names=organism_names,
             exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
@@ -10842,7 +10865,7 @@ def build_genes_by_metabolite_summary(
         if include_tcdb_family_substrates:
             w_conditions, _ = _genes_by_metabolite_shared_where(
                 metabolite_ids=metabolite_ids,
-                organism=organism,
+                organism_names=organism_names,
                 exclude_metabolite_ids=exclude_metabolite_ids,
                 metabolite_pathway_ids=metabolite_pathway_ids,
                 gene_categories=gene_categories,
@@ -10853,7 +10876,7 @@ def build_genes_by_metabolite_summary(
     if "go_transport" in arms:
         g_conditions, g_params = _genes_by_metabolite_go_transport_where(
             metabolite_ids=metabolite_ids,
-            organism=organism,
+            organism_names=organism_names,
             exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
@@ -11059,7 +11082,7 @@ def build_genes_by_metabolite_summary(
 def _metabolites_by_gene_metabolism_where(
     *,
     locus_tags: list[str],
-    organism: str,
+    organism_names: list[str],
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
@@ -11071,12 +11094,11 @@ def _metabolites_by_gene_metabolism_where(
     """Build WHERE conditions + params for the MBG metabolism arm."""
     conditions: list[str] = [
         "g.locus_tag IN $locus_tags",
-        "ALL(word IN split(toLower($organism), ' ')"
-        " WHERE toLower(g.organism_name) CONTAINS word)",
+        "g.organism_name IN $organism_names",
     ]
     params: dict = {
         "locus_tags": locus_tags,
-        "organism": organism,
+        "organism_names": organism_names,
     }
     if metabolite_ids:
         conditions.append("m.id IN $metabolite_ids")
@@ -11113,7 +11135,7 @@ def _metabolites_by_gene_metabolism_where(
 def _metabolites_by_gene_shared_where(
     *,
     locus_tags: list[str],
-    organism: str,
+    organism_names: list[str],
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
@@ -11123,12 +11145,11 @@ def _metabolites_by_gene_shared_where(
     """Shared mbg filters on `g` / `m` (both TCDB routes take exactly these)."""
     conditions: list[str] = [
         "g.locus_tag IN $locus_tags",
-        "ALL(word IN split(toLower($organism), ' ')"
-        " WHERE toLower(g.organism_name) CONTAINS word)",
+        "g.organism_name IN $organism_names",
     ]
     params: dict = {
         "locus_tags": locus_tags,
-        "organism": organism,
+        "organism_names": organism_names,
     }
     if metabolite_ids:
         conditions.append("m.id IN $metabolite_ids")
@@ -11157,7 +11178,7 @@ def _metabolites_by_gene_shared_where(
 def _metabolites_by_gene_transport_where(
     *,
     locus_tags: list[str],
-    organism: str,
+    organism_names: list[str],
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
@@ -11172,7 +11193,7 @@ def _metabolites_by_gene_transport_where(
     metabolism-arm filters and the transport arm is unaffected by them.
     """
     conditions, params = _metabolites_by_gene_shared_where(
-        locus_tags=locus_tags, organism=organism,
+        locus_tags=locus_tags, organism_names=organism_names,
         metabolite_elements=metabolite_elements,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
@@ -11186,7 +11207,7 @@ def _metabolites_by_gene_transport_where(
 def build_metabolites_by_gene_metabolism(
     *,
     locus_tags: list[str],
-    organism: str,
+    organism_names: list[str],
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
@@ -11221,7 +11242,7 @@ def build_metabolites_by_gene_metabolism(
     """
     conditions, params = _metabolites_by_gene_metabolism_where(
         locus_tags=locus_tags,
-        organism=organism,
+        organism_names=organism_names,
         metabolite_elements=metabolite_elements,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
@@ -11292,7 +11313,7 @@ def build_metabolites_by_gene_metabolism(
 def build_metabolites_by_gene_transport(
     *,
     locus_tags: list[str],
-    organism: str,
+    organism_names: list[str],
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
@@ -11323,7 +11344,7 @@ def build_metabolites_by_gene_transport(
     """
     conditions, params = _metabolites_by_gene_transport_where(
         locus_tags=locus_tags,
-        organism=organism,
+        organism_names=organism_names,
         metabolite_elements=metabolite_elements,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
@@ -11348,7 +11369,7 @@ def build_metabolites_by_gene_transport(
 def build_metabolites_by_gene_tcdb_family(
     *,
     locus_tags: list[str],
-    organism: str,
+    organism_names: list[str],
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
@@ -11365,7 +11386,7 @@ def build_metabolites_by_gene_tcdb_family(
     Sort as the mbg direct arm.
     """
     conditions, params = _metabolites_by_gene_shared_where(
-        locus_tags=locus_tags, organism=organism,
+        locus_tags=locus_tags, organism_names=organism_names,
         metabolite_elements=metabolite_elements,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
@@ -11392,7 +11413,7 @@ def build_metabolites_by_gene_tcdb_family(
 def build_metabolites_by_gene_tcdb_family_hint(
     *,
     locus_tags: list[str],
-    organism: str,
+    organism_names: list[str],
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
@@ -11416,7 +11437,7 @@ def build_metabolites_by_gene_tcdb_family_hint(
     unknown) -- independent of the metabolite filters.
     """
     conditions, params = _metabolites_by_gene_shared_where(
-        locus_tags=locus_tags, organism=organism,
+        locus_tags=locus_tags, organism_names=organism_names,
         metabolite_elements=metabolite_elements,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
@@ -11475,7 +11496,7 @@ def build_metabolites_by_gene_tcdb_family_hint(
 def _metabolites_by_gene_go_transport_where(
     *,
     locus_tags: list[str],
-    organism: str,
+    organism_names: list[str],
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_elements: list[str] | None = None,
@@ -11493,12 +11514,11 @@ def _metabolites_by_gene_go_transport_where(
     """
     conditions: list[str] = [
         "g.locus_tag IN $locus_tags",
-        "ALL(word IN split(toLower($organism), ' ')"
-        " WHERE toLower(g.organism_name) CONTAINS word)",
+        "g.organism_name IN $organism_names",
     ]
     params: dict = {
         "locus_tags": locus_tags,
-        "organism": organism,
+        "organism_names": organism_names,
     }
     if metabolite_ids:
         conditions.append("m.id IN $metabolite_ids")
@@ -11530,7 +11550,7 @@ def _metabolites_by_gene_go_transport_where(
 def build_metabolites_by_gene_go_transport(
     *,
     locus_tags: list[str],
-    organism: str,
+    organism_names: list[str],
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     metabolite_pathway_ids: list[str] | None = None,
@@ -11561,7 +11581,7 @@ def build_metabolites_by_gene_go_transport(
     """
     conditions, params = _metabolites_by_gene_go_transport_where(
         locus_tags=locus_tags,
-        organism=organism,
+        organism_names=organism_names,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
         metabolite_elements=metabolite_elements,
@@ -11598,7 +11618,7 @@ def build_metabolites_by_gene_go_transport(
 def build_metabolites_by_gene_summary(
     *,
     locus_tags: list[str],
-    organism: str,
+    organism_names: list[str],
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
@@ -11664,7 +11684,7 @@ def build_metabolites_by_gene_summary(
     """
     params: dict = {
         "locus_tags": locus_tags,
-        "organism": organism,
+        "organism_names": organism_names,
     }
 
     arm_blocks: list[str] = []
@@ -11672,7 +11692,7 @@ def build_metabolites_by_gene_summary(
     if "metabolism" in arms:
         m_conditions, m_params = _metabolites_by_gene_metabolism_where(
             locus_tags=locus_tags,
-            organism=organism,
+            organism_names=organism_names,
             metabolite_elements=metabolite_elements,
             metabolite_ids=metabolite_ids,
             exclude_metabolite_ids=exclude_metabolite_ids,
@@ -11694,7 +11714,7 @@ def build_metabolites_by_gene_summary(
     if "transport" in arms:
         t_conditions, t_params = _metabolites_by_gene_transport_where(
             locus_tags=locus_tags,
-            organism=organism,
+            organism_names=organism_names,
             metabolite_elements=metabolite_elements,
             metabolite_ids=metabolite_ids,
             exclude_metabolite_ids=exclude_metabolite_ids,
@@ -11706,7 +11726,7 @@ def build_metabolites_by_gene_summary(
         if include_tcdb_family_substrates:
             w_conditions, _ = _metabolites_by_gene_shared_where(
                 locus_tags=locus_tags,
-                organism=organism,
+                organism_names=organism_names,
                 metabolite_elements=metabolite_elements,
                 metabolite_ids=metabolite_ids,
                 exclude_metabolite_ids=exclude_metabolite_ids,
@@ -11719,7 +11739,7 @@ def build_metabolites_by_gene_summary(
     if "go_transport" in arms:
         g_conditions, g_params = _metabolites_by_gene_go_transport_where(
             locus_tags=locus_tags,
-            organism=organism,
+            organism_names=organism_names,
             metabolite_ids=metabolite_ids,
             exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_elements=metabolite_elements,
@@ -11969,7 +11989,7 @@ _EMPTY_METABOLITE_ELEMENTS_CONDITION = "size(coalesce(m.elements, [])) = 0"
 def build_metabolites_by_gene_no_formula_count(
     *,
     locus_tags: list[str],
-    organism: str,
+    organism_names: list[str],
     metabolite_elements: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
@@ -12001,7 +12021,7 @@ def build_metabolites_by_gene_no_formula_count(
     del metabolite_elements  # swapped for the empty-elements condition
     params: dict = {
         "locus_tags": locus_tags,
-        "organism": organism,
+        "organism_names": organism_names,
     }
 
     arm_blocks: list[str] = []
@@ -12009,7 +12029,7 @@ def build_metabolites_by_gene_no_formula_count(
     if "metabolism" in arms:
         m_conditions, m_params = _metabolites_by_gene_metabolism_where(
             locus_tags=locus_tags,
-            organism=organism,
+            organism_names=organism_names,
             metabolite_ids=metabolite_ids,
             exclude_metabolite_ids=exclude_metabolite_ids,
             ec_numbers=ec_numbers,
@@ -12030,7 +12050,7 @@ def build_metabolites_by_gene_no_formula_count(
     if "transport" in arms:
         t_conditions, t_params = _metabolites_by_gene_transport_where(
             locus_tags=locus_tags,
-            organism=organism,
+            organism_names=organism_names,
             metabolite_ids=metabolite_ids,
             exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
@@ -12042,7 +12062,7 @@ def build_metabolites_by_gene_no_formula_count(
         if include_tcdb_family_substrates:
             w_conditions, _ = _metabolites_by_gene_shared_where(
                 locus_tags=locus_tags,
-                organism=organism,
+                organism_names=organism_names,
                 metabolite_ids=metabolite_ids,
                 exclude_metabolite_ids=exclude_metabolite_ids,
                 metabolite_pathway_ids=metabolite_pathway_ids,
@@ -12055,7 +12075,7 @@ def build_metabolites_by_gene_no_formula_count(
     if "go_transport" in arms:
         g_conditions, g_params = _metabolites_by_gene_go_transport_where(
             locus_tags=locus_tags,
-            organism=organism,
+            organism_names=organism_names,
             metabolite_ids=metabolite_ids,
             exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
@@ -12086,7 +12106,7 @@ def build_metabolites_by_gene_no_formula_count(
 
 def _list_metabolite_assays_where(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     metric_types: list[str] | None = None,
     value_kind: str | None = None,
     compartment: str | None = None,
@@ -12115,12 +12135,10 @@ def _list_metabolite_assays_where(
     conditions: list[str] = []
     params: dict = {}
 
-    if organism is not None:
-        conditions.append(
-            "ALL(word IN split(toLower($organism), ' ') "
-            "WHERE toLower(a.organism_name) CONTAINS word)"
-        )
-        params["organism"] = organism
+    if organism_names is not None:
+        # Exact canonical names, pre-resolved by the api layer ([] → 0 rows).
+        conditions.append("a.organism_name IN $organism_names")
+        params["organism_names"] = organism_names
     if metric_types:
         conditions.append("a.metric_type IN $metric_types")
         params["metric_types"] = metric_types
@@ -12179,7 +12197,7 @@ def _list_metabolite_assays_where(
 def build_list_metabolite_assays_summary(
     *,
     search_text: str | None = None,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     metric_types: list[str] | None = None,
     value_kind: str | None = None,
     compartment: str | None = None,
@@ -12203,7 +12221,7 @@ def build_list_metabolite_assays_summary(
     When `search_text` is set, also returns: score_max, score_median.
     """
     conditions, params = _list_metabolite_assays_where(
-        organism=organism, metric_types=metric_types, value_kind=value_kind,
+        organism_names=organism_names, metric_types=metric_types, value_kind=value_kind,
         compartment=compartment, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
         publication_doi=publication_doi, experiment_ids=experiment_ids,
@@ -12269,7 +12287,7 @@ def build_list_metabolite_assays_summary(
 def build_list_metabolite_assays(
     *,
     search_text: str | None = None,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     metric_types: list[str] | None = None,
     value_kind: str | None = None,
     compartment: str | None = None,
@@ -12299,7 +12317,7 @@ def build_list_metabolite_assays(
     Verbose adds: treatment, light_condition, experimental_context.
     """
     conditions, params = _list_metabolite_assays_where(
-        organism=organism, metric_types=metric_types, value_kind=value_kind,
+        organism_names=organism_names, metric_types=metric_types, value_kind=value_kind,
         compartment=compartment, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
         publication_doi=publication_doi, experiment_ids=experiment_ids,
@@ -12400,7 +12418,7 @@ def build_list_metabolite_assays(
 
 def _metabolites_by_quantifies_assay_where(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     experiment_ids: list[str] | None = None,
@@ -12435,9 +12453,10 @@ def _metabolites_by_quantifies_assay_where(
     conditions: list[str] = []
     params: dict = {}
 
-    if organism is not None:
-        conditions.append("toLower(a.organism_name) CONTAINS $organism")
-        params["organism"] = organism.lower()
+    if organism_names is not None:
+        # Exact canonical names, pre-resolved by the api layer ([] → 0 rows).
+        conditions.append("a.organism_name IN $organism_names")
+        params["organism_names"] = organism_names
     if metabolite_ids is not None:
         conditions.append("m.id IN $metabolite_ids")
         params["metabolite_ids"] = metabolite_ids
@@ -12516,7 +12535,7 @@ def _metabolites_by_quantifies_assay_where(
 def build_metabolites_by_quantifies_assay_diagnostics(
     *,
     assay_ids: list[str],
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     experiment_ids: list[str] | None = None,
@@ -12549,7 +12568,7 @@ def build_metabolites_by_quantifies_assay_diagnostics(
     # Reuse WHERE-helper for organism/metabolite/scoping conditions
     # (no edge filters — diagnostics is node-level only).
     conditions, params = _metabolites_by_quantifies_assay_where(
-        organism=organism,
+        organism_names=organism_names,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
         experiment_ids=experiment_ids,
@@ -12610,7 +12629,7 @@ def build_metabolites_by_quantifies_assay_diagnostics(
 def build_metabolites_by_quantifies_assay_summary(
     *,
     assay_ids: list[str],
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     experiment_ids: list[str] | None = None,
@@ -12640,7 +12659,7 @@ def build_metabolites_by_quantifies_assay_summary(
     api/ layer by enriching with diagnostics result.
     """
     conditions, params = _metabolites_by_quantifies_assay_where(
-        organism=organism,
+        organism_names=organism_names,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
         experiment_ids=experiment_ids,
@@ -12690,7 +12709,7 @@ def build_metabolites_by_quantifies_assay_summary(
 def build_metabolites_by_quantifies_assay(
     *,
     assay_ids: list[str],
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     experiment_ids: list[str] | None = None,
@@ -12733,7 +12752,7 @@ def build_metabolites_by_quantifies_assay(
     r.time_point_order ASC.
     """
     conditions, params = _metabolites_by_quantifies_assay_where(
-        organism=organism,
+        organism_names=organism_names,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
         experiment_ids=experiment_ids,
@@ -12813,7 +12832,7 @@ def build_metabolites_by_quantifies_assay(
 
 def _metabolites_by_flags_assay_where(
     *,
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     experiment_ids: list[str] | None = None,
@@ -12834,9 +12853,10 @@ def _metabolites_by_flags_assay_where(
     conditions: list[str] = []
     params: dict = {}
 
-    if organism is not None:
-        conditions.append("toLower(a.organism_name) CONTAINS $organism")
-        params["organism"] = organism.lower()
+    if organism_names is not None:
+        # Exact canonical names, pre-resolved by the api layer ([] → 0 rows).
+        conditions.append("a.organism_name IN $organism_names")
+        params["organism_names"] = organism_names
     if metabolite_ids is not None:
         conditions.append("m.id IN $metabolite_ids")
         params["metabolite_ids"] = metabolite_ids
@@ -12906,7 +12926,7 @@ def build_metabolite_assay_kind_lookup(
 def build_metabolites_by_flags_assay_summary(
     *,
     assay_ids: list[str],
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     experiment_ids: list[str] | None = None,
@@ -12926,7 +12946,7 @@ def build_metabolites_by_flags_assay_summary(
     No `by_detection_status` — boolean arm has no `detection_status` field.
     """
     conditions, params = _metabolites_by_flags_assay_where(
-        organism=organism,
+        organism_names=organism_names,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
         experiment_ids=experiment_ids,
@@ -12964,7 +12984,7 @@ def build_metabolites_by_flags_assay_summary(
 def build_metabolites_by_flags_assay(
     *,
     assay_ids: list[str],
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     metabolite_ids: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     experiment_ids: list[str] | None = None,
@@ -12993,7 +13013,7 @@ def build_metabolites_by_flags_assay(
     Sort key (slice spec §5.4): flag_value DESC (coerced bool, detected first), m.id ASC, a.id ASC.
     """
     conditions, params = _metabolites_by_flags_assay_where(
-        organism=organism,
+        organism_names=organism_names,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
         experiment_ids=experiment_ids,
@@ -13052,7 +13072,7 @@ def build_metabolites_by_flags_assay(
 def _assays_by_metabolite_branch_conditions(
     *,
     rel_alias: str,  # 'rq' or 'rf'
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     metric_types: list[str] | None = None,
     compartment: str | None = None,
@@ -13071,9 +13091,10 @@ def _assays_by_metabolite_branch_conditions(
     """
     conditions: list[str] = []
     params: dict = {}
-    if organism is not None:
-        conditions.append("toLower(a.organism_name) CONTAINS $organism")
-        params["organism"] = organism.lower()
+    if organism_names is not None:
+        # Exact canonical names, pre-resolved by the api layer ([] → 0 rows).
+        conditions.append("a.organism_name IN $organism_names")
+        params["organism_names"] = organism_names
     if exclude_metabolite_ids is not None:
         conditions.append("NOT m.id IN $exclude_metabolite_ids")
         params["exclude_metabolite_ids"] = exclude_metabolite_ids
@@ -13092,7 +13113,7 @@ def _assays_by_metabolite_branch_conditions(
 def build_assays_by_metabolite_summary(
     *,
     metabolite_ids: list[str],
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     evidence_kind: str | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     metric_types: list[str] | None = None,
@@ -13130,7 +13151,7 @@ def build_assays_by_metabolite_summary(
     for rel_alias in ("rq", "rf"):
         branch_conds, arm_params = _assays_by_metabolite_branch_conditions(
             rel_alias=rel_alias,
-            organism=organism,
+            organism_names=organism_names,
             exclude_metabolite_ids=exclude_metabolite_ids,
             metric_types=metric_types,
             compartment=compartment,
@@ -13226,7 +13247,7 @@ def build_assays_by_metabolite_summary(
 def build_assays_by_metabolite(
     *,
     metabolite_ids: list[str],
-    organism: str | None = None,
+    organism_names: list[str] | None = None,
     evidence_kind: str | None = None,
     exclude_metabolite_ids: list[str] | None = None,
     metric_types: list[str] | None = None,
@@ -13259,7 +13280,7 @@ def build_assays_by_metabolite(
     for rel_alias in ("rq", "rf"):
         branch_conds, arm_params = _assays_by_metabolite_branch_conditions(
             rel_alias=rel_alias,
-            organism=organism,
+            organism_names=organism_names,
             exclude_metabolite_ids=exclude_metabolite_ids,
             metric_types=metric_types,
             compartment=compartment,

@@ -358,6 +358,15 @@ def test_regression(conn, case, data_regression):
         builder = TOOL_BUILDERS[tool]
         # Strip tool-level params that aren't accepted by query builders
         builder_params = {k: v for k, v in params.items() if k not in ("deduplicate", "limit")}
+        # Backlog 2.8: builders take exact canonical `organism_names`; the
+        # case's organism text resolves through the api resolver first
+        # (list_publications also keeps gene-less taxa, as the api does).
+        for org_key in ("organism", "organisms"):
+            if org_key in builder_params:
+                builder_params["organism_names"] = api._resolve_organism_filter(
+                    builder_params.pop(org_key), conn,
+                    include_geneless=(tool.startswith("list_publications")),
+                )
         cypher, query_params = builder(**builder_params)
         results = conn.execute_query(cypher, **query_params)
         # gene_details returns g{.*} AS gene — unwrap for flat comparison

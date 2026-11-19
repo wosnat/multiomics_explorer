@@ -890,40 +890,105 @@ def _stereo_assignment_envelope(
     return by_stereo, warnings
 
 
-def _organism_word_match(query: str, target: str | None) -> bool:
-    """Word-based CONTAINS match, mirroring the Cypher convention used
-    throughout (`_clustering_analysis_where`, `_metabolites_by_*_where`,
-    etc.): every whitespace-split word of `query` (lowercased) must be a
-    substring of `target` (lowercased). `target=None` never matches —
-    callers use that to mean "we don't actually know this entity's
-    organism," which must not be silently treated as a match OR a
-    mismatch by the caller (llm-review 2b.3 Task 5 controller fix).
+def _resolve_organism_row(conn, organism: str) -> dict:
+    """One round-trip of the tiered organism resolver
+    (`build_resolve_organism_for_organism`: exact name / synonym, then whole
+    words, then substring — best tier only). Returns the single row
+    (`organisms`, `match_tier`, `geneless_matches`), `{}` when none."""
+    cypher, params = build_resolve_organism_for_organism(organism=organism)
+    rows = conn.execute_query(cypher, **params)
+    return rows[0] if rows else {}
+
+
+def _resolve_organism_entry(
+    conn, organism: str, *, include_geneless: bool = False,
+) -> list[str]:
+    """Canonical names one organism text resolves to (gene-bearing, plus the
+    gene-less taxa when `include_geneless`). `geneless_matches` is read with
+    `.get` — resolver rows from before backlog 2.8 omit it."""
+    row = _resolve_organism_row(conn, organism)
+    names = list(row.get("organisms") or [])
+    if include_geneless:
+        names += [n for n in (row.get("geneless_matches") or [])
+                  if n not in names]
+    return names
+
+
+def _resolve_organism_filter(
+    organism: str | list[str] | None,
+    conn,
+    *,
+    include_geneless: bool = False,
+) -> list[str] | None:
+    """Resolve an organism filter to exact canonical names for the builders'
+    `organism_names` (backlog 2.8).
+
+    - `None` (or blank text) → `None`: no filter, no query.
+    - `str` → the resolver's `organisms` (several when a genus pools
+      strains; `[]` when nothing matches → the builder returns 0 rows).
+    - `list[str]` → each entry resolved, unioned in first-seen order,
+      duplicates dropped; unresolved entries are skipped.
+    - `include_geneless=True` (only `list_publications`) appends the
+      gene-less taxa the text matched.
     """
-    if not target:
-        return False
-    words = query.lower().split()
-    target_lower = target.lower()
-    return all(w in target_lower for w in words)
+    if organism is None:
+        return None
+    if isinstance(organism, str):
+        if not organism.strip():
+            return None
+        entries = [organism]
+    else:
+        entries = list(organism)
+    out: list[str] = []
+    for entry in entries:
+        for name in _resolve_organism_entry(
+                conn, entry, include_geneless=include_geneless):
+            if name not in out:
+                out.append(name)
+    return out
+
+
+def _organism_inputs(
+    organisms: list[str] | None, conn,
+) -> tuple[list[dict] | None, list[str] | None]:
+    """Per-entry resolution for the list-param tools (`genes_by_homolog_group`,
+    `differential_expression_by_ortholog`): returns
+    (`organism_inputs=[{"input": raw, "names": [...]}, ...]` for the
+    diagnostics builders, the first-seen union for `organism_names`).
+    `(None, None)` when `organisms` is None."""
+    if organisms is None:
+        return None, None
+    inputs: list[dict] = []
+    union: list[str] = []
+    for entry in organisms:
+        names = _resolve_organism_entry(conn, entry)
+        inputs.append({"input": entry, "names": names})
+        for n in names:
+            if n not in union:
+                union.append(n)
+    return inputs, union
 
 
 def _organism_resolves(conn, organism: str | None) -> bool:
-    """True if `organism` word-matches at least one gene-bearing
+    """True if `organism` resolves to at least one gene-bearing
     OrganismTaxon. Shared existence check behind `_organism_zero_match_warning`
     and `_assay_organism_warnings` (llm-review 2b.3 Task 5) — one query,
     reused rather than re-run per caller.
     """
     if not organism:
         return False
-    cypher, params = build_resolve_organism_for_organism(organism=organism)
-    rows = conn.execute_query(cypher, **params)
-    orgs = rows[0]["organisms"] if rows else []
-    return bool(orgs)
+    return bool(_resolve_organism_entry(conn, organism))
 
 
-def _organism_zero_match_warning(conn, organism: str | None) -> list[str]:
+_UNRESOLVED = object()
+
+
+def _organism_zero_match_warning(
+    conn, organism: str | None, names=_UNRESOLVED,
+) -> list[str]:
     """Warn when a scalar `organism` filter resolves to no OrganismTaxon.
 
-    Runs the same word-based CONTAINS resolve query
+    Runs the same tiered resolve query
     `_validate_organism_inputs` uses (`build_resolve_organism_for_organism`,
     gated on `gene_count > 0`) without raising — for tools that treat an
     unmatched organism as a normal empty result rather than a hard error.
@@ -931,19 +996,26 @@ def _organism_zero_match_warning(conn, organism: str | None) -> list[str]:
     already surface a zero-match organism, e.g. `not_found.organism`) must
     not call this — it would be unreachable dead code there.
     """
-    if not organism:
+    if not organism or not organism.strip():
         return []
-    if _organism_resolves(conn, organism):
+    if names is not _UNRESOLVED:
+        # Backlog 2.8: the caller already resolved the organism for its
+        # builders — reuse that result, no second round-trip.
+        if names:
+            return []
+    elif _organism_resolves(conn, organism):
         return []
     return [f"organism '{organism}' matched no organism — see list_organisms()"]
 
 
-def _assay_organism_warnings(conn, organism: str | None) -> list[str]:
+def _assay_organism_warnings(
+    conn, organism: str | None, names=_UNRESOLVED,
+) -> list[str]:
     """Organism warnings for the MetaboliteAssay-anchored tools
     (`list_metabolite_assays`, `assays_by_metabolite`), llm-review 2b.3
     Task 5:
 
-    1. `organism` doesn't word-match any OrganismTaxon at all — same
+    1. `organism` resolves to no gene-bearing OrganismTaxon at all — same
        message as `_organism_zero_match_warning`.
     2. `organism` resolves genomically (has genes) but has zero
        MetaboliteAssay nodes — the metabolomics layer is a separate
@@ -956,18 +1028,22 @@ def _assay_organism_warnings(conn, organism: str | None) -> list[str]:
        assays.
 
     Never both at once — case 2 only runs when case 1 didn't fire.
+
+    `names`: the caller's already-resolved organism names (backlog 2.8) —
+    reused instead of a second resolver round-trip.
     """
-    if not organism:
+    if not organism or not organism.strip():
         return []
-    if not _organism_resolves(conn, organism):
+    if names is _UNRESOLVED:
+        names = _resolve_organism_entry(conn, organism)
+    if not names:
         return [f"organism '{organism}' matched no organism — see list_organisms()"]
 
     exists_rows = conn.execute_query(
         "MATCH (a:MetaboliteAssay) "
-        "WHERE ALL(word IN split(toLower($organism), ' ') "
-        "WHERE toLower(a.organism_name) CONTAINS word) "
+        "WHERE a.organism_name IN $organism_names "
         "RETURN count(a) > 0 AS has_assays",
-        organism=organism,
+        organism_names=list(names),
     )
     has_assays = exists_rows[0]["has_assays"] if exists_rows else False
     if has_assays:
@@ -1060,12 +1136,13 @@ def _classify_dm_kind_mismatch(
 
 def _classify_dm_organism_mismatch(
     diagnostics: list[dict], organism: str | None,
+    organism_names: list[str] | None = None,
 ) -> tuple[list[dict], str | None, list[str]]:
-    """Filter kind-correct DM diagnostics rows by `organism` (word-based
-    CONTAINS, mirrors the SQL organism filter the diagnostics query used
-    to apply) — moved to Python so a kind-correct DM outside the
-    requested organism can be reported as `not_matched_organism` instead
-    of silently vanishing (llm-review 2b.3).
+    """Filter kind-correct DM diagnostics rows to the canonical names
+    `organism` resolved to (`organism_names`, exact match — the same tiered
+    resolver every organism filter uses) — done in Python so a kind-correct
+    DM outside the requested organism can be reported as
+    `not_matched_organism` instead of silently vanishing (llm-review 2b.3).
 
     `not_matched_organism` is set only when `diagnostics` was non-empty
     BEFORE this filter (the selected DM(s) genuinely exist) but none of
@@ -1075,18 +1152,11 @@ def _classify_dm_organism_mismatch(
 
     Returns (organism_filtered_rows, not_matched_organism, warnings).
     """
-    if not organism:
+    if not organism or organism_names is None:
         return diagnostics, None, []
 
-    words = organism.lower().split()
-
-    def _match(name: str | None) -> bool:
-        if not name:
-            return False
-        name_lower = name.lower()
-        return all(w in name_lower for w in words)
-
-    matched = [d for d in diagnostics if _match(d.get("organism_name"))]
+    wanted = set(organism_names)
+    matched = [d for d in diagnostics if d.get("organism_name") in wanted]
     if diagnostics and not matched:
         dm_organisms = sorted({
             d["organism_name"] for d in diagnostics if d.get("organism_name")
@@ -1574,7 +1644,10 @@ def resolve_gene(
         logger.debug("resolve_gene: empty identifier")
         raise ValueError("identifier must not be empty.")
     conn = _default_conn(conn)
-    cypher, params = build_resolve_gene(identifier=identifier, organism=organism)
+    cypher, params = build_resolve_gene(
+        identifier=identifier,
+        organism_names=_resolve_organism_filter(organism, conn),
+    )
     all_results = conn.execute_query(cypher, **params)
     total = len(all_results)
 
@@ -1645,9 +1718,11 @@ def genes_by_function(
 
     conn = _default_conn(conn)
     warnings = _closed_vocab_warnings(conn, gene_categories=gene_categories)
-    warnings += _organism_zero_match_warning(conn, organism)
+    organism_names = _resolve_organism_filter(organism, conn)
+    warnings += _organism_zero_match_warning(
+        conn, organism, names=organism_names)
     filter_kwargs = dict(
-        search_text=search_text, organism=organism,
+        search_text=search_text, organism_names=organism_names,
         gene_categories=gene_categories, min_quality=min_quality,
     )
 
@@ -2476,8 +2551,9 @@ def list_organisms(
     """List organisms in the knowledge graph, optionally filtered by name or compartment.
 
     organism_names: when provided, each name goes through the shared organism
-        resolver (case-insensitive word match on `preferred_name` and
-        `name_synonyms`, so 'MED4' works as everywhere else); an exact
+        resolver (matched by name on `preferred_name` and `name_synonyms`:
+        exact name or synonym first, then whole words, then partial; best
+        tier wins — so 'MED4' works as everywhere else); an exact
         `preferred_name` also matches gene-less treatment taxa. Names that
         resolve to nothing are returned in `not_found`.
     compartment: when provided, restricts to organisms with at least one
@@ -2546,8 +2622,8 @@ def list_organisms(
 
     warnings = _closed_vocab_warnings(conn, compartment=compartment)
 
-    # Resolve each input through the shared organism resolver (word match on
-    # preferred_name + name_synonyms, gene_count > 0) so 'MED4' works here
+    # Resolve each input through the shared organism resolver (tiered match
+    # on preferred_name + name_synonyms, gene_count > 0) so 'MED4' works here
     # like everywhere else; exact preferred_name stays a fallback so gene-less
     # treatment taxa remain addressable (backlog 3.3).
     names_lc: list[str] | None = None
@@ -2805,9 +2881,14 @@ def list_publications(
         background_factors=background_factors,
         growth_phases=growth_phases, compartment=compartment,
     )
-    warnings += _organism_zero_match_warning(conn, organism)
+    # `p.organisms` also lists gene-less taxa (Phage, Escherichia coli, …),
+    # so the publication filter keeps the resolver's geneless_matches.
+    organism_names = _resolve_organism_filter(
+        organism, conn, include_geneless=True)
+    warnings += _organism_zero_match_warning(
+        conn, organism, names=organism_names)
     filter_kwargs = dict(
-        organism=organism, treatment_type=treatment_type,
+        organism_names=organism_names, treatment_type=treatment_type,
         background_factors=background_factors,
         growth_phases=growth_phases,
         search_text=search_text, author=author,
@@ -3006,8 +3087,9 @@ def list_experiments(
     and "DMs associated with this experiment" (slice-2 D5).
     When search_text is provided, detail results include score.
 
-    organism: case-insensitive substring match against profiled organism
-        (e.organism_name only). For partner-side filtering, use
+    organism: the profiled organism (e.organism_name only), matched by
+        name: exact name or synonym first, then whole words, then partial;
+        best tier wins (a genus pools its strains). For partner-side filtering, use
         coculture_partner=; the two filters AND-compose.
 
     coculture_partner: case-insensitive substring match against any entry
@@ -3077,9 +3159,11 @@ def list_experiments(
         table_scope=table_scope, growth_phases=growth_phases,
         compartment=compartment, control_timing=control_timing,
     )
-    warnings += _organism_zero_match_warning(conn, organism)
+    organism_names = _resolve_organism_filter(organism, conn)
+    warnings += _organism_zero_match_warning(
+        conn, organism, names=organism_names)
     filter_kwargs = dict(
-        organism=organism, treatment_type=treatment_type,
+        organism_names=organism_names, treatment_type=treatment_type,
         background_factors=background_factors,
         omics_type=omics_type, publication_doi=publication_dois,
         coculture_partner=coculture_partner, coculture_role=coculture_role,
@@ -3385,7 +3469,9 @@ def search_ontology(
             (`organism_gene_count` when `organism` is set).
         organism: Scope gene counts to one organism; rows gain
             `organism_gene_count` and browse ranks by it. Resolved by the
-            shared organism resolver (word match, e.g. 'MED4'); an unknown
+            shared organism resolver (matched by name: exact name or
+            synonym first, then whole words, then partial; best tier wins;
+            e.g. 'MED4'); an unknown
             or ambiguous name raises ValueError.
         module_type: kegg_module-only facet: 'pathway' (a route) or
             'signature' (a marker set). None keeps both. Raises when
@@ -3432,7 +3518,7 @@ def search_ontology(
 
     conn = _default_conn(conn)
     if organism is not None:
-        # Same fuzzy resolution as every other organism-taking tool
+        # Same tiered resolution as every other organism-taking tool
         # ('MED4' -> 'Prochlorococcus MED4'; unknown / ambiguous raises).
         organism = _validate_organism_inputs(organism, None, None, conn)
 
@@ -3707,9 +3793,14 @@ def genes_by_homolog_group(
 
     conn = _default_conn(conn)
 
+    # Backlog 2.8: each `organisms` entry resolves to exact canonical names
+    # (per-entry for the not_found / not_matched diagnostics, unioned for
+    # the row / summary builders).
+    organism_inputs, organism_names = _organism_inputs(organisms, conn)
+
     # Summary query — always runs
     sum_cypher, sum_params = build_genes_by_homolog_group_summary(
-        group_ids=group_ids, organisms=organisms,
+        group_ids=group_ids, organism_names=organism_names,
     )
     raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
 
@@ -3742,7 +3833,7 @@ def genes_by_homolog_group(
     # Diagnostics query — only when organisms filter is active
     if organisms is not None:
         diag_cypher, diag_params = build_genes_by_homolog_group_diagnostics(
-            group_ids=group_ids, organisms=organisms,
+            group_ids=group_ids, organism_inputs=organism_inputs,
         )
         raw_diag = conn.execute_query(diag_cypher, **diag_params)[0]
         envelope["not_found_organisms"] = raw_diag["not_found_organisms"]
@@ -3754,7 +3845,7 @@ def genes_by_homolog_group(
     # by_clade query — runs on summary and detail calls alike. Sorted in
     # Python (genus, clade; nulls last) for a deterministic order.
     clade_cypher, clade_params = build_genes_by_homolog_group_by_clade(
-        group_ids=group_ids, organisms=organisms,
+        group_ids=group_ids, organism_names=organism_names,
     )
     by_clade = [
         {
@@ -3781,7 +3872,7 @@ def genes_by_homolog_group(
         return envelope
 
     det_cypher, det_params = build_genes_by_homolog_group(
-        group_ids=group_ids, organisms=organisms,
+        group_ids=group_ids, organism_names=organism_names,
         verbose=verbose, limit=limit, offset=offset,
     )
     results = conn.execute_query(det_cypher, **det_params)
@@ -3961,8 +4052,10 @@ def ontology_term_details(
             (level 3 of kegg_module) also add `organism_module_status` (the
             organism's completeness band) and `organism_steps_present`;
             both are null when no step of the module is covered in that
-            organism. Resolved by the shared organism resolver (word match,
-            e.g. 'MED4'); an unknown or ambiguous name raises ValueError.
+            organism. Resolved by the shared organism resolver (matched by
+            name: exact name or synonym first, then whole words, then
+            partial; best tier wins; e.g. 'MED4'); an unknown or ambiguous
+            name raises ValueError.
         link_kinds: Keep only these link kinds ('composition', 'membership',
             'router'); None keeps all.
         verbose: Add `properties` (every node prop), `links_out[].props`
@@ -4244,7 +4337,9 @@ def genes_by_ontology(
 
     - a ``str``: one organism. It must match exactly one organism; a name
       that matches several raises ``ValueError`` (pass a list instead).
-    - a ``list[str]``: these organisms. Each entry is word-matched and may
+    - a ``list[str]``: these organisms. Each entry is matched by name
+      (exact name or synonym first, then whole words, then partial; best
+      tier wins) and may
       expand to several strains (``"Prochlorococcus"`` matches every
       Prochlorococcus genome); the matches are unioned and de-duplicated.
       Entries that match nothing are listed in ``not_found_organisms``. An
@@ -5169,9 +5264,11 @@ def kegg_module_completeness(
     module with a single unannotated subunit has no covered step.
 
     Args:
-        organism: ``str`` = exactly one organism (word match, e.g. 'MED4';
-            a name matching several raises ValueError — pass a list);
-            ``list[str]`` = the union of word-matched organisms (unmatched
+        organism: ``str`` = exactly one organism (matched by name: exact
+            name or synonym first, then whole words, then partial; best tier
+            wins; e.g. 'MED4'; a name matching several raises ValueError —
+            pass a list); ``list[str]`` = the union of matched organisms
+            (unmatched
             entries land in ``not_found_organisms``; an empty list raises);
             None = every organism with genes.
         module_ids: KeggModule ids at any level — a module
@@ -5539,8 +5636,15 @@ def _validate_organism_inputs(
     resolved: dict[str, list[str]] = {}
 
     if organism:
-        cypher, params = build_resolve_organism_for_organism(organism=organism)
-        orgs = conn.execute_query(cypher, **params)[0]["organisms"]
+        row = _resolve_organism_row(conn, organism)
+        orgs = list(row.get("organisms") or [])
+        if len(orgs) == 0 and row.get("geneless_matches"):
+            raise ValueError(
+                f"'{organism}' is in the KG as a taxon without genes (a "
+                "coculture partner or treatment taxon); it cannot be the "
+                "organism here. Use list_organisms to see organisms with "
+                "genes."
+            )
         if len(orgs) == 0:
             raise ValueError(
                 f"no organism matching '{organism}' found. "
@@ -5714,8 +5818,8 @@ def differential_expression_by_gene(
 
     Raises:
         ValueError: if no filter provided, if inputs span multiple organisms,
-            if organisms don't match each other, or if organism fuzzy match
-            is ambiguous.
+            if organisms don't match each other, if `organism` matches
+            several organisms, or if it names a taxon without genes.
 
     Returns:
         dict with keys: organism_name, matching_genes, total_matching,
@@ -5797,9 +5901,17 @@ def differential_expression_by_gene(
     if summary:
         limit = 0
 
+    # Pre-validate single organism
+    organism_name = _validate_organism_inputs(
+        organism, locus_tags, experiment_ids, conn
+    )
+    # Backlog 2.8: builders match the resolved canonical name exactly (no
+    # Cypher re-match of the raw text, which leaked e.g. PAC1 → EQPAC1).
+    organism_names = [organism_name] if organism else None
+
     # Common filter kwargs for all builders
     filter_kwargs = dict(
-        organism=organism,
+        organism_names=organism_names,
         locus_tags=locus_tags,
         experiment_ids=experiment_ids,
         direction=direction,
@@ -5807,11 +5919,6 @@ def differential_expression_by_gene(
         growth_phases=growth_phases,
         treatment_type=treatment_type,
         background_factors=background_factors,
-    )
-
-    # Pre-validate single organism
-    organism_name = _validate_organism_inputs(
-        organism, locus_tags, experiment_ids, conn
     )
 
     # --- Summary query 1: global stats ---
@@ -5906,7 +6013,7 @@ def differential_expression_by_gene(
         exp_diag_cypher, exp_diag_params = (
             build_differential_expression_by_gene_experiment_diagnostics(
                 experiment_ids=experiment_ids,
-                organism=organism,
+                organism_names=organism_names,
                 locus_tags=locus_tags,
                 direction=direction,
                 significant_only=significant_only,
@@ -6045,9 +6152,13 @@ def differential_expression_by_ortholog(
         treatment_type=treatment_type, background_factors=background_factors,
     )
 
+    # Backlog 2.8: each `organisms` entry resolves to exact canonical names
+    # (per-entry for the diagnostics, unioned for the row / summary builders).
+    organism_inputs, organism_names = _organism_inputs(organisms, conn)
+
     # Common filter kwargs for all builders
     filter_kwargs = dict(
-        organisms=organisms,
+        organism_names=organism_names,
         experiment_ids=experiment_ids,
         direction=direction,
         significant_only=significant_only,
@@ -6138,7 +6249,7 @@ def differential_expression_by_ortholog(
     # --- Q5: membership_counts (always) ---
     mc_cypher, mc_params = (
         build_differential_expression_by_ortholog_membership_counts(
-            group_ids=group_ids, organisms=organisms,
+            group_ids=group_ids, organism_names=organism_names,
         )
     )
     mc_rows = conn.execute_query(mc_cypher, **mc_params)
@@ -6153,7 +6264,7 @@ def differential_expression_by_ortholog(
     # --- Q6: diagnostics (conditional) ---
     if organisms is not None or experiment_ids is not None:
         diag_queries = build_differential_expression_by_ortholog_diagnostics(
-            group_ids=group_ids, organisms=organisms,
+            group_ids=group_ids, organism_inputs=organism_inputs,
             experiment_ids=experiment_ids,
             direction=direction, significant_only=significant_only,
             growth_phases=growth_phases,
@@ -6476,10 +6587,12 @@ def list_clustering_analyses(
         background_factors=background_factors, growth_phases=growth_phases,
         omics_type=omics_type,
     )
-    warnings += _organism_zero_match_warning(conn, organism)
+    organism_names = _resolve_organism_filter(organism, conn)
+    warnings += _organism_zero_match_warning(
+        conn, organism, names=organism_names)
 
     filter_kwargs = dict(
-        organism=organism, cluster_type=cluster_type,
+        organism_names=organism_names, cluster_type=cluster_type,
         treatment_type=treatment_type, background_factors=background_factors,
         growth_phases=growth_phases,
         omics_type=omics_type, publication_doi=publication_dois,
@@ -6638,10 +6751,13 @@ def list_derived_metrics(
         treatment_type=treatment_type, background_factors=background_factors,
         growth_phases=growth_phases,
     )
-    warnings += _organism_zero_match_warning(conn, organism)
+    organism_names = _resolve_organism_filter(organism, conn)
+    warnings += _organism_zero_match_warning(
+        conn, organism, names=organism_names)
 
     filter_kwargs = dict(
-        organism=organism, metric_types=metric_types, value_kind=value_kind,
+        organism_names=organism_names, metric_types=metric_types,
+        value_kind=value_kind,
         compartment=compartment, omics_type=omics_type,
         treatment_type=treatment_type, background_factors=background_factors,
         growth_phases=growth_phases, publication_doi=publication_dois,
@@ -7160,12 +7276,14 @@ def genes_by_numeric_metric(
         conn, compartment=compartment, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
     )
-    warnings += _organism_zero_match_warning(conn, organism)
+    organism_names = _resolve_organism_filter(organism, conn)
+    warnings += _organism_zero_match_warning(
+        conn, organism, names=organism_names)
     warnings += kind_warnings
 
     # 4b. Partition correct-kind survivors by organism.
     diagnostics, not_matched_organism, organism_warnings = (
-        _classify_dm_organism_mismatch(diagnostics, organism)
+        _classify_dm_organism_mismatch(diagnostics, organism, organism_names)
     )
     warnings += organism_warnings
 
@@ -7526,11 +7644,13 @@ def genes_by_boolean_metric(
         conn, compartment=compartment, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
     )
-    warnings += _organism_zero_match_warning(conn, organism)
+    organism_names = _resolve_organism_filter(organism, conn)
+    warnings += _organism_zero_match_warning(
+        conn, organism, names=organism_names)
     warnings += kind_warnings
 
     diagnostics, not_matched_organism, organism_warnings = (
-        _classify_dm_organism_mismatch(diagnostics, organism)
+        _classify_dm_organism_mismatch(diagnostics, organism, organism_names)
     )
     warnings += organism_warnings
 
@@ -7797,11 +7917,13 @@ def genes_by_categorical_metric(
         conn, compartment=compartment, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
     )
-    warnings += _organism_zero_match_warning(conn, organism)
+    organism_names = _resolve_organism_filter(organism, conn)
+    warnings += _organism_zero_match_warning(
+        conn, organism, names=organism_names)
     warnings += kind_warnings
 
     diagnostics, not_matched_organism, organism_warnings = (
-        _classify_dm_organism_mismatch(diagnostics, organism)
+        _classify_dm_organism_mismatch(diagnostics, organism, organism_names)
     )
     warnings += organism_warnings
 
@@ -8021,9 +8143,13 @@ def genes_in_cluster(
 
     conn = _default_conn(conn)
 
+    # Backlog 2.8: organism text → exact canonical names for the builders.
+    organism_names = _resolve_organism_filter(organism, conn)
+
     # Summary query — always runs
     sum_cypher, sum_params = build_genes_in_cluster_summary(
-        cluster_ids=cluster_ids, analysis_id=analysis_id, organism=organism)
+        cluster_ids=cluster_ids, analysis_id=analysis_id,
+        organism_names=organism_names)
     raw_summary = conn.execute_query(sum_cypher, **sum_params)[0]
 
     by_cluster = raw_summary["by_cluster"]
@@ -8076,7 +8202,8 @@ def genes_in_cluster(
     # unreachable (llm-review 2b.3 Task 5 controller fix). Fix: compare the
     # analysis's own `ca_organism_name` (a direct ClusteringAnalysis
     # property, same convention `_clustering_analysis_where` filters on)
-    # against the requested `organism` — flag a mismatch only when they
+    # against the names the requested `organism` resolved to (backlog 2.8:
+    # exact canonical names, not a word match) — flag a mismatch only when they
     # genuinely differ. A missing `ca_organism_name` (unknown analysis, or
     # a real analysis that somehow carries no organism_name) never counts
     # as a mismatch here — `not_found_analysis` already covers the unknown
@@ -8090,14 +8217,14 @@ def genes_in_cluster(
     if analysis_id is not None:
         ca_organism_name = raw_summary.get("ca_organism_name")
         if (
-            organism is not None
-            and not _organism_word_match(organism, ca_organism_name)
+            organism_names is not None
             and ca_organism_name is not None
+            and ca_organism_name not in organism_names
         ):
             envelope["not_matched_organism"] = organism
         else:
             envelope["not_matched_organism"] = None
-    elif organism is not None and total_matching == 0 and not raw_summary["not_found_clusters"]:
+    elif organism_names is not None and total_matching == 0 and not raw_summary["not_found_clusters"]:
         envelope["not_matched_organism"] = organism
     else:
         envelope["not_matched_organism"] = None
@@ -8111,7 +8238,8 @@ def genes_in_cluster(
         return envelope
 
     det_cypher, det_params = build_genes_in_cluster(
-        cluster_ids=cluster_ids, analysis_id=analysis_id, organism=organism,
+        cluster_ids=cluster_ids, analysis_id=analysis_id,
+        organism_names=organism_names,
         verbose=verbose, limit=limit, offset=offset)
     results = conn.execute_query(det_cypher, **det_params)
 
@@ -10283,7 +10411,7 @@ def _stereo_relatives_in_organism(
     }
     sum_cypher, sum_params = build_genes_by_metabolite_summary(
         metabolite_ids=relative_ids,
-        organism=organism,
+        organism_names=[organism],
         exclude_metabolite_ids=None,
         arms=tuple(arms),
         include_ancestors=include_ancestors,
@@ -10593,8 +10721,9 @@ def genes_by_metabolite(
             diverges from `list_metabolites` — gene-anchored tools reject
             ``"metabolomics"``. Also on unknown `go_namespace` or
             `go_evidence` values (raised even when the
-            GO arm is off). Also if `organism` fuzzy-matches multiple
-            organisms (be more specific); a word matching zero organisms
+            GO arm is off). Also if `organism` matches multiple
+            organisms (be more specific) or names a taxon without genes;
+            a name matching zero organisms
             does not raise — it returns an empty envelope with
             `not_found.organism` set.
     """
@@ -10652,11 +10781,10 @@ def genes_by_metabolite(
 
     # 1c. Pre-validate & resolve organism to its canonical preferred_name.
     # Both the builders' organism filter and the existence probe (step 6
-    # below) need the canonical form — the raw word the caller passed can
-    # fuzzy word-match every organism sharing a token (e.g. 'Prochlorococcus'
-    # matching every strain) instead of the single organism intended.
-    # Ambiguous words propagate the ValueError (mirrors
-    # `differential_expression_by_gene`); a word matching zero organisms
+    # below) need the canonical form — a genus word (e.g. 'Prochlorococcus')
+    # resolves to every strain instead of the single organism intended.
+    # Ambiguous input propagates the ValueError (mirrors
+    # `differential_expression_by_gene`); input matching zero organisms
     # short-circuits to an empty envelope with `not_found.organism` set —
     # the metabolite-side probes still run since they don't depend on
     # organism.
@@ -10742,7 +10870,7 @@ def genes_by_metabolite(
     sum_cypher, sum_params = build_genes_by_metabolite_summary(
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
-        organism=organism,
+        organism_names=[organism],
         ec_numbers=ec_numbers,
         mass_balance=mass_balance,
         metabolite_pathway_ids=metabolite_pathway_ids,
@@ -10771,7 +10899,7 @@ def genes_by_metabolite(
             return build_genes_by_metabolite_metabolism(
                 metabolite_ids=metabolite_ids,
                 exclude_metabolite_ids=exclude_metabolite_ids,
-                organism=organism,
+                organism_names=[organism],
                 ec_numbers=ec_numbers,
                 mass_balance=mass_balance,
                 metabolite_pathway_ids=metabolite_pathway_ids,
@@ -10784,7 +10912,7 @@ def genes_by_metabolite(
             return build_genes_by_metabolite_transport(
                 metabolite_ids=metabolite_ids,
                 exclude_metabolite_ids=exclude_metabolite_ids,
-                organism=organism,
+                organism_names=[organism],
                 metabolite_pathway_ids=metabolite_pathway_ids,
                 gene_categories=gene_categories,
                 verbose=verbose,
@@ -10795,7 +10923,7 @@ def genes_by_metabolite(
             return build_genes_by_metabolite_tcdb_family(
                 metabolite_ids=metabolite_ids,
                 exclude_metabolite_ids=exclude_metabolite_ids,
-                organism=organism,
+                organism_names=[organism],
                 metabolite_pathway_ids=metabolite_pathway_ids,
                 gene_categories=gene_categories,
                 verbose=verbose,
@@ -10804,7 +10932,7 @@ def genes_by_metabolite(
             )
         return build_genes_by_metabolite_go_transport(
             metabolite_ids=metabolite_ids,
-            organism=organism,
+            organism_names=[organism],
             exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
@@ -10994,7 +11122,7 @@ def genes_by_metabolite(
         hint_cypher, hint_params = build_genes_by_metabolite_tcdb_family_hint(
             metabolite_ids=metabolite_ids,
             exclude_metabolite_ids=exclude_metabolite_ids,
-            organism=organism,
+            organism_names=[organism],
             metabolite_pathway_ids=metabolite_pathway_ids,
             gene_categories=gene_categories,
         )
@@ -11426,8 +11554,8 @@ def metabolites_by_gene(
             `genes_by_metabolite`
             — gene-anchored tools reject ``"metabolomics"``. Also on
             unknown `go_namespace` or `go_evidence` values (raised even when the GO arm is off). Also if `organism`
-            fuzzy-matches multiple organisms (be more specific); a word
-            matching zero organisms does not raise — it returns an empty
+            matches multiple organisms (be more specific) or names a taxon
+            without genes; a name matching zero organisms does not raise — it returns an empty
             envelope with `not_found.organism` set.
     """
     # 0. Empty gene list raises before anything else (no query runs).
@@ -11526,7 +11654,7 @@ def metabolites_by_gene(
 
     # 1c. Resolve the organism to its canonical preferred_name.
     # The existence probe below (step 6) requires an EXACT match on
-    # `Gene.organism_name` — passing the raw fuzzy word through (e.g.
+    # `Gene.organism_name` — passing the raw input through (e.g.
     # 'MED4') would never match, listing every found gene as not_found.
     organism_given = bool(organism)
     if organism:
@@ -11563,7 +11691,7 @@ def metabolites_by_gene(
     # 3. Always run summary builder (envelope rollups even when summary=True).
     sum_cypher, sum_params = build_metabolites_by_gene_summary(
         locus_tags=locus_tags,
-        organism=organism,
+        organism_names=[organism],
         metabolite_elements=metabolite_elements,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
@@ -11589,7 +11717,7 @@ def metabolites_by_gene(
     if metabolite_elements:
         nf_cypher, nf_params = build_metabolites_by_gene_no_formula_count(
             locus_tags=locus_tags,
-            organism=organism,
+            organism_names=[organism],
             metabolite_elements=metabolite_elements,
             metabolite_ids=metabolite_ids,
             exclude_metabolite_ids=exclude_metabolite_ids,
@@ -11624,7 +11752,7 @@ def metabolites_by_gene(
         if arm == "metabolism":
             return build_metabolites_by_gene_metabolism(
                 locus_tags=locus_tags,
-                organism=organism,
+                organism_names=[organism],
                 metabolite_elements=metabolite_elements,
                 metabolite_ids=metabolite_ids,
                 exclude_metabolite_ids=exclude_metabolite_ids,
@@ -11639,7 +11767,7 @@ def metabolites_by_gene(
         if arm == "transport":
             return build_metabolites_by_gene_transport(
                 locus_tags=locus_tags,
-                organism=organism,
+                organism_names=[organism],
                 metabolite_elements=metabolite_elements,
                 metabolite_ids=metabolite_ids,
                 exclude_metabolite_ids=exclude_metabolite_ids,
@@ -11652,7 +11780,7 @@ def metabolites_by_gene(
         if arm == "tcdb_family":
             return build_metabolites_by_gene_tcdb_family(
                 locus_tags=locus_tags,
-                organism=organism,
+                organism_names=[organism],
                 metabolite_elements=metabolite_elements,
                 metabolite_ids=metabolite_ids,
                 exclude_metabolite_ids=exclude_metabolite_ids,
@@ -11664,7 +11792,7 @@ def metabolites_by_gene(
             )
         return build_metabolites_by_gene_go_transport(
             locus_tags=locus_tags,
-            organism=organism,
+            organism_names=[organism],
             metabolite_ids=metabolite_ids,
             exclude_metabolite_ids=exclude_metabolite_ids,
             metabolite_pathway_ids=metabolite_pathway_ids,
@@ -11879,7 +12007,7 @@ def metabolites_by_gene(
     if tcdb_active:
         hint_cypher, hint_params = build_metabolites_by_gene_tcdb_family_hint(
             locus_tags=locus_tags,
-            organism=organism,
+            organism_names=[organism],
             metabolite_elements=metabolite_elements,
             metabolite_ids=metabolite_ids,
             exclude_metabolite_ids=exclude_metabolite_ids,
@@ -12110,10 +12238,12 @@ def list_metabolite_assays(
         conn, compartment=compartment, treatment_type=treatment_type,
         background_factors=background_factors, growth_phases=growth_phases,
     )
-    warnings += _assay_organism_warnings(conn, organism)
+    organism_names = _resolve_organism_filter(organism, conn)
+    warnings += _assay_organism_warnings(conn, organism, names=organism_names)
 
     builder_kwargs = dict(
-        search_text=search_text, organism=organism, metric_types=metric_types,
+        search_text=search_text, organism_names=organism_names,
+        metric_types=metric_types,
         value_kind=value_kind, compartment=compartment,
         treatment_type=treatment_type, background_factors=background_factors,
         growth_phases=growth_phases, publication_doi=publication_dois,
@@ -12473,10 +12603,13 @@ def metabolites_by_quantifies_assay(
             conn, metabolite_ids, exclude_metabolite_ids)
     )
 
+    # Backlog 2.8: organism text → exact canonical names for the builders.
+    organism_names = _resolve_organism_filter(organism, conn)
+
     # ---- Q1: diagnostics probe (kind-agnostic — see builder docstring) --
     diag_cypher, diag_params = build_metabolites_by_quantifies_assay_diagnostics(
         assay_ids=assay_ids,
-        organism=organism,
+        organism_names=organism_names,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
         experiment_ids=experiment_ids,
@@ -12570,7 +12703,7 @@ def metabolites_by_quantifies_assay(
     # ---- Q2: summary ----------------------------------------------------
     sum_cypher, sum_params = build_metabolites_by_quantifies_assay_summary(
         assay_ids=surviving_ids,
-        organism=organism,
+        organism_names=organism_names,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
         experiment_ids=experiment_ids,
@@ -12620,7 +12753,7 @@ def metabolites_by_quantifies_assay(
     if not summary:
         det_cypher, det_params = build_metabolites_by_quantifies_assay(
             assay_ids=surviving_ids,
-            organism=organism,
+            organism_names=organism_names,
             metabolite_ids=metabolite_ids,
             exclude_metabolite_ids=exclude_metabolite_ids,
             experiment_ids=experiment_ids,
@@ -12792,10 +12925,13 @@ def metabolites_by_flags_assay(
                 "metabolites_by_quantifies_assay"
             )
 
+    # Backlog 2.8: organism text → exact canonical names for the builders.
+    organism_names = _resolve_organism_filter(organism, conn)
+
     # ---- Q2: summary ----------------------------------------------------
     sum_cypher, sum_params = build_metabolites_by_flags_assay_summary(
         assay_ids=assay_ids,
-        organism=organism,
+        organism_names=organism_names,
         metabolite_ids=metabolite_ids,
         exclude_metabolite_ids=exclude_metabolite_ids,
         experiment_ids=experiment_ids,
@@ -12842,7 +12978,7 @@ def metabolites_by_flags_assay(
     if not summary:
         det_cypher, det_params = build_metabolites_by_flags_assay(
             assay_ids=assay_ids,
-            organism=organism,
+            organism_names=organism_names,
             metabolite_ids=metabolite_ids,
             exclude_metabolite_ids=exclude_metabolite_ids,
             experiment_ids=experiment_ids,
@@ -12975,7 +13111,8 @@ def assays_by_metabolite(
         _canonicalize_metabolite_id_params(
             conn, metabolite_ids, exclude_metabolite_ids)
     )
-    warnings += _assay_organism_warnings(conn, organism)
+    organism_names = _resolve_organism_filter(organism, conn)
+    warnings += _assay_organism_warnings(conn, organism, names=organism_names)
     warnings += _closed_edge_vocab_warnings(
         conn, "stereo_assignment", stereo_assignment,
         {"quantifies": ("Assay_quantifies_metabolite",),
@@ -12993,7 +13130,7 @@ def assays_by_metabolite(
     # ---- Q2: summary (UNION ALL envelope) -------------------------------
     sum_cypher, sum_params = build_assays_by_metabolite_summary(
         metabolite_ids=metabolite_ids,
-        organism=organism,
+        organism_names=organism_names,
         evidence_kind=evidence_kind,
         exclude_metabolite_ids=exclude_metabolite_ids,
         metric_types=metric_types,
@@ -13026,7 +13163,7 @@ def assays_by_metabolite(
     if not summary:
         det_cypher, det_params = build_assays_by_metabolite(
             metabolite_ids=metabolite_ids,
-            organism=organism,
+            organism_names=organism_names,
             evidence_kind=evidence_kind,
             exclude_metabolite_ids=exclude_metabolite_ids,
             metric_types=metric_types,

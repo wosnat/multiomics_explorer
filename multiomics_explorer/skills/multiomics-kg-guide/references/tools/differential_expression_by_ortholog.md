@@ -14,7 +14,7 @@ docs://tools/differential_expression_by_ortholog; summary=True first.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | group_ids | list[string] | — | Ortholog group IDs (from search_homolog_groups or gene_homologs). E.g. ['cyanorak:CK_00000570']. Bare ids are accepted (e.g. 'CK_00000570', 'COG0592@2') and coerced to canonical (see `resolved_aliases`). |
-| organisms | list[string] \| None | None | Organisms, each word-matched as `organism`. Omit for all. |
+| organisms | list[string] \| None | None | Organisms, each entry matched by name (exact first, then whole words, then partial); a genus word matches every strain. Omit for all. |
 | experiment_ids | list[string] \| None | None | Filter to these experiments. Get IDs from list_experiments. |
 | direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` = all statuses. |
 | significant_only | bool | False | If true, return only statistically significant rows. |

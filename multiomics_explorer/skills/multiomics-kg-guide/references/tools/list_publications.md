@@ -13,7 +13,7 @@ docs://tools/list_publications; summary=True caps the same rollups (smaller than
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
+| organism | string \| None | None | Organism, matched by name (exact first, then whole words, then partial) on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
 | treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
 | background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
@@ -46,11 +46,11 @@ Result row: `doi, title, authors, year, journal, study_type, organisms, experime
 
 ## Common mistakes
 
+- organism also matches taxa without genes that papers name (Phage, Escherichia coli, Vibrio parahaemolyticus, Thalassiosira pseudonana) — the only tool where they match; gene tools reject them.
+
 - Use the dedicated author param for author filtering (e.g. author='Biller'), not search_text — search_text searches title, abstract, and description only.
 
 - experiment_count is per-publication — a publication with experiment_count=10 may span multiple organisms and treatment types.
-
-- metabolite_count > 0 indicates a metabolomics-bearing publication. Drill into MetaboliteAssay nodes via list_metabolite_assays(publication_dois=[...]); inspect compartments via metabolite_compartments per row.
 
 ## Chaining patterns
 

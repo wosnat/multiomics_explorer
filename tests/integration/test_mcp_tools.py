@@ -187,7 +187,7 @@ class TestListPublications:
 
     def test_organism_filter(self, conn):
         """Organism filter returns subset with MED4 experiments."""
-        cypher, params = build_list_publications(organism="MED4")
+        cypher, params = build_list_publications(organism_names=["Prochlorococcus MED4"])
         results = conn.execute_query(cypher, **params)
         assert len(results) >= 5
 
@@ -212,10 +212,10 @@ class TestListPublications:
 
     def test_summary_matches_data(self, conn):
         """Summary total_matching equals actual data row count (no limit)."""
-        summary_cypher, summary_params = build_list_publications_summary(organism="MED4")
+        summary_cypher, summary_params = build_list_publications_summary(organism_names=["Prochlorococcus MED4"])
         summary = conn.execute_query(summary_cypher, **summary_params)[0]
 
-        data_cypher, data_params = build_list_publications(organism="MED4")
+        data_cypher, data_params = build_list_publications(organism_names=["Prochlorococcus MED4"])
         data = conn.execute_query(data_cypher, **data_params)
 
         assert summary["total_matching"] == len(data)
@@ -3841,7 +3841,8 @@ class TestOrganismResolverGenomeOnlyLive:
         if not rows:
             pytest.skip("no gene-less OrganismTaxon in current KG")
         gene_less = rows[0]["name"]
-        with pytest.raises(ValueError, match="no organism matching"):
+        # 2.8: a gene-less taxon now gets its own message.
+        with pytest.raises(ValueError, match="taxon without genes"):
             _validate_organism_inputs(
                 organism=gene_less,
                 locus_tags=None,

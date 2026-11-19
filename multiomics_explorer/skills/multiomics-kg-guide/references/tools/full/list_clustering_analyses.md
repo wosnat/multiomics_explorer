@@ -14,7 +14,7 @@ docs://tools/list_clustering_analyses; summary=True first.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string \| None | None | Lucene full-text query over analysis name, cluster names, functional/behavioral descriptions, experimental_context. Results ranked by score. |
-| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
+| organism | string \| None | None | Organism, matched by name (exact first, then whole words, then partial) on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
 | cluster_type | string \| None | None | Filter by cluster type. Live vocabulary: list_filter_values(filter_type='cluster_type'). Offline examples: 'condition_comparison', 'decay_pattern', 'diel', 'expression_bin', 'genomic_island', 'time_course'. |
 | treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
 | background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
@@ -151,7 +151,7 @@ response['total_matching']  # use total, not len — results may be truncated
 
 - Unknown `treatment_type` / `background_factors` / `growth_phases` values return 0 rows and land in `warnings`; live value sets via list_filter_values, semantics in docs://guide/conventions.
 
-- `organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works.
+- `organism=` is matched by name on preferred_name + name_synonyms, case-insensitive (exact first, then whole words, then partial) — 'MED4' works and selects one strain.
 
 - DataFrame conversion: `to_dataframe(result)` auto-dispatches and returns one row per analysis × cluster (compact: cluster_id / cluster_name / cluster_member_count; verbose=True adds cluster descriptions). See `docs://guide/python_api`.
 

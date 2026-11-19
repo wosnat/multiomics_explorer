@@ -442,25 +442,26 @@ class TestBuildResolveGene:
         cypher, params = build_resolve_gene(identifier="PMM0001")
         assert "MATCH (g:Gene)" in cypher
         assert params["identifier"] == "PMM0001"
-        assert params["organism"] is None
+        assert params["organism_names"] is None
 
     def test_with_organism(self):
-        cypher, params = build_resolve_gene(identifier="dnaN", organism="MED4")
-        assert params["organism"] == "MED4"
-        assert "toLower($organism)" in cypher
-        assert "toLower(g.organism_name)" in cypher
+        cypher, params = build_resolve_gene(identifier="dnaN", organism_names=["MED4"])
+        assert params["organism_names"] == ["MED4"]
+        assert "IN $organism_names" in cypher
+        assert "g.organism_name IN $organism_names" in cypher
 
     def test_organism_case_insensitive(self):
         """Organism filter uses toLower for case-insensitive matching."""
-        cypher, params = build_resolve_gene(identifier="recF", organism="prochlorococcus")
-        assert params["organism"] == "prochlorococcus"
-        assert "toLower($organism)" in cypher
+        cypher, params = build_resolve_gene(identifier="recF", organism_names=["prochlorococcus"])
+        assert params["organism_names"] == ["prochlorococcus"]
+        assert "IN $organism_names" in cypher
 
     def test_organism_multi_word_partial(self):
-        """Multi-word organism like 'Alteromonas EZ55' uses ALL/split for word matching."""
-        cypher, params = build_resolve_gene(identifier="recF", organism="Alteromonas EZ55")
-        assert params["organism"] == "Alteromonas EZ55"
-        assert "ALL(word IN split(" in cypher
+        """2.8: multi-word names arrive resolved; exact IN match, no word split."""
+        cypher, params = build_resolve_gene(identifier="recF", organism_names=["Alteromonas EZ55"])
+        assert params["organism_names"] == ["Alteromonas EZ55"]
+        assert "g.organism_name IN $organism_names" in cypher
+        assert "ALL(word IN split(" not in cypher
 
     def test_returns_expected_columns(self):
         cypher, _ = build_resolve_gene(identifier="x")
@@ -489,15 +490,15 @@ class TestBuildGenesByFunction:
         cypher, params = build_genes_by_function(search_text="DNA repair")
         assert "fulltext" in cypher.lower() or "geneFullText" in cypher
         assert params["search_text"] == "DNA repair"
-        assert params["organism"] is None
+        assert params["organism_names"] is None
         assert params["gene_categories"] is None
         assert params["min_quality"] == 0
 
     def test_organism_filter(self):
         """Organism filter uses toLower for case-insensitive matching."""
-        cypher, params = build_genes_by_function(search_text="x", organism="prochlorococcus")
-        assert params["organism"] == "prochlorococcus"
-        assert "toLower($organism)" in cypher
+        cypher, params = build_genes_by_function(search_text="x", organism_names=["prochlorococcus"])
+        assert params["organism_names"] == ["prochlorococcus"]
+        assert "IN $organism_names" in cypher
 
     def test_gene_categories_filter(self):
         """When gene_categories is provided, it is passed as $gene_categories."""
@@ -523,13 +524,13 @@ class TestBuildGenesByFunction:
     def test_combined_filters(self):
         """All three filters (organism, gene_categories, min_quality) in WHERE."""
         cypher, params = build_genes_by_function(
-            search_text="x", organism="MED4", gene_categories=["Photosynthesis"],
+            search_text="x", organism_names=["MED4"], gene_categories=["Photosynthesis"],
             min_quality=2,
         )
-        assert "toLower($organism)" in cypher
+        assert "IN $organism_names" in cypher
         assert "$gene_categories" in cypher
         assert "$min_quality" in cypher
-        assert params["organism"] == "MED4"
+        assert params["organism_names"] == ["MED4"]
         assert params["gene_categories"] == ["Photosynthesis"]
         assert params["min_quality"] == 2
 
@@ -590,17 +591,17 @@ class TestBuildGenesByFunctionSummary:
         cypher, params = build_genes_by_function_summary(search_text="DNA repair")
         assert "geneFullText" in cypher
         assert params["search_text"] == "DNA repair"
-        assert params["organism"] is None
+        assert params["organism_names"] is None
         assert params["gene_categories"] is None
 
     def test_with_filters(self):
         """Filters are applied to the summary query."""
         cypher, params = build_genes_by_function_summary(
-            search_text="x", organism="MED4", gene_categories=["Photosynthesis"],
+            search_text="x", organism_names=["MED4"], gene_categories=["Photosynthesis"],
             min_quality=2,
         )
-        assert "toLower($organism)" in cypher
-        assert params["organism"] == "MED4"
+        assert "IN $organism_names" in cypher
+        assert params["organism_names"] == ["MED4"]
         assert params["gene_categories"] == ["Photosynthesis"]
         assert params["min_quality"] == 2
 
@@ -2853,9 +2854,9 @@ class TestBuildListPublications:
 
     def test_organism_filter(self):
         """Organism filter uses ANY on p.organisms with toLower CONTAINS."""
-        cypher, params = build_list_publications(organism="MED4")
-        assert "ANY(o IN p.organisms WHERE toLower(o) CONTAINS toLower($organism))" in cypher
-        assert params["organism"] == "MED4"
+        cypher, params = build_list_publications(organism_names=["MED4"])
+        assert "ANY(o IN p.organisms WHERE o IN $organism_names)" in cypher
+        assert params["organism_names"] == ["MED4"]
 
     def test_treatment_type_filter(self):
         """Treatment type filter uses ANY on p.treatment_types with a lowercased
@@ -2915,11 +2916,11 @@ class TestBuildListPublications:
     def test_combined_filters(self):
         """All filters produce AND-joined WHERE."""
         cypher, params = build_list_publications(
-            organism="MED4", treatment_type=["coculture"], author="Sher",
+            organism_names=["MED4"], treatment_type=["coculture"], author="Sher",
         )
         assert "WHERE" in cypher
         assert " AND " in cypher
-        assert params["organism"] == "MED4"
+        assert params["organism_names"] == ["MED4"]
         assert params["treatment_types"] == ["coculture"]
         assert params["author"] == "Sher"
 
@@ -2998,9 +2999,9 @@ class TestBuildListPublicationsSummary:
 
     def test_with_filters(self):
         """Filters are applied to the matching count."""
-        cypher, params = build_list_publications_summary(organism="MED4")
-        assert "toLower($organism)" in cypher
-        assert params["organism"] == "MED4"
+        cypher, params = build_list_publications_summary(organism_names=["MED4"])
+        assert "IN $organism_names" in cypher
+        assert params["organism_names"] == ["MED4"]
 
     def test_search_text_uses_fulltext(self):
         """search_text uses fulltext CALL in summary query."""
@@ -3018,7 +3019,7 @@ class TestBuildListPublicationsSummary:
         """The filtered count uses OPTIONAL MATCH so an empty intersection
         still emits one row with total_matching=0 (otherwise the caller
         IndexErrors on summary[0])."""
-        cypher, _ = build_list_publications_summary(organism="MED4")
+        cypher, _ = build_list_publications_summary(organism_names=["MED4"])
         assert "OPTIONAL MATCH (p:Publication)" in cypher
 
     def test_summary_returns_dm_rollup_envelope_keys(self):
@@ -3068,7 +3069,7 @@ class TestBuildListPublicationsPublicationDoisFilter:
 
     def test_combines_with_organism(self):
         cypher, params = build_list_publications(
-            organism="MED4", publication_dois=["10.1038/ismej.2016.70"],
+            organism_names=["MED4"], publication_dois=["10.1038/ismej.2016.70"],
         )
         assert "toLower(p.doi) IN $publication_dois" in cypher
         assert "$organism" in cypher
@@ -3109,19 +3110,19 @@ class TestBuildListExperiments:
 
     def test_organism_filter(self):
         """Organism filter matches profiled organism only (no OR against coculture_partner)."""
-        cypher, params = build_list_experiments(organism="MED4")
-        assert "ALL(word IN split(toLower($organism)" in cypher
-        assert "toLower(e.organism_name) CONTAINS word" in cypher
+        cypher, params = build_list_experiments(organism_names=["MED4"])
+        assert "IN $organism_names" in cypher
+        assert "e.organism_name IN $organism_names" in cypher
         # No OR against coculture_partner — that footgun is gone.
         assert "toLower(e.coculture_partner) CONTAINS word" not in cypher
-        assert params["organism"] == "MED4"
+        assert params["organism_names"] == ["MED4"]
 
     def test_organism_and_coculture_partner_compose_with_and(self):
         """organism= and coculture_partner= compose with AND, not OR."""
         cypher, params = build_list_experiments(
-            organism="MED4", coculture_partner="Alteromonas",
+            organism_names=["MED4"], coculture_partner="Alteromonas",
         )
-        assert "toLower(e.organism_name) CONTAINS word" in cypher
+        assert "e.organism_name IN $organism_names" in cypher
         assert (
             "ANY(cp IN e.coculture_partner"
             " WHERE toLower(cp) CONTAINS toLower($partner))"
@@ -3131,7 +3132,7 @@ class TestBuildListExperiments:
         # No OR anywhere — the organism predicate must not be re-OR'd, and the
         # partner predicate composes via outer AND. See spec F2.
         assert " OR " not in cypher
-        assert params["organism"] == "MED4"
+        assert params["organism_names"] == ["MED4"]
         assert params["partner"] == "Alteromonas"
 
     def test_treatment_type_filter(self):
@@ -3189,11 +3190,11 @@ class TestBuildListExperiments:
     def test_combined_filters(self):
         """Multiple filters produce AND-joined WHERE."""
         cypher, params = build_list_experiments(
-            organism="MED4", treatment_type=["coculture"], omics_type=["RNASEQ"],
+            organism_names=["MED4"], treatment_type=["coculture"], omics_type=["RNASEQ"],
         )
         assert "WHERE" in cypher
         assert " AND " in cypher
-        assert params["organism"] == "MED4"
+        assert params["organism_names"] == ["MED4"]
         assert params["treatment_types"] == ["coculture"]
         assert params["omics_types"] == ["RNASEQ"]
 
@@ -3285,10 +3286,10 @@ class TestBuildListExperiments:
     def test_table_scope_combined_with_organism(self):
         """table_scope + organism produces AND-joined WHERE."""
         cypher, params = build_list_experiments(
-            organism="MED4", table_scope=["all_detected_genes"],
+            organism_names=["MED4"], table_scope=["all_detected_genes"],
         )
         assert "e.table_scope IN $table_scopes" in cypher
-        assert "toLower($organism)" in cypher
+        assert "IN $organism_names" in cypher
         assert " AND " in cypher
 
     def test_growth_phases_filter(self):
@@ -3349,7 +3350,7 @@ class TestBuildListExperimentsExperimentIdsFilter:
 
     def test_combines_with_organism(self):
         cypher, params = build_list_experiments(
-            organism="MED4", experiment_ids=["exp_a"],
+            organism_names=["MED4"], experiment_ids=["exp_a"],
         )
         assert "e.id IN $experiment_ids" in cypher
         assert "$organism" in cypher
@@ -3383,7 +3384,7 @@ class TestBuildListExperimentsDistinctGeneCount:
 
     def test_distinct_gene_count_returned_with_filters(self):
         # Column should still be in RETURN when filters narrow the result.
-        cypher, _ = build_list_experiments(organism="MED4", verbose=True)
+        cypher, _ = build_list_experiments(organism_names=["MED4"], verbose=True)
         assert "distinct_gene_count" in cypher
 
 
@@ -3402,9 +3403,9 @@ class TestBuildListExperimentsSummary:
 
     def test_with_filters(self):
         """Filters are applied to the summary query."""
-        cypher, params = build_list_experiments_summary(organism="MED4")
-        assert "ALL(word IN split(toLower($organism)" in cypher
-        assert params["organism"] == "MED4"
+        cypher, params = build_list_experiments_summary(organism_names=["MED4"])
+        assert "IN $organism_names" in cypher
+        assert params["organism_names"] == ["MED4"]
 
     def test_search_text_fulltext(self):
         """search_text uses experimentFullText index and includes score distribution."""
@@ -3520,9 +3521,9 @@ class TestBuildListExperimentsDmRollup:
         assert "compartment" not in params
 
     def test_compartment_combines_with_organism(self):
-        cypher, params = build_list_experiments(organism="MED4", compartment="vesicle")
+        cypher, params = build_list_experiments(organism_names=["MED4"], compartment="vesicle")
         assert "e.compartment = $compartment" in cypher
-        assert "organism" in params
+        assert "organism_names" in params
         assert " AND " in cypher
 
     def test_compartment_filter_summary_builder(self):
@@ -3590,11 +3591,12 @@ class TestBuildResolveOrganismForOrganism:
         cypher, _ = build_resolve_organism_for_organism(
             organism="Meiothermus taiwanensis")
         assert "coalesce(o.name_synonyms, [])" in cypher
-        assert "toLower(syn) CONTAINS word" in cypher
+        # 2.8: synonyms join preferred_name in one lower-cased alias list.
+        assert "[o.preferred_name] + coalesce(o.name_synonyms, [])" in cypher
 
     def test_fuzzy_match(self):
         cypher, _ = build_resolve_organism_for_organism(organism="MED4")
-        assert "toLower($organism)" in cypher
+        assert "toLower(trim($organism))" in cypher
         assert "CONTAINS" in cypher
 
 
@@ -3635,11 +3637,11 @@ class TestBuildDifferentialExpressionByGeneSummaryGlobal:
     def test_organism_filter(self):
         cypher, params = (
             build_differential_expression_by_gene_summary_global(
-                organism="MED4"
+                organism_names=["MED4"]
             )
         )
-        assert "toLower($organism)" in cypher
-        assert params["organism"] == "MED4"
+        assert "IN $organism_names" in cypher
+        assert params["organism_names"] == ["MED4"]
 
     def test_locus_tags_filter(self):
         cypher, params = (
@@ -3698,7 +3700,7 @@ class TestBuildDifferentialExpressionByGeneSummaryGlobal:
     def test_combined_filters(self):
         cypher, params = (
             build_differential_expression_by_gene_summary_global(
-                organism="MED4",
+                organism_names=["MED4"],
                 locus_tags=["PMM0001"],
                 experiment_ids=["exp1"],
                 significant_only=True,
@@ -3706,7 +3708,7 @@ class TestBuildDifferentialExpressionByGeneSummaryGlobal:
         )
         assert "WHERE" in cypher
         assert "AND" in cypher
-        assert params["organism"] == "MED4"
+        assert params["organism_names"] == ["MED4"]
         assert params["locus_tags"] == ["PMM0001"]
         assert params["experiment_ids"] == ["exp1"]
 
@@ -3742,11 +3744,11 @@ class TestBuildDifferentialExpressionByGeneSummaryByExperiment:
     def test_organism_filter(self):
         cypher, params = (
             build_differential_expression_by_gene_summary_by_experiment(
-                organism="HOT1A3"
+                organism_names=["HOT1A3"]
             )
         )
-        assert "toLower($organism)" in cypher
-        assert params["organism"] == "HOT1A3"
+        assert "IN $organism_names" in cypher
+        assert params["organism_names"] == ["HOT1A3"]
 
 
 class TestBuildDifferentialExpressionByGeneSummaryDiagnostics:
@@ -3754,7 +3756,7 @@ class TestBuildDifferentialExpressionByGeneSummaryDiagnostics:
         """Without locus_tags, returns empty not_found/no_expression."""
         cypher, params = (
             build_differential_expression_by_gene_summary_diagnostics(
-                organism="MED4"
+                organism_names=["MED4"]
             )
         )
         assert "[] AS not_found" in cypher
@@ -3864,14 +3866,14 @@ class TestBuildDifferentialExpressionByGene:
 
     def test_organism_filter(self):
         cypher, params = build_differential_expression_by_gene(
-            organism="MED4"
+            organism_names=["MED4"]
         )
-        assert "toLower($organism)" in cypher
-        assert params["organism"] == "MED4"
+        assert "IN $organism_names" in cypher
+        assert params["organism_names"] == ["MED4"]
 
     def test_combined_filters(self):
         cypher, params = build_differential_expression_by_gene(
-            organism="MED4",
+            organism_names=["MED4"],
             locus_tags=["PMM0001"],
             experiment_ids=["exp1"],
             direction="up",
@@ -3879,7 +3881,7 @@ class TestBuildDifferentialExpressionByGene:
             limit=20,
         )
         assert "WHERE" in cypher
-        assert params["organism"] == "MED4"
+        assert params["organism_names"] == ["MED4"]
         assert params["locus_tags"] == ["PMM0001"]
         assert params["experiment_ids"] == ["exp1"]
         assert params["limit"] == 20
@@ -4101,14 +4103,14 @@ class TestBuildGenesByHomologGroup:
 
     def test_organisms_filter_clause(self):
         cypher, params = build_genes_by_homolog_group(
-            group_ids=["cyanorak:CK_1"], organisms=["MED4"])
-        assert "$organisms IS NULL" in cypher
-        assert params["organisms"] == ["MED4"]
+            group_ids=["cyanorak:CK_1"], organism_names=["MED4"])
+        assert "$organism_names IS NULL" in cypher
+        assert params["organism_names"] == ["MED4"]
 
     def test_no_organisms_filter(self):
         cypher, params = build_genes_by_homolog_group(
             group_ids=["cyanorak:CK_1"])
-        assert params["organisms"] is None
+        assert params["organism_names"] is None
 
     def test_returns_expected_columns(self):
         cypher, _ = build_genes_by_homolog_group(
@@ -4215,11 +4217,11 @@ class TestBuildGenesByHomologGroupByClade:
     def test_params_group_ids_and_organisms_default_none(self):
         _, params = self._build(group_ids=["cyanorak:CK_1", "eggnog:COG0592@2"])
         assert params["group_ids"] == ["cyanorak:CK_1", "eggnog:COG0592@2"]
-        assert params["organisms"] is None
+        assert params["organism_names"] is None
 
     def test_params_organisms(self):
-        _, params = self._build(group_ids=["cyanorak:CK_1"], organisms=["MED4"])
-        assert params["organisms"] == ["MED4"]
+        _, params = self._build(group_ids=["cyanorak:CK_1"], organism_names=["MED4"])
+        assert params["organism_names"] == ["MED4"]
 
     def test_keyword_only(self):
         from multiomics_explorer.kg.queries_lib import (
@@ -4236,12 +4238,12 @@ class TestBuildGenesByHomologGroupByClade:
         assert "OrganismTaxon" in cypher
 
     def test_organism_word_match_clause(self):
-        """Same organism word-match as the summary builder."""
-        cypher, _ = self._build(group_ids=["cyanorak:CK_1"], organisms=["MED4"])
-        assert "$organisms IS NULL" in cypher
-        assert "ANY(org_input IN $organisms" in cypher
-        assert "ALL(word IN split(toLower(org_input), ' ')" in cypher
-        assert "toLower(g.organism_name) CONTAINS word" in cypher
+        """Same exact-name organism filter as the summary builder (2.8)."""
+        cypher, _ = self._build(group_ids=["cyanorak:CK_1"], organism_names=["MED4"])
+        assert "$organism_names IS NULL" in cypher
+        assert "g.organism_name IN $organism_names" in cypher
+        assert "org_input" not in cypher
+        assert "CONTAINS word" not in cypher
 
     def test_groups_by_genus_and_clade(self):
         cypher, _ = self._build(group_ids=["cyanorak:CK_1"])
@@ -4268,9 +4270,9 @@ class TestBuildGenesByHomologGroupByClade:
 
     def test_denominator_ignores_organisms_filter(self):
         """organisms narrows numerators only — not inside the CALL subquery."""
-        cypher, _ = self._build(group_ids=["cyanorak:CK_1"], organisms=["MED4"])
+        cypher, _ = self._build(group_ids=["cyanorak:CK_1"], organism_names=["MED4"])
         call_body = cypher.split("CALL {", 1)[1].split("}", 1)[0]
-        assert "$organisms" not in call_body
+        assert "$organism_names" not in call_body
 
     def test_return_columns(self):
         cypher, _ = self._build(group_ids=["cyanorak:CK_1"])
@@ -4303,9 +4305,9 @@ class TestBuildGenesByHomologGroupSummary:
 
     def test_organisms_filter(self):
         cypher, params = build_genes_by_homolog_group_summary(
-            group_ids=["cyanorak:CK_1"], organisms=["MED4"])
-        assert "$organisms IS NULL" in cypher
-        assert params["organisms"] == ["MED4"]
+            group_ids=["cyanorak:CK_1"], organism_names=["MED4"])
+        assert "$organism_names IS NULL" in cypher
+        assert params["organism_names"] == ["MED4"]
 
     def test_not_found_groups_detection(self):
         cypher, _ = build_genes_by_homolog_group_summary(
@@ -4320,20 +4322,22 @@ class TestBuildGenesByHomologGroupDiagnostics:
 
     def test_returns_expected_keys(self):
         cypher, _ = build_genes_by_homolog_group_diagnostics(
-            group_ids=["cyanorak:CK_1"], organisms=["MED4"])
+            group_ids=["cyanorak:CK_1"],
+            organism_inputs=[{"input": "MED4", "names": ["Prochlorococcus MED4"]}])
         assert "not_found_organisms" in cypher
         assert "not_matched_organisms" in cypher
 
     def test_organisms_list_in_params(self):
+        oi = [{"input": "MED4", "names": ["Prochlorococcus MED4"]}]
         cypher, params = build_genes_by_homolog_group_diagnostics(
-            group_ids=["cyanorak:CK_1"], organisms=["MED4"])
-        assert params["organisms"] == ["MED4"]
+            group_ids=["cyanorak:CK_1"], organism_inputs=oi)
+        assert params["organism_inputs"] == oi
         assert params["group_ids"] == ["cyanorak:CK_1"]
 
     def test_organisms_none_in_params(self):
         cypher, params = build_genes_by_homolog_group_diagnostics(
-            group_ids=["cyanorak:CK_1"], organisms=None)
-        assert params["organisms"] is None
+            group_ids=["cyanorak:CK_1"], organism_inputs=None)
+        assert params["organism_inputs"] is None
         assert "not_found_organisms" in cypher
 
 
@@ -4375,10 +4379,10 @@ class TestBuildDifferentialExpressionByOrthologSummaryGlobal:
     def test_organisms_filter(self):
         cypher, params = build_differential_expression_by_ortholog_summary_global(
             group_ids=["cyanorak:CK_00000570"],
-            organisms=["MED4", "MIT9313"],
+            organism_names=["MED4", "MIT9313"],
         )
-        assert "$organisms" in cypher
-        assert params["organisms"] == ["MED4", "MIT9313"]
+        assert "$organism_names" in cypher
+        assert params["organism_names"] == ["MED4", "MIT9313"]
 
     def test_experiment_ids_filter(self):
         cypher, params = build_differential_expression_by_ortholog_summary_global(
@@ -4469,9 +4473,9 @@ class TestBuildDifferentialExpressionByOrthologTopExperiments:
 
     def test_filters_applied(self):
         cypher, params = build_differential_expression_by_ortholog_top_experiments(
-            group_ids=["g1"], organisms=["MED4"],
+            group_ids=["g1"], organism_names=["MED4"],
         )
-        assert "$organisms" in cypher
+        assert "$organism_names" in cypher
 
 
 class TestBuildDifferentialExpressionByOrthologResults:
@@ -4559,10 +4563,10 @@ class TestBuildDifferentialExpressionByOrthologMembershipCounts:
 
     def test_organism_filter(self):
         cypher, params = build_differential_expression_by_ortholog_membership_counts(
-            group_ids=["g1"], organisms=["MED4"],
+            group_ids=["g1"], organism_names=["MED4"],
         )
-        assert "$organisms" in cypher
-        assert params["organisms"] == ["MED4"]
+        assert "$organism_names" in cypher
+        assert params["organism_names"] == ["MED4"]
 
     def test_no_expression_edges(self):
         """Membership counts should not reference expression edges."""
@@ -4584,7 +4588,7 @@ class TestBuildDifferentialExpressionByOrthologDiagnostics:
 
     def test_organisms_returns_queries(self):
         result = build_differential_expression_by_ortholog_diagnostics(
-            group_ids=["g1"], organisms=["MED4"],
+            group_ids=["g1"], organism_inputs=[{"input": "MED4", "names": ["Prochlorococcus MED4"]}],
         )
         assert result is not None
         assert isinstance(result, list)
@@ -4601,7 +4605,7 @@ class TestBuildDifferentialExpressionByOrthologDiagnostics:
         """Combined organisms + experiment_ids must not produce double WHERE."""
         result = build_differential_expression_by_ortholog_diagnostics(
             group_ids=["g1"],
-            organisms=["MED4"],
+            organism_inputs=[{"input": "MED4", "names": ["Prochlorococcus MED4"]}],
             experiment_ids=["EXP001"],
             direction="up",
         )
@@ -4620,7 +4624,7 @@ class TestBuildDifferentialExpressionByOrthologDiagnostics:
     def test_direction_forwarded_to_diagnostics(self):
         """Direction filter must appear in diagnostic Cypher."""
         result = build_differential_expression_by_ortholog_diagnostics(
-            group_ids=["g1"], organisms=["MED4"], direction="up",
+            group_ids=["g1"], organism_inputs=[{"input": "MED4", "names": ["Prochlorococcus MED4"]}], direction="up",
         )
         assert result is not None
         cypher, _ = result[0]
@@ -4803,10 +4807,10 @@ class TestClusteringAnalysisWhere:
 
     def test_organism_filter(self):
         from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
-        conditions, params = _clustering_analysis_where(organism="MED4")
+        conditions, params = _clustering_analysis_where(organism_names=["MED4"])
         assert len(conditions) == 1
         assert "organism_name" in conditions[0].lower()
-        assert params["organism"] == "MED4"
+        assert params["organism_names"] == ["MED4"]
 
     def test_cluster_type_filter(self):
         from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
@@ -4859,7 +4863,7 @@ class TestClusteringAnalysisWhere:
     def test_combined_filters(self):
         from multiomics_explorer.kg.queries_lib import _clustering_analysis_where
         conditions, params = _clustering_analysis_where(
-            organism="MED4", cluster_type="condition_comparison",
+            organism_names=["MED4"], cluster_type="condition_comparison",
             treatment_type=["nitrogen_stress"], omics_type=["MICROARRAY"],
             background_factors=["axenic"],
         )
@@ -4893,9 +4897,9 @@ class TestBuildListClusteringAnalysesSummary:
 
     def test_with_organism_filter(self):
         from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses_summary
-        cypher, params = build_list_clustering_analyses_summary(organism="MED4")
+        cypher, params = build_list_clustering_analyses_summary(organism_names=["MED4"])
         assert "WHERE" in cypher
-        assert params["organism"] == "MED4"
+        assert params["organism_names"] == ["MED4"]
 
     def test_with_publication_doi_filter(self):
         from multiomics_explorer.kg.queries_lib import build_list_clustering_analyses_summary
@@ -5181,9 +5185,9 @@ class TestBuildGenesInClusterSummary:
         from multiomics_explorer.kg.queries_lib import build_genes_in_cluster_summary
         cypher, params = build_genes_in_cluster_summary(
             cluster_ids=["cluster:msb4100087:med4:up_n_transport"],
-            organism="MED4")
+            organism_names=["MED4"])
         assert "organism" in cypher.lower()
-        assert params["organism"] == "MED4"
+        assert params["organism_names"] == ["MED4"]
 
     def test_analysis_id_mode(self):
         from multiomics_explorer.kg.queries_lib import build_genes_in_cluster_summary
@@ -5796,27 +5800,27 @@ class TestDEGrowthPhases:
     def test_de_by_gene_growth_phases_filter(self):
         """Edge-level growth_phases filter on r.growth_phase."""
         cypher, params = build_differential_expression_by_gene(
-            organism="MED4", growth_phases=["exponential"]
+            organism_names=["MED4"], growth_phases=["exponential"]
         )
         assert "r.growth_phase" in cypher
         assert params["growth_phases"] == ["exponential"]
 
     def test_de_by_gene_returns_growth_phase(self):
         """Returns growth_phase column from edge."""
-        cypher, _ = build_differential_expression_by_gene(organism="MED4")
+        cypher, _ = build_differential_expression_by_gene(organism_names=["MED4"])
         assert "r.growth_phase AS growth_phase" in cypher
 
     def test_de_by_gene_summary_global_rows_by_growth_phase(self):
         """Summary includes rows_by_growth_phase."""
         cypher, _ = build_differential_expression_by_gene_summary_global(
-            organism="MED4"
+            organism_names=["MED4"]
         )
         assert "rows_by_growth_phase" in cypher
 
     def test_de_by_gene_summary_by_experiment_growth_phase(self):
         """Per-experiment summary includes growth_phase at timepoint level."""
         cypher, _ = build_differential_expression_by_gene_summary_by_experiment(
-            organism="MED4"
+            organism_names=["MED4"]
         )
         assert "growth_phase" in cypher
 
@@ -5908,20 +5912,20 @@ class TestDETreatmentBackgroundFilters:
 
     def test_de_by_gene_detail_treatment_type_filter(self):
         cypher, params = build_differential_expression_by_gene(
-            organism="MED4", treatment_type=["diel"]
+            organism_names=["MED4"], treatment_type=["diel"]
         )
         assert "toLower(t) IN $treatment_types" in cypher
         assert params["treatment_types"] == ["diel"]
 
     def test_de_by_gene_detail_background_factors_filter(self):
         cypher, params = build_differential_expression_by_gene(
-            organism="MED4", background_factors=["axenic"]
+            organism_names=["MED4"], background_factors=["axenic"]
         )
         assert "toLower(bf) IN $background_factors" in cypher
         assert params["background_factors"] == ["axenic"]
 
     def test_de_by_gene_detail_none_no_filter(self):
-        cypher, _ = build_differential_expression_by_gene(organism="MED4")
+        cypher, _ = build_differential_expression_by_gene(organism_names=["MED4"])
         assert "$treatment_types" not in cypher
         assert "$background_factors" not in cypher
 
@@ -6015,7 +6019,7 @@ class TestDETreatmentBackgroundFilters:
 
     def test_de_by_ortholog_diagnostics_threads_filters(self):
         queries = build_differential_expression_by_ortholog_diagnostics(
-            group_ids=["OG1"], organisms=["MED4"], experiment_ids=["exp1"],
+            group_ids=["OG1"], organism_inputs=[{"input": "MED4", "names": ["Prochlorococcus MED4"]}], experiment_ids=["exp1"],
             treatment_type=["diel"], background_factors=["axenic"],
         )
         assert queries is not None and len(queries) == 2
@@ -6037,11 +6041,11 @@ class TestListDerivedMetricsWhere:
 
     def test_organism_space_split_contains(self):
         from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
-        conditions, params = _list_derived_metrics_where(organism="MED4")
+        conditions, params = _list_derived_metrics_where(organism_names=["MED4"])
         assert len(conditions) == 1
-        assert "ALL(word IN split(toLower($organism), ' ')" in conditions[0]
-        assert "toLower(dm.organism_name) CONTAINS word" in conditions[0]
-        assert params == {"organism": "MED4"}
+        assert "IN $organism_names" in conditions[0]
+        assert "dm.organism_name IN $organism_names" in conditions[0]
+        assert params == {"organism_names": ["MED4"]}
 
     def test_metric_types_list(self):
         from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
@@ -6139,9 +6143,9 @@ class TestListDerivedMetricsWhere:
     def test_combined_filters(self):
         from multiomics_explorer.kg.queries_lib import _list_derived_metrics_where
         conditions, params = _list_derived_metrics_where(
-            organism="NATL2A", value_kind="boolean", rankable=False)
+            organism_names=["NATL2A"], value_kind="boolean", rankable=False)
         assert len(conditions) == 3
-        assert params.keys() == {"organism", "value_kind", "rankable_str"}
+        assert params.keys() == {"organism_names", "value_kind", "rankable_str"}
 
 
 class TestBuildListDerivedMetricsSummary:
@@ -6191,12 +6195,12 @@ class TestBuildListDerivedMetricsSummary:
     def test_shares_where_clause(self):
         from multiomics_explorer.kg.queries_lib import build_list_derived_metrics_summary
         cypher, params = build_list_derived_metrics_summary(
-            organism="MED4", value_kind="numeric", rankable=True)
+            organism_names=["MED4"], value_kind="numeric", rankable=True)
         assert "WHERE" in cypher
         assert "dm.value_kind = $value_kind" in cypher
         assert "dm.rankable = $rankable_str" in cypher
         assert params == {
-            "organism": "MED4",
+            "organism_names": ["MED4"],
             "value_kind": "numeric",
             "rankable_str": "rankable",
         }
@@ -6212,7 +6216,7 @@ class TestBuildListDerivedMetricsSummary:
     def test_search_text_with_filters(self):
         from multiomics_explorer.kg.queries_lib import build_list_derived_metrics_summary
         cypher, params = build_list_derived_metrics_summary(
-            search_text="diel", organism="MED4", value_kind="numeric")
+            search_text="diel", organism_names=["MED4"], value_kind="numeric")
         # Both fulltext MATCH and WHERE present
         assert (
             "CALL db.index.fulltext.queryNodes('derivedMetricFullText', $search_text)"
@@ -6225,7 +6229,7 @@ class TestBuildListDerivedMetricsSummary:
         # Score columns only when search_text — present here
         assert "score_max" in cypher
         assert "score_median" in cypher
-        assert params == {"search_text": "diel", "organism": "MED4", "value_kind": "numeric"}
+        assert params == {"search_text": "diel", "organism_names": ["MED4"], "value_kind": "numeric"}
 
 
 class TestBuildGeneDerivedMetricsSummary:
@@ -6583,12 +6587,12 @@ class TestBuildListDerivedMetrics:
     def test_combined_filters(self):
         from multiomics_explorer.kg.queries_lib import build_list_derived_metrics
         cypher, params = build_list_derived_metrics(
-            organism="NATL2A", value_kind="boolean", rankable=False, limit=10)
+            organism_names=["NATL2A"], value_kind="boolean", rankable=False, limit=10)
         assert "WHERE" in cypher
         assert "dm.value_kind = $value_kind" in cypher
         assert "dm.rankable = $rankable_str" in cypher
         assert params == {
-            "organism": "NATL2A",
+            "organism_names": ["NATL2A"],
             "value_kind": "boolean",
             "rankable_str": "not_rankable",
             "limit": 10,
@@ -7936,7 +7940,7 @@ class TestBuildGenesByMetaboliteMetabolism:
             build_genes_by_metabolite_metabolism,
         )
         kwargs.setdefault("metabolite_ids", self._METS)
-        kwargs.setdefault("organism", self._ORG)
+        kwargs.setdefault("organism_names", [self._ORG])
         return build_genes_by_metabolite_metabolism(**kwargs)
 
     def test_match_path_metabolism_arm(self):
@@ -7956,11 +7960,11 @@ class TestBuildGenesByMetaboliteMetabolism:
     def test_organism_fuzzy_word_match_in_where(self):
         """Mirrors the differential_expression_by_gene fuzzy organism match."""
         cypher, params = self._build()
-        assert "split(toLower($organism), ' ')" in cypher
-        assert "toLower(g.organism_name) CONTAINS word" in cypher
+        assert "split(toLower($organism)" not in cypher
+        assert "g.organism_name IN $organism_names" in cypher
         # Wrapped in ALL(...) so all input words must be present
-        assert "ALL(word IN split" in cypher
-        assert params["organism"] == self._ORG
+        assert "ALL(word IN split" not in cypher
+        assert params["organism_names"] == [self._ORG]
 
     def test_ec_numbers_filter(self):
         cypher, params = self._build(ec_numbers=["6.3.1.2"])
@@ -8069,7 +8073,7 @@ class TestBuildGenesByMetaboliteTransport:
             build_genes_by_metabolite_transport,
         )
         kwargs.setdefault("metabolite_ids", self._METS)
-        kwargs.setdefault("organism", self._ORG)
+        kwargs.setdefault("organism_names", [self._ORG])
         return build_genes_by_metabolite_transport(**kwargs)
 
     def test_match_path_transport_arm(self):
@@ -8087,9 +8091,9 @@ class TestBuildGenesByMetaboliteTransport:
 
     def test_organism_fuzzy_word_match_in_where(self):
         cypher, params = self._build()
-        assert "split(toLower($organism), ' ')" in cypher
-        assert "toLower(g.organism_name) CONTAINS word" in cypher
-        assert params["organism"] == self._ORG
+        assert "split(toLower($organism)" not in cypher
+        assert "g.organism_name IN $organism_names" in cypher
+        assert params["organism_names"] == [self._ORG]
 
     def test_metabolite_pathway_ids_filter(self):
         cypher, params = self._build(
@@ -8123,13 +8127,13 @@ class TestBuildGenesByMetaboliteTransport:
         with pytest.raises(TypeError):
             build_genes_by_metabolite_transport(
                 metabolite_ids=self._METS,
-                organism=self._ORG,
+                organism_names=[self._ORG],
                 ec_numbers=["6.3.1.2"],
             )
         with pytest.raises(TypeError):
             build_genes_by_metabolite_transport(
                 metabolite_ids=self._METS,
-                organism=self._ORG,
+                organism_names=[self._ORG],
                 mass_balance="balanced",
             )
 
@@ -8199,7 +8203,7 @@ class TestBuildGenesByMetaboliteSummary:
             build_genes_by_metabolite_summary,
         )
         kwargs.setdefault("metabolite_ids", self._METS)
-        kwargs.setdefault("organism", self._ORG)
+        kwargs.setdefault("organism_names", [self._ORG])
         return build_genes_by_metabolite_summary(**kwargs)
 
     def test_unioned_match_paths_present(self):
@@ -8241,8 +8245,9 @@ class TestBuildGenesByMetaboliteSummary:
 
     def test_organism_fuzzy_match_in_params(self):
         cypher, params = self._build()
-        assert "split(toLower($organism), ' ')" in cypher
-        assert params["organism"] == self._ORG
+        assert "split(toLower($organism)" not in cypher
+        assert "g.organism_name IN $organism_names" in cypher
+        assert params["organism_names"] == [self._ORG]
 
     def test_metabolism_only_filters_propagate_to_metabolism_arm(self):
         """ec_numbers / mass_balance reach the WHERE block — and only the
@@ -8314,7 +8319,7 @@ class TestBuildMetabolitesByGeneMetabolism:
             build_metabolites_by_gene_metabolism,
         )
         kwargs.setdefault("locus_tags", self._LOCUS)
-        kwargs.setdefault("organism", self._ORG)
+        kwargs.setdefault("organism_names", [self._ORG])
         return build_metabolites_by_gene_metabolism(**kwargs)
 
     def test_match_path_metabolism_arm(self):
@@ -8335,11 +8340,11 @@ class TestBuildMetabolitesByGeneMetabolism:
     def test_organism_fuzzy_word_match_in_where(self):
         """Mirrors the differential_expression_by_gene + GBM fuzzy organism match."""
         cypher, params = self._build()
-        assert "split(toLower($organism), ' ')" in cypher
-        assert "toLower(g.organism_name) CONTAINS word" in cypher
+        assert "split(toLower($organism)" not in cypher
+        assert "g.organism_name IN $organism_names" in cypher
         # All input words must match
-        assert "ALL(word IN split" in cypher
-        assert params["organism"] == self._ORG
+        assert "ALL(word IN split" not in cypher
+        assert params["organism_names"] == [self._ORG]
 
     def test_ec_numbers_filter(self):
         cypher, params = self._build(ec_numbers=["3.5.1.5"])
@@ -8488,7 +8493,7 @@ class TestBuildMetabolitesByGeneTransport:
             build_metabolites_by_gene_transport,
         )
         kwargs.setdefault("locus_tags", self._LOCUS)
-        kwargs.setdefault("organism", self._ORG)
+        kwargs.setdefault("organism_names", [self._ORG])
         return build_metabolites_by_gene_transport(**kwargs)
 
     def test_match_path_transport_arm(self):
@@ -8506,9 +8511,9 @@ class TestBuildMetabolitesByGeneTransport:
 
     def test_organism_fuzzy_word_match_in_where(self):
         cypher, params = self._build()
-        assert "split(toLower($organism), ' ')" in cypher
-        assert "toLower(g.organism_name) CONTAINS word" in cypher
-        assert params["organism"] == self._ORG
+        assert "split(toLower($organism)" not in cypher
+        assert "g.organism_name IN $organism_names" in cypher
+        assert params["organism_names"] == [self._ORG]
 
     def test_metabolite_pathway_ids_filter(self):
         cypher, params = self._build(
@@ -8557,13 +8562,13 @@ class TestBuildMetabolitesByGeneTransport:
         with pytest.raises(TypeError):
             build_metabolites_by_gene_transport(
                 locus_tags=self._LOCUS,
-                organism=self._ORG,
+                organism_names=[self._ORG],
                 ec_numbers=["3.5.1.5"],
             )
         with pytest.raises(TypeError):
             build_metabolites_by_gene_transport(
                 locus_tags=self._LOCUS,
-                organism=self._ORG,
+                organism_names=[self._ORG],
                 mass_balance="balanced",
             )
 
@@ -8635,7 +8640,7 @@ class TestBuildMetabolitesByGeneSummary:
             build_metabolites_by_gene_summary,
         )
         kwargs.setdefault("locus_tags", self._LOCUS)
-        kwargs.setdefault("organism", self._ORG)
+        kwargs.setdefault("organism_names", [self._ORG])
         return build_metabolites_by_gene_summary(**kwargs)
 
     def test_unioned_match_paths_present(self):
@@ -8682,8 +8687,9 @@ class TestBuildMetabolitesByGeneSummary:
 
     def test_organism_fuzzy_match_in_params(self):
         cypher, params = self._build()
-        assert "split(toLower($organism), ' ')" in cypher
-        assert params["organism"] == self._ORG
+        assert "split(toLower($organism)" not in cypher
+        assert "g.organism_name IN $organism_names" in cypher
+        assert params["organism_names"] == [self._ORG]
 
     def test_metabolism_only_filters_propagate_to_metabolism_arm(self):
         """ec_numbers / mass_balance reach only the metabolism arm WHERE."""
@@ -9807,7 +9813,7 @@ class TestBuildMetabolitesByGeneSummaryPhase2TopMetabolitePathways:
             build_metabolites_by_gene_summary,
         )
         kwargs.setdefault("locus_tags", self._LOCUS)
-        kwargs.setdefault("organism", self._ORG)
+        kwargs.setdefault("organism_names", [self._ORG])
         return build_metabolites_by_gene_summary(**kwargs)
 
     def test_top_metabolite_pathways_alias(self):
@@ -9913,7 +9919,7 @@ class TestBuildGenesByMetaboliteMetabolismPhase2ExcludeMetaboliteIds:
             build_genes_by_metabolite_metabolism,
         )
         kwargs.setdefault("metabolite_ids", self._METS)
-        kwargs.setdefault("organism", self._ORG)
+        kwargs.setdefault("organism_names", [self._ORG])
         return build_genes_by_metabolite_metabolism(**kwargs)
 
     def test_exclude_metabolite_ids_filter(self):
@@ -9943,7 +9949,7 @@ class TestBuildGenesByMetaboliteTransportPhase2ExcludeMetaboliteIds:
             build_genes_by_metabolite_transport,
         )
         kwargs.setdefault("metabolite_ids", self._METS)
-        kwargs.setdefault("organism", self._ORG)
+        kwargs.setdefault("organism_names", [self._ORG])
         return build_genes_by_metabolite_transport(**kwargs)
 
     def test_exclude_metabolite_ids_filter(self):
@@ -9974,7 +9980,7 @@ class TestBuildGenesByMetaboliteSummaryPhase2ExcludeMetaboliteIds:
             build_genes_by_metabolite_summary,
         )
         kwargs.setdefault("metabolite_ids", self._METS)
-        kwargs.setdefault("organism", self._ORG)
+        kwargs.setdefault("organism_names", [self._ORG])
         return build_genes_by_metabolite_summary(**kwargs)
 
     def test_exclude_metabolite_ids_filter(self):
@@ -10007,7 +10013,7 @@ class TestBuildMetabolitesByGeneMetabolismPhase2ExcludeMetaboliteIds:
             build_metabolites_by_gene_metabolism,
         )
         kwargs.setdefault("locus_tags", self._LOCUS)
-        kwargs.setdefault("organism", self._ORG)
+        kwargs.setdefault("organism_names", [self._ORG])
         return build_metabolites_by_gene_metabolism(**kwargs)
 
     def test_exclude_metabolite_ids_filter(self):
@@ -10037,7 +10043,7 @@ class TestBuildMetabolitesByGeneTransportPhase2ExcludeMetaboliteIds:
             build_metabolites_by_gene_transport,
         )
         kwargs.setdefault("locus_tags", self._LOCUS)
-        kwargs.setdefault("organism", self._ORG)
+        kwargs.setdefault("organism_names", [self._ORG])
         return build_metabolites_by_gene_transport(**kwargs)
 
     def test_exclude_metabolite_ids_filter(self):
@@ -10068,7 +10074,7 @@ class TestBuildMetabolitesByGeneSummaryPhase2ExcludeMetaboliteIds:
             build_metabolites_by_gene_summary,
         )
         kwargs.setdefault("locus_tags", self._LOCUS)
-        kwargs.setdefault("organism", self._ORG)
+        kwargs.setdefault("organism_names", [self._ORG])
         return build_metabolites_by_gene_summary(**kwargs)
 
     def test_exclude_metabolite_ids_filter(self):
@@ -10154,11 +10160,11 @@ class TestListMetaboliteAssaysWhere:
 
     def test_organism_space_split_contains(self):
         from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
-        conditions, params = _list_metabolite_assays_where(organism="MIT9301")
+        conditions, params = _list_metabolite_assays_where(organism_names=["MIT9301"])
         assert len(conditions) == 1
-        assert "ALL(word IN split(toLower($organism), ' ')" in conditions[0]
-        assert "toLower(a.organism_name) CONTAINS word" in conditions[0]
-        assert params == {"organism": "MIT9301"}
+        assert "IN $organism_names" in conditions[0]
+        assert "a.organism_name IN $organism_names" in conditions[0]
+        assert params == {"organism_names": ["MIT9301"]}
 
     def test_metric_types_list(self):
         from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
@@ -10266,9 +10272,9 @@ class TestListMetaboliteAssaysWhere:
     def test_combined_filters(self):
         from multiomics_explorer.kg.queries_lib import _list_metabolite_assays_where
         conditions, params = _list_metabolite_assays_where(
-            organism="MIT9301", value_kind="boolean", rankable=False)
+            organism_names=["MIT9301"], value_kind="boolean", rankable=False)
         assert len(conditions) == 3
-        assert params.keys() == {"organism", "value_kind", "rankable_str"}
+        assert params.keys() == {"organism_names", "value_kind", "rankable_str"}
 
 
 class TestBuildListMetaboliteAssaysSummary:
@@ -10304,10 +10310,10 @@ class TestBuildListMetaboliteAssaysSummary:
 
     def test_with_organism_adds_where(self):
         from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays_summary
-        cypher, params = build_list_metabolite_assays_summary(organism="MIT9313")
-        assert "WHERE ALL(word IN split(toLower($organism), ' ')" in cypher
-        assert "toLower(a.organism_name) CONTAINS word" in cypher
-        assert params == {"organism": "MIT9313"}
+        cypher, params = build_list_metabolite_assays_summary(organism_names=["MIT9313"])
+        assert "ALL(word IN split(" not in cypher
+        assert "a.organism_name IN $organism_names" in cypher
+        assert params == {"organism_names": ["MIT9313"]}
 
     def test_search_text_uses_fulltext_index(self):
         from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays_summary
@@ -10333,9 +10339,9 @@ class TestBuildListMetaboliteAssaysSummary:
             _list_metabolite_assays_where,
         )
         cypher, params = build_list_metabolite_assays_summary(
-            organism="MIT9301", rankable=True, value_kind="numeric")
+            organism_names=["MIT9301"], rankable=True, value_kind="numeric")
         helper_conds, helper_params = _list_metabolite_assays_where(
-            organism="MIT9301", rankable=True, value_kind="numeric")
+            organism_names=["MIT9301"], rankable=True, value_kind="numeric")
         for cond in helper_conds:
             assert cond in cypher
         assert params == helper_params
@@ -10428,13 +10434,13 @@ class TestBuildListMetaboliteAssays:
     def test_filters_through_helper(self):
         from multiomics_explorer.kg.queries_lib import build_list_metabolite_assays
         cypher, params = build_list_metabolite_assays(
-            organism="MIT9313", value_kind="numeric", rankable=True)
+            organism_names=["MIT9313"], value_kind="numeric", rankable=True)
         assert "WHERE" in cypher
         assert "a.value_kind = $value_kind" in cypher
         assert "a.rankable = $rankable_str" in cypher
         assert params["value_kind"] == "numeric"
         assert params["rankable_str"] == "rankable"
-        assert params["organism"] == "MIT9313"
+        assert params["organism_names"] == ["MIT9313"]
 
     def test_rankable_returned_as_bool_via_string_compare(self):
         """Per Phase 5 D4: per-row rankable is bool, derived from string compare."""
@@ -10467,10 +10473,12 @@ class TestMetabolitesByQuantifiesAssayWhere:
         assert params == {}
 
     def test_organism_contains_lowercased(self):
+        """2.8: exact canonical names (no lowering, no CONTAINS)."""
         from multiomics_explorer.kg.queries_lib import _metabolites_by_quantifies_assay_where
-        conditions, params = _metabolites_by_quantifies_assay_where(organism="MIT9313")
-        assert any("toLower(a.organism_name) CONTAINS" in c for c in conditions)
-        assert params == {"organism": "mit9313"}
+        conditions, params = _metabolites_by_quantifies_assay_where(organism_names=["MIT9313"])
+        assert any("a.organism_name IN $organism_names" in c for c in conditions)
+        assert not any("CONTAINS" in c for c in conditions)
+        assert params == {"organism_names": ["MIT9313"]}
 
     def test_metabolite_ids_in_list(self):
         from multiomics_explorer.kg.queries_lib import _metabolites_by_quantifies_assay_where
@@ -10597,9 +10605,9 @@ class TestBuildMetabolitesByQuantifiesAssayDiagnostics:
     def test_organism_filter_passes_through(self):
         from multiomics_explorer.kg.queries_lib import build_metabolites_by_quantifies_assay_diagnostics
         cypher, params = build_metabolites_by_quantifies_assay_diagnostics(
-            assay_ids=["a1"], organism="MIT9313")
-        assert "toLower(a.organism_name) CONTAINS" in cypher
-        assert "mit9313" in str(params).lower()
+            assay_ids=["a1"], organism_names=["MIT9313"])
+        assert "a.organism_name IN $organism_names" in cypher
+        assert params["organism_names"] == ["MIT9313"]
 
 
 class TestBuildMetaboliteAssayKindLookup:
@@ -10819,8 +10827,8 @@ class TestBuildAssaysByMetabolite:
     def test_organism_filter(self):
         from multiomics_explorer.kg.queries_lib import build_assays_by_metabolite
         cypher, params = build_assays_by_metabolite(
-            metabolite_ids=["kegg.compound:C00074"], organism="MIT9313")
-        assert params.get("organism") == "mit9313"
+            metabolite_ids=["kegg.compound:C00074"], organism_names=["MIT9313"])
+        assert params.get("organism_names") == ["MIT9313"]
 
 
 class TestEdgePropColumnHelper:
@@ -13348,7 +13356,7 @@ def _order_by_clause(cypher: str) -> str:
 
 
 class TestPagedOrderByUniqueKey:
-    _MBG = dict(locus_tags=["PMM0331"], organism="Prochlorococcus MED4",
+    _MBG = dict(locus_tags=["PMM0331"], organism_names=["Prochlorococcus MED4"],
                 limit=10, offset=10)
 
     @pytest.mark.parametrize(
@@ -13398,7 +13406,7 @@ class TestBuildMetabolitesByGeneNoFormulaCount:
             build_metabolites_by_gene_no_formula_count,
         )
         kwargs.setdefault("locus_tags", self._LOCUS)
-        kwargs.setdefault("organism", self._ORG)
+        kwargs.setdefault("organism_names", [self._ORG])
         return build_metabolites_by_gene_no_formula_count(**kwargs)
 
     def test_both_arms_present_by_default(self):
@@ -13434,9 +13442,10 @@ class TestBuildMetabolitesByGeneNoFormulaCount:
     def test_locus_and_organism_forwarded(self):
         cypher, params = self._build(metabolite_elements=["N"])
         assert "g.locus_tag IN $locus_tags" in cypher
-        assert "split(toLower($organism), ' ')" in cypher
+        assert "split(toLower($organism)" not in cypher
+        assert "g.organism_name IN $organism_names" in cypher
         assert params["locus_tags"] == self._LOCUS
-        assert params["organism"] == self._ORG
+        assert params["organism_names"] == [self._ORG]
 
     def test_shared_filters_forwarded(self):
         cypher, params = self._build(
@@ -13641,7 +13650,7 @@ class TestBuildListExperimentsCocultureRole:
 
     def test_where_no_role_no_param(self):
         from multiomics_explorer.kg.queries_lib import _list_experiments_where
-        where, params = _list_experiments_where(organism="MED4")
+        where, params = _list_experiments_where(organism_names=["MED4"])
         assert "coculture_role" not in params
         assert "$coculture_role" not in where
         assert "Tests_coculture_with" not in where
@@ -14227,7 +14236,7 @@ class TestBuildMetabolitesByGeneSummaryStereoLinked:
             build_metabolites_by_gene_summary,
         )
         kwargs.setdefault("locus_tags", ["PMM0963"])
-        kwargs.setdefault("organism", "Prochlorococcus MED4")
+        kwargs.setdefault("organism_names", ["Prochlorococcus MED4"])
         return build_metabolites_by_gene_summary(**kwargs)
 
     @pytest.mark.parametrize("arms", [
@@ -14237,7 +14246,7 @@ class TestBuildMetabolitesByGeneSummaryStereoLinked:
         cypher, params = self._build(arms=arms)
         ret = cypher[cypher.rfind("RETURN"):]
         assert "stereo_linked_metabolite_ids" in ret
-        assert set(params) == {"locus_tags", "organism"}
+        assert set(params) == {"locus_tags", "organism_names"}
 
     def test_exists_stereo_form_edge(self):
         cypher, _ = self._build()
@@ -14280,10 +14289,10 @@ class TestBuildListExperimentsControlTiming:
 
     def test_control_timing_combined_with_organism(self):
         cypher, params = build_list_experiments(
-            organism="MED4", control_timing=["matched"],
+            organism_names=["MED4"], control_timing=["matched"],
         )
         assert "e.control_timing IN $control_timings" in cypher
-        assert "toLower($organism)" in cypher
+        assert "IN $organism_names" in cypher
         assert " AND " in cypher
         assert params["control_timings"] == ["matched"]
 
@@ -14315,31 +14324,31 @@ class TestBuildDifferentialExpressionByGeneControlTiming:
     (compact) + control_timing / design_notes in the per-experiment map."""
 
     def test_detail_compact_returns_control_timing(self):
-        cypher, _ = build_differential_expression_by_gene(organism="MED4")
+        cypher, _ = build_differential_expression_by_gene(organism_names=["MED4"])
         assert "e.control_timing AS control_timing" in cypher
 
     def test_detail_verbose_returns_control_timing_once(self):
         cypher, _ = build_differential_expression_by_gene(
-            organism="MED4", verbose=True,
+            organism_names=["MED4"], verbose=True,
         )
         assert cypher.count("e.control_timing AS control_timing") == 1
 
     def test_detail_does_not_return_design_notes(self):
         """design_notes lives on the experiments[] envelope, not per row."""
         cypher, _ = build_differential_expression_by_gene(
-            organism="MED4", verbose=True,
+            organism_names=["MED4"], verbose=True,
         )
         assert "design_notes" not in cypher
 
     def test_summary_by_experiment_map_has_control_timing(self):
         cypher, _ = build_differential_expression_by_gene_summary_by_experiment(
-            organism="MED4",
+            organism_names=["MED4"],
         )
         assert "control_timing: e.control_timing" in cypher
 
     def test_summary_by_experiment_map_has_design_notes(self):
         cypher, _ = build_differential_expression_by_gene_summary_by_experiment(
-            organism="MED4",
+            organism_names=["MED4"],
         )
         assert "design_notes: e.design_notes" in cypher
 
@@ -14391,7 +14400,7 @@ class TestBuildGoTransportArm:
             build_genes_by_metabolite_go_transport,
         )
         kwargs.setdefault("metabolite_ids", ["kegg.compound:C00086"])
-        kwargs.setdefault("organism", "Prochlorococcus MED4")
+        kwargs.setdefault("organism_names", ["Prochlorococcus MED4"])
         return build_genes_by_metabolite_go_transport(**kwargs)
 
     def _mbg(self, **kwargs):
@@ -14399,7 +14408,7 @@ class TestBuildGoTransportArm:
             build_metabolites_by_gene_go_transport,
         )
         kwargs.setdefault("locus_tags", ["PMM0970"])
-        kwargs.setdefault("organism", "Prochlorococcus MED4")
+        kwargs.setdefault("organism_names", ["Prochlorococcus MED4"])
         return build_metabolites_by_gene_go_transport(**kwargs)
 
     def test_gbm_go_transport_builder_walks_both_edge_types(self):
@@ -14519,7 +14528,7 @@ class TestBuildTransportArmRoleEdge:
             build_genes_by_metabolite_transport,
         )
         cypher, _ = build_genes_by_metabolite_transport(
-            metabolite_ids=["chebi.role:26672"], organism="Prochlorococcus MED4"
+            metabolite_ids=["chebi.role:26672"], organism_names=["Prochlorococcus MED4"]
         )
         assert "Tcdb_family_transports_chemical_role" in cypher
         assert "(m:Metabolite|ChemicalRole)" in cypher
@@ -14531,7 +14540,7 @@ class TestBuildTransportArmRoleEdge:
             build_metabolites_by_gene_transport,
         )
         cypher, _ = build_metabolites_by_gene_transport(
-            locus_tags=["PMM0097"], organism="Prochlorococcus MED4"
+            locus_tags=["PMM0097"], organism_names=["Prochlorococcus MED4"]
         )
         assert "Tcdb_family_transports_chemical_role" in cypher
         assert "(m:Metabolite|ChemicalRole)" in cypher
@@ -14544,10 +14553,10 @@ class TestBuildTransportArmRoleEdge:
         )
         c1, _ = build_genes_by_metabolite_metabolism(
             metabolite_ids=["kegg.compound:C00086"],
-            organism="Prochlorococcus MED4",
+            organism_names=["Prochlorococcus MED4"],
         )
         c2, _ = build_metabolites_by_gene_metabolism(
-            locus_tags=["PMM0970"], organism="Prochlorococcus MED4"
+            locus_tags=["PMM0970"], organism_names=["Prochlorococcus MED4"]
         )
         for c in (c1, c2):
             assert "null AS go_term_id" in c
@@ -14562,7 +14571,7 @@ class TestBuildGoTransportSummaries:
         )
         cypher, _ = build_genes_by_metabolite_summary(
             metabolite_ids=["kegg.compound:C00086"],
-            organism="Prochlorococcus MED4",
+            organism_names=["Prochlorococcus MED4"],
             arms=("metabolism", "transport", "go_transport"),
             include_ancestors=True,
         )
@@ -14579,7 +14588,7 @@ class TestBuildGoTransportSummaries:
         )
         cypher, _ = build_genes_by_metabolite_summary(
             metabolite_ids=["kegg.compound:C00086"],
-            organism="Prochlorococcus MED4",
+            organism_names=["Prochlorococcus MED4"],
         )
         assert "Molecular_function_transports_metabolite" not in cypher
         assert "rows_by_go_term_depth" in cypher
@@ -14590,7 +14599,7 @@ class TestBuildGoTransportSummaries:
         )
         cypher, _ = build_metabolites_by_gene_summary(
             locus_tags=["PMM0970"],
-            organism="Prochlorococcus MED4",
+            organism_names=["Prochlorococcus MED4"],
             arms=("metabolism", "transport", "go_transport"),
             include_ancestors=True,
         )
@@ -14605,7 +14614,7 @@ class TestBuildGoTransportSummaries:
         )
         cypher, _ = build_metabolites_by_gene_no_formula_count(
             locus_tags=["PMM0970"],
-            organism="Prochlorococcus MED4",
+            organism_names=["Prochlorococcus MED4"],
             arms=("metabolism", "transport", "go_transport"),
             include_ancestors=True,
         )
@@ -14762,7 +14771,7 @@ class TestGoTransportWhereGoFilters:
             _genes_by_metabolite_go_transport_where,
         )
         kw.setdefault("metabolite_ids", ["kegg.compound:C00086"])
-        kw.setdefault("organism", "Prochlorococcus MED4")
+        kw.setdefault("organism_names", ["Prochlorococcus MED4"])
         return _genes_by_metabolite_go_transport_where(**kw)
 
     def _mbg_where(self, **kw):
@@ -14770,7 +14779,7 @@ class TestGoTransportWhereGoFilters:
             _metabolites_by_gene_go_transport_where,
         )
         kw.setdefault("locus_tags", ["PMM0970"])
-        kw.setdefault("organism", "Prochlorococcus MED4")
+        kw.setdefault("organism_names", ["Prochlorococcus MED4"])
         return _metabolites_by_gene_go_transport_where(**kw)
 
     @pytest.mark.parametrize("helper", ["_gbm_where", "_mbg_where"])
@@ -14828,7 +14837,7 @@ class TestBuildGoTransportDetailGoFilters:
             build_genes_by_metabolite_go_transport,
         )
         kw.setdefault("metabolite_ids", ["kegg.compound:C00086"])
-        kw.setdefault("organism", "Prochlorococcus MED4")
+        kw.setdefault("organism_names", ["Prochlorococcus MED4"])
         return build_genes_by_metabolite_go_transport(**kw)
 
     def _mbg(self, **kw):
@@ -14836,7 +14845,7 @@ class TestBuildGoTransportDetailGoFilters:
             build_metabolites_by_gene_go_transport,
         )
         kw.setdefault("locus_tags", ["PMM0970"])
-        kw.setdefault("organism", "Prochlorococcus MED4")
+        kw.setdefault("organism_names", ["Prochlorococcus MED4"])
         return build_metabolites_by_gene_go_transport(**kw)
 
     @pytest.mark.parametrize("builder", ["_gbm", "_mbg"])
@@ -14890,7 +14899,7 @@ class TestBuildGoTransportSummaryGoFilters:
             build_genes_by_metabolite_summary,
         )
         kw.setdefault("metabolite_ids", ["kegg.compound:C00086"])
-        kw.setdefault("organism", "Prochlorococcus MED4")
+        kw.setdefault("organism_names", ["Prochlorococcus MED4"])
         return build_genes_by_metabolite_summary(**kw)
 
     def _mbg_summary(self, **kw):
@@ -14898,7 +14907,7 @@ class TestBuildGoTransportSummaryGoFilters:
             build_metabolites_by_gene_summary,
         )
         kw.setdefault("locus_tags", ["PMM0970"])
-        kw.setdefault("organism", "Prochlorococcus MED4")
+        kw.setdefault("organism_names", ["Prochlorococcus MED4"])
         return build_metabolites_by_gene_summary(**kw)
 
     def _mbg_no_formula(self, **kw):
@@ -14906,7 +14915,7 @@ class TestBuildGoTransportSummaryGoFilters:
             build_metabolites_by_gene_no_formula_count,
         )
         kw.setdefault("locus_tags", ["PMM0970"])
-        kw.setdefault("organism", "Prochlorococcus MED4")
+        kw.setdefault("organism_names", ["Prochlorococcus MED4"])
         kw.setdefault("metabolite_elements", ["N"])
         return build_metabolites_by_gene_no_formula_count(**kw)
 
@@ -14981,7 +14990,7 @@ class TestBuildChemistrySummaryRouteAgreement:
             build_genes_by_metabolite_summary,
         )
         kw.setdefault("metabolite_ids", ["kegg.compound:C00086"])
-        kw.setdefault("organism", "Prochlorococcus MED4")
+        kw.setdefault("organism_names", ["Prochlorococcus MED4"])
         kw.setdefault("arms", ("metabolism", "transport", "go_transport"))
         return build_genes_by_metabolite_summary(**kw)
 
@@ -14990,7 +14999,7 @@ class TestBuildChemistrySummaryRouteAgreement:
             build_metabolites_by_gene_summary,
         )
         kw.setdefault("locus_tags", ["PMM0970"])
-        kw.setdefault("organism", "Prochlorococcus MED4")
+        kw.setdefault("organism_names", ["Prochlorococcus MED4"])
         kw.setdefault("arms", ("metabolism", "transport", "go_transport"))
         return build_metabolites_by_gene_summary(**kw)
 
@@ -15157,13 +15166,13 @@ _TC_REMOVED_TOKENS = [
 
 def _gbm_kw(**kw):
     kw.setdefault("metabolite_ids", _TC_METS)
-    kw.setdefault("organism", _TC_ORG)
+    kw.setdefault("organism_names", [_TC_ORG])
     return kw
 
 
 def _mbg_kw(**kw):
     kw.setdefault("locus_tags", _TC_LOCI)
-    kw.setdefault("organism", _TC_ORG)
+    kw.setdefault("organism_names", [_TC_ORG])
     return kw
 
 
@@ -15864,7 +15873,7 @@ class TestTcdbFamilyWalkBuilders:
         assert "$exclude_metabolite_ids" in cypher
         assert "$metabolite_pathway_ids" in cypher
         assert re.search(r"\w+\.gene_category IN \$gene_categories", cypher)
-        assert _TC_ORG in (params or {}).values()
+        assert [_TC_ORG] in (params or {}).values()
         assert params["metabolite_ids"] == _TC_METS
         assert params["gene_categories"] == ["Transport"]
 
@@ -15921,7 +15930,7 @@ class TestTcdbFamilyWalkHintBuilders:
         assert re.search(r"\w+\.id IN \$metabolite_ids", cypher)
         assert "$gene_categories" in cypher
         assert "$exclude_metabolite_ids" in cypher
-        assert _TC_ORG in params.values()
+        assert [_TC_ORG] in params.values()
 
     def test_mbg_hint_reports_genes_without_direct_edges(self):
         """Per requested gene with gate-passing edges but no direct edge:
@@ -16383,7 +16392,7 @@ def _dn_chem(name: str, **kw):
         kw.setdefault("metabolite_ids", list(_DN_METS))
     else:
         kw.setdefault("locus_tags", list(_DN_LOCI))
-    kw.setdefault("organism", _DN_ORG)
+    kw.setdefault("organism_names", [_DN_ORG])
     cypher, _ = fn(**kw)
     return cypher
 
@@ -18284,3 +18293,383 @@ class TestBuildOntologyTermDetailsOrganismModuleStatus:
         assert "organism_module_status" not in cypher
         assert "organism_steps_present" not in cypher
         assert "Organism_has_kegg_module" not in cypher
+
+
+# ---------------------------------------------------------------------------
+# Backlog 2.8 — organism resolver exact-first + builders match exact names
+# (docs/tool-specs/organism-resolver-exact-first.md §1, §4)
+# ---------------------------------------------------------------------------
+
+
+import multiomics_explorer.kg.queries_lib as _ql28  # noqa: E402
+
+_ORG28_ALT = ["Alteromonas mediterranea AltDE"]
+_ORG28_M = ["kegg.compound:C00086"]
+_ORG28_L = ["PMM0001"]
+
+# (builder / where-helper name, required kwargs, expected exact-name clause)
+_ORG28_G = "g.organism_name IN $organism_names"
+_ORG28_E = "e.organism_name IN $organism_names"
+_ORG28_A = "a.organism_name IN $organism_names"
+_ORG28_PUB = "ANY(o IN p.organisms WHERE o IN $organism_names)"
+_ORG28_CASES = [
+    ("build_resolve_gene", {"identifier": "dnaN"}, _ORG28_G),
+    ("build_genes_by_function", {"search_text": "x"}, _ORG28_G),
+    ("build_genes_by_function_summary", {"search_text": "x"}, _ORG28_G),
+    ("_list_publications_where", {}, _ORG28_PUB),
+    ("build_list_publications", {}, _ORG28_PUB),
+    ("build_list_publications_summary", {}, _ORG28_PUB),
+    ("_list_experiments_where", {}, _ORG28_E),
+    ("build_list_experiments", {}, _ORG28_E),
+    ("build_list_experiments_summary", {}, _ORG28_E),
+    ("_differential_expression_where", {}, _ORG28_E),
+    ("build_differential_expression_by_gene", {}, _ORG28_E),
+    ("build_differential_expression_by_gene_summary_global", {}, _ORG28_E),
+    ("build_differential_expression_by_gene_summary_by_experiment", {},
+     _ORG28_E),
+    ("build_differential_expression_by_gene_summary_diagnostics", {},
+     _ORG28_E),
+    ("build_differential_expression_by_gene_experiment_diagnostics",
+     {"experiment_ids": ["e1"]}, _ORG28_E),
+    ("build_genes_by_homolog_group", {"group_ids": ["cyanorak:CK_1"]},
+     _ORG28_G),
+    ("build_genes_by_homolog_group_summary", {"group_ids": ["cyanorak:CK_1"]},
+     _ORG28_G),
+    ("build_genes_by_homolog_group_by_clade",
+     {"group_ids": ["cyanorak:CK_1"]}, _ORG28_G),
+    ("_differential_expression_by_ortholog_where", {}, _ORG28_E),
+    ("build_differential_expression_by_ortholog_summary_global",
+     {"group_ids": ["g1"]}, _ORG28_E),
+    ("build_differential_expression_by_ortholog_top_groups",
+     {"group_ids": ["g1"]}, _ORG28_E),
+    ("build_differential_expression_by_ortholog_top_experiments",
+     {"group_ids": ["g1"]}, _ORG28_E),
+    ("build_differential_expression_by_ortholog_results",
+     {"group_ids": ["g1"]}, _ORG28_E),
+    ("build_differential_expression_by_ortholog_membership_counts",
+     {"group_ids": ["g1"]}, _ORG28_G),
+    ("_build_de_by_ortholog_experiment_diagnostics",
+     {"group_ids": ["g1"], "experiment_ids": ["e1"]}, _ORG28_E),
+    ("_clustering_analysis_where", {}, "ca.organism_name IN $organism_names"),
+    ("build_list_clustering_analyses", {},
+     "ca.organism_name IN $organism_names"),
+    ("build_list_clustering_analyses_summary", {},
+     "ca.organism_name IN $organism_names"),
+    ("build_genes_in_cluster", {"cluster_ids": ["c1"]}, _ORG28_G),
+    ("build_genes_in_cluster_summary", {"cluster_ids": ["c1"]}, _ORG28_G),
+    ("_list_derived_metrics_where", {}, "dm.organism_name IN $organism_names"),
+    ("build_list_derived_metrics", {}, "dm.organism_name IN $organism_names"),
+    ("build_list_derived_metrics_summary", {},
+     "dm.organism_name IN $organism_names"),
+    ("_genes_by_metabolite_metabolism_where", {"metabolite_ids": _ORG28_M},
+     _ORG28_G),
+    ("_genes_by_metabolite_shared_where", {"metabolite_ids": _ORG28_M},
+     _ORG28_G),
+    ("_genes_by_metabolite_transport_where", {"metabolite_ids": _ORG28_M},
+     _ORG28_G),
+    ("_genes_by_metabolite_go_transport_where", {"metabolite_ids": _ORG28_M},
+     _ORG28_G),
+    ("build_genes_by_metabolite_metabolism", {"metabolite_ids": _ORG28_M},
+     _ORG28_G),
+    ("build_genes_by_metabolite_transport", {"metabolite_ids": _ORG28_M},
+     _ORG28_G),
+    ("build_genes_by_metabolite_tcdb_family", {"metabolite_ids": _ORG28_M},
+     _ORG28_G),
+    ("build_genes_by_metabolite_tcdb_family_hint",
+     {"metabolite_ids": _ORG28_M}, _ORG28_G),
+    ("build_genes_by_metabolite_go_transport", {"metabolite_ids": _ORG28_M},
+     _ORG28_G),
+    ("build_genes_by_metabolite_summary", {"metabolite_ids": _ORG28_M},
+     _ORG28_G),
+    ("_metabolites_by_gene_metabolism_where", {"locus_tags": _ORG28_L},
+     _ORG28_G),
+    ("_metabolites_by_gene_shared_where", {"locus_tags": _ORG28_L}, _ORG28_G),
+    ("_metabolites_by_gene_transport_where", {"locus_tags": _ORG28_L},
+     _ORG28_G),
+    ("_metabolites_by_gene_go_transport_where", {"locus_tags": _ORG28_L},
+     _ORG28_G),
+    ("build_metabolites_by_gene_metabolism", {"locus_tags": _ORG28_L},
+     _ORG28_G),
+    ("build_metabolites_by_gene_transport", {"locus_tags": _ORG28_L},
+     _ORG28_G),
+    ("build_metabolites_by_gene_tcdb_family", {"locus_tags": _ORG28_L},
+     _ORG28_G),
+    ("build_metabolites_by_gene_tcdb_family_hint", {"locus_tags": _ORG28_L},
+     _ORG28_G),
+    ("build_metabolites_by_gene_go_transport", {"locus_tags": _ORG28_L},
+     _ORG28_G),
+    ("build_metabolites_by_gene_summary", {"locus_tags": _ORG28_L}, _ORG28_G),
+    ("build_metabolites_by_gene_no_formula_count", {"locus_tags": _ORG28_L},
+     _ORG28_G),
+    ("_list_metabolite_assays_where", {}, _ORG28_A),
+    ("build_list_metabolite_assays", {}, _ORG28_A),
+    ("build_list_metabolite_assays_summary", {}, _ORG28_A),
+    ("_metabolites_by_quantifies_assay_where", {}, _ORG28_A),
+    ("build_metabolites_by_quantifies_assay", {"assay_ids": ["a1"]},
+     _ORG28_A),
+    ("build_metabolites_by_quantifies_assay_summary", {"assay_ids": ["a1"]},
+     _ORG28_A),
+    ("build_metabolites_by_quantifies_assay_diagnostics",
+     {"assay_ids": ["a1"]}, _ORG28_A),
+    ("_metabolites_by_flags_assay_where", {}, _ORG28_A),
+    ("build_metabolites_by_flags_assay", {"assay_ids": ["a1"]}, _ORG28_A),
+    ("build_metabolites_by_flags_assay_summary", {"assay_ids": ["a1"]},
+     _ORG28_A),
+    ("_assays_by_metabolite_branch_conditions", {"rel_alias": "rq"},
+     _ORG28_A),
+    ("build_assays_by_metabolite", {"metabolite_ids": _ORG28_M}, _ORG28_A),
+    ("build_assays_by_metabolite_summary", {"metabolite_ids": _ORG28_M},
+     _ORG28_A),
+]
+# Single-organism chemistry builders: the api always passes the resolved
+# name, so `organism_names=None` is not a supported call for them.
+_ORG28_REQUIRED = {
+    name for name, _, _ in _ORG28_CASES
+    if "genes_by_metabolite" in name or "metabolites_by_gene" in name
+}
+_ORG28_IDS = [c[0] for c in _ORG28_CASES]
+
+
+def _org28_text(out) -> tuple[str, dict]:
+    """Normalize builder / where-helper output to (text, params)."""
+    if isinstance(out, str):
+        return out, {}
+    cypher_or_conds, params = out
+    if isinstance(cypher_or_conds, list):
+        cypher_or_conds = "\n AND ".join(cypher_or_conds)
+    return cypher_or_conds, params
+
+
+def _org28_assert_no_word_match(text: str, params: dict) -> None:
+    assert "organism_name) CONTAINS" not in text
+    assert "CONTAINS word" not in text
+    assert "split(toLower($organism" not in text
+    assert "split(toLower(org_input" not in text
+    assert "org_input" not in text
+    assert "CONTAINS toLower($organism)" not in text
+    assert "CONTAINS $organism" not in text
+    assert not re.search(r"\$organism\b", text), text
+    assert not re.search(r"\$organisms\b", text), text
+    assert "organism" not in params
+    assert "organisms" not in params
+
+
+class TestOrganismResolverExactFirst28:
+    """§1: three tiers (exact → whole word → substring), best tier only,
+    gene-bearing gate, geneless_matches + match_tier, one row always."""
+
+    def _cypher(self, organism="Prochlorococcus PAC1"):
+        return build_resolve_organism_for_organism(organism=organism)
+
+    def test_params_unchanged(self):
+        _, params = self._cypher("Alteromonas mediterranea AltDE")
+        assert params == {"organism": "Alteromonas mediterranea AltDE"}
+
+    def test_returns_three_columns(self):
+        cypher, _ = self._cypher()
+        ret = cypher.rsplit("RETURN", 1)[1]
+        assert re.search(r"AS organisms\b", ret)
+        assert re.search(r"AS match_tier\b", ret)
+        assert re.search(r"AS geneless_matches\b", ret)
+
+    def test_input_trimmed_and_lowercased(self):
+        cypher, _ = self._cypher()
+        assert "toLower(trim($organism))" in cypher
+
+    def test_aliases_are_preferred_name_plus_synonyms(self):
+        cypher, _ = self._cypher()
+        assert "[o.preferred_name] + coalesce(o.name_synonyms, [])" in cypher
+
+    def test_tier1_exact_alias(self):
+        """Tier 1: whole input equals a lower-cased name / synonym."""
+        cypher, _ = self._cypher()
+        assert re.search(r"WHEN\s+ql\s+IN\s+aliases\s+THEN\s+1", cypher)
+
+    def test_tier2_whole_word(self):
+        """Tier 2: each input word equals a space-split word of an alias."""
+        cypher, _ = self._cypher()
+        assert "split(a, ' ')" in cypher
+        assert re.search(r"THEN\s+2", cypher)
+
+    def test_tier3_substring_kept(self):
+        """Tier 3: today's substring rule (so '9312' still resolves)."""
+        cypher, _ = self._cypher()
+        assert "a CONTAINS w" in cypher
+        assert re.search(r"THEN\s+3", cypher)
+
+    def test_gene_gate(self):
+        cypher, _ = self._cypher()
+        assert "gene_count" in cypher
+        assert "> 0" in cypher
+        assert "Experiment" not in cypher
+
+    def test_no_grouping_key_one_row_always(self):
+        """Aggregates without a grouping key — a no-match input still
+        returns one row (organisms=[], match_tier=null)."""
+        cypher, _ = self._cypher()
+        # the candidate aggregation is a pure aggregate WITH (no `o,` key)
+        assert re.search(r"WITH\s+collect\(", cypher), cypher
+        assert "collect(DISTINCT o.preferred_name) AS organisms" not in cypher
+
+    def test_best_tier_only(self):
+        cypher, _ = self._cypher()
+        assert "reduce(" in cypher
+        assert "c.t = best" in cypher
+
+    def test_geneless_matches_are_non_gene_candidates(self):
+        cypher, _ = self._cypher()
+        assert re.search(r"WHERE\s+NOT\s+c\.g", cypher)
+
+    def test_outputs_sorted(self):
+        cypher, _ = self._cypher()
+        assert cypher.count("apoc.coll.sort(") >= 2
+
+
+class TestBuildersMatchExactOrganismNames28:
+    """§4: every word-matching builder / where helper takes
+    `organism_names: list[str] | None` and emits `IN $organism_names`."""
+
+    @pytest.mark.parametrize("name,kwargs,clause", _ORG28_CASES,
+                             ids=_ORG28_IDS)
+    def test_emits_exact_name_clause(self, name, kwargs, clause):
+        out = getattr(_ql28, name)(**kwargs, organism_names=_ORG28_ALT)
+        text, params = _org28_text(out)
+        assert clause in text, text
+        assert params["organism_names"] == _ORG28_ALT
+
+    @pytest.mark.parametrize("name,kwargs,clause", _ORG28_CASES,
+                             ids=_ORG28_IDS)
+    def test_no_word_match_left(self, name, kwargs, clause):
+        out = getattr(_ql28, name)(**kwargs, organism_names=_ORG28_ALT)
+        text, params = _org28_text(out)
+        _org28_assert_no_word_match(text, params)
+
+    @pytest.mark.parametrize("name,kwargs,clause", _ORG28_CASES,
+                             ids=_ORG28_IDS)
+    def test_empty_list_still_filters(self, name, kwargs, clause):
+        """`[]` = the text resolved to nothing → 0 rows (as today), never
+        'no filter'."""
+        out = getattr(_ql28, name)(**kwargs, organism_names=[])
+        text, params = _org28_text(out)
+        assert clause in text, text
+        assert params["organism_names"] == []
+
+    @pytest.mark.parametrize(
+        "name,kwargs,clause",
+        [c for c in _ORG28_CASES if c[0] not in _ORG28_REQUIRED],
+        ids=[c[0] for c in _ORG28_CASES if c[0] not in _ORG28_REQUIRED])
+    def test_none_means_no_filter(self, name, kwargs, clause):
+        out = getattr(_ql28, name)(**kwargs, organism_names=None)
+        text, params = _org28_text(out)
+        assert clause not in text or "$organism_names IS NULL" in text, text
+        _org28_assert_no_word_match(text, params)
+
+    @pytest.mark.parametrize("name,kwargs,clause", _ORG28_CASES,
+                             ids=_ORG28_IDS)
+    def test_old_organism_kwarg_gone(self, name, kwargs, clause):
+        old = "organisms" if (
+            "homolog_group" in name or "ortholog" in name) else "organism"
+        with pytest.raises(TypeError):
+            getattr(_ql28, name)(**kwargs, **{old: "Prochlorococcus MED4"})
+
+    def test_genes_by_function_filter_clause(self):
+        clause = _ql28._genes_by_function_filter_clause()
+        assert _ORG28_G in clause
+        _org28_assert_no_word_match(clause, {})
+
+    def test_genes_by_function_params(self):
+        params = _ql28._genes_by_function_params(
+            search_text="x", organism_names=_ORG28_ALT)
+        assert params["organism_names"] == _ORG28_ALT
+        assert "organism" not in params
+
+    def test_list_publications_names_match_whole_entries(self):
+        """p.organisms entries compared whole (incl. gene-less taxa like
+        'Phage'), not lower-cased substrings."""
+        text, params = _ql28._list_publications_where(
+            organism_names=["Phage"])
+        assert _ORG28_PUB in text
+        assert "toLower(o)" not in text
+        assert params["organism_names"] == ["Phage"]
+
+    def test_list_experiments_partner_filter_untouched(self):
+        """coculture_partner keeps its own matching (out of scope)."""
+        cypher, params = build_list_experiments(
+            organism_names=_ORG28_ALT, coculture_partner="Alteromonas")
+        assert _ORG28_E in cypher
+        assert "$partner" in cypher
+        assert params["partner"] == "Alteromonas"
+
+
+_ORG28_INPUTS = [
+    {"input": "Alteromonas mediterranea AltDE",
+     "names": ["Alteromonas mediterranea AltDE"]},
+    {"input": "Bogus", "names": []},
+]
+
+
+class TestOrganismDiagnosticsPerInput28:
+    """List-param diagnostics keep per-input not_found / not_matched; each
+    input arrives pre-resolved as {"input": <raw entry>, "names": [...]}
+    (kwarg `organism_inputs`; None = no organisms filter)."""
+
+    def test_homolog_diagnostics_takes_organism_inputs(self):
+        cypher, params = build_genes_by_homolog_group_diagnostics(
+            group_ids=["cyanorak:CK_1"], organism_inputs=_ORG28_INPUTS)
+        assert params["organism_inputs"] == _ORG28_INPUTS
+        assert "$organism_inputs" in cypher
+        assert "AS not_found_organisms" in cypher
+        assert "AS not_matched_organisms" in cypher
+        _org28_assert_no_word_match(cypher, params)
+
+    def test_homolog_diagnostics_none(self):
+        cypher, params = build_genes_by_homolog_group_diagnostics(
+            group_ids=["cyanorak:CK_1"], organism_inputs=None)
+        assert params["organism_inputs"] is None
+        assert "AS not_found_organisms" in cypher
+
+    def test_homolog_diagnostics_matches_by_names_not_words(self):
+        cypher, _ = build_genes_by_homolog_group_diagnostics(
+            group_ids=["cyanorak:CK_1"], organism_inputs=_ORG28_INPUTS)
+        assert "organism_name IN " in cypher
+        assert ".names" in cypher
+
+    def test_de_by_ortholog_organism_diagnostics(self):
+        cypher, params = _ql28._build_de_by_ortholog_organism_diagnostics(
+            group_ids=["g1"], organism_inputs=_ORG28_INPUTS)
+        assert params["organism_inputs"] == _ORG28_INPUTS
+        assert "$organism_inputs" in cypher
+        assert "organism_name IN " in cypher
+        assert "AS not_found_organisms" in cypher
+        assert "AS not_matched_organisms" in cypher
+        _org28_assert_no_word_match(cypher, params)
+
+    def test_de_by_ortholog_diagnostics_dispatch(self):
+        queries = build_differential_expression_by_ortholog_diagnostics(
+            group_ids=["g1"], organism_inputs=_ORG28_INPUTS,
+            experiment_ids=["e1"])
+        assert queries is not None and len(queries) == 2
+        (org_c, org_p), (exp_c, exp_p) = queries
+        assert org_p["organism_inputs"] == _ORG28_INPUTS
+        # experiment diagnostics filter on the union of resolved names
+        assert exp_p["organism_names"] == ["Alteromonas mediterranea AltDE"]
+        assert _ORG28_E in exp_c
+        for c, p in queries:
+            _org28_assert_no_word_match(c, p)
+
+    def test_de_by_ortholog_diagnostics_none_when_no_inputs(self):
+        assert build_differential_expression_by_ortholog_diagnostics(
+            group_ids=["g1"], organism_inputs=None) is None
+
+    def test_de_by_ortholog_diagnostics_union_first_seen_dedup(self):
+        inputs = [
+            {"input": "Alteromonas", "names": [
+                "Alteromonas macleodii EZ55",
+                "Alteromonas mediterranea AltDE"]},
+            {"input": "AltDE", "names": ["Alteromonas mediterranea AltDE"]},
+        ]
+        queries = build_differential_expression_by_ortholog_diagnostics(
+            group_ids=["g1"], organism_inputs=inputs, experiment_ids=["e1"])
+        _, exp_p = queries[1]
+        assert exp_p["organism_names"] == [
+            "Alteromonas macleodii EZ55", "Alteromonas mediterranea AltDE"]

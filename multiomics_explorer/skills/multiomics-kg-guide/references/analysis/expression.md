@@ -80,7 +80,7 @@ results found.
 | Parameter | Type | Default | Description |
 |---|---|---|---|
 | `genes` | `list[str]` | required | Locus tags to query |
-| `organism` | `str \| None` | `None` | Organism filter (fuzzy match) |
+| `organism` | `str \| None` | `None` | Organism filter (matched by name, exact first) |
 | `experiment_ids` | `list[str] \| None` | `None` | Experiment filter (ignored when `group_map` is set) |
 | `group_map` | `dict[str, str] \| None` | `None` | `experiment_id → group label` for custom grouping |
 | `conn` | `GraphConnection \| None` | `None` | Reuse an existing Neo4j connection |

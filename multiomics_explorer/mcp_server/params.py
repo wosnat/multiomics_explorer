@@ -52,14 +52,13 @@ OntologyKey = Literal[
 # Cross-cutting filters / paging / mode switches.
 # ---------------------------------------------------------------------------
 
-# Three organism-matching contracts (docs-review 2026-09-15): filter-style
-# tools word-match and WIDEN on a genus word; single-organism tools resolve
-# and RAISE on an ambiguous match; the metabolomics assay drill-downs use a
-# plain substring CONTAINS. The description must state the right one — the
-# old shared "Ambiguous match raises" text was false on the widening tools.
-_ORGANISM_WIDENING_DESC = "Organism: case-insensitive word match on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms."
+# Two organism-matching contracts over one tiered resolver (exact name →
+# whole words → partial, best tier only): filter-style tools WIDEN on a genus
+# word; single-organism tools RAISE on an ambiguous match. The description
+# must state the right one.
+_ORGANISM_WIDENING_DESC = "Organism, matched by name (exact first, then whole words, then partial) on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms."
 
-_ORGANISM_SINGLE_DESC = "Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms."
+_ORGANISM_SINGLE_DESC = "Organism, matched by name (exact first, then whole words, then partial) on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms."
 
 OrganismParam = Annotated[str | None, Field(description=_ORGANISM_WIDENING_DESC)]
 
@@ -84,15 +83,15 @@ OrganismFromTagsSingleParam = Annotated[str | None, Field(
 # genes_by_ontology: one organism, a list, or every organism (cross-organism
 # TERM2GENE; a single string still must resolve to one organism).
 OrganismScopeParam = Annotated[str | list[str] | None, Field(
-    description="One organism, a list (each entry word-matched and may expand to several strains), or omit for all organisms. A single string must resolve to ONE organism. See list_organisms.",
+    description="One organism, a list (each entry matched by name — exact first, then whole words, then partial — and may expand to several strains), or omit for all organisms. A single string must resolve to ONE organism. See list_organisms.",
 )]
 
 OrganismContainsParam = Annotated[str | None, Field(
-    description="Organism: case-insensitive substring match on the organism name ('MED4'); a genus word matches every strain. See list_organisms.",
+    description="Organism, matched by name (exact first, then whole words, then partial) ('MED4'); a genus word matches every strain. See list_organisms.",
 )]
 
 OrganismsParam = Annotated[list[str] | None, Field(
-    description="Organisms, each word-matched as `organism`. Omit for all.",
+    description="Organisms, each entry matched by name (exact first, then whole words, then partial); a genus word matches every strain. Omit for all.",
 )]
 
 _LIMIT_DESC = "Max rows returned (paging)."

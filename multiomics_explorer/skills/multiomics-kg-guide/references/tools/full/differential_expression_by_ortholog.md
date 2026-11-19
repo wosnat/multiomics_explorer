@@ -14,7 +14,7 @@ docs://tools/differential_expression_by_ortholog; summary=True first.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | group_ids | list[string] | — | Ortholog group IDs (from search_homolog_groups or gene_homologs). E.g. ['cyanorak:CK_00000570']. Bare ids are accepted (e.g. 'CK_00000570', 'COG0592@2') and coerced to canonical (see `resolved_aliases`). |
-| organisms | list[string] \| None | None | Organisms, each word-matched as `organism`. Omit for all. |
+| organisms | list[string] \| None | None | Organisms, each entry matched by name (exact first, then whole words, then partial); a genus word matches every strain. Omit for all. |
 | experiment_ids | list[string] \| None | None | Filter to these experiments. Get IDs from list_experiments. |
 | direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` = all statuses. |
 | significant_only | bool | False | If true, return only statistically significant rows. |
@@ -156,7 +156,7 @@ differential_expression_by_ortholog → genes_by_homolog_group(organisms=[...]) 
 
 - For cross-experiment summarization patterns see `docs://analysis/expression` — covers `response_matrix` for gene × treatment-group pivots and `gene_set_compare` for two-set comparisons.
 
-- Each `organisms` entry is OR-matched word-by-word against preferred_name + name_synonyms, so a genus word (e.g. 'Alteromonas') matches every strain in that genus.
+- Each `organisms` entry is matched by name against preferred_name + name_synonyms (exact first, then whole words, then partial), so 'PAC1' selects one strain while a genus word (e.g. 'Alteromonas') matches every strain in that genus.
 
 ## Package import equivalent
 

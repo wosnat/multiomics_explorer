@@ -13,7 +13,7 @@ docs://tools/list_organisms; summary=True caps the same rollups at 10 (smaller t
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism_names | list[string] \| None | None | Filter by organism: case-insensitive word match on preferred_name and name_synonyms, like every other tool's organism param ('MED4', 'Prochlorococcus MED4'; the synonym 'Meiothermus taiwanensis' resolves to 'Meiothermus ruber'); a genus word like 'Alteromonas' matches every strain. Unknown names are reported in not_found rather than raising. |
+| organism_names | list[string] \| None | None | Each entry matched by name (exact first, then whole words, then partial) on preferred_name / synonyms ('MED4'; synonym 'Meiothermus taiwanensis' → 'Meiothermus ruber'); a genus word like 'Alteromonas' matches every strain. Unknown names go to not_found. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
@@ -1088,7 +1088,7 @@ list_organisms (per-row complete_pathway_module_count) → kegg_module_completen
 
 - `top_annotation_capability` ranks the matched set by `peptidase_gene_count` descending, then `preferred_name`; the other three counts are carried as columns, not sort keys. All-zero rows are excluded from the ranking but still appear in `results`. The ranking is capped to the first 10 on every call, `summary=True` included (`top_annotation_capability_truncated=true` when capped); every organism's four counts are on its row. There is no min-count filter — read the ranking, then drill in with genes_by_ontology(ontology='merops', call_class=['peptidase'], organism=...).
 
-- `organism_names=` uses the same word-based, case-insensitive match on preferred_name + name_synonyms as every other tool's organism param ('MED4' works); unknown names land in `not_found`.
+- `organism_names=` uses the same case-insensitive name match on preferred_name + name_synonyms as every other tool's organism param (exact first, then whole words, then partial; 'MED4' works, 'PAC1' does not also return EQPAC1); unknown names land in `not_found`.
 
 - `compartment` keeps organisms with at least one experiment in that compartment — it is not a per-organism property.
 

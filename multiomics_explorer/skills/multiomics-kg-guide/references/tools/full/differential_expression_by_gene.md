@@ -13,7 +13,7 @@ docs://tools/differential_expression_by_gene; summary=True first.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
+| organism | string \| None | None | Organism, matched by name (exact first, then whole words, then partial) on preferred_name / synonyms ('MED4'). Must resolve to ONE organism — an ambiguous match (e.g. a genus word) raises; see list_organisms. |
 | locus_tags | list[string] \| None | None | Gene locus tags. E.g. ['PMM0001', 'PMM0845']. Get these from resolve_gene / gene_overview. |
 | experiment_ids | list[string] \| None | None | Experiment IDs to restrict to. Get these from list_experiments. |
 | direction | string ('up', 'down', 'both') \| None | None | Filter by expression direction. `'up'` / `'down'` restrict to one arm. `'both'` is the union of significant up + significant down — functionally identical to `direction=None, significant_only=True`; pick whichever spelling is clearer at the call site. Default `None` = all statuses. |
@@ -404,7 +404,7 @@ differential_expression_by_gene(organism='Prochlorococcus', summary=True)  # gen
 ```
 
 ```correction
-differential_expression_by_gene(organism='MED4', summary=True)  # organism= is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works; a bare genus word matches every strain and raises 'matches multiple organisms — be more specific'
+differential_expression_by_gene(organism='MED4', summary=True)  # organism= is matched by name on preferred_name + name_synonyms, case-insensitive, exact first — 'MED4' works; a bare genus word matches every strain and raises 'matches multiple organisms — be more specific'
 ```
 
 - `direction` and `significant_only` interplay: when direction is 'up' / 'down' / 'both' it filters expression_status directly and `significant_only` is ignored (direction='up', significant_only=False still returns only significant_up rows). `significant_only=True` only matters with direction=None, where it drops not_significant rows — i.e. it equals direction='both'. Pick whichever spelling is clearer at the call site; default direction=None, significant_only=False returns everything.

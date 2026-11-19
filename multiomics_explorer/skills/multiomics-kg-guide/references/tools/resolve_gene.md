@@ -14,7 +14,7 @@ docs://tools/resolve_gene; summary=True caps by_organism at 10 too (smaller than
 | Name | Type | Default | Description |
 |---|---|---|---|
 | identifier | string | — | Gene identifier (case-insensitive) — locus_tag (e.g. 'PMM0001'), gene name (e.g. 'dnaN'), old locus tag, or RefSeq protein ID. |
-| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
+| organism | string \| None | None | Organism, matched by name (exact first, then whole words, then partial) on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |

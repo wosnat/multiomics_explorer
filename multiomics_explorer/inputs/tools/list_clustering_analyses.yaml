@@ -47,7 +47,7 @@ mistakes:
   - "Valid `cluster_type` values come from the KG vocabulary — enumerate them with list_filter_values(filter_type='cluster_type') (currently six: time_course, diel, condition_comparison, expression_bin, decay_pattern, genomic_island). The list quoted in the parameter description is documentation, not the source."
   - "`treatment_type` is dense and never empty. A characterization study with no perturbation names what was measured — `rna_decay` (decay_pattern clusters from an mRNA half-life survey), `genomic_analysis` (sequence-predicted genomic-island sets) — so `treatment_type=[...]` filters reach it. `background_factors` is `[]` only on the genomic_island analyses (sequence-only, no experimental context); every expression-derived analysis carries at least one factor."
   - "Unknown `treatment_type` / `background_factors` / `growth_phases` values return 0 rows and land in `warnings`; live value sets via list_filter_values, semantics in docs://guide/conventions."
-  - "`organism=` is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works."
+  - "`organism=` is matched by name on preferred_name + name_synonyms, case-insensitive (exact first, then whole words, then partial) — 'MED4' works and selects one strain."
   - "DataFrame conversion: `to_dataframe(result)` auto-dispatches and returns one row per analysis × cluster (compact: cluster_id / cluster_name / cluster_member_count; verbose=True adds cluster descriptions). See `docs://guide/python_api`."
   - "A genus word alone in `organism=` (e.g. 'Alteromonas') matches every strain in that genus rather than raising ambiguous."
   - "`search_text` is Lucene — see docs://guide/conventions for syntax and scoring."

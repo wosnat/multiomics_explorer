@@ -13,7 +13,7 @@ docs://tools/list_experiments; summary=True first.
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
+| organism | string \| None | None | Organism, matched by name (exact first, then whole words, then partial) on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
 | treatment_type | list[string] \| None | None | Keep experiments with any of these treatment_type values. Values: list_filter_values('treatment_type'). |
 | background_factors | list[string] \| None | None | Keep experiments with any of these background_factors. Values: list_filter_values('background_factors'). |
 | growth_phases | list[string] \| None | None | Keep timepoints whose growth_phase is in this list. Values: list_filter_values('growth_phase'). |
@@ -608,7 +608,7 @@ list_filter_values(filter_type='partner_role') → list_experiments(coculture_ro
 
 - `authors` is on every result row — no need to join with list_publications when you only need author attribution. list_publications is still the right call for richer publication metadata (abstract, journal, year).
 
-- `organism=` filters the profiled organism only (word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works). It does NOT match coculture partners — for partner-side filtering use `coculture_partner=`. The two filters AND-compose. A genus word alone ('Prochlorococcus') matches every strain of the genus — fine here, but the single-organism expression tools raise on it.
+- `organism=` filters the profiled organism only (case-insensitive name match on preferred_name + name_synonyms, exact first — 'MED4' works). It does NOT match coculture partners — for partner-side filtering use `coculture_partner=`. The two filters AND-compose. A genus word alone ('Prochlorococcus') matches every strain of the genus — fine here, but the single-organism expression tools raise on it.
 
 - Phage infection is a treatment partner: role `treatment` with `treatment_type=['viral']`, not `['coculture']`. `coculture_role='treatment'` therefore returns phage experiments too unless you also pass `coculture_partner=` or `treatment_type=`.
 

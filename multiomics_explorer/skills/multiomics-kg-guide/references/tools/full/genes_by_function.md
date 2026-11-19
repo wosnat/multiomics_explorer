@@ -14,7 +14,7 @@ docs://tools/genes_by_function; summary=True first.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string | — | Free-text query (Lucene syntax: quoted phrases, AND/OR, wildcards `*`, fuzzy `~`). E.g. 'photosystem', 'nitrogen AND transport', 'dnaN~'. Multi-word input is OR'd — quote the phrase or join with AND for an exact/combined match. See docs://guide/conventions for Lucene scoring details. |
-| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
+| organism | string \| None | None | Organism, matched by name (exact first, then whole words, then partial) on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
 | gene_categories | list[string] \| None | None | Filter by gene_category — matches any of the given values. E.g. ['Photosynthesis', 'Transport']. Use list_filter_values to see valid values. |
 | min_quality | int | 0 | Minimum annotation_quality (0..3 numeric encoding of `Gene.annotation_state`): 0=no_evidence, 1=catch_all_only, 2=informative_single, 3=informative_multi. Use 2 to require at least one informative annotation source (a hypothetical protein with a Pfam / KO call still passes); 3 for multi-source support. [AQ] see docs://guide/conventions. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
@@ -220,7 +220,7 @@ genes_by_function(search_text='ABC transporter permease', organism='HOT1A3', gen
 
 - `min_quality` counts informative annotation sources, not product-name quality: min_quality=2 requires at least one informative source (a hypothetical protein with a Pfam / KO call still passes), 3 requires multi-source support. To drop hypotheticals, filter the returned rows on `product` yourself. See docs://guide/conventions [AQ].
 
-- The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works. A genus word alone ('Prochlorococcus') matches every strain of that genus.
+- The organism filter is matched by name on preferred_name + name_synonyms, case-insensitive (exact first, then whole words, then partial) — 'MED4' works, and 'PAC1' returns PAC1 genes only (not EQPAC1). A genus word alone ('Prochlorococcus') matches every strain of that genus.
 
 - `search_text` is Lucene: fuzzy `~`, wildcards `*`, quoted phrases and AND / OR are supported — see docs://guide/conventions for syntax and scoring.
 

@@ -14,7 +14,7 @@ docs://tools/assays_by_metabolite; summary=True first for 50+ IDs.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | metabolite_ids | list[string] | — | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolite_ids. |
-| organism | string \| None | None | Organism: case-insensitive substring match on the organism name ('MED4'); a genus word matches every strain. See list_organisms. |
+| organism | string \| None | None | Organism, matched by name (exact first, then whole words, then partial) ('MED4'); a genus word matches every strain. See list_organisms. |
 | evidence_kind | string ('quantifies', 'flags') \| None | None | Filter by edge type. `'quantifies'` = numeric arm only (rows carry value, detection_status, timepoint*). `'flags'` = boolean arm only (rows carry flag_value, n_positive). Default `None` = both arms merged (polymorphic rows; cross-arm fields explicit `None`). |
 | exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
 | metric_types | list[string] \| None | None | Filter by metric_type tag(s) on the parent assay, e.g. ['cellular_concentration']. Values: `list_metabolite_assays(summary=True)` → `top_metric_types`. |

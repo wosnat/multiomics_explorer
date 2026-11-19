@@ -16178,3 +16178,27 @@ class TestListFilterValuesKeggModuleTypesWrapper:
     def test_filter_type_literal_includes(self, tool_fns, value):
         hint = _hint_str(tool_fns, "list_filter_values", "filter_type")
         assert f"'{value}'" in hint
+
+
+class TestOrganismGenelessMessageWrapper28:
+    """Backlog 2.8: the gene-less organism message reaches the caller
+    verbatim through single-organism wrappers (no signature change)."""
+
+    _MSG = (
+        "'Escherichia coli' is in the KG as a taxon without genes (a "
+        "coculture partner or treatment taxon); it cannot be the organism "
+        "here. Use list_organisms to see organisms with genes."
+    )
+
+    @pytest.mark.asyncio
+    @pytest.mark.parametrize("tool,kwargs", [
+        ("differential_expression_by_gene", {"organism": "Escherichia coli"}),
+        ("genes_by_ontology", {"ontology": "go_bp", "level": 1,
+                               "organism": "Escherichia coli"}),
+    ])
+    async def test_geneless_message_passthrough(self, tool_fns, mock_ctx,
+                                                tool, kwargs):
+        with patch(f"multiomics_explorer.api.functions.{tool}",
+                   side_effect=ValueError(self._MSG)):
+            with pytest.raises(ToolError, match="taxon without genes"):
+                await tool_fns[tool](mock_ctx, **kwargs)

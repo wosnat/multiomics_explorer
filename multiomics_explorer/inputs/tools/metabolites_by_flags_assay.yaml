@@ -199,4 +199,4 @@ mistakes:
   - wrong: "metabolites_by_flags_assay(metabolite_ids=['C00064'])  # then treating `C00064` in `not_found` as 'no such metabolite'"
     right: "IDs in any form (bare, prefixed, ChEBI / HMDB / MNX / InChIKey, retired) resolve before the query; read `resolved_aliases`. Removed compounds and chemical-role ids stay in `not_found` with a warning. See docs://analysis/metabolites, 'Metabolite ID forms'."
   - "See `docs://analysis/metabolites` (evidence sources: metabolism, TCDB transport, GO transport, metabolomics) and `docs://guide/conventions` for tested-absent semantics (about 69% of boolean rows are flag_value=False, kept by default)."
-  - "`organism` here matches by case-insensitive CONTAINS, not the word-based match the gene tools use; cross-organism is the default."
+  - "`organism` resolves like the gene tools' (by name, exact first; a genus word pools its strains); cross-organism is the default."

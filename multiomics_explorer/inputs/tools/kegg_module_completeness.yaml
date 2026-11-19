@@ -454,4 +454,4 @@ mistakes:
   - wrong: "kegg_module_completeness(module_ids=['M00627'])  # a signature module under the default module_type='pathway' lands in not_matched_modules"
     right: "kegg_module_completeness(module_ids=['M00627'], module_type='signature')  # or module_type=None for both kinds"
   - "`status` filters rows, `by_status`, `by_class` and the `top_*` band counts, never the no-edge counts (`no_edge_count`, `no_edge`, `organisms_without_edge`)."
-  - "`organism` follows `genes_by_ontology`: a string names exactly one strain (an ambiguous name raises), a list is word-matched and can expand to many strains (unmatched entries → `not_found_organisms`), `None` covers every organism with genes."
+  - "`organism` follows `genes_by_ontology`: a string names exactly one strain (an ambiguous name raises), a list entry is matched by name (exact first, then whole words, then partial) and can expand to many strains (unmatched entries → `not_found_organisms`), `None` covers every organism with genes."

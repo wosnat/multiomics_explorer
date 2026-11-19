@@ -149,7 +149,7 @@ examples:
 
   - title: Role target — siderophore transporters in Alteromonas mediterranea AltDE1 (target_kind='chemical_role')
     call: genes_by_metabolite(metabolite_ids=["chebi.role:26672"], organism="Alteromonas mediterranea AltDE1", evidence_sources=["go_transport"], limit=5)
-    note: "`chebi.role:<n>` ids are valid inputs. A role row is a class, not a compound: `target_kind='chemical_role'`, `metabolite_id` is the role id, formula and mass are absent, and roles are not propagated to metabolites. The same role id also reaches TCDB role edges. In AltDE1 those are family-level only: the default call adds no TCDB rows, and the warning plus `tcdb_family_substrates_not_shown` (5 genes) point at `include_tcdb_family_substrates=True`. Use the exact strain `Alteromonas mediterranea AltDE1` (the shorter `AltDE` string also word-matches AltDE1 genes)."
+    note: "`chebi.role:<n>` ids are valid inputs. A role row is a class, not a compound: `target_kind='chemical_role'`, `metabolite_id` is the role id, formula and mass are absent, and roles are not propagated to metabolites. The same role id also reaches TCDB role edges. In AltDE1 those are family-level only: the default call adds no TCDB rows, and the warning plus `tcdb_family_substrates_not_shown` (5 genes) point at `include_tcdb_family_substrates=True`. `AltDE` would select the different strain AltDE, not AltDE1."
 
   - title: Inherited rows are opt-in — go_include_ancestors=True adds is_a-ancestor rows, tagged with the term that names the target
     call: genes_by_metabolite(metabolite_ids=["kegg.compound:C01356"], organism="Prochlorococcus MED4", evidence_sources=["go_transport"], go_include_ancestors=True)

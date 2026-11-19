@@ -14,7 +14,7 @@ docs://tools/resolve_gene; summary=True caps by_organism at 10 too (smaller than
 | Name | Type | Default | Description |
 |---|---|---|---|
 | identifier | string | — | Gene identifier (case-insensitive) — locus_tag (e.g. 'PMM0001'), gene name (e.g. 'dnaN'), old locus tag, or RefSeq protein ID. |
-| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
+| organism | string \| None | None | Organism, matched by name (exact first, then whole words, then partial) on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
 | limit | int | 5 | Max rows returned (paging). |
 | offset | int | 0 | Rows to skip (paging). |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
@@ -157,7 +157,7 @@ genes_by_function(search_text='PMM0001')  # wrong tool for ID lookup
 resolve_gene(identifier='PMM0001')  # exact identity resolution
 ```
 
-- The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works, as does 'Prochlorococcus MED4'. A genus word alone ('Prochlorococcus') matches every strain of that genus — here that just widens the result set (this tool never raises on ambiguity; the single-organism expression tools do).
+- The organism filter is matched by name on preferred_name + name_synonyms, case-insensitive (exact first, then whole words, then partial) — 'MED4' works, as does 'Prochlorococcus MED4'. A genus word alone ('Prochlorococcus') matches every strain of that genus — here that just widens the result set (this tool never raises on ambiguity; the single-organism expression tools do).
 
 - `by_organism` is capped at 10 entries on every call, `summary=True` included (`by_organism_truncated: true` when trimmed). On a name shared by many strains, pass `organism=` or page the rows to see the rest.
 

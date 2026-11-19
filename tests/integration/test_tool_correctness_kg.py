@@ -98,7 +98,7 @@ class TestResolveGeneCorrectnessKG:
 
     def test_dnan_filtered_by_organism(self, conn):
         """dnaN + organism=MED4 should return exactly 1 result from MED4."""
-        cypher, params = build_resolve_gene(identifier="dnaN", organism="MED4")
+        cypher, params = build_resolve_gene(identifier="dnaN", organism_names=["Prochlorococcus MED4"])
         results = conn.execute_query(cypher, **params)
         assert len(results) == 1
         assert "MED4" in results[0]["organism_name"]
@@ -146,7 +146,7 @@ class TestGenesByFunctionCorrectnessKG:
 
     def test_organism_filter(self, conn):
         """Organism filter should restrict full-text results."""
-        cypher, params = build_genes_by_function(search_text="DNA repair", organism="MED4")
+        cypher, params = build_genes_by_function(search_text="DNA repair", organism_names=["Prochlorococcus MED4"])
         results = conn.execute_query(cypher, **params)
         assert len(results) > 0
         for r in results:

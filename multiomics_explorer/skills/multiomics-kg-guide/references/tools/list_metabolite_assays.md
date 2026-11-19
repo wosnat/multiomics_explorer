@@ -14,7 +14,7 @@ docs://tools/list_metabolite_assays; summary=True first.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | search_text | string \| None | None | Full-text search over MetaboliteAssay name, field_description, treatment, experimental_context. E.g. 'chitosan', 'cellular concentration', 'KEGG export'. |
-| organism | string \| None | None | Organism: case-insensitive word match on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
+| organism | string \| None | None | Organism, matched by name (exact first, then whole words, then partial) on preferred_name / synonyms ('MED4'); a genus word matches every strain. See list_organisms. |
 | metric_types | list[string] \| None | None | Filter by metric_type tag(s). Values: this tool's `top_metric_types` (summary=True). |
 | value_kind | string ('numeric', 'boolean') \| None | None | 'numeric' → metabolites_by_quantifies_assay drill-down; 'boolean' → metabolites_by_flags_assay. |
 | compartment | string \| None | None | Keep rows in this compartment. Values: list_filter_values('compartment'). |

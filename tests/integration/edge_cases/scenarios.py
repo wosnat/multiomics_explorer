@@ -64,6 +64,20 @@ _2D4_UNKNOWN_ORG = "nope_2d4_organism"
 _KM_CLASS_NO_MED4_GENES = (
     "kegg.module:pathway_modules.energy_metabolism.nitrogen_metabolism")
 
+# Backlog 2.8 organism resolver exact-first
+# (docs/tool-specs/organism-resolver-exact-first.md). Two gene-bearing strain
+# names are substrings of others; an exact canonical name must now select
+# exactly one strain (no ambiguity raise, no pooling). Dev KG 2026-11-19:
+#   MATCH (o:OrganismTaxon) WHERE o.preferred_name IN [$PAC1, 'Prochlorococcus
+#     EQPAC1', $ALTDE, 'Alteromonas mediterranea AltDE1'] RETURN
+#     o.preferred_name, o.gene_count  -> 2317 / 1990 / 3817 / 4238
+#   'Escherichia coli' is an OrganismTaxon with gene_count 0 (gene-less).
+#   eggnog:46530@72275 has members in AltDE and AltDE1.
+_28_PAC1 = "Prochlorococcus PAC1"
+_28_ALTDE = "Alteromonas mediterranea AltDE"
+_28_GENELESS = "Escherichia coli"
+_28_ALT_GROUP = "eggnog:46530@72275"
+
 
 @dataclass
 class Scenario:
@@ -75,6 +89,10 @@ class Scenario:
 
 def genes_by_ontology_scenarios():
     return [
+        # 2.8: exact colliding strain name resolves (no ambiguity raise).
+        Scenario(
+            "colliding_name_exact_pac1",
+            dict(ontology="kegg", level=1, organism=_28_PAC1)),
         Scenario(
             "genome_only_organism",
             dict(ontology="cyanorak_role",
@@ -287,6 +305,15 @@ def gene_overview_scenarios():
 
 def differential_expression_by_gene_scenarios():
     return [
+        # 2.8: exact colliding strain name (no DE edges -> empty layer);
+        # a gene-less taxon raises the gene-less message.
+        Scenario(
+            "colliding_name_exact_pac1",
+            dict(organism=_28_PAC1)),
+        Scenario(
+            "geneless_taxon_organism",
+            dict(organism=_28_GENELESS),
+            expects_error=ToolError),
         Scenario(
             "genome_only_organism",
             dict(organism=fx.GENOME_ONLY_ORGANISM)),
@@ -327,6 +354,11 @@ _DECAY_ANALYSIS_GENE = "PMM2072"    # MED4 gene inside one of its clusters
 
 def list_organisms_scenarios():
     return [
+        # 2.8: exact colliding name selects one strain.
+        Scenario(
+            "colliding_name_exact_pac1",
+            dict(organism_names=[_28_PAC1]),
+            input_ids=[_28_PAC1]),
         Scenario(
             "unknown_organism_name",
             dict(organism_names=["Nonexistus fakeii"]),
@@ -640,6 +672,10 @@ def genes_by_function_scenarios():
     # Free-text Lucene search; no batch ID input. Degenerate axes: a query
     # term that matches nothing (empty-layer shape) and offset past end.
     return [
+        # 2.8: exact colliding strain name (PAC1 vs EQPAC1).
+        Scenario(
+            "colliding_name_exact_pac1",
+            dict(search_text="photosystem", organism=_28_PAC1)),
         Scenario(
             "no_hits_search",
             dict(search_text="zzzznonexistentfunctionzzz")),
@@ -806,6 +842,15 @@ def genes_by_homolog_group_scenarios():
     # not_found) — oracle batch-diagnostic auto-skips, input_ids omitted.
     # unknown group -> empty layer; mixed batch -> partial; offset past end.
     return [
+        # 2.8: exact colliding strain name in the organisms list, plus an
+        # entry that resolves to nothing (-> not_found_organisms).
+        Scenario(
+            "colliding_name_exact_altde",
+            dict(group_ids=[_28_ALT_GROUP], organisms=[_28_ALTDE])),
+        Scenario(
+            "colliding_name_exact_altde_plus_unknown",
+            dict(group_ids=[_28_ALT_GROUP],
+                 organisms=[_28_ALTDE, "nope_28_organism"])),
         Scenario(
             "unknown_group",
             dict(group_ids=[fx.UNKNOWN_HOMOLOG_GROUP])),
@@ -892,6 +937,10 @@ def list_experiments_scenarios():
     # genome-only organism has 0 experiments -> empty layer. summary path also
     # builds breakdowns from an empty set; probe it too.
     return [
+        # 2.8: exact colliding strain name (PAC1 vs EQPAC1).
+        Scenario(
+            "colliding_name_exact_pac1",
+            dict(organism=_28_PAC1)),
         Scenario(
             "genome_only_organism",
             dict(organism=fx.GENOME_ONLY_ORGANISM)),
@@ -968,6 +1017,10 @@ def list_derived_metrics_scenarios():
     # layer). The DM-rich rollups (by_value_kind, by_metric_type, by_compartment)
     # must build empty on the filtered-empty set.
     return [
+        # 2.8: exact colliding strain name (PAC1 vs EQPAC1).
+        Scenario(
+            "colliding_name_exact_pac1",
+            dict(organism=_28_PAC1)),
         Scenario(
             "genome_only_organism",
             dict(organism=fx.GENOME_ONLY_ORGANISM)),
@@ -1277,6 +1330,10 @@ def genes_by_metabolite_scenarios():
     # + empty-shape are the real checks. Urea on the genome-only (no-DE) strain
     # exercises the drill-down path on a strain that still has chemistry.
     return [
+        # 2.8: exact colliding strain name resolves (no ambiguity raise).
+        Scenario(
+            "colliding_name_exact_altde",
+            dict(metabolite_ids=[_UREA_ID], organism=_28_ALTDE)),
         Scenario(
             "unknown_metabolite",
             dict(metabolite_ids=[fx.UNKNOWN_METABOLITE_ID],
@@ -1845,6 +1902,10 @@ def kegg_module_completeness_scenarios():
     # not_matched_modules / not_found_organisms are named lists (not a flat
     # not_found), so input_ids stays empty.
     return [
+        # 2.8: exact colliding strain name resolves (no ambiguity raise).
+        Scenario(
+            "colliding_name_exact_altde",
+            dict(organism=_28_ALTDE)),
         Scenario(
             "unknown_module_id",
             dict(organism=fx.CONTROL_ORGANISM,

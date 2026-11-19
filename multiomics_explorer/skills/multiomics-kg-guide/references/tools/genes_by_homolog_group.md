@@ -14,7 +14,7 @@ docs://tools/genes_by_homolog_group; summary=True first.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | group_ids | list[string] | — | Ortholog group IDs (from search_homolog_groups or gene_homologs). E.g. ['cyanorak:CK_00000570']. Bare ids are accepted (e.g. 'CK_00000570', 'COG0592@2') and coerced to canonical (see `resolved_aliases`). |
-| organisms | list[string] \| None | None | Organisms, each word-matched as `organism`. Omit for all. |
+| organisms | list[string] \| None | None | Organisms, each entry matched by name (exact first, then whole words, then partial); a genus word matches every strain. Omit for all. |
 | summary | bool | False | True = envelope breakdowns only, no rows — the cheap first call. |
 | verbose | bool | False | True adds the fields listed under verbose_fields on this tool's full page, docs://tools/{tool}/full. |
 | limit | int | 5 | Max rows returned (paging). |

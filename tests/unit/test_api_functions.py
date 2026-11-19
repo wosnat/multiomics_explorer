@@ -283,10 +283,12 @@ class TestResolveGene:
             api.resolve_gene("  ", conn=mock_conn)
 
     def test_organism_filter_passed(self, mock_conn):
-        mock_conn.execute_query.return_value = []
+        # 2.8: organism text resolves first; the builder gets exact names.
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"MED4": ["Prochlorococcus MED4"]}, default=[])
         api.resolve_gene("dnaN", organism="MED4", conn=mock_conn)
         _, kwargs = mock_conn.execute_query.call_args
-        assert kwargs["organism"] == "MED4"
+        assert kwargs["organism_names"] == ["Prochlorococcus MED4"]
 
     def test_limit_slices_results(self, mock_conn):
         mock_conn.execute_query.return_value = [
@@ -466,10 +468,12 @@ class TestGenesByFunction:
         read as 'no transporters in this organism')."""
         monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
         monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
-        mock_conn.execute_query.side_effect = [
-            self._summary_result(total_search_hits=9374, total_matching=0),
-            [],
-        ]
+        # 2.8: the organism resolves first (resolver-aware mock).
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"HOT1A3": ["Alteromonas macleodii HOT1A3"]}, default=_org28_seq([
+                self._summary_result(total_search_hits=9374, total_matching=0),
+                [],
+            ]))
         result = api.genes_by_function(
             "ABC transporter permease", organism="HOT1A3",
             gene_categories=["Transport"], conn=mock_conn)
@@ -532,18 +536,18 @@ class TestGenesByFunction:
         """Verify organism, gene_categories, min_quality forwarded to builder."""
         monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
         monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
-        mock_conn.execute_query.side_effect = [
-            self._summary_result(),
-            self._detail_rows(),
-        ]
+        # 2.8: organism resolves first; the builder gets exact names.
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"MED4": ["Prochlorococcus MED4"]},
+            default=_org28_seq([self._summary_result(), self._detail_rows()]))
         api.genes_by_function(
             "test", organism="MED4", gene_categories=["Photosynthesis"],
             min_quality=2, conn=mock_conn,
         )
-        # Summary query (1st call) should have filter params
-        summary_call = mock_conn.execute_query.call_args_list[0]
+        # Summary query (1st non-resolver call) should have filter params
+        summary_call = _non_org_resolve_calls(mock_conn)[0]
         params = summary_call[1]
-        assert params.get("organism") == "MED4"
+        assert params.get("organism_names") == ["Prochlorococcus MED4"]
         assert params.get("gene_categories") == ["Photosynthesis"]
         assert params.get("min_quality") == 2
 
@@ -2433,21 +2437,24 @@ class TestListPublications:
         """All filter params are forwarded to builders."""
         monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
         monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
-        mock_conn.execute_query.side_effect = [
-            [{"total_entries": 21, "total_matching": 5}],
-            [{"doi": "10.1234/test"}],
-        ]
+        # 2.8: organism resolves first (+ gene-less taxa for publications).
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"MED4": ["Prochlorococcus MED4"]}, default=_org28_seq([
+                [{"total_entries": 21, "total_matching": 5}],
+                [{"doi": "10.1234/test"}],
+            ]))
         api.list_publications(
             organism="MED4", treatment_type="coculture",
             search_text="nitrogen", author="Sher",
             verbose=True, limit=10, conn=mock_conn,
         )
+        calls = _non_org_resolve_calls(mock_conn)
         # Verify summary query was called with filter params
-        summary_call = mock_conn.execute_query.call_args_list[0]
+        summary_call = calls[0]
         assert "$search_text" in summary_call[0][0]
-        assert "organism" in summary_call[1]  # kwargs contain param keys
+        assert summary_call[1]["organism_names"] == ["Prochlorococcus MED4"]
         # Verify data query was called with verbose (no LIMIT — slicing done in Python)
-        data_call = mock_conn.execute_query.call_args_list[1]
+        data_call = calls[1]
         assert "abstract" in data_call[0][0]  # verbose columns in Cypher
 
     def test_creates_conn_when_none(self):
@@ -2799,11 +2806,13 @@ class TestListExperiments:
         """All filter params forwarded to builders."""
         monkeypatch.setattr(api, "_closed_vocab_warnings", lambda *a, **k: [])
         monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
-        mock_conn.execute_query.side_effect = [
-            self._summary_result(total_matching=5),
-            self._summary_result(),
-            [self._detail_row()],
-        ]
+        # 2.8: organism resolves first; the builder gets exact names.
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"MED4": ["Prochlorococcus MED4"]}, default=_org28_seq([
+                self._summary_result(total_matching=5),
+                self._summary_result(),
+                [self._detail_row()],
+            ]))
         api.list_experiments(
             organism="MED4", treatment_type=["coculture"],
             omics_type=["RNASEQ"], publication_dois=["10.1234/test"],
@@ -2811,12 +2820,13 @@ class TestListExperiments:
             table_scope=["gene_level"],
             verbose=True, limit=10, conn=mock_conn,
         )
+        calls = _non_org_resolve_calls(mock_conn)
         # Summary query has filter params
-        summary_call = mock_conn.execute_query.call_args_list[0]
-        assert "organism" in summary_call[1]
+        summary_call = calls[0]
+        assert summary_call[1]["organism_names"] == ["Prochlorococcus MED4"]
         assert "treatment_types" in summary_call[1]
         # Detail query has verbose + limit
-        detail_call = mock_conn.execute_query.call_args_list[2]
+        detail_call = calls[2]
         assert "e.name AS experiment_name" in detail_call[0][0]
         assert "LIMIT $limit" in detail_call[0][0]
 
@@ -4061,18 +4071,21 @@ class TestGenesByHomologGroup:
             api.genes_by_homolog_group([], conn=mock_conn)
 
     def test_passes_params(self, mock_conn):
-        mock_conn.execute_query.side_effect = [
-            [{"total_matching": 0, "total_genes": 0, "total_categories": 0,
-              "by_organism": [], "by_category_raw": [], "by_group_raw": [],
-              "not_found_groups": [], "not_matched_groups": []}],
-            [{"not_found_organisms": [], "not_matched_organisms": []}],
-            [],  # by_clade (backlog 2d.2)
-        ]
+        # 2.8: organisms entries resolve first; builders get exact names.
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"MED4": ["Prochlorococcus MED4"]}, default=_org28_seq([
+                [{"total_matching": 0, "total_genes": 0,
+                  "total_categories": 0, "by_organism": [],
+                  "by_category_raw": [], "by_group_raw": [],
+                  "not_found_groups": [], "not_matched_groups": []}],
+                [{"not_found_organisms": [], "not_matched_organisms": []}],
+                [],  # by_clade (backlog 2d.2)
+            ]))
         api.genes_by_homolog_group(
             ["cyanorak:CK_1"], organisms=["MED4"], summary=True, conn=mock_conn)
-        first_call = mock_conn.execute_query.call_args_list[0]
+        first_call = _non_org_resolve_calls(mock_conn)[0]
         cypher = first_call[0][0]
-        assert "$organisms" in cypher
+        assert "$organism_names" in cypher
 
     def test_by_organism_tie_break_is_deterministic(self, mock_conn):
         """Equal-count organisms sort by count DESC then organism_name ASC.
@@ -4260,13 +4273,15 @@ class TestGenesByHomologGroupByClade:
         assert result["by_clade"] == []
 
     def test_by_clade_query_receives_group_ids_and_organisms(self, mock_conn):
-        mock_conn.execute_query.side_effect = self._dispatch()
+        # 2.8: organisms entries resolve first; by_clade gets exact names.
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"MED4": ["Prochlorococcus MED4"]}, default=self._dispatch())
         api.genes_by_homolog_group(
             ["cyanorak:CK_00002025"], organisms=["MED4"], summary=True,
             conn=mock_conn)
         (call,) = self._by_clade_calls(mock_conn)
         assert call.kwargs["group_ids"] == ["cyanorak:CK_00002025"]
-        assert call.kwargs["organisms"] == ["MED4"]
+        assert call.kwargs["organism_names"] == ["Prochlorococcus MED4"]
 
     def test_by_clade_query_uses_coerced_group_ids(self, mock_conn):
         """Bare group IDs are coerced before the by_clade query, too."""
@@ -4275,7 +4290,7 @@ class TestGenesByHomologGroupByClade:
             ["CK_00002025"], summary=True, conn=mock_conn)
         (call,) = self._by_clade_calls(mock_conn)
         assert call.kwargs["group_ids"] == ["cyanorak:CK_00002025"]
-        assert call.kwargs["organisms"] is None
+        assert call.kwargs["organism_names"] is None
 
 
 class TestDifferentialExpressionByGeneCompactProduct:
@@ -5326,10 +5341,11 @@ class TestGenesInCluster:
             "analysis_exists": True,
             "ca_organism_name": "Prochlorococcus MED4",
         }
-        mock_conn.execute_query.side_effect = [
-            [summary_zero_same_org],
-            [],  # detail query: no gene rows
-        ]
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"MED4": ["Prochlorococcus MED4"]}, default=_org28_seq([
+                [summary_zero_same_org],
+                [],  # detail query: no gene rows
+            ]))
         result = api.genes_in_cluster(
             analysis_id="ca:test", organism="MED4", conn=mock_conn)
         assert result["not_found_analysis"] is None
@@ -5351,10 +5367,11 @@ class TestGenesInCluster:
             "analysis_exists": True,
             "ca_organism_name": "Prochlorococcus MED4",
         }
-        mock_conn.execute_query.side_effect = [
-            [summary_zero_diff_org],
-            [],  # detail query: no gene rows
-        ]
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"MIT9515": ["Prochlorococcus MIT9515"]}, default=_org28_seq([
+                [summary_zero_diff_org],
+                [],  # detail query: no gene rows
+            ]))
         result = api.genes_in_cluster(
             analysis_id="ca:test", organism="MIT9515", conn=mock_conn)
         assert result["not_found_analysis"] is None
@@ -5377,10 +5394,11 @@ class TestGenesInCluster:
             "analysis_exists": True,
             "ca_organism_name": None,
         }
-        mock_conn.execute_query.side_effect = [
-            [summary_zero_no_org],
-            [],
-        ]
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"MED4": ["Prochlorococcus MED4"]}, default=_org28_seq([
+                [summary_zero_no_org],
+                [],
+            ]))
         result = api.genes_in_cluster(
             analysis_id="ca:test", organism="MED4", conn=mock_conn)
         assert result["not_matched_organism"] is None
@@ -5619,6 +5637,17 @@ class TestGeneDerivedMetrics:
 # ---------------------------------------------------------------------------
 
 
+
+def _dm_org_names28(organism, conn, **kw):
+    """Backlog 2.8: DM drill-downs resolve `organism` to canonical names
+    before filtering diagnostics — stub without a resolver round-trip."""
+    if organism is None:
+        return None
+    return {"prochlorococcus med4": ["Prochlorococcus MED4"],
+            "med4": ["Prochlorococcus MED4"],
+            "alteromonas": ["Alteromonas macleodii EZ55"]}.get(
+                organism.lower(), [])
+
 class TestGenesByNumericMetric:
     """Unit tests for api.genes_by_numeric_metric with mocked GraphConnection."""
 
@@ -5830,6 +5859,7 @@ class TestGenesByNumericMetric:
     def test_not_matched_organism_set_when_no_match(
             self, diag_rankable, summary_row, monkeypatch):
         monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_resolve_organism_filter", _dm_org_names28)
         mock_conn = MagicMock()
         mock_conn.execute_query.side_effect = [diag_rankable, summary_row, []]
         data = api.genes_by_numeric_metric(
@@ -5842,6 +5872,7 @@ class TestGenesByNumericMetric:
     def test_not_matched_organism_none_when_match(
             self, diag_rankable, summary_row, monkeypatch):
         monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_resolve_organism_filter", _dm_org_names28)
         mock_conn = MagicMock()
         mock_conn.execute_query.side_effect = [diag_rankable, summary_row, []]
         data = api.genes_by_numeric_metric(
@@ -5854,6 +5885,7 @@ class TestGenesByNumericMetric:
     def test_not_matched_organism_warning_lists_dm_organisms(
             self, diag_rankable, summary_row, monkeypatch):
         monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_resolve_organism_filter", _dm_org_names28)
         mock_conn = MagicMock()
         mock_conn.execute_query.side_effect = [diag_rankable, summary_row, []]
         data = api.genes_by_numeric_metric(
@@ -5868,6 +5900,7 @@ class TestGenesByNumericMetric:
         # (llm-review 2b.3 bug fix) organism passed + metric_type doesn't
         # exist at all (any organism) → not_matched_organism stays None.
         monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_resolve_organism_filter", _dm_org_names28)
         mock_conn = MagicMock()
         mock_conn.execute_query.side_effect = [[]]  # diagnostics empty
         data = api.genes_by_numeric_metric(
@@ -6348,6 +6381,7 @@ class TestGenesByBooleanMetric:
         # exist at all (any organism) → not_matched_organism stays None
         # (it's a not_found, not an organism mismatch).
         monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_resolve_organism_filter", _dm_org_names28)
         mock_conn = MagicMock()
         mock_conn.execute_query.side_effect = [[]]  # diagnostics empty
         data = api.genes_by_boolean_metric(
@@ -6364,6 +6398,7 @@ class TestGenesByBooleanMetric:
         # match — not_matched_organism set, warning lists the DM's
         # organism(s), short-circuits before summary/detail.
         monkeypatch.setattr(api, "_organism_zero_match_warning", lambda *a, **k: [])
+        monkeypatch.setattr(api, "_resolve_organism_filter", _dm_org_names28)
         mock_conn = MagicMock()
         mock_conn.execute_query.side_effect = [diag_boolean]
         data = api.genes_by_boolean_metric(
@@ -6891,8 +6926,8 @@ class TestOntologyLandscape:
         conn = MagicMock()
 
         def run(cypher, **params):
-            if "RETURN collect(DISTINCT o.preferred_name)" in cypher:
-                return [{"organisms": ["Prochlorococcus MED4"]}]
+            if _is_org_resolve(cypher, params):  # 2.8 tiered resolver
+                return _org_resolve_rows(["Prochlorococcus MED4"])
             if "count(g) AS total_genes" in cypher:
                 return [{"total_genes": gene_count}]
             # Match one of the 9 ontology landscape queries
@@ -6911,8 +6946,8 @@ class TestOntologyLandscape:
         conn = MagicMock()
 
         def run(cypher, **params):
-            if "RETURN collect(DISTINCT o.preferred_name)" in cypher:
-                return [{"organisms": ["Prochlorococcus MED4"]}]
+            if _is_org_resolve(cypher, params):  # 2.8 tiered resolver
+                return _org_resolve_rows(["Prochlorococcus MED4"])
             if "count(g) AS total_genes" in cypher:
                 return [{"total_genes": gene_count}]
             if "OPTIONAL MATCH (e:Experiment {id: eid})" in cypher:
@@ -7188,8 +7223,8 @@ class TestApiAcceptsTcdbCazy:
         conn = MagicMock()
 
         def run(cypher, **params):
-            if "RETURN collect(DISTINCT o.preferred_name)" in cypher:
-                return [{"organisms": ["Prochlorococcus MED4"]}]
+            if _is_org_resolve(cypher, params):  # 2.8 tiered resolver
+                return _org_resolve_rows(["Prochlorococcus MED4"])
             if "count(g) AS total_genes" in cypher:
                 return [{"total_genes": 1976}]
             for ont, rows in per_ont_rows.items():
@@ -8182,6 +8217,8 @@ class TestClusterEnrichmentInputs:
                 self.calls = 0
 
             def execute_query(self, cypher, **params):
+                if _is_org_resolve(cypher, params):  # 2.8 organism resolver
+                    return _org_resolve_rows(["Prochlorococcus MED4"])
                 self.calls += 1
                 if self.calls == 1:
                     # Real build_genes_in_cluster_summary shape
@@ -8686,8 +8723,11 @@ class TestListDerivedMetrics:
     def _mock_conn(self, summary_row, detail_rows):
         from unittest.mock import MagicMock
         conn = MagicMock()
-        # Two calls: summary first, detail second
-        conn.execute_query.side_effect = [[summary_row], detail_rows]
+        # Two calls: summary first, detail second (2.8: the organism
+        # resolver round-trip is answered separately).
+        conn.execute_query.side_effect = _org_resolver_aware(
+            {"MED4": ["Prochlorococcus MED4"]},
+            default=_org28_seq([[summary_row], detail_rows]))
         return conn
 
     def test_summary_and_detail_envelope(self, monkeypatch):
@@ -11487,8 +11527,8 @@ class TestOntologyLandscapeF1Surface:
         conn = MagicMock()
 
         def run(cypher, **params):
-            if "RETURN collect(DISTINCT o.preferred_name)" in cypher:
-                return [{"organisms": ["Prochlorococcus MED4"]}]
+            if _is_org_resolve(cypher, params):  # 2.8 tiered resolver
+                return _org_resolve_rows(["Prochlorococcus MED4"])
             if "count(g) AS total_genes" in cypher:
                 return [{"total_genes": gene_count}]
             from multiomics_explorer.kg.queries_lib import ONTOLOGY_CONFIG
@@ -17255,13 +17295,13 @@ class TestListOrganismsAnnotationCapability:
                 return [summary_row]
             if "collect(toLower(o.preferred_name)) AS found" in cypher:
                 return [{"found": [r["organism_name"].lower() for r in rows]}]
-            if "collect(DISTINCT o.preferred_name) AS organisms" in cypher:
-                # shared resolver: word match on the wired rows
+            if _is_org_resolve(cypher, params):
+                # shared resolver (2.8 tiered): word match on the wired rows
                 words = params["organism"].lower().split()
-                return [{"organisms": [
+                return _org_resolve_rows([
                     r["organism_name"] for r in rows
                     if all(w in r["organism_name"].lower() for w in words)
-                ]}]
+                ])
             names_lc = params.get("organism_names_lc")
             if names_lc:
                 return [r for r in rows if r["organism_name"].lower() in names_lc]
@@ -19723,7 +19763,7 @@ class TestMetabolitesByGeneNoFormula:
         assert builder.call_count == 1
         k = builder.call_args.kwargs
         assert k["locus_tags"] == self._LOCUS
-        assert k["organism"] == self._ORG
+        assert k["organism_names"] == [self._ORG]
         assert k["metabolite_pathway_ids"] == ["kegg.pathway:ko00910"]
         assert "substrate_depth" not in k
         assert tuple(k["arms"]) == ("transport",)
@@ -21034,7 +21074,7 @@ class TestStereoRelativesInOrganism:
                    arms=self._BOTH)
         (cypher, params), = kg.gbm_summary_calls()
         assert sorted(params["metabolite_ids"]) == sorted([_LCYS, _DCYS])
-        assert params["organism"] == _MSH_ORG
+        assert params["organism_names"] == [_MSH_ORG]
         assert params.get("ec_numbers") == ["2.5.1.47"]
         assert not params.get("exclude_metabolite_ids")
         assert "Gene_catalyzes_reaction" in cypher
@@ -23227,7 +23267,7 @@ class TestGenesByMetaboliteTcdbCleanup:
             ec_numbers=["3.6.1.1"], mass_balance="balanced")
         kw = rec["hint"][0]
         assert kw["metabolite_ids"] == self._METS
-        assert kw["organism"] == _TCDB_MED4
+        assert kw["organism_names"] == [_TCDB_MED4]
         assert kw["exclude_metabolite_ids"] == [_UREA_ID]
         assert kw["gene_categories"] == ["Transport"]
         assert kw["metabolite_pathway_ids"] == ["kegg.pathway:ko02010"]
@@ -23251,7 +23291,7 @@ class TestGenesByMetaboliteTcdbCleanup:
             walk_rows=[_tcdb_family_row("PMM0673", identity=55.0)])
         (kw,) = rec["tcdb_family"]
         assert kw["metabolite_ids"] == self._METS
-        assert kw["organism"] == _TCDB_MED4
+        assert kw["organism_names"] == [_TCDB_MED4]
         assert kw["gene_categories"] == ["Transport"]
         assert kw["exclude_metabolite_ids"] == [_UREA_ID]
         assert "ec_numbers" not in kw and "substrate_depth" not in kw
@@ -23514,7 +23554,7 @@ class TestMetabolitesByGeneTcdbCleanup:
             walk_rows=[_tcdb_family_row("PMM0673")])
         for kw in (rec["hint"][0], rec["tcdb_family"][0]):
             assert kw["locus_tags"] == self._LOCI
-            assert kw["organism"] == _TCDB_MED4
+            assert kw["organism_names"] == [_TCDB_MED4]
             assert kw["metabolite_elements"] == ["P"]
             assert kw["exclude_metabolite_ids"] == [_UREA_ID]
             assert kw["gene_categories"] == ["Transport"]
@@ -27123,3 +27163,430 @@ class TestListFilterValuesKeggModuleTypes:
             api.list_filter_values(filter_type="nope", conn=mock_conn)
         assert "kegg_module_status" in str(exc.value)
         assert "module_type" in str(exc.value)
+
+
+# ---------------------------------------------------------------------------
+# Backlog 2.8 — organism resolver exact-first; api resolves organism text
+# once and hands builders exact canonical names
+# (docs/tool-specs/organism-resolver-exact-first.md §2, §3, §4)
+# ---------------------------------------------------------------------------
+
+_PAC1 = "Prochlorococcus PAC1"
+_ALTDE = "Alteromonas mediterranea AltDE"
+_EZ55 = "Alteromonas macleodii EZ55"
+
+
+def _is_org_resolve(cypher, params):
+    """The organism resolver round-trip (`build_resolve_organism_for_organism`
+    — the only OrganismTaxon query whose sole param is `organism`)."""
+    return "OrganismTaxon" in cypher and set(params) == {"organism"}
+
+
+def _org_resolve_rows(organisms, geneless=()):
+    organisms = list(organisms)
+    return [{"organisms": organisms,
+             "match_tier": 1 if organisms else None,
+             "geneless_matches": list(geneless)}]
+
+
+def _org_resolver_aware(mapping, default=None, geneless=None):
+    """`side_effect`: organism-resolver queries answer from `mapping`
+    (input text → gene-bearing names) and `geneless` (input → gene-less
+    names); every other query → `default` (a callable is delegated to,
+    anything else is returned as-is; None → [])."""
+    geneless = geneless or {}
+
+    def _exec(cypher, *args, **params):
+        if _is_org_resolve(cypher, params):
+            org = params["organism"]
+            return _org_resolve_rows(mapping.get(org, []),
+                                     geneless.get(org, []))
+        if callable(default):
+            return default(cypher, *args, **params)
+        return [] if default is None else default
+
+    return _exec
+
+
+def _org28_seq(responses):
+    """Sequential responder for the non-resolver queries (MagicMock
+    side_effect-list semantics)."""
+    queue = list(responses)
+
+    def _next(cypher, *args, **params):
+        if not queue:
+            raise StopIteration
+        return queue.pop(0)
+
+    return _next
+
+
+def _non_org_resolve_calls(conn):
+    """`conn.execute_query.call_args_list` minus organism-resolver calls."""
+    return [c for c in conn.execute_query.call_args_list
+            if not _is_org_resolve(c.args[0] if c.args else "", c.kwargs)]
+
+
+class _Stop28(Exception):
+    """Raised by a captured builder once it has recorded its kwargs."""
+
+
+def _capture28(monkeypatch, builder_name):
+    """Replace `api.<builder_name>` with a recorder that raises _Stop28."""
+    calls = []
+
+    def _fake(*args, **kwargs):
+        calls.append(kwargs)
+        raise _Stop28
+
+    monkeypatch.setattr(api, builder_name, _fake)
+    return calls
+
+
+class TestValidateOrganismInputsGeneless28:
+    """§2: gene-less taxa get their own error; other paths unchanged."""
+
+    def test_geneless_taxon_message(self, mock_conn):
+        mock_conn.execute_query.return_value = _org_resolve_rows(
+            [], geneless=["Escherichia coli"])
+        with pytest.raises(ValueError) as exc:
+            api._validate_organism_inputs(
+                "Escherichia coli", None, None, mock_conn)
+        msg = str(exc.value)
+        assert "'Escherichia coli'" in msg
+        assert "taxon without genes" in msg
+        assert "list_organisms" in msg
+        assert "no organism matching" not in msg
+
+    def test_no_match_message_unchanged(self, mock_conn):
+        mock_conn.execute_query.return_value = _org_resolve_rows([])
+        with pytest.raises(ValueError, match="no organism matching 'Bogus'"):
+            api._validate_organism_inputs("Bogus", None, None, mock_conn)
+
+    def test_no_match_legacy_row_shape(self, mock_conn):
+        """A resolver row without geneless_matches still reads as no match."""
+        mock_conn.execute_query.return_value = [{"organisms": []}]
+        with pytest.raises(ValueError, match="no organism matching"):
+            api._validate_organism_inputs("Bogus", None, None, mock_conn)
+
+    def test_multiple_message_unchanged(self, mock_conn):
+        mock_conn.execute_query.return_value = _org_resolve_rows(
+            [_EZ55, _ALTDE], geneless=["Alteromonas"])
+        with pytest.raises(ValueError, match="matches multiple organisms"):
+            api._validate_organism_inputs(
+                "Alteromonas", None, None, mock_conn)
+
+    def test_exact_strain_resolves(self, mock_conn):
+        mock_conn.execute_query.return_value = _org_resolve_rows([_ALTDE])
+        assert api._validate_organism_inputs(
+            _ALTDE, None, None, mock_conn) == _ALTDE
+
+    def test_single_organism_tool_surfaces_geneless_message(self, mock_conn):
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {}, geneless={"Escherichia coli": ["Escherichia coli"]})
+        with pytest.raises(ValueError, match="taxon without genes"):
+            api.differential_expression_by_gene(
+                organism="Escherichia coli", conn=mock_conn)
+
+
+class TestResolveOrganismFilter28:
+    """§3: `_resolve_organism_filter(organism, conn, *, include_geneless)`."""
+
+    def test_none_is_no_filter_and_no_query(self, mock_conn):
+        assert api._resolve_organism_filter(None, mock_conn) is None
+        mock_conn.execute_query.assert_not_called()
+
+    def test_str_returns_resolver_organisms(self, mock_conn):
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {_PAC1: [_PAC1]})
+        assert api._resolve_organism_filter(_PAC1, mock_conn) == [_PAC1]
+
+    def test_str_genus_pools_strains(self, mock_conn):
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"Alteromonas": [_EZ55, _ALTDE]},
+            geneless={"Alteromonas": ["Alteromonas"]})
+        assert api._resolve_organism_filter("Alteromonas", mock_conn) == [
+            _EZ55, _ALTDE]
+
+    def test_str_no_match_is_empty_list(self, mock_conn):
+        mock_conn.execute_query.side_effect = _org_resolver_aware({})
+        assert api._resolve_organism_filter("Bogus", mock_conn) == []
+
+    def test_geneless_excluded_by_default(self, mock_conn):
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {}, geneless={"Phage": ["Phage"]})
+        assert api._resolve_organism_filter("Phage", mock_conn) == []
+
+    def test_include_geneless_appends(self, mock_conn):
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"Alteromonas": [_EZ55, _ALTDE]},
+            geneless={"Alteromonas": ["Alteromonas"]})
+        assert api._resolve_organism_filter(
+            "Alteromonas", mock_conn, include_geneless=True) == [
+            _EZ55, _ALTDE, "Alteromonas"]
+
+    def test_include_geneless_only_geneless(self, mock_conn):
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {}, geneless={"Phage": ["Phage"]})
+        assert api._resolve_organism_filter(
+            "Phage", mock_conn, include_geneless=True) == ["Phage"]
+
+    def test_list_union_first_seen_dedup(self, mock_conn):
+        mock_conn.execute_query.side_effect = _org_resolver_aware({
+            "AltDE": [_ALTDE],
+            "Alteromonas": [_EZ55, _ALTDE],
+            "PAC1": [_PAC1],
+        })
+        assert api._resolve_organism_filter(
+            ["AltDE", "Alteromonas", "PAC1"], mock_conn) == [
+            _ALTDE, _EZ55, _PAC1]
+
+    def test_list_skips_unresolved_entries(self, mock_conn):
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"AltDE": [_ALTDE]})
+        assert api._resolve_organism_filter(
+            ["Bogus", "AltDE"], mock_conn) == [_ALTDE]
+
+    def test_empty_list_is_empty(self, mock_conn):
+        assert api._resolve_organism_filter([], mock_conn) == []
+
+    def test_keyword_only_include_geneless(self, mock_conn):
+        with pytest.raises(TypeError):
+            api._resolve_organism_filter("x", mock_conn, True)  # type: ignore[misc]
+
+
+# (api function, kwargs, first organism-filtered builder, resolver mapping,
+#  expected organism_names)
+_API28_CASES = [
+    ("resolve_gene", {"identifier": "dnaN", "organism": "PAC1"},
+     "build_resolve_gene", {"PAC1": [_PAC1]}, [_PAC1]),
+    ("genes_by_function",
+     {"search_text": "photosystem", "organism": _PAC1},
+     "build_genes_by_function_summary", {_PAC1: [_PAC1]}, [_PAC1]),
+    ("genes_by_function",
+     {"search_text": "photosystem", "organism": "Alteromonas"},
+     "build_genes_by_function_summary",
+     {"Alteromonas": [_EZ55, _ALTDE]}, [_EZ55, _ALTDE]),
+    ("list_experiments", {"organism": _ALTDE},
+     "build_list_experiments_summary", {_ALTDE: [_ALTDE]}, [_ALTDE]),
+    ("list_derived_metrics", {"organism": _PAC1},
+     "build_list_derived_metrics_summary", {_PAC1: [_PAC1]}, [_PAC1]),
+    ("differential_expression_by_gene", {"organism": _PAC1},
+     "build_differential_expression_by_gene_summary_global",
+     {_PAC1: [_PAC1]}, [_PAC1]),
+    ("genes_by_metabolite",
+     {"metabolite_ids": ["kegg.compound:C00086"], "organism": _ALTDE},
+     "build_genes_by_metabolite_summary", {_ALTDE: [_ALTDE]}, [_ALTDE]),
+    ("metabolites_by_gene", {"locus_tags": ["P1"], "organism": _ALTDE},
+     "build_metabolites_by_gene_summary", {_ALTDE: [_ALTDE]}, [_ALTDE]),
+    ("list_metabolite_assays", {"organism": _PAC1},
+     "build_list_metabolite_assays_summary", {_PAC1: [_PAC1]}, [_PAC1]),
+    ("metabolites_by_quantifies_assay",
+     {"assay_ids": ["a1"], "organism": _PAC1},
+     "build_metabolites_by_quantifies_assay_diagnostics",
+     {_PAC1: [_PAC1]}, [_PAC1]),
+    ("metabolites_by_flags_assay", {"assay_ids": ["a1"], "organism": _PAC1},
+     "build_metabolites_by_flags_assay_summary", {_PAC1: [_PAC1]}, [_PAC1]),
+    ("assays_by_metabolite",
+     {"metabolite_ids": ["kegg.compound:C00086"], "organism": _PAC1},
+     "build_assays_by_metabolite_summary", {_PAC1: [_PAC1]}, [_PAC1]),
+    ("list_clustering_analyses", {"organism": _PAC1},
+     "build_list_clustering_analyses_summary", {_PAC1: [_PAC1]}, [_PAC1]),
+    ("genes_in_cluster", {"cluster_ids": ["c1"], "organism": _PAC1},
+     "build_genes_in_cluster_summary", {_PAC1: [_PAC1]}, [_PAC1]),
+    ("genes_by_homolog_group",
+     {"group_ids": ["cyanorak:CK_1"], "organisms": ["AltDE", "Alteromonas"]},
+     "build_genes_by_homolog_group_summary",
+     {"AltDE": [_ALTDE], "Alteromonas": [_EZ55, _ALTDE]}, [_ALTDE, _EZ55]),
+]
+_API28_IDS = [f"{c[0]}:{c[1].get('organism', c[1].get('organisms'))}"
+              for c in _API28_CASES]
+
+
+class TestApiPassesResolvedOrganismNames28:
+    """§3/§4: the organism text goes through the resolver; the builder gets
+    exact canonical names (`organism_names=[...]`), never the raw text."""
+
+    @pytest.mark.parametrize("fn,kwargs,builder,mapping,expected",
+                             _API28_CASES, ids=_API28_IDS)
+    def test_builder_receives_resolved_names(
+            self, monkeypatch, mock_conn, fn, kwargs, builder, mapping,
+            expected):
+        mock_conn.execute_query.side_effect = _org_resolver_aware(mapping)
+        calls = _capture28(monkeypatch, builder)
+        with pytest.raises(_Stop28):
+            getattr(api, fn)(**kwargs, conn=mock_conn)
+        assert calls[0]["organism_names"] == expected
+        assert "organism" not in calls[0]
+        assert "organisms" not in calls[0]
+        assert any(_is_org_resolve(c.args[0], c.kwargs)
+                   for c in mock_conn.execute_query.call_args_list)
+
+    @pytest.mark.parametrize("fn,kwargs,builder", [
+        ("genes_by_function", {"search_text": "photosystem"},
+         "build_genes_by_function_summary"),
+        ("list_experiments", {}, "build_list_experiments_summary"),
+        ("list_derived_metrics", {}, "build_list_derived_metrics_summary"),
+        ("list_metabolite_assays", {}, "build_list_metabolite_assays_summary"),
+        ("list_publications", {}, "build_list_publications_summary"),
+        ("genes_by_homolog_group", {"group_ids": ["cyanorak:CK_1"]},
+         "build_genes_by_homolog_group_summary"),
+    ])
+    def test_no_organism_no_filter(self, monkeypatch, mock_conn, fn, kwargs,
+                                   builder):
+        mock_conn.execute_query.side_effect = _org_resolver_aware({})
+        calls = _capture28(monkeypatch, builder)
+        with pytest.raises(_Stop28):
+            getattr(api, fn)(**kwargs, conn=mock_conn)
+        assert calls[0].get("organism_names") is None
+        assert "organism" not in calls[0]
+        assert "organisms" not in calls[0]
+        assert not any(_is_org_resolve(c.args[0], c.kwargs)
+                       for c in mock_conn.execute_query.call_args_list)
+
+    def test_unresolved_text_filters_to_nothing(self, monkeypatch, mock_conn):
+        """Discovery tools: no match → organism_names=[] (0 rows, as today),
+        never None (which would drop the filter)."""
+        mock_conn.execute_query.side_effect = _org_resolver_aware({})
+        calls = _capture28(monkeypatch, "build_list_experiments_summary")
+        with pytest.raises(_Stop28):
+            api.list_experiments(organism="Bogus", conn=mock_conn)
+        assert calls[0]["organism_names"] == []
+
+    def test_list_publications_includes_geneless(self, monkeypatch,
+                                                 mock_conn):
+        """`p.organisms` lists gene-less taxa too — 'Phage' keeps its papers."""
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {}, geneless={"Phage": ["Phage"]})
+        calls = _capture28(monkeypatch, "build_list_publications_summary")
+        with pytest.raises(_Stop28):
+            api.list_publications(organism="Phage", conn=mock_conn)
+        assert calls[0]["organism_names"] == ["Phage"]
+
+    def test_list_publications_names_then_geneless(self, monkeypatch,
+                                                   mock_conn):
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"Alteromonas": [_EZ55, _ALTDE]},
+            geneless={"Alteromonas": ["Alteromonas"]})
+        calls = _capture28(monkeypatch, "build_list_publications_summary")
+        with pytest.raises(_Stop28):
+            api.list_publications(organism="Alteromonas", conn=mock_conn)
+        assert calls[0]["organism_names"] == [_EZ55, _ALTDE, "Alteromonas"]
+
+    def test_discovery_does_not_raise_on_multi_strain(self, monkeypatch,
+                                                      mock_conn):
+        """Decision 3: discovery tools pool a genus, they never raise."""
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            {"Alteromonas": [_EZ55, _ALTDE]})
+        calls = _capture28(monkeypatch, "build_list_derived_metrics_summary")
+        with pytest.raises(_Stop28):
+            api.list_derived_metrics(organism="Alteromonas", conn=mock_conn)
+        assert calls[0]["organism_names"] == [_EZ55, _ALTDE]
+
+
+class TestListOrganismInputsDiagnostics28:
+    """List-param tools: per-entry resolution feeds the diagnostics builder
+    as `organism_inputs=[{"input": entry, "names": [...]}, ...]` (input
+    order kept); entries resolving to nothing land in not_found_organisms."""
+
+    _MAP = {"AltDE": [_ALTDE], "Alteromonas": [_EZ55, _ALTDE]}
+
+    def test_homolog_group_diagnostics_get_per_input_names(
+            self, monkeypatch, mock_conn):
+        def _rest(cypher, *a, **p):
+            if "by_group_raw" in cypher:
+                return [{
+                    "total_matching": 0, "total_genes": 0,
+                    "total_categories": 0, "by_organism": [],
+                    "by_category_raw": [], "by_group_raw": [],
+                    "not_found_groups": [], "not_matched_groups": []}]
+            return []
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            self._MAP, default=_rest)
+        calls = _capture28(monkeypatch,
+                           "build_genes_by_homolog_group_diagnostics")
+        with pytest.raises(_Stop28):
+            api.genes_by_homolog_group(
+                ["cyanorak:CK_1"], organisms=["AltDE", "Bogus", "Alteromonas"],
+                summary=True, conn=mock_conn)
+        assert calls[0]["organism_inputs"] == [
+            {"input": "AltDE", "names": [_ALTDE]},
+            {"input": "Bogus", "names": []},
+            {"input": "Alteromonas", "names": [_EZ55, _ALTDE]},
+        ]
+        assert "organisms" not in calls[0]
+
+    def test_homolog_group_unresolved_entry_not_found(self, mock_conn):
+        """End-to-end through the mocked diagnostics row: the entry that
+        resolved to nothing is reported as given."""
+        def _rest(cypher, *a, **p):
+            if "not_found_organisms" in cypher:
+                return [{"not_found_organisms": ["Bogus"],
+                         "not_matched_organisms": []}]
+            if "by_group_raw" in cypher:
+                return [{
+                    "total_matching": 0, "total_genes": 0,
+                    "total_categories": 0, "by_organism": [],
+                    "by_category_raw": [], "by_group_raw": [],
+                    "not_found_groups": [], "not_matched_groups": []}]
+            return []
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            self._MAP, default=_rest)
+        out = api.genes_by_homolog_group(
+            ["cyanorak:CK_1"], organisms=["AltDE", "Bogus"], summary=True,
+            conn=mock_conn)
+        assert out["not_found_organisms"] == ["Bogus"]
+        summary_call = next(
+            c for c in mock_conn.execute_query.call_args_list
+            if "by_group_raw" in c.args[0])
+        assert summary_call.kwargs["organism_names"] == [_ALTDE]
+
+    def test_de_by_ortholog_builders_get_resolved_names(
+            self, monkeypatch, mock_conn):
+        def _rest(cypher, *a, **p):
+            if set(p) == {"group_ids"} and "not_found" in cypher:
+                return [{"not_found": []}]
+            return []
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            self._MAP, default=_rest)
+        calls = _capture28(
+            monkeypatch,
+            "build_differential_expression_by_ortholog_summary_global")
+        with pytest.raises(_Stop28):
+            api.differential_expression_by_ortholog(
+                ["cyanorak:CK_1"], organisms=["AltDE", "Alteromonas"],
+                conn=mock_conn)
+        assert calls[0]["organism_names"] == [_ALTDE, _EZ55]
+        assert "organisms" not in calls[0]
+
+    def test_de_by_ortholog_diagnostics_get_per_input_names(
+            self, monkeypatch, mock_conn):
+        """Drive past the summary builders with recorders that return
+        harmless queries, then capture the diagnostics call."""
+        recorded = {}
+
+        def _rest(cypher, *a, **p):
+            if set(p) == {"group_ids"} and "not_found" in cypher:
+                return [{"not_found": []}]
+            return []
+        mock_conn.execute_query.side_effect = _org_resolver_aware(
+            self._MAP, default=_rest)
+
+        def _diag(**kwargs):
+            recorded.update(kwargs)
+            raise _Stop28
+        monkeypatch.setattr(
+            api, "build_differential_expression_by_ortholog_diagnostics",
+            _diag)
+        try:
+            api.differential_expression_by_ortholog(
+                ["cyanorak:CK_1"], organisms=["AltDE", "Bogus"],
+                conn=mock_conn)
+        except _Stop28:
+            pass
+        except Exception:  # noqa: BLE001 — empty mocks may trip later code
+            pass
+        assert recorded.get("organism_inputs") == [
+            {"input": "AltDE", "names": [_ALTDE]},
+            {"input": "Bogus", "names": []},
+        ]

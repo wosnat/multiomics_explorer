@@ -1187,7 +1187,7 @@ class GbmNotFound(BaseModel):
         "node (e.g. typo, wrong prefix, ChEBI ID not in our KG).")
     organism: str | None = Field(
         default=None,
-        description="Set to the input string when the organism word-match resolves "
+        description="Set to the input string when the organism name match resolves "
         "to zero organisms (typo, unsupported strain). None on success — "
         "including a valid organism with zero matching rows (see "
         "`not_matched` for that case).")
@@ -1602,7 +1602,7 @@ class MbgNotFound(BaseModel):
         "KG rebuild). E.g. ['PMM9999'].")
     organism: str | None = Field(
         default=None,
-        description="Set to the input string when the organism word-match "
+        description="Set to the input string when the organism name match "
         "resolves to zero organisms. None on success — including a valid "
         "organism where none of the input locus_tags resolve (see "
         "`locus_tags` above for that case).")
@@ -2249,12 +2249,11 @@ def register_tools(mcp: FastMCP):
         ctx: Context,
         organism_names: Annotated[list[str] | None, Field(
             description=(
-                "Filter by organism: case-insensitive word match on "
-                "preferred_name and name_synonyms, like every other tool's "
-                "organism param ('MED4', 'Prochlorococcus MED4'; the synonym "
-                "'Meiothermus taiwanensis' resolves to 'Meiothermus ruber'); a "
-                "genus word like 'Alteromonas' matches every strain. Unknown "
-                "names are reported in not_found rather than raising."
+                "Each entry matched by name (exact first, then whole words, "
+                "then partial) on preferred_name / synonyms ('MED4'; synonym "
+                "'Meiothermus taiwanensis' → 'Meiothermus ruber'); a genus "
+                "word like 'Alteromonas' matches every strain. Unknown names "
+                "go to not_found."
             ),
         )] = None,
         compartment: CompartmentParam = None,

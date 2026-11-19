@@ -128,5 +128,5 @@ mistakes:
     (`search_text='"3.A.1.4.4"'`): unquoted, the analyzer splits it into tokens.
   - "Use summary=True to get organism/category breakdowns without fetching gene rows."
   - "`min_quality` counts informative annotation sources, not product-name quality: min_quality=2 requires at least one informative source (a hypothetical protein with a Pfam / KO call still passes), 3 requires multi-source support. To drop hypotheticals, filter the returned rows on `product` yourself. See docs://guide/conventions [AQ]."
-  - "The organism filter is a word-based, case-insensitive match on preferred_name + name_synonyms — 'MED4' works. A genus word alone ('Prochlorococcus') matches every strain of that genus."
+  - "The organism filter is matched by name on preferred_name + name_synonyms, case-insensitive (exact first, then whole words, then partial) — 'MED4' works, and 'PAC1' returns PAC1 genes only (not EQPAC1). A genus word alone ('Prochlorococcus') matches every strain of that genus."
   - "`search_text` is Lucene: fuzzy `~`, wildcards `*`, quoted phrases and AND / OR are supported — see docs://guide/conventions for syntax and scoring."

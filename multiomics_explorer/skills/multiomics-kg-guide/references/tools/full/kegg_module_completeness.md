@@ -13,7 +13,7 @@ docs://tools/kegg_module_completeness. Routing: missing_kos to genes_by_function
 
 | Name | Type | Default | Description |
 |---|---|---|---|
-| organism | string \| list[string] \| None | None | One organism, a list (each entry word-matched and may expand to several strains), or omit for all organisms. A single string must resolve to ONE organism. See list_organisms. |
+| organism | string \| list[string] \| None | None | One organism, a list (each entry matched by name — exact first, then whole words, then partial — and may expand to several strains), or omit for all organisms. A single string must resolve to ONE organism. See list_organisms. |
 | module_ids | list[string] \| None | None | KEGG module IDs (e.g. 'kegg.module:M00531'; bare 'M00531' accepted). A class, subclass or type ID expands to every module under it. None = all modules. |
 | status | list[string ('complete', 'one_step_missing', 'two_steps_missing', 'partial')] \| None | None | Keep rows in these bands. Filters rows and band counts, never the no-edge counts. Values: list_filter_values with filter_type kegg_module_status. |
 | module_type | string ('pathway', 'signature') \| None | pathway | 'pathway' (default; routes) or 'signature' (marker sets such as drug resistance); None = both. |
@@ -563,7 +563,7 @@ kegg_module_completeness(module_ids=['M00627'], module_type='signature')  # or m
 
 - `status` filters rows, `by_status`, `by_class` and the `top_*` band counts, never the no-edge counts (`no_edge_count`, `no_edge`, `organisms_without_edge`).
 
-- `organism` follows `genes_by_ontology`: a string names exactly one strain (an ambiguous name raises), a list is word-matched and can expand to many strains (unmatched entries → `not_found_organisms`), `None` covers every organism with genes.
+- `organism` follows `genes_by_ontology`: a string names exactly one strain (an ambiguous name raises), a list entry is matched by name (exact first, then whole words, then partial) and can expand to many strains (unmatched entries → `not_found_organisms`), `None` covers every organism with genes.
 
 ## Package import equivalent
 

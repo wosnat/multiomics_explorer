@@ -86,8 +86,8 @@ and `vesicle` simultaneously — distinct rows. Filter via
 - **`OrganismTaxon`** — strain-level organism with full taxonomy
   hierarchy. `preferred_name` is the canonical identifier (e.g.
   `"Prochlorococcus MED4"`) and equals `Gene.organism_name`; every
-  organism parameter resolves by case-insensitive word match on it and
-  on `name_synonyms` (rules in `docs://guide/conventions` "Organism
+  organism parameter resolves by case-insensitive name match on it and
+  on `name_synonyms`, exact name first (rules in `docs://guide/conventions` "Organism
   naming"). Not every node has genes — genus-level, phage and
   treatment-only taxa exist for experiment metadata and never resolve
   as an `organism=` value.

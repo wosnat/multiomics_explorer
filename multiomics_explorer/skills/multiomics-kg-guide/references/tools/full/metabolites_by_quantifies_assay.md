@@ -14,7 +14,7 @@ docs://tools/metabolites_by_quantifies_assay; summary=True first.
 | Name | Type | Default | Description |
 |---|---|---|---|
 | assay_ids | list[string] | — | MetaboliteAssay IDs to drill into (full prefixed). Discover via `list_metabolite_assays(value_kind='numeric')`. E.g. ['metabolite_assay:pnas.2213271120:metabolites_intracellular_mit9313:cellular_concentration']. `not_found.assay_ids` lists IDs absent from the KG. |
-| organism | string \| None | None | Organism: case-insensitive substring match on the organism name ('MED4'); a genus word matches every strain. See list_organisms. |
+| organism | string \| None | None | Organism, matched by name (exact first, then whole words, then partial) ('MED4'); a genus word matches every strain. See list_organisms. |
 | metabolite_ids | list[string] \| None | None | Metabolite IDs in any form (KEGG, ChEBI, MNX, HMDB, InChIKey; bare or prefixed). Retired ids resolve (see resolved_aliases); removed compounds and chemical roles warn. docs://analysis/metabolite_ids. |
 | exclude_metabolite_ids | list[string] \| None | None | Drop these metabolites; any id form, bare or prefixed, retired ids resolve (see resolved_aliases); exclude wins on overlap. |
 | experiment_ids | list[string] \| None | None | Filter to assays from these experiments. |
@@ -432,7 +432,7 @@ IDs in any form (bare, prefixed, ChEBI / HMDB / MNX / InChIKey, retired) resolve
 
 - See `docs://analysis/metabolites` (evidence sources: metabolism, TCDB transport, GO transport, metabolomics) and `docs://guide/conventions` for tested-absent semantics (about 70% of numeric edges are not_detected, kept by default).
 
-- `organism` here matches by case-insensitive CONTAINS, not the word-based match the gene tools use; cross-organism is the default.
+- `organism` resolves like the gene tools' (by name, exact first; a genus word pools its strains); cross-organism is the default.
 
 - A `metabolite_ids` entry absent from the KG lands in `not_found.metabolite_ids`; one that exists but is unmeasured by the selected assays simply contributes zero rows.
 

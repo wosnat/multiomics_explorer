@@ -123,6 +123,9 @@ def _cypher_literal(value) -> str:
         return f"'{escaped}'"
     if isinstance(value, list):
         return "[" + ", ".join(_cypher_literal(v) for v in value) + "]"
+    if isinstance(value, dict):  # 2.8: organism_inputs = list of maps
+        return "{" + ", ".join(
+            f"{k}: {_cypher_literal(v)}" for k, v in value.items()) + "}"
     raise TypeError(f"Unsupported param type for CyVer substitution: {type(value)}")
 
 
@@ -308,7 +311,7 @@ _BUILDERS: list[tuple[str, ...]] = [
     ("list_metabolite_assays_search", build_list_metabolite_assays, {"search_text": "chitosan"}),
     ("list_metabolite_assays_verbose", build_list_metabolite_assays, {"verbose": True}),
     ("list_metabolite_assays_filtered", build_list_metabolite_assays,
-     {"organism": "MIT9301", "value_kind": "numeric", "rankable": True}),
+     {"organism_names": ["Prochlorococcus MIT9301"], "value_kind": "numeric", "rankable": True}),
     ("list_metabolite_assays_metabolite_ids", build_list_metabolite_assays,
      {"metabolite_ids": ["kegg.compound:C00074"]}),
     ("list_metabolite_assays_summary", build_list_metabolite_assays_summary, {}),
@@ -617,7 +620,7 @@ for _ont_key in ONTOLOGY_CONFIG:
 _DE_ORTHO_DIAG_CASES = [
     (
         "de_by_ortholog_diagnostics_organisms",
-        {"group_ids": _GROUPS, "organisms": ["Prochlorococcus"]},
+        {"group_ids": _GROUPS, "organism_inputs": [{"input": "Prochlorococcus", "names": ["Prochlorococcus MED4", "Prochlorococcus MIT9313"]}]},
     ),
     (
         "de_by_ortholog_diagnostics_experiments",
@@ -625,7 +628,7 @@ _DE_ORTHO_DIAG_CASES = [
     ),
     (
         "de_by_ortholog_diagnostics_both",
-        {"group_ids": _GROUPS, "organisms": ["Prochlorococcus"], "experiment_ids": _EIDS},
+        {"group_ids": _GROUPS, "organism_inputs": [{"input": "Prochlorococcus", "names": ["Prochlorococcus MED4", "Prochlorococcus MIT9313"]}], "experiment_ids": _EIDS},
     ),
 ]
 

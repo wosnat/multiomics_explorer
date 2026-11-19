@@ -171,3 +171,18 @@ keeps its meaning; only how an entry maps to organisms changes.
    strains); single-organism tools keep raising on ambiguity.
 4. Folded backlog housekeeping: KG ask E6 (PCC 7942 psbD / K02706 has no KO → no M00161
    edge) and item `best_module_type` in `ontology_landscape`; delete 2.8 on ship.
+
+## Build note (2026-11-19)
+
+The back-compat check missed one golden: `genes_by_function_synechococcus_filter`.
+`Synechococcus` now resolves at tier 2 to the 53 Synechococcus strains and no longer pulls in
+`Thermosynechococcus vestitus BP-1` (tier 3), −94 rows. A KG-wide sweep found only five words
+the whole-word tier narrows: `altde`, `pac1` (intended), `synechococcus`, `pcc` (drops
+`Cyanobium PCC6307` / `PCC7001`, written without a space), `sp.` (drops `subsp.`). All follow the
+frozen tier rule; golden regenerated, noted in the CHANGELOG.
+
+Code review added one site the §4 table missed: `genes_by_{numeric,boolean,categorical}_metric`
+filtered DM diagnostics with a Python word match (`_classify_dm_organism_mismatch`), so PAC1
+pulled EQPAC1's `sbp_nutrient_class` DM. Now resolved once via `_resolve_organism_filter` and
+filtered by exact name; live test added. Also: blank `organism` = no filter and no warning;
+`list_publications` documented as the one tool where gene-less taxa match.
